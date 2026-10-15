@@ -406,6 +406,36 @@ describe('MultiSelect', () => {
       expect(selectEl.checkValidity()).toBeTrue()
     })
 
+    it.each([
+      ['empties', [{ value: '1', text: 'Option 1', selected: true }], ['is-invalid', 'true']],
+      ['fills', [{ value: '1', text: 'Option 1' }], [null, null]]
+    ])('should show the state of the new selection at the change event when the user %s a reported required field', (_, options, expected) => {
+      fixtureEl.innerHTML = '<form><select multiple></select><div class="invalid-feedback">Pick one.</div></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options, required: true, validationState: 'invalid' })
+      const seen = []
+
+      selectEl.form.checkValidity()
+      selectEl.addEventListener('change.coreui.multi-select', () => {
+        seen.push([multiSelect._wrapperElement.classList.contains('is-invalid') ? 'is-invalid' : null, multiSelect._togglerElement.getAttribute('aria-invalid')])
+      })
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+
+      expect(seen).toEqual([expected])
+    })
+
+    it('should keep a state a change listener gives while setConfig replaces the value', () => {
+      fixtureEl.innerHTML = '<form><select multiple></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2', selected: true }] })
+
+      selectEl.addEventListener('change', () => multiSelect.setConfig({ validationState: 'invalid' }), { once: true })
+      multiSelect.setConfig({ value: ['1'] })
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBe(true)
+      expect(selectEl.validity.customError).toBe(true)
+    })
+
     it('should keep a given state through user actions that leave the selection as it is', () => {
       fixtureEl.innerHTML = '<form><select class="is-invalid" multiple></select></form>'
       const options = [{ value: '1', text: 'Option 1', selected: true }, { value: '2', text: 'Option 2', selected: true }]
@@ -4867,6 +4897,21 @@ describe('MultiSelect', () => {
 
       expect(() => multiSelect.setConfig({ multiple: 'yes' })).toThrowError(TypeError)
       expect(multiSelect._config.multiple).toBeFalse()
+    })
+
+    it('should keep the selection when it rejects a value given with a wrong option', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2', selected: true }]
+      })
+      const changes = []
+
+      selectEl.addEventListener('change', () => changes.push(selectEl.value))
+
+      expect(() => multiSelect.setConfig({ value: ['1'], multiple: 'yes' })).toThrowError(TypeError)
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['2'])
+      expect(changes).toEqual([])
     })
 
     it('should refresh multiple and required on the native select', () => {

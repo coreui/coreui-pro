@@ -460,13 +460,14 @@ class MultiSelect extends ComboboxBase {
   setConfig(config: Partial<MultiSelectConfig> | null): void {
     const keys = Object.keys(config ?? {})
 
+    this._config = this._getConfig({ ...this._config, ...config })
+
     if (keys.some(key => VALIDATION_OPTIONS.has(key))) {
       this._serverClasses = []
       this._stateSerial = nextStateSerial()
     }
 
     if (keys.length > 0 && keys.every(key => VALIDATION_OPTIONS.has(key))) {
-      this._config = this._getConfig({ ...this._config, ...config })
       this._updateValidity()
       return
     }
@@ -475,7 +476,6 @@ class MultiSelect extends ComboboxBase {
       this.deselectAll()
     }
 
-    this._config = this._getConfig({ ...this._config, ...config })
     this._selected = []
     this._options = this._getOptions()
     this._destroySelect()
@@ -1374,6 +1374,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._syncOptionElementState(value, true)
+    this._updateValidity()
 
     EventHandler.trigger(this._element, EVENT_CHANGE, {
       value: this._selected
@@ -1405,6 +1406,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._syncOptionElementState(value, false)
+    this._updateValidity()
 
     EventHandler.trigger(this._element, EVENT_CHANGE, {
       value: this._selected

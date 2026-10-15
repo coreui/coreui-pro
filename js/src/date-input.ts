@@ -351,21 +351,21 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     }
 
     const keys = Object.keys(config ?? {})
+    const stateOnly = keys.length === 1 && keys[0] === 'validationState'
+    const sections = this._sections
+
+    this._config = this._getConfig(stateOnly ? { ...this._config, ...config } : { ...this._config, date: getDateFromSections(sections), ...config })
 
     if (keys.includes('validationState')) {
       this._serverClasses = []
       this._stateSerial = nextStateSerial()
     }
 
-    if (keys.length === 1 && keys[0] === 'validationState') {
-      this._config = this._getConfig({ ...this._config, ...config })
+    if (stateOnly) {
       this._updateValidity()
       return
     }
 
-    const sections = this._sections
-
-    this._config = this._getConfig({ ...this._config, date: getDateFromSections(sections), ...config })
     this._applyConfig()
 
     if (config?.date === undefined && this._getLayoutKey(this._sections) === this._getLayoutKey(sections)) {

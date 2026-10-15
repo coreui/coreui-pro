@@ -260,9 +260,9 @@ class Combobox extends ComboboxBase {
       return
     }
 
+    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
     this._serverClasses = []
     this._stateSerial = nextStateSerial()
-    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
     this._updateValidity()
   }
 
