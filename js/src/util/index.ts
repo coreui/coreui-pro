@@ -432,13 +432,6 @@ const getNextActiveElement = <T>(list: T[], activeElement: T, shouldGetNext: boo
   return list[Math.max(0, Math.min(index, listLength - 1))]
 }
 
-type CountLabel = string | ((count: number, total: number) => string)
-
-const resolveCountLabel = (label: CountLabel, count: number, total: number): string =>
-  typeof label === 'function' ?
-    label(count, total) :
-    label.replace('{count}', String(count)).replace('{total}', String(total))
-
 export type HostClasses = { classNames: string[], hadAttribute: boolean }
 
 /**
@@ -474,7 +467,6 @@ const restoreHostClasses = (element: HTMLElement, managed: string[], host: HostC
 
 export {
   captureHostClasses,
-  type CountLabel,
   defineJQueryPlugin,
   execute,
   executeAfterTransition,
@@ -494,7 +486,6 @@ export {
   onDOMContentLoaded,
   parseSelector,
   reflow,
-  resolveCountLabel,
   restoreHostClasses,
   setAriaAttribute,
   triggerTransitionEnd,

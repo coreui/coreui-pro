@@ -14,10 +14,11 @@ import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
 } from './util/icons.js'
 import {
-  type CountLabel, defineJQueryPlugin, getUID, jQueryDispatch
+  defineJQueryPlugin, getUID, jQueryDispatch
 } from './util/index.js'
 import { getOptionValue } from './util/option-tree.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import type { CountLabel } from './util/selection-state.js'
 
 /**
  * Constants

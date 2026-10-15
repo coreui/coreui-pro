@@ -1,5 +1,6 @@
 import {
-  fillSelection, getAriaPressed, getSelectionLimit, getSelectionState, isSelectionLimitReached, toSelectionValues
+  fillSelection, getAriaPressed, getSelectionLimit, getSelectionState, isSelectionLimitReached, resolveCountLabel,
+  toSelectionValues
 } from '../../../src/util/selection-state.js'
 
 describe('Selection utilities', () => {
@@ -122,6 +123,20 @@ describe('Selection utilities', () => {
       expect(isSelectionLimitReached(5, null)).toBeFalse()
       expect(isSelectionLimitReached(5)).toBeFalse()
       expect(isSelectionLimitReached(5, Number.NaN)).toBeFalse()
+    })
+  })
+
+  describe('resolveCountLabel', () => {
+    it('should hand the count and the total to a function label', () => {
+      const label = (count, total) => `${count} of ${total}`
+
+      expect(resolveCountLabel(label, 2, 5)).toBe('2 of 5')
+    })
+
+    it('should replace every placeholder of a string label', () => {
+      expect(resolveCountLabel('{count}/{total} selected', 2, 5)).toBe('2/5 selected')
+      expect(resolveCountLabel('{count} chosen, {count} of {total}, {total} in all', 3, 4)).toBe('3 chosen, 3 of 4, 4 in all')
+      expect(resolveCountLabel('Some selected', 1, 2)).toBe('Some selected')
     })
   })
 })

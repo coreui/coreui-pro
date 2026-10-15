@@ -19,10 +19,9 @@ import { CARET_ICON } from './util/icons.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
-import { toSelectionValues } from './util/selection-state.js'
+import { type CountLabel, resolveCountLabel, toSelectionValues } from './util/selection-state.js'
 import {
-  captureHostClasses, type CountLabel, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, resolveCountLabel,
-  restoreHostClasses, writeAttribute
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
 } from './util/index.js'
 
 /**

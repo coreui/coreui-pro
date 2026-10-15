@@ -20,14 +20,14 @@ import {
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { flattenOptions, getSelectableOptions, isOptionGroup } from './util/option-tree.js'
 import {
-  fillSelection, getAriaPressed, getSelectionLimit, getSelectionState, isSelectionLimitReached, type SelectionState
+  type CountLabel, fillSelection, getAriaPressed, getSelectionLimit, getSelectionState, isSelectionLimitReached,
+  resolveCountLabel, type SelectionState
 } from './util/selection-state.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, resolveCountLabel, restoreHostClasses,
-  writeAttribute
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
 } from './util/index.js'
 
 /**
@@ -131,7 +131,7 @@ type MultiSelectConfig = {
   selectAll: boolean
   selectAllLabel: string
   selectAllMode: 'all' | 'filtered'
-  selectedLabel: string | ((count: number, total: number) => string)
+  selectedLabel: CountLabel
   selectFilteredLabel: string
   selectionLimit: number | null
   selectionType: 'chips' | 'counter' | 'tags' | 'text'
