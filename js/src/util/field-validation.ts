@@ -12,6 +12,17 @@ export type FieldValidationConfig = {
 }
 
 /**
+ * The component a part belongs to, as the part's controller sees it: the state the owner was
+ * given, whether the owner shows an error of its own on the part, and where the part reports that
+ * it dropped its state.
+ */
+export type FieldValidationOwner = {
+  dismiss: (serial: number) => void
+  invalid: boolean
+  state: ValidationState | undefined
+}
+
+/**
  * How a component tells `FieldValidation` about itself.
  *
  * - `aliases`: the component takes the `invalid` and `valid` aliases of `validationState`.
@@ -25,9 +36,15 @@ export type FieldValidationConfig = {
  * - `frames`: the elements that get the state class.
  * - `invalidTargets`: the elements that get `aria-invalid`.
  * - `owned`: the elements the form utilities leave to the component; `fields` by default.
- * - `pageDescribed`: the described targets that carry the description the page gave the host in
- *   every state, or the host itself, which then keeps the description where the page put it. By
- *   default the first described target, and every described target while the state is `'invalid'`.
+ * - `owner`: the component this one is a part of. Its state counts as given after the component's
+ *   own options and state classes, its error marks the focus targets invalid without the state
+ *   class, and it hears every drop of the state with the serial of the moment.
+ * - `ownError`: whether the component has an error of its own, such as a value outside its limits,
+ *   which it shows as `'invalid'` over the given and the reported state without blocking.
+ * - `pageDescribed`: the described targets that carry the description the page gave the host, given
+ *   whether the state is `'invalid'`, and the host itself when it keeps that description. A host
+ *   that keeps it lends the description it carries at the moment. By default the first described
+ *   target, and every described target while the state is `'invalid'`.
  * - `restore`: puts back the value the component had when it was built, on a native reset.
  * - `serverClassSources`: the elements whose state class in the markup counts as the given state;
  *   the host by default.
@@ -42,7 +59,9 @@ export type FieldValidationOptions = {
   frames: () => Element[]
   invalidTargets: () => Element[]
   owned?: () => Element[]
-  pageDescribed?: () => Element[]
+  owner?: () => FieldValidationOwner | null
+  ownError?: () => boolean
+  pageDescribed?: (isInvalid: boolean) => Element[]
   restore?: () => void
   serverClassSources?: () => Element[]
 }
@@ -169,34 +188,37 @@ class FieldValidation {
 
   /**
    * Drops the given state, in the component's configuration and as a state class from the markup,
-   * and lifts its block, unless the state was given after the moment the serial stands for. A
-   * component that knows a change is the user's calls it directly, before its change events.
+   * and lifts its block, unless the state was given after the moment the serial stands for, then
+   * tells the owner with the same serial. A component that knows a change is the user's calls it
+   * directly, before its change events.
    *
    * @param serial - The serial taken at the moment that drops the state, such as the start of a
    * key press or a native reset; any state given before it is dropped by default
-   * @returns `true` when it dropped a state, so the component has something to draw
+   * @returns `true` when it dropped a state of the component's own, so the component has something
+   * to draw
    */
   dismiss(serial: number = Number.POSITIVE_INFINITY): boolean {
     const config = this._options.config()
+    const isDropped = this._serial <= serial && this._givenState(config) !== undefined
 
-    if (this._serial > serial || this._givenState(config) === undefined) {
-      return false
+    if (isDropped) {
+      config.validationState = null
+
+      if (this._options.aliases) {
+        config.invalid = false
+        config.valid = false
+      }
+
+      this._serverClasses.clear()
+
+      for (const field of this._options.fields()) {
+        setStateValidity(field, false)
+      }
     }
 
-    config.validationState = null
+    this._options.owner?.()?.dismiss(serial)
 
-    if (this._options.aliases) {
-      config.invalid = false
-      config.valid = false
-    }
-
-    this._serverClasses.clear()
-
-    for (const field of this._options.fields()) {
-      setStateValidity(field, false)
-    }
-
-    return true
+    return isDropped
   }
 
   /**
@@ -247,7 +269,7 @@ class FieldValidation {
 
     this._userValidity = followers
 
-    if (!this._movedDescription && !fields.includes(this._host as ValueField) && !this._options.pageDescribed?.().includes(this._host)) {
+    if (!this._movedDescription && !fields.includes(this._host as ValueField) && !this._options.pageDescribed?.(false).includes(this._host)) {
       this._movedDescription = true
       writeAttribute(this._host, 'aria-describedby', null)
     }
@@ -265,14 +287,16 @@ class FieldValidation {
    * ids others put there, and only then the block of a given `'invalid'` on the fields that carry it
    * while the component can block, so the block takes the message the page and the stylesheet show
    * for them. The message in the description is the feedback of the first field that carries the
-   * block, else of the first focus target. The state is the given one, else `'invalid'` when a
-   * validation reported a field whose value is invalid, else what the stylesheet shows for the
-   * fields. Focus and described targets the component no longer lists lose what the controller wrote
-   * there.
+   * block, else of the first focus target. The given state is the component's own, else its
+   * owner's; the shown state comes from `_shownState()`. An error of the owner marks the focus
+   * targets invalid and describes them with the message, but leaves the state class to the owner
+   * unless the component shows `'invalid'` itself. Focus and described targets the component no
+   * longer lists lose what the controller wrote there.
    */
   update(): void {
     const config = this._options.config()
-    const givenState = this._givenState(config)
+    const owner = this._options.owner?.()
+    const givenState = this._givenState(config) ?? owner?.state
     const fields = this._options.fields()
     const blockers = this._options.blockers?.() ?? fields
     const blocked = givenState === 'invalid' && (this._options.canBlock?.() ?? !config.disabled) ? fields.filter(field => blockers.includes(field)) : []
@@ -283,20 +307,16 @@ class FieldValidation {
       }
     }
 
-    const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
-    const state = givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
-    const isInvalid = state === 'invalid'
+    const shownState = this._shownState(givenState)
+    const isInvalid = shownState === 'invalid' || Boolean(owner?.invalid)
+    const state = isInvalid && shownState !== 'invalid' ? undefined : shownState
 
     this._drawStateClass(state ? `is-${state}` : null)
 
     const invalidTargets = this._options.invalidTargets()
-    const source = (blockers[0] ?? invalidTargets[0]) as ValueField | undefined
-    const feedbackIds = isInvalid && source ? getFeedbackIds(source) : []
-    const describedTargets = this._options.describedTargets?.() ?? invalidTargets
-    const pageDescribed = this._options.pageDescribed?.() ?? describedTargets.filter((_, index) => index === 0 || isInvalid)
 
     this._markInvalid(invalidTargets, isInvalid)
-    this._describe(describedTargets.map(target => [target, [...(pageDescribed.includes(target) ? this._describedBy : []), ...feedbackIds]]))
+    this._describeTargets(invalidTargets, (blockers[0] ?? invalidTargets[0]) as ValueField | undefined, isInvalid)
 
     for (const field of blocked) {
       setStateValidity(field, true)
@@ -342,6 +362,24 @@ class FieldValidation {
 
       writeAttribute(this._host, 'aria-describedby', [...new Set([...this._describedBy, ...ids])].join(' ') || null)
     }
+  }
+
+  /**
+   * Reads the state the component shows: `'invalid'` for an error of its own, else the given state,
+   * else `'invalid'` when a validation reported a field whose value is invalid, else what the
+   * stylesheet shows for the fields.
+   *
+   * @param givenState - The state the component or its owner was given
+   * @returns The state to show, or `undefined` for none
+   */
+  _shownState(givenState: ValidationState | undefined): ValidationState | undefined {
+    if (this._options.ownError?.()) {
+      return 'invalid'
+    }
+
+    const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
+
+    return givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
   }
 
   /**
@@ -410,6 +448,26 @@ class FieldValidation {
 
       writeAttribute(target, 'aria-invalid', isInvalid ? 'true' : null)
     }
+  }
+
+  /**
+   * Gives the described targets the page's description where `pageDescribed` puts it and, while the
+   * state is `'invalid'`, the invalid feedback of the message source.
+   *
+   * @param invalidTargets - The focus targets, the described targets by default
+   * @param source - The field whose invalid feedback the targets get
+   * @param isInvalid - Whether the state is `'invalid'`
+   */
+  _describeTargets(invalidTargets: Element[], source: ValueField | undefined, isInvalid: boolean): void {
+    const feedbackIds = isInvalid && source ? getFeedbackIds(source) : []
+    const describedTargets = this._options.describedTargets?.() ?? invalidTargets
+    const pageDescribed = this._options.pageDescribed?.(isInvalid) ?? describedTargets.filter((_, index) => index === 0 || isInvalid)
+    const written = this._described.get(this._host) ?? []
+    const describedBy = !this._movedDescription && pageDescribed.includes(this._host) ?
+      splitIds(this._host.getAttribute('aria-describedby')).filter(id => !written.includes(id)) :
+      this._describedBy
+
+    this._describe(describedTargets.map(target => [target, [...(pageDescribed.includes(target) ? describedBy : []), ...feedbackIds]]))
   }
 
   /**

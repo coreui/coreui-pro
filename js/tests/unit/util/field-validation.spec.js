@@ -203,6 +203,98 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
+    it('should show an error of its own as invalid over a given state, without blocking', () => {
+      let hasError = true
+      const { field, form, host, state, targets, validation } = mount({ config: { validationState: 'valid' }, ownError: () => hasError })
+
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+      expect(form.checkValidity()).toBe(true)
+
+      hasError = false
+      state.config.validationState = null
+      field.required = true
+      form.checkValidity()
+      validation.update()
+
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+    })
+
+    it('should take the state of its owner after its own, mark the owner\'s error without the class, and tell the owner every drop', () => {
+      const owner = { dismiss: vi.fn(), invalid: false, state: 'invalid' }
+      const { field, host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"', owner: () => owner })
+
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(field.validity.customError).toBe(true)
+
+      state.config.validationState = 'valid'
+      validation.update()
+
+      expect(stateClasses(host)).toEqual(['is-valid'])
+
+      owner.invalid = true
+      validation.update()
+
+      expect(stateClasses(host)).toEqual([])
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+      expect(targets.map(describedBy)).toEqual(['hint feedback', 'hint feedback'])
+
+      expect(validation.dismiss()).toBe(true)
+
+      const serial = nextStateSerial()
+
+      owner.state = undefined
+      owner.invalid = false
+
+      expect(validation.dismiss(serial)).toBe(false)
+      expect(owner.dismiss.mock.calls).toEqual([[Number.POSITIVE_INFINITY], [serial]])
+    })
+
+    it('should keep its own invalid state class while its owner shows an error', () => {
+      const owner = { dismiss() {}, invalid: true, state: undefined }
+      const { host } = mount({ config: { validationState: 'invalid' }, owner: () => owner })
+
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+    })
+
+    it('should let a host that keeps the description lend the one it carries to the targets it names', () => {
+      const { host, state, targets, validation } = mount({
+        attributes: ' aria-describedby="hint"',
+        pageDescribed: isInvalid => [fixtureEl.querySelector('#host'), ...[...fixtureEl.querySelectorAll('#target, #second')].filter((_, index) => index === 0 || isInvalid)]
+      })
+
+      expect(describedBy(host)).toBe('hint')
+      expect(targets.map(describedBy)).toEqual(['hint', null])
+
+      host.setAttribute('aria-describedby', 'hint note')
+      state.config.validationState = 'invalid'
+      validation.update()
+
+      expect(targets.map(describedBy)).toEqual(['hint note feedback', 'hint note feedback'])
+
+      validation.dispose()
+
+      expect(describedBy(host)).toBe('hint note')
+    })
+
+    it('should lend a kept description without the ids it wrote on a host that is also described', () => {
+      const { host, state, validation } = mount({
+        attributes: ' aria-describedby="hint"',
+        describedTargets: () => [fixtureEl.querySelector('#host')],
+        pageDescribed: () => [fixtureEl.querySelector('#host')]
+      })
+
+      state.config.validationState = 'invalid'
+      validation.update()
+
+      expect(describedBy(host)).toBe('hint feedback')
+
+      state.config.validationState = 'valid'
+      validation.update()
+
+      expect(describedBy(host)).toBe('hint')
+    })
+
     it('should read the invalid and valid aliases only for a component that has them', () => {
       const without = mount({ config: { invalid: true } })
 
@@ -787,6 +879,19 @@ describe('FieldValidation', () => {
       await tick()
 
       expect(stateClasses(host)).toEqual([])
+    })
+
+    it('should tell the owner the serial of a reset', async () => {
+      const owner = { dismiss: vi.fn(), invalid: false, state: undefined }
+      const { form } = mount({ owner: () => owner })
+      const before = nextStateSerial()
+
+      form.reset()
+      await tick()
+
+      expect(owner.dismiss).toHaveBeenCalledTimes(1)
+      expect(owner.dismiss.mock.calls[0][0]).toBeGreaterThan(before)
+      expect(Number.isFinite(owner.dismiss.mock.calls[0][0])).toBe(true)
     })
 
     it('should keep a state given in a reset listener of the form', async () => {

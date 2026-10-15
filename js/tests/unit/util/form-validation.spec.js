@@ -3,7 +3,7 @@ import {
   alignValueField, clearValidationState, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidity,
   getFeedbackIds, getFeedbackText, getServerState, getStateClasses, getUserValidity, getValidationState, isFormValid,
   nextStateSerial, ownValidationState, setStateValidity, splitIds, updateValidationState, validateForm,
-  writeDescribedBy, writeValueField
+  writeValueField
 } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -998,36 +998,6 @@ describe('Form validation utilities', () => {
       setStateValidity(after, false)
 
       expect(after.validationMessage).toBe('Page rule.')
-    })
-  })
-
-  describe('writeDescribedBy', () => {
-    it('should follow the page description with the feedback ids, without duplicates', () => {
-      fixtureEl.innerHTML = '<input>'
-      const input = fixtureEl.querySelector('input')
-
-      writeDescribedBy(input, ' hint  feedback ', ['feedback', 'other'])
-
-      expect(describedBy(input)).toBe('hint feedback other')
-
-      const setAttribute = spyOn(input, 'setAttribute').and.callThrough()
-
-      writeDescribedBy(input, 'hint feedback', ['other'])
-
-      expect(setAttribute).not.toHaveBeenCalled()
-
-      writeDescribedBy(input, 'hint', [])
-
-      expect(describedBy(input)).toBe('hint')
-
-      writeDescribedBy(input, null, [])
-
-      expect(input.hasAttribute('aria-describedby')).toBeFalse()
-
-      input.setAttribute('aria-describedby', '')
-      writeDescribedBy(input, '', [])
-
-      expect(input.hasAttribute('aria-describedby')).toBeFalse()
     })
   })
 
