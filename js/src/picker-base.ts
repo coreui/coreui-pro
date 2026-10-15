@@ -10,10 +10,8 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
+import FieldValidation from './util/field-validation.js'
 import { createControlGroupAction, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
-import {
-  getServerState, getStateClasses, getValidationState, nextStateSerial, type ValidationState
-} from './util/form-validation.js'
 import { getUID } from './util/index.js'
 import Popup from './util/popup.js'
 import { sanitizeByConfig } from './util/sanitizer.js'
@@ -38,38 +36,30 @@ const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 abstract class PickerBase extends BaseComponent {
   protected declare _adoptedAttributes: [Element, string, string | null, string | null][]
-  protected declare _byUser: boolean
   protected declare _cleanerElement: HTMLElement | null
   protected declare _fieldElement: HTMLElement
   protected declare _footerTemplate: HTMLTemplateElement | null
-  protected declare _givenState: ValidationState | undefined
   protected declare _hostClasses: HostClasses
   protected declare _menu: HTMLElement
-  protected declare _ownsStateClass: boolean
   protected declare _popup: Popup
-  protected declare _serverClasses: string[]
-  protected declare _stateClass: string | null
-  protected declare _stateSerial: number
   protected declare _toggleElement: HTMLElement | null
+  protected declare _validation: FieldValidation
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._adoptedAttributes = []
-    this._byUser = false
     this._cleanerElement = null
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element) as HTMLTemplateElement | null
-    this._givenState = undefined
     this._menu = null as any
-    this._ownsStateClass = false
     this._popup = null as any
-    this._serverClasses = getStateClasses(this._element)
-    this._stateClass = null
-    this._stateSerial = nextStateSerial()
-
-    if (this._serverClasses.length > 0) {
-      this._element.classList.remove(...this._serverClasses)
-    }
+    this._validation = new FieldValidation(this._element, {
+      aliases: true,
+      config: () => this._config,
+      fields: () => [],
+      frames: () => this._stateFrames(),
+      invalidTargets: () => []
+    })
   }
 
   // Public
@@ -93,9 +83,7 @@ abstract class PickerBase extends BaseComponent {
     }
 
     this._config = this._getConfig({ ...this._config, ...validation })
-    this._serverClasses = []
-    this._stateSerial = nextStateSerial()
-    this._updateValidity()
+    this._validation.configure(validation)
   }
 
   override dispose(): void {
@@ -110,15 +98,7 @@ abstract class PickerBase extends BaseComponent {
     this._popup.dispose()
     this._disposeParts()
     this._restoreAdoptedAttributes()
-
-    if (this._stateClass && this._ownsStateClass) {
-      this._element.classList.remove(this._stateClass)
-    }
-
-    if (this._serverClasses.length > 0) {
-      this._element.classList.add(...this._serverClasses)
-    }
-
+    this._validation.dispose()
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
@@ -178,76 +158,14 @@ abstract class PickerBase extends BaseComponent {
         context[action]()
       }
     })
-
-    this._updateValidity()
   }
 
-  _updateValidity(): void {
-    this._givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
-      getServerState(this._serverClasses)
-    this._syncStateClass()
-    this._setFieldState(this._givenState)
-  }
-
-  _syncStateClass(): boolean {
-    const stateClass = this._shownStateClass()
-
-    if (stateClass === this._stateClass) {
-      return false
-    }
-
-    if (this._stateClass && this._ownsStateClass) {
-      this._element.classList.remove(this._stateClass)
-    }
-
-    this._ownsStateClass = stateClass !== null && !this._element.classList.contains(stateClass)
-
-    if (this._ownsStateClass) {
-      this._element.classList.add(stateClass!)
-    }
-
-    this._stateClass = stateClass
-
-    return true
-  }
-
-  _shownStateClass(): string | null {
-    return null
-  }
-
-  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
-    if (this._stateSerial > serial) {
-      return
-    }
-
-    this._config.invalid = false
-    this._config.valid = false
-    this._config.validationState = null
-    this._serverClasses = []
-    this._updateValidity()
+  _stateFrames(): Element[] {
+    return []
   }
 
   _runAsUser(action: () => void): void {
-    const previous = this._byUser
-    this._byUser = true
-
-    try {
-      action()
-    } finally {
-      this._byUser = previous
-    }
-  }
-
-  _withUser(part: any, action: () => void): void {
-    const byUser = this._byUser
-    this._byUser = false
-
-    if (byUser) {
-      part._runAsUser(action)
-      return
-    }
-
-    action()
+    this._validation.runAsUser(action)
   }
 
   _createAction(className: string, icon: string, label: string): HTMLElement {
@@ -412,8 +330,6 @@ abstract class PickerBase extends BaseComponent {
   abstract _managedClassNames(): string[]
 
   abstract _isNowSelectable(): boolean
-
-  abstract _setFieldState(givenState: ValidationState | undefined): void
 
   abstract getContext(): Record<string, any>
 

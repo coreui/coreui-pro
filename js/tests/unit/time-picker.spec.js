@@ -853,6 +853,13 @@ describe('TimePicker', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
     })
 
+    it('should draw a given state on the field and leave the picker element without a state class', () => {
+      buildPicker({ time: '10:30:00', validationState: 'invalid' })
+
+      expect(fixtureEl.querySelector('.form-date-time')).toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('#picker')).not.toHaveClass('is-invalid')
+    })
+
     it('should take no state from a class or an aria-invalid the page writes on the picker element', async () => {
       buildPicker({}, '<div id="picker" aria-invalid="true"></div>')
 

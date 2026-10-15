@@ -1316,6 +1316,13 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
     })
 
+    it('should draw a given state on the field and leave the picker element without a state class', () => {
+      buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US', validationState: 'invalid' })
+
+      expect(fixtureEl.querySelector('.form-date-time')).toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('#picker')).not.toHaveClass('is-invalid')
+    })
+
     it('should take no state from a class or an aria-invalid the page writes on the picker element', async () => {
       buildPicker({ locale: 'en-US' }, '<div id="picker" aria-invalid="true"></div>')
 
@@ -1366,8 +1373,8 @@ describe('DatePicker', () => {
         section.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
       }]
     ])('should drop the given state and the class the markup carried when the user %s', (_, act) => {
-      for (const markup of ['class="is-invalid"', 'data-coreui-validation-state="invalid"']) {
-        const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, `<form><div id="picker" ${markup}>${footer}</div></form>`)
+      for (const [markup, field] of [['class="is-invalid"', ''], ['data-coreui-validation-state="invalid"', ''], ['', '<div data-coreui-picker-field class="is-invalid"></div>']]) {
+        const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, `<form><div id="picker" ${markup}>${field}${footer}</div></form>`)
         const element = fixtureEl.querySelector('#picker')
 
         act(picker)
@@ -1378,6 +1385,7 @@ describe('DatePicker', () => {
         picker.dispose()
 
         expect(element.classList.contains('is-invalid')).toBeFalse()
+        expect(fixtureEl.querySelector('.is-invalid')).toBeNull()
       }
     })
 

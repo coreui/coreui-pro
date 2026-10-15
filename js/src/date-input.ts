@@ -39,7 +39,7 @@ import type {
   DateSection, EditableSection, SectionFormat, SectionInputType
 } from './util/date-sections.js'
 import { onLabelClick } from './util/field-label.js'
-import FieldValidation, { type FieldValidationOwner } from './util/field-validation.js'
+import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import { type ValidationState } from './util/form-validation.js'
@@ -232,7 +232,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   declare ['constructor']: typeof DateInput & typeof BaseComponent
   protected declare _date: Date | null
   protected declare _minDate: Date | null
-  protected declare _owner: FieldValidationOwner
   protected declare _maxDate: Date | null
   protected declare _sections: DateSection[]
   protected declare _draft: string
@@ -249,7 +248,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   protected declare _rejected: boolean
   protected declare _removeLabelClick: () => void
   protected declare _reportedDate: Date | null
-  protected declare _validation: FieldValidation
+  declare _validation: FieldValidation
   protected declare _validationError: string | null
   protected declare _valueKey: string
 
@@ -263,7 +262,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._errorHolds = 0
     this._inputElement = null
     this._isBuilt = false
-    this._owner = { dismiss() {}, invalid: false, state: undefined }
     this._rejected = false
     this._validationError = null
     this._hostAriaLabel = this._element.getAttribute('aria-label')
@@ -275,7 +273,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       fields: () => [this._inputElement!],
       frames: () => [this._element],
       invalidTargets: () => this._getSectionElements(),
-      owner: () => this._owner,
       ownError: () => this._rejected,
       pageDescribed: isInvalid => [this._element, ...this._getSectionElements().filter((_, index) => index === 0 || isInvalid)],
       restore: () => this.reset()
@@ -720,9 +717,9 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       this._inputElement!.value = value
     }
 
-    this._validation.update()
     this._date = isDisabled ? null : date
     this._validationError = error
+    this._validation.update()
 
     return isChanged && this._isBuilt ? value : null
   }
@@ -747,16 +744,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
   _runAsUser(action: () => void): void {
     this._validation.runAsUser(action)
-  }
-
-  _setOwnerDismiss(onDismiss: (serial: number) => void): void {
-    this._owner.dismiss = onDismiss
-  }
-
-  _setOwnerState(givenState: ValidationState | undefined, isInvalid = false): void {
-    this._owner.state = givenState
-    this._owner.invalid = isInvalid
-    this._validation.update()
   }
 
   _getValidationError(date: Date | null, isFilled: boolean): string | null {

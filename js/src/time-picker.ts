@@ -256,7 +256,7 @@ class TimePicker extends PickerBase {
       validationState: null
     }))
 
-    this._input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
+    this._validation.adopt(this._input._validation)
 
     EventHandler.on(inputEl, TimeInput.eventName(TimeInput.CHANGE_EVENT_NAME), (event: any) => {
       this._onFieldChange(event.date)
@@ -269,10 +269,6 @@ class TimePicker extends PickerBase {
 
   override _isNowSelectable(): boolean {
     return this._input.isDateSelectable(new Date())
-  }
-
-  override _setFieldState(givenState: ValidationState | undefined): void {
-    this._input._setOwnerState(givenState)
   }
 
   _ensureSelection(): void {
@@ -293,7 +289,7 @@ class TimePicker extends PickerBase {
     this._source = source
 
     try {
-      this._withUser(this._input, action)
+      action()
     } finally {
       this._source = previous
     }

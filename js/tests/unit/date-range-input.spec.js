@@ -749,6 +749,37 @@ describe('DateRangeInput', () => {
 
       expect(describedBy()).toEqual(Array.from({ length: 6 }, () => null))
     })
+
+    it('should mark only the sections of the end that has a limit error, and show the error on the frame', () => {
+      build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 30), maxDate: new Date(2026, 6, 25) })
+
+      expect(sectionsInvalid()).toEqual([null, null, null, 'true', 'true', 'true'])
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should show the order error to the change listeners of the field the user moves before the start', () => {
+      build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 14) })
+      const seen = []
+
+      hiddenInputs()[1].addEventListener('change', () => {
+        seen.push(sectionsInvalid())
+      })
+      typeIn(fields()[1], 'ArrowDown')
+
+      expect(seen).toEqual([Array.from({ length: 6 }, () => 'true')])
+    })
+
+    it('should draw the order error a setRange leaves behind when it runs inside a date change listener of another', () => {
+      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) })
+
+      root().addEventListener('startDateChange.coreui.date-range-input', () => {
+        range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 14))
+      }, { once: true })
+      range.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21))
+
+      expect(sectionsInvalid()).toEqual(Array.from({ length: 6 }, () => 'true'))
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+    })
   })
 
   describe('keyboard', () => {
