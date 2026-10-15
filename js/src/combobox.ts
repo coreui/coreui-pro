@@ -572,7 +572,7 @@ class Combobox extends ComboboxBase {
       resolveCountLabel(
         this._config.selectedLabel,
         values.length,
-        SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).length
+        new Set([...SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).map(option => this._valueOf(option as HTMLElement)), ...values]).size
       ) :
       this._optionLabel(values[0])
   }

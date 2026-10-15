@@ -390,6 +390,16 @@ describe('Combobox', () => {
 
       expect(value(toggle)).toEqual('2 of 3 selected')
     })
+
+    it('should count the selected values the items do not list in {total}', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true, selectedLabel: '{count} of {total} selected' })
+
+      combobox.setValue(['us', 'uk', 'ca'])
+      combobox.setItems([{ value: 'de', label: 'Germany' }])
+
+      expect(value(toggle)).toEqual('3 of 4 selected')
+    })
   })
 
   describe('selection', () => {
