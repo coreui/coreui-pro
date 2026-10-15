@@ -9,14 +9,13 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onLabelClick } from './util/field-label.js'
+import FieldValidation from './util/field-validation.js'
 import {
-  configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getServerState,
-  getStateClasses, getValidationState, nextStateSerial, ownValidationState, setStateValidity, swapStateClass,
-  writeDescribedBy, writeValueField, type UserValidity, type ValidationState
+  configureValueField, createValueField, dispatchValueChange, writeValueField, type ValidationState
 } from './util/form-validation.js'
 import {
   captureHostClasses, defineJQueryPlugin, getNextActiveElement, type HostClasses, isRTL, jQueryDispatch,
-  restoreHostClasses, writeAttribute
+  restoreHostClasses
 } from './util/index.js'
 
 /**
@@ -106,15 +105,10 @@ class OTPInput extends BaseComponent {
   protected declare _inputElement: HTMLInputElement | null
   protected declare _placeholders: Map<HTMLInputElement, string | null>
   protected declare _readOnlySlots: Set<HTMLInputElement>
-  protected declare _releaseValidationState: (() => void) | null
   protected declare _removeLabelClick: () => void
   protected declare _requiredSlots: Set<HTMLInputElement>
   protected declare _resetCode: string | null
-  protected declare _serverMarks: Map<Element, string[]>
-  protected declare _slotAria: Map<HTMLInputElement, { describedBy: string | null, invalid: string | null }>
-  protected declare _stateClass: string | null
-  protected declare _stateSerial: number
-  protected declare _userValidity: UserValidity | null
+  protected declare _validation: FieldValidation
 
   constructor(element?: string | Element | null, config?: Partial<OtpInputConfig> | null) {
     super(element, config)
@@ -125,23 +119,17 @@ class OTPInput extends BaseComponent {
     this._inputElement = null
     this._placeholders = new Map()
     this._readOnlySlots = new Set()
-    this._releaseValidationState = null
     this._requiredSlots = new Set()
     this._resetCode = null
-    this._serverMarks = new Map()
-    this._slotAria = new Map()
-    this._stateClass = null
-    this._stateSerial = nextStateSerial()
-    this._userValidity = null
-
-    for (const element of [this._element, ...this._getInputs()]) {
-      const names = getStateClasses(element)
-
-      if (names.length > 0) {
-        element.classList.remove(...names)
-        this._serverMarks.set(element, names)
-      }
-    }
+    this._validation = new FieldValidation(this._element, {
+      config: () => this._config,
+      fields: () => (this._inputElement ? [this._inputElement] : []),
+      frames: () => [this._element],
+      invalidTargets: () => this._getInputs(),
+      owned: () => [this._inputElement!, ...this._getInputs()],
+      restore: () => this._restoreValue(),
+      serverClassSources: () => [this._element, ...this._getInputs()]
+    })
 
     this._setRoleAttribute()
     this._setInputsAttributes()
@@ -183,23 +171,10 @@ class OTPInput extends BaseComponent {
     }
 
     this._removeLabelClick()
-    this._userValidity?.stop()
-    this._releaseValidationState?.()
+    this._validation.dispose()
     this._inputElement?.remove()
     this._inputElement = null
-
-    swapStateClass(this._element, this._stateClass)
-
-    for (const [element, names] of this._serverMarks) {
-      element.classList.add(...names)
-    }
-
     restoreHostClasses(this._element, [], this._hostClasses)
-
-    for (const [input, { describedBy, invalid }] of this._slotAria) {
-      writeAttribute(input, 'aria-describedby', describedBy)
-      writeAttribute(input, 'aria-invalid', invalid)
-    }
 
     for (const input of this._requiredSlots) {
       input.removeAttribute('aria-required')
@@ -235,14 +210,8 @@ class OTPInput extends BaseComponent {
     this._config = this._getConfig({ ...this._config, ...config })
     const repaint = this._config.value !== previousValue
 
-    if ('validationState' in config) {
-      this._serverMarks.clear()
-      this._stateSerial = nextStateSerial()
-
-      if (Object.keys(config).length === 1) {
-        this._updateValidity()
-        return
-      }
+    if (this._validation.configure(config)) {
+      return
     }
 
     this._setInputsAttributes()
@@ -463,7 +432,6 @@ class OTPInput extends BaseComponent {
 
     this._element.append(field)
     this._inputElement = field
-    this._userValidity = followUserValidity(field, () => this._updateValidity(), serial => this._restoreValue(serial))
     this._syncValueField()
   }
 
@@ -477,8 +445,6 @@ class OTPInput extends BaseComponent {
       required: this._config.required
     })
     field.pattern = `${this._config.type === 'number' ? '[0-9]' : '.'}{${this._getInputs().length}}`
-    this._releaseValidationState?.()
-    this._releaseValidationState = ownValidationState(field, ...this._getInputs())
 
     if (this._config.id) {
       field.id = this._config.id
@@ -486,7 +452,7 @@ class OTPInput extends BaseComponent {
       field.removeAttribute('id')
     }
 
-    this._updateValidity()
+    this._validation.refresh()
   }
 
   _extractValidChars(text: string): string {
@@ -522,10 +488,10 @@ class OTPInput extends BaseComponent {
       const isChanged = writeValueField(this._inputElement, value || '')
 
       if (isChanged && byUser) {
-        this._dismissValidationState()
+        this._validation.dismiss()
       }
 
-      this._updateValidity()
+      this._validation.update()
 
       if (isChanged) {
         dispatchValueChange(this._inputElement)
@@ -539,46 +505,8 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
-    if (this._stateSerial > serial) {
-      return
-    }
-
-    this._config.validationState = null
-    this._serverMarks.clear()
-  }
-
-  _updateValidity(): void {
-    const field = this._inputElement
-
-    if (!field) {
-      return
-    }
-
-    const givenState = getValidationState(this._config.validationState) ??
-      getServerState([...this._serverMarks.values()].flat())
-
-    setStateValidity(field, givenState === 'invalid')
-
-    const state = givenState ?? this._userValidity?.read()
-    const feedbackIds = state === 'invalid' ? getFeedbackIds(field) : []
-
-    this._stateClass = swapStateClass(this._element, this._stateClass, state)
-
-    for (const input of this._getInputs()) {
-      if (!this._slotAria.has(input)) {
-        this._slotAria.set(input, { describedBy: input.getAttribute('aria-describedby'), invalid: input.getAttribute('aria-invalid') })
-      }
-
-      writeDescribedBy(input, this._slotAria.get(input)!.describedBy, feedbackIds)
-      writeAttribute(input, 'aria-invalid', state === 'invalid' ? 'true' : null)
-    }
-  }
-
-  _restoreValue(serial: number): void {
+  _restoreValue(): void {
     const code = this._resetCode
-
-    this._dismissValidationState(serial)
 
     if (code !== null) {
       for (const [index, input] of this._getInputs().entries()) {

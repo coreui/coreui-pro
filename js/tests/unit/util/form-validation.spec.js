@@ -2,7 +2,7 @@ import { vi } from 'vitest'
 import {
   alignValueField, clearValidationState, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidity,
   getFeedbackIds, getFeedbackText, getServerState, getStateClasses, getUserValidity, getValidationState, isFormValid,
-  nextStateSerial, ownValidationState, setStateValidity, swapStateClass, updateValidationState, validateForm,
+  nextStateSerial, ownValidationState, setStateValidity, splitIds, swapStateClass, updateValidationState, validateForm,
   writeDescribedBy, writeValueField
 } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
@@ -616,6 +616,14 @@ describe('Form validation utilities', () => {
       expect(getUserValidity(fixtureEl.querySelector('#empty'))).toBe('invalid')
       expect(getUserValidity(fixtureEl.querySelector('#filled'))).toBe('valid')
       expect(getUserValidity(fixtureEl.querySelector('#plainEmpty'))).toBeUndefined()
+    })
+  })
+
+  describe('splitIds', () => {
+    it('should split an id reference list into its ids, without empty entries', () => {
+      expect(splitIds('  hint   feedback ')).toEqual(['hint', 'feedback'])
+      expect(splitIds('')).toEqual([])
+      expect(splitIds(null)).toEqual([])
     })
   })
 

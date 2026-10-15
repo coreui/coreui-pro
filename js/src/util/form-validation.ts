@@ -93,7 +93,7 @@ const isValidatable = (control: Element | null): control is FormControl =>
  * @param value - The attribute value
  * @returns The ids, without empty entries
  */
-const splitIds = (value: string | null | undefined): string[] => (value ?? '').split(/\s+/).filter(Boolean)
+export const splitIds = (value: string | null | undefined): string[] => (value ?? '').split(/\s+/).filter(Boolean)
 
 /**
  * Writes the ids of `aria-describedby`, removing the attribute when no id is left and leaving it

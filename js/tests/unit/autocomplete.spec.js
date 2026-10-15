@@ -542,6 +542,19 @@ describe('Autocomplete', () => {
       input.dispatchEvent(new Event('input', { bubbles: true }))
     }
 
+    it('should show a state dropped by a native reset as gone while the reset empties the search', async () => {
+      const { autocomplete, element, form, input } = mountInForm()
+      const seen = []
+
+      typeInto(input, 'Opt')
+      autocomplete.setConfig({ validationState: 'invalid' })
+      element.addEventListener('input.coreui.autocomplete', () => seen.push([element.classList.contains('is-invalid'), input.getAttribute('aria-invalid')]))
+      form.reset()
+      await settle()
+
+      expect(seen).toEqual([[false, null]])
+    })
+
     it('should show validationState on the frame and the field, and block the submit with the message while it is invalid', () => {
       const { autocomplete, element, form, input } = mountInForm({ validationState: 'invalid' })
       const { id } = fixtureEl.querySelector('.invalid-feedback')

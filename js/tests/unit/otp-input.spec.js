@@ -2087,6 +2087,60 @@ describe('OTPInput', () => {
       expect(slotStates(slots)).toEqual([[null, 'hint'], [null, null]])
     })
 
+    it('should give the description of the group to the first slot, and to every slot while invalid', () => {
+      const { otpInput, slots } = mountForm({}, '', '<input class="form-otp-control"><input class="form-otp-control">')
+      const host = otpInput._element
+
+      host.setAttribute('aria-describedby', 'hint')
+      otpInput.dispose()
+
+      const described = new OTPInput(host, { name: 'code' })
+      const feedback = host.nextElementSibling
+
+      expect(host.hasAttribute('aria-describedby')).toBe(false)
+      expect(slots.map(slot => slot.getAttribute('aria-describedby'))).toEqual(['hint', null])
+
+      described.setConfig({ validationState: 'invalid' })
+
+      expect(slots.map(slot => slot.getAttribute('aria-describedby'))).toEqual([`hint ${feedback.id}`, `hint ${feedback.id}`])
+
+      described.dispose()
+
+      expect(host.getAttribute('aria-describedby')).toBe('hint')
+    })
+
+    it('should give a slot added later its own aria-invalid back on dispose', () => {
+      const { otpInput, slots } = mountForm({ validationState: 'invalid' }, '', '<input class="form-otp-control">')
+      const added = document.createElement('input')
+
+      added.className = 'form-otp-control'
+      added.setAttribute('aria-invalid', 'false')
+      slots[0].after(added)
+      otpInput.setConfig({ placeholder: '-' })
+
+      expect(added.getAttribute('aria-invalid')).toBe('true')
+
+      otpInput.dispose()
+
+      expect(added.getAttribute('aria-invalid')).toBe('false')
+    })
+
+    it('should still answer a native reset when a capturing reset listener reconfigures it', async () => {
+      const { form, otpInput, slots } = mountForm({ validationState: 'invalid', value: '12' }, '', '<input class="form-otp-control"><input class="form-otp-control">')
+      const listener = () => otpInput.setConfig({ placeholder: '*' })
+
+      document.addEventListener('reset', listener, true)
+      otpInput.setConfig({ placeholder: '-' })
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      document.removeEventListener('reset', listener, true)
+
+      expect(otpInput._element.classList.contains('is-invalid')).toBe(false)
+      expect(slots.map(slot => slot.value)).toEqual(['1', '2'])
+    })
+
     it('should be found by the form plugin as the first invalid control', () => {
       const { form, slots } = mountForm({ required: true }, 'data-coreui-validate novalidate')
 

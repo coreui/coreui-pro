@@ -9,11 +9,9 @@ import ComboboxBase from './combobox-base.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import FieldValidation from './util/field-validation.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
-import {
-  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
-  ownValidationState, setStateValidity, swapStateClass, type UserValidity, type ValidationState
-} from './util/form-validation.js'
+import { nextStateSerial, type ValidationState } from './util/form-validation.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
@@ -22,7 +20,7 @@ import {
   filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, highlightMatches, isOptionGroup
 } from './util/option-tree.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
 } from './util/index.js'
 
 /**
@@ -69,8 +67,6 @@ const HOST_CLASS_NAMES = [CLASS_NAME_AUTOCOMPLETE, CLASS_NAME_DISABLED, CLASS_NA
 const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
 const SELECTOR_INDICATOR = '.form-control-action'
-
-const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 type AutocompleteConfig = {
   allowList: SanitizerAllowList
@@ -174,17 +170,13 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputElement: any
   protected declare _inputHintElement: any
   protected declare _hostClasses: HostClasses
-  protected declare _feedbackIds: string[]
   protected declare _keySerial: number | null
   protected declare _previousTabIndex: string | null
   protected declare _initialValue: any
   protected declare _reportSeed: boolean
   protected declare _seenOptionValues: Set<string>
-  protected declare _serverClasses: string[]
   protected declare _shownText: string
-  protected declare _stateClass: string | null
-  protected declare _stateSerial: number
-  protected declare _userValidity: UserValidity | null
+  protected declare _validation: FieldValidation
   protected declare _valueApplied: boolean
 
   constructor(element?: string | Element | null, config?: Partial<AutocompleteConfig> | null) {
@@ -196,13 +188,16 @@ class Autocomplete extends ComboboxBase {
     this._inputHintElement = null
     this._togglerElement = null
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
-    this._feedbackIds = []
     this._keySerial = null
-    this._serverClasses = getStateClasses(this._element)
-    this._element.classList.remove(...this._serverClasses)
     this._shownText = ''
-    this._stateClass = null
-    this._stateSerial = nextStateSerial()
+    this._validation = new FieldValidation(this._element, {
+      aliases: true,
+      config: () => this._config,
+      fields: () => [this._inputElement],
+      frames: () => [this._element],
+      invalidTargets: () => [this._inputElement],
+      restore: () => this._restoreInitialSelection()
+    })
     this._previousTabIndex = null
     this._optionsElement = null
 
@@ -218,9 +213,7 @@ class Autocomplete extends ComboboxBase {
     this._reportSeed = false
 
     this._createAutocomplete()
-    ownValidationState(this._inputElement)
-    this._userValidity = followUserValidity(this._inputElement, () => this._updateValidationState(), serial => this._restoreInitialSelection(serial))
-    this._updateValidationState()
+    this._validation.refresh()
     this._addEventListeners()
 
     Data.set(this._element, DATA_KEY, this)
@@ -266,9 +259,9 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
+    this._validation.dispose()
     this._disposeFloating()
     this._disposeListBox()
-    this._userValidity?.stop()
 
     for (const element of [
       this._menu,
@@ -284,8 +277,6 @@ class Autocomplete extends ComboboxBase {
       }
     }
 
-    swapStateClass(this._element, this._stateClass)
-    this._element.classList.add(...this._serverClasses)
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     if (this._previousTabIndex === null) {
@@ -302,7 +293,7 @@ class Autocomplete extends ComboboxBase {
     this.search('')
     this._filterOptionsList()
     this._setText('')
-    this._updateValidationState()
+    this._validation.update()
 
     this._triggerChangeEvent(null)
   }
@@ -319,17 +310,9 @@ class Autocomplete extends ComboboxBase {
   }
 
   setConfig(config: Partial<AutocompleteConfig> | null): void {
-    const keys = Object.keys(config ?? {})
-
     this._config = this._getConfig({ ...this._config, ...config })
 
-    if (keys.some(key => VALIDATION_OPTIONS.has(key))) {
-      this._serverClasses = []
-      this._stateSerial = nextStateSerial()
-    }
-
-    if (keys.length > 0 && keys.every(key => VALIDATION_OPTIONS.has(key))) {
-      this._updateValidationState()
+    if (this._validation.configure(config)) {
       return
     }
 
@@ -348,7 +331,7 @@ class Autocomplete extends ComboboxBase {
     }
 
     this._seedSelection()
-    this._updateValidationState()
+    this._validation.update()
   }
 
   deselectAll(options: any[] = this._selected): void {
@@ -421,9 +404,9 @@ class Autocomplete extends ComboboxBase {
       }
 
       if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._selected.length > 0) {
-        this._dismissValidationState(this._keySerial)
+        this._validation.dismiss(this._keySerial)
         this.deselectAll()
-        this._updateValidationState()
+        this._validation.update()
         this._triggerChangeEvent(null)
       }
     })
@@ -506,11 +489,11 @@ class Autocomplete extends ComboboxBase {
       const { value } = this._inputElement
 
       if (value !== this._shownText) {
-        this._dismissValidationState(this._keySerial ?? Number.POSITIVE_INFINITY)
+        this._validation.dismiss(this._keySerial ?? Number.POSITIVE_INFINITY)
       }
 
       this._shownText = value
-      this._updateValidationState()
+      this._validation.update()
 
       if (this._selected.length > 0) {
         this.deselectAll()
@@ -773,11 +756,11 @@ class Autocomplete extends ComboboxBase {
     }
 
     if (this._inputElement.value !== option.label) {
-      this._dismissValidationState()
+      this._validation.dismiss()
     }
 
     this._applySelection(option)
-    this._updateValidationState()
+    this._validation.update()
     this._triggerChangeEvent(option)
 
     if (this._config.showHints) {
@@ -819,7 +802,8 @@ class Autocomplete extends ComboboxBase {
 
   _clearByUser(): void {
     if (this._selected.length > 0 || this._inputElement.value !== '') {
-      this._dismissValidationState()
+      this._validation.dismiss()
+      this._validation.update()
     }
 
     this.clear()
@@ -827,49 +811,16 @@ class Autocomplete extends ComboboxBase {
 
   _emptyByUser(): void {
     if (this._inputElement.value !== '') {
-      this._dismissValidationState()
+      this._validation.dismiss()
     }
 
     this._setText('')
-    this._updateValidationState()
+    this._validation.update()
   }
 
   _setText(text: string): void {
     this._inputElement.value = text
     this._shownText = text
-  }
-
-  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
-    if (this._stateSerial > serial) {
-      return
-    }
-
-    this._config.invalid = false
-    this._config.valid = false
-    this._config.validationState = null
-    this._serverClasses = []
-    this._updateValidationState()
-  }
-
-  _updateValidationState(): void {
-    const input = this._inputElement
-    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
-      getServerState(this._serverClasses)
-
-    setStateValidity(input, givenState === 'invalid')
-
-    const state = givenState ?? this._userValidity?.read()
-    const feedbackIds = state === 'invalid' ? getFeedbackIds(input) : []
-
-    this._stateClass = swapStateClass(this._element, this._stateClass, state)
-
-    const current: string = input.getAttribute('aria-describedby') ?? ''
-    const pageIds = current.split(/\s+/).filter(id => id && !this._feedbackIds.includes(id))
-    const describedBy = [...new Set([...pageIds, ...feedbackIds])].join(' ')
-
-    this._feedbackIds = feedbackIds.filter(id => !pageIds.includes(id))
-    writeAttribute(input, 'aria-invalid', state === 'invalid' ? 'true' : null)
-    writeAttribute(input, 'aria-describedby', describedBy || null)
   }
 
   _updateCleaner(): void {
@@ -889,11 +840,10 @@ class Autocomplete extends ComboboxBase {
     return event.key === ARROW_DOWN_KEY || (event.key === ENTER_KEY && event.target === this._togglerElement)
   }
 
-  _restoreInitialSelection(serial: number): void {
+  _restoreInitialSelection(): void {
     const previous = this._selected[0]?.value
     const text = this._shownText
 
-    this._dismissValidationState(serial)
     this._reportSeed = false
     this.deselectAll()
     this._setText('')
@@ -910,7 +860,7 @@ class Autocomplete extends ComboboxBase {
     this._valueApplied = false
     this._seenOptionValues.clear()
     this._seedSelection()
-    this._updateValidationState()
+    this._validation.update()
 
     const current = this._selected[0]
 
@@ -944,7 +894,7 @@ class Autocomplete extends ComboboxBase {
 
       if (this._reportSeed && this._selected.includes(seed)) {
         this._reportSeed = false
-        this._updateValidationState()
+        this._validation.update()
         this._triggerChangeEvent(seed)
       }
     }

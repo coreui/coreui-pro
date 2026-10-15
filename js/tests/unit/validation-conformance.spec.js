@@ -68,8 +68,7 @@ const ADAPTERS = [
     changeFromCode: t => t.instance.setConfig({ value: '2' }),
     reconfigure: t => t.instance.setConfig({ placeholder: 'Pick one' }),
     rejectedOption: { cleaner: 'yes' },
-    required: { required: true },
-    knownDivergence: { pageDescription: 'the page description stays on the host' }
+    required: { required: true }
   },
   {
     name: 'Combobox',
@@ -107,8 +106,7 @@ const ADAPTERS = [
     changeAsUser: t => typeInto(t.instance._input, 'two,'),
     changeEvents: t => [[t.root.querySelector('.chip-input'), 'change.coreui.chip-input'], ...nativeChange(t.instance._valueField)],
     changeFromCode: t => t.instance.add('two'),
-    required: { required: true },
-    knownDivergence: { pageDescription: 'the page description stays on the host' }
+    required: { required: true }
   },
   {
     name: 'DateInput',
@@ -232,8 +230,7 @@ const ADAPTERS = [
     changeFromCode: t => t.instance.setConfig({ value: '1' }),
     reconfigure: t => t.instance.setConfig({ placeholder: '-' }),
     rejectedOption: { required: 'yes' },
-    required: { required: true },
-    knownDivergence: { pageDescription: 'the page description stays on the host' }
+    required: { required: true }
   },
   {
     name: 'RangeSlider',
@@ -252,6 +249,7 @@ const ADAPTERS = [
     required: null,
     makeInvalid: t => t.root.querySelector('.form-range-input').setCustomValidity('Pick a higher budget.'),
     notApplicable: {
+      pageClass: 'it takes off the class it shows, also one the page put there, until it moves onto the controller',
       reportedReconfigure: 'its rebuild replaces the handles and does not carry the report over yet'
     }
   },
@@ -270,7 +268,10 @@ const ADAPTERS = [
     changeFromCode: t => t.instance.setConfig({ value: 4 }),
     reconfigure: t => t.instance.setConfig({ itemCount: 6 }),
     rejectedOption: { itemCount: 'six' },
-    required: { required: true }
+    required: { required: true },
+    notApplicable: {
+      pageClass: 'it takes off the class it shows, also one the page put there, until it moves onto the controller'
+    }
   }
 ]
 
@@ -321,12 +322,9 @@ describe('validation conformance', () => {
   const conform = (rule, title, test) => {
     for (const adapter of ADAPTERS) {
       const reason = reasonFor(adapter, rule)
-      const divergence = adapter.knownDivergence?.[rule]
 
       if (reason) {
         it.skip(`${adapter.name} ${title} (not applicable: ${reason})`, () => {})
-      } else if (divergence) {
-        it.fails(`${adapter.name} ${title} (known divergence: ${divergence})`, () => test(adapter))
       } else {
         it(`${adapter.name} ${title}`, () => test(adapter))
       }
@@ -571,6 +569,15 @@ describe('validation conformance', () => {
       expect(t.form.checkValidity()).toBe(true)
     })
 
+    conform('disposeDescription', 'should give the host the description the page gave it', adapter => {
+      const t = mount(adapter, { config: { validationState: 'invalid' } })
+      const host = adapter.serverClassElement(t)
+
+      dispose(t)
+
+      expect(describedBy(host)).toEqual(['hint'])
+    })
+
     conform('pageValueField', 'should leave a custom validity the page set on its value field', adapter => {
       const t = mount(adapter, { config: { validationState: 'invalid' } })
       const [field] = adapter.blockers(t)
@@ -595,6 +602,19 @@ describe('validation conformance', () => {
         expect(field.validationMessage).toBe('The page says no.')
       })
     }
+  })
+
+  describe('a state class the page puts on a frame', () => {
+    conform('pageClass', 'should stay when the given state goes', adapter => {
+      const t = mount(adapter)
+      const [frame] = adapter.frames(t)
+
+      frame.classList.add('is-invalid')
+      t.instance.setConfig({ validationState: 'invalid' })
+      t.instance.setConfig({ validationState: null })
+
+      expect(stateClasses(frame)).toEqual(['is-invalid'])
+    })
   })
 
   describe('a disabled component', () => {
