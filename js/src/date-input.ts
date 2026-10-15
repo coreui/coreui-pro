@@ -673,8 +673,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       this._validation.change()
     }
 
-    this._validation.userAction = false
-
     this._sections = sections
     this._syncSections()
 

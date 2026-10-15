@@ -1877,19 +1877,6 @@ describe('DateInput', () => {
       }
     })
 
-    it('should end the user action with its first commit, so a date code sets in it keeps the given state', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const element = fixtureEl.querySelector('div')
-      const dateInput = new DateInput(element, { date: new Date(2026, 6, 10), format: 'dd.MM.yyyy', validationState: 'invalid' })
-
-      dateInput._runAsUser(() => {
-        dateInput._commitSections()
-        dateInput.setConfig({ date: new Date(2026, 6, 11) })
-      })
-
-      expect(element).toHaveClass('is-invalid')
-    })
-
     it('should drop a given state on a paste that inputDateParse reads', () => {
       fixtureEl.innerHTML = '<form><div></div></form>'
       const dateInput = new DateInput(fixtureEl.querySelector('form > div'), {

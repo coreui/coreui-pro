@@ -620,15 +620,14 @@ class Combobox extends ComboboxBase {
   }
 
   override _onOptionSelected(): void {
-    this._validation.userAction = true
+    this._validation.dismiss()
   }
 
   override _onOptionDeselected(): void {
-    this._validation.userAction = true
+    this._validation.dismiss()
   }
 
   override _onSelectionChange(): void {
-    this._validation.change()
     this._commitValue()
 
     // One value, one decision: the panel has nothing left to offer, so it
