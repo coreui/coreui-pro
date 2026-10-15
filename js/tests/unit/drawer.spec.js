@@ -1173,6 +1173,100 @@ describe('Drawer', () => {
       expect(hiddenCount).toEqual(1)
       expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
     })
+
+    it('should keep a dialog shown by an instance that replaced one during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.drawer')
+      const shown = new Promise(resolve => {
+        drawerEl.addEventListener('shown.coreui.drawer', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      drawerEl.addEventListener('hidden.coreui.drawer', () => {
+        hiddenCount++
+      })
+
+      const first = new Drawer(drawerEl)
+      first.show()
+      await shown
+      first.hide()
+      new Drawer(drawerEl).show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(drawerEl.open).toBeTrue()
+      expect(hiddenCount).toEqual(0)
+    })
+
+    it('should not fire hidden on an instance that replaced one during the exit transition and was never shown', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.drawer')
+      const shown = new Promise(resolve => {
+        drawerEl.addEventListener('shown.coreui.drawer', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      drawerEl.addEventListener('hidden.coreui.drawer', () => {
+        hiddenCount++
+      })
+
+      const first = new Drawer(drawerEl)
+      first.show()
+      await shown
+      first.hide()
+      const second = new Drawer(drawerEl)
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(drawerEl.open).toBeFalse()
+      expect(Drawer.getInstance(drawerEl)).toBe(second)
+      expect(hiddenCount).toEqual(0)
+    })
+
+    it('should keep a dialog shown by a new instance right after the open one was disposed', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.drawer')
+      const shown = new Promise(resolve => {
+        drawerEl.addEventListener('shown.coreui.drawer', resolve, { once: true })
+      })
+      const first = new Drawer(drawerEl)
+
+      first.show()
+      await shown
+      first.dispose()
+      Drawer.getOrCreateInstance(drawerEl).show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(drawerEl.open).toBeTrue()
+      expect(document.documentElement.classList.contains('dialog-open')).toBeTrue()
+    })
+
+    it('should finish the lifecycle when an open-by-default drawer is closed natively', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer" open><form method="dialog"><button type="submit">Done</button></form></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.drawer')
+      let hiddenCount = 0
+
+      drawerEl.addEventListener('hidden.coreui.drawer', () => {
+        hiddenCount++
+      })
+
+      window.dispatchEvent(createEvent('load'))
+      drawerEl.querySelector('button').click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(drawerEl.open).toBeFalse()
+      expect(hiddenCount).toEqual(1)
+    })
   })
 
   describe('drawer-static class', () => {
