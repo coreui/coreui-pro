@@ -16,6 +16,7 @@ import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
+import { isTypingKey } from './util/list-navigation.js'
 import {
   filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, highlightMatches, isOptionGroup
 } from './util/option-tree.js'
@@ -87,6 +88,7 @@ type AutocompleteConfig = {
   clearSearchOnSelect: boolean
   container: Element | boolean | string
   disabled: boolean
+  globalSearch: boolean
   highlightOptionsOnSearch: boolean
   id: string | null
   invalid: boolean
@@ -100,7 +102,7 @@ type AutocompleteConfig = {
   required: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
-  search: string | ('external' | 'global')[] | null
+  search: 'external' | null
   searchNoResultsLabel: boolean | string
   showHints: boolean
   valid: boolean
@@ -117,6 +119,7 @@ const Default: AutocompleteConfig = {
   clearSearchOnSelect: true,
   container: false,
   disabled: false,
+  globalSearch: true,
   highlightOptionsOnSearch: false,
   id: null,
   invalid: false,
@@ -147,6 +150,7 @@ const DefaultType: Record<string, string> = {
   clearSearchOnSelect: 'boolean',
   container: '(string|element|boolean)',
   disabled: 'boolean',
+  globalSearch: 'boolean',
   highlightOptionsOnSearch: 'boolean',
   id: '(string|null)',
   invalid: 'boolean',
@@ -160,7 +164,7 @@ const DefaultType: Record<string, string> = {
   required: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
-  search: '(array|string|null)',
+  search: '(string|null)',
   searchNoResultsLabel: 'boolean|string',
   showHints: 'boolean',
   valid: 'boolean',
@@ -181,8 +185,8 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputHintElement: any
   protected declare _hostClasses: HostClasses
   protected declare _hostAria: Array<[string, string]>
+  protected declare _hostTabIndex: string | null
   protected declare _keySerial: number | null
-  protected declare _previousTabIndex: string | null
   protected declare _initialValue: any
   protected declare _reportSeed: boolean
   protected declare _seenOptionValues: Set<string>
@@ -209,7 +213,6 @@ class Autocomplete extends ComboboxBase {
       invalidTargets: () => [this._inputElement],
       restore: () => this._restoreInitialSelection()
     })
-    this._previousTabIndex = null
     this._optionsElement = null
 
     this._menu = null
@@ -248,7 +251,7 @@ class Autocomplete extends ComboboxBase {
 
   override _canShow(): boolean {
     return Boolean(this._config.searchNoResultsLabel) ||
-      filterOptionTree(this._options, this._search).length > 0
+      (this._isExternalSearch() ? this._options : filterOptionTree(this._options, this._search)).length > 0
   }
 
   override _getAriaExpandedTarget(): HTMLElement {
@@ -296,10 +299,8 @@ class Autocomplete extends ComboboxBase {
       }
     }
 
-    if (this._previousTabIndex === null) {
-      this._element.removeAttribute('tabindex')
-    } else {
-      this._element.setAttribute('tabindex', this._previousTabIndex)
+    if (this._hostTabIndex !== null && !this._element.hasAttribute('tabindex')) {
+      this._element.setAttribute('tabindex', this._hostTabIndex)
     }
 
     super.dispose()
@@ -380,11 +381,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   _isExternalSearch(): boolean {
-    return Array.isArray(this._config.search) && this._config.search.includes('external')
-  }
-
-  _isGlobalSearch(): boolean {
-    return Array.isArray(this._config.search) && this._config.search.includes('global')
+    return this._config.search === 'external'
   }
 
   // Private
@@ -393,6 +390,7 @@ class Autocomplete extends ComboboxBase {
     EventHandler.on(this._element, EVENT_CLICK, (event: any) => {
       if (!this._config.disabled && !event.target.closest(SELECTOR_INDICATOR)) {
         this.show()
+        this._inputElement.focus()
       }
     })
 
@@ -416,7 +414,7 @@ class Autocomplete extends ComboboxBase {
         return
       }
 
-      if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+      if (this._config.globalSearch && !event.defaultPrevented && isTypingKey(event)) {
         this._inputElement.focus()
       }
 
@@ -433,7 +431,7 @@ class Autocomplete extends ComboboxBase {
     })
 
     EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => {
-      if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+      if (this._config.globalSearch && !event.defaultPrevented && isTypingKey(event)) {
         this._inputElement.focus()
       }
     })
@@ -665,17 +663,14 @@ class Autocomplete extends ComboboxBase {
     // The root is the frame: a field component has nothing to wrap, so it
     // carries `.form-control-group` itself instead of nesting one.
     const togglerEl = this._element
-    this._previousTabIndex = togglerEl.getAttribute('tabindex')
     this._hostAria = [...togglerEl.attributes]
       .filter(({ name }) => HOST_FIELD_ATTRIBUTES.has(name))
       .map(({ name, value }): [string, string] => [name, value])
+    this._hostTabIndex = togglerEl.getAttribute('tabindex')
+    togglerEl.removeAttribute('tabindex')
 
     applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
-
-    if (!this._config.search && !this._config.disabled) {
-      togglerEl.tabIndex = -1
-    }
 
     if (!this._config.disabled && this._config.showHints) {
       const inputHintEl = document.createElement('input')
@@ -947,10 +942,6 @@ class Autocomplete extends ComboboxBase {
 
     if (typeof config.options === 'string') {
       config.options = config.options.split(/,\s*/).map(String)
-    }
-
-    if (typeof config.search === 'string') {
-      config.search = config.search.split(/,\s*/).map(String)
     }
 
     if (config.searchNoResultsLabel === true) {

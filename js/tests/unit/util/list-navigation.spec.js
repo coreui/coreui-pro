@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  createTypeaheadBuffer, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, rangeBetween
+  createTypeaheadBuffer, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, isTypingKey, rangeBetween
 } from '../../../src/util/list-navigation.js'
 import * as Util from '../../../src/util/index.js'
 
@@ -152,6 +152,43 @@ describe('List navigation utilities', () => {
       expect(getRemovalNeighbor(['a'], 'a')).toBeNull()
       expect(getRemovalNeighbor([], 'a')).toBeNull()
       expect(getRemovalNeighbor(['a', 'b'], 'z')).toBe('a')
+    })
+  })
+
+  describe('isTypingKey', () => {
+    const press = init => new KeyboardEvent('keydown', init)
+
+    it('should take a character, Backspace and Delete', () => {
+      expect(isTypingKey(press({ key: 'r' }))).toBeTrue()
+      expect(isTypingKey(press({ key: 'R', shiftKey: true }))).toBeTrue()
+      expect(isTypingKey(press({ key: '7' }))).toBeTrue()
+      expect(isTypingKey(press({ key: 'Backspace' }))).toBeTrue()
+      expect(isTypingKey(press({ key: 'Delete' }))).toBeTrue()
+      expect(isTypingKey(press({ key: 'Dead' }))).toBeTrue()
+    })
+
+    it('should take a character typed with AltGr or Option', () => {
+      expect(isTypingKey(press({ key: 'ą', ctrlKey: true, altKey: true }))).toBeTrue()
+      expect(isTypingKey(press({ key: 'ß', altKey: true }))).toBeTrue()
+    })
+
+    it('should leave out the space bar, other named keys and shortcuts', () => {
+      expect(isTypingKey(press({ key: ' ' }))).toBeFalse()
+      expect(isTypingKey(press({ key: 'Enter' }))).toBeFalse()
+      expect(isTypingKey(press({ key: 'ArrowDown' }))).toBeFalse()
+      expect(isTypingKey(press({ key: 'a', ctrlKey: true }))).toBeFalse()
+      expect(isTypingKey(press({ key: 'a', metaKey: true }))).toBeFalse()
+      expect(isTypingKey(press({ key: 'Backspace', metaKey: true }))).toBeFalse()
+      expect(isTypingKey(press({ key: 'Delete', ctrlKey: true }))).toBeFalse()
+    })
+
+    it('should leave out every key of an IME composition', () => {
+      expect(isTypingKey(press({ key: 'a', isComposing: true }))).toBeFalse()
+      expect(isTypingKey(press({ key: 'Backspace', isComposing: true }))).toBeFalse()
+    })
+
+    it('should leave out a key event without a key', () => {
+      expect(isTypingKey(new Event('keydown'))).toBeFalse()
     })
   })
 })

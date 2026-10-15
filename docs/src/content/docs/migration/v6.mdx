@@ -1044,6 +1044,25 @@ check, radio, carousel and toggler icons already work:
   a keystroke over the options list jumps to the first option starting with
   it.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Autocomplete's `search` takes only `'external'`, and global typing is
+  `globalSearch`, on by default.** The array and the comma list are gone, so
+  `search: ['external', 'global']` and `data-coreui-search="external, global"`
+  become `search: 'external'`, and `search: 'global'` goes away: typing on the
+  picker or clear button, or in the panel, reaches the field without it. Set
+  `globalSearch: false` to keep a keystroke where the focus is. An array now
+  fails the option type check, so `new coreui.Autocomplete(el, { search:
+  ['external'] })` throws until it is updated, and a string other than
+  `'external'` no longer turns external search on, so a page still writing
+  the comma list in a data attribute filters the server's results again. The
+  space bar and shortcuts with Ctrl or Cmd stay with the button that has the
+  focus.
+- Autocomplete no longer gives the host `tabindex="-1"` and keeps a
+  `tabindex` the page wrote out of the tab order while it lives, so the field
+  is the only tab stop; a click on the frame puts the focus in the field
+  rather than only opening the panel. With
+  `search: 'external'` the panel opens for the options you set even when they
+  do not contain the typed text.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Autocomplete's typeahead hint no longer reaches the server.** With
   `showHints` on, the hint input behind the field carried a `name` and, being
   readonly rather than disabled, was serialized with the form: the configured

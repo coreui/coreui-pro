@@ -837,7 +837,8 @@ class ListBox extends BaseComponent {
   }
 
   _fieldTakesText(): boolean {
-    return this._field instanceof HTMLInputElement || this._field instanceof HTMLTextAreaElement
+    return this._field instanceof HTMLInputElement || this._field instanceof HTMLTextAreaElement ||
+      Boolean(this._field?.isContentEditable)
   }
 
   _optionValue(option: HTMLElement): string {
@@ -1269,7 +1270,9 @@ class ListBox extends BaseComponent {
       return
     }
 
-    this._typeahead(key)
+    if (!this._fieldTakesText()) {
+      this._typeahead(key)
+    }
   }
 
   _handleArrowKey(forward: boolean, extend: boolean): void {

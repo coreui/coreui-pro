@@ -19,7 +19,6 @@ new coreui.Autocomplete(myAutoCompleteValues, {
   ],
   pickerIcon: true,
   placeholder: 'Select product by ID...',
-  search: 'global',
   value: 100
 })
 

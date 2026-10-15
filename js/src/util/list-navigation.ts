@@ -93,3 +93,21 @@ export const getRemovalNeighbor = <T>(list: readonly T[], item: T): T | null => 
 
   return list[index + 1] ?? list[index - 1] ?? null
 }
+
+/**
+ * Tells whether a key press types into a text field: Backspace, Delete, a dead key that starts an
+ * accent, or a single character other than the space bar. A press with Meta, or with Ctrl but no
+ * Alt, is a shortcut instead; Ctrl with Alt is AltGr on Windows and Alt alone is Option on macOS,
+ * so both still type. Nothing types during an IME composition or for a key event without a key,
+ * such as the ones autofill sends.
+ *
+ * @param event - The key press
+ * @returns `true` for a key that types
+ */
+export const isTypingKey = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'isComposing' | 'key' | 'metaKey'>): boolean => {
+  if (typeof event.key !== 'string' || event.isComposing || event.metaKey || (event.ctrlKey && !event.altKey)) {
+    return false
+  }
+
+  return ['Backspace', 'Dead', 'Delete'].includes(event.key) || (event.key.length === 1 && event.key !== ' ')
+}

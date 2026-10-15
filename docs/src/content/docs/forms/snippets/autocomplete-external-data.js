@@ -20,7 +20,7 @@ const autocomplete = new coreui.Autocomplete(myAutoCompleteExternalData, {
   name: 'autocomplete-external',
   options: [],
   placeholder: 'Search names...',
-  search: ['external', 'global'], // 🔴 'external' is required for external search
+  search: 'external', // 🔴 'external' is required for external search
   showHints: true
 })
 
