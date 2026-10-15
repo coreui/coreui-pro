@@ -62,7 +62,7 @@
     },
     {
       "path": "./dist/js/coreui.bundle.min.js",
-      "maxSize": "119.72KB"
+      "maxSize": "120.18KB"
     },
     {
       "path": "./dist/js/coreui.esm.js",
@@ -70,7 +70,7 @@
     },
     {
       "path": "./dist/js/coreui.esm.min.js",
-      "maxSize": "113.46KB"
+      "maxSize": "113.95KB"
     },
     {
       "path": "./dist/js/coreui.js",
@@ -78,7 +78,7 @@
     },
     {
       "path": "./dist/js/coreui.min.js",
-      "maxSize": "113.67KB"
+      "maxSize": "114.16KB"
     }
   ],
   "ci": {

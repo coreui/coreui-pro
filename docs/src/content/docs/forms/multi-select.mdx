@@ -9,6 +9,7 @@ otherFrameworks:
 
 import multiSelectArrayData from './snippets/multi-select-array-data.js?raw'
 import multiSelectCustomOptions from './snippets/multi-select-custom-options.js?raw'
+import multiSelectExternalSearch from './snippets/multi-select-external-search.js?raw'
 import multiSelectHeader from './snippets/multi-select-header.js?raw'
 import multiSelectIndeterminate from './snippets/multi-select-indeterminate.js?raw'
 import multiSelectSelectionLimit from './snippets/multi-select-selection-limit.js?raw'
@@ -86,6 +87,8 @@ We use the following JavaScript to set up our multi-select:
 
 <Code code={multiSelectArrayData} lang="js" />
 
+`setOptions(options)` swaps the options later without rebuilding the control, and the selection stays as it is. A multi select whose options depend on another field, such as the cities of the chosen country, sets `resetSelectionOnOptionsChange: true`: when the values of the new options differ, `setOptions()` empties the selection and takes the options marked `selected`, so the cities of the previous country never travel on. The same values in any order keep the selection. Leave it off with `search: 'external'`, where every answer brings different values and would drop the picks.
+
 ## Search
 
 You can configure the search functionality within the component. The `data-coreui-search` option determines how the search input element is enabled and behaves. It accepts multiple types to provide flexibility in configuring search behavior. By default is set to `false`.
@@ -147,6 +150,14 @@ Add `data-coreui-global-search="false"` to keep typing local. The search box the
       <option value="6">Node.js</option>
     </optgroup>
   </select>`} />
+
+### External search
+
+With `search: 'external'` the search box filters nothing. Every change of its text, a paste included, fires `search.coreui.multi-select` with the `query`, and you answer with `setOptions()`: the list shows what you hand it, and the selection stays as it is, so a selected option the new results lack keeps its chip, counts against `selectionLimit` and is still sent with the form, unless it is disabled. The clear button and `deselectAll()` drop it like any other, while pressing a pressed select all button deselects only the listed options, and a form reset brings the initial selection back even when the current results lack it. A selected option that comes back disabled stays selected and, as in a native `<select>`, is not sent. Debounce the request and put `setLoading()` around it; <kbd>Enter</kbd> in the search box picks nothing while the list loads. With `globalSearch: false` a keystroke over the options list does nothing, since the list holds only the last results.
+
+<Example pro code={`<select id="multiSelectExternalSearch" name="users" multiple></select>`} sandboxJs={multiSelectExternalSearch} />
+
+<Code code={multiSelectExternalSearch} lang="js" />
 
 ## Selection types
 
@@ -571,8 +582,8 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `deselectAllLabel` | string | `'Deselect all'` | Sets the select all button label shown once everything is selected. See `selectAllLabel`. |
 | `deselectFilteredLabel` | string | `'Deselect filtered'` | Label shown instead of `deselectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list. See `selectFilteredLabel`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
-| `globalSearch` | boolean | `true` | Routes typing to the search box from anywhere in the component, so a keystroke never depends on where the focus sits. Set to `false` to keep it local: the search box then filters only while it has the focus, and typing over the options list jumps to the first option that starts with what was typed. Needs `search`. |
-| `headerTemplate` | function, null | `null` | Custom template function for rendering the dropdown header (the area above the options list). Replaces the built-in select all button and renders independently of `selectAll`. Receives a `state` object (`{ selected, total, filtered, filteredSelected }`) and an `actions` object (`{ selectAll, deselectAll, selectFiltered, deselectFiltered }`) whose functions act for the user and drop a given validation state. Return an `HTMLElement` (wire your own listeners using `actions`, supports multiple controls) or an HTML string (sanitized, no actions wired). Re-renders on every selection change and search filter. |
+| `globalSearch` | boolean | `true` | Routes typing to the search box from anywhere in the component, so a keystroke never depends on where the focus sits. Set to `false` to keep it local: the search box then filters only while it has the focus, and typing over the options list jumps to the first option that starts with what was typed, except with `search: 'external'`, where the list holds only the last results. Needs `search`. |
+| `headerTemplate` | function, null | `null` | Custom template function for rendering the dropdown header (the area above the options list). Replaces the built-in select all button and renders independently of `selectAll`. Receives a `state` object (`{ selected, total, filtered, filteredSelected }`), where `selected` counts every selected value, disabled ones and ones the current options lack included, and the other three count options in the list, and an `actions` object (`{ selectAll, deselectAll, selectFiltered, deselectFiltered }`) whose functions act for the user and drop a given validation state. Return an `HTMLElement` (wire your own listeners using `actions`, supports multiple controls) or an HTML string (sanitized, no actions wired). Re-renders on every selection change and search filter. |
 | `hideSelectAllOnSearchNoResults` | boolean | `true` | Hides the dropdown header with the built-in select all button when a search filter leaves no matching options. Set to `false` to keep the select all button visible even when there are no results. |
 | `id` | string, null | `null` | Id of the native select and the base of the ids the component builds (`-listbox`, `-label`, `search-`). Without it the select keeps its own `id`, or gets a generated one. |
 | `indicator` | string | `'checkbox'` | Sets the marker used by the options, the selectable group labels and the select all button: `'checkbox'` or `'none'`. |
@@ -587,14 +598,15 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `pickerIcon` | string, boolean | `true` | The button that toggles the options list: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Clicking the control only opens the list, so without the button a pointer closes it by clicking away. |
 | `placeholder` | string | `'Select...'` | Specifies a short hint that is visible in the input. |
 | `required` | boolean | `false` | Makes the input field required for form validation. |
+| `resetSelectionOnOptionsChange` | boolean | `false` | Empties the selection when `setOptions()` brings options with different values, then takes the options marked `selected`. For options that depend on another field. |
 | `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
 | `sanitizeFn` | function, null | `null` | Custom sanitization function. If provided, it will be used instead of the built-in sanitizer. |
-| `search` | boolean | `false` | Renders a search box in the control and filters the options as the user types. It takes the focus when the panel opens, and typing anywhere in the component reaches it unless `globalSearch` is off. |
+| `search` | boolean, string | `false` | Renders a search box in the control. `true` filters the options as the user types; `'external'` filters nothing and fires `search.coreui.multi-select`, which you answer with `setOptions()`. Any other string throws a `TypeError`. The box takes the focus when the panel opens, and typing anywhere in the component reaches it unless `globalSearch` is off. |
 | `searchNoResultsLabel` | string | `'No results found'` | Sets the label for no results when filtering.	|
 | `selectAll` | boolean | `true` | Enables select all button.|
 | `selectAllLabel` | string | `'Select all'` | Sets the select all button label shown until everything is selected. The button is a toggle: it shows `selectAllLabel` (and selects all) until everything is selected, then shows `deselectAllLabel` (and deselects all). |
 | `selectAllMode` | string | `'all'` | Scope of the built-in select all button: `'all'` toggles every option (ignoring the search filter), `'filtered'` toggles only the search-filtered options. With no active filter both behave the same. |
-| `selectedLabel` | string, function | `` (count) => `${count} item(s) selected` `` | The counter selection label. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced; `total` is the number of options a user can select, including the ones inside a group, without the disabled options, plus any selected option that is disabled, so it never falls below `count`. |
+| `selectedLabel` | string, function | `` (count) => `${count} item(s) selected` `` | The counter selection label. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced; `total` is the number of options a user can select, including the ones inside a group, without the disabled options, plus any selected option that is disabled or that the current options lack, so it never falls below `count`. |
 | `selectFilteredLabel` | string | `'Select filtered'` | Label shown instead of `selectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list, so the button reads as acting on the filtered options rather than the whole list. |
 | `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. The select all button stays enabled and selects up to the limit (firing the `selectionLimit` event), then toggles to deselect all once the limit is reached. |
 | `selectionType` | string | `'tags'` | Sets the selection style: `'chips'`, `'counter'`, `'tags'` or `'text'`. Selections render as [Chip](/components/chip/) components — `'tags'` and `'chips'` are the same thing, kept as synonyms. |
@@ -606,14 +618,16 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 
 | Method | Description |
 | --- | --- |
-| `deselectAll` | Deselect all options. |
+| `deselectAll` | Deselects every selected option that is not disabled, including selected values the current options lack. Pass an array of options to deselect only those. |
 | `deselectFiltered` | Deselect only the currently filtered (search-matched) options. |
-| `dispose` | Destroys an element's multi select. (Removes stored data on the DOM element) |
+| `dispose` | Destroys an element's multi select and gives the native select back the options it had before the component started, when the component replaced them. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the multi select instance associated with a DOM element. |
 | `getValue` | Returns the array with selected elements. |
 | `hide` | Hides the multi select's options. |
 | `selectAll` | Select all options. |
 | `selectFiltered` | Select only the currently filtered (search-matched) options. |
+| `setLoading` | Dims the list and marks it busy while you wait for options, for example with `search: 'external'`; <kbd>Enter</kbd> in the search box picks nothing meanwhile. |
+| `setOptions` | Replaces the options without rebuilding the control: the selection, an open panel and the search box keep their state, and the focus stays where it was unless the element holding it goes. A selected option the new list lacks stays selected and is still sent with the form unless it is disabled; `selected` flags in the new options are ignored unless `resetSelectionOnOptionsChange` empties the selection first. |
 | `setConfig` | Merges the given options over the current configuration and rebuilds the interface. Options you leave out keep their current value. A call that only changes `validationState`, `invalid` or `valid` updates the state without rebuilding. |
 | `show` | Shows the multi select's options. |
 
@@ -623,9 +637,10 @@ Multi Select component exposes a few events for hooking into multi select functi
 
 | Event | Description |
 | --- | --- |
-| `change.coreui.multi-select` | Fires once for every change of the selection, by the user or by `selectAll()`, `deselectAll()` or `setConfig()`, after the native select holds the new value; `event.value` is the selection. An action that selects or deselects several options sends one event, and an action that changes nothing sends none. Nothing is sent while the component builds or when a form reset brings the initial selection back. |
+| `change.coreui.multi-select` | Fires once for every change of the selection, by the user or by `selectAll()`, `deselectAll()`, `setOptions()` or `setConfig()`, after the native select holds the new value; `event.value` is the selection. An action that selects or deselects several options sends one event, and an action that changes nothing sends none. Nothing is sent while the component builds or when a form reset brings the initial selection back. |
 | `hidden.coreui.multi-select` | Fired when the multi select options have finished being hidden from the user and CSS transitions have completed. |
 | `hide.coreui.multi-select` | Fires immediately when the hide instance method has been called. Call `event.preventDefault()` to keep the menu open. |
+| `search.coreui.multi-select` | Fires when the text of the search box changes, a paste included, and when `search()` gets a different text; `event.query` is the text. A key that leaves the text alone and opening or closing the panel over an empty box send nothing; closing the panel clears a filled box, which reports an empty `query`. With `search: 'external'` nothing is filtered, so answer with `setOptions()`. |
 | `selectionLimit.coreui.multi-select` | Fires when selecting an option is blocked because the selection limit has been reached. |
 | `show.coreui.multi-select` | Fires immediately when the show instance method is called. Call `event.preventDefault()` to keep the menu closed. |
 | `shown.coreui.multi-select` | Fired when the multi select options have been made visible to the user and CSS transitions have completed. |
