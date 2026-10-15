@@ -4869,6 +4869,21 @@ describe('MultiSelect', () => {
       expect(multiSelect._config.multiple).toBeFalse()
     })
 
+    it('should keep the selection when it rejects a value given with a wrong option', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2', selected: true }]
+      })
+      const changes = []
+
+      selectEl.addEventListener('change', () => changes.push(selectEl.value))
+
+      expect(() => multiSelect.setConfig({ value: ['1'], multiple: 'yes' })).toThrowError(TypeError)
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['2'])
+      expect(changes).toEqual([])
+    })
+
     it('should refresh multiple and required on the native select', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
