@@ -1,0 +1,349 @@
+import {
+  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
+  ownValidationState, setStateValidity, type UserValidity, type ValidationState, type ValueField, writeDescribedBy
+} from './form-validation.js'
+import { writeAttribute } from './index.js'
+
+export type FieldValidationConfig = {
+  disabled?: boolean
+  invalid?: boolean
+  valid?: boolean
+  validationState?: ValidationState | null
+}
+
+/**
+ * How a component tells `FieldValidation` about itself.
+ *
+ * - `aliases`: the component takes the `invalid` and `valid` aliases of `validationState`.
+ * - `blockers`: the value fields that carry the block of a given `'invalid'`; all of `fields` by default.
+ * - `canBlock`: whether a given `'invalid'` may block the submit now; by default while not `disabled`.
+ * - `config`: the live configuration object of the component, which the controller writes when it
+ *   drops the given state.
+ * - `describedTargets`: the elements that get the page's description and the invalid feedback;
+ *   `invalidTargets` by default.
+ * - `fields`: the value fields, in order.
+ * - `frames`: the elements that get the state class.
+ * - `invalidTargets`: the elements that get `aria-invalid`.
+ * - `owned`: the elements the form utilities leave to the component; `fields` by default.
+ * - `restore`: puts back the value the component had when it was built, on a native reset.
+ */
+export type FieldValidationOptions = {
+  aliases?: boolean
+  blockers?: () => ValueField[]
+  canBlock?: () => boolean
+  config: () => FieldValidationConfig
+  describedTargets?: () => Element[]
+  fields: () => ValueField[]
+  frames: () => Element[]
+  invalidTargets: () => Element[]
+  owned?: () => Element[]
+  restore?: () => void
+}
+
+/**
+ * Keeps the validation state of a component that carries a form value: the state it was given, by
+ * an option or by a state class its markup carried, the state a validation reported for its value
+ * fields, the block a given `'invalid'` puts on the submit, the state class, `aria-invalid` and the
+ * invalid feedback in `aria-describedby`, and a native reset of the form. The component describes
+ * where these go, marks the actions of the user and tells the controller when its value changes; it
+ * writes none of these itself. When the controller drops the given state, it clears it in the
+ * component's configuration.
+ */
+class FieldValidation {
+  /** A user action is running that has not changed the value yet. */
+  declare userAction: boolean
+  protected declare _describedBy: string | null
+  protected declare _fields: ValueField[]
+  protected declare _frames: Map<Element, string | null>
+  protected declare _host: Element
+  protected declare _movedDescription: boolean
+  protected declare _onReset: (event: Event) => void
+  protected declare _options: FieldValidationOptions
+  protected declare _release: () => void
+  protected declare _resetRoots: Node[]
+  protected declare _resetTimeout: ReturnType<typeof setTimeout> | undefined
+  protected declare _serial: number
+  protected declare _serverClasses: string[]
+  protected declare _userValidity: Map<ValueField, UserValidity>
+
+  /**
+   * Takes the state class the host carries in its markup as the state the component was given, and
+   * takes it off the host. Call `refresh()` once the component has built its fields.
+   *
+   * @param host - The element of the component
+   * @param options - How the component describes itself, see `FieldValidationOptions`
+   */
+  constructor(host: Element, options: FieldValidationOptions) {
+    const root = host.getRootNode()
+
+    this.userAction = false
+    this._describedBy = host.getAttribute('aria-describedby')
+    this._fields = []
+    this._frames = new Map()
+    this._host = host
+    this._movedDescription = false
+    this._onReset = event => this._handleReset(event)
+    this._options = options
+    this._release = () => {}
+    this._resetRoots = root instanceof ShadowRoot ? [host.ownerDocument, root] : [host.ownerDocument]
+    this._resetTimeout = undefined
+    this._serial = nextStateSerial()
+    this._serverClasses = getStateClasses(host)
+    this._userValidity = new Map()
+
+    host.classList.remove(...this._serverClasses)
+  }
+
+  /**
+   * Takes the validation options of a `setConfig` call the component has already type-checked and
+   * stored: the state class from the markup is no longer the given state, and a call that holds
+   * validation options alone is drawn in place.
+   *
+   * @param config - The options passed to `setConfig`
+   * @returns `true` when the call held validation options only, so the component has nothing to
+   * rebuild
+   */
+  configure(config: object | null): boolean {
+    const keys = Object.keys(config ?? {})
+    const isValidationOption = (key: string) => key === 'validationState' || Boolean(this._options.aliases && (key === 'invalid' || key === 'valid'))
+
+    if (!keys.some(isValidationOption)) {
+      return false
+    }
+
+    this._serverClasses = []
+    this._serial = nextStateSerial()
+
+    if (keys.every(isValidationOption)) {
+      this.update()
+      return true
+    }
+
+    return false
+  }
+
+  /**
+   * Runs an action as the user's: the first change of the value it makes drops the given state.
+   *
+   * @param action - The action
+   */
+  runAsUser(action: () => void): void {
+    const pending = this.userAction
+    this.userAction = true
+
+    try {
+      action()
+    } finally {
+      this.userAction = pending && this.userAction
+    }
+  }
+
+  /**
+   * Records a change of the value: the first change of a user action ends it and drops the given
+   * state, with its block. The component calls `update()` before each change event it sends, once
+   * its value fields hold the new value.
+   */
+  change(): void {
+    if (this.userAction) {
+      this.userAction = false
+      this._dismiss(Number.POSITIVE_INFINITY)
+    }
+  }
+
+  /**
+   * Follows the value fields and takes over the elements the component built, after a build or a
+   * rebuild, and draws the state on them. A field that replaces another at the same position keeps
+   * the report a validation made on that one. Moves the description the page gave the host to the
+   * described targets, unless the host is a value field, and starts following native resets of the
+   * form after the fields, so the fields forget a report before the value is restored.
+   */
+  refresh(): void {
+    const fields = this._options.fields()
+
+    for (const [index, field] of fields.entries()) {
+      const replaced = this._fields[index]
+
+      if (!this._userValidity.has(field)) {
+        const wasReported = replaced !== undefined && !fields.includes(replaced) && this._userValidity.get(replaced)?.isReported()
+
+        this._userValidity.set(field, followUserValidity(field, () => this.update(), undefined, wasReported))
+      }
+    }
+
+    for (const [field, userValidity] of this._userValidity) {
+      if (!fields.includes(field)) {
+        userValidity.stop()
+        this._userValidity.delete(field)
+      }
+    }
+
+    for (const node of this._resetRoots) {
+      node.removeEventListener('reset', this._onReset, true)
+      node.addEventListener('reset', this._onReset, true)
+    }
+
+    if (!this._movedDescription && !fields.includes(this._host as ValueField)) {
+      this._movedDescription = true
+      writeAttribute(this._host, 'aria-describedby', null)
+    }
+
+    this._fields = fields
+    this._release()
+    this._release = ownValidationState(...(this._options.owned?.() ?? fields))
+    this.update()
+  }
+
+  /**
+   * Draws the state: the block of a given `'invalid'` on the fields that carry it while the component
+   * can block, then the state class on the frames, `aria-invalid` on the focus targets, and the
+   * page's description and the invalid feedback on the described targets, the description always on
+   * the first of them. The state is the given one, else `'invalid'` when a validation reported a
+   * field whose value is invalid, else what the stylesheet shows for the fields.
+   */
+  update(): void {
+    const config = this._options.config()
+    const { aliases } = this._options
+    const givenState = getValidationState(config.validationState, aliases && config.valid, aliases && config.invalid) ?? getServerState(this._serverClasses)
+    const fields = this._options.fields()
+    const blockers = this._options.blockers?.() ?? fields
+    const blocks = givenState === 'invalid' && (this._options.canBlock?.() ?? !config.disabled)
+
+    for (const field of fields) {
+      setStateValidity(field, blocks && blockers.includes(field))
+    }
+
+    const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
+    const state = givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
+    const isInvalid = state === 'invalid'
+    const feedbackIds = isInvalid && blockers[0] ? getFeedbackIds(blockers[0]) : []
+
+    this._drawStateClass(state ? `is-${state}` : null)
+
+    for (const target of this._options.invalidTargets()) {
+      writeAttribute(target, 'aria-invalid', isInvalid ? 'true' : null)
+    }
+
+    for (const [index, target] of (this._options.describedTargets?.() ?? this._options.invalidTargets()).entries()) {
+      writeDescribedBy(target, index === 0 || isInvalid ? this._describedBy : null, feedbackIds)
+    }
+  }
+
+  /**
+   * Hands everything back: stops following the fields and the form, lifts the block, takes off what
+   * it drew, and gives the host the page's description and the state class of its markup, unless that
+   * state was dropped meanwhile. Call it before the component takes its elements apart.
+   */
+  dispose(): void {
+    clearTimeout(this._resetTimeout)
+
+    for (const node of this._resetRoots) {
+      node.removeEventListener('reset', this._onReset, true)
+    }
+
+    for (const userValidity of this._userValidity.values()) {
+      userValidity.stop()
+    }
+
+    for (const field of this._options.fields()) {
+      setStateValidity(field, false)
+    }
+
+    for (const target of this._options.invalidTargets()) {
+      writeAttribute(target, 'aria-invalid', null)
+    }
+
+    for (const target of this._options.describedTargets?.() ?? this._options.invalidTargets()) {
+      writeDescribedBy(target, null, [])
+    }
+
+    this._userValidity.clear()
+    this._release()
+    this._drawStateClass(null)
+    this._host.classList.add(...this._serverClasses)
+    writeAttribute(this._host, 'aria-describedby', this._describedBy)
+  }
+
+  /**
+   * Drops the given state, in the component's configuration and as a state class from the markup,
+   * unless it was given after the moment the serial stands for.
+   *
+   * @param serial - The serial of the moment that drops the state, such as a native reset
+   */
+  _dismiss(serial: number): void {
+    if (this._serial > serial) {
+      return
+    }
+
+    const config = this._options.config()
+
+    config.validationState = null
+
+    if (this._options.aliases) {
+      config.invalid = false
+      config.valid = false
+    }
+
+    this._serverClasses = []
+
+    for (const field of this._options.fields()) {
+      setStateValidity(field, false)
+    }
+  }
+
+  /**
+   * Puts a state class on the frames, taking off only the classes the controller added itself, also
+   * from frames the component no longer lists.
+   *
+   * @param stateClass - The class to show, or `null` for none
+   */
+  _drawStateClass(stateClass: string | null): void {
+    const frames = new Set(this._options.frames())
+
+    for (const [frame, owned] of this._frames) {
+      if (owned && (owned !== stateClass || !frames.has(frame))) {
+        frame.classList.remove(owned)
+        this._frames.set(frame, null)
+      }
+
+      if (!frames.has(frame)) {
+        this._frames.delete(frame)
+      }
+    }
+
+    for (const frame of frames) {
+      if (stateClass && !frame.classList.contains(stateClass)) {
+        frame.classList.add(stateClass)
+        this._frames.set(frame, stateClass)
+      } else if (!this._frames.has(frame)) {
+        this._frames.set(frame, null)
+      }
+    }
+  }
+
+  /**
+   * Answers a native reset of the form of a value field: in the next task, unless a listener
+   * cancelled it, drops a state given before the reset, restores the value and draws the state.
+   *
+   * @param event - The `reset` event
+   */
+  _handleReset(event: Event): void {
+    if (!this._options.fields().some(field => field.form === event.target)) {
+      return
+    }
+
+    const serial = nextStateSerial()
+
+    clearTimeout(this._resetTimeout)
+    this._resetTimeout = setTimeout(() => {
+      if (event.defaultPrevented) {
+        return
+      }
+
+      this._dismiss(serial)
+      this._options.restore?.()
+      this.update()
+    })
+  }
+}
+
+export default FieldValidation

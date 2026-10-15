@@ -627,12 +627,14 @@ describe('Form validation utilities', () => {
       const validity = followUserValidity(control, state => updates.push(state))
 
       expect(validity.read()).toBeUndefined()
+      expect(validity.isReported()).toBe(false)
 
       fixtureEl.querySelector('#other').checkValidity()
       expect(validity.read()).toBeUndefined()
 
       control.form.checkValidity()
       expect(validity.read()).toBe('invalid')
+      expect(validity.isReported()).toBe(true)
       expect(updates.at(-1)).toBe('invalid')
 
       control.value = '1'

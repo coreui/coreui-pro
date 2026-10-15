@@ -327,6 +327,24 @@ describe('MultiSelect', () => {
       expect(selectEl.validationMessage).toBe('Pick a framework.')
     })
 
+    it('should block with the message the page links through aria-describedby on the select', () => {
+      fixtureEl.innerHTML = '<form><div id="message" class="invalid-feedback">Pick one.</div><select aria-describedby="message"></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], validationState: 'invalid' })
+
+      expect(selectEl.validationMessage).toBe('Pick one.')
+      expect(multiSelect._togglerElement.getAttribute('aria-describedby')).toBe('message')
+    })
+
+    it('should block with a given state whatever other keys its configuration holds', () => {
+      fixtureEl.innerHTML = '<form><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+
+      new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], readonly: true, validationState: 'invalid' }) // eslint-disable-line no-new
+
+      expect(selectEl.form.checkValidity()).toBe(false)
+    })
+
     it('should take validationState over the invalid and valid aliases, and invalid over valid', () => {
       fixtureEl.innerHTML = '<select id="both"></select><select id="state"></select>'
       const both = new MultiSelect(fixtureEl.querySelector('#both'), { options: [], invalid: true, valid: true })
@@ -501,7 +519,7 @@ describe('MultiSelect', () => {
       fixtureEl.innerHTML = '<form><select multiple></select></form>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }], validationState: 'invalid' })
 
-      multiSelect._runAsUser(() => {})
+      multiSelect._validation.runAsUser(() => {})
       multiSelect.selectAll()
 
       expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
@@ -788,7 +806,7 @@ describe('MultiSelect', () => {
     it('should leave input in the other fields of the form alone', () => {
       fixtureEl.innerHTML = '<form><select></select><textarea></textarea></form>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }] })
-      const spy = spyOn(multiSelect, '_updateValidity').and.callThrough()
+      const spy = spyOn(multiSelect._validation, 'update').and.callThrough()
       const textarea = fixtureEl.querySelector('textarea')
 
       for (let index = 0; index < 3; index++) {

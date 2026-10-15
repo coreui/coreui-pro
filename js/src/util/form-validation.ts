@@ -12,6 +12,7 @@ export type ValidationMarks = WeakMap<Element, ValidationMark>
 export type ValidationState = 'invalid' | 'valid' | (string & {})
 
 export type UserValidity = {
+  isReported: () => boolean
   read: () => ValidationState | undefined
   stop: () => void
 }
@@ -686,7 +687,8 @@ export const nextStateSerial = (): number => ++stateSerial
  * cancelled, before `onUpdate`, with the last `nextStateSerial()` given out before the reset
  * @param wasReported - Whether a validation already reported the control, for a control that
  * replaces one a validation reported
- * @returns `read()` for the current state, and `stop()` to remove the listeners
+ * @returns `read()` for the current state, `isReported()` for whether a validation reported the
+ * control since the last reset, and `stop()` to remove the listeners
  */
 export const followUserValidity = (
   control: FormControl,
@@ -743,6 +745,7 @@ export const followUserValidity = (
   }
 
   return {
+    isReported: () => reported,
     read,
     stop() {
       clearTimeout(resetTimeout)
