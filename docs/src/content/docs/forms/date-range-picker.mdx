@@ -407,6 +407,10 @@ myPicker.addEventListener('endDateChange.coreui.date-range-picker', event => {
 
 ### CSS variables
 
+The field is a [`.form-control-group`](/forms/form-control-group/#css-variables), `.form-date-range`, inside the picker element, so its frame, the separator, the cleaner and the toggle read the `--cui-control-*` and `--cui-control-group-*` tokens. Set them on `.form-date-range`; the group declares them itself, so a value set on the picker element stops there. The two ends are [date inputs](/forms/date-input/#css-variables) and carry the `form-date-time` tokens.
+
+The panel is the date picker's, and declares its own on `.date-picker-popup`:
+
 <ScssDocs file="scss/_date-picker.scss" capture="date-picker-tokens" />
 
 The panel is a `.popup`: its surface, border, shadow, stacking and fade come from the tokens every popup panel shares with the other pickers, Combobox, Autocomplete and Multi Select. `.popup` declares them itself, so set them on `.date-picker-popup` to restyle the panels of the date and date range pickers, or on `.popup` for all of them; a value set on an ancestor or on `:root` does not reach it.

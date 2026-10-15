@@ -163,7 +163,9 @@ already listening to the field keeps working.
 ### CSS variables
 
 The frame, the buttons and their sizing are the group's, and read the shared
-`--cui-control-*` properties:
+`--cui-control-*` properties. Set them on the `.form-control-group` the plugin
+wraps around the input; a `style` attribute on the `<input>` does not reach the
+frame:
 
 <ScssDocs file="scss/forms/_form-control-group.scss" capture="form-control-group-tokens" />
 
