@@ -186,6 +186,16 @@
         "default": "./js/dist/util/field-label.js"
       }
     },
+    "./utils/focus": {
+      "import": {
+        "types": "./js/dist/util/focus.d.mts",
+        "default": "./js/dist/util/focus.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/focus.d.ts",
+        "default": "./js/dist/util/focus.js"
+      }
+    },
     "./utils/form-validation": {
       "import": {
         "types": "./js/dist/util/form-validation.d.mts",

@@ -372,12 +372,13 @@ describe('ChipSet', () => {
       new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
-      chips[0].focus()
-      chips[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+      chips[1].focus()
+      chips[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
 
       const remaining = el.querySelectorAll('.chip')
       expect(remaining).toHaveSize(2)
-      expect(document.activeElement).toEqual(remaining[0])
+      expect(document.activeElement).toEqual(remaining[1])
+      expect(remaining[1].textContent).toContain('Third')
     })
 
     it('should move focus to the previous chip after removing the last chip', () => {

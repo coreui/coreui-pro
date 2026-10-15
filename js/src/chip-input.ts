@@ -11,6 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { splitChipText } from './util/chip-values.js'
+import { containsFocus } from './util/focus.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
   configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getServerState,
@@ -344,7 +345,7 @@ class ChipInput extends ChipSet {
 
     for (const chip of this._getChipElements()) {
       if (!this._initialChips.includes(chip)) {
-        hadFocus ||= chip.contains((chip.getRootNode() as Document | ShadowRoot).activeElement)
+        hadFocus ||= containsFocus(chip)
         Chip.getInstance(chip)?.dispose()
         this._ownedChips.delete(chip)
         this._optionChips.delete(chip)

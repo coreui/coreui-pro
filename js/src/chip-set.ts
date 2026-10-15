@@ -12,9 +12,10 @@ import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
 import { type ChipAnnouncement, getChipAnnouncement, resolveChipClassName } from './util/chip-values.js'
+import { containsFocus } from './util/focus.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
-  createTypeaheadBuffer, findTypeaheadMatch, rangeBetween, type TypeaheadBuffer
+  createTypeaheadBuffer, findTypeaheadMatch, getRemovalNeighbor, rangeBetween, type TypeaheadBuffer
 } from './util/list-navigation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
@@ -603,23 +604,7 @@ class ChipSet extends BaseComponent {
   }
 
   _getRemovalFocusTarget(chip: HTMLElement): HTMLElement {
-    return this._getRemovalNeighbor(chip) ?? this._element
-  }
-
-  _getRemovalNeighbor(chip: HTMLElement): HTMLElement | null {
-    const chips = this._getFocusableChips()
-    if (chips.length === 0) {
-      return null
-    }
-
-    // Prefer the next chip, fall back to the previous one at the end.
-    const next = getNextActiveElement(chips, chip, true, false)
-    if (next && next !== chip) {
-      return next
-    }
-
-    const previous = getNextActiveElement(chips, chip, false, false)
-    return previous && previous !== chip ? previous : null
+    return getRemovalNeighbor(this._getFocusableChips(), chip) ?? this._element
   }
 
   _navigateToEdge(targetIndex: number): HTMLElement | null {
@@ -658,7 +643,7 @@ class ChipSet extends BaseComponent {
     const target = this._pendingFocus
     this._pendingFocus = null
 
-    if (target && chip?.contains((chip.getRootNode() as Document | ShadowRoot).activeElement)) {
+    if (target && containsFocus(chip)) {
       if (target === this._element) {
         this._focusSet()
       } else {
