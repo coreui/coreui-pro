@@ -15,11 +15,11 @@ import {
   ownValidationState, setStateValidity, swapStateClass, type UserValidity, type ValidationState
 } from './util/form-validation.js'
 import {
-  DefaultAllowlist, escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
+  DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import {
-  filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, isOptionGroup
+  filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, highlightMatches, isOptionGroup
 } from './util/option-tree.js'
 import {
   captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
@@ -377,21 +377,6 @@ class Autocomplete extends ComboboxBase {
     EventHandler.trigger(this._element, EVENT_CHANGE, {
       value
     })
-  }
-
-  _highlightOption(label: string): string {
-    const search = this._search.trim()
-
-    if (!search) {
-      return escapeHtml(label)
-    }
-
-    const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    const regex = new RegExp(`(${escapedSearch})`, 'gi')
-    return String(label)
-      .split(regex)
-      .map((part, index) => (index % 2 === 0 ? escapeHtml(part) : `<strong>${escapeHtml(part)}</strong>`))
-      .join('')
   }
 
   _isExternalSearch(): boolean {
@@ -971,7 +956,7 @@ class Autocomplete extends ComboboxBase {
     }
 
     for (const option of this._getDisplayedOptions()) {
-      option.innerHTML = this._highlightOption(option.textContent!)
+      option.innerHTML = highlightMatches(option.textContent!, this._search)
     }
   }
 
