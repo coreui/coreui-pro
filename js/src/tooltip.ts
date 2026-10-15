@@ -23,6 +23,7 @@ import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import type { ComponentConfig } from './util/config.js'
+import { containsFocus } from './util/focus.js'
 import {
   defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop
 } from './util/index.js'
@@ -845,7 +846,7 @@ class Tooltip extends BaseComponent {
         event.type === EVENT_POINTERCANCEL ||
         (event.type === EVENT_CLICK && pressedInside) ||
         !this._activeTrigger[TRIGGER_FOCUS] ||
-        [this._element, this.tip].some(element => element?.contains((element.getRootNode() as Document).activeElement))
+        [this._element, this.tip].some(element => containsFocus(element))
       ) {
         return
       }

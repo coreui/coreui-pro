@@ -39,6 +39,7 @@ import type {
   DateSection, EditableSection, SectionFormat, SectionInputType
 } from './util/date-sections.js'
 import { onLabelClick } from './util/field-label.js'
+import { containsFocus } from './util/focus.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import {
   followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
@@ -853,9 +854,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
         return null
       }
 
-      const root = this._element.getRootNode() as Document | ShadowRoot
-
-      return !this._element.contains(root.activeElement) && isBeforeYearOne(this._sections) ? 'minDate' : 'incomplete'
+      return !containsFocus(this._element) && isBeforeYearOne(this._sections) ? 'minDate' : 'incomplete'
     }
 
     return getDateLimitError(this._sections, date, this._minDate, this._maxDate, this._config.disabledDates)

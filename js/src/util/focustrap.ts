@@ -121,12 +121,13 @@ class FocusTrap extends Config {
 
   _handleFocusin(event: CoreUIEvent): void {
     const { additionalElement, trapElement } = this._config
+    const target = (event.composedPath()[0] ?? event.target) as Node
 
-    if (!this._isTopmost() || event.target === document || event.target === trapElement || trapElement!.contains(event.target as Node)) {
+    if (!this._isTopmost() || target === document || target === trapElement || trapElement!.contains(target)) {
       return
     }
 
-    if (additionalElement && (event.target === additionalElement || additionalElement.contains(event.target as Node))) {
+    if (additionalElement && (target === additionalElement || additionalElement.contains(target))) {
       return
     }
 

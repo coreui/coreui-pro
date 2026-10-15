@@ -921,6 +921,49 @@ describe('MultiSelect', () => {
       expect(multiSelect._menu.contains(document.activeElement)).toBe(true)
     })
 
+    it('should put the focus on the active option when it opens inside a shadow root', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const shadowRoot = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(shadowRoot.querySelector('select'), {
+        options: [{ value: '1', text: 'Option 1' }]
+      })
+
+      multiSelect.show()
+
+      expect(shadowRoot.activeElement).toBe(multiSelect._menu.querySelector('.list-box-option'))
+    })
+
+    it('should return the focus home when it closes from inside a shadow root', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const shadowRoot = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(shadowRoot.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }], selectAll: true
+      })
+
+      multiSelect.show()
+      multiSelect._selectAllElement.focus()
+      multiSelect.hide()
+
+      expect(shadowRoot.activeElement).toBe(multiSelect._togglerElement)
+    })
+
+    it('should see the focus on its toggler inside a shadow root when it starts to hide', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const shadowRoot = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(shadowRoot.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      multiSelect.show()
+      multiSelect._togglerElement.focus()
+      multiSelect._onHideStart()
+
+      expect(multiSelect._refocusOnHide).toBeTrue()
+    })
+
     it('should hand a keystroke on the native select to the control once after update()', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
