@@ -363,6 +363,7 @@ The one-time password input component is designed with accessibility in mind and
 - **Required**: with `data-coreui-required="true"`, every slot carries `aria-required="true"`, since the value input that holds `required` is hidden from assistive technologies
 - **Keyboard Navigation**: Full keyboard support with arrow keys, tab, and backspace
 - **Screen Reader Support**: Clear announcements when values change; while the state is `'invalid'`, every slot carries `aria-invalid="true"` and the error message after the group
+- **Description**: an `aria-describedby` on the group moves to the first slot, and to every slot while the state is `'invalid'`, after the ids each slot already has; the group gets it back on dispose
 - **Focus Management**: Automatic focus handling for seamless navigation
 - **Autofill**: only the first field advertises `autocomplete="one-time-code"`, so SMS autofill and password managers target a single field; a code delivered that way is spread across the slots automatically, exactly like a paste
 

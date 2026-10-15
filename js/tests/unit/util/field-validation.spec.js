@@ -1,7 +1,7 @@
 import { userEvent } from '@vitest/browser/context'
 import { vi } from 'vitest'
 import FieldValidation from '../../../src/util/field-validation.js'
-import { updateValidationState } from '../../../src/util/form-validation.js'
+import { nextStateSerial, updateValidationState } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('FieldValidation', () => {
@@ -12,8 +12,8 @@ describe('FieldValidation', () => {
     setTimeout(resolve)
   })
 
-  const mount = ({ attributes = '', classes = '', config = {}, root = null, ...options } = {}) => {
-    const markup = `<form><div id="host" class="form-control-group${classes}"${attributes}><textarea name="value"></textarea><span id="target"></span><span id="second"></span></div><div class="invalid-feedback" id="feedback">Fix it.</div></form>`
+  const mount = ({ attributes = '', classes = '', config = {}, root = null, targetClasses = '', ...options } = {}) => {
+    const markup = `<form><div id="host" class="form-control-group${classes}"${attributes}><textarea name="value"></textarea><span id="target" class="${targetClasses}"></span><span id="second"></span></div><div class="invalid-feedback" id="feedback">Fix it.</div></form>`
     const container = root ?? fixtureEl
 
     container.innerHTML = markup
@@ -87,11 +87,36 @@ describe('FieldValidation', () => {
 
       expect(targets.map(describedBy)).toEqual(['hint feedback', 'hint feedback'])
 
+      host.setAttribute('aria-describedby', 'later')
       validation.dispose()
 
-      expect(describedBy(host)).toBe('hint')
+      expect(describedBy(host)).toBe('hint later')
       expect(targets.map(describedBy)).toEqual([null, null])
       expect(targets.some(target => target.hasAttribute('aria-invalid'))).toBe(false)
+    })
+
+    it('should give back the aria-invalid it overwrote, when a target leaves the list and on dispose', () => {
+      fixtureEl.innerHTML = '<form><div id="host"><textarea></textarea><input id="first" aria-invalid="false"><input id="second" aria-invalid="grammar"></div></form>'
+      const host = fixtureEl.querySelector('#host')
+      const [first, second] = host.querySelectorAll('input')
+      let targets = [first, second]
+      const validation = new FieldValidation(host, {
+        config: () => ({ validationState: 'invalid' }), fields: () => [host.querySelector('textarea')], frames: () => [host], invalidTargets: () => targets
+      })
+
+      controllers.push(validation)
+      validation.refresh()
+
+      expect([first, second].map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+
+      targets = [first]
+      validation.update()
+
+      expect(second.getAttribute('aria-invalid')).toBe('grammar')
+
+      validation.dispose()
+
+      expect(first.getAttribute('aria-invalid')).toBe('false')
     })
 
     it('should describe the targets it is given apart from the ones it marks invalid', () => {
@@ -209,6 +234,82 @@ describe('FieldValidation', () => {
     })
   })
 
+  describe('what it writes', () => {
+    it('should take the state classes of every server source and give each its own back', () => {
+      const { host, targets, validation } = mount({ classes: ' is-valid', targetClasses: 'is-invalid', serverClassSources: () => [fixtureEl.querySelector('#host'), fixtureEl.querySelector('#target')] })
+
+      expect(stateClasses(targets[0])).toEqual([])
+
+      validation.dispose()
+
+      expect(stateClasses(host)).toEqual(['is-valid'])
+      expect(stateClasses(targets[0])).toEqual(['is-invalid'])
+    })
+
+    it('should add its ids after the ones someone else put on a target, and take back only its own', () => {
+      const { field, host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"' })
+
+      targets[1].setAttribute('aria-describedby', 'own feedback')
+      state.config.validationState = 'invalid'
+      validation.update()
+
+      expect(targets.map(describedBy)).toEqual(['hint feedback', 'own feedback hint'])
+
+      validation.dispose()
+
+      expect(targets.map(describedBy)).toEqual([null, 'own feedback'])
+      expect(describedBy(host)).toBe('hint')
+      expect(field.hasAttribute('aria-describedby')).toBe(false)
+    })
+
+    it('should leave the description on a host that is itself the value field', () => {
+      fixtureEl.innerHTML = '<form><textarea id="host" aria-describedby="hint"></textarea><span id="target"></span></form>'
+      const host = fixtureEl.querySelector('#host')
+      const target = fixtureEl.querySelector('#target')
+      const validation = new FieldValidation(host, {
+        config: () => ({}), fields: () => [host], frames: () => [host], invalidTargets: () => [target]
+      })
+
+      controllers.push(validation)
+      validation.refresh()
+
+      expect([describedBy(host), describedBy(target)]).toEqual(['hint', 'hint'])
+
+      validation.dispose()
+
+      expect([describedBy(host), describedBy(target)]).toEqual(['hint', null])
+    })
+
+    it('should take what it wrote off a target the component no longer lists', () => {
+      const { host, targets, validation } = mount({ attributes: ' aria-describedby="hint"', config: { validationState: 'invalid' } })
+      let listed = targets
+
+      validation._options.invalidTargets = () => listed
+      validation.update()
+      listed = [targets[0]]
+      validation.update()
+
+      expect(targets[1].hasAttribute('aria-invalid')).toBe(false)
+      expect(targets[1].hasAttribute('aria-describedby')).toBe(false)
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+    })
+
+    it('should take the message of the first focus target when no field carries the block', () => {
+      fixtureEl.innerHTML = '<form><div id="host" class="form-control-group"><input id="target" data-coreui-invalid-feedback="named"></div><div id="named" class="invalid-feedback">Named.</div></form>'
+      const host = fixtureEl.querySelector('#host')
+      const target = host.querySelector('#target')
+      const validation = new FieldValidation(host, {
+        config: () => ({ validationState: 'invalid' }), fields: () => [], frames: () => [host], invalidTargets: () => [target]
+      })
+
+      controllers.push(validation)
+      validation.refresh()
+
+      expect(describedBy(target)).toBe('named')
+      expect(target.getAttribute('aria-invalid')).toBe('true')
+    })
+  })
+
   describe('configure', () => {
     it('should apply options of validation alone in place and forget the state class from the markup', () => {
       const { host, state, validation } = mount({ classes: ' is-invalid' })
@@ -284,6 +385,25 @@ describe('FieldValidation', () => {
       validation.update()
 
       expect(stateClasses(host)).toEqual([])
+    })
+
+    it('should drop a state given before the moment a serial stands for, and keep one given after it', () => {
+      const { host, state, validation } = mount({ config: { validationState: 'invalid' } })
+      const serial = nextStateSerial()
+
+      validation.dismiss(serial)
+      validation.update()
+
+      expect(stateClasses(host)).toEqual([])
+
+      const later = nextStateSerial()
+
+      state.config.validationState = 'invalid'
+      validation.configure({ validationState: 'invalid' })
+      validation.dismiss(later)
+      validation.update()
+
+      expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
     it('should keep the given state for a change made by code, and end a user action that changed nothing', () => {
@@ -383,6 +503,18 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual([])
     })
 
+    it('should lift the block from a field the component no longer lists', () => {
+      const { field, validation } = mount({ config: { validationState: 'invalid' } })
+      const replacement = document.createElement('textarea')
+
+      validation._options.fields = () => [replacement]
+      field.form.append(replacement)
+      validation.refresh()
+
+      expect(field.validity.customError).toBe(false)
+      expect(replacement.validity.customError).toBe(true)
+    })
+
     it('should take over the fields it owns from the form utilities and hand them back on dispose', () => {
       const { field, form, validation } = mount()
 
@@ -429,6 +561,31 @@ describe('FieldValidation', () => {
       await tick()
 
       expect(seen).toEqual([[]])
+    })
+
+    it('should draw the dropped state before the value is restored', async () => {
+      const seen = []
+      let onRestore = () => {}
+      const { form, host } = mount({ config: { validationState: 'invalid' }, restore: () => onRestore() })
+
+      onRestore = () => seen.push(stateClasses(host))
+      form.reset()
+      await tick()
+
+      expect(seen).toEqual([[]])
+    })
+
+    it('should keep its place among the reset listeners while a refresh finds no new field', async () => {
+      const { form, host, validation } = mount({ config: { validationState: 'invalid' } })
+      const listener = () => validation.refresh()
+
+      document.addEventListener('reset', listener, true)
+      validation.refresh()
+      form.reset()
+      await tick()
+      document.removeEventListener('reset', listener, true)
+
+      expect(stateClasses(host)).toEqual([])
     })
 
     it('should keep a state given in a reset listener of the form', async () => {

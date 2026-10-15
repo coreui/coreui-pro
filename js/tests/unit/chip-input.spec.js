@@ -106,6 +106,18 @@ describe('ChipInput', () => {
       setTimeout(resolve)
     })
 
+    it('should give the text field of the page its own aria-invalid back on dispose', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"><input type="text" class="chip-input-field" aria-invalid="spelling"></div></form>'
+      const input = fixtureEl.querySelector('input')
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { validationState: 'invalid' })
+
+      expect(input.getAttribute('aria-invalid')).toBe('true')
+
+      chipInput.dispose()
+
+      expect(input.getAttribute('aria-invalid')).toBe('spelling')
+    })
+
     it('should block the submit while it is required and holds no chip, and tell the text field it is required', () => {
       fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
       const form = fixtureEl.querySelector('form')

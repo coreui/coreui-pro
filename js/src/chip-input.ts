@@ -11,12 +11,11 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { splitChipText } from './util/chip-values.js'
+import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
-  configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getServerState,
-  getStateClasses, getValidationState, nextStateSerial, ownValidationState, setStateValidity, swapStateClass,
-  type UserValidity, type ValidationState, writeDescribedBy, writeValueField
+  configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
 } from './util/form-validation.js'
 import {
   captureHostClasses, getUID, type HostClasses, isRTL, restoreHostClasses, writeAttribute
@@ -104,16 +103,10 @@ class ChipInput extends ChipSet {
   protected declare _input: HTMLInputElement
   protected declare _inputDisabled: string | null
   protected declare _inputReadonly: string | null
-  protected declare _describedBy: string | null
   protected declare _hostClasses: HostClasses
   protected declare _initialChips: HTMLElement[]
-  protected declare _releaseValidationState: (() => void) | null
   protected declare _removingByCode: boolean
-  protected declare _serverClasses: string[]
-  protected declare _stateClass: string | null
-  protected declare _stateSerial: number
-  protected declare _userChange: boolean
-  protected declare _userValidity: UserValidity | null
+  protected declare _validation: FieldValidation
   private _addedAriaRequired = false
   private _createdInput = false
   private _labelledFor: Element | null = null
@@ -124,14 +117,15 @@ class ChipInput extends ChipSet {
     this._uniqueId = this._config.id ?? getUID(NAME)
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._valueField = null
-    this._releaseValidationState = null
     this._removingByCode = false
-    this._serverClasses = getStateClasses(this._element)
-    this._element.classList.remove(...this._serverClasses)
-    this._stateClass = null
-    this._stateSerial = nextStateSerial()
-    this._userChange = false
-    this._userValidity = null
+    this._validation = new FieldValidation(this._element, {
+      config: () => this._config,
+      fields: () => (this._valueField ? [this._valueField] : []),
+      frames: () => [this._element],
+      invalidTargets: () => [this._input],
+      owned: () => [this._valueField, this._input].filter(Boolean) as Element[],
+      restore: () => this._restoreChips()
+    })
 
     // The element is the frame: unlike the components that wrap a control, a
     // chip input has nothing to wrap, so it takes the frame class itself and
@@ -145,7 +139,6 @@ class ChipInput extends ChipSet {
       this._createInput()
     }
 
-    this._describedBy = this._input.getAttribute('aria-describedby')
     this._inputDisabled = this._input.getAttribute('disabled')
     this._inputReadonly = this._input.getAttribute('readonly')
     this._applyInteractionState()
@@ -158,9 +151,8 @@ class ChipInput extends ChipSet {
     }
 
     this._initialChips = this._getChipElements()
-    this._releaseValidationState = ownValidationState(...[this._valueField, this._input].filter(Boolean) as Element[])
     this._addInputEventListeners()
-    this._updateValidity()
+    this._validation.refresh()
   }
 
   // Getters
@@ -198,17 +190,11 @@ class ChipInput extends ChipSet {
     }
 
     this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._serverClasses = []
-    this._stateSerial = nextStateSerial()
-    this._updateValidity()
+    this._validation.configure({ validationState: config.validationState })
   }
 
   override dispose(): void {
-    this._userValidity?.stop()
-    this._releaseValidationState?.()
-
-    swapStateClass(this._element, this._stateClass)
-    this._element.classList.add(...this._serverClasses)
+    this._validation.dispose()
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     EventHandler.off(this._input, EVENT_KEY)
@@ -218,8 +204,6 @@ class ChipInput extends ChipSet {
       this._input.remove()
       this._labelledFor?.removeAttribute('for')
     } else {
-      this._input.removeAttribute('aria-invalid')
-      writeAttribute(this._input, 'aria-describedby', this._describedBy)
       writeAttribute(this._input, 'disabled', this._inputDisabled)
       writeAttribute(this._input, 'readonly', this._inputReadonly)
 
@@ -281,22 +265,18 @@ class ChipInput extends ChipSet {
       return
     }
 
-    this._runAsUser(() => super._handleChipRemoved(event))
+    this._validation.runAsUser(() => super._handleChipRemoved(event))
   }
 
   override _noteChange(): void {
     super._noteChange()
-
-    if (this._userChange) {
-      this._userChange = false
-      this._dismissValidationState()
-    }
+    this._validation.change()
   }
 
   override _triggerChange(): void {
     const isChanged = this._valueField ? writeValueField(this._valueField, this.getValues()) : false
 
-    this._updateValidity()
+    this._validation.update()
     super._triggerChange()
 
     if (isChanged) {
@@ -304,42 +284,7 @@ class ChipInput extends ChipSet {
     }
   }
 
-  _runAsUser(action: () => void): void {
-    this._userChange = true
-
-    try {
-      action()
-    } finally {
-      this._userChange = false
-    }
-  }
-
-  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
-    if (this._stateSerial > serial) {
-      return
-    }
-
-    this._config.validationState = null
-    this._serverClasses = []
-  }
-
-  _updateValidity(): void {
-    const field = this._valueField
-    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverClasses)
-
-    if (field) {
-      setStateValidity(field, givenState === 'invalid')
-    }
-
-    const state = givenState ?? this._userValidity?.read()
-    const feedbackIds = state === 'invalid' ? getFeedbackIds(field ?? this._input) : []
-
-    this._stateClass = swapStateClass(this._element, this._stateClass, state)
-    writeAttribute(this._input, 'aria-invalid', state === 'invalid' ? 'true' : null)
-    writeDescribedBy(this._input, this._describedBy, feedbackIds)
-  }
-
-  _restoreChips(serial: number): void {
+  _restoreChips(): void {
     const values = this.getValues().join(',')
     let hadFocus = false
 
@@ -366,7 +311,6 @@ class ChipInput extends ChipSet {
 
     this._chips = this._initialChips.map(chip => this._getChipValue(chip))
     this._setInputSize()
-    this._dismissValidationState(serial)
 
     if (hadFocus) {
       this._input.focus()
@@ -374,10 +318,7 @@ class ChipInput extends ChipSet {
 
     if (this.getValues().join(',') !== values || this._valueField!.value !== this.getValues().join(',')) {
       this._triggerChange()
-      return
     }
-
-    this._updateValidity()
   }
 
   _addInputEventListeners(): void {
@@ -468,7 +409,6 @@ class ChipInput extends ChipSet {
 
     this._element.append(field)
     this._valueField = field
-    this._userValidity = followUserValidity(field, () => this._updateValidity(), serial => this._restoreChips(serial))
   }
 
   _createChipFromInput(): void {
@@ -478,7 +418,7 @@ class ChipInput extends ChipSet {
 
     const value = this._input.value.trim()
     if (value) {
-      this._runAsUser(() => this.add(value))
+      this._validation.runAsUser(() => this.add(value))
       this._input.value = ''
       this._setInputSize()
     }
@@ -558,7 +498,7 @@ class ChipInput extends ChipSet {
     if (parts) {
       const rest = parts.pop() as string
 
-      this._runAsUser(() => {
+      this._validation.runAsUser(() => {
         for (const part of parts) {
           this.add(part)
         }
@@ -588,7 +528,7 @@ class ChipInput extends ChipSet {
     if (parts) {
       event.preventDefault()
 
-      this._runAsUser(() => {
+      this._validation.runAsUser(() => {
         for (const part of parts) {
           this.add(part)
         }
