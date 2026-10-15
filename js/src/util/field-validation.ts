@@ -12,17 +12,6 @@ export type FieldValidationConfig = {
 }
 
 /**
- * The component a part belongs to, as the part's controller sees it: the state the owner was
- * given, whether the owner shows an error of its own on the part, and where the part reports that
- * it dropped its state.
- */
-export type FieldValidationOwner = {
-  dismiss: (serial: number) => void
-  invalid: boolean
-  state: ValidationState | undefined
-}
-
-/**
  * How a component tells `FieldValidation` about itself.
  *
  * - `aliases`: the component takes the `invalid` and `valid` aliases of `validationState`.
@@ -36,11 +25,9 @@ export type FieldValidationOwner = {
  * - `frames`: the elements that get the state class.
  * - `invalidTargets`: the elements that get `aria-invalid`.
  * - `owned`: the elements the form utilities leave to the component; `fields` by default.
- * - `owner`: the component this one is a part of. Its state counts as given after the component's
- *   own options and state classes, its error marks the focus targets invalid without the state
- *   class, and it hears every drop of the state with the serial of the moment.
- * - `ownError`: whether the component has an error of its own, such as a value outside its limits,
- *   which it shows as `'invalid'` over the given and the reported state without blocking.
+ * - `ownError`: whether the component has an error of its own, such as a value outside its limits
+ *   or a range in the wrong order, which it shows as `'invalid'` over the given and the reported
+ *   state without blocking.
  * - `pageDescribed`: the described targets that carry the description the page gave the host, given
  *   whether the state is `'invalid'`, and the host itself when it keeps that description. A host
  *   that keeps it lends the description it carries at the moment. By default the first described
@@ -59,7 +46,6 @@ export type FieldValidationOptions = {
   frames: () => Element[]
   invalidTargets: () => Element[]
   owned?: () => Element[]
-  owner?: () => FieldValidationOwner | null
   ownError?: () => boolean
   pageDescribed?: (isInvalid: boolean) => Element[]
   restore?: () => void
@@ -87,6 +73,8 @@ class FieldValidation {
   protected declare _movedDescription: boolean
   protected declare _onReset: (event: Event) => void
   protected declare _options: FieldValidationOptions
+  protected declare _owner: FieldValidation | null
+  protected declare _parts: FieldValidation[]
   protected declare _release: () => void
   protected declare _resetRoots: Node[]
   protected declare _resetTimeouts: Set<ReturnType<typeof setTimeout>>
@@ -111,6 +99,8 @@ class FieldValidation {
     this._movedDescription = false
     this._onReset = event => this._handleReset(event)
     this._options = options
+    this._owner = null
+    this._parts = []
     this._release = () => {}
     this._resetRoots = []
     this._resetTimeouts = new Set()
@@ -128,6 +118,20 @@ class FieldValidation {
 
     this._userValidity = new Map()
     this.userAction = false
+  }
+
+  /**
+   * Makes this controller the owner of the controller of a part, such as a field of a picker or an
+   * end of a range: the part takes the owner's given state after its own, shows the owner's error
+   * of its own on its focus targets, and tells the owner every drop of its state. Draws the owner
+   * and its parts.
+   *
+   * @param part - The controller of the part
+   */
+  adopt(part: FieldValidation): void {
+    part._owner = this
+    this._parts.push(part)
+    this.update()
   }
 
   /**
@@ -188,9 +192,9 @@ class FieldValidation {
 
   /**
    * Drops the given state, in the component's configuration and as a state class from the markup,
-   * and lifts its block, unless the state was given after the moment the serial stands for, then
-   * tells the owner with the same serial. A component that knows a change is the user's calls it
-   * directly, before its change events.
+   * and lifts its block, unless the state was given after the moment the serial stands for; an owner
+   * that dropped a state draws itself and its parts. Then tells its own owner with the same serial.
+   * A component that knows a change is the user's calls it directly, before its change events.
    *
    * @param serial - The serial taken at the moment that drops the state, such as the start of a
    * key press or a native reset; any state given before it is dropped by default
@@ -214,9 +218,13 @@ class FieldValidation {
       for (const field of this._options.fields()) {
         setStateValidity(field, false)
       }
+
+      if (this._parts.length > 0) {
+        this.update()
+      }
     }
 
-    this._options.owner?.()?.dismiss(serial)
+    this._owner?.dismiss(serial)
 
     return isDropped
   }
@@ -287,16 +295,16 @@ class FieldValidation {
    * ids others put there, and only then the block of a given `'invalid'` on the fields that carry it
    * while the component can block, so the block takes the message the page and the stylesheet show
    * for them. The message in the description is the feedback of the first field that carries the
-   * block, else of the first focus target. The given state is the component's own, else its
-   * owner's; the shown state comes from `_shownState()`. An error of the owner marks the focus
-   * targets invalid and describes them with the message, but leaves the state class to the owner
-   * unless the component shows `'invalid'` itself. Focus and described targets the component no
-   * longer lists lose what the controller wrote there.
+   * block, else of the first focus target. The given state is the component's own, else the one
+   * its owners were given; the shown state comes from `_shownState()`. An error of the owner's own
+   * marks the focus targets invalid and describes them with the message, but leaves the state class
+   * to the owner unless the component shows `'invalid'` itself. Focus and described targets the
+   * component no longer lists lose what the controller wrote there. An owner draws its parts after
+   * itself.
    */
   update(): void {
     const config = this._options.config()
-    const owner = this._options.owner?.()
-    const givenState = this._givenState(config) ?? owner?.state
+    const givenState = this._givenState(config) ?? this._owner?._inheritedState()
     const fields = this._options.fields()
     const blockers = this._options.blockers?.() ?? fields
     const blocked = givenState === 'invalid' && (this._options.canBlock?.() ?? !config.disabled) ? fields.filter(field => blockers.includes(field)) : []
@@ -308,7 +316,7 @@ class FieldValidation {
     }
 
     const shownState = this._shownState(givenState)
-    const isInvalid = shownState === 'invalid' || Boolean(owner?.invalid)
+    const isInvalid = shownState === 'invalid' || Boolean(this._owner?._options.ownError?.())
     const state = isInvalid && shownState !== 'invalid' ? undefined : shownState
 
     this._drawStateClass(state ? `is-${state}` : null)
@@ -321,16 +329,23 @@ class FieldValidation {
     for (const field of blocked) {
       setStateValidity(field, true)
     }
+
+    for (const part of this._parts) {
+      part.update()
+    }
   }
 
   /**
-   * Hands everything back: stops following the fields and the form, lifts the block, takes off what
-   * it drew, gives back the `aria-invalid` it overwrote, gives the server sources the state classes
-   * of their markup, unless that state was dropped meanwhile, and adds the page's description back
-   * to the host next to what the host carries now. Call it before the component takes its elements
-   * apart.
+   * Hands everything back: leaves its owner, stops following the fields and the form, lifts the
+   * block, takes off what it drew, gives back the `aria-invalid` it overwrote, gives the server
+   * sources the state classes of their markup, unless that state was dropped meanwhile, and adds the
+   * page's description back to the host next to what the host carries now. Call it before the
+   * component takes its elements apart.
    */
   dispose(): void {
+    this._owner?._parts.splice(this._owner._parts.indexOf(this), 1)
+    this._owner = null
+
     for (const timeout of this._resetTimeouts) {
       clearTimeout(timeout)
     }
@@ -373,13 +388,32 @@ class FieldValidation {
    * @returns The state to show, or `undefined` for none
    */
   _shownState(givenState: ValidationState | undefined): ValidationState | undefined {
-    if (this._options.ownError?.()) {
+    if (this._hasError()) {
       return 'invalid'
     }
 
     const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
 
     return givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
+  }
+
+  /**
+   * Tells whether the component or one of its parts, at any depth, has an error of its own.
+   *
+   * @returns `true` when an error of its own makes the component show `'invalid'`
+   */
+  _hasError(): boolean {
+    return Boolean(this._options.ownError?.()) || this._parts.some(part => part._hasError())
+  }
+
+  /**
+   * Reads the state given to the component or, when it was given none, to its owner, up the chain
+   * of owners.
+   *
+   * @returns The given state, or `undefined` when none was given
+   */
+  _inheritedState(): ValidationState | undefined {
+    return this._givenState(this._options.config()) ?? this._owner?._inheritedState()
   }
 
   /**

@@ -879,6 +879,15 @@ describe('DateRangePicker', () => {
       expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
     })
 
+    it('should show the order error on the picker element when only the start moves past the end', () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) })
+      const element = fixtureEl.querySelector('#picker')
+
+      picker.setRange(new Date(2026, 6, 25), new Date(2026, 6, 20))
+
+      expect(element).toHaveClass('is-invalid')
+    })
+
     it('should show the order error on the picker element over a given valid state', () => {
       const picker = buildPicker({
         endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'valid'

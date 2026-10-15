@@ -38,6 +38,23 @@ describe('FieldValidation', () => {
     }
   }
 
+  const mountOwner = ({ config = {}, error = false, frames = false } = {}) => {
+    const host = document.createElement('div')
+    const state = { config: { validationState: null, ...config }, error }
+    const validation = new FieldValidation(host, {
+      config: () => state.config,
+      fields: () => [],
+      frames: () => (frames ? [host] : []),
+      invalidTargets: () => [],
+      ownError: () => state.error
+    })
+
+    fixtureEl.append(host)
+    controllers.push(validation)
+
+    return { host, state, validation }
+  }
+
   const stateClasses = element => [...element.classList].filter(name => name.startsWith('is-'))
   const describedBy = element => element.getAttribute('aria-describedby')
 
@@ -220,11 +237,16 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
-    it('should take the state of its owner after its own, mark the owner\'s error without the class, and tell the owner every drop', () => {
-      const owner = { dismiss: vi.fn(), invalid: false, state: 'invalid' }
-      const { field, host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"', owner: () => owner })
+    it('should take the state of its owners after its own, mark the owner\'s error without the class, and tell the owners every drop', () => {
+      const { field, host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"' })
+      const range = mountOwner({ frames: true })
+      const picker = mountOwner({ config: { validationState: 'invalid' } })
+
+      picker.validation.adopt(range.validation)
+      range.validation.adopt(validation)
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(stateClasses(range.host)).toEqual(['is-invalid'])
       expect(field.validity.customError).toBe(true)
 
       state.config.validationState = 'valid'
@@ -232,29 +254,52 @@ describe('FieldValidation', () => {
 
       expect(stateClasses(host)).toEqual(['is-valid'])
 
-      owner.invalid = true
+      range.state.error = true
       validation.update()
 
       expect(stateClasses(host)).toEqual([])
       expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
       expect(targets.map(describedBy)).toEqual(['hint feedback', 'hint feedback'])
 
-      expect(validation.dismiss()).toBe(true)
+      range.state.error = false
+      validation.dismiss()
 
-      const serial = nextStateSerial()
-
-      owner.state = undefined
-      owner.invalid = false
-
-      expect(validation.dismiss(serial)).toBe(false)
-      expect(owner.dismiss.mock.calls).toEqual([[Number.POSITIVE_INFINITY], [serial]])
+      expect([state.config.validationState, picker.state.config.validationState]).toEqual([null, null])
+      expect(stateClasses(host)).toEqual([])
+      expect(stateClasses(range.host)).toEqual([])
+      expect(field.validity.customError).toBe(false)
     })
 
     it('should keep its own invalid state class while its owner shows an error', () => {
-      const owner = { dismiss() {}, invalid: true, state: undefined }
-      const { host } = mount({ config: { validationState: 'invalid' }, owner: () => owner })
+      const { host, validation } = mount({ config: { validationState: 'invalid' } })
+      const range = mountOwner({ error: true })
+
+      range.validation.adopt(validation)
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
+    })
+
+    it('should show invalid on an owner whose part has an error of its own, and stop drawing a disposed part', () => {
+      let hasError = true
+      const { host, validation } = mount({ ownError: () => hasError })
+      const range = mountOwner({ config: { validationState: 'valid' }, frames: true })
+
+      range.validation.adopt(validation)
+
+      expect(stateClasses(range.host)).toEqual(['is-invalid'])
+
+      hasError = false
+      range.validation.update()
+
+      expect(stateClasses(range.host)).toEqual(['is-valid'])
+      expect(stateClasses(host)).toEqual(['is-valid'])
+
+      validation.dispose()
+      hasError = true
+      range.validation.update()
+
+      expect(stateClasses(host)).toEqual([])
+      expect(stateClasses(range.host)).toEqual(['is-valid'])
     })
 
     it('should let a host that keeps the description lend the one it carries to the targets it names', () => {
@@ -882,16 +927,19 @@ describe('FieldValidation', () => {
     })
 
     it('should tell the owner the serial of a reset', async () => {
-      const owner = { dismiss: vi.fn(), invalid: false, state: undefined }
-      const { form } = mount({ owner: () => owner })
+      const { form, validation } = mount()
+      const range = mountOwner({ config: { validationState: 'invalid' }, frames: true })
       const before = nextStateSerial()
+      const dismiss = vi.spyOn(range.validation, 'dismiss')
 
+      range.validation.adopt(validation)
       form.reset()
       await tick()
 
-      expect(owner.dismiss).toHaveBeenCalledTimes(1)
-      expect(owner.dismiss.mock.calls[0][0]).toBeGreaterThan(before)
-      expect(Number.isFinite(owner.dismiss.mock.calls[0][0])).toBe(true)
+      expect(dismiss).toHaveBeenCalledTimes(1)
+      expect(dismiss.mock.calls[0][0]).toBeGreaterThan(before)
+      expect(Number.isFinite(dismiss.mock.calls[0][0])).toBe(true)
+      expect(stateClasses(range.host)).toEqual([])
     })
 
     it('should keep a state given in a reset listener of the form', async () => {
