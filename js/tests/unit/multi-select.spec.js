@@ -443,7 +443,7 @@ describe('MultiSelect', () => {
       expect(seen).toEqual([expected])
     })
 
-    it('should keep a state a change listener gives while setConfig replaces the value', () => {
+    it('should keep a state a change listener gives while setConfig gives a value', () => {
       fixtureEl.innerHTML = '<form><select multiple></select></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2', selected: true }] })
@@ -1796,6 +1796,13 @@ describe('MultiSelect', () => {
       expect(selectEl.value).toBe('2')
     })
 
+    it('should add a given value to the options marked selected in a multiple select', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b">B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { value: ['b'] })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b'])
+    })
+
     it('should take the given value over the first option of a single select', () => {
       fixtureEl.innerHTML = '<select><option value="a">A</option><option value="b">B</option></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false, value: 'b' })
@@ -2839,11 +2846,29 @@ describe('MultiSelect', () => {
       multiSelect.setConfig({ placeholder: 'b' })
 
       expect(multiSelect._menu.querySelector('.list-box-section-label').textContent).toBe('G (unavailable)')
+    })
 
+    it('should keep an option disabled on its own after its group is enabled again', () => {
+      fixtureEl.innerHTML = '<select multiple><optgroup label="G" disabled><option value="1" disabled>One</option><option value="2">Two</option></optgroup></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+
+      multiSelect.setConfig({ placeholder: 'a' })
       selectEl.querySelector('optgroup').disabled = false
-      multiSelect.setConfig({ placeholder: 'c' })
+      multiSelect.setConfig({ placeholder: 'b' })
 
-      expect(multiSelect._menu.querySelector('[data-coreui-value="1"]').getAttribute('aria-disabled')).toBeNull()
+      expect(multiSelect._menu.querySelector('[data-coreui-value="1"]').getAttribute('aria-disabled')).toBe('true')
+    })
+
+    it('should keep a group the deselectAll options mark disabled', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ label: 'G', options: [{ value: '1', text: 'One', selected: true }] }, { value: '2', text: 'Two', selected: true }]
+      })
+
+      multiSelect.deselectAll([{ label: 'G', disabled: true, options: [{ value: '1', text: 'One' }] }, { value: '2', text: 'Two' }])
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
     })
   })
 

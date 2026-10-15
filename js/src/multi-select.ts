@@ -783,19 +783,19 @@ class MultiSelect extends ComboboxBase {
     this._element.toggleAttribute('disabled', this._config.disabled)
   }
 
-  _createNativeOptions(parentElement: HTMLElement, options: any[], disabled = false): void {
+  _createNativeOptions(parentElement: HTMLElement, options: any[]): void {
     for (const option of options) {
       if (isOptionGroup(option)) {
         const optgroup = document.createElement('optgroup')
         optgroup.label = option.label
         optgroup.disabled = option.disabled === true
-        this._createNativeOptions(optgroup, option.options, disabled || optgroup.disabled)
+        this._createNativeOptions(optgroup, option.options)
         parentElement.append(optgroup)
       } else {
         const opt = document.createElement('OPTION') as HTMLOptionElement
         opt.value = option.value
 
-        if (option.disabled && !disabled) {
+        if (option.disabled === true) {
           opt.setAttribute('disabled', 'disabled')
         }
 
