@@ -303,7 +303,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._createSelect()
-    this._initialSelection = this._selected.map((option: any) => ({ ...option }))
+    this._initialSelection = [...this._selected]
     this._addEventListeners()
     Data.set(this._element, DATA_KEY, this)
   }
@@ -478,11 +478,11 @@ class MultiSelect extends ComboboxBase {
   }
 
   selectAll(options: any[] = this._options): void {
-    this._selectUpToLimit(getSelectableOptions(options))
+    this._selectUpToLimit(this._enabledOptions(options))
   }
 
   deselectAll(options?: any[]): void {
-    const values = options ? new Set(getSelectableOptions(options).map((option: any) => String(option.value))) : null
+    const values = options ? new Set(this._enabledOptions(options).map((option: any) => String(option.value))) : null
 
     this._commit(this._selected.filter((option: any) => option.disabled === true || (values !== null && !values.has(option.value))))
   }
@@ -725,7 +725,7 @@ class MultiSelect extends ComboboxBase {
       }
 
       const value = String(option.value)
-      const isSelected = this._config.value ? this._config.value.includes(value) : option.selected
+      const isSelected = option.selected || this._config.value?.includes(value)
 
       const customProperties = typeof option === 'object' ? { ...option } : {}
 
@@ -783,18 +783,19 @@ class MultiSelect extends ComboboxBase {
     this._element.toggleAttribute('disabled', this._config.disabled)
   }
 
-  _createNativeOptions(parentElement: HTMLElement, options: any[]): void {
+  _createNativeOptions(parentElement: HTMLElement, options: any[], disabled = false): void {
     for (const option of options) {
       if (isOptionGroup(option)) {
         const optgroup = document.createElement('optgroup')
         optgroup.label = option.label
-        this._createNativeOptions(optgroup, option.options)
+        optgroup.disabled = option.disabled === true
+        this._createNativeOptions(optgroup, option.options, disabled || optgroup.disabled)
         parentElement.append(optgroup)
       } else {
         const opt = document.createElement('OPTION') as HTMLOptionElement
         opt.value = option.value
 
-        if (option.disabled === true) {
+        if (option.disabled && !disabled) {
           opt.setAttribute('disabled', 'disabled')
         }
 
@@ -1142,7 +1143,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   override _onSelectionChange(): void {
-    const proposed = this._listBox ? this._listBox.getSelectedValues() : []
+    const proposed = this._listBox!.getSelectedValues()
     const listed = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
     const kept = this._config.multiple ?
       this._selected.filter((option: any) => option.disabled === true || !listed.has(option.value) || proposed.includes(option.value)) :
@@ -1178,6 +1179,12 @@ class MultiSelect extends ComboboxBase {
 
   override _onSelectionLimit(): void {
     this._triggerSelectionLimit()
+  }
+
+  _enabledOptions(options: any[]): any[] {
+    return options
+      .filter(option => !option.disabled)
+      .flatMap(option => (isOptionGroup(option) ? this._enabledOptions(option.options) : [option]))
   }
 
   _selectUpToLimit(options: any[]): void {
@@ -1252,22 +1259,6 @@ class MultiSelect extends ComboboxBase {
 
   _render(): void {
     const options = new Map(flattenOptions(this._options).toReversed().map((option: any) => [String(option.value), option]))
-    const enabled = new Set(getSelectableOptions(this._options).map((option: any) => String(option.value)))
-
-    for (const option of this._selected) {
-      const listed = options.get(option.value)
-
-      if (listed) {
-        option.text = listed.text
-
-        if (enabled.has(option.value)) {
-          delete option.disabled
-        } else {
-          option.disabled = true
-        }
-      }
-    }
-
     const values = new Set<string>(this._selected.map((option: any) => option.value))
     const held = new Set<string>(this._listBox ? this._listBox.getSelectedValues() : [])
 
@@ -1277,9 +1268,23 @@ class MultiSelect extends ComboboxBase {
       }
     }
 
-    for (const value of values) {
-      if (!held.has(value) && enabled.has(value)) {
-        this._syncOptionElementState(value, true)
+    for (const option of this._selected) {
+      const listed = options.get(option.value)
+
+      if (!listed) {
+        continue
+      }
+
+      option.text = listed.text
+
+      if (listed.disabled) {
+        option.disabled = true
+      } else {
+        delete option.disabled
+
+        if (!held.has(option.value)) {
+          this._syncOptionElementState(option.value, true)
+        }
       }
     }
 
@@ -1309,7 +1314,7 @@ class MultiSelect extends ComboboxBase {
 
   _restoreSelection(): void {
     this._onSearchChange(this._searchElement)
-    this._commit(this._initialSelection.filter((option: any) => this._findOptionByValue(option.value)).map((option: any) => ({ ...option })), false)
+    this._commit(this._initialSelection.filter((option: any) => this._findOptionByValue(option.value)), false)
   }
 
   _updateSelection(): void {

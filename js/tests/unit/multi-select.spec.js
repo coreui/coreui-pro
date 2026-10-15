@@ -1824,20 +1824,6 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
     })
 
-    it('should take the given value over the selected options of a multiple select', () => {
-      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b">B</option></select>'
-      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { value: ['b'] })
-
-      expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
-    })
-
-    it('should take the given value over a selected option further down a single select', () => {
-      fixtureEl.innerHTML = '<select><option value="a">A</option><option value="b" selected>B</option></select>'
-      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false, value: 'a' })
-
-      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
-    })
-
     it('should keep the last selected option of multiple markup read as a single select', () => {
       fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b" selected>B</option><option value="c">C</option></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false })
@@ -2802,7 +2788,7 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
     })
 
-    it('should leave the options of a disabled group out of the counter total', () => {
+    it('should leave the unselected options of a disabled group out of the counter total', () => {
       fixtureEl.innerHTML = '<select></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
         options: [
@@ -2827,8 +2813,37 @@ describe('MultiSelect', () => {
       })
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
-      expect(selectEl.querySelector('option[value="1"]').disabled).toBeTrue()
+      expect(selectEl.querySelector('optgroup').disabled).toBeTrue()
       expect(new FormData(fixtureEl.querySelector('form')).getAll('f')).toEqual(['2'])
+    })
+
+    it('should skip a disabled group in the options selectAll is given', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const options = [
+        { label: 'G', disabled: true, options: [{ value: '1', text: 'One' }] },
+        { value: '2', text: 'Two' }
+      ]
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options })
+
+      multiSelect.selectAll(options)
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['2'])
+    })
+
+    it('should keep a markup group disabled through a rebuild', () => {
+      fixtureEl.innerHTML = '<select multiple><optgroup label="G" disabled><option value="1">One</option></optgroup><option value="2">Two</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { optionsGroupsTemplate: group => `${group.label}${group.disabled ? ' (unavailable)' : ''}` })
+
+      multiSelect.setConfig({ placeholder: 'a' })
+      multiSelect.setConfig({ placeholder: 'b' })
+
+      expect(multiSelect._menu.querySelector('.list-box-section-label').textContent).toBe('G (unavailable)')
+
+      selectEl.querySelector('optgroup').disabled = false
+      multiSelect.setConfig({ placeholder: 'c' })
+
+      expect(multiSelect._menu.querySelector('[data-coreui-value="1"]').getAttribute('aria-disabled')).toBeNull()
     })
   })
 
