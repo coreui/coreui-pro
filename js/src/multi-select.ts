@@ -1331,10 +1331,6 @@ class MultiSelect extends ComboboxBase {
     return SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element)
   }
 
-  _getOptionElement(value: any): any {
-    return SelectorEngine.findOne(`[data-coreui-value="${CSS.escape(value)}"]`, this._optionsElement)
-  }
-
   _getDisplayedItems(): HTMLElement[] {
     return this._getDisplayedOptions().filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
   }
@@ -1825,13 +1821,6 @@ class MultiSelect extends ComboboxBase {
 
     for (let i = 0, len = selects.length; i < len; i++) {
       const context = Data.get(selects[i], DATA_KEY)
-      const relatedTarget: any = {
-        relatedTarget: selects[i]
-      }
-
-      if (event && event.type === 'click') {
-        relatedTarget.clickEvent = event
-      }
 
       if (!context) {
         continue

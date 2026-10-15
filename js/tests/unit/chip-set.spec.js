@@ -1194,6 +1194,24 @@ describe('ChipSet', () => {
       expect(messages()).toEqual(['Alfa dodano', 'Alfa usuni\u0119to'])
     })
 
+    it('should let a function word the whole announcement', async () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el, {
+        ariaAddedAnnouncement: values => `Dodano: ${values.join(' i ')}`,
+        ariaRemovedAnnouncement: values => `Usuni\u0119to ${values.length}`
+      })
+      await Promise.resolve()
+
+      chipSet.add('Alfa')
+      chipSet.add('Beta')
+      await settle()
+      chipSet.remove('Alfa')
+      chipSet.remove('Beta')
+      await settle()
+
+      expect(messages()).toEqual(['Dodano: Alfa i Beta', 'Usuni\u0119to 2'])
+    })
+
     it('should not announce chips added while it is set up', async () => {
       const el = setMarkup([])
       const chipSet = new ChipSet(el)
@@ -1222,7 +1240,19 @@ describe('ChipSet', () => {
       chipSet.add('e')
       await settle()
 
-      expect(messages()).toEqual(['c added', 'd added'])
+      expect(messages()).toEqual(['c added', 'd, e added'])
+    })
+
+    it('should name every chip removed in one task', async () => {
+      const el = setMarkup(['a', 'b', 'c'])
+      const chipSet = new ChipSet(el)
+      await settle()
+
+      chipSet.remove('a')
+      chipSet.remove('c')
+      await settle()
+
+      expect(messages()).toEqual(['a, c removed'])
     })
 
     it('should stay silent while the set is hidden or out of the page', async () => {

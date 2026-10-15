@@ -1,3 +1,5 @@
+export type ChipAnnouncement = string | ((values: string[]) => string)
+
 export type ChipClassName = string | ((value: string) => unknown) | null | undefined
 
 /**
@@ -60,4 +62,28 @@ export const resolveChipClassName = (chipClassName: ChipClassName, value: string
   const className = typeof chipClassName === 'function' ? chipClassName(value) : chipClassName
 
   return typeof className === 'string' ? className : ''
+}
+
+/**
+ * Words the change between two lists of chip values for a live region. The values the list did not
+ * hold before are the ones named, each once, or, when there is none, the values it no longer holds;
+ * empty values are left out. A string label follows the values, joined with commas; a function label
+ * receives them and returns the whole message.
+ *
+ * @param before - The chip values before the change
+ * @param after - The chip values after it
+ * @param addedLabel - The word that follows added values, or a function that words them
+ * @param removedLabel - The word that follows removed values, or a function that words them
+ * @returns The message, or `null` when no value was added or removed or the label gave no text
+ */
+export const getChipAnnouncement = (before: readonly string[], after: readonly string[], addedLabel: ChipAnnouncement, removedLabel: ChipAnnouncement): string | null => {
+  let changed = [...new Set(after.filter(value => value && !before.includes(value)))]
+  let label = addedLabel
+
+  if (changed.length === 0) {
+    changed = [...new Set(before.filter(value => value && !after.includes(value)))]
+    label = removedLabel
+  }
+
+  return (changed.length > 0 && (typeof label === 'function' ? label(changed) : `${changed.join(', ')} ${label}`)) || null
 }
