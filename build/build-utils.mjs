@@ -20,8 +20,9 @@ const bundle = await rolldown({
   }
 })
 
-await bundle.write({
-  banner: chunk => banner(`util/${chunk.name}.ts`),
+const { output } = await bundle.write({
+  banner: chunk => banner(chunk.isEntry ? `util/${chunk.name}.ts` : chunk.moduleIds.map(id => path.relative(path.resolve(__dirname, '../js/src'), id)).join(', ')),
+  chunkFileNames: '[name]-[hash].mjs',
   comments: { jsdoc: false },
   dir: path.resolve(__dirname, '../js/dist/util'),
   entryFileNames: '[name].mjs',
@@ -31,5 +32,11 @@ await bundle.write({
 })
 
 await bundle.close()
+
+const misnamed = output.filter(file => file.type === 'chunk' && !file.fileName.endsWith('.mjs'))
+
+if (misnamed.length > 0) {
+  throw new Error(`The ESM utils must end in .mjs, the package has no "type": "module": ${misnamed.map(file => file.fileName).join(', ')}`)
+}
 
 console.log(`Built the ESM utils: ${UTILS.join(', ')}`)

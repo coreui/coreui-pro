@@ -1,3 +1,5 @@
+export { getNextActiveElement } from './index.js'
+
 export type TypeaheadBuffer = {
   clear: () => void
   push: (key: string) => string | null
