@@ -1,9 +1,20 @@
 import { vi } from 'vitest'
-import { createTypeaheadBuffer, findTypeaheadMatch, rangeBetween } from '../../../src/util/list-navigation.js'
+import {
+  createTypeaheadBuffer, findTypeaheadMatch, getNextActiveElement, rangeBetween
+} from '../../../src/util/list-navigation.js'
+import * as Util from '../../../src/util/index.js'
 
 describe('List navigation utilities', () => {
   afterEach(() => {
     vi.useRealTimers()
+  })
+
+  describe('getNextActiveElement', () => {
+    it('should be the list walk of util/index', () => {
+      expect(getNextActiveElement).toBe(Util.getNextActiveElement)
+      expect(getNextActiveElement(['a', 'b', 'c'], 'c', true, true)).toBe('a')
+      expect(getNextActiveElement(['a', 'b', 'c'], 'a', false, false)).toBe('a')
+    })
   })
 
   describe('createTypeaheadBuffer', () => {
