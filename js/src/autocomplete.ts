@@ -63,6 +63,16 @@ const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_SHOW = 'show'
 
 const HOST_CLASS_NAMES = [CLASS_NAME_AUTOCOMPLETE, CLASS_NAME_DISABLED, CLASS_NAME_INPUT_GROUP, CLASS_NAME_SHOW]
+const HOST_FIELD_ATTRIBUTES = new Set([
+  'aria-description',
+  'aria-details',
+  'aria-errormessage',
+  'aria-label',
+  'aria-labelledby',
+  'aria-placeholder',
+  'aria-readonly',
+  'aria-required'
+])
 
 const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
@@ -170,6 +180,7 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputElement: any
   protected declare _inputHintElement: any
   protected declare _hostClasses: HostClasses
+  protected declare _hostAria: Array<[string, string]>
   protected declare _keySerial: number | null
   protected declare _previousTabIndex: string | null
   protected declare _initialValue: any
@@ -278,6 +289,12 @@ class Autocomplete extends ComboboxBase {
     }
 
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
+
+    for (const [name, value] of this._hostAria) {
+      if (!this._element.hasAttribute(name)) {
+        this._element.setAttribute(name, value)
+      }
+    }
 
     if (this._previousTabIndex === null) {
       this._element.removeAttribute('tabindex')
@@ -649,6 +666,9 @@ class Autocomplete extends ComboboxBase {
     // carries `.form-control-group` itself instead of nesting one.
     const togglerEl = this._element
     this._previousTabIndex = togglerEl.getAttribute('tabindex')
+    this._hostAria = [...togglerEl.attributes]
+      .filter(({ name }) => HOST_FIELD_ATTRIBUTES.has(name))
+      .map(({ name, value }): [string, string] => [name, value])
 
     applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
@@ -676,6 +696,12 @@ class Autocomplete extends ComboboxBase {
     inputEl.autocomplete = 'off'
     inputEl.placeholder = this._config.placeholder ?? ''
     inputEl.role = 'combobox'
+
+    for (const [name, value] of this._hostAria) {
+      inputEl.setAttribute(name, value)
+      togglerEl.removeAttribute(name)
+    }
+
     inputEl.setAttribute('aria-autocomplete', 'list')
     inputEl.setAttribute('aria-expanded', 'false')
     inputEl.setAttribute('aria-haspopup', 'listbox')

@@ -72,6 +72,41 @@ describe('Autocomplete', () => {
       expect(autocomplete._selected.map(option => option.value)).toEqual(['1'])
     })
 
+    it('should name the field by the aria-label or aria-labelledby on the host', () => {
+      fixtureEl.innerHTML = [
+        '<h2 id="country-heading">Shipping country</h2>',
+        '<div id="labelled" aria-labelledby="country-heading"></div>',
+        '<div id="named" aria-label="Country"></div>'
+      ].join('')
+      const labelled = new Autocomplete(fixtureEl.querySelector('#labelled'), { options: ['Poland'] })
+      const named = new Autocomplete(fixtureEl.querySelector('#named'), { options: ['Poland'] })
+
+      expect(labelled._inputElement.getAttribute('aria-labelledby')).toBe('country-heading')
+      expect(labelled._element.hasAttribute('aria-labelledby')).toBeFalse()
+      expect(named._inputElement.getAttribute('aria-label')).toBe('Country')
+      expect(named._element.hasAttribute('aria-label')).toBeFalse()
+    })
+
+    it('should move the other aria attributes on the host to the field and keep its own', () => {
+      fixtureEl.innerHTML = '<div aria-activedescendant="stale" aria-errormessage="country-error" aria-expanded="true" aria-hidden="true" aria-required="true"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('div'), { options: ['Poland'] })
+
+      expect(autocomplete._inputElement.getAttribute('aria-errormessage')).toBe('country-error')
+      expect(autocomplete._inputElement.getAttribute('aria-required')).toBe('true')
+      expect(autocomplete._inputElement.getAttribute('aria-expanded')).toBe('false')
+      expect(autocomplete._inputElement.hasAttribute('aria-activedescendant')).toBeFalse()
+      expect(autocomplete._inputElement.hasAttribute('aria-hidden')).toBeFalse()
+      expect(autocomplete._element.getAttribute('aria-hidden')).toBe('true')
+      expect(autocomplete._element.hasAttribute('aria-required')).toBeFalse()
+    })
+
+    it('should name the field by a label pointing at its id', () => {
+      fixtureEl.innerHTML = '<label for="country">Country</label><div data-coreui-id="country"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('div'), { options: ['Poland'] })
+
+      expect([...autocomplete._inputElement.labels].map(label => label.textContent)).toEqual(['Country'])
+    })
+
     it('should take care of element either passed as a CSS selector or DOM element', () => {
       fixtureEl.innerHTML = [
         '<div class="autocomplete" data-coreui-autocomplete>',
@@ -3221,6 +3256,31 @@ describe('Autocomplete', () => {
 
       expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
       expect(autocompleteEl.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should give the aria-label and aria-labelledby back to the host', () => {
+      fixtureEl.innerHTML = '<div aria-label="Country" aria-labelledby="country-heading"></div><div id="bare"></div>'
+      const autocompleteEl = fixtureEl.querySelector('[aria-label]')
+      const bare = fixtureEl.querySelector('#bare')
+
+      new Autocomplete(autocompleteEl, { options: [] }).dispose()
+      new Autocomplete(bare, { options: [] }).dispose()
+
+      expect(autocompleteEl.getAttribute('aria-label')).toBe('Country')
+      expect(autocompleteEl.getAttribute('aria-labelledby')).toBe('country-heading')
+      expect(bare.hasAttribute('aria-label')).toBeFalse()
+      expect(bare.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should keep an aria-label the page wrote on the host after init', () => {
+      fixtureEl.innerHTML = '<div aria-label="Country"></div>'
+      const autocompleteEl = fixtureEl.querySelector('div')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocompleteEl.setAttribute('aria-label', 'Kraj')
+      autocomplete.dispose()
+
+      expect(autocompleteEl.getAttribute('aria-label')).toBe('Kraj')
     })
 
     it('should leave no class attribute on an element that had none, and keep a disabled class the page wrote', () => {
