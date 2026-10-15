@@ -1044,6 +1044,26 @@ check, radio, carousel and toggler icons already work:
   a keystroke over the options list jumps to the first option starting with
   it.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Multi Select sends one `change.coreui.multi-select` per change of the
+  selection.** The clear button, `deselectAll()`, `selectAll()` and a pick
+  that replaces the value of a single select used to send one event for every
+  option they touched; they send one now, once the native select holds the new
+  value and the control shows it, the way the native `change` works. An action
+  that changes nothing sends no event, native ones included, and the component
+  no longer sends one for each preselected option while it builds or rebuilds;
+  `setConfig()` sends one when it changes the selection.
+- **Multi Select keeps its selection through `setConfig()`** when the config
+  carries neither `options` nor `value`, fitted to a new `multiple` or
+  `selectionLimit`; with options from the config it used to fall back to the
+  options marked `selected`. A selected option that is disabled, also inside a
+  disabled group, shows as a disabled chip and stays through the clear button,
+  `deselectAll()` and <kbd>Backspace</kbd>; the options of a disabled group
+  are disabled in the list and in the native select as well, so, like any
+  disabled option, they are not sent with the form. A single select whose
+  selection is empty holds its `value=""` placeholder option, or none, instead
+  of letting the browser fall back to the first option, so the form gets no
+  option the control does not show.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Autocomplete's `search` takes only `'external'`, and global typing is
   `globalSearch`, on by default.** The array and the comma list are gone, so
   `search: ['external', 'global']` and `data-coreui-search="external, global"`
