@@ -2,7 +2,7 @@ import { vi } from 'vitest'
 import {
   alignValueField, clearValidationState, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidity,
   getFeedbackIds, getFeedbackText, getServerState, getStateClasses, getUserValidity, getValidationState, isFormValid,
-  nextStateSerial, ownValidationState, setStateValidity, splitIds, swapStateClass, updateValidationState, validateForm,
+  nextStateSerial, ownValidationState, setStateValidity, splitIds, updateValidationState, validateForm,
   writeDescribedBy, writeValueField
 } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
@@ -635,14 +635,12 @@ describe('Form validation utilities', () => {
       const validity = followUserValidity(control, state => updates.push(state))
 
       expect(validity.read()).toBeUndefined()
-      expect(validity.isReported()).toBe(false)
 
       fixtureEl.querySelector('#other').checkValidity()
       expect(validity.read()).toBeUndefined()
 
       control.form.checkValidity()
       expect(validity.read()).toBe('invalid')
-      expect(validity.isReported()).toBe(true)
       expect(updates.at(-1)).toBe('invalid')
 
       control.value = '1'
@@ -655,18 +653,37 @@ describe('Form validation utilities', () => {
       validity.stop()
     })
 
+    it('should go on with the control it follows next, with its report', () => {
+      fixtureEl.innerHTML = '<form novalidate><select id="value" required><option value="">None</option><option value="1">One</option></select><select id="next" required><option value="">None</option></select></form>'
+      const control = fixtureEl.querySelector('#value')
+      const next = fixtureEl.querySelector('#next')
+      const updates = []
+      const validity = followUserValidity(control, state => updates.push(state))
+
+      control.form.checkValidity()
+      validity.follow(next)
+
+      expect(validity.read()).toBe('invalid')
+
+      control.dispatchEvent(new Event('change'))
+      next.dispatchEvent(new Event('change'))
+
+      expect(updates).toEqual(['invalid', 'invalid'])
+
+      next.required = false
+
+      expect(validity.read()).toBeUndefined()
+
+      validity.stop()
+    })
+
     it('should start from a report the control it replaces had', () => {
-      fixtureEl.innerHTML = '<form novalidate><select id="value" required><option value="">None</option><option value="1">One</option></select></form>'
+      fixtureEl.innerHTML = '<form novalidate><select id="value" required><option value="">None</option></select></form>'
       const control = fixtureEl.querySelector('#value')
       const fresh = followUserValidity(control, () => {})
       const carried = followUserValidity(control, () => {}, undefined, true)
 
-      expect(fresh.read()).toBeUndefined()
-      expect(carried.read()).toBe('invalid')
-
-      control.value = '1'
-
-      expect(carried.read()).toBeUndefined()
+      expect([fresh.read(), carried.read()]).toEqual([undefined, 'invalid'])
 
       fresh.stop()
       carried.stop()
@@ -741,6 +758,77 @@ describe('Form validation utilities', () => {
       expect(validity.read()).toBe('invalid')
 
       validity.stop()
+    })
+
+    it('should leave out a report a native reset forgets before its task runs, unless the reset is cancelled', async () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
+      const control = fixtureEl.querySelector('#value')
+      const validity = followUserValidity(control, () => {})
+      const seen = []
+      const look = () => seen.push(validity.read())
+      const cancel = event => event.preventDefault()
+
+      control.form.checkValidity()
+      control.form.addEventListener('reset', look)
+      control.form.reset()
+      look()
+      control.form.checkValidity()
+      look()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(seen).toEqual([undefined, undefined, 'invalid'])
+      expect(validity.read()).toBe('invalid')
+
+      seen.length = 0
+      control.form.removeEventListener('reset', look)
+      control.form.addEventListener('reset', cancel)
+      control.form.addEventListener('reset', look)
+      control.form.reset()
+      look()
+
+      expect(seen).toEqual(['invalid', 'invalid'])
+
+      validity.stop()
+    })
+
+    it('should forget the report after a reset that went through, also when a second one in the same task is cancelled', async () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
+      const control = fixtureEl.querySelector('#value')
+      const resets = []
+      const validity = followUserValidity(control, () => {}, serial => resets.push(serial))
+
+      control.form.checkValidity()
+      control.form.reset()
+      control.form.addEventListener('reset', event => event.preventDefault(), { once: true })
+      control.form.dispatchEvent(new Event('reset', { cancelable: true }))
+
+      expect(validity.read()).toBeUndefined()
+
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(validity.read()).toBeUndefined()
+      expect(resets).toHaveSize(1)
+
+      validity.stop()
+    })
+
+    it('should drop the tasks of resets in progress when it stops', async () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
+      const control = fixtureEl.querySelector('#value')
+      const resets = []
+      const validity = followUserValidity(control, () => {}, serial => resets.push(serial))
+
+      control.form.reset()
+      validity.stop()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(resets).toEqual([])
     })
 
     it('should follow a reset in a shadow root and one whose propagation a listener stops', async () => {
@@ -910,25 +998,6 @@ describe('Form validation utilities', () => {
       setStateValidity(after, false)
 
       expect(after.validationMessage).toBe('Page rule.')
-    })
-  })
-
-  describe('swapStateClass', () => {
-    it('should move the state class and leave the element alone while the state stays', () => {
-      fixtureEl.innerHTML = '<div class="custom"></div>'
-      const div = fixtureEl.querySelector('div')
-
-      expect(swapStateClass(div, null, 'invalid')).toBe('is-invalid')
-      expect(div.className).toBe('custom is-invalid')
-
-      div.classList.add('is-warning')
-
-      expect(swapStateClass(div, 'is-invalid', 'invalid')).toBe('is-invalid')
-      expect(div.className).toBe('custom is-invalid is-warning')
-      expect(swapStateClass(div, 'is-invalid', 'valid')).toBe('is-valid')
-      expect(div.className).toBe('custom is-warning is-valid')
-      expect(swapStateClass(div, 'is-valid')).toBeNull()
-      expect(div.className).toBe('custom is-warning')
     })
   })
 

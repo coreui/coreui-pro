@@ -28,7 +28,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div class="form-text">Tell us how the delivery went.</div>
   </div>`} />
 
-Inside a `<form>`, the rating follows a form reset: it goes back to its `value`, or to no rating when it has none, and fires `change.coreui.rating` when that differs from the current value. A reset that a listener cancels changes nothing.
+Inside a `<form>`, the rating follows a form reset: it goes back to its `value`, or to no rating when it has none, and fires `change.coreui.rating` when that differs from the current value. A reset that a listener cancels changes nothing. The rating hears the reset through the document, or the shadow root, it sits in when it is created, so create it once its form is in the page, not inside a cloned `<template>` that is inserted later.
 
 ## Allow clear
 

@@ -12,7 +12,7 @@ export type ValidationMarks = WeakMap<Element, ValidationMark>
 export type ValidationState = 'invalid' | 'valid' | (string & {})
 
 export type UserValidity = {
-  isReported: () => boolean
+  follow: (control: FormControl) => void
   read: () => ValidationState | undefined
   stop: () => void
 }
@@ -677,7 +677,9 @@ export const nextStateSerial = (): number => ++stateSerial
  * fires `invalid` on it, the state is `'invalid'` whenever its value is invalid; before that, and
  * while its value is valid, it is what `getUserValidity()` reads. A native reset of the form the
  * control belongs to forgets the report in the next task, unless a listener cancelled the reset or a
- * validation reported the control again after it. The control is followed wherever it sits, also
+ * validation reported the control again after it, each reset on its own; until then the state
+ * already leaves out a report the reset forgets, so a component that reads it in the meantime does
+ * not show a report from before the reset. The control is followed wherever it sits, also
  * outside the `<form>` it names with `form` and inside a shadow root, and a reset reaches it even
  * when a listener stops its propagation.
  *
@@ -687,8 +689,9 @@ export const nextStateSerial = (): number => ++stateSerial
  * cancelled, before `onUpdate`, with the last `nextStateSerial()` given out before the reset
  * @param wasReported - Whether a validation already reported the control, for a control that
  * replaces one a validation reported
- * @returns `read()` for the current state, `isReported()` for whether a validation reported the
- * control since the last reset, and `stop()` to remove the listeners
+ * @returns `read()` for the current state, `follow(control)` to go on with a control that replaces
+ * this one, with the report and a reset whose task has not run yet, and `stop()` to remove the
+ * listeners
  */
 export const followUserValidity = (
   control: FormControl,
@@ -698,10 +701,12 @@ export const followUserValidity = (
 ): UserValidity => {
   const root = control.getRootNode()
   const roots = root instanceof ShadowRoot ? [control.ownerDocument, root] : [control.ownerDocument]
+  const resets = new Map<Event, ReturnType<typeof setTimeout>>()
+  let current = control
   let reported = wasReported
   let reportedSinceReset = false
-  let resetTimeout: ReturnType<typeof setTimeout> | undefined
-  const read = () => (reported && !control.validity.valid ? 'invalid' : getUserValidity(control))
+  const isReported = () => ([...resets.keys()].some(event => !event.defaultPrevented) ? reportedSinceReset : reported)
+  const read = () => (isReported() && !current.validity.valid ? 'invalid' : getUserValidity(current))
   const update = () => onUpdate(read())
   const handleInvalid = () => {
     reported = true
@@ -709,8 +714,16 @@ export const followUserValidity = (
     update()
   }
 
+  const listen = (method: 'addEventListener' | 'removeEventListener') => {
+    for (const type of ['change', 'focusout', 'input']) {
+      current[method](type, update)
+    }
+
+    current[method]('invalid', handleInvalid)
+  }
+
   const handleFormEvent = (event: Event) => {
-    if (event.target !== control.form) {
+    if (event.target !== current.form) {
       return
     }
 
@@ -721,23 +734,20 @@ export const followUserValidity = (
 
     const serial = stateSerial
 
-    clearTimeout(resetTimeout)
     reportedSinceReset = false
-    resetTimeout = setTimeout(() => {
+    resets.set(event, setTimeout(() => {
+      resets.delete(event)
+
       if (!event.defaultPrevented) {
         reported = reportedSinceReset
         onReset?.(serial)
       }
 
       update()
-    })
+    }))
   }
 
-  for (const type of ['change', 'focusout', 'input']) {
-    control.addEventListener(type, update)
-  }
-
-  control.addEventListener('invalid', handleInvalid)
+  listen('addEventListener')
 
   for (const node of roots) {
     node.addEventListener('reset', handleFormEvent, true)
@@ -745,16 +755,18 @@ export const followUserValidity = (
   }
 
   return {
-    isReported: () => reported,
+    follow(next) {
+      listen('removeEventListener')
+      current = next
+      listen('addEventListener')
+    },
     read,
     stop() {
-      clearTimeout(resetTimeout)
-
-      for (const type of ['change', 'focusout', 'input']) {
-        control.removeEventListener(type, update)
+      for (const timeout of resets.values()) {
+        clearTimeout(timeout)
       }
 
-      control.removeEventListener('invalid', handleInvalid)
+      listen('removeEventListener')
 
       for (const node of roots) {
         node.removeEventListener('reset', handleFormEvent, true)
@@ -821,31 +833,6 @@ export const setStateValidity = (control: FormControl, invalid: boolean): void =
 
   control.setCustomValidity(message)
   stateMessages.set(control, control.willValidate ? control.validationMessage : message)
-}
-
-/**
- * Moves the state class of a component, `.is-{state}`, from the state it showed to the one it shows
- * now.
- *
- * @param element - The element the stylesheet colours
- * @param previous - The class the component put there last, or `null`
- * @param state - The state to show, none when left out
- * @returns The class the element carries now, to pass back as `previous`
- */
-export const swapStateClass = (element: Element, previous: string | null, state?: ValidationState): string | null => {
-  const stateClass = state ? `is-${state}` : null
-
-  if (stateClass !== previous) {
-    if (previous) {
-      element.classList.remove(previous)
-    }
-
-    if (stateClass) {
-      element.classList.add(stateClass)
-    }
-  }
-
-  return stateClass
 }
 
 /**
