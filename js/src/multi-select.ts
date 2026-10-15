@@ -476,7 +476,7 @@ class MultiSelect extends ComboboxBase {
 
     const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
     const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || [...values].some(value => !previous.has(value)))
-    const next = reset ? flattenOptions(options).filter((option: any) => option.selected).map((option: any) => ({ value: String(option.value), text: option.text })) : selected
+    const next = reset ? this._selected : selected
 
     this._selected = selected
     this._element.replaceChildren()
@@ -1683,7 +1683,7 @@ class MultiSelect extends ComboboxBase {
     config = this._normalizeContainerConfig(config)
 
     if (typeof config.search === 'string' && config.search !== 'external') {
-      throw new TypeError(`${NAME.toUpperCase()}: Option "search" provided "${config.search}" but expected true, false or "external".`)
+      throw new TypeError(`${NAME.toUpperCase()}: Option "search" takes true, false or "external".`)
     }
 
     if (typeof config.value === 'number') {

@@ -6229,6 +6229,24 @@ describe('MultiSelect', () => {
       expect(document.activeElement).toBe(multiSelect._searchElement)
     })
 
+    it('should drop the hidden native option of a value the options lack once it is deselected', () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option></select>')
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+      multiSelect.deselectAll()
+
+      expect(fixtureEl.querySelectorAll('select option[hidden]')).toHaveSize(0)
+    })
+
+    it('should keep the list busy through setConfig', () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.setLoading(true)
+      multiSelect.setConfig({ placeholder: 'Search' })
+
+      expect(multiSelect._menu.querySelector('[role="listbox"]').getAttribute('aria-busy')).toBe('true')
+    })
+
     it('should deselect only the listed options when select all is pressed again', () => {
       fixtureEl.innerHTML = '<select multiple><option value="a" selected>Angular</option></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external' })
