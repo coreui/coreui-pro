@@ -405,7 +405,7 @@ The Autocomplete component includes several accessibility features:
 
 - **ARIA attributes**: Proper `role`, `aria-expanded`, `aria-haspopup`, and `aria-autocomplete` attributes
 - **Screen reader support**: Descriptive labels and announcements for state changes
-- **Name**: the `aria-*` attributes on the autocomplete element, `aria-label` and `aria-labelledby` among them, move to the input, which is the combobox, and the element gets them back on dispose (`aria-describedby` follows the rule below, and `aria-invalid` stays where it is); without a name there, point a `<label>` at the input through `data-coreui-id`
+- **Name**: `aria-label`, `aria-labelledby`, `aria-description`, `aria-details`, `aria-errormessage`, `aria-placeholder`, `aria-readonly` and `aria-required` on the autocomplete element move to the input, which is the combobox, and the element gets them back on dispose; attributes that apply to the whole control, such as `aria-hidden`, stay on the element. Without a name there, point a `<label>` at the input through `data-coreui-id`
 - **Description**: an `aria-describedby` on the autocomplete element moves to the input, after the ids the input already has, and the element gets it back on dispose; while the state is `'invalid'` the error message follows it
 - **Keyboard navigation**: Full keyboard support with arrow keys, Enter, Escape, and Tab
 - **Focus management**: The focus never leaves the input — `aria-activedescendant` points at the highlighted option, so typing and choosing happen in one place. <kbd>Home</kbd>, <kbd>End</kbd> and the space bar stay with the text.

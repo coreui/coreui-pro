@@ -63,7 +63,16 @@ const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_SHOW = 'show'
 
 const HOST_CLASS_NAMES = [CLASS_NAME_AUTOCOMPLETE, CLASS_NAME_DISABLED, CLASS_NAME_INPUT_GROUP, CLASS_NAME_SHOW]
-const HOST_FIELD_ATTRIBUTE = /^aria-(?!describedby$|invalid$)/
+const HOST_FIELD_ATTRIBUTES = new Set([
+  'aria-description',
+  'aria-details',
+  'aria-errormessage',
+  'aria-label',
+  'aria-labelledby',
+  'aria-placeholder',
+  'aria-readonly',
+  'aria-required'
+])
 
 const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
@@ -282,7 +291,9 @@ class Autocomplete extends ComboboxBase {
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     for (const [name, value] of this._hostAria) {
-      this._element.setAttribute(name, value)
+      if (!this._element.hasAttribute(name)) {
+        this._element.setAttribute(name, value)
+      }
     }
 
     if (this._previousTabIndex === null) {
@@ -656,7 +667,7 @@ class Autocomplete extends ComboboxBase {
     const togglerEl = this._element
     this._previousTabIndex = togglerEl.getAttribute('tabindex')
     this._hostAria = [...togglerEl.attributes]
-      .filter(({ name }) => HOST_FIELD_ATTRIBUTE.test(name))
+      .filter(({ name }) => HOST_FIELD_ATTRIBUTES.has(name))
       .map(({ name, value }): [string, string] => [name, value])
 
     applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP)

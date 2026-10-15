@@ -88,13 +88,23 @@ describe('Autocomplete', () => {
     })
 
     it('should move the other aria attributes on the host to the field and keep its own', () => {
-      fixtureEl.innerHTML = '<div aria-errormessage="country-error" aria-expanded="true" aria-required="true"></div>'
+      fixtureEl.innerHTML = '<div aria-activedescendant="stale" aria-errormessage="country-error" aria-expanded="true" aria-hidden="true" aria-required="true"></div>'
       const autocomplete = new Autocomplete(fixtureEl.querySelector('div'), { options: ['Poland'] })
 
       expect(autocomplete._inputElement.getAttribute('aria-errormessage')).toBe('country-error')
       expect(autocomplete._inputElement.getAttribute('aria-required')).toBe('true')
       expect(autocomplete._inputElement.getAttribute('aria-expanded')).toBe('false')
+      expect(autocomplete._inputElement.hasAttribute('aria-activedescendant')).toBeFalse()
+      expect(autocomplete._inputElement.hasAttribute('aria-hidden')).toBeFalse()
+      expect(autocomplete._element.getAttribute('aria-hidden')).toBe('true')
       expect(autocomplete._element.hasAttribute('aria-required')).toBeFalse()
+    })
+
+    it('should name the field by a label pointing at its id', () => {
+      fixtureEl.innerHTML = '<label for="country">Country</label><div data-coreui-id="country"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('div'), { options: ['Poland'] })
+
+      expect([...autocomplete._inputElement.labels].map(label => label.textContent)).toEqual(['Country'])
     })
 
     it('should take care of element either passed as a CSS selector or DOM element', () => {
@@ -3260,6 +3270,17 @@ describe('Autocomplete', () => {
       expect(autocompleteEl.getAttribute('aria-labelledby')).toBe('country-heading')
       expect(bare.hasAttribute('aria-label')).toBeFalse()
       expect(bare.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should keep an aria-label the page wrote on the host after init', () => {
+      fixtureEl.innerHTML = '<div aria-label="Country"></div>'
+      const autocompleteEl = fixtureEl.querySelector('div')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocompleteEl.setAttribute('aria-label', 'Kraj')
+      autocomplete.dispose()
+
+      expect(autocompleteEl.getAttribute('aria-label')).toBe('Kraj')
     })
 
     it('should leave no class attribute on an element that had none, and keep a disabled class the page wrote', () => {
