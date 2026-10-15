@@ -1,3 +1,5 @@
+export type CountLabel = string | ((count: number, total: number) => string)
+
 export type FilledSelection<T extends number | string> = {
   added: T[]
   refused: T | null
@@ -115,3 +117,17 @@ export const fillSelection = <T extends number | string>(selected: readonly T[],
 
   return { added, refused: null, values }
 }
+
+/**
+ * Words how many options are selected. A function label receives the count and the total; a string
+ * label has every `{count}` and `{total}` replaced.
+ *
+ * @param label - A template string, or a function of the count and the total
+ * @param count - How many options are selected
+ * @param total - How many options the count is out of
+ * @returns The label text
+ */
+export const resolveCountLabel = (label: CountLabel, count: number, total: number): string =>
+  typeof label === 'function' ?
+    label(count, total) :
+    label.replaceAll('{count}', String(count)).replaceAll('{total}', String(total))

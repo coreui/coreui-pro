@@ -14,16 +14,18 @@ import {
 import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
+  type CountLabel,
   getAriaPressed,
   getSelectionLimit,
   getSelectionState,
   isSelectionLimitReached,
+  resolveCountLabel,
   type SelectionMode,
   type SelectionState,
   toSelectionValues
 } from './util/selection-state.js'
 import {
-  type CountLabel, defineJQueryPlugin, getElement, getNextActiveElement, getUID, jQueryDispatch, resolveCountLabel
+  defineJQueryPlugin, getElement, getNextActiveElement, getUID, jQueryDispatch
 } from './util/index.js'
 
 /**
