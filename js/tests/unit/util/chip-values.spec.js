@@ -1,5 +1,5 @@
 import {
-  appendChipValues, getChipValues, resolveChipClassName, splitChipText
+  appendChipValues, getChipAnnouncement, getChipValues, resolveChipClassName, splitChipText
 } from '../../../src/util/chip-values.js'
 
 describe('Chip value utilities', () => {
@@ -72,6 +72,47 @@ describe('Chip value utilities', () => {
       expect(resolveChipClassName(null, 'apple')).toBe('')
       expect(resolveChipClassName(undefined, 'apple')).toBe('')
       expect(resolveChipClassName('', 'apple')).toBe('')
+    })
+  })
+
+  describe('getChipAnnouncement', () => {
+    it('should name every added value, in the order of the list', () => {
+      expect(getChipAnnouncement(['a'], ['a', 'b'], 'added', 'removed')).toBe('b added')
+      expect(getChipAnnouncement(['a'], ['c', 'a', 'b'], 'added', 'removed')).toBe('c, b added')
+    })
+
+    it('should name every removed value when none was added', () => {
+      expect(getChipAnnouncement(['a', 'b', 'c'], ['b'], 'added', 'removed')).toBe('a, c removed')
+    })
+
+    it('should name only the added values when values were also removed', () => {
+      expect(getChipAnnouncement(['a', 'b'], ['b', 'c'], 'added', 'removed')).toBe('c added')
+    })
+
+    it('should leave empty values out', () => {
+      expect(getChipAnnouncement(['React'], [''], 'added', 'removed')).toBe('React removed')
+      expect(getChipAnnouncement(['a'], ['a', '', 'b'], 'added', 'removed')).toBe('b added')
+      expect(getChipAnnouncement(['a'], ['a', ''], 'added', 'removed')).toBeNull()
+    })
+
+    it('should name a value once, however many chips carry it', () => {
+      expect(getChipAnnouncement([], ['a', 'a', 'b'], 'added', 'removed')).toBe('a, b added')
+      expect(getChipAnnouncement(['a', 'a'], [], 'added', 'removed')).toBe('a removed')
+      expect(getChipAnnouncement(['a'], ['a', 'a'], 'added', 'removed')).toBeNull()
+    })
+
+    it('should hand the values to a function label and use what it returns', () => {
+      const added = values => `Dodano: ${values.join(' i ')}`
+      const removed = values => `${values.length} removed`
+
+      expect(getChipAnnouncement(['a'], ['a', 'b', 'c'], added, removed)).toBe('Dodano: b i c')
+      expect(getChipAnnouncement(['a', 'b'], [], added, removed)).toBe('2 removed')
+      expect(getChipAnnouncement([], ['a'], () => '', removed)).toBeNull()
+    })
+
+    it('should give null when nothing was added or removed', () => {
+      expect(getChipAnnouncement(['a', 'b'], ['b', 'a'], 'added', 'removed')).toBeNull()
+      expect(getChipAnnouncement([], [], 'added', 'removed')).toBeNull()
     })
   })
 })

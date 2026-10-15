@@ -11,7 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
-import { resolveChipClassName } from './util/chip-values.js'
+import { type ChipAnnouncement, getChipAnnouncement, resolveChipClassName } from './util/chip-values.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
   createTypeaheadBuffer, findTypeaheadMatch, rangeBetween, type TypeaheadBuffer
@@ -62,9 +62,9 @@ const HOST_ATTRIBUTES = ['aria-multiselectable', 'aria-orientation', 'role']
 const SELECTION_MODE_SINGLE = 'single'
 
 export type ChipSetConfig = {
-  ariaAddedAnnouncement: string
+  ariaAddedAnnouncement: ChipAnnouncement
   ariaRemoveLabel: string
-  ariaRemovedAnnouncement: string
+  ariaRemovedAnnouncement: ChipAnnouncement
   chipClassName: string | ((value: string) => string) | null
   disabled: boolean
   filter: boolean
@@ -96,9 +96,9 @@ const Default: ChipSetConfig = {
 }
 
 const DefaultType: Record<string, string> = {
-  ariaAddedAnnouncement: 'string',
+  ariaAddedAnnouncement: '(string|function)',
   ariaRemoveLabel: 'string',
-  ariaRemovedAnnouncement: 'string',
+  ariaRemovedAnnouncement: '(string|function)',
   chipClassName: '(string|function|null)',
   disabled: 'boolean',
   filter: 'boolean',
@@ -419,13 +419,10 @@ class ChipSet extends BaseComponent {
       return
     }
 
-    const added = this._chips.find(value => !before.includes(value))
-    const removed = before.find(value => !this._chips.includes(value))
+    const message = getChipAnnouncement(before, this._chips, this._config.ariaAddedAnnouncement, this._config.ariaRemovedAnnouncement)
 
-    if (added) {
-      announce(`${added} ${this._config.ariaAddedAnnouncement}`, { context: this._element })
-    } else if (removed) {
-      announce(`${removed} ${this._config.ariaRemovedAnnouncement}`, { context: this._element })
+    if (message) {
+      announce(message, { context: this._element })
     }
   }
 
