@@ -1173,6 +1173,80 @@ describe('Offcanvas', () => {
       expect(hiddenCount).toEqual(1)
       expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
     })
+
+    it('should keep a dialog shown by an instance that replaced one during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
+      const shown = new Promise(resolve => {
+        offcanvasEl.addEventListener('shown.coreui.offcanvas', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      offcanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
+        hiddenCount++
+      })
+
+      const first = new Offcanvas(offcanvasEl)
+      first.show()
+      await shown
+      first.hide()
+      new Offcanvas(offcanvasEl).show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(offcanvasEl.open).toBeTrue()
+      expect(hiddenCount).toEqual(0)
+    })
+
+    it('should not fire hidden on an instance that replaced one during the exit transition and was never shown', async () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
+      const shown = new Promise(resolve => {
+        offcanvasEl.addEventListener('shown.coreui.offcanvas', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      offcanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
+        hiddenCount++
+      })
+
+      const first = new Offcanvas(offcanvasEl)
+      first.show()
+      await shown
+      first.hide()
+      const second = new Offcanvas(offcanvasEl)
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(offcanvasEl.open).toBeFalse()
+      expect(Offcanvas.getInstance(offcanvasEl)).toBe(second)
+      expect(hiddenCount).toEqual(0)
+    })
+
+    it('should keep a dialog shown by a new instance right after the open one was disposed', async () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
+      const shown = new Promise(resolve => {
+        offcanvasEl.addEventListener('shown.coreui.offcanvas', resolve, { once: true })
+      })
+      const first = new Offcanvas(offcanvasEl)
+
+      first.show()
+      await shown
+      first.dispose()
+      Offcanvas.getOrCreateInstance(offcanvasEl).show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(offcanvasEl.open).toBeTrue()
+      expect(document.documentElement.classList.contains('dialog-open')).toBeTrue()
+    })
   })
 
   describe('offcanvas-static class', () => {

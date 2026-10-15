@@ -64,7 +64,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._isTransitioning = false
     this._openedAsModal = false
     this._closedByComponent = false
-    this._hiddenByComponent = false
+    this._hiddenByComponent = true
     this._resizeObserver = null
     this._resizeFrame = null
     this._addDialogListeners()
@@ -365,14 +365,15 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     // later — `_closedByComponent` tells that one apart from a form with
     // method="dialog", a consumer's dialog.close() or any other native path,
     // which skip hide() and would otherwise leave the scroll lock and the
-    // lifecycle state behind.
+    // lifecycle state behind. A close that arrives while the dialog is open
+    // again belongs to an earlier close, e.g. one made by a disposed instance.
     this._closeHandler = () => {
       if (this._closedByComponent) {
         this._closedByComponent = false
         return
       }
 
-      if (this._hiddenByComponent) {
+      if (this._hiddenByComponent || this._element.open) {
         return
       }
 

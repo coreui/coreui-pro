@@ -1492,6 +1492,80 @@ describe('Modal', () => {
       expect(hiddenCount).toEqual(1)
       expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
     })
+
+    it('should keep a dialog shown by an instance that replaced one during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
+
+      const modalEl = fixtureEl.querySelector('.modal')
+      const shown = new Promise(resolve => {
+        modalEl.addEventListener('shown.coreui.modal', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      modalEl.addEventListener('hidden.coreui.modal', () => {
+        hiddenCount++
+      })
+
+      const first = new Modal(modalEl)
+      first.show()
+      await shown
+      first.hide()
+      new Modal(modalEl).show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(modalEl.open).toBeTrue()
+      expect(hiddenCount).toEqual(0)
+    })
+
+    it('should not fire hidden on an instance that replaced one during the exit transition and was never shown', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
+
+      const modalEl = fixtureEl.querySelector('.modal')
+      const shown = new Promise(resolve => {
+        modalEl.addEventListener('shown.coreui.modal', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      modalEl.addEventListener('hidden.coreui.modal', () => {
+        hiddenCount++
+      })
+
+      const first = new Modal(modalEl)
+      first.show()
+      await shown
+      first.hide()
+      const second = new Modal(modalEl)
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(modalEl.open).toBeFalse()
+      expect(Modal.getInstance(modalEl)).toBe(second)
+      expect(hiddenCount).toEqual(0)
+    })
+
+    it('should keep a dialog shown by a new instance right after the open one was disposed', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
+
+      const modalEl = fixtureEl.querySelector('.modal')
+      const shown = new Promise(resolve => {
+        modalEl.addEventListener('shown.coreui.modal', resolve, { once: true })
+      })
+      const first = new Modal(modalEl)
+
+      first.show()
+      await shown
+      first.dispose()
+      Modal.getOrCreateInstance(modalEl).show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(modalEl.open).toBeTrue()
+      expect(document.documentElement.classList.contains('dialog-open')).toBeTrue()
+    })
   })
 
   describe('hidePrevented', () => {

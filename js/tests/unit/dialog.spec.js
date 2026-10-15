@@ -1563,6 +1563,80 @@ describe('Dialog', () => {
       expect(hiddenCount).toEqual(1)
       expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
     })
+
+    it('should keep a dialog shown by an instance that replaced one during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'
+
+      const dialogEl = fixtureEl.querySelector('.dialog')
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.dialog', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      dialogEl.addEventListener('hidden.coreui.dialog', () => {
+        hiddenCount++
+      })
+
+      const first = new Dialog(dialogEl)
+      first.show()
+      await shown
+      first.hide()
+      new Dialog(dialogEl).show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(dialogEl.open).toBeTrue()
+      expect(hiddenCount).toEqual(0)
+    })
+
+    it('should not fire hidden on an instance that replaced one during the exit transition and was never shown', async () => {
+      fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'
+
+      const dialogEl = fixtureEl.querySelector('.dialog')
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.dialog', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      dialogEl.addEventListener('hidden.coreui.dialog', () => {
+        hiddenCount++
+      })
+
+      const first = new Dialog(dialogEl)
+      first.show()
+      await shown
+      first.hide()
+      const second = new Dialog(dialogEl)
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(dialogEl.open).toBeFalse()
+      expect(Dialog.getInstance(dialogEl)).toBe(second)
+      expect(hiddenCount).toEqual(0)
+    })
+
+    it('should keep a dialog shown by a new instance right after the open one was disposed', async () => {
+      fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'
+
+      const dialogEl = fixtureEl.querySelector('.dialog')
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.dialog', resolve, { once: true })
+      })
+      const first = new Dialog(dialogEl)
+
+      first.show()
+      await shown
+      first.dispose()
+      Dialog.getOrCreateInstance(dialogEl).show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(dialogEl.open).toBeTrue()
+      expect(document.documentElement.classList.contains('dialog-open')).toBeTrue()
+    })
   })
 
   describe('hidePrevented', () => {
