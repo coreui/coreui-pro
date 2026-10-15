@@ -340,19 +340,19 @@ class ComboboxBase extends BaseComponent {
       typeof this._config.optionsGroupsTemplate === 'function'
   }
 
-  _getListBoxItems(options: any[] = this._options): any[] {
+  _getListBoxItems(options: any[] = this._options, disabled = false): any[] {
     return options.map((option: any) => {
       if (isOptionGroup(option)) {
         return {
           label: this._renderGroupLabel(option),
-          items: this._getListBoxItems(option.options)
+          items: this._getListBoxItems(option.options, disabled || option.disabled === true)
         }
       }
 
       return {
         value: String(option.value),
         label: this._renderOptionLabel(option),
-        ...option.disabled && { disabled: true }
+        ...(disabled || option.disabled) && { disabled: true }
       }
     })
   }

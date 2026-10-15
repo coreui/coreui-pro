@@ -1823,6 +1823,55 @@ describe('MultiSelect', () => {
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
     })
+
+    it('should take the given value over a selected option further down a single select', () => {
+      fixtureEl.innerHTML = '<select><option value="a">A</option><option value="b" selected>B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false, value: 'a' })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should keep the last selected option of multiple markup read as a single select', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b" selected>B</option><option value="c">C</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
+    })
+
+    it('should send nothing with an empty single select that has no placeholder option', () => {
+      fixtureEl.innerHTML = '<form><select name="f"></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+
+      // eslint-disable-next-line no-new
+      new MultiSelect(selectEl, { multiple: false, options: [{ value: '1', text: 'One' }, { value: '2', text: 'Two' }], required: true })
+
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('f')).toEqual([])
+      expect(selectEl.checkValidity()).toBeFalse()
+    })
+
+    it('should select the placeholder option again once a single select is cleared', () => {
+      fixtureEl.innerHTML = '<form><select name="f"><option value="" disabled selected>Choose</option><option value="1">One</option><option value="2">Two</option></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { multiple: false, required: true })
+
+      multiSelect.selectAll([{ value: '2', text: 'Two' }])
+      multiSelect.deselectAll()
+
+      expect(selectEl.value).toBe('')
+      expect(selectEl.checkValidity()).toBeFalse()
+    })
+
+    it('should deselect a selected native option the list does not carry in a multiple select', () => {
+      fixtureEl.innerHTML = '<form><select multiple name="s"><option value="" selected>None</option><option value="a">A</option></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { required: true })
+
+      multiSelect.selectAll([{ value: 'a', text: 'A' }])
+      multiSelect.deselectAll()
+
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('s')).toEqual([])
+      expect(selectEl.checkValidity()).toBeFalse()
+    })
   })
 
   describe('show', () => {
@@ -2170,7 +2219,7 @@ describe('MultiSelect', () => {
       const onLimit = vi.fn()
 
       selectEl.addEventListener('selectionLimit.coreui.multi-select', onLimit)
-      multiSelect._selectOption('1', 'Option 1')
+      multiSelect.selectAll([{ value: '1', text: 'Option 1' }])
 
       expect(multiSelect._selected.map(item => item.value)).toEqual(['1'])
       expect(onLimit).not.toHaveBeenCalled()
@@ -2224,8 +2273,8 @@ describe('MultiSelect', () => {
         selectionLimit: 1
       })
 
-      multiSelect._selectOption('1', 'Option 1')
-      multiSelect._selectOption('2', 'Option 2')
+      multiSelect.selectAll([{ value: '1', text: 'Option 1' }])
+      multiSelect.selectAll([{ value: '2', text: 'Option 2' }])
 
       expect(multiSelect._selected.length).toBe(1)
       expect(multiSelect._selected[0].value).toBe('1')
@@ -2248,8 +2297,8 @@ describe('MultiSelect', () => {
         eventValue = event
       })
 
-      multiSelect._selectOption('1', 'Option 1')
-      multiSelect._selectOption('2', 'Option 2')
+      multiSelect.selectAll([{ value: '1', text: 'Option 1' }])
+      multiSelect.selectAll([{ value: '2', text: 'Option 2' }])
 
       expect(eventValue).not.toBeNull()
       expect(eventValue.selectionLimit).toBe(1)
@@ -2297,8 +2346,8 @@ describe('MultiSelect', () => {
         eventValue = event
       }, { once: true })
 
-      multiSelect._selectOption('1', 'Option 1')
-      multiSelect._selectOption('2', 'Option 2')
+      multiSelect.selectAll([{ value: '1', text: 'Option 1' }])
+      multiSelect.selectAll([{ value: '2', text: 'Option 2' }])
 
       expect(eventValue).not.toBeNull()
       expect(eventValue.target).toBe(selectEl)
@@ -2709,6 +2758,32 @@ describe('MultiSelect', () => {
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
       expect(multiSelect._selectionElement.querySelector('[data-value="1"]').classList.contains('disabled')).toBeTrue()
+    })
+
+    it('should disable the options of a disabled group in the list and keep its selected option', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [
+          { label: 'G', disabled: true, options: [{ value: '1', text: 'One', selected: true }, { value: '3', text: 'Three' }] },
+          { value: '2', text: 'Two' }
+        ]
+      })
+
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="3"]').click()
+      multiSelect.deselectAll()
+
+      expect(multiSelect._menu.querySelector('[data-coreui-value="3"]').getAttribute('aria-disabled')).toBe('true')
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
+    })
+
+    it('should keep a selected option of a disabled optgroup in the markup', () => {
+      fixtureEl.innerHTML = '<select multiple><optgroup label="G" disabled><option value="1" selected>One</option></optgroup><option value="2" selected>Two</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
+
+      multiSelect._selectionCleanerElement.click()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
     })
   })
 
@@ -3194,7 +3269,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true })
 
-      multiSelect._selectOption('1', 'A1')
+      multiSelect.selectAll([{ value: '1', text: 'A1' }])
 
       const groupLabel = multiSelect._menu.querySelector('.list-box-section-label')
       expect(groupLabel.classList.contains('indeterminate')).toBe(true)
@@ -3282,7 +3357,7 @@ describe('MultiSelect', () => {
       expect(master.classList.contains('selected')).toBe(false)
       expect(master.classList.contains('indeterminate')).toBe(false)
 
-      multiSelect._selectOption('1', 'Apple')
+      multiSelect.selectAll([{ value: '1', text: 'Apple' }])
       expect(master.classList.contains('indeterminate')).toBe(true)
 
       multiSelect.selectAll()
@@ -3874,8 +3949,8 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Opt 1' }]
       })
 
-      multiSelect._selectOption('1', 'Opt 1')
-      multiSelect._selectOption('1', 'Opt 1')
+      multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
+      multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
 
       expect(multiSelect._selected.length).toBe(1)
     })
@@ -3894,7 +3969,7 @@ describe('MultiSelect', () => {
           resolve()
         })
 
-        multiSelect._selectOption('1', 'Opt 1')
+        multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
       })
     })
 
@@ -3926,7 +4001,7 @@ describe('MultiSelect', () => {
         ]
       })
 
-      multiSelect._selectOption('1', 'Opt 1')
+      multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
 
       const nativeOpt = selectEl.querySelector('option[value="1"]')
       expect(nativeOpt.selected).toBe(true)
@@ -3996,7 +4071,7 @@ describe('MultiSelect', () => {
       })
 
       // This tag node did not exist when listeners were bound.
-      multiSelect._selectOption('2', 'Opt 2')
+      multiSelect.selectAll([{ value: '2', text: 'Opt 2' }])
       const newTagDelete = multiSelect._wrapperElement
         .querySelector('.chip[data-value="2"] .chip-remove')
 
@@ -4022,7 +4097,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._searchElement.getAttribute('size')).toBeNull()
 
       // Select an item
-      multiSelect._selectOption('1', 'Opt 1')
+      multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
       expect(multiSelect._searchElement.size).toBe(2)
     })
 
@@ -4088,7 +4163,7 @@ describe('MultiSelect', () => {
 
       const firstTag = multiSelect._wrapperElement.querySelector('.chip[data-value="1"]')
 
-      multiSelect._selectOption('2', 'Opt 2')
+      multiSelect.selectAll([{ value: '2', text: 'Opt 2' }])
 
       // The diff update keeps the already-rendered tag node instead of recreating it.
       expect(multiSelect._wrapperElement.querySelector('.chip[data-value="1"]')).toBe(firstTag)
@@ -4107,7 +4182,7 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._wrapperElement.querySelector('.form-multi-select-placeholder')).not.toBeNull()
 
-      multiSelect._selectOption('1', 'Opt 1')
+      multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
 
       expect(multiSelect._wrapperElement.querySelector('.form-multi-select-placeholder')).toBeNull()
       expect(multiSelect._wrapperElement.querySelectorAll('.chip').length).toBe(1)
@@ -4127,8 +4202,8 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      multiSelect._selectOption('2', 'Opt 2')
-      multiSelect._selectOption('1', 'Opt 1')
+      multiSelect.selectAll([{ value: '2', text: 'Opt 2' }])
+      multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
 
       const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       const order = Array.from(selection.children).map(child => child.dataset.value || 'search')
@@ -4142,7 +4217,7 @@ describe('MultiSelect', () => {
       const chip = multiSelect._selectionElement.querySelector('[data-value="a"]')
 
       chip.focus()
-      multiSelect._selectOption('b', 'B')
+      multiSelect.selectAll([{ value: 'b', text: 'B' }])
 
       expect(document.activeElement).toBe(chip)
     })
@@ -4153,7 +4228,7 @@ describe('MultiSelect', () => {
 
       multiSelect._searchElement.focus()
       multiSelect._searchElement.value = 'react'
-      multiSelect._selectOption('b', 'B')
+      multiSelect.selectAll([{ value: 'b', text: 'B' }])
 
       expect(document.activeElement).toBe(multiSelect._searchElement)
       expect(multiSelect._searchElement.size).toBe(6)
@@ -4890,7 +4965,7 @@ describe('MultiSelect', () => {
       multiSelect.deselectAll()
       expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).toBeNull()
 
-      multiSelect._selectOption('2', 'Opt 2')
+      multiSelect.selectAll([{ value: '2', text: 'Opt 2' }])
       const cleaner = multiSelect._wrapperElement.querySelector('.form-control-cleaner')
       expect(cleaner).not.toBeNull()
 
@@ -4924,7 +4999,7 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).toBeNull()
 
-      multiSelect._selectOption('1', 'Opt 1')
+      multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
 
       expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).not.toBeNull()
     })
@@ -5177,6 +5252,38 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue()).toHaveSize(3)
       expect(sync).not.toHaveBeenCalled()
     })
+
+    it('should report the limit once when a range in the list stops at it', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="1">One</option><option value="2">Two</option><option value="3">Three</option><option value="4">Four</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { selectionLimit: 2 })
+      const limits = []
+
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', () => limits.push(true))
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="1"]').click()
+      multiSelect._menu.querySelector('[data-coreui-value="4"]').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, shiftKey: true }))
+
+      expect(multiSelect.getValue()).toHaveSize(2)
+      expect(limits).toHaveSize(1)
+    })
+
+    it('should report the limit once when a group label in the list stops at it', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ label: 'G', options: [{ value: '1', text: 'One' }, { value: '2', text: 'Two' }] }],
+        optionsGroupsSelectable: true,
+        selectionLimit: 1
+      })
+      const limits = []
+
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', () => limits.push(true))
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-section-toggle]').click()
+
+      expect(limits).toHaveSize(1)
+    })
   })
 
   describe('setConfig', () => {
@@ -5394,7 +5501,7 @@ describe('MultiSelect', () => {
           resolve()
         })
 
-        multiSelect._selectOption('1', 'Option 1')
+        multiSelect.selectAll([{ value: '1', text: 'Option 1' }])
       })
     })
 
@@ -5452,6 +5559,19 @@ describe('MultiSelect', () => {
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['2'])
       expect(events).toEqual(['component', 'native'])
+    })
+
+    it('should send the change once the selection shows the new value', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">A</option><option value="b">B</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { selectionType: 'text' })
+      const shown = []
+
+      selectEl.addEventListener('change.coreui.multi-select', event => shown.push([event.value.map(option => option.text), multiSelect._selectionElement.textContent]))
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="b"]').click()
+
+      expect(shown).toEqual([[['B'], 'B ']])
     })
 
     it('should report the value setConfig gives once, and nothing when it is already held', () => {
@@ -5534,6 +5654,50 @@ describe('MultiSelect', () => {
 
       expect(multiSelect.getValue()).toEqual([])
       expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should send nothing when setConfig gives the held values in another order', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">A</option><option value="b">B</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+      const events = []
+
+      multiSelect.selectAll([{ value: 'b', text: 'B' }])
+      multiSelect.selectAll([{ value: 'a', text: 'A' }])
+      selectEl.addEventListener('change.coreui.multi-select', () => events.push('component'))
+      selectEl.addEventListener('change', () => events.push('native'))
+      multiSelect.setConfig({ value: ['a', 'b'] })
+
+      expect(events).toEqual([])
+    })
+
+    it('should let a native change listener dispose the component', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">A</option><option value="b">B</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+
+      const errors = []
+      const onError = event => {
+        event.preventDefault()
+        errors.push(event.message)
+      }
+
+      selectEl.addEventListener('change', () => multiSelect.dispose(), { once: true })
+      window.addEventListener('error', onError)
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="a"]').click()
+      window.removeEventListener('error', onError)
+
+      expect(errors).toEqual([])
+    })
+
+    it('should clear a single select from markup when setConfig gives an empty value', () => {
+      fixtureEl.innerHTML = '<select><option value="a">A</option><option value="b" selected>B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false })
+
+      multiSelect.setConfig({ value: [] })
+
+      expect(multiSelect.getValue()).toEqual([])
     })
   })
 
@@ -5804,7 +5968,7 @@ describe('MultiSelect', () => {
         cleaner: true
       })
 
-      multiSelect._selectOption('1', 'Option 1')
+      multiSelect.selectAll([{ value: '1', text: 'Option 1' }])
 
       const clone = multiSelect._wrapperElement
       const optionsElement = multiSelect._optionsElement
@@ -6327,7 +6491,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       const spy = spyOn(multiSelect, '_updateFloatingPosition')
 
-      multiSelect._selectOption('1', 'Opt 1')
+      multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
 
       expect(spy).toHaveBeenCalled()
     })
