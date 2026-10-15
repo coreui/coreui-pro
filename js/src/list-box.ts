@@ -129,6 +129,7 @@ type ListBoxConfig = {
   indicator: string
   items: ListBoxEntry[]
   loading: boolean
+  resetSelectionOnItemsChange: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   search: boolean | string
@@ -152,6 +153,7 @@ const Default: ListBoxConfig = {
   indicator: 'none',
   items: [],
   loading: false,
+  resetSelectionOnItemsChange: false,
   sanitize: true,
   sanitizeFn: null,
   search: false,
@@ -175,6 +177,7 @@ const DefaultType: Record<string, string> = {
   indicator: 'string',
   items: 'array',
   loading: 'boolean',
+  resetSelectionOnItemsChange: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   search: '(boolean|string)',
@@ -312,17 +315,20 @@ class ListBox extends BaseComponent {
 
   setItems(items: ListBoxEntry[]): void {
     const previous = this.getSelectedValues()
+    const previousValues = this._flatItems().map(item => item.value)
 
     this._items = this._normalizeItems(items)
     this._render()
 
+    const values = this._flatItems().map(item => item.value)
+    const reset = this._config.resetSelectionOnItemsChange && values.join('\u0000') !== previousValues.join('\u0000')
     const marked = this._selectable(this._flatItems().filter(item => item.selected).map(item => item.value))
 
     this._anchor = null
-    this._selected = new Set(toSelectionValues([...new Set([...previous, ...marked])], this._config.selectionMode as SelectionMode))
+    this._selected = new Set(toSelectionValues([...new Set([...(reset ? [] : previous), ...marked])], this._config.selectionMode as SelectionMode))
     this.update()
 
-    if (this._selected.size !== previous.length) {
+    if (this._selected.size !== previous.length || previous.some(value => !this._selected.has(value))) {
       this._triggerChange()
     }
   }

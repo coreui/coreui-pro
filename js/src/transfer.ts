@@ -299,6 +299,7 @@ class Transfer extends BaseComponent {
         html: this._config.html,
         indicator: this._config.indicator,
         loading: this._config.loading,
+        resetSelectionOnItemsChange: true,
         sanitize: this._config.sanitize,
         sanitizeFn: this._config.sanitizeFn,
         search: this._config.search,

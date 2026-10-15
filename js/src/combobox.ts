@@ -93,6 +93,7 @@ type ComboboxConfig = {
   name: string | null
   placeholder: string
   required: boolean
+  resetSelectionOnItemsChange: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   search: boolean | string
@@ -118,6 +119,7 @@ const Default: ComboboxConfig = {
   name: null,
   placeholder: '',
   required: false,
+  resetSelectionOnItemsChange: false,
   sanitize: true,
   sanitizeFn: null,
   search: false,
@@ -143,6 +145,7 @@ const DefaultType: Record<string, string> = {
   name: '(string|null)',
   placeholder: 'string',
   required: 'boolean',
+  resetSelectionOnItemsChange: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   search: '(boolean|string)',
@@ -243,7 +246,9 @@ class Combobox extends ComboboxBase {
   }
 
   setItems(items: ListBoxEntry[]): void {
-    this._labels = new Map((this._listBox?.getSelectedValues() ?? []).map(value => [value, this._optionLabel(value)]))
+    const listed = new Map(SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).map(option => [this._valueOf(option as HTMLElement), this._labelOf(option as HTMLElement)]))
+
+    this._labels = new Map((this._listBox?.getSelectedValues() ?? []).map(value => [value, listed.get(value) ?? this._labels.get(value) ?? value]))
     this._listBox?.setItems(items)
     this._updateValue()
   }
@@ -498,6 +503,7 @@ class Combobox extends ComboboxBase {
       html: this._config.html,
       indicator: this._config.indicator,
       items: this._config.items,
+      resetSelectionOnItemsChange: this._config.resetSelectionOnItemsChange,
       sanitize: this._config.sanitize,
       sanitizeFn: this._config.sanitizeFn,
       search: this._config.search,
@@ -528,10 +534,17 @@ class Combobox extends ComboboxBase {
       return
     }
 
-    this._syncing = true
-    this._listBox.clear()
+    const next = toSelectionValues(values, this._config.multiple ? 'multiple' : 'single')
 
-    for (const value of toSelectionValues(values, this._config.multiple ? 'multiple' : 'single')) {
+    this._syncing = true
+
+    for (const value of this._listBox.getSelectedValues()) {
+      if (!next.includes(value)) {
+        this._listBox.deselect(value)
+      }
+    }
+
+    for (const value of next) {
       this._listBox.select(value)
     }
 
@@ -581,13 +594,13 @@ class Combobox extends ComboboxBase {
     const option = SelectorEngine.find(SELECTOR_OPTION, this._optionsElement)
       .find(element => this._valueOf(element as HTMLElement) === value) as HTMLElement | undefined
 
-    if (!option) {
-      return this._labels.get(value) ?? value
-    }
+    return option ? this._labelOf(option) : this._labels.get(value) ?? value
+  }
 
+  _labelOf(option: HTMLElement): string {
     const label = SelectorEngine.findOne(SELECTOR_OPTION_LABEL, option)
 
-    return (label ?? option).textContent?.trim() ?? value
+    return (label ?? option).textContent?.trim() ?? this._valueOf(option)
   }
 
   override _afterShow(): void {

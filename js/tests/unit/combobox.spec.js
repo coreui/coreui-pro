@@ -102,6 +102,7 @@ describe('Combobox', () => {
         name: null,
         placeholder: '',
         required: false,
+        resetSelectionOnItemsChange: false,
         sanitize: true,
         sanitizeFn: null,
         search: false,
@@ -967,6 +968,28 @@ describe('Combobox', () => {
       expect(value(toggle)).toEqual('Canada')
     })
 
+    it('should keep a held value the items no longer carry when setValue gives it back', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true })
+
+      combobox.setValue(['us', 'uk'])
+      combobox.setItems([{ value: 'us', label: 'United States' }, { value: 'de', label: 'Germany' }])
+      combobox.setValue([...combobox.getValue(), 'de'])
+
+      expect(combobox.getValue()).toEqual(['us', 'uk', 'de'])
+    })
+
+    it('should drop the value and take the marked item when resetSelectionOnItemsChange is set', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { resetSelectionOnItemsChange: true })
+
+      combobox.setValue('ca')
+      combobox.setItems([{ value: 'de', label: 'Germany', selected: true }, { value: 'fr', label: 'France' }])
+
+      expect(combobox.getValue()).toEqual('de')
+      expect(value(toggle)).toEqual('Germany')
+    })
+
     it('should label a value the new items no longer carry once it is the only one left', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { multiple: true })
@@ -1047,6 +1070,11 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toEqual('ca')
       expect(value(toggle)).toEqual('Canada')
       expect(toggle.classList.contains('show')).toBeTrue()
+
+      type(searchField(combobox), 'gerf')
+      combobox.setItems([{ value: 'fr', label: 'France' }])
+
+      expect(value(toggle)).toEqual('Canada')
     })
   })
 
