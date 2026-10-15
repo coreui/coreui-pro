@@ -88,6 +88,9 @@ calendar.setConfig({ selectionType: 'week' })
 
 const multiSelect = new MultiSelect(element, { multiple: true, search: true })
 const selection = multiSelect.getValue()
+const externalSelect = new MultiSelect(element, { search: 'external' })
+externalSelect.setLoading(true)
+externalSelect.setOptions([{ text: 'One', value: '1' }])
 
 const datePicker = new DatePicker(element, { locale: 'en-US' })
 datePicker.show()

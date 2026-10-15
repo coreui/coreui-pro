@@ -5552,18 +5552,20 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
     })
 
-    it('should leave out the initial values the options no longer carry on a form reset', async () => {
-      fixtureEl.innerHTML = '<form><select multiple><option value="a" selected>A</option><option value="b">B</option></select></form>'
+    it('should bring back the initial values the options no longer carry on a form reset', async () => {
+      fixtureEl.innerHTML = '<form><select multiple name="s"><option value="a" selected>A</option><option value="b">B</option></select></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl)
 
-      multiSelect.setConfig({ options: [{ value: 'x', text: 'X' }, { value: 'y', text: 'Y' }] })
+      multiSelect.setOptions([{ value: 'x', text: 'X' }, { value: 'y', text: 'Y' }])
+      multiSelect.selectAll([{ value: 'x', text: 'X' }])
       fixtureEl.querySelector('form').reset()
       await new Promise(resolve => {
         setTimeout(resolve)
       })
 
-      expect(multiSelect.getValue()).toEqual([])
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('s')).toEqual(['a'])
     })
 
     it('should give the search box its resting width back on a form reset', async () => {
@@ -5819,6 +5821,424 @@ describe('MultiSelect', () => {
 
       expect(multiSelect.getValue()).toEqual([])
       expect(fixtureEl.querySelector('select').value).toBe('')
+    })
+  })
+
+  describe('external search', () => {
+    const mountExternal = (markup = '<select multiple name="tech"><option value="a">Angular</option><option value="r">React</option></select>') => {
+      fixtureEl.innerHTML = `<form>${markup}</form>`
+      return new MultiSelect(fixtureEl.querySelector('select'), { search: 'external' })
+    }
+
+    it('should filter nothing and report the query', async () => {
+      const multiSelect = mountExternal()
+      const queries = []
+      fixtureEl.querySelector('select').addEventListener('search.coreui.multi-select', event => queries.push(event.query))
+
+      multiSelect.show()
+      await userEvent.keyboard('zz')
+
+      expect(multiSelect._getDisplayedOptions()).toHaveSize(2)
+      expect(queries).toEqual(['z', 'zz'])
+    })
+
+    it('should report the query with the internal search too', async () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option><option value="r">React</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
+      const queries = []
+      fixtureEl.querySelector('select').addEventListener('search.coreui.multi-select', event => queries.push(event.query))
+
+      multiSelect.show()
+      await userEvent.keyboard('re')
+
+      expect(multiSelect._getDisplayedOptions()).toHaveSize(1)
+      expect(queries).toEqual(['r', 're'])
+    })
+
+    it('should keep the panel, the query, the focus and the selection when the options change', async () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option><option value="r">React</option></select>')
+
+      multiSelect.show()
+      await userEvent.keyboard('vu')
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }, { value: 's', text: 'Svelte' }])
+
+      expect(multiSelect._isShown()).toBe(true)
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+      expect(multiSelect._searchElement.value).toBe('vu')
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+      expect(multiSelect._getDisplayedOptions().map(option => option.textContent.trim())).toEqual(['Vue.js', 'Svelte'])
+    })
+
+    it('should keep a selected value the new options lack in the chips and the form', () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option><option value="r">React</option></select>')
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+
+      expect(multiSelect._selectionElement.querySelector('.chip').textContent).toContain('Angular')
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('tech')).toEqual(['a'])
+    })
+
+    it('should leave the selection to the user when new options carry selected', () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js', selected: true }])
+
+      expect(multiSelect.getValue()).toEqual([])
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('tech')).toEqual([])
+    })
+
+    it('should give the focus to the search field when the option holding it goes', async () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.show()
+      multiSelect._menu.querySelector('.list-box-option').focus()
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+    })
+
+    it('should leave a letter on an option alone with globalSearch off', async () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option><option value="r">React</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { globalSearch: false, search: 'external' })
+
+      multiSelect.show()
+      const option = multiSelect._menu.querySelector('.list-box-option')
+      option.focus()
+      await userEvent.keyboard('r')
+
+      expect(document.activeElement).toBe(option)
+      expect(multiSelect._searchElement.value).toBe('')
+    })
+
+    it('should mark the list busy while loading', () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.setLoading(true)
+
+      expect(multiSelect._menu.querySelector('[role="listbox"]').getAttribute('aria-busy')).toBe('true')
+
+      multiSelect.setLoading(false)
+
+      expect(multiSelect._menu.querySelector('[role="listbox"]').hasAttribute('aria-busy')).toBe(false)
+    })
+
+    it('should bring the initial selection back on a form reset after the options changed', async () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option><option value="r">React</option></select>')
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+      multiSelect.selectAll()
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('tech')).toEqual(['a'])
+    })
+
+    it('should report the query on every change of the text and not on navigation keys', async () => {
+      const multiSelect = mountExternal()
+      const queries = []
+      fixtureEl.querySelector('select').addEventListener('search.coreui.multi-select', event => queries.push(event.query))
+
+      multiSelect.show()
+      await userEvent.keyboard('v{ArrowLeft}{Shift}{Home}')
+      multiSelect._searchElement.value = 'vue'
+      multiSelect._searchElement.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(queries).toEqual(['v', 'vue'])
+    })
+
+    it('should keep the focus on an option that survives the new options', () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="r"]').focus()
+      multiSelect.setOptions([{ value: 'r', text: 'React' }, { value: 'v', text: 'Vue.js' }])
+
+      expect(document.activeElement).toBe(multiSelect._menu.querySelector('[data-coreui-value="r"]'))
+    })
+
+    it('should clear a selected value the new options lack', () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option><option value="r">React</option></select>')
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+      multiSelect.deselectAll()
+
+      expect(multiSelect.getValue()).toEqual([])
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('tech')).toEqual([])
+    })
+
+    it('should replace a selected value the new options lack in single mode', () => {
+      fixtureEl.innerHTML = '<form><select name="tech"><option value="a" selected>Angular</option><option value="r">React</option></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false, search: 'external' })
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }, { value: 'w', text: 'Svelte' }])
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="v"]').click()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['v'])
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('tech')).toEqual(['v'])
+    })
+
+    it('should count a selected value the new options lack against the selection limit', () => {
+      fixtureEl.innerHTML = '<form><select multiple name="tech"><option value="a" selected>Angular</option><option value="b" selected>Backbone</option></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external', selectionLimit: 2 })
+      const limits = []
+
+      fixtureEl.querySelector('select').addEventListener('selectionLimit.coreui.multi-select', () => limits.push(true))
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }, { value: 'w', text: 'Svelte' }])
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="v"]').click()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b'])
+      expect(limits).toHaveSize(1)
+      expect(multiSelect._menu.querySelector('[data-coreui-value="v"]').classList.contains('selected')).toBe(false)
+    })
+
+    it('should not press select all for selected values the new options lack', () => {
+      fixtureEl.innerHTML = '<form><select multiple name="tech"><option value="a" selected>Angular</option><option value="b" selected>Backbone</option></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external' })
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }, { value: 'w', text: 'Svelte' }])
+
+      expect(multiSelect._selectAllElement.getAttribute('aria-pressed')).toBe('false')
+    })
+
+    it('should count the selected values the new options lack in the total right after the options change', () => {
+      fixtureEl.innerHTML = '<form><select multiple name="tech"><option value="a" selected>Angular</option><option value="b" selected>Backbone</option></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { selectedLabel: '{count}/{total}', selectionType: 'counter' })
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }, { value: 'w', text: 'Svelte' }, { value: 'x', text: 'Ember' }])
+
+      expect(multiSelect._selectionElement.textContent).toBe('2/5')
+    })
+
+    it('should keep a selected value that comes back disabled out of the form, like a native select', () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option><option value="r">React</option></select>')
+
+      multiSelect.setOptions([{ value: 'a', text: 'Angular', disabled: true }])
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('tech')).toEqual([])
+    })
+
+    it('should give the native select its own options back on dispose after the options changed', () => {
+      const multiSelect = mountExternal()
+      const select = fixtureEl.querySelector('select')
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+      multiSelect.dispose()
+
+      expect([...select.options].map(option => option.value)).toEqual(['a', 'r'])
+    })
+
+    it('should start from the marked options when resetSelectionOnOptionsChange is set and the values change', () => {
+      fixtureEl.innerHTML = '<form><select multiple name="city"><option value="waw" selected>Warsaw</option><option value="krk">Krakow</option></select></form>'
+      const select = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(select, { resetSelectionOnOptionsChange: true })
+      const changes = []
+
+      select.addEventListener('change', () => changes.push(true))
+      multiSelect.setOptions([{ value: 'ber', text: 'Berlin', selected: true }, { value: 'muc', text: 'Munich' }])
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['ber'])
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('city')).toEqual(['ber'])
+      expect(changes).toHaveSize(1)
+    })
+
+    it('should keep the selection when resetSelectionOnOptionsChange is set and the values stay the same', () => {
+      fixtureEl.innerHTML = '<form><select multiple name="city"><option value="waw" selected>Warsaw</option><option value="krk">Krakow</option></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { resetSelectionOnOptionsChange: true })
+
+      multiSelect.setOptions([{ value: 'krk', text: 'Kraków' }, { value: 'waw', text: 'Warszawa' }])
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['waw'])
+    })
+
+    it('should tick a selected value that comes back enabled', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{
+          value: 'a', text: 'Angular', selected: true, disabled: true
+        }],
+        search: 'external'
+      })
+
+      multiSelect.setOptions([{ value: 'a', text: 'Angular' }, { value: 'r', text: 'React' }])
+
+      expect(multiSelect._menu.querySelector('[data-coreui-value="a"]').getAttribute('aria-selected')).toBe('true')
+    })
+
+    it('should take the new label of a selected value', () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option></select>')
+
+      multiSelect.setOptions([{ value: 'a', text: 'Angular (LTS)' }])
+
+      expect(multiSelect.getValue()[0].text).toBe('Angular (LTS)')
+      expect(multiSelect._selectionElement.querySelector('.chip').textContent).toContain('Angular (LTS)')
+    })
+
+    it('should keep the text and the focus of the search box in text mode', async () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>Angular</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external', selectionType: 'text' })
+
+      multiSelect.show()
+      await userEvent.keyboard('vu')
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+      expect(multiSelect._searchElement.value).toBe('vu')
+    })
+
+    it('should keep the focus on a chip', () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option></select>')
+      const chip = multiSelect._selectionElement.querySelector('.chip')
+
+      chip.focus()
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+
+      expect(document.activeElement).toBe(chip)
+    })
+
+    it('should keep a selected disabled value the new options lack out of the clear and the form', () => {
+      fixtureEl.innerHTML = '<form><select multiple name="tech"></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{
+          value: 'a', text: 'Angular', selected: true, disabled: true
+        }, { value: 'r', text: 'React', selected: true }],
+        search: 'external'
+      })
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+      multiSelect._selectionCleanerElement.click()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('tech')).toEqual([])
+    })
+
+    it('should start from a marked disabled option when resetSelectionOnOptionsChange is set', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { resetSelectionOnOptionsChange: true })
+
+      multiSelect.setOptions([{
+        value: 'x', text: 'X', selected: true, disabled: true
+      }, { value: 'y', text: 'Y' }])
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['x'])
+    })
+
+    it('should start from the marked option of a single select once, when resetSelectionOnOptionsChange is set', () => {
+      fixtureEl.innerHTML = '<form><select name="city"><option value="waw" selected>Warsaw</option><option value="krk">Krakow</option></select></form>'
+      const select = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(select, { multiple: false, resetSelectionOnOptionsChange: true })
+      const changes = []
+
+      select.addEventListener('change', () => changes.push(true))
+      multiSelect.setOptions([{ value: 'ber', text: 'Berlin', selected: true }, { value: 'muc', text: 'Munich' }])
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['ber'])
+      expect(changes).toHaveSize(1)
+    })
+
+    it('should keep the new options and a selected value they lack through setConfig', () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option></select>')
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+      multiSelect.setConfig({ placeholder: 'Pick' })
+
+      expect(multiSelect._getDisplayedOptions().map(option => option.dataset.coreuiValue)).toEqual(['v'])
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should keep the options it was given through setConfig on an instance that started with none', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [], search: 'external' })
+
+      multiSelect.setOptions([{ value: 'waw', text: 'Warsaw' }, { value: 'krk', text: 'Krakow' }])
+      multiSelect.setConfig({ disabled: false })
+
+      expect(multiSelect._getDisplayedOptions().map(option => option.dataset.coreuiValue)).toEqual(['waw', 'krk'])
+    })
+
+    it('should send nothing from a single select that gets options later', () => {
+      fixtureEl.innerHTML = '<form><select name="f"></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false, options: [], search: 'external' })
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }, { value: 'w', text: 'Svelte' }])
+
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('f')).toEqual([])
+    })
+
+    it('should not report a query when the panel opens and closes over an empty search box', () => {
+      const multiSelect = mountExternal()
+      const queries = []
+
+      fixtureEl.querySelector('select').addEventListener('search.coreui.multi-select', event => queries.push(event.query))
+      multiSelect.show()
+      multiSelect.hide()
+
+      expect(queries).toEqual([])
+    })
+
+    it('should refuse a search option other than true, false or external', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+
+      expect(() => new MultiSelect(fixtureEl.querySelector('select'), { search: 'global' })).toThrowError(TypeError)
+    })
+
+    it('should not pick with Enter while the list loads', async () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.show()
+      multiSelect.setLoading(true)
+      multiSelect._searchElement.focus()
+      await userEvent.keyboard('{Enter}')
+
+      expect(multiSelect.getValue()).toEqual([])
+    })
+
+    it('should give the focus to the search field when the option holding it comes back disabled', () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="r"]').focus()
+      multiSelect.setOptions([{ value: 'r', text: 'React', disabled: true }])
+
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+    })
+
+    it('should give the focus to the first option without a search field', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
+
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+
+      expect(document.activeElement).toBe(multiSelect._menu.querySelector('[data-coreui-value="v"]'))
+    })
+
+    it('should give the focus to the search field when the select all button it held goes', () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.show()
+      multiSelect._selectAllElement.focus()
+      multiSelect.setOptions([])
+
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+    })
+
+    it('should deselect only the listed options when select all is pressed again', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>Angular</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external' })
+
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }, { value: 'w', text: 'Svelte' }])
+      multiSelect.show()
+      multiSelect._selectAllElement.click()
+      multiSelect._selectAllElement.click()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
     })
   })
 
@@ -6998,7 +7418,7 @@ describe('MultiSelect', () => {
   })
 
   describe('search with keyup event handler', () => {
-    it('should filter options on keyup in search input', () => {
+    it('should filter options on input in the search box', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -7012,8 +7432,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       multiSelect._searchElement.value = 'ban'
 
-      const keyupEvent = new KeyboardEvent('keyup', { bubbles: true })
-      multiSelect._searchElement.dispatchEvent(keyupEvent)
+      multiSelect._searchElement.dispatchEvent(new Event('input', { bubbles: true }))
 
       const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.list-box-option'))
         .filter(option => !option.hasAttribute('hidden'))

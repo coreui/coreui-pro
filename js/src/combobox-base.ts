@@ -488,8 +488,12 @@ class ComboboxBase extends BaseComponent {
   // Filtering — the list hides what does not match and follows with its empty
   // state, its select-all scope and its keyboard order.
 
+  _filterQuery(): string | null {
+    return this._search === '' ? null : this._search
+  }
+
   _filterOptionsList(): void {
-    this._listBox?.filter(this._search === '' ? null : this._search)
+    this._listBox?.filter(this._filterQuery())
     this._afterOptionsRendered()
     this._afterFilter(this._getDisplayedOptions().length)
   }

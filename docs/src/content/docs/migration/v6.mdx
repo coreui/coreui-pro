@@ -1036,13 +1036,25 @@ check, radio, carousel and toggler icons already work:
   (`true`/`false`/`mixed`); selectable group labels are in the arrow order in
   its place.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **Multi Select's `search` is a boolean, and `search: 'global'` is gone.**
+  **Multi Select's `search` takes `true`, `false` or `'external'`, and `search: 'global'` is gone.**
   Typing reaches the search box from anywhere in the component by default,
   which is what `'global'` used to turn on, so `data-coreui-search="global"`
   becomes `data-coreui-search="true"`. Set `globalSearch: false` to keep
   typing local: the search box then filters only while it has the focus, and
   a keystroke over the options list jumps to the first option starting with
-  it.
+  it. Any other string throws a `TypeError`.
+- **Multi Select takes `search: 'external'`.** The search box then filters
+  nothing, `search.coreui.multi-select` carries the `query`, and
+  `setOptions()` replaces the options without rebuilding the control or
+  touching the selection; a selected value the new options lack keeps its
+  chip and is still sent with the form. `setLoading()` dims the list
+  meanwhile. `resetSelectionOnOptionsChange` empties the selection when the new
+  options carry different values, for options that depend on another field.
+- **Multi Select's `search.coreui.multi-select` follows the text, not the
+  keys.** It fires when the text of the search box changes, a paste included,
+  and no longer on a key that leaves the text alone, such as an arrow, or when
+  the panel opens or closes over an empty box. `dispose()` gives the native
+  select back the options it had before the component started.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Multi Select sends one `change.coreui.multi-select` per change of the
   selection.** The clear button, `deselectAll()`, `selectAll()` and a pick

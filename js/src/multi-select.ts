@@ -26,7 +26,7 @@ import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, isVisible, jQueryDispatch, restoreHostClasses, writeAttribute
 } from './util/index.js'
 
 /**
@@ -67,7 +67,7 @@ const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_KEYUP = `keyup${EVENT_KEY}`
+const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
 const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
@@ -122,9 +122,10 @@ type MultiSelectConfig = {
   pickerIcon: string | boolean
   placeholder: string
   required: boolean
+  resetSelectionOnOptionsChange: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
-  search: boolean
+  search: boolean | 'external'
   searchNoResultsLabel: string
   selectAll: boolean
   selectAllLabel: string
@@ -166,6 +167,7 @@ const Default: MultiSelectConfig = {
   pickerIcon: true,
   placeholder: 'Select...',
   required: false,
+  resetSelectionOnOptionsChange: false,
   sanitize: true,
   sanitizeFn: null,
   search: false,
@@ -210,9 +212,10 @@ const DefaultType: Record<string, string> = {
   pickerIcon: '(string|boolean)',
   placeholder: 'string',
   required: 'boolean',
+  resetSelectionOnOptionsChange: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
-  search: 'boolean',
+  search: '(boolean|string)',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
   selectAllLabel: 'string',
@@ -245,7 +248,9 @@ class MultiSelect extends ComboboxBase {
   protected declare _uniqueName: any
   protected declare _hostAttributes: Map<string, string | null>
   protected declare _hostClasses: HostClasses
+  protected declare _hostOptions: ChildNode[]
   protected declare _initialSelection: any[]
+  protected declare _loading: boolean
   protected declare _validation: FieldValidation
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
@@ -268,6 +273,7 @@ class MultiSelect extends ComboboxBase {
 
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
+    this._hostOptions = [...this._element.childNodes]
     this._validation = new FieldValidation(this._element, {
       aliases: true,
       config: () => this._config,
@@ -297,6 +303,7 @@ class MultiSelect extends ComboboxBase {
     this._floatingCleanup = null
     this._anchoredPosition = null
     this._search = ''
+    this._loading = false
 
     if (this._config.options.length > 0) {
       this._createNativeOptions(this._element, this._options)
@@ -431,6 +438,7 @@ class MultiSelect extends ComboboxBase {
   override dispose(): void {
     this._validation.dispose()
     this._destroySelect()
+    this._element.replaceChildren(...this._hostOptions)
 
     for (const [name, value] of this._hostAttributes) {
       writeAttribute(this._element, name, value)
@@ -441,9 +449,58 @@ class MultiSelect extends ComboboxBase {
   }
 
   search(text: string): void {
-    this._search = text.length > 0 ? text.toLowerCase() : text
+    const changed = text !== this._search
+
+    this._search = text
     this._filterOptionsList()
-    EventHandler.trigger(this._element, EVENT_SEARCH)
+
+    if (changed) {
+      EventHandler.trigger(this._element, EVENT_SEARCH, { query: text })
+    }
+  }
+
+  setLoading(loading: boolean): void {
+    this._loading = loading
+    this._listBox?.setLoading(loading)
+  }
+
+  setOptions(options: any[]): void {
+    const hadFocus = containsFocus(this._menu)
+    const active = this._listBox?.getActive() ?? null
+    const previous = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
+    const selected = this._selected
+
+    this._config.options = options
+    this._selected = []
+    this._options = this._getOptionsFromConfig(options)
+
+    const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
+    const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || [...values].some(value => !previous.has(value)))
+    const next = reset ? flattenOptions(options).filter((option: any) => option.selected).map((option: any) => ({ value: String(option.value), text: option.text })) : selected
+
+    this._selected = selected
+    this._element.replaceChildren()
+    this._createNativeOptions(this._element, this._options)
+    this._listBox?.setItems(this._getListBoxItems())
+    this._filterOptionsList()
+    this._commit(next)
+
+    if (!hadFocus || (containsFocus(this._menu) && isVisible((this._menu.getRootNode() as Document | ShadowRoot).activeElement))) {
+      return
+    }
+
+    if (active !== null && getSelectableOptions(this._options).some((option: any) => String(option.value) === active)) {
+      this._listBox!.setActive(active)
+      this._listBox!.focusActive()
+    } else if (this._searchElement) {
+      this._searchElement.focus()
+    } else {
+      this._listBox!.focusActive()
+
+      if (!containsFocus(this._menu)) {
+        this._menu.focus()
+      }
+    }
   }
 
   setConfig(config: Partial<MultiSelectConfig> | null): void {
@@ -594,7 +651,10 @@ class MultiSelect extends ComboboxBase {
 
           if (stop?.dataset.coreuiValue) {
             event.preventDefault()
-            this._listBox?.toggle(stop.dataset.coreuiValue)
+
+            if (!this._loading) {
+              this._listBox?.toggle(stop.dataset.coreuiValue)
+            }
           }
 
           return
@@ -672,7 +732,7 @@ class MultiSelect extends ComboboxBase {
       this.toggle()
     })
 
-    EventHandler.on(this._searchElement, EVENT_KEYUP, () => {
+    EventHandler.on(this._searchElement, EVENT_INPUT, () => {
       this._onSearchChange(this._searchElement)
     })
 
@@ -1066,7 +1126,8 @@ class MultiSelect extends ComboboxBase {
       sectionsSelectable: this._config.optionsGroupsSelectable,
       selectionLimit: this._config.selectionLimit,
       selectionMode: this._config.multiple ? 'multiple' : 'single',
-      typeahead: !this._routesTypingToSearch()
+      loading: this._loading,
+      typeahead: !this._routesTypingToSearch() && this._config.search !== 'external'
     }
   }
 
@@ -1288,7 +1349,7 @@ class MultiSelect extends ComboboxBase {
       }
     }
 
-    this._syncNativeSelection()
+    this._syncNativeSelection(options)
     this._validation.userAction = false
     this._updateSelection()
     this._updateSelectionCleaner()
@@ -1299,7 +1360,23 @@ class MultiSelect extends ComboboxBase {
     this._validation.update()
   }
 
-  _syncNativeSelection(): void {
+  _syncNativeSelection(options: Map<string, any>): void {
+    for (const option of SelectorEngine.find('option[hidden]', this._element) as HTMLOptionElement[]) {
+      if (!options.has(option.value)) {
+        option.remove()
+      }
+    }
+
+    for (const option of this._selected) {
+      if (!options.has(option.value)) {
+        const native = new Option(option.text, option.value)
+
+        native.hidden = true
+        native.disabled = option.disabled === true
+        this._element.append(native)
+      }
+    }
+
     if (!this._config.multiple) {
       (this._element as HTMLSelectElement).value = this._selected[0]?.value ?? ''
       return
@@ -1314,7 +1391,7 @@ class MultiSelect extends ComboboxBase {
 
   _restoreSelection(): void {
     this._onSearchChange(this._searchElement)
-    this._commit(this._initialSelection.filter((option: any) => this._findOptionByValue(option.value)), false)
+    this._commit(this._initialSelection, false)
   }
 
   _updateSelection(): void {
@@ -1562,6 +1639,10 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
+  override _filterQuery(): string | null {
+    return this._config.search === 'external' ? null : super._filterQuery()
+  }
+
   _onSearchChange(element: any): void {
     if (element) {
       this.search(element.value)
@@ -1600,6 +1681,10 @@ class MultiSelect extends ComboboxBase {
 
   override _configAfterMerge(config: any): any {
     config = this._normalizeContainerConfig(config)
+
+    if (typeof config.search === 'string' && config.search !== 'external') {
+      throw new TypeError(`${NAME.toUpperCase()}: Option "search" provided "${config.search}" but expected true, false or "external".`)
+    }
 
     if (typeof config.value === 'number') {
       config.value = [String(config.value)]
