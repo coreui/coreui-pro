@@ -39,12 +39,10 @@ import type {
   DateSection, EditableSection, SectionFormat, SectionInputType
 } from './util/date-sections.js'
 import { onLabelClick } from './util/field-label.js'
+import FieldValidation, { type FieldValidationOwner } from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
-import {
-  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
-  ownValidationState, setStateValidity, type UserValidity, type ValidationState, writeDescribedBy
-} from './util/form-validation.js'
+import { type ValidationState } from './util/form-validation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
 } from './util/index.js'
@@ -234,10 +232,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   declare ['constructor']: typeof DateInput & typeof BaseComponent
   protected declare _date: Date | null
   protected declare _minDate: Date | null
-  protected declare _onDismissValidationState: ((serial: number) => void) | null
-  protected declare _ownerInvalid: boolean
-  protected declare _ownerState: ValidationState | undefined
-  protected declare _ownsStateClass: boolean
+  protected declare _owner: FieldValidationOwner
   protected declare _maxDate: Date | null
   protected declare _sections: DateSection[]
   protected declare _draft: string
@@ -252,14 +247,9 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   protected declare _initialDate: Date | null
   protected declare _isBuilt: boolean
   protected declare _rejected: boolean
-  protected declare _releaseValidationState: () => void
   protected declare _removeLabelClick: () => void
   protected declare _reportedDate: Date | null
-  protected declare _serverClasses: string[]
-  protected declare _stateClass: string | null
-  protected declare _stateSerial: number
-  protected declare _userCommit: boolean
-  protected declare _userValidity: UserValidity
+  protected declare _validation: FieldValidation
   protected declare _validationError: string | null
   protected declare _valueKey: string
 
@@ -273,25 +263,25 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._errorHolds = 0
     this._inputElement = null
     this._isBuilt = false
-    this._onDismissValidationState = null
-    this._ownerInvalid = false
-    this._ownerState = undefined
-    this._ownsStateClass = false
+    this._owner = { dismiss() {}, invalid: false, state: undefined }
     this._rejected = false
-    this._stateClass = null
-    this._stateSerial = nextStateSerial()
-    this._userCommit = false
     this._validationError = null
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostNodes = [...this._element.childNodes]
     this._hostRole = this._element.getAttribute('role')
-    this._serverClasses = getStateClasses(this._element)
-    this._element.classList.remove(...this._serverClasses)
+    this._validation = new FieldValidation(this._element, {
+      config: () => this._config as DateInputConfig,
+      fields: () => [this._inputElement!],
+      frames: () => [this._element],
+      invalidTargets: () => this._getSectionElements(),
+      owner: () => this._owner,
+      ownError: () => this._rejected,
+      pageDescribed: isInvalid => [this._element, ...this._getSectionElements().filter((_, index) => index === 0 || isInvalid)],
+      restore: () => this.reset()
+    })
 
     this._createSectionInput()
-    this._userValidity = followUserValidity(this._inputElement!, () => this._updateValidity(), serial => this._onFormReset(serial))
-    this._releaseValidationState = ownValidationState(this._inputElement!)
     this._initialDate = getDateFromSections(this._sections)
     this._applyValidationState()
     this._reportedDate = this._date
@@ -357,13 +347,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
     this._config = this._getConfig(stateOnly ? { ...this._config, ...config } : { ...this._config, date: getDateFromSections(sections), ...config })
 
-    if (keys.includes('validationState')) {
-      this._serverClasses = []
-      this._stateSerial = nextStateSerial()
-    }
-
-    if (stateOnly) {
-      this._updateValidity()
+    if (this._validation.configure(config)) {
       return
     }
 
@@ -384,16 +368,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
     this._removeLabelClick()
     EventHandler.off(this._element, this.constructor.EVENT_KEY)
-    this._userValidity.stop()
-    this._releaseValidationState()
-    setStateValidity(this._inputElement!, false)
-
-    if (this._stateClass && this._ownsStateClass) {
-      this._element.classList.remove(this._stateClass)
-    }
-
-    this._element.classList.add(...this._serverClasses)
-
+    this._validation.dispose()
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     if (!this._hostAriaLabel) {
@@ -537,11 +512,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     target?.focus()
   }
 
-  _onFormReset(serial: number): void {
-    this._dismissValidationState(serial)
-    this.reset()
-  }
-
   _onKeydown(event: KeyboardEvent): void {
     const { key } = event
     const target = event.target as HTMLElement
@@ -576,7 +546,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       event.preventDefault()
       section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY ? 1 : -1, this._getSectionMax(section))
       this._draft = ''
-      this._commitSections(this._sections, true)
+      this._runAsUser(() => this._commitSections())
       return
     }
 
@@ -590,7 +560,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
       section.value = null
       this._draft = ''
-      this._commitSections(this._sections, true)
+      this._runAsUser(() => this._commitSections())
       return
     }
 
@@ -643,7 +613,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
     this._draft = result.completed ? '' : result.draft
     section.value = result.value
-    this._commitSections(this._sections, true)
+    this._runAsUser(() => this._commitSections())
 
     if (result.completed) {
       this._focusSibling(sectionElement, true)
@@ -655,7 +625,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   _clearAndFocus(): HTMLElement {
     this._setAllSelected(false)
     this._draft = ''
-    this._commitSections(setSectionsFromDate(this._sections, null), true)
+    this._runAsUser(() => this._commitSections(setSectionsFromDate(this._sections, null)))
     const [firstSection] = this._getSectionElements()
     firstSection.focus()
     return firstSection
@@ -671,7 +641,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     const sections = this._config.inputDateParse ? null : getSectionsFromString(text, this._sections)
 
     if (sections) {
-      this._commitSections(sections, true)
+      this._runAsUser(() => this._commitSections(sections))
       return
     }
 
@@ -680,7 +650,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       getLocalDateFromString(text, this._config.locale)
 
     if (date instanceof Date && !Number.isNaN(date.getTime())) {
-      this._commitSections(setSectionsFromDate(this._sections, date), true)
+      this._runAsUser(() => this._commitSections(setSectionsFromDate(this._sections, date)))
     }
   }
 
@@ -698,12 +668,12 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._commitSections()
   }
 
-  _commitSections(sections: DateSection[] = this._sections, byUser: boolean = this._userCommit): void {
-    this._userCommit = false
-
-    if (byUser && this._getValueKey(sections) !== this._valueKey) {
-      this._dismissValidationState()
+  _commitSections(sections: DateSection[] = this._sections): void {
+    if (this._getValueKey(sections) !== this._valueKey) {
+      this._validation.change()
     }
+
+    this._validation.userAction = false
 
     this._sections = sections
     this._syncSections()
@@ -752,7 +722,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       this._inputElement!.value = value
     }
 
-    this._updateValidity()
+    this._validation.update()
     this._date = isDisabled ? null : date
     this._validationError = error
 
@@ -769,7 +739,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     EventHandler.trigger(this._element, this.constructor.eventName('errorChange'), {
       error: this._error
     })
-    this._syncDescription()
+    this._validation.update()
   }
 
   _holdErrors(hold: boolean): void {
@@ -778,74 +748,17 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   }
 
   _runAsUser(action: () => void): void {
-    const previous = this._userCommit
-    this._userCommit = true
-
-    try {
-      action()
-    } finally {
-      this._userCommit = previous
-    }
+    this._validation.runAsUser(action)
   }
 
   _setOwnerDismiss(onDismiss: (serial: number) => void): void {
-    this._onDismissValidationState = onDismiss
+    this._owner.dismiss = onDismiss
   }
 
   _setOwnerState(givenState: ValidationState | undefined, isInvalid = false): void {
-    this._ownerState = givenState
-    this._ownerInvalid = isInvalid
-    this._updateValidity()
-  }
-
-  _updateValidity(): void {
-    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverClasses) ?? this._ownerState
-
-    setStateValidity(this._inputElement!, givenState === 'invalid' && !this._config.disabled)
-
-    const ownState = this._rejected ? 'invalid' : givenState ?? this._userValidity.read()
-    const state = this._ownerInvalid && ownState !== 'invalid' ? undefined : ownState
-    const stateClass = state ? `is-${state}` : null
-    const isInvalid = state === 'invalid' || this._ownerInvalid
-
-    if (stateClass !== this._stateClass) {
-      if (this._stateClass && this._ownsStateClass) {
-        this._element.classList.remove(this._stateClass)
-      }
-
-      this._ownsStateClass = stateClass !== null && !this._element.classList.contains(stateClass)
-
-      if (this._ownsStateClass) {
-        this._element.classList.add(stateClass!)
-      }
-
-      this._stateClass = stateClass
-    }
-
-    for (const section of this._getSectionElements()) {
-      writeAttribute(section, 'aria-invalid', isInvalid ? 'true' : null)
-    }
-
-    this._syncDescription()
-  }
-
-  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
-    if (this._stateSerial <= serial) {
-      this._config.validationState = null
-      this._serverClasses = []
-    }
-
-    this._onDismissValidationState?.(serial)
-  }
-
-  _syncDescription(): void {
-    const isAnnouncedInvalid = this._getSectionElements()[0]?.getAttribute('aria-invalid') === 'true'
-    const describedBy = this._element.getAttribute('aria-describedby')
-    const feedbackIds = isAnnouncedInvalid ? getFeedbackIds(this._inputElement!) : []
-
-    for (const [index, element] of this._getSectionElements().entries()) {
-      writeDescribedBy(element, index === 0 || isAnnouncedInvalid ? describedBy : null, feedbackIds)
-    }
+    this._owner.state = givenState
+    this._owner.invalid = isInvalid
+    this._validation.update()
   }
 
   _getValidationError(date: Date | null, isFilled: boolean): string | null {
@@ -941,6 +854,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._element.append(this._inputElement)
     this._syncSections()
     this._setTabIndexes()
+    this._validation.refresh()
   }
 
   _syncSections(): void {

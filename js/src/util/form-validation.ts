@@ -1,5 +1,5 @@
 import { announce } from './announce.js'
-import { getUID, writeAttribute } from './index.js'
+import { getUID } from './index.js'
 
 export type ValidationMark = {
   ariaInvalid: boolean
@@ -833,21 +833,6 @@ export const setStateValidity = (control: FormControl, invalid: boolean): void =
 
   control.setCustomValidity(message)
   stateMessages.set(control, control.willValidate ? control.validationMessage : message)
-}
-
-/**
- * Writes `aria-describedby` of the element the user works in: the description the page gave it,
- * followed by the ids of the invalid feedback, without duplicates. The attribute is removed when
- * no id is left, also when it is empty, and left untouched when it already holds the ids.
- *
- * @param control - The element to describe
- * @param describedBy - The description the page gave, as an id reference list
- * @param feedbackIds - The ids of the feedback to add, empty when the state is not `'invalid'`
- */
-export const writeDescribedBy = (control: Element, describedBy: string | null | undefined, feedbackIds: string[]): void => {
-  const ids = [...new Set([...splitIds(describedBy), ...feedbackIds])]
-
-  writeAttribute(control, 'aria-describedby', ids.length > 0 ? ids.join(' ') : null)
 }
 
 /**
