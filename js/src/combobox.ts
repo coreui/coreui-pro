@@ -10,10 +10,9 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import ListBox, { type ListBoxEntry } from './list-box.js'
+import FieldValidation from './util/field-validation.js'
 import {
-  alignValueField, configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds,
-  getServerState, getStateClasses, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
-  swapStateClass, type UserValidity, type ValidationState, writeDescribedBy, writeValueField
+  alignValueField, configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
 } from './util/form-validation.js'
 import { CARET_ICON } from './util/icons.js'
 import {
@@ -163,20 +162,14 @@ const DefaultType: Record<string, string> = {
 class Combobox extends ComboboxBase {
   protected declare _addedMenuClassNames: string[]
   protected declare _createdNodes: ChildNode[]
-  protected declare _describedBy: string | null
   protected declare _hostAttributes: Map<string, string | null>
   protected declare _hostClasses: HostClasses
   protected declare _hostMenuStyle: Map<string, string> | null
   protected declare _hostOptionsId: string
   protected declare _hostValue: { nodes: Node[], placeholder: boolean } | null
-  protected declare _listGesture: boolean
-  protected declare _releaseValidationState: (() => void) | null
   protected declare _resetValues: string[]
   protected declare _searchElement: HTMLInputElement | null
-  protected declare _serverClasses: string[]
-  protected declare _stateClass: string | null
-  protected declare _stateSerial: number
-  protected declare _userValidity: UserValidity
+  protected declare _validation: FieldValidation
   protected declare _valueElement: HTMLElement
   protected declare _valueField: HTMLSelectElement
   protected declare _valueFromMarkup: boolean
@@ -193,14 +186,17 @@ class Combobox extends ComboboxBase {
     this._hostMenuStyle = null
     this._hostOptionsId = ''
     this._hostValue = null
-    this._listGesture = false
-    this._releaseValidationState = null
     this._resetValues = []
     this._searchElement = null
-    this._serverClasses = getStateClasses(this._element)
-    this._element.classList.remove(...this._serverClasses)
-    this._stateClass = null
-    this._stateSerial = nextStateSerial()
+    this._validation = new FieldValidation(this._element, {
+      config: () => this._config,
+      describedTargets: () => [this._element],
+      fields: () => [this._valueField],
+      frames: () => [this._element],
+      invalidTargets: () => [],
+      owned: () => [this._valueField, this._searchElement].filter(Boolean) as Element[],
+      restore: () => this._restoreValue()
+    })
     this._listBox = null
     this._listBoxElement = null
     this._menu = null
@@ -260,9 +256,7 @@ class Combobox extends ComboboxBase {
     }
 
     this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._serverClasses = []
-    this._stateSerial = nextStateSerial()
-    this._updateValidity()
+    this._validation.configure({ validationState: config.validationState })
   }
 
   override dispose(): void {
@@ -270,15 +264,10 @@ class Combobox extends ComboboxBase {
       return
     }
 
+    this._validation.dispose()
     this._disposeFloating()
     this._disposeListBox()
-
-    this._userValidity.stop()
-    this._releaseValidationState?.()
     this._valueField.remove()
-
-    swapStateClass(this._element, this._stateClass)
-    this._element.classList.add(...this._serverClasses)
 
     if (this._menu) {
       EventHandler.off(this._menu, EVENT_KEY)
@@ -360,7 +349,7 @@ class Combobox extends ComboboxBase {
     this._createValueField()
     this._resolveMenu()
     this._createSearchInput()
-    this._releaseValidationState = ownValidationState(...[this._valueField, this._searchElement].filter(Boolean) as Element[])
+    this._validation.refresh()
 
     this._listBox = new ListBox(this._listBoxElement, this._getListBoxConfig())
     this._addListBoxListeners()
@@ -422,8 +411,6 @@ class Combobox extends ComboboxBase {
     this._element.after(field)
 
     this._valueField = field
-    this._describedBy = this._hostAttributes.get('aria-describedby') ?? null
-    this._userValidity = followUserValidity(field, () => this._updateValidity(), serial => this._restoreValue(serial))
   }
 
   // The panel is written next to the toggle, or built here when the options
@@ -564,7 +551,7 @@ class Combobox extends ComboboxBase {
     const values = this._listBox ? this._listBox.getSelectedValues() : []
     const isChanged = writeValueField(this._valueField, values)
 
-    this._updateValidity()
+    this._validation.update()
     this._updateValueText(values)
 
     return isChanged
@@ -612,19 +599,15 @@ class Combobox extends ComboboxBase {
   }
 
   override _onOptionSelected(): void {
-    this._listGesture = true
+    this._validation.userAction = true
   }
 
   override _onOptionDeselected(): void {
-    this._listGesture = true
+    this._validation.userAction = true
   }
 
   override _onSelectionChange(): void {
-    if (this._listGesture) {
-      this._listGesture = false
-      this._dismissValidationState()
-    }
-
+    this._validation.change()
     this._commitValue()
 
     // One value, one decision: the panel has nothing left to offer, so it
@@ -635,36 +618,10 @@ class Combobox extends ComboboxBase {
     }
   }
 
-  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
-    if (this._stateSerial > serial) {
-      return
-    }
-
-    this._config.validationState = null
-    this._serverClasses = []
-  }
-
-  _updateValidity(): void {
-    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverClasses)
-
-    setStateValidity(this._valueField, givenState === 'invalid')
-
-    const state = givenState ?? this._userValidity.read()
-    const feedbackIds = state === 'invalid' ? getFeedbackIds(this._valueField) : []
-
-    this._stateClass = swapStateClass(this._element, this._stateClass, state)
-    writeDescribedBy(this._element, this._describedBy, feedbackIds)
-  }
-
-  _restoreValue(serial: number): void {
-    this._dismissValidationState(serial)
-
+  _restoreValue(): void {
     if (this._listBox && this._listBox.getSelectedValues().join('\u0000') !== this._resetValues.join('\u0000')) {
       this._applySelection(this._resetValues)
-      return
     }
-
-    this._updateValidity()
   }
 
   _addEventListeners(): void {
