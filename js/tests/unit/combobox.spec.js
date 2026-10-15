@@ -742,15 +742,15 @@ describe('Combobox', () => {
       expect(searchField(combobox).classList.contains('is-valid')).toBeFalse()
     })
 
-    it('should keep a state given after a pick through setItems that drops the picked value', () => {
+    it('should keep a state given after a pick through setItems that marks another value', () => {
       const toggle = setMarkupInForm()
-      const combobox = new Combobox(toggle, { validationState: 'invalid' })
+      const combobox = new Combobox(toggle, { multiple: true, validationState: 'invalid' })
 
       pick(combobox, 'ca')
       combobox.setConfig({ validationState: 'invalid' })
-      combobox.setItems([{ value: 'us', label: 'United States' }])
+      combobox.setItems([{ value: 'us', label: 'United States', selected: true }])
 
-      expect(combobox.getValue()).toBeNull()
+      expect(combobox.getValue()).toEqual(['ca', 'us'])
       expect(toggle.classList.contains('is-invalid')).toBeTrue()
     })
 
@@ -946,15 +946,28 @@ describe('Combobox', () => {
       expect(value(toggle)).toEqual('Kanada')
     })
 
-    it('should drop a value the new items no longer carry', () => {
+    it('should keep a value the new items no longer carry, with its label', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { placeholder: 'Pick a country' })
 
       combobox.setValue('ca')
       combobox.setItems([{ value: 'de', label: 'Germany' }])
 
-      expect(combobox.getValue()).toBeNull()
-      expect(value(toggle)).toEqual('Pick a country')
+      expect(combobox.getValue()).toEqual('ca')
+      expect(value(toggle)).toEqual('Canada')
+    })
+
+    it('should label a value the new items no longer carry once it is the only one left', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true })
+
+      combobox.setValue(['us', 'ca'])
+      combobox.setItems([{ value: 'us', label: 'United States' }, { value: 'de', label: 'Germany' }])
+      combobox.show()
+      option(combobox, 'us').click()
+
+      expect(combobox.getValue()).toEqual(['ca'])
+      expect(value(toggle)).toEqual('Canada')
     })
   })
 
@@ -1009,6 +1022,21 @@ describe('Combobox', () => {
 
       expect(spy).toHaveBeenCalledWith('zzz')
       expect(option(combobox, 'ca').hasAttribute('hidden')).toBeFalse()
+    })
+
+    it('should keep the value and the open panel when the external results no longer carry the value', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { search: 'external' })
+
+      combobox.show()
+      option(combobox, 'ca').click()
+      combobox.show()
+      type(searchField(combobox), 'ger')
+      combobox.setItems([{ value: 'de', label: 'Germany' }])
+
+      expect(combobox.getValue()).toEqual('ca')
+      expect(value(toggle)).toEqual('Canada')
+      expect(toggle.classList.contains('show')).toBeTrue()
     })
   })
 

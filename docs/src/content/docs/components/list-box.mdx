@@ -129,7 +129,7 @@ Leave an empty `.list-box-options` in the markup so you can name it; the plugin 
 
 ## Remote data
 
-`setItems(items)` rebuilds the list at any time and keeps the selection for every value that survived the rebuild — a value that is gone drops out and `change.coreui.list-box` fires once, with the selection that is left. `getItems()` hands back the normalized array. Nothing changed means no event, so re-fetching the same page costs the user nothing.
+`setItems(items)` rebuilds the list at any time and leaves the selection alone. A value the new items no longer carry stays selected, counts against `selectionLimit`, and comes off with `deselect()`, `clear()` or the next pick in single mode. An item marked `selected` joins the selection and fires `change.coreui.list-box` once; otherwise nothing fires, so re-fetching the same page or answering a search costs the user nothing. `getItems()` hands back the normalized array.
 
 `loading` covers the wait: it writes `aria-busy="true"` on the options element, puts `.loading` on the container — which dims the options and stops them responding — and holds the empty state back, so "No results" never flashes before the answer arrives. `setLoading(value)` turns it on and off around the request.
 
@@ -167,7 +167,7 @@ The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-se
 
 ### External search
 
-`search: 'external'` builds the same field and filters nothing. Every keystroke fires `search.coreui.list-box` with the `query`, and you answer with `setItems()` — the list shows what you hand it, so the query is yours to interpret. Debounce the request and put `setLoading()` around it, and the list dims instead of flickering between two answers.
+`search: 'external'` builds the same field and filters nothing. Every keystroke fires `search.coreui.list-box` with the `query`, and you answer with `setItems()` — the list shows what you hand it, so the query is yours to interpret. What the user picked stays picked while the results change, also when the next answer does not carry it. Debounce the request and put `setLoading()` around it, and the list dims instead of flickering between two answers.
 
 <Example code={`<div class="list-box" id="listBoxExternalSearch" style="max-width: 22rem">
     <div class="list-box-options" role="listbox" aria-label="Users" style="max-height: 14rem; overflow-y: auto">
@@ -466,7 +466,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `select(value)` | Selects the option. In `single` mode it replaces the current selection. |
 | `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
 | `setActive(value)` | Moves the highlight without taking the focus. |
-| `setItems(items)` | Rebuilds the list from an `items` array. Values that are still there keep their selection, the rest drop out, and `change` fires only when the selection actually changed. |
+| `setItems(items)` | Rebuilds the list from an `items` array. The selection stays as it is, values the new items no longer carry included; items marked `selected` join it, and `change` fires only when they do. |
 | `setLoading(loading)` | Turns the loading state on or off. |
 | `toggle(value)` | Selects the value, or deselects it when it is already selected. |
 | `update` | Re-reads the DOM: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, the empty state and the select-all button are re-evaluated. The selection survives all of it. |

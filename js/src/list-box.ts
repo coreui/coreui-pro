@@ -316,16 +316,13 @@ class ListBox extends BaseComponent {
     this._items = this._normalizeItems(items)
     this._render()
 
-    const values = new Set(this._flatItems().map(item => item.value))
-    const kept = previous.filter(value => values.has(value))
-    const marked = this._flatItems().filter(item => item.selected).map(item => item.value)
-    const next = [...new Set([...kept, ...marked])]
+    const marked = this._selectable(this._flatItems().filter(item => item.selected).map(item => item.value))
 
     this._anchor = null
-    this._selected = new Set(this._selectable(toSelectionValues(next, this._config.selectionMode as SelectionMode)))
+    this._selected = new Set(toSelectionValues([...new Set([...previous, ...marked])], this._config.selectionMode as SelectionMode))
     this.update()
 
-    if (previous.length !== this._selected.size || previous.some(value => !this._selected.has(value))) {
+    if (this._selected.size !== previous.length) {
       this._triggerChange()
     }
   }

@@ -167,6 +167,7 @@ class Combobox extends ComboboxBase {
   protected declare _hostMenuStyle: Map<string, string> | null
   protected declare _hostOptionsId: string
   protected declare _hostValue: { nodes: Node[], placeholder: boolean } | null
+  protected declare _labels: Map<string, string>
   protected declare _resetValues: string[]
   protected declare _searchElement: HTMLInputElement | null
   protected declare _validation: FieldValidation
@@ -186,6 +187,7 @@ class Combobox extends ComboboxBase {
     this._hostMenuStyle = null
     this._hostOptionsId = ''
     this._hostValue = null
+    this._labels = new Map()
     this._resetValues = []
     this._searchElement = null
     this._validation = new FieldValidation(this._element, {
@@ -241,6 +243,7 @@ class Combobox extends ComboboxBase {
   }
 
   setItems(items: ListBoxEntry[]): void {
+    this._labels = new Map((this._listBox?.getSelectedValues() ?? []).map(value => [value, this._optionLabel(value)]))
     this._listBox?.setItems(items)
     this._updateValue()
   }
@@ -579,7 +582,7 @@ class Combobox extends ComboboxBase {
       .find(element => this._valueOf(element as HTMLElement) === value) as HTMLElement | undefined
 
     if (!option) {
-      return value
+      return this._labels.get(value) ?? value
     }
 
     const label = SelectorEngine.findOne(SELECTOR_OPTION_LABEL, option)

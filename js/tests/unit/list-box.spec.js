@@ -1242,7 +1242,7 @@ describe('ListBox', () => {
       ])
     })
 
-    it('should keep the selection of the values that are still there', () => {
+    it('should keep the selection of the values the new items no longer carry', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
         items: [
@@ -1263,9 +1263,81 @@ describe('ListBox', () => {
         { value: 'cheese', label: 'Cheese' }
       ])
 
-      expect(listBox.getSelectedValues()).toEqual(['tomato'])
-      expect(changed).toEqual([['tomato']])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato', 'onion'])
+      expect(changed).toEqual([])
       expect(item(el, 'tomato').classList.contains('selected')).toBeTrue()
+      expect(item(el, 'cheese').classList.contains('selected')).toBeFalse()
+    })
+
+    it('should replace a value the new items no longer carry in single selection mode', () => {
+      const el = setEmptyMarkup()
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const events = []
+
+      el.addEventListener('deselected.coreui.list-box', event => events.push(`deselected:${event.value}`))
+      el.addEventListener('change.coreui.list-box', event => events.push(`change:${event.value}`))
+
+      listBox.setItems([{ value: 'tomato', label: 'Tomato' }])
+      click(item(el, 'tomato'))
+
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
+      expect(events).toEqual(['deselected:lettuce', 'change:tomato'])
+    })
+
+    it('should count the values the new items no longer carry against the selection limit', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, {
+        items: [
+          { value: 'lettuce', label: 'Lettuce' },
+          { value: 'tomato', label: 'Tomato' }
+        ],
+        selectionLimit: 2
+      })
+      const reported = []
+
+      el.addEventListener('selectionLimit.coreui.list-box', event => reported.push(event.value))
+
+      listBox.selectAll()
+      listBox.setItems([{ value: 'onion', label: 'Onion' }])
+      click(item(el, 'onion'))
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
+      expect(reported).toEqual(['onion'])
+    })
+
+    it('should clear the values the new items no longer carry', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const changed = []
+
+      listBox.setItems([{ value: 'tomato', label: 'Tomato' }])
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.clear()
+
+      expect(listBox.getSelectedValues()).toEqual([])
+      expect(changed).toEqual([[]])
+    })
+
+    it('should keep a selected value that comes back disabled', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+
+      listBox.setItems([{ value: 'lettuce', label: 'Lettuce', disabled: true }])
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
+      expect(item(el, 'lettuce').classList.contains('selected')).toBeTrue()
+    })
+
+    it('should fire change when setItems marks a value that was not selected', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const changed = []
+
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.setItems([{ value: 'tomato', label: 'Tomato', selected: true }])
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
+      expect(changed).toEqual([['lettuce', 'tomato']])
     })
 
     it('should keep the selection mode when setItems marks several items', () => {
