@@ -117,7 +117,7 @@ While using visually hidden content (`.visually-hidden`, `aria-label`, and even 
 
 ## Customizing
 
-Many form values are set at a general level and re-used by individual form components. You'll see these most often as the `--cui-btn-input-*` and `--cui-control-*` tokens.
+Many form values are set once on `:root` as `--cui-btn-input-*` tokens and re-used by every form component. Each field points its own `--cui-control-*` tokens at them and declares those on itself, so one field is restyled through its `--cui-control-*` tokens and every field at once through `--cui-btn-input-*`. The checkbox, radio and switch share a few `--cui-control-*` tokens on `:root` as well.
 
 ### CSS variables
 
