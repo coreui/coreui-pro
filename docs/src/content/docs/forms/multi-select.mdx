@@ -663,7 +663,7 @@ The select stays in the page as an invisible overlay for form validation and is 
 
 ### CSS variables
 
-MultiSelects use local CSS variables on `.form-multi-select` for enhanced real-time customization.
+The field is a [`.form-control-group`](/forms/form-control-group/#css-variables), so its frame, the cleaner and the toggle read the `--cui-control-*` and `--cui-control-group-*` tokens. The plugin renders that frame as a `.form-multi-select` element around your `<select>`: set the tokens with a rule on `.form-multi-select`, because a `style` attribute on the `<select>` does not reach the frame. The selected tags add two of their own:
 
 <ScssDocs file="scss/forms/_form-multi-select.scss" capture="form-multi-select-tokens" />
 
@@ -675,4 +675,4 @@ Its surface, border, shadow, stacking and fade come from the `.popup` tokens it 
 
 <ScssDocs file="scss/_popup.scss" capture="popup-tokens" />
 
-Everything inside it — options, section labels, checkbox indicators and the select all button — is a [List box](/components/list-box/) and takes its `--cui-list-box-*` variables. Set them on `.combobox-popup` to restyle one Multi Select, or on `:root` for all of them.
+Everything inside it — options, section labels, checkbox indicators and the select all button — is a [List box](/components/list-box/) and takes its `--cui-list-box-*` variables. `.list-box` declares them itself, so a value set on `.combobox-popup` or on `:root` does not reach it: set them with a rule on `.combobox-popup .list-box`, which covers the panels of Combobox, Autocomplete and Multi Select alike.

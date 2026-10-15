@@ -140,7 +140,7 @@ See the [v6 migration guide](/migration/v6/) for the full picture.
 
 ### CSS variables
 
-Selects use local CSS variables on the control for enhanced real-time customization.
+A select takes its frame from the same `--cui-control-*` tokens as [`.form-control`](/forms/form-control/#css-variables), declared on `.form-select` itself. The arrow and the space it reserves have their own:
 
 <ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-tokens" />
 

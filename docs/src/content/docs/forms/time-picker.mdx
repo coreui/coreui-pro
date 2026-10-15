@@ -297,7 +297,9 @@ context.disabled         // disabled state
 
 ### CSS variables
 
-The tokens are declared on `.time-picker-popup`, which is the element that survives being teleported away from the field — set them there rather than on an ancestor.
+The field is a [`.form-control-group`](/forms/form-control-group/#css-variables) on the picker element itself, so its frame, the cleaner and the toggle read the `--cui-control-*` and `--cui-control-group-*` tokens. Set them on the picker element to restyle one field.
+
+The panel's tokens are declared on `.time-picker-popup`, which is the element that survives being teleported away from the field — set them there rather than on an ancestor.
 
 <ScssDocs file="scss/_time-picker.scss" capture="time-picker-tokens" />
 

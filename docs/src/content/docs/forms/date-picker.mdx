@@ -541,6 +541,8 @@ myDatePicker.addEventListener('dateChange.coreui.date-picker', event => {
 
 ### CSS variables
 
+The field is a [`.form-control-group`](/forms/form-control-group/#css-variables) on the picker element itself, so its frame, the cleaner and the toggle read the `--cui-control-*` and `--cui-control-group-*` tokens. Set them on the picker element to restyle one field.
+
 The picker declares its local CSS variables on its panel, `.date-picker-popup`,
 for real-time customization. Values are set via Sass, so Sass customization is
 supported too.

@@ -314,7 +314,7 @@ CSS selectors can only account for so much. When a group carries an element that
 
 ### CSS variables
 
-The addon declares its own tokens on `.input-group-text`, so a single addon can be repainted or resized without a modifier class. `.input-group` itself declares none — it is a layout wrapper.
+The addon declares its own tokens on `.input-group-text`, so a single addon can be repainted or resized without a modifier class. The first six are the [`--cui-control-*`](/forms/form-control/#css-variables) frame tokens, copied onto the addon so it lines up with the control next to it; `.input-group-{size}` re-points all of them but the border width, on the addon and on the `.form-control` or `.form-select` next to it. `.input-group` itself declares none — it is a layout wrapper, and a token set on it reaches neither the addon nor the control, because each declares its own.
 
 <ScssDocs file="scss/forms/_input-group.scss" capture="input-group-tokens" />
 

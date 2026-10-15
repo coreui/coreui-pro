@@ -621,4 +621,4 @@ Its surface, border, shadow, stacking and fade come from the `.popup` tokens it 
 
 <ScssDocs file="scss/_popup.scss" capture="popup-tokens" />
 
-Everything inside it — options, section labels and the checkbox indicator — is a [List box](/components/list-box/) and takes its `--cui-list-box-*` variables. Set them on `.combobox-popup` to restyle one Combobox, or on `:root` for all of them. The frame of the toggle is a [`.form-control`](/forms/form-control/) and takes the `--cui-control-*` properties.
+Everything inside it — options, section labels and the checkbox indicator — is a [List box](/components/list-box/) and takes its `--cui-list-box-*` variables. `.list-box` declares them itself, so a value set on `.combobox-popup` or on `:root` does not reach it: set them with a rule on `.combobox-popup .list-box`, which covers the panels of Combobox, Autocomplete and Multi Select alike. The frame of the toggle is a [`.form-control`](/forms/form-control/) and takes the `--cui-control-*` properties.

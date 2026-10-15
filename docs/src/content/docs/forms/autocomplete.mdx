@@ -432,4 +432,4 @@ Its surface, border, shadow, stacking and fade come from the `.popup` tokens it 
 
 <ScssDocs file="scss/_popup.scss" capture="popup-tokens" />
 
-The options themselves are a [List box](/components/list-box/), so their padding, colors, indicator and section labels come from its `--cui-list-box-*` variables — set them on `.combobox-popup` to restyle one Autocomplete, or on `:root` for all of them.
+The options themselves are a [List box](/components/list-box/), so their padding, colors, indicator and section labels come from its `--cui-list-box-*` variables. `.list-box` declares them itself, so a value set on `.combobox-popup` or on `:root` does not reach it: set them with a rule on `.combobox-popup .list-box`, which covers the panels of Combobox, Autocomplete and Multi Select alike.

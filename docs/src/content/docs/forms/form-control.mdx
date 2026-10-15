@@ -162,7 +162,9 @@ Learn more about [support for datalist elements](https://caniuse.com/datalist).
 
 ### CSS variables
 
-`.form-control` and `.form-select` carry the `--cui-control-*` tokens. The namespace is shared by every field component — the OTP input, the chip input, the pickers — so setting one of these on an ancestor restyles all of them at once. `.form-control-sm` and `.form-control-lg` are themselves token overrides.
+`.form-control` and `.form-select` declare the `--cui-control-*` tokens on themselves, and so does every field built on them: the [form control group](/forms/form-control-group/#css-variables) and every component that renders one — Autocomplete, Chip Input, Multi Select, the pickers, the password and number inputs — and the cells of the OTP input. Set a token on the field to restyle that field; a value set on an ancestor or on `:root` stops there. To restyle the frame of every field at once, change the [`--cui-btn-input-*` tokens](/forms/overview/#css-variables) it points to; buttons share their sizes, so they move too. The placeholder, disabled background and file button colours point at the palette instead and are set per field. `.form-control-sm` and `.form-control-lg` are themselves token overrides.
+
+The checkbox, radio and switch are not fields: the few `--cui-control-*` tokens they share sit on `:root` and are listed with the [checkbox](/forms/checkbox/#shared-variables).
 
 <ScssDocs file="scss/forms/_form-control.scss" capture="form-control-tokens" />
 
