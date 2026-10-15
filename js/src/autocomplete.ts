@@ -20,7 +20,7 @@ import {
   filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, highlightMatches, isOptionGroup
 } from './util/option-tree.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
 } from './util/index.js'
 
 /**
@@ -63,7 +63,7 @@ const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_SHOW = 'show'
 
 const HOST_CLASS_NAMES = [CLASS_NAME_AUTOCOMPLETE, CLASS_NAME_DISABLED, CLASS_NAME_INPUT_GROUP, CLASS_NAME_SHOW]
-const HOST_LABEL_ATTRIBUTES = ['aria-label', 'aria-labelledby']
+const HOST_FIELD_ATTRIBUTE = /^aria-(?!describedby$|invalid$)/
 
 const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
@@ -171,7 +171,7 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputElement: any
   protected declare _inputHintElement: any
   protected declare _hostClasses: HostClasses
-  protected declare _hostLabels: Array<string | null>
+  protected declare _hostAria: Array<[string, string]>
   protected declare _keySerial: number | null
   protected declare _previousTabIndex: string | null
   protected declare _initialValue: any
@@ -281,8 +281,8 @@ class Autocomplete extends ComboboxBase {
 
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
-    for (const [index, name] of HOST_LABEL_ATTRIBUTES.entries()) {
-      writeAttribute(this._element, name, this._hostLabels[index])
+    for (const [name, value] of this._hostAria) {
+      this._element.setAttribute(name, value)
     }
 
     if (this._previousTabIndex === null) {
@@ -655,7 +655,9 @@ class Autocomplete extends ComboboxBase {
     // carries `.form-control-group` itself instead of nesting one.
     const togglerEl = this._element
     this._previousTabIndex = togglerEl.getAttribute('tabindex')
-    this._hostLabels = HOST_LABEL_ATTRIBUTES.map(name => togglerEl.getAttribute(name))
+    this._hostAria = [...togglerEl.attributes]
+      .filter(({ name }) => HOST_FIELD_ATTRIBUTE.test(name))
+      .map(({ name, value }): [string, string] => [name, value])
 
     applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
@@ -683,14 +685,15 @@ class Autocomplete extends ComboboxBase {
     inputEl.autocomplete = 'off'
     inputEl.placeholder = this._config.placeholder ?? ''
     inputEl.role = 'combobox'
+
+    for (const [name, value] of this._hostAria) {
+      inputEl.setAttribute(name, value)
+      togglerEl.removeAttribute(name)
+    }
+
     inputEl.setAttribute('aria-autocomplete', 'list')
     inputEl.setAttribute('aria-expanded', 'false')
     inputEl.setAttribute('aria-haspopup', 'listbox')
-
-    for (const [index, name] of HOST_LABEL_ATTRIBUTES.entries()) {
-      writeAttribute(inputEl, name, this._hostLabels[index])
-      togglerEl.removeAttribute(name)
-    }
 
     if (this._config.disabled) {
       inputEl.setAttribute('disabled', true as any)

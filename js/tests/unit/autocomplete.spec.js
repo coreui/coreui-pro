@@ -87,6 +87,16 @@ describe('Autocomplete', () => {
       expect(named._element.hasAttribute('aria-label')).toBeFalse()
     })
 
+    it('should move the other aria attributes on the host to the field and keep its own', () => {
+      fixtureEl.innerHTML = '<div aria-errormessage="country-error" aria-expanded="true" aria-required="true"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('div'), { options: ['Poland'] })
+
+      expect(autocomplete._inputElement.getAttribute('aria-errormessage')).toBe('country-error')
+      expect(autocomplete._inputElement.getAttribute('aria-required')).toBe('true')
+      expect(autocomplete._inputElement.getAttribute('aria-expanded')).toBe('false')
+      expect(autocomplete._element.hasAttribute('aria-required')).toBeFalse()
+    })
+
     it('should take care of element either passed as a CSS selector or DOM element', () => {
       fixtureEl.innerHTML = [
         '<div class="autocomplete" data-coreui-autocomplete>',
