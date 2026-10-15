@@ -25,6 +25,9 @@ export type FieldValidationConfig = {
  * - `frames`: the elements that get the state class.
  * - `invalidTargets`: the elements that get `aria-invalid`.
  * - `owned`: the elements the form utilities leave to the component; `fields` by default.
+ * - `pageDescribed`: the described targets that carry the description the page gave the host in
+ *   every state, or the host itself, which then keeps the description where the page put it. By
+ *   default the first described target, and every described target while the state is `'invalid'`.
  * - `restore`: puts back the value the component had when it was built, on a native reset.
  * - `serverClassSources`: the elements whose state class in the markup counts as the given state;
  *   the host by default.
@@ -39,6 +42,7 @@ export type FieldValidationOptions = {
   frames: () => Element[]
   invalidTargets: () => Element[]
   owned?: () => Element[]
+  pageDescribed?: () => Element[]
   restore?: () => void
   serverClassSources?: () => Element[]
 }
@@ -66,7 +70,7 @@ class FieldValidation {
   protected declare _options: FieldValidationOptions
   protected declare _release: () => void
   protected declare _resetRoots: Node[]
-  protected declare _resetTimeout: ReturnType<typeof setTimeout> | undefined
+  protected declare _resetTimeouts: Set<ReturnType<typeof setTimeout>>
   protected declare _serial: number
   protected declare _serverClasses: Map<Element, string[]>
   protected declare _userValidity: Map<ValueField, UserValidity>
@@ -79,9 +83,6 @@ class FieldValidation {
    * @param options - How the component describes itself, see `FieldValidationOptions`
    */
   constructor(host: Element, options: FieldValidationOptions) {
-    const root = host.getRootNode()
-
-    this.userAction = false
     this._ariaInvalid = new Map()
     this._described = new Map()
     this._describedBy = splitIds(host.getAttribute('aria-describedby'))
@@ -92,8 +93,8 @@ class FieldValidation {
     this._onReset = event => this._handleReset(event)
     this._options = options
     this._release = () => {}
-    this._resetRoots = root instanceof ShadowRoot ? [host.ownerDocument, root] : [host.ownerDocument]
-    this._resetTimeout = undefined
+    this._resetRoots = []
+    this._resetTimeouts = new Set()
     this._serial = nextStateSerial()
     this._serverClasses = new Map()
 
@@ -107,6 +108,7 @@ class FieldValidation {
     }
 
     this._userValidity = new Map()
+    this.userAction = false
   }
 
   /**
@@ -172,13 +174,14 @@ class FieldValidation {
    *
    * @param serial - The serial taken at the moment that drops the state, such as the start of a
    * key press or a native reset; any state given before it is dropped by default
+   * @returns `true` when it dropped a state, so the component has something to draw
    */
-  dismiss(serial: number = Number.POSITIVE_INFINITY): void {
-    if (this._serial > serial) {
-      return
-    }
-
+  dismiss(serial: number = Number.POSITIVE_INFINITY): boolean {
     const config = this._options.config()
+
+    if (this._serial > serial || this._givenState(config) === undefined) {
+      return false
+    }
 
     config.validationState = null
 
@@ -192,47 +195,59 @@ class FieldValidation {
     for (const field of this._options.fields()) {
       setStateValidity(field, false)
     }
+
+    return true
   }
 
   /**
    * Follows the value fields and takes over the elements the component built, after a build or a
-   * rebuild, and draws the state on them. A field that replaces another at the same position keeps
-   * the report a validation made on that one, and a field that is gone loses its block. Moves the
-   * description the page gave the host to the described targets, unless the host is a value field.
-   * Follows native resets of the form after the fields it newly follows, so the fields forget a
-   * report before the value is restored.
+   * rebuild, and draws the state on them. The first refresh starts following native resets of the
+   * form ahead of the fields. A field that replaces another at the same position goes on with the
+   * follower of that one, with its report and a reset in progress, and a field that is gone loses its
+   * block. Moves the description the page gave the host to the described targets, unless the host is
+   * a value field or keeps it.
    */
   refresh(): void {
     const fields = this._options.fields()
-    let isFollowing = false
+    const followers = new Map<ValueField, UserValidity>()
 
-    for (const [index, field] of fields.entries()) {
-      const replaced = this._fields[index]
+    if (this._resetRoots.length === 0) {
+      const root = this._host.getRootNode()
 
-      if (!this._userValidity.has(field)) {
-        const wasReported = replaced !== undefined && !fields.includes(replaced) && this._userValidity.get(replaced)?.isReported()
+      this._resetRoots = root instanceof ShadowRoot ? [this._host.ownerDocument, root] : [this._host.ownerDocument]
 
-        this._userValidity.set(field, followUserValidity(field, () => this.update(), undefined, wasReported))
-        isFollowing = true
-      }
-    }
-
-    for (const [field, userValidity] of this._userValidity) {
-      if (!fields.includes(field)) {
-        userValidity.stop()
-        setStateValidity(field, false)
-        this._userValidity.delete(field)
-      }
-    }
-
-    if (isFollowing) {
       for (const node of this._resetRoots) {
-        node.removeEventListener('reset', this._onReset, true)
         node.addEventListener('reset', this._onReset, true)
       }
     }
 
-    if (!this._movedDescription && !fields.includes(this._host as ValueField)) {
+    for (const [index, field] of fields.entries()) {
+      const replaced = this._fields[index]
+      let userValidity = this._userValidity.get(field)
+
+      if (!userValidity && replaced !== undefined && !fields.includes(replaced)) {
+        userValidity = this._userValidity.get(replaced)!
+        userValidity.follow(field)
+      }
+
+      followers.set(field, userValidity ?? followUserValidity(field, () => this.update()))
+    }
+
+    const kept = new Set(followers.values())
+
+    for (const [field, userValidity] of this._userValidity) {
+      if (!fields.includes(field)) {
+        setStateValidity(field, false)
+      }
+
+      if (!kept.has(userValidity)) {
+        userValidity.stop()
+      }
+    }
+
+    this._userValidity = followers
+
+    if (!this._movedDescription && !fields.includes(this._host as ValueField) && !this._options.pageDescribed?.().includes(this._host)) {
       this._movedDescription = true
       writeAttribute(this._host, 'aria-describedby', null)
     }
@@ -244,38 +259,48 @@ class FieldValidation {
   }
 
   /**
-   * Draws the state: the block of a given `'invalid'` on the fields that carry it while the component
-   * can block, then the state class on the frames, `aria-invalid` on the focus targets, and the
-   * page's description and the invalid feedback on the described targets, the description always on
-   * the first of them, next to the ids others put there. The message is the feedback of the first
-   * field that carries the block, else of the first focus target. The state is the given one, else
-   * `'invalid'` when a validation reported a field whose value is invalid, else what the stylesheet
-   * shows for the fields. Focus and described targets the component no longer lists lose what the
-   * controller wrote there.
+   * Draws the state: lifts the block from the fields that no longer carry it, puts the state class on
+   * the frames, `aria-invalid` on the focus targets, and the page's description and the invalid
+   * feedback on the described targets, the description where `pageDescribed` puts it, next to the
+   * ids others put there, and only then the block of a given `'invalid'` on the fields that carry it
+   * while the component can block, so the block takes the message the page and the stylesheet show
+   * for them. The message in the description is the feedback of the first field that carries the
+   * block, else of the first focus target. The state is the given one, else `'invalid'` when a
+   * validation reported a field whose value is invalid, else what the stylesheet shows for the
+   * fields. Focus and described targets the component no longer lists lose what the controller wrote
+   * there.
    */
   update(): void {
     const config = this._options.config()
-    const { aliases } = this._options
-    const serverClasses = [...this._serverClasses.values()].flat()
-    const givenState = getValidationState(config.validationState, aliases && config.valid, aliases && config.invalid) ?? getServerState(serverClasses)
+    const givenState = this._givenState(config)
     const fields = this._options.fields()
     const blockers = this._options.blockers?.() ?? fields
-    const blocks = givenState === 'invalid' && (this._options.canBlock?.() ?? !config.disabled)
+    const blocked = givenState === 'invalid' && (this._options.canBlock?.() ?? !config.disabled) ? fields.filter(field => blockers.includes(field)) : []
 
     for (const field of fields) {
-      setStateValidity(field, blocks && blockers.includes(field))
+      if (!blocked.includes(field)) {
+        setStateValidity(field, false)
+      }
     }
 
     const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
     const state = givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
     const isInvalid = state === 'invalid'
+
+    this._drawStateClass(state ? `is-${state}` : null)
+
     const invalidTargets = this._options.invalidTargets()
     const source = (blockers[0] ?? invalidTargets[0]) as ValueField | undefined
     const feedbackIds = isInvalid && source ? getFeedbackIds(source) : []
+    const describedTargets = this._options.describedTargets?.() ?? invalidTargets
+    const pageDescribed = this._options.pageDescribed?.() ?? describedTargets.filter((_, index) => index === 0 || isInvalid)
 
-    this._drawStateClass(state ? `is-${state}` : null)
     this._markInvalid(invalidTargets, isInvalid)
-    this._describe((this._options.describedTargets?.() ?? invalidTargets).map((target, index) => [target, [...(index === 0 || isInvalid ? this._describedBy : []), ...feedbackIds]]))
+    this._describe(describedTargets.map(target => [target, [...(pageDescribed.includes(target) ? this._describedBy : []), ...feedbackIds]]))
+
+    for (const field of blocked) {
+      setStateValidity(field, true)
+    }
   }
 
   /**
@@ -286,7 +311,9 @@ class FieldValidation {
    * apart.
    */
   dispose(): void {
-    clearTimeout(this._resetTimeout)
+    for (const timeout of this._resetTimeouts) {
+      clearTimeout(timeout)
+    }
 
     for (const node of this._resetRoots) {
       node.removeEventListener('reset', this._onReset, true)
@@ -315,6 +342,19 @@ class FieldValidation {
 
       writeAttribute(this._host, 'aria-describedby', [...new Set([...this._describedBy, ...ids])].join(' ') || null)
     }
+  }
+
+  /**
+   * Reads the state the component was given: by its options, else by the state classes its markup
+   * carried.
+   *
+   * @param config - The configuration of the component
+   * @returns The given state, or `undefined` when none was given
+   */
+  _givenState(config: FieldValidationConfig): ValidationState | undefined {
+    const { aliases } = this._options
+
+    return getValidationState(config.validationState, aliases && config.valid, aliases && config.invalid) ?? getServerState([...this._serverClasses.values()].flat())
   }
 
   /**
@@ -406,7 +446,8 @@ class FieldValidation {
   /**
    * Answers a native reset of the form of a value field: in the next task, unless a listener
    * cancelled it, drops a state given before the reset and draws it gone, so the events the restore
-   * sends see it, then restores the value and draws the state again.
+   * sends see it, then restores the value. The followers of the fields draw the state of the restored
+   * value right after, in their own tasks for the same reset.
    *
    * @param event - The `reset` event
    */
@@ -416,18 +457,17 @@ class FieldValidation {
     }
 
     const serial = nextStateSerial()
+    const timeout = setTimeout(() => {
+      this._resetTimeouts.delete(timeout)
 
-    clearTimeout(this._resetTimeout)
-    this._resetTimeout = setTimeout(() => {
-      if (event.defaultPrevented) {
-        return
+      if (!event.defaultPrevented) {
+        this.dismiss(serial)
+        this.update()
+        this._options.restore?.()
       }
-
-      this.dismiss(serial)
-      this.update()
-      this._options.restore?.()
-      this.update()
     })
+
+    this._resetTimeouts.add(timeout)
   }
 }
 

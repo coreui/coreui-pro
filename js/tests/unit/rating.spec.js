@@ -1,5 +1,4 @@
 import { userEvent } from '@vitest/browser/context'
-import { vi } from 'vitest'
 
 import Rating from '../../src/rating.js'
 import EventHandler from '../../src/dom/event-handler.js'
@@ -1809,28 +1808,35 @@ describe('Rating', () => {
     it('should stop following the form once disposed, and leave the other ratings listening', async () => {
       fixtureEl.innerHTML = '<form><div id="first"></div><div id="second"></div></form>'
       const form = fixtureEl.querySelector('form')
-      const first = new Rating(fixtureEl.querySelector('#first'), { value: 1 })
+      const firstEl = fixtureEl.querySelector('#first')
+      const first = new Rating(firstEl, { value: 1 })
       const secondEl = fixtureEl.querySelector('#second')
       // eslint-disable-next-line no-new
       new Rating(secondEl, { value: 2 })
+      const firstInput = firstEl.querySelectorAll('.rating-item-input')[3]
       const input = secondEl.querySelectorAll('.rating-item-input')[3]
+      const firstChangeSpy = jasmine.createSpy('firstChange')
       const changeSpy = jasmine.createSpy('change')
+      const errors = []
+      const onError = event => errors.push(event.message)
 
-      const offSpy = vi.spyOn(EventHandler, 'off')
-
+      firstInput.checked = true
+      firstInput.dispatchEvent(createEvent('change', { bubbles: true }))
       first.dispose()
-
-      expect(offSpy).toHaveBeenCalledWith(document, 'reset.coreui.rating', 'form', expect.any(Function))
 
       input.checked = true
       input.dispatchEvent(createEvent('change', { bubbles: true }))
+      firstEl.addEventListener('change.coreui.rating', firstChangeSpy)
       secondEl.addEventListener('change.coreui.rating', changeSpy)
+      window.addEventListener('error', onError)
       form.reset()
       await wait()
+      window.removeEventListener('error', onError)
 
+      expect(errors).toEqual([])
+      expect(firstChangeSpy).not.toHaveBeenCalled()
       expect(changeSpy).toHaveBeenCalledTimes(1)
       expect(secondEl.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
-      offSpy.mockRestore()
     })
   })
 
@@ -1946,6 +1952,16 @@ describe('Rating', () => {
       expect(radiosOf(element).some(radio => radio.hasAttribute('aria-describedby'))).toBeFalse()
     })
 
+    it('should drop a given state before listeners on the rating see the native input event', () => {
+      const { element } = mountInForm({ validationState: 'invalid' })
+      const seen = []
+
+      element.addEventListener('input', () => seen.push(element.classList.contains('is-invalid'), element.getAttribute('aria-invalid')), true)
+      element.querySelectorAll('.rating-item-label')[3].click()
+
+      expect(seen).toEqual([false, null])
+    })
+
     it('should drop a given valid state when the user picks a star', () => {
       const { element } = mountInForm({ validationState: 'valid' })
 
@@ -2019,21 +2035,7 @@ describe('Rating', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should follow a native reset of a form cloned from a template and inside a shadow root', async () => {
-      const template = document.createElement('template')
-      template.innerHTML = '<form><div></div></form>'
-      const clone = template.content.cloneNode(true)
-      const cloned = clone.querySelector('div')
-      // eslint-disable-next-line no-new
-      new Rating(cloned, { name: 'score', validationState: 'invalid', value: 2 })
-      fixtureEl.append(clone)
-
-      cloned.querySelectorAll('.rating-item-label')[3].click()
-      cloned.closest('form').reset()
-      await wait()
-
-      expect(cloned.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
-
+    it('should follow a native reset of a form inside a shadow root', async () => {
       const host = document.createElement('div')
       fixtureEl.append(host)
       host.attachShadow({ mode: 'open' }).innerHTML = '<form><div></div></form>'
@@ -2045,6 +2047,35 @@ describe('Rating', () => {
       await wait()
 
       expect(shadowed).not.toHaveClass('is-invalid')
+    })
+
+    it('should let a change listener of a reset dispose the rating', async () => {
+      const { element, form, rating } = mountInForm({ value: 2 })
+      const errors = []
+      const onError = event => errors.push(event.message)
+
+      element.querySelectorAll('.rating-item-label')[3].click()
+      element.addEventListener('change.coreui.rating', () => rating.dispose())
+      window.addEventListener('error', onError)
+      form.reset()
+      await wait()
+      window.removeEventListener('error', onError)
+
+      expect(errors).toEqual([])
+      expect(radiosOf(element)).toHaveSize(0)
+    })
+
+    it('should keep a report when a reset listener rebuilds the rating and a later one cancels the reset', async () => {
+      const { element, form, rating } = mountInForm({ required: true })
+
+      form.checkValidity()
+      form.addEventListener('reset', () => rating.setConfig({ itemCount: 6 }))
+      form.addEventListener('reset', event => event.preventDefault())
+      form.reset()
+      await wait()
+
+      expect(element).toHaveClass('is-invalid')
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
     })
 
     it('should keep a state given in a reset listener the page added before the rating', async () => {

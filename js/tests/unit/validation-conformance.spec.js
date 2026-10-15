@@ -238,9 +238,10 @@ const ADAPTERS = [
     create: (root, config) => new RangeSlider(root.querySelector('#field'), { name: 'budget', value: [20, 80], ...config }),
     serverClassElement: t => t.root.querySelector('#field'),
     blockers: t => [t.root.querySelector('.form-range-input')],
-    frames: t => [t.root.querySelector('#field')],
+    frames: t => [t.root.querySelector('#field'), ...t.root.querySelectorAll('.form-range-input')],
     invalidTargets: t => [...t.root.querySelectorAll('.form-range-input')],
     describedTargets: t => [...t.root.querySelectorAll('.form-range-input')],
+    pageDescribed: t => [...t.root.querySelectorAll('.form-range-input')],
     changeAsUser: t => typeInto(t.root.querySelector('.form-range-input'), '30'),
     changeEvents: t => [[t.root.querySelector('#field'), 'input.coreui.range-slider']],
     changeFromCode: t => t.instance.setConfig({ value: [30, 70] }),
@@ -249,8 +250,8 @@ const ADAPTERS = [
     required: null,
     makeInvalid: t => t.root.querySelector('.form-range-input').setCustomValidity('Pick a higher budget.'),
     notApplicable: {
-      pageClass: 'it takes off the class it shows, also one the page put there, until it moves onto the controller',
-      reportedReconfigure: 'its rebuild replaces the handles and does not carry the report over yet'
+      reportedReconfigure: 'its rebuild replaces the handles and leaves the validity the page set on the old ones behind',
+      reportedResetReconfigure: 'its rebuild replaces the handles and leaves the validity the page set on the old ones behind'
     }
   },
   {
@@ -268,10 +269,7 @@ const ADAPTERS = [
     changeFromCode: t => t.instance.setConfig({ value: 4 }),
     reconfigure: t => t.instance.setConfig({ itemCount: 6 }),
     rejectedOption: { itemCount: 'six' },
-    required: { required: true },
-    notApplicable: {
-      pageClass: 'it takes off the class it shows, also one the page put there, until it moves onto the controller'
-    }
+    required: { required: true }
   }
 ]
 
@@ -316,7 +314,7 @@ describe('validation conformance', () => {
   }
 
   const reasonFor = (adapter, rule) => adapter.notApplicable?.[rule] ??
-    ((/^rejected(Option|Mixed)$/.test(rule) && !adapter.rejectedOption) || (rule === 'reportedReconfigure' && !adapter.reconfigure) ? VALIDATION_ONLY : null) ??
+    ((/^rejected(Option|Mixed)$/.test(rule) && !adapter.rejectedOption) || (rule.endsWith('Reconfigure') && !adapter.reconfigure) ? VALIDATION_ONLY : null) ??
     (rule === 'pageValueField' && !adapter.pageOwnsValueField ? 'its value field is built by the component' : null)
 
   const conform = (rule, title, test) => {
@@ -530,6 +528,18 @@ describe('validation conformance', () => {
       expectFrames(adapter, t, ['is-invalid'])
       expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
     })
+
+    conform('resetReconfigure', 'should drop a state given before it after a setConfig of another option', async adapter => {
+      const t = mount(adapter, { config: { ...adapter.filled, validationState: 'invalid' } })
+
+      adapter.reconfigure(t)
+      t.form.reset()
+      await tick()
+
+      expect(shownStates(t)).toEqual([])
+      expect(ariaInvalid(t)).toHaveLength(0)
+      expect(isBlocked(adapter, t).some(Boolean)).toBe(false)
+    })
   })
 
   describe('a reported state', () => {
@@ -555,6 +565,17 @@ describe('validation conformance', () => {
       adapter.reconfigure(t)
 
       expectFrames(adapter, t, ['is-invalid'])
+    })
+
+    conform('reportedResetReconfigure', 'should forget it when a reset listener of the form makes a setConfig of another option', async adapter => {
+      const t = mountInvalid(adapter)
+
+      t.form.checkValidity()
+      t.form.addEventListener('reset', () => adapter.reconfigure(t))
+      t.form.reset()
+      await tick()
+
+      expect(shownStates(t)).toEqual([])
     })
   })
 

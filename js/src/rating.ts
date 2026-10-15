@@ -8,13 +8,11 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import {
-  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
-  ownValidationState, setStateValidity, swapStateClass, type UserValidity, type ValidationState
-} from './util/form-validation.js'
+import FieldValidation from './util/field-validation.js'
+import { type ValidationState } from './util/form-validation.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
 } from './util/index.js'
 import Tooltip from './tooltip.js'
 
@@ -37,7 +35,6 @@ const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`
 const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`
-const EVENT_RESET = `reset${EVENT_KEY}`
 
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_DISABLED = 'disabled'
@@ -53,7 +50,6 @@ const CLASS_NAME_READONLY = 'readonly'
 const SIZE_CLASS_NAMES = ['rating-lg', 'rating-sm']
 
 const SELECTOR_DATA_RATING = '[data-coreui-rating]'
-const SELECTOR_FORM = 'form'
 const SELECTOR_RATING_ITEM = '.rating-item'
 const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input'
 const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label'
@@ -127,7 +123,6 @@ const DefaultType = {
 
 class Rating extends BaseComponent {
   protected declare _currentValue: number | string | null
-  protected declare _form: HTMLFormElement | null
   protected declare _hostAriaInvalid: string | null
   protected declare _hostAriaReadonly: string | null
   protected declare _hostAriaRequired: string | null
@@ -135,18 +130,10 @@ class Rating extends BaseComponent {
   protected declare _hostRole: string | null
   protected declare _items: HTMLElement[]
   protected declare _name: string
-  protected declare _releaseValidationState: (() => void) | null
-  protected declare _reported: boolean
-  protected declare _resetEvent: Event | null
-  protected declare _resetHandler: (event: Event) => void
-  protected declare _resetRoot: Document | ShadowRoot
-  protected declare _serverMarks: string[]
   protected declare _sizeClassName: string | null
   protected declare _sizeClassNames: Set<string>
-  protected declare _stateClass: string | null
-  protected declare _stateSerial: number
   protected declare _tooltip: any
-  protected declare _userValidity: UserValidity[]
+  protected declare _validation: FieldValidation
 
   constructor(element?: string | Element | null, config?: Partial<RatingConfig> | null) {
     super(element)
@@ -162,51 +149,22 @@ class Rating extends BaseComponent {
     this._hostAriaRequired = this._element.getAttribute('aria-required')
     this._hostRole = this._element.getAttribute('role')
     this._items = []
-    this._form = this._element.closest('form')
-    this._releaseValidationState = null
-    this._reported = false
-    this._resetEvent = null
-    this._resetRoot = this._element.getRootNode() instanceof ShadowRoot ? this._element.getRootNode() as ShadowRoot : this._element.ownerDocument
-    this._serverMarks = getStateClasses(this._element)
-    this._stateClass = null
-    this._stateSerial = nextStateSerial()
-    this._userValidity = []
+    this._validation = new FieldValidation(this._element, {
+      blockers: () => {
+        const radios = this._radios()
+        const blocked = radios.find(radio => radio.checked) ?? radios[0]
 
-    if (this._serverMarks.length > 0) {
-      this._element.classList.remove(...this._serverMarks)
-    }
-
-    this._resetHandler = (event: Event) => {
-      if (event === this._resetEvent || event.target !== this._radios()[0]?.form) {
-        return
-      }
-
-      this._resetEvent = event
-      const serial = nextStateSerial()
-
-      setTimeout(() => {
-        if (!this._element || event.defaultPrevented) {
-          return
-        }
-
-        this._dismissValidationState(serial)
-
-        const checkedInput = SelectorEngine.findOne<HTMLInputElement>(`${SELECTOR_RATING_ITEM_INPUT}:checked`, this._element as ParentNode)
-        const value = checkedInput?.value ?? null
-
-        // eslint-disable-next-line eqeqeq
-        if (value == this._currentValue) {
-          return
-        }
-
-        this._currentValue = value
-        this._highlightLabels(checkedInput)
-
-        EventHandler.trigger(this._element, EVENT_CHANGE, {
-          value
-        })
-      })
-    }
+        return blocked ? [blocked] : []
+      },
+      canBlock: () => !this._config.disabled && !this._config.readonly,
+      config: () => this._config,
+      describedTargets: () => this._radios(),
+      fields: () => this._radios(),
+      frames: () => [this._element],
+      invalidTargets: () => (this._hostAriaInvalid === null ? [this._element] : []),
+      pageDescribed: () => [this._element],
+      restore: () => this._restoreValue()
+    })
 
     this._sizeClassName = null
     this._sizeClassNames = new Set()
@@ -237,14 +195,8 @@ class Rating extends BaseComponent {
     this._config = this._getConfig({ ...this._config, ...config })
     this._name = this._config.name || this._name
 
-    if (config && 'validationState' in config) {
-      this._serverMarks = []
-      this._stateSerial = nextStateSerial()
-
-      if (Object.keys(config).length === 1) {
-        this._updateValidity()
-        return
-      }
+    if (this._validation.configure(config)) {
+      return
     }
 
     if (config?.value !== undefined) {
@@ -269,20 +221,9 @@ class Rating extends BaseComponent {
       return
     }
 
-    EventHandler.off(this._resetRoot, EVENT_RESET, SELECTOR_FORM, this._resetHandler)
-    this._form?.removeEventListener('reset', this._resetHandler, true)
+    this._validation.dispose()
     this._removeRating()
-
-    swapStateClass(this._element, this._stateClass)
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
-
-    if (this._serverMarks.length > 0) {
-      this._element.classList.add(...this._serverMarks)
-    }
-
-    if (this._hostAriaInvalid === null) {
-      this._element.removeAttribute('aria-invalid')
-    }
 
     if (this._hostAriaRequired === null) {
       this._element.removeAttribute('aria-required')
@@ -311,15 +252,6 @@ class Rating extends BaseComponent {
   _removeRating(): ChildNode | null {
     this._disposeTooltips()
 
-    for (const follower of this._userValidity) {
-      follower.stop()
-    }
-
-    this._reported = this._userValidity.some(follower => follower.read() === 'invalid')
-    this._userValidity = []
-    this._releaseValidationState?.()
-    this._releaseValidationState = null
-
     const anchor = this._items.at(-1)?.nextSibling ?? null
 
     for (const item of this._items) {
@@ -339,9 +271,6 @@ class Rating extends BaseComponent {
   }
 
   _addEventListeners(): void {
-    EventHandler.on(this._resetRoot, EVENT_RESET, SELECTOR_FORM, this._resetHandler)
-    this._form?.addEventListener('reset', this._resetHandler, true)
-
     EventHandler.on(this._element, EVENT_CLICK, SELECTOR_RATING_ITEM_INPUT, (event: any) => {
       const { target } = event
 
@@ -359,7 +288,8 @@ class Rating extends BaseComponent {
         this._currentValue = null
         target.checked = false
         this._resetLabels()
-        this._dismissValidationState()
+        this._validation.dismiss()
+        this._validation.update()
 
         EventHandler.trigger(this._element, EVENT_CHANGE, {
           value: null
@@ -368,8 +298,8 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_INPUT, SELECTOR_RATING_ITEM_INPUT, () => {
-      if (!this._config.disabled && !this._config.readonly) {
-        this._dismissValidationState()
+      if (!this._config.disabled && !this._config.readonly && this._validation.dismiss()) {
+        this._validation.update()
       }
     })
 
@@ -592,60 +522,28 @@ class Rating extends BaseComponent {
       this._resetLabels()
     }
 
-    const radios = this._radios()
-    this._userValidity = radios.map(radio => followUserValidity(radio, () => this._updateValidity(), undefined, this._reported))
-    this._releaseValidationState = ownValidationState(...radios)
-    this._updateValidity()
+    this._validation.refresh()
   }
 
   _isRequired(): boolean {
     return this._config.required && !this._config.readonly
   }
 
-  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
-    if (this._stateSerial > serial || (this._config.validationState === null && this._serverMarks.length === 0)) {
+  _restoreValue(): void {
+    const checkedInput = SelectorEngine.findOne<HTMLInputElement>(`${SELECTOR_RATING_ITEM_INPUT}:checked`, this._element as ParentNode)
+    const value = checkedInput?.value ?? null
+
+    // eslint-disable-next-line eqeqeq
+    if (value == this._currentValue) {
       return
     }
 
-    this._config.validationState = null
-    this._serverMarks = []
-    this._updateValidity()
-  }
+    this._currentValue = value
+    this._highlightLabels(checkedInput)
 
-  _updateValidity(): void {
-    const radios = this._radios()
-
-    if (radios.length === 0) {
-      return
-    }
-
-    const blocked = radios.find(radio => radio.checked) ?? radios[0]
-    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverMarks)
-
-    for (const radio of radios) {
-      if (radio !== blocked || givenState !== 'invalid') {
-        setStateValidity(radio, false)
-      }
-    }
-
-    const reported = this._userValidity.map(follower => follower.read())
-    const state = givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
-
-    this._stateClass = swapStateClass(this._element, this._stateClass, state)
-    setStateValidity(blocked, givenState === 'invalid' && !this._config.readonly)
-    this._writeInvalid(state === 'invalid', radios, blocked)
-  }
-
-  _writeInvalid(invalid: boolean, radios: HTMLInputElement[], blocked: HTMLInputElement): void {
-    const feedbackIds = invalid ? getFeedbackIds(blocked).join(' ') : ''
-
-    for (const radio of radios) {
-      writeAttribute(radio, 'aria-describedby', feedbackIds || null)
-    }
-
-    if (this._hostAriaInvalid === null) {
-      writeAttribute(this._element, 'aria-invalid', invalid ? 'true' : null)
-    }
+    EventHandler.trigger(this._element, EVENT_CHANGE, {
+      value
+    })
   }
 
   _createRatingItem(index: number): HTMLElement {

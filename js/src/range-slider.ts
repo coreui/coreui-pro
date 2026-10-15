@@ -8,13 +8,10 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import FieldValidation from './util/field-validation.js'
+import { type ValidationState } from './util/form-validation.js'
 import {
-  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
-  ownValidationState, setStateValidity, swapStateClass, type UserValidity, type ValidationState, writeDescribedBy
-} from './util/form-validation.js'
-import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, isRTL, jQueryDispatch, restoreHostClasses,
-  writeAttribute
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, isRTL, jQueryDispatch, restoreHostClasses
 } from './util/index.js'
 import {
   constrainInput,
@@ -51,11 +48,10 @@ const EVENT_POINTERCANCEL = `pointercancel${EVENT_KEY}`
 const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
 const EVENT_POINTERMOVE = `pointermove${EVENT_KEY}`
 const EVENT_POINTERUP = `pointerup${EVENT_KEY}`
-const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const ATTRIBUTE_INVALID_FEEDBACK = 'data-coreui-invalid-feedback'
-const HOST_ATTRIBUTES = ['aria-describedby', 'aria-label', 'aria-labelledby']
+const HOST_ATTRIBUTES = ['aria-label', 'aria-labelledby']
 
 const CLASS_NAME_FORM_RANGE = 'form-range'
 const CLASS_NAME_FORM_RANGE_INPUT = 'form-range-input'
@@ -69,7 +65,6 @@ const PROPERTY_FILL = '--cui-range-fill'
 const PROPERTY_FILL_START = '--cui-range-fill-start'
 
 const SELECTOR_DATA_RANGE_SLIDER = '[data-coreui-range-slider]'
-const SELECTOR_FORM = 'form'
 const SELECTOR_INPUT = '.form-range-input'
 const SELECTOR_TICK = '.form-range-tick'
 
@@ -161,17 +156,11 @@ class RangeSlider extends BaseComponent {
   protected declare _hostClasses: HostClasses
   protected declare _inputs: HTMLInputElement[]
   protected declare _press: RangeSliderPress | null
-  protected declare _releaseValidationState: (() => void) | null
-  protected declare _resetRoot: Document | ShadowRoot
-  protected declare _resetTimeout: ReturnType<typeof setTimeout> | null
-  protected declare _serverMarks: string[]
   protected declare _shownValues: string[]
-  protected declare _stateClass: string | null
-  protected declare _stateSerial: number
   protected declare _tickPoints: RangeTickPoint[]
   protected declare _ticks: HTMLElement | null
   protected declare _tooltips: HTMLElement[]
-  protected declare _userValidity: UserValidity[]
+  protected declare _validation: FieldValidation
   protected declare _wrapper: HTMLElement | null
   protected declare _onChange: (event: Event) => void
   protected declare _onInput: (event: Event) => void
@@ -179,7 +168,6 @@ class RangeSlider extends BaseComponent {
   protected declare _onPointerDown: (event: Event) => void
   protected declare _onPointerMove: (event: Event) => void
   protected declare _onPointerUp: (event: Event) => void
-  protected declare _onReset: (event: Event) => void
 
   constructor(element?: string | Element | null, config?: Partial<RangeSliderConfig> | null) {
     super(element, config)
@@ -192,21 +180,21 @@ class RangeSlider extends BaseComponent {
     this._hostClasses = captureHostClasses(this._element, [])
     this._inputs = []
     this._press = null
-    this._releaseValidationState = null
-    this._resetRoot = this._element.getRootNode() instanceof ShadowRoot ? this._element.getRootNode() as ShadowRoot : this._element.ownerDocument
-    this._resetTimeout = null
-    this._serverMarks = getStateClasses(this._element)
     this._shownValues = []
-    this._stateClass = null
-    this._stateSerial = nextStateSerial()
     this._tickPoints = []
     this._ticks = null
     this._tooltips = []
-    this._userValidity = []
+    this._validation = new FieldValidation(this._element, {
+      blockers: () => this._inputs.slice(0, 1),
+      config: () => this._config,
+      fields: () => this._inputs,
+      frames: () => [this._element, ...this._inputs],
+      invalidTargets: () => this._inputs,
+      pageDescribed: () => (this._addedRole ? this._inputs : [this._element]),
+      restore: () => this._update()
+    })
     this._wrapper = null
     this._hostAttributes = new Map()
-
-    this._element.classList.remove(...this._serverMarks)
 
     if (this._addedRole) {
       this._element.setAttribute('role', 'group')
@@ -218,8 +206,8 @@ class RangeSlider extends BaseComponent {
       if (this._inputs.includes(input)) {
         this._constrain(input)
 
-        if (input.value !== this._shownValues[this._inputs.indexOf(input)]) {
-          this._dismissValidationState()
+        if (input.value !== this._shownValues[this._inputs.indexOf(input)] && this._validation.dismiss()) {
+          this._validation.update()
         }
 
         this._update()
@@ -238,24 +226,6 @@ class RangeSlider extends BaseComponent {
     this._onPointerDown = event => this._pointerDown(event as PointerEvent)
     this._onPointerMove = event => this._pointerMove(event as PointerEvent)
     this._onPointerUp = event => this._pointerUp(event as PointerEvent)
-    this._onReset = event => {
-      if (event.target !== this._inputs[0]?.form) {
-        return
-      }
-
-      const serial = nextStateSerial()
-
-      clearTimeout(this._resetTimeout!)
-      this._resetTimeout = setTimeout(() => {
-        if (!event.defaultPrevented) {
-          this._dismissValidationState(serial)
-        }
-
-        this._update()
-      })
-    }
-
-    EventHandler.on(this._resetRoot, EVENT_RESET, SELECTOR_FORM, this._onReset)
     this._build()
   }
 
@@ -277,14 +247,8 @@ class RangeSlider extends BaseComponent {
     const current = config && 'value' in config ? null : this._values()
     this._config = this._getConfig({ ...this._config, ...config }) as RangeSliderConfig
 
-    if (config && 'validationState' in config) {
-      this._serverMarks = []
-      this._stateSerial = nextStateSerial()
-
-      if (Object.keys(config).length === 1) {
-        this._updateValidity()
-        return
-      }
+    if (this._validation.configure(config)) {
+      return
     }
 
     this._teardown()
@@ -296,22 +260,12 @@ class RangeSlider extends BaseComponent {
       return
     }
 
+    this._validation.dispose()
     this._teardown()
-    clearTimeout(this._resetTimeout!)
-    EventHandler.off(this._resetRoot, EVENT_RESET, SELECTOR_FORM, this._onReset)
-
-    swapStateClass(this._element, this._stateClass)
-    this._element.classList.add(...this._serverMarks)
     restoreHostClasses(this._element, [], this._hostClasses)
 
     if (this._addedRole && this._element.getAttribute('role') === 'group') {
       this._element.removeAttribute('role')
-    }
-
-    const describedBy = this._hostAttributes.get('aria-describedby')
-
-    if (describedBy && !this._element.hasAttribute('aria-describedby')) {
-      this._element.setAttribute('aria-describedby', describedBy)
     }
 
     super.dispose()
@@ -349,23 +303,13 @@ class RangeSlider extends BaseComponent {
       this._wrapper.append(this._ticks)
     }
 
-    this._userValidity = this._inputs.map(input => followUserValidity(input, () => this._updateValidity()))
-    this._releaseValidationState = ownValidationState(...this._inputs)
     this._addEventListeners()
     this._update()
-    this._updateValidity()
+    this._validation.refresh()
   }
 
   _teardown(): void {
     this._releasePress()
-
-    for (const follower of this._userValidity) {
-      follower.stop()
-    }
-
-    this._releaseValidationState?.()
-    this._releaseValidationState = null
-    this._userValidity = []
 
     if (this._wrapper) {
       EventHandler.off(this._wrapper, EVENT_INPUT, SELECTOR_INPUT, this._onInput)
@@ -432,33 +376,20 @@ class RangeSlider extends BaseComponent {
 
   _readHostAttributes(): void {
     for (const name of HOST_ATTRIBUTES) {
-      if (name === 'aria-describedby' && !this._addedRole) {
-        continue
-      }
-
       const value = this._element.getAttribute(name)
 
-      if (value !== null) {
-        this._hostAttributes.set(name, value)
-      } else if (name !== 'aria-describedby') {
+      if (value === null) {
         this._hostAttributes.delete(name)
+      } else {
+        this._hostAttributes.set(name, value)
       }
-    }
-
-    if (this._addedRole) {
-      this._element.removeAttribute('aria-describedby')
     }
   }
 
   _nameInput(input: HTMLInputElement, index: number): void {
     const handleLabel = this._ariaLabel(index)
-    const describedBy = this._hostAttributes.get('aria-describedby')
     const label = this._hostAttributes.get('aria-label')
     const labelledBy = this._hostAttributes.get('aria-labelledby')
-
-    if (describedBy) {
-      input.setAttribute('aria-describedby', describedBy)
-    }
 
     if ((this._config.value as number[]).length > 1) {
       if (handleLabel) {
@@ -508,53 +439,6 @@ class RangeSlider extends BaseComponent {
 
   _values(): number[] {
     return this._inputs.map(input => Number(input.value))
-  }
-
-  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
-    if (this._stateSerial > serial || (this._config.validationState === null && this._serverMarks.length === 0)) {
-      return
-    }
-
-    this._config.validationState = null
-    this._serverMarks = []
-    this._updateValidity()
-  }
-
-  _updateValidity(): void {
-    const [first] = this._inputs
-
-    if (!first) {
-      return
-    }
-
-    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverMarks)
-
-    if (givenState !== 'invalid') {
-      setStateValidity(first, false)
-    }
-
-    const reported = this._userValidity.map(follower => follower.read())
-    const state = givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
-    const previousClass = this._stateClass
-    const stateClass = swapStateClass(this._element, previousClass, state)
-
-    this._stateClass = stateClass
-    setStateValidity(first, givenState === 'invalid')
-
-    const feedbackIds = state === 'invalid' ? getFeedbackIds(first) : []
-
-    for (const input of this._inputs) {
-      if (previousClass && previousClass !== stateClass) {
-        input.classList.remove(previousClass)
-      }
-
-      if (stateClass) {
-        input.classList.add(stateClass)
-      }
-
-      writeDescribedBy(input, this._hostAttributes.get('aria-describedby'), feedbackIds)
-      writeAttribute(input, 'aria-invalid', state === 'invalid' ? 'true' : null)
-    }
   }
 
   _update(): void {

@@ -1052,6 +1052,31 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
     })
 
+    it('should keep the report a validation made on a handle for the handle that replaces it', () => {
+      const { element, form, rangeSlider } = mountInForm({ value: [20, 80] })
+
+      inputsOf(element)[1].setCustomValidity('Too wide.')
+      form.checkValidity()
+      rangeSlider.setConfig({ step: 5 })
+
+      const [, second] = inputsOf(element)
+
+      second.setCustomValidity('Too wide.')
+      second.dispatchEvent(new Event('focusout'))
+
+      expect(element).toHaveClass('is-invalid')
+    })
+
+    it('should block with the feedback the page linked through the description of the element', () => {
+      const { element, rangeSlider } = mountInForm({ validationState: 'invalid', value: 40 }, 'aria-describedby="budgetError"', '<div class="invalid-feedback" id="budgetError">Pick a budget.</div>')
+
+      fixtureEl.querySelector('form').before(fixtureEl.querySelector('#budgetError'))
+
+      rangeSlider.setConfig({ step: 5 })
+
+      expect(inputsOf(element)[0].validationMessage).toEqual('Pick a budget.')
+    })
+
     it('should keep a given valid state over a validity the page sets on a handle when the form plugin validates', () => {
       const { element, form } = mountInForm({ validationState: 'valid', value: [20, 80] })
       const [, second] = inputsOf(element)
@@ -1166,6 +1191,20 @@ describe('RangeSlider', () => {
       expect(element.getAttribute('aria-label')).toEqual('Budget')
       expect(element.getAttribute('aria-labelledby')).toEqual('budgetLabel')
       expect(element.getAttribute('aria-describedby')).toEqual('budgetHelp')
+    })
+
+    it('should leave a description the page sets on the element later there, and give its own back before it', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-describedby="budgetHelp"')
+
+      element.setAttribute('aria-describedby', 'budgetNote')
+      rangeSlider.setConfig({ step: 5 })
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp'])
+      expect(element.getAttribute('aria-describedby')).toEqual('budgetNote')
+
+      rangeSlider.dispose()
+
+      expect(element.getAttribute('aria-describedby')).toEqual('budgetHelp budgetNote')
     })
 
     it('should leave no label or description on an element that had none', () => {
