@@ -1247,6 +1247,26 @@ describe('Offcanvas', () => {
       expect(offcanvasEl.open).toBeTrue()
       expect(document.documentElement.classList.contains('dialog-open')).toBeTrue()
     })
+
+    it('should finish the lifecycle when an open-by-default offcanvas is closed natively', async () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas" open><form method="dialog"><button type="submit">Done</button></form></dialog>'
+
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
+      let hiddenCount = 0
+
+      offcanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
+        hiddenCount++
+      })
+
+      window.dispatchEvent(createEvent('load'))
+      offcanvasEl.querySelector('button').click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(offcanvasEl.open).toBeFalse()
+      expect(hiddenCount).toEqual(1)
+    })
   })
 
   describe('offcanvas-static class', () => {

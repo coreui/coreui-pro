@@ -1247,6 +1247,26 @@ describe('Drawer', () => {
       expect(drawerEl.open).toBeTrue()
       expect(document.documentElement.classList.contains('dialog-open')).toBeTrue()
     })
+
+    it('should finish the lifecycle when an open-by-default drawer is closed natively', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer" open><form method="dialog"><button type="submit">Done</button></form></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.drawer')
+      let hiddenCount = 0
+
+      drawerEl.addEventListener('hidden.coreui.drawer', () => {
+        hiddenCount++
+      })
+
+      window.dispatchEvent(createEvent('load'))
+      drawerEl.querySelector('button').click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(drawerEl.open).toBeFalse()
+      expect(hiddenCount).toEqual(1)
+    })
   })
 
   describe('drawer-static class', () => {

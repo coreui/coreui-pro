@@ -64,7 +64,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._isTransitioning = false
     this._openedAsModal = false
     this._closedByComponent = false
-    this._hiddenByComponent = true
+    this._hiddenByComponent = !this._element?.open
     this._resizeObserver = null
     this._resizeFrame = null
     this._addDialogListeners()
