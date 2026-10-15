@@ -623,7 +623,7 @@ Multi Select component exposes a few events for hooking into multi select functi
 
 | Event | Description |
 | --- | --- |
-| `change.coreui.multi-select` | Fires immediately when an option is selected or deselected. |
+| `change.coreui.multi-select` | Fires once for every change of the selection, after the native select holds the new value; `event.value` is the selection. An action that selects or deselects several options sends one event, and an action that changes nothing sends none. |
 | `hidden.coreui.multi-select` | Fired when the multi select options have finished being hidden from the user and CSS transitions have completed. |
 | `hide.coreui.multi-select` | Fires immediately when the hide instance method has been called. Call `event.preventDefault()` to keep the menu open. |
 | `selectionLimit.coreui.multi-select` | Fires when selecting an option is blocked because the selection limit has been reached. |
