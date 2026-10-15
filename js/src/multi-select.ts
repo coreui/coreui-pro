@@ -11,6 +11,7 @@ import ComboboxBase from './combobox-base.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { containsFocus } from './util/focus.js'
 import FocusTrap from './util/focustrap.js'
 import {
   followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
@@ -398,7 +399,7 @@ class MultiSelect extends ComboboxBase {
 
     this._listBox.focusActive()
 
-    if (!this._menu.contains(document.activeElement)) {
+    if (!containsFocus(this._menu)) {
       this._menu.focus()
     }
   }
@@ -416,8 +417,7 @@ class MultiSelect extends ComboboxBase {
   override _onHideStart(): void {
     this._releaseFocus()
 
-    this._refocusOnHide =
-      this._wrapperElement.contains(document.activeElement) || this._menu.contains(document.activeElement)
+    this._refocusOnHide = containsFocus(this._wrapperElement) || containsFocus(this._menu)
   }
 
   override _afterHideDispose(): void {

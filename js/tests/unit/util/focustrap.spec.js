@@ -67,12 +67,7 @@ describe('FocusTrap', () => {
 
         document.addEventListener('focusin', focusInListener)
 
-        const focusInEvent = createEvent('focusin', { bubbles: true })
-        Object.defineProperty(focusInEvent, 'target', {
-          value: document.getElementById('outside')
-        })
-
-        document.dispatchEvent(focusInEvent)
+        document.getElementById('outside').dispatchEvent(createEvent('focusin', { bubbles: true }))
       })
     })
 
@@ -176,13 +171,28 @@ describe('FocusTrap', () => {
 
         document.addEventListener('focusin', focusInListener)
 
-        const focusInEvent = createEvent('focusin', { bubbles: true })
-        Object.defineProperty(focusInEvent, 'target', {
-          value: document.getElementById('outside')
-        })
-
-        document.dispatchEvent(focusInEvent)
+        document.getElementById('outside').dispatchEvent(createEvent('focusin', { bubbles: true }))
       })
+    })
+  })
+
+  describe('inside a shadow root', () => {
+    it('should leave the focus on an element of the trap the document sees as the host', () => {
+      fixtureEl.innerHTML = '<a href="#" id="outside">outside</a><div id="host"></div>'
+
+      const shadowRoot = fixtureEl.querySelector('#host').attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = '<div tabindex="-1"><a href="#" id="first">first</a><a href="#" id="second">second</a></div>'
+
+      const trapElement = shadowRoot.querySelector('div')
+      const focustrap = new FocusTrap({ trapElement })
+      focustrap.activate()
+
+      const second = shadowRoot.getElementById('second')
+      second.focus()
+      second.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+
+      expect(shadowRoot.activeElement).toEqual(second)
+      focustrap.deactivate()
     })
   })
 

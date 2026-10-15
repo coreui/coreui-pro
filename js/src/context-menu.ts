@@ -9,6 +9,7 @@ import type { ReferenceElement } from '@floating-ui/dom'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
+import { containsFocus } from './util/focus.js'
 import {
   defineJQueryPlugin, isDisabled, jQueryDispatch, noop
 } from './util/index.js'
@@ -147,7 +148,7 @@ class ContextMenu extends Menu {
       }
     }
 
-    const hadFocus = this._menu.contains(document.activeElement)
+    const hadFocus = containsFocus(this._menu)
 
     this._unlockScroll()
     this._disposeFloating()

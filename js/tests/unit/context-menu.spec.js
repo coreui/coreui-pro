@@ -290,6 +290,27 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should return focus to the element when the menu lives in a shadow root', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const shadowRoot = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = markup()
+
+      const area = shadowRoot.querySelector('.area')
+      const menu = shadowRoot.querySelector('.menu')
+      const contextMenu = new ContextMenu(area)
+
+      const shown = whenShown(area, () => {
+        expect(shadowRoot.activeElement).toEqual(menu)
+        contextMenu.hide()
+      })
+
+      contextMenu.show({ x: 5, y: 5 })
+      await shown
+
+      expect(shadowRoot.activeElement).toEqual(area)
+    })
+
     it('should leave focus alone when it was outside the menu', () => {
       fixtureEl.innerHTML = `${markup()}<button id="other">Other</button>`
 
