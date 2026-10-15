@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  createTypeaheadBuffer, findTypeaheadMatch, getNextActiveElement, rangeBetween
+  createTypeaheadBuffer, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, rangeBetween
 } from '../../../src/util/list-navigation.js'
 import * as Util from '../../../src/util/index.js'
 
@@ -138,6 +138,20 @@ describe('List navigation utilities', () => {
       expect(rangeBetween(items, 1, -1)).toEqual([])
       expect(rangeBetween(items, 4, -1)).toEqual([])
       expect(rangeBetween(items, -1, -1)).toEqual([])
+    })
+  })
+
+  describe('getRemovalNeighbor', () => {
+    it('should pick the next item, or the previous one for the last', () => {
+      expect(getRemovalNeighbor(['a', 'b', 'c'], 'b')).toBe('c')
+      expect(getRemovalNeighbor(['a', 'b', 'c'], 'c')).toBe('b')
+      expect(getRemovalNeighbor(['a', 'b', 'c'], 'a')).toBe('b')
+    })
+
+    it('should give null for the only item and the first item for one the list does not hold', () => {
+      expect(getRemovalNeighbor(['a'], 'a')).toBeNull()
+      expect(getRemovalNeighbor([], 'a')).toBeNull()
+      expect(getRemovalNeighbor(['a', 'b'], 'z')).toBe('a')
     })
   })
 })

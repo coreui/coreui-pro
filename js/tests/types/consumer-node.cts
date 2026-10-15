@@ -17,6 +17,7 @@ import { createDate } from '@coreui/coreui-pro/utils/calendar'
 import { appendChipValues } from '@coreui/coreui-pro/utils/chip-values'
 import { getSectionLayout } from '@coreui/coreui-pro/utils/date-sections'
 import { onLabelClick } from '@coreui/coreui-pro/utils/field-label'
+import { containsFocus } from '@coreui/coreui-pro/utils/focus'
 import { focusFirstInvalidControl } from '@coreui/coreui-pro/utils/form-validation'
 
 const element = document.createElement('div')
@@ -35,6 +36,7 @@ createDate(2026, 0, 1).getFullYear()
 appendChipValues(['a'], ['b'], 2).at(-1)
 getSectionLayout('dd.MM.yyyy', 'en-US')
 onLabelClick(element, () => {})()
+containsFocus(element).valueOf()
 focusFirstInvalidControl(document.createElement('form'))
 
 export { rootTooltip }

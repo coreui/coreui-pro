@@ -79,3 +79,17 @@ export const rangeBetween = <T>(items: readonly T[], from: number, to: number): 
 
   return items.slice(Math.min(start, to), Math.max(start, to) + 1)
 }
+
+/**
+ * Picks the item the focus moves to when one leaves a list: the next item, or the previous one when
+ * the item was the last. An item the list does not hold gives the first item.
+ *
+ * @param list - The items, in order and each once, the leaving one included
+ * @param item - The item that leaves
+ * @returns The neighbor, or `null` when the item is the only one
+ */
+export const getRemovalNeighbor = <T>(list: readonly T[], item: T): T | null => {
+  const index = list.indexOf(item)
+
+  return list[index + 1] ?? list[index - 1] ?? null
+}

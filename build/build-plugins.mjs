@@ -30,7 +30,7 @@ const filenameToEntity = filename => filename.replace(/\.[jt]s$/, '')
 const componentFiles = new Set(tsFiles.filter(file => path.dirname(file) === sourcePath).map(file => path.basename(file)))
 
 // build-utils.mjs writes these as ESM for the React and Vue packages
-const bundledUtils = new Set(['announce', 'calendar', 'chip-values', 'date-sections', 'form-validation', 'list-navigation', 'option-tree', 'range', 'selection-state', 'time', 'transfer'].map(name => `${sourcePath}/util/${name}.ts`))
+const bundledUtils = new Set(['announce', 'calendar', 'chip-values', 'date-sections', 'focus', 'form-validation', 'list-navigation', 'option-tree', 'range', 'selection-state', 'time', 'transfer'].map(name => `${sourcePath}/util/${name}.ts`))
 
 for (const file of tsFiles) {
   const fileName = path.basename(file)
