@@ -979,6 +979,45 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toEqual(['us', 'uk', 'de'])
     })
 
+    it('should keep the order setValue gives', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true })
+
+      combobox.setValue(['us', 'uk'])
+      combobox.setValue(['uk', 'us'])
+
+      expect(combobox.getValue()).toEqual(['uk', 'us'])
+    })
+
+    it('should keep a held value that comes back disabled when setValue reorders it', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true })
+
+      combobox.setValue(['us', 'ca'])
+      combobox.setItems([
+        { value: 'ca', label: 'Canada', disabled: true },
+        { value: 'us', label: 'United States' },
+        { value: 'de', label: 'Germany' }
+      ])
+      combobox.setValue(['ca', 'us'])
+
+      expect(combobox.getValue()).toEqual(['ca', 'us'])
+    })
+
+    it('should keep the value of a combobox built from markup when resetSelectionOnItemsChange is set and the values stay', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { resetSelectionOnItemsChange: true })
+
+      combobox.setValue('ca')
+      combobox.setItems([
+        { value: 'us', label: 'United States' },
+        { value: 'uk', label: 'United Kingdom' },
+        { value: 'ca', label: 'Canada' }
+      ])
+
+      expect(combobox.getValue()).toEqual('ca')
+    })
+
     it('should drop the value and take the marked item when resetSelectionOnItemsChange is set', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { resetSelectionOnItemsChange: true })

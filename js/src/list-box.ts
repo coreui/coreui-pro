@@ -315,13 +315,13 @@ class ListBox extends BaseComponent {
 
   setItems(items: ListBoxEntry[]): void {
     const previous = this.getSelectedValues()
-    const previousValues = this._flatItems().map(item => item.value)
+    const previousValues = new Set(this._allOptions().map(option => this._optionValue(option)))
 
     this._items = this._normalizeItems(items)
     this._render()
 
-    const values = this._flatItems().map(item => item.value)
-    const reset = this._config.resetSelectionOnItemsChange && values.join('\u0000') !== previousValues.join('\u0000')
+    const values = new Set(this._allOptions().map(option => this._optionValue(option)))
+    const reset = this._config.resetSelectionOnItemsChange && (values.size !== previousValues.size || [...values].some(value => !previousValues.has(value)))
     const marked = this._selectable(this._flatItems().filter(item => item.selected).map(item => item.value))
 
     this._anchor = null

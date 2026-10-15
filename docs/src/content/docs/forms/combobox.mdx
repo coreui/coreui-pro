@@ -272,7 +272,7 @@ The panel is as tall as its content — cap it where you want a scroll container
 
 ### External search
 
-`search: "external"` builds the same field and filters nothing. Every keystroke fires `search.coreui.combobox` with the `query`, and you answer with `setItems()` — the list shows what you hand it, so the query is yours to interpret. The value the user picked stays while the results change, and the toggle keeps its label when the next answer does not carry it. A combobox whose list depends on another field, such as the cities of the chosen country, sets `resetSelectionOnItemsChange: true`, so items with different values drop the value and take the item marked `selected`.
+`search: "external"` builds the same field and filters nothing. Every keystroke fires `search.coreui.combobox` with the `query`, and you answer with `setItems()` — the list shows what you hand it, so the query is yours to interpret. The value the user picked stays while the results change, and the toggle keeps its label when the next answer does not carry it.
 
 ## Groups
 
@@ -525,6 +525,8 @@ const combobox = new coreui.Combobox('#myCombobox', {
   ]
 })
 ```
+
+A combobox whose list depends on another field, such as the cities of the chosen country, sets `resetSelectionOnItemsChange: true`: `setItems()` with different values then drops the value and takes the item marked `selected`. Leave it off with `search: 'external'`, where every answer brings different values and would drop the pick.
 
 ### Options
 

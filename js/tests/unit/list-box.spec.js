@@ -1367,7 +1367,7 @@ describe('ListBox', () => {
       const changed = []
 
       el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
-      listBox.setItems([{ value: 'lettuce', label: 'Lettuce, fresh' }, { value: 'tomato', label: 'Tomato, fresh' }])
+      listBox.setItems([{ value: 'tomato', label: 'Tomato, fresh' }, { value: 'lettuce', label: 'Lettuce, fresh' }])
 
       expect(listBox.getSelectedValues()).toEqual(['tomato'])
       expect(changed).toEqual([])
@@ -1376,6 +1376,32 @@ describe('ListBox', () => {
 
       expect(listBox.getSelectedValues()).toEqual([])
       expect(changed).toEqual([[]])
+    })
+
+    it('should reset the selection when resetSelectionOnItemsChange is set and the selected values are still listed', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, {
+        items: [{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }],
+        resetSelectionOnItemsChange: true,
+        selected: 'lettuce'
+      })
+      const changed = []
+
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.setItems([{ value: 'lettuce', label: 'Lettuce' }, { value: 'onion', label: 'Onion' }])
+
+      expect(listBox.getSelectedValues()).toEqual([])
+      expect(changed).toEqual([[]])
+    })
+
+    it('should compare the values of a list box built from markup when resetSelectionOnItemsChange is set', () => {
+      const el = setMarkup(' data-coreui-reset-selection-on-items-change="true"')
+      const listBox = new ListBox(el)
+
+      click(item(el, 'tomato'))
+      listBox.setItems([...el.querySelectorAll('.list-box-option')].map(option => ({ value: option.dataset.coreuiValue, label: option.textContent })))
+
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
     })
 
     it('should reset the selection of a disabled list box with resetSelectionOnItemsChange', () => {
