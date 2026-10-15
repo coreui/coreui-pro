@@ -1,6 +1,6 @@
 import {
-  filterOptionTree, findOptionByLabel, findOptionByValue, flattenOptions, getOptionLabel, getOptionValue, getSelectableOptions, isOptionDisabled,
-  isOptionGroup, normalizeSearchText
+  filterOptionTree, findOptionByLabel, findOptionByValue, flattenOptions, getOptionLabel, getOptionValue, getSelectableOptions, highlightMatches,
+  isOptionDisabled, isOptionGroup, normalizeSearchText
 } from '../../../src/util/option-tree.js'
 
 describe('Option tree utilities', () => {
@@ -158,6 +158,41 @@ describe('Option tree utilities', () => {
       expect(filterOptionTree(['Café', 'Tea'], 'cafe')).toEqual([])
       expect(filterOptionTree(['Café', 'Tea'], 'cafe', true)).toEqual(['Café'])
       expect(filterOptionTree(['Cafe'], 'café', true)).toEqual(['Cafe'])
+    })
+  })
+
+  describe('highlightMatches', () => {
+    it('should mark every match in any case, with the query trimmed', () => {
+      expect(highlightMatches('Option 1', 'opt')).toBe('<strong>Opt</strong>ion 1')
+      expect(highlightMatches('Option 1', '  opt ')).toBe('<strong>Opt</strong>ion 1')
+      expect(highlightMatches('Option One', 'o')).toBe('<strong>O</strong>pti<strong>o</strong>n <strong>O</strong>ne')
+    })
+
+    it('should mark matches left to right without overlapping them', () => {
+      expect(highlightMatches('aaa', 'aa')).toBe('<strong>aa</strong>a')
+    })
+
+    it('should escape the label, marked parts included', () => {
+      const highlighted = highlightMatches('<img src=x onerror=alert(1)> img', 'img')
+
+      expect(highlighted).not.toContain('<img')
+      expect(highlighted).toBe('&lt;<strong>img</strong> src=x onerror=alert(1)&gt; <strong>img</strong>')
+      expect(highlightMatches('A&B', '&')).toBe('A<strong>&amp;</strong>B')
+      expect(highlightMatches('<b>', '<b')).toBe('<strong>&lt;b</strong>&gt;')
+    })
+
+    it('should match the query as plain text', () => {
+      expect(highlightMatches('a (b) c', '(')).toBe('a <strong>(</strong>b) c')
+      expect(highlightMatches('a (b) c', ')')).toBe('a (b<strong>)</strong> c')
+      expect(highlightMatches('1.5 or 125', '1.5')).toBe('<strong>1.5</strong> or 125')
+      expect(highlightMatches('x.*+?^${}()|[]\\y', '.*+?^${}()|[]\\')).toBe('x<strong>.*+?^${}()|[]\\</strong>y')
+    })
+
+    it('should return the escaped label when the query is empty or missing', () => {
+      expect(highlightMatches('<b>x</b>', '')).toBe('&lt;b&gt;x&lt;/b&gt;')
+      expect(highlightMatches('<b>x</b>', '   ')).toBe('&lt;b&gt;x&lt;/b&gt;')
+      expect(highlightMatches('<b>x</b>')).toBe('&lt;b&gt;x&lt;/b&gt;')
+      expect(highlightMatches('<b>x</b>', null)).toBe('&lt;b&gt;x&lt;/b&gt;')
     })
   })
 })

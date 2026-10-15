@@ -1,3 +1,5 @@
+import { escapeHtml } from './sanitizer.js'
+
 export type OptionItem = string | {
   disabled?: boolean
   label?: string
@@ -125,4 +127,29 @@ export const filterOptionTree = <T extends OptionItem>(options: readonly T[], qu
   })
 
   return filter(options)
+}
+
+/**
+ * Renders a label as HTML with the matches of a query wrapped in `<strong>`: case-insensitive,
+ * found left to right and never overlapping. The whole label is escaped, and the query is matched
+ * as plain text, so none of its characters act as a pattern.
+ *
+ * @param label - The text to render
+ * @param query - The text to mark; surrounding whitespace is ignored, and an empty or missing query
+ * marks nothing
+ * @returns The label as HTML
+ */
+export const highlightMatches = (label: string, query?: string | null): string => {
+  const needle = query?.trim()
+
+  if (!needle) {
+    return escapeHtml(label)
+  }
+
+  const pattern = new RegExp(`(${needle.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+
+  return String(label)
+    .split(pattern)
+    .map((part, index) => (index % 2 === 0 ? escapeHtml(part) : `<strong>${escapeHtml(part)}</strong>`))
+    .join('')
 }
