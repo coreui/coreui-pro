@@ -76,7 +76,7 @@ export type FieldValidationOptions = {
  * overwrote, and when it drops the given state, it clears it in the component's configuration.
  */
 class FieldValidation {
-  /** A user action is running that has not changed the value yet. */
+  /** A user action runs that has not changed the value yet; only `runAsUser()` opens it. */
   declare userAction: boolean
   protected declare _ariaInvalid: Map<Element, string | null>
   protected declare _described: Map<Element, string[]>

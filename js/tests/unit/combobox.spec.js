@@ -724,6 +724,20 @@ describe('Combobox', () => {
       expect(toggle.classList.contains('is-invalid')).toBeFalse()
     })
 
+    it('should drop a state given when the user takes an option off in the list', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { multiple: true, validationState: 'invalid' })
+
+      combobox.setValue(['ca'])
+
+      expect(toggle.classList.contains('is-invalid')).toBeTrue()
+
+      pick(combobox, 'ca')
+
+      expect(combobox.getValue()).toEqual([])
+      expect(toggle.classList.contains('is-invalid')).toBeFalse()
+    })
+
     it('should send input and change from the value field on a pick, and keep a state the page gives there', () => {
       const toggle = setMarkupInForm()
       const combobox = new Combobox(toggle, { name: 'country', validationState: 'invalid' })

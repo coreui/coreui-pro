@@ -574,17 +574,18 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
-    it('should keep a gesture open through an inner action that changed nothing, and closed once one changed the value', () => {
+    it('should keep a user action open through an inner action that changed nothing, and close it once one changed the value', () => {
       const { validation } = mount({ config: { validationState: 'invalid' } })
+      const seen = []
 
-      validation.userAction = true
-      validation.runAsUser(() => {})
+      validation.runAsUser(() => {
+        validation.runAsUser(() => {})
+        seen.push(validation.userAction)
+        validation.runAsUser(() => validation.change())
+        seen.push(validation.userAction)
+      })
 
-      expect(validation.userAction).toBe(true)
-
-      validation.runAsUser(() => validation.change())
-
-      expect(validation.userAction).toBe(false)
+      expect(seen).toEqual([true, false])
     })
   })
 
