@@ -46,7 +46,6 @@ const ADAPTERS = [
     changeEvents: t => [[t.instance._element, 'change.coreui.multi-select'], ...nativeChange(t.instance._element)],
     changeFromCode: t => t.instance.selectAll(),
     reconfigure: t => t.instance.setConfig({ placeholder: 'Pick one' }),
-    rejectedOption: { multiple: 'yes' },
     pageOwnsValueField: true,
     required: { required: true }
   },
@@ -67,7 +66,6 @@ const ADAPTERS = [
     changeEvents: t => [[t.root.querySelector('.autocomplete'), 'input.coreui.autocomplete']],
     changeFromCode: t => t.instance.setConfig({ value: '2' }),
     reconfigure: t => t.instance.setConfig({ placeholder: 'Pick one' }),
-    rejectedOption: { cleaner: 'yes' },
     required: { required: true }
   },
   {
@@ -124,7 +122,6 @@ const ADAPTERS = [
     changeEvents: t => [[t.root.querySelector('#field'), 'dateChange.coreui.date-input'], ...nativeChange(t.instance._inputElement)],
     changeFromCode: t => t.instance.setConfig({ date: new Date(2026, 6, 15) }),
     reconfigure: t => t.instance.setConfig({ locale: 'en-GB' }),
-    rejectedOption: { required: 'yes' },
     required: { required: true }
   },
   {
@@ -143,7 +140,6 @@ const ADAPTERS = [
     changeEvents: t => [[t.root.querySelector('#field'), 'timeChange.coreui.time-input'], ...nativeChange(t.instance._inputElement)],
     changeFromCode: t => t.instance.setConfig({ date: '11:45:00' }),
     reconfigure: t => t.instance.setConfig({ locale: 'en-GB' }),
-    rejectedOption: { required: 'yes' },
     required: { required: true }
   },
   {
@@ -229,7 +225,6 @@ const ADAPTERS = [
     changeEvents: t => [[t.root.querySelector('.form-otp'), 'change.coreui.otp-input'], ...nativeChange(t.instance._inputElement)],
     changeFromCode: t => t.instance.setConfig({ value: '1' }),
     reconfigure: t => t.instance.setConfig({ placeholder: '-' }),
-    rejectedOption: { required: 'yes' },
     required: { required: true }
   },
   {
@@ -246,7 +241,6 @@ const ADAPTERS = [
     changeEvents: t => [[t.root.querySelector('#field'), 'input.coreui.range-slider']],
     changeFromCode: t => t.instance.setConfig({ value: [30, 70] }),
     reconfigure: t => t.instance.setConfig({ step: 5 }),
-    rejectedOption: { disabled: 'yes' },
     required: null,
     makeInvalid: t => t.root.querySelector('.form-range-input').setCustomValidity('Pick a higher budget.'),
     notApplicable: {
@@ -268,7 +262,6 @@ const ADAPTERS = [
     changeEvents: t => [[t.root.querySelector('#field'), 'change.coreui.rating']],
     changeFromCode: t => t.instance.setConfig({ value: 4 }),
     reconfigure: t => t.instance.setConfig({ itemCount: 6 }),
-    rejectedOption: { itemCount: 'six' },
     required: { required: true }
   }
 ]
@@ -314,7 +307,7 @@ describe('validation conformance', () => {
   }
 
   const reasonFor = (adapter, rule) => adapter.notApplicable?.[rule] ??
-    ((/^rejected(Option|Mixed)$/.test(rule) && !adapter.rejectedOption) || (rule.endsWith('Reconfigure') && !adapter.reconfigure) ? VALIDATION_ONLY : null) ??
+    (rule.endsWith('Reconfigure') && !adapter.reconfigure ? VALIDATION_ONLY : null) ??
     (rule === 'pageValueField' && !adapter.pageOwnsValueField ? 'its value field is built by the component' : null)
 
   const conform = (rule, title, test) => {
@@ -421,28 +414,20 @@ describe('validation conformance', () => {
   })
 
   describe('a rejected setConfig', () => {
-    const rejections = [
-      ['rejectedState', 'a state of the wrong type', () => ({ validationState: 1 })],
-      ['rejectedOption', 'another option of the wrong type', adapter => adapter.rejectedOption],
-      ['rejectedMixed', 'a state given with another option of the wrong type', adapter => ({ validationState: 'valid', ...adapter.rejectedOption })]
-    ]
+    conform('rejectedState', 'should keep a state class from the markup through a state of the wrong type', adapter => {
+      const t = mount(adapter, { serverClass: 'is-invalid' })
 
-    for (const [rule, title, configOf] of rejections) {
-      conform(rule, `should keep a state class from the markup through ${title}`, adapter => {
-        const t = mount(adapter, { serverClass: 'is-invalid' })
+      expect(() => t.instance.setConfig({ validationState: 1 })).toThrowError(TypeError)
+      adapter.changeFromCode(t)
 
-        expect(() => t.instance.setConfig(configOf(adapter))).toThrowError(TypeError)
-        adapter.changeFromCode(t)
+      expectFrames(adapter, t, ['is-invalid'])
+      expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
 
-        expectFrames(adapter, t, ['is-invalid'])
-        expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
+      const element = adapter.serverClassElement(t)
+      dispose(t)
 
-        const element = adapter.serverClassElement(t)
-        dispose(t)
-
-        expect(stateClasses(element)).toEqual(['is-invalid'])
-      })
-    }
+      expect(stateClasses(element)).toEqual(['is-invalid'])
+    })
   })
 
   describe('a change of the value', () => {

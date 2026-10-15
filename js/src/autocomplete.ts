@@ -824,7 +824,6 @@ class Autocomplete extends ComboboxBase {
   _clearByUser(): void {
     if (this._selected.length > 0 || this._inputElement.value !== '') {
       this._validation.dismiss()
-      this._validation.update()
     }
 
     this.clear()

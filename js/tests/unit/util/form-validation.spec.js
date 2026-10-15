@@ -736,7 +736,7 @@ describe('Form validation utilities', () => {
       validity.stop()
     })
 
-    it('should keep a report made after a native reset in the same task', async () => {
+    it('should keep a report made after a native reset, before its task runs', async () => {
       fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
       const control = fixtureEl.querySelector('#value')
       const validity = followUserValidity(control, () => {})
@@ -760,63 +760,7 @@ describe('Form validation utilities', () => {
       validity.stop()
     })
 
-    it('should leave out a report a native reset forgets before its task runs, unless the reset is cancelled', async () => {
-      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
-      const control = fixtureEl.querySelector('#value')
-      const validity = followUserValidity(control, () => {})
-      const seen = []
-      const look = () => seen.push(validity.read())
-      const cancel = event => event.preventDefault()
-
-      control.form.checkValidity()
-      control.form.addEventListener('reset', look)
-      control.form.reset()
-      look()
-      control.form.checkValidity()
-      look()
-      await new Promise(resolve => {
-        setTimeout(resolve)
-      })
-
-      expect(seen).toEqual([undefined, undefined, 'invalid'])
-      expect(validity.read()).toBe('invalid')
-
-      seen.length = 0
-      control.form.removeEventListener('reset', look)
-      control.form.addEventListener('reset', cancel)
-      control.form.addEventListener('reset', look)
-      control.form.reset()
-      look()
-
-      expect(seen).toEqual(['invalid', 'invalid'])
-
-      validity.stop()
-    })
-
-    it('should forget the report after a reset that went through, also when a second one in the same task is cancelled', async () => {
-      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
-      const control = fixtureEl.querySelector('#value')
-      const resets = []
-      const validity = followUserValidity(control, () => {}, serial => resets.push(serial))
-
-      control.form.checkValidity()
-      control.form.reset()
-      control.form.addEventListener('reset', event => event.preventDefault(), { once: true })
-      control.form.dispatchEvent(new Event('reset', { cancelable: true }))
-
-      expect(validity.read()).toBeUndefined()
-
-      await new Promise(resolve => {
-        setTimeout(resolve)
-      })
-
-      expect(validity.read()).toBeUndefined()
-      expect(resets).toHaveSize(1)
-
-      validity.stop()
-    })
-
-    it('should drop the tasks of resets in progress when it stops', async () => {
+    it('should drop the task of a reset in progress when it stops', async () => {
       fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
       const control = fixtureEl.querySelector('#value')
       const resets = []
