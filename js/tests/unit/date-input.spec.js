@@ -2237,24 +2237,6 @@ describe('DateInput', () => {
       expect(describedBy()).toEqual(['help', null, null])
     })
 
-    it('should describe the sections with an error the page attaches on errorChange', () => {
-      fixtureEl.innerHTML = '<div aria-describedby="help"></div><div id="help">Pick a date</div><div id="error">Too late</div>'
-      const element = fixtureEl.querySelector('div')
-      const dateInput = new DateInput(element, { date: new Date(2026, 6, 10), format: 'dd.MM.yyyy', maxDate: new Date(2026, 6, 14) })
-      const describedBy = () => [...getSections(element)].map(section => section.getAttribute('aria-describedby'))
-
-      element.addEventListener('errorChange.coreui.date-input', event => {
-        element.setAttribute('aria-describedby', event.error ? 'help error' : 'help')
-      })
-      dateInput.setConfig({ date: new Date(2026, 6, 20) })
-
-      expect(describedBy()).toEqual(['help error', 'help error', 'help error'])
-
-      dateInput.setConfig({ date: new Date(2026, 6, 10) })
-
-      expect(describedBy()).toEqual(['help', null, null])
-    })
-
     it('should keep the description on the field and lend it to the first section while the field is valid', () => {
       fixtureEl.innerHTML = '<div aria-describedby="help"></div><div id="help">Pick a date</div>'
       const element = fixtureEl.querySelector('div')

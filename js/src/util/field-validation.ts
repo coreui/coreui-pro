@@ -42,8 +42,8 @@ export type FieldValidationOwner = {
  * - `ownError`: whether the component has an error of its own, such as a value outside its limits,
  *   which it shows as `'invalid'` over the given and the reported state without blocking.
  * - `pageDescribed`: the described targets that carry the description the page gave the host, given
- *   whether the state is `'invalid'`, and the host itself when it keeps that description. A host
- *   that keeps it lends the description it carries at the moment. By default the first described
+ *   whether the state is `'invalid'`, and the host itself when it keeps that description, which the
+ *   other targets then get as well, as the host had it at the start. By default the first described
  *   target, and every described target while the state is `'invalid'`.
  * - `restore`: puts back the value the component had when it was built, on a native reset.
  * - `serverClassSources`: the elements whose state class in the markup counts as the given state;
@@ -89,19 +89,22 @@ class FieldValidation {
   protected declare _options: FieldValidationOptions
   protected declare _release: () => void
   protected declare _resetRoots: Node[]
-  protected declare _resetTimeouts: Set<ReturnType<typeof setTimeout>>
+  protected declare _resetTimeout: ReturnType<typeof setTimeout> | undefined
   protected declare _serial: number
   protected declare _serverClasses: Map<Element, string[]>
   protected declare _userValidity: Map<ValueField, UserValidity>
 
   /**
    * Takes the state classes the server sources carry in their markup as the state the component was
-   * given, and takes them off. Call `refresh()` once the component has built its fields.
+   * given, takes them off, and starts following native resets of the form ahead of the fields. Call
+   * `refresh()` once the component has built its fields.
    *
    * @param host - The element of the component
    * @param options - How the component describes itself, see `FieldValidationOptions`
    */
   constructor(host: Element, options: FieldValidationOptions) {
+    const root = host.getRootNode()
+
     this._ariaInvalid = new Map()
     this._described = new Map()
     this._describedBy = splitIds(host.getAttribute('aria-describedby'))
@@ -112,8 +115,8 @@ class FieldValidation {
     this._onReset = event => this._handleReset(event)
     this._options = options
     this._release = () => {}
-    this._resetRoots = []
-    this._resetTimeouts = new Set()
+    this._resetRoots = root instanceof ShadowRoot ? [host.ownerDocument, root] : [host.ownerDocument]
+    this._resetTimeout = undefined
     this._serial = nextStateSerial()
     this._serverClasses = new Map()
 
@@ -124,6 +127,10 @@ class FieldValidation {
         element.classList.remove(...classes)
         this._serverClasses.set(element, classes)
       }
+    }
+
+    for (const node of this._resetRoots) {
+      node.addEventListener('reset', this._onReset, true)
     }
 
     this._userValidity = new Map()
@@ -188,17 +195,16 @@ class FieldValidation {
 
   /**
    * Drops the given state, in the component's configuration and as a state class from the markup,
-   * and lifts its block, unless the state was given after the moment the serial stands for, then
-   * tells the owner with the same serial. A component that knows a change is the user's calls it
-   * directly, before its change events.
+   * unless the state was given after the moment the serial stands for, tells the owner with the same
+   * serial, and then draws the component without the state it dropped. A component that knows a
+   * change is the user's calls it directly, before its change events.
    *
    * @param serial - The serial taken at the moment that drops the state, such as the start of a
    * key press or a native reset; any state given before it is dropped by default
-   * @returns `true` when it dropped a state of the component's own, so the component has something
-   * to draw
    */
-  dismiss(serial: number = Number.POSITIVE_INFINITY): boolean {
+  dismiss(serial: number = Number.POSITIVE_INFINITY): void {
     const config = this._options.config()
+
     const isDropped = this._serial <= serial && this._givenState(config) !== undefined
 
     if (isDropped) {
@@ -210,38 +216,25 @@ class FieldValidation {
       }
 
       this._serverClasses.clear()
-
-      for (const field of this._options.fields()) {
-        setStateValidity(field, false)
-      }
     }
 
     this._options.owner?.()?.dismiss(serial)
 
-    return isDropped
+    if (isDropped) {
+      this.update()
+    }
   }
 
   /**
    * Follows the value fields and takes over the elements the component built, after a build or a
-   * rebuild, and draws the state on them. The first refresh starts following native resets of the
-   * form ahead of the fields. A field that replaces another at the same position goes on with the
-   * follower of that one, with its report and a reset in progress, and a field that is gone loses its
-   * block. Moves the description the page gave the host to the described targets, unless the host is
+   * rebuild, and draws the state on them. A field that replaces another at the same position goes on
+   * with the follower of that one, with its report and a reset in progress, and a field that is gone
+   * loses its block. Moves the description the page gave the host to the described targets, unless the host is
    * a value field or keeps it.
    */
   refresh(): void {
     const fields = this._options.fields()
     const followers = new Map<ValueField, UserValidity>()
-
-    if (this._resetRoots.length === 0) {
-      const root = this._host.getRootNode()
-
-      this._resetRoots = root instanceof ShadowRoot ? [this._host.ownerDocument, root] : [this._host.ownerDocument]
-
-      for (const node of this._resetRoots) {
-        node.addEventListener('reset', this._onReset, true)
-      }
-    }
 
     for (const [index, field] of fields.entries()) {
       const replaced = this._fields[index]
@@ -299,7 +292,7 @@ class FieldValidation {
     const givenState = this._givenState(config) ?? owner?.state
     const fields = this._options.fields()
     const blockers = this._options.blockers?.() ?? fields
-    const blocked = givenState === 'invalid' && (this._options.canBlock?.() ?? !config.disabled) ? fields.filter(field => blockers.includes(field)) : []
+    const blocked = givenState === 'invalid' && (this._options.canBlock?.() ?? !config.disabled) ? blockers : []
 
     for (const field of fields) {
       if (!blocked.includes(field)) {
@@ -331,9 +324,7 @@ class FieldValidation {
    * apart.
    */
   dispose(): void {
-    for (const timeout of this._resetTimeouts) {
-      clearTimeout(timeout)
-    }
+    clearTimeout(this._resetTimeout)
 
     for (const node of this._resetRoots) {
       node.removeEventListener('reset', this._onReset, true)
@@ -462,12 +453,8 @@ class FieldValidation {
     const feedbackIds = isInvalid && source ? getFeedbackIds(source) : []
     const describedTargets = this._options.describedTargets?.() ?? invalidTargets
     const pageDescribed = this._options.pageDescribed?.(isInvalid) ?? describedTargets.filter((_, index) => index === 0 || isInvalid)
-    const written = this._described.get(this._host) ?? []
-    const describedBy = !this._movedDescription && pageDescribed.includes(this._host) ?
-      splitIds(this._host.getAttribute('aria-describedby')).filter(id => !written.includes(id)) :
-      this._describedBy
 
-    this._describe(describedTargets.map(target => [target, [...(pageDescribed.includes(target) ? describedBy : []), ...feedbackIds]]))
+    this._describe(describedTargets.map(target => [target, [...(pageDescribed.includes(target) ? this._describedBy : []), ...feedbackIds]]))
   }
 
   /**
@@ -503,9 +490,9 @@ class FieldValidation {
 
   /**
    * Answers a native reset of the form of a value field: in the next task, unless a listener
-   * cancelled it, drops a state given before the reset and draws it gone, so the events the restore
-   * sends see it, then restores the value. The followers of the fields draw the state of the restored
-   * value right after, in their own tasks for the same reset.
+   * cancelled it, drops a state given before the reset, then restores the value; of several resets of
+   * the form in one task, the last decides. The followers of the fields draw the state of the
+   * restored value right after, in their own tasks for the same reset.
    *
    * @param event - The `reset` event
    */
@@ -515,17 +502,14 @@ class FieldValidation {
     }
 
     const serial = nextStateSerial()
-    const timeout = setTimeout(() => {
-      this._resetTimeouts.delete(timeout)
 
+    clearTimeout(this._resetTimeout)
+    this._resetTimeout = setTimeout(() => {
       if (!event.defaultPrevented) {
         this.dismiss(serial)
-        this.update()
         this._options.restore?.()
       }
     })
-
-    this._resetTimeouts.add(timeout)
   }
 }
 

@@ -677,11 +677,10 @@ export const nextStateSerial = (): number => ++stateSerial
  * fires `invalid` on it, the state is `'invalid'` whenever its value is invalid; before that, and
  * while its value is valid, it is what `getUserValidity()` reads. A native reset of the form the
  * control belongs to forgets the report in the next task, unless a listener cancelled the reset or a
- * validation reported the control again after it, each reset on its own; until then the state
- * already leaves out a report the reset forgets, so a component that reads it in the meantime does
- * not show a report from before the reset. The control is followed wherever it sits, also
- * outside the `<form>` it names with `form` and inside a shadow root, and a reset reaches it even
- * when a listener stops its propagation.
+ * validation reported the control again before that task; of several resets of the form in one
+ * task, the last decides. The control is followed wherever it sits, also outside the `<form>` it
+ * names with `form` and inside a shadow root, and a reset reaches it even when a listener stops its
+ * propagation.
  *
  * @param control - The control that carries the value
  * @param onUpdate - Called with the state after every event that may change it
@@ -690,7 +689,7 @@ export const nextStateSerial = (): number => ++stateSerial
  * @param wasReported - Whether a validation already reported the control, for a control that
  * replaces one a validation reported
  * @returns `read()` for the current state, `follow(control)` to go on with a control that replaces
- * this one, with the report and a reset whose task has not run yet, and `stop()` to remove the
+ * this one, with its report and a reset whose task has not run yet, and `stop()` to remove the
  * listeners
  */
 export const followUserValidity = (
@@ -701,12 +700,11 @@ export const followUserValidity = (
 ): UserValidity => {
   const root = control.getRootNode()
   const roots = root instanceof ShadowRoot ? [control.ownerDocument, root] : [control.ownerDocument]
-  const resets = new Map<Event, ReturnType<typeof setTimeout>>()
   let current = control
   let reported = wasReported
   let reportedSinceReset = false
-  const isReported = () => ([...resets.keys()].some(event => !event.defaultPrevented) ? reportedSinceReset : reported)
-  const read = () => (isReported() && !current.validity.valid ? 'invalid' : getUserValidity(current))
+  let resetTimeout: ReturnType<typeof setTimeout> | undefined
+  const read = () => (reported && !current.validity.valid ? 'invalid' : getUserValidity(current))
   const update = () => onUpdate(read())
   const handleInvalid = () => {
     reported = true
@@ -734,17 +732,16 @@ export const followUserValidity = (
 
     const serial = stateSerial
 
+    clearTimeout(resetTimeout)
     reportedSinceReset = false
-    resets.set(event, setTimeout(() => {
-      resets.delete(event)
-
+    resetTimeout = setTimeout(() => {
       if (!event.defaultPrevented) {
         reported = reportedSinceReset
         onReset?.(serial)
       }
 
       update()
-    }))
+    })
   }
 
   listen('addEventListener')
@@ -762,10 +759,7 @@ export const followUserValidity = (
     },
     read,
     stop() {
-      for (const timeout of resets.values()) {
-        clearTimeout(timeout)
-      }
-
+      clearTimeout(resetTimeout)
       listen('removeEventListener')
 
       for (const node of roots) {

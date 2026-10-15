@@ -298,8 +298,8 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_INPUT, SELECTOR_RATING_ITEM_INPUT, () => {
-      if (!this._config.disabled && !this._config.readonly && this._validation.dismiss()) {
-        this._validation.update()
+      if (!this._config.disabled && !this._config.readonly) {
+        this._validation.dismiss()
       }
     })
 

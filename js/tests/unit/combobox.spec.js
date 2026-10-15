@@ -887,22 +887,6 @@ describe('Combobox', () => {
       expect(form.checkValidity()).toBe(!kept)
     })
 
-    it('should forget a report before the value it puts back on a native reset sends its change events', async () => {
-      const toggle = setMarkupInForm()
-      const combobox = new Combobox(toggle, { name: 'country', required: true })
-      const form = fixtureEl.querySelector('form')
-      const seen = []
-
-      form.checkValidity()
-      pick(combobox, 'ca')
-      toggle.addEventListener('change.coreui.combobox', () => seen.push(toggle.classList.contains('is-invalid')))
-      form.reset()
-      await tick()
-
-      expect(combobox.getValue()).toBeNull()
-      expect(seen).toEqual([false])
-    })
-
     it('should keep its value field through a native reset that changes nothing', async () => {
       const toggle = setMarkupInForm()
       const combobox = new Combobox(toggle, {
