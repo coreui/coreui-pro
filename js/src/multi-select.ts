@@ -16,6 +16,7 @@ import { containsFocus } from './util/focus.js'
 import FocusTrap from './util/focustrap.js'
 import { type ValidationState } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
+import { isTypingKey } from './util/list-navigation.js'
 import { flattenOptions, getSelectableOptions, isOptionGroup } from './util/option-tree.js'
 import {
   type CountLabel, fillSelection, getAriaPressed, getSelectionLimit, getSelectionState, isSelectionLimitReached,
@@ -45,7 +46,6 @@ const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
-const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
@@ -600,7 +600,7 @@ class MultiSelect extends ComboboxBase {
 
       if (
         this._routesTypingToSearch() &&
-        (this._isTyping(event) || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)
+        isTypingKey(event)
       ) {
         this._searchElement.focus()
       }
@@ -609,7 +609,7 @@ class MultiSelect extends ComboboxBase {
     EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => {
       if (
         this._routesTypingToSearch() &&
-        (this._isTyping(event) || event.key === BACKSPACE_KEY || event.key === DELETE_KEY) &&
+        isTypingKey(event) &&
         !(event.target as HTMLElement).closest(SELECTOR_TEXT_ENTRY)
       ) {
         this._searchElement.focus()
@@ -1079,12 +1079,6 @@ class MultiSelect extends ComboboxBase {
 
     this._togglerElement.id ||= getUID(`${this.constructor.NAME}-toggler-`)
     this._menu.setAttribute('aria-labelledby', this._togglerElement.id)
-  }
-
-  // The space bar belongs to whatever is under the focus, and a chord is a
-  // command rather than a character.
-  _isTyping(event: KeyboardEvent): boolean {
-    return event.key.length === 1 && event.key !== SPACE_KEY && !event.ctrlKey && !event.metaKey
   }
 
   _routesTypingToSearch(): boolean {

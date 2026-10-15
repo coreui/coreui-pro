@@ -28,7 +28,6 @@ A straightforward demonstration of how to implement a basic Bootstrap Autocomple
     data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
     data-coreui-picker-icon="true"
     data-coreui-placeholder="Search technologies..."
-    data-coreui-search="global"
     data-coreui-search-no-results-label="No results found"
     data-coreui-show-hints="true"
     data-coreui-value="React.js"
@@ -99,22 +98,22 @@ This example shows how to connect the AutoComplete to a remote API to search use
 
 <Example code={`<div id="myAutoCompleteExternalData"></div>`} sandboxJs={autocompleteExternalData} />
 
-To fetch data from an external source, you must set the search option to `'external'` or `['external', 'global']`.
+To fetch data from an external source, you must set the search option to `'external'`.
 This disables internal filtering and allows you to provide custom data (e.g., from an API) based on user input.
 
 ## Search functionality
 
-Configure the search behavior within the component. The `data-coreui-search` option determines how the search input operates and provides different search modes.
-
-By default, search applies only while the input field is focused:
+The field filters the options as the user types.
 
 <Example pro code={`<div data-coreui-autocomplete data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Search technologies..."></div>`} />
 
-### Global search
+### Where typing goes
 
-Enable global search functionality that works across the entire component, regardless of focus position:
+Typing reaches the field from anywhere in the component — the picker button, the clear button, the options panel — so a keystroke never depends on where the focus happens to be. The space bar and keyboard shortcuts stay with whatever has the focus.
 
-<Example pro code={`<div data-coreui-autocomplete data-coreui-search="global" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Global search enabled..."></div>`} />
+Add `data-coreui-global-search="false"` to keep typing local: a keystroke then counts only while the field has the focus.
+
+<Example pro code={`<div data-coreui-autocomplete data-coreui-global-search="false" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-picker-icon="true" data-coreui-placeholder="Typing stays local..."></div>`} />
 
 ### External search
 
@@ -146,9 +145,7 @@ myAutoCompleteExternalDataExample.addEventListener('input.coreui.autocomplete', 
 ```
 
 <Callout color="info">
-When `search: 'external'` is used, the component no longer filters options internally — you must handle all data fetching and filtering logic manually.
-
-You can combine it with `'global'` (e.g. search: `['external', 'global']`) to allow search input even when focus is not in the text field.
+When `search: 'external'` is used, the component no longer filters options internally — you must handle all data fetching and filtering logic manually. It opens the panel for whatever options you set, whether or not they contain the typed text.
 </Callout>
 
 ## Restricted selection
@@ -220,7 +217,6 @@ The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the 
     data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
     data-coreui-picker-icon="true"
     data-coreui-placeholder="Large autocomplete..."
-    data-coreui-search="global"
     data-coreui-show-hints="true"
     data-coreui-autocomplete
   ></div>
@@ -230,7 +226,6 @@ The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the 
     data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
     data-coreui-picker-icon="true"
     data-coreui-placeholder="Normal autocomplete..."
-    data-coreui-search="global"
     data-coreui-show-hints="true"
     data-coreui-autocomplete
   ></div>
@@ -241,7 +236,6 @@ The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the 
     data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
     data-coreui-picker-icon="true"
     data-coreui-placeholder="Small autocomplete..."
-    data-coreui-search="global"
     data-coreui-show-hints="true"
     data-coreui-autocomplete
   ></div>`} />
@@ -292,7 +286,7 @@ We use the following JavaScript to set up our autocomplete:
 Add the `data-coreui-autocomplete` attribute to a container element:
 
 ```html
-<div data-coreui-autocomplete data-coreui-name="framework" data-coreui-options="JavaScript, TypeScript, React, Vue.js, Angular" data-coreui-search="global"></div>
+<div data-coreui-autocomplete data-coreui-name="framework" data-coreui-options="JavaScript, TypeScript, React, Vue.js, Angular"></div>
 ```
 
 ### Via JavaScript
@@ -313,8 +307,7 @@ const autoComplete = new coreui.Autocomplete(autoCompleteElement, {
     'React',
     'Vue.js',
     'Angular'
-  ],
-  search: 'global'
+  ]
 })
 ```
 
@@ -334,6 +327,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `clearSearchOnSelect` | boolean | `true` | Clears the search input when an option is selected. |
 | `container` | string, element, boolean | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `disabled` | boolean | `false` | Disables the component when set to `true`. |
+| `globalSearch` | boolean | `true` | Routes typing to the field from anywhere in the component, so a keystroke never depends on where the focus sits. Set to `false` to keep it local: a keystroke then counts only while the field has the focus. |
 | `highlightOptionsOnSearch` | boolean | `false` | Highlights matching text in options during search. |
 | `id` | string, null | `null` | Sets a custom ID for the component. If not provided, a unique ID is auto-generated. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
@@ -347,7 +341,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `required` | boolean | `false` | Makes the input field required for form validation. |
 | `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
 | `sanitizeFn` | function, null | `null` | Custom sanitization function. If provided, it will be used instead of the built-in sanitizer. |
-| `search` | array, string, null | `null` | Enables search functionality. Use `'global'` for global search across the component and `'external'` when options are provided from external sources. |
+| `search` | string, null | `null` | `'external'` hands the filtering to your code: the component shows the options you set and reports what the user types through `input.coreui.autocomplete`. |
 | `searchNoResultsLabel` | boolean, string | `false` | Text displayed when no search results are found; `true` shows "No results found". |
 | `showHints` | boolean | `false` | Shows completion hints as users type. |
 | `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
@@ -421,6 +415,7 @@ The Autocomplete component includes several accessibility features:
 | <kbd>Escape</kbd> | Close the dropdown and clear focus |
 | <kbd>Tab</kbd> | Accept hint completion (when hints are enabled) |
 | <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Clear input and trigger search |
+| Any character, <kbd>Backspace</kbd>, <kbd>Delete</kbd> on the picker or clear button | Move the focus to the field and type there, unless `globalSearch` is `false` |
 
 ## Customizing
 

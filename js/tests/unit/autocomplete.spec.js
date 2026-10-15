@@ -447,16 +447,17 @@ describe('Autocomplete', () => {
       expect(autocomplete._options[2].label).toBe('Cherry')
     })
 
-    it('should handle search as comma-separated string via configAfterMerge', () => {
+    it('should turn globalSearch on by default and search externally only for search external', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        search: 'external, global',
-        options: []
-      })
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
 
-      expect(autocomplete._isExternalSearch()).toBe(true)
-      expect(autocomplete._isGlobalSearch()).toBe(true)
+      expect(autocomplete._config.globalSearch).toBe(true)
+      expect(autocomplete._isExternalSearch()).toBe(false)
+
+      autocomplete.setConfig({ search: 'external' })
+
+      expect(Autocomplete.getInstance(autocompleteEl)._isExternalSearch()).toBe(true)
     })
 
     it('should not create hint input when disabled', () => {
@@ -543,15 +544,40 @@ describe('Autocomplete', () => {
       expect(keys).toEqual([])
     })
 
-    it('should set togglerElement tabIndex to -1 when search is falsy and not disabled', () => {
+    it('should keep a tab stop the page wrote on the host out of the tab order while it lives', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete" tabindex="0"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      expect(autocompleteEl.hasAttribute('tabindex')).toBe(false)
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.getAttribute('tabindex')).toBe('0')
+    })
+
+    it('should refuse a search option given as an array', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+
+      expect(() => new Autocomplete(fixtureEl.querySelector('.autocomplete'), { search: ['external'] })).toThrowError(TypeError)
+    })
+
+    it('should leave the host without a tab stop of its own', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        search: null,
-        options: []
-      })
+      new Autocomplete(autocompleteEl, { options: [] }) // eslint-disable-line no-new
 
-      expect(autocomplete._togglerElement.tabIndex).toBe(-1)
+      expect(autocompleteEl.hasAttribute('tabindex')).toBe(false)
+    })
+
+    it('should put the focus in the field when the frame is clicked', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [{ label: 'Option 1', value: '1' }] })
+
+      autocompleteEl.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(document.activeElement).toBe(autocomplete._inputElement)
     })
   })
 
@@ -1451,7 +1477,7 @@ describe('Autocomplete', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['external'],
+        search: 'external',
         options: [
           { label: 'Apple', value: 'apple' },
           { label: 'Banana', value: 'banana' }
@@ -1719,28 +1745,31 @@ describe('Autocomplete', () => {
   })
 
   describe('_isExternalSearch', () => {
-    it('should return true when search includes external', () => {
+    it('should open on external results that do not contain the typed text', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['external'],
+        options: [{ label: 'Alpha', value: 'a' }],
+        search: 'external'
+      })
+
+      autocomplete.search('xyz')
+      autocomplete.show()
+
+      expect(autocomplete._isShown()).toBe(true)
+    })
+
+    it('should return true for search external', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        search: 'external',
         options: []
       })
 
       expect(autocomplete._isExternalSearch()).toBe(true)
     })
 
-    it('should return false when search does not include external', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['internal'],
-        options: []
-      })
-
-      expect(autocomplete._isExternalSearch()).toBe(false)
-    })
-
     it('should return false when search is null', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -1750,41 +1779,6 @@ describe('Autocomplete', () => {
       })
 
       expect(autocomplete._isExternalSearch()).toBe(false)
-    })
-  })
-
-  describe('_isGlobalSearch', () => {
-    it('should return true when search includes global', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['global'],
-        options: []
-      })
-
-      expect(autocomplete._isGlobalSearch()).toBe(true)
-    })
-
-    it('should return false when search does not include global', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['local'],
-        options: []
-      })
-
-      expect(autocomplete._isGlobalSearch()).toBe(false)
-    })
-
-    it('should return false when search is null', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        search: null,
-        options: []
-      })
-
-      expect(autocomplete._isGlobalSearch()).toBe(false)
     })
   })
 
@@ -2305,94 +2299,94 @@ describe('Autocomplete', () => {
       })
     })
 
-    it('should focus input on character key when global search on element keydown', () => {
+    it('should move a letter typed on the picker button into the field', async () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['global'],
-        options: [{ label: 'Option 1', value: '1' }]
+        options: [{ label: 'Option 1', value: '1' }],
+        pickerIcon: true
       })
 
-      autocomplete.show()
-      const spy = spyOn(autocomplete._inputElement, 'focus')
+      autocomplete._indicatorElement.focus()
+      await userEvent.keyboard('o')
 
-      const keydownEvent = createEvent('keydown')
-      keydownEvent.key = 'a'
-      autocompleteEl.dispatchEvent(keydownEvent)
-
-      expect(spy).toHaveBeenCalled()
+      expect(document.activeElement).toBe(autocomplete._inputElement)
+      expect(autocomplete._inputElement.value).toBe('o')
     })
 
-    it('should focus input on Backspace key when global search on element keydown', () => {
+    it('should move a letter typed on the clear button into the field', async () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['global'],
-        options: [{ label: 'Option 1', value: '1' }]
+        cleaner: true,
+        options: [{ label: 'Option 1', value: '1' }],
+        value: '1'
       })
 
-      autocomplete.show()
-      const spy = spyOn(autocomplete._inputElement, 'focus')
+      autocomplete._cleanerElement.focus()
+      await userEvent.keyboard('o')
 
-      const keydownEvent = createEvent('keydown')
-      keydownEvent.key = 'Backspace'
-      autocompleteEl.dispatchEvent(keydownEvent)
-
-      expect(spy).toHaveBeenCalled()
+      expect(document.activeElement).toBe(autocomplete._inputElement)
     })
 
-    it('should focus input on Delete key when global search on element keydown', () => {
+    it('should leave a key the page prevented on the picker button where it is', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['global'],
-        options: [{ label: 'Option 1', value: '1' }]
+        options: [{ label: 'Option 1', value: '1' }],
+        pickerIcon: true
       })
 
-      autocomplete.show()
-      const spy = spyOn(autocomplete._inputElement, 'focus')
+      autocomplete._indicatorElement.addEventListener('keydown', event => event.preventDefault())
+      autocomplete._indicatorElement.focus()
+      autocomplete._indicatorElement.dispatchEvent(new KeyboardEvent('keydown', { key: '/', bubbles: true, cancelable: true }))
 
-      const keydownEvent = createEvent('keydown')
-      keydownEvent.key = 'Delete'
-      autocompleteEl.dispatchEvent(keydownEvent)
-
-      expect(spy).toHaveBeenCalled()
+      expect(document.activeElement).toBe(autocomplete._indicatorElement)
     })
 
-    it('should focus input on character key when global search on menu keydown', () => {
+    it('should leave the space bar to the picker button', async () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['global'],
-        options: [{ label: 'Option 1', value: '1' }]
+        options: [{ label: 'Option 1', value: '1' }],
+        pickerIcon: true
       })
 
-      autocomplete.show()
-      const spy = spyOn(autocomplete._inputElement, 'focus')
+      autocomplete._indicatorElement.focus()
+      await userEvent.keyboard(' ')
 
-      const keydownEvent = createEvent('keydown')
-      keydownEvent.key = 'b'
-      autocomplete._menu.dispatchEvent(keydownEvent)
-
-      expect(spy).toHaveBeenCalled()
+      expect(document.activeElement).toBe(autocomplete._indicatorElement)
+      expect(autocomplete._inputElement.value).toBe('')
+      expect(autocomplete._isShown()).toBe(true)
     })
 
-    it('should focus input on Backspace key when global search on menu keydown', () => {
+    it('should keep letters typed on the picker button there when globalSearch is false', async () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['global'],
+        globalSearch: false,
+        options: [{ label: 'Option 1', value: '1' }],
+        pickerIcon: true
+      })
+
+      autocomplete._indicatorElement.focus()
+      await userEvent.keyboard('o')
+
+      expect(document.activeElement).toBe(autocomplete._indicatorElement)
+      expect(autocomplete._inputElement.value).toBe('')
+    })
+
+    it('should move a letter pressed in the panel into the field', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
       autocomplete.show()
-      const spy = spyOn(autocomplete._inputElement, 'focus')
+      autocomplete._menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', bubbles: true }))
 
-      const keydownEvent = createEvent('keydown')
-      keydownEvent.key = 'Backspace'
-      autocomplete._menu.dispatchEvent(keydownEvent)
-
-      expect(spy).toHaveBeenCalled()
+      expect(document.activeElement).toBe(autocomplete._inputElement)
     })
   })
 
@@ -4167,7 +4161,7 @@ describe('Autocomplete', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
-        search: ['external'],
+        search: 'external',
         highlightOptionsOnSearch: true,
         options: [{ label: 'Apple', value: 'apple' }]
       })
@@ -4632,7 +4626,7 @@ describe('Autocomplete', () => {
 
     it('should initialize autocomplete from data attributes', () => {
       fixtureEl.innerHTML =
-        '<div data-coreui-autocomplete data-coreui-options="JavaScript, TypeScript" data-coreui-search="global"></div>'
+        '<div data-coreui-autocomplete data-coreui-options="JavaScript, TypeScript" data-coreui-search="external" data-coreui-global-search="false"></div>'
 
       const autocompleteEl = fixtureEl.querySelector('[data-coreui-autocomplete]')
 
@@ -4642,7 +4636,8 @@ describe('Autocomplete', () => {
 
       expect(autocomplete).toBeInstanceOf(Autocomplete)
       expect(autocomplete._config.options).toEqual(['JavaScript', 'TypeScript'])
-      expect(autocomplete._config.search).toEqual(['global'])
+      expect(autocomplete._config.search).toBe('external')
+      expect(autocomplete._config.globalSearch).toBe(false)
     })
 
     it('should close autocomplete when clicking outside', () => {
@@ -4864,17 +4859,6 @@ describe('Autocomplete', () => {
       expect(autocomplete._options[0].label).toBe('one')
       expect(autocomplete._options[1].label).toBe('two')
       expect(autocomplete._options[2].label).toBe('three')
-    })
-
-    it('should convert search string to array', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        search: 'external, global',
-        options: []
-      })
-
-      expect(autocomplete._config.search).toEqual(['external', 'global'])
     })
   })
 

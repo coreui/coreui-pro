@@ -198,7 +198,7 @@ const unknownOptions = [
 
 // Every component with options type-checks them.
 const otherOptions = [
-  new Autocomplete(element, { optionsTemplate: option => `<b>${option.text}</b>`, search: ['external', 'global'] }),
+  new Autocomplete(element, { optionsTemplate: option => `<b>${option.text}</b>`, globalSearch: false, search: 'external' }),
   new ChipInput(element, { maxChips: 3, selectionMode: 'single' }),
   new ContextMenu(element, { autoClose: 'outside' }),
   new Dialog(element, { backdrop: 'static' }),
@@ -283,6 +283,8 @@ const otherOptions = [
   new Stepper(element, { liner: false }),
   // @ts-expect-error — setConfig takes the same options
   new Autocomplete(element).setConfig({ searchable: true }),
+  // @ts-expect-error — search takes only 'external'
+  new Autocomplete(element, { search: 'global' }),
   // @ts-expect-error — and so does the multi select's
   new MultiSelect(element).setConfig({ selectionType: 'pills' }),
   // @ts-expect-error — and the rating's
@@ -297,7 +299,7 @@ const exportedConfigs: [
   Partial<NumberInputConfig>, Partial<OffcanvasConfig>, Partial<PasswordInputConfig>, Partial<RatingConfig>,
   Partial<SearchButtonConfig>, Partial<StepperConfig>
 ] = [
-  { search: 'global' },
+  { globalSearch: false, search: 'external' },
   { maxChips: 3 },
   { reference: 'pointer' },
   { modal: false },

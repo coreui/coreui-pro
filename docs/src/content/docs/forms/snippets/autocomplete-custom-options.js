@@ -86,8 +86,7 @@ new coreui.Autocomplete(myAutocompleteCountries, {
   },
   pickerIcon: true,
   placeholder: 'Select country',
-  showHints: true,
-  search: 'global'
+  showHints: true
 })
 
 new coreui.Autocomplete(myAutocompleteCountriesAndCities, {
@@ -98,6 +97,5 @@ new coreui.Autocomplete(myAutocompleteCountriesAndCities, {
   },
   pickerIcon: true,
   placeholder: 'Select city',
-  showHints: true,
-  search: 'global'
+  showHints: true
 })

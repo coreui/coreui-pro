@@ -845,6 +845,24 @@ describe('ListBox', () => {
   })
 
   describe('activeDescendant', () => {
+    it('should leave letters typed in a text field to the field rather than the typeahead', () => {
+      fixtureEl.innerHTML = [
+        '<input type="text" id="field">',
+        '<div class="list-box">',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
+        '</div>'
+      ].join('')
+
+      const field = fixtureEl.querySelector('#field')
+      const listBox = new ListBox(fixtureEl.querySelector('.list-box'), { activeDescendant: field })
+
+      listBox.setActive('lettuce')
+      field.dispatchEvent(new KeyboardEvent('keydown', { key: 't', bubbles: true, cancelable: true }))
+
+      expect(listBox.getActive()).toEqual('lettuce')
+    })
+
     it('should drop its references on the field while the list is out of the document, and restore them on focus', () => {
       fixtureEl.innerHTML = [
         '<input type="text" id="field">',

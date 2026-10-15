@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context'
 import { vi } from 'vitest'
 
 import Chip from '../../src/chip.js'
@@ -4578,69 +4579,108 @@ describe('MultiSelect', () => {
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
-    it('should focus search on global search keydown on clone', () => {
-      fixtureEl.innerHTML = '<select></select>'
-      const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, {
-        options: [{ value: '1', text: 'Option 1' }],
-        search: true
-      })
+    it('should move letters typed on an option into the search field', async () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option><option value="r">React</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
 
       multiSelect.show()
+      multiSelect._menu.querySelector('.list-box-option').focus()
+      await userEvent.keyboard('r')
 
-      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true })
-      multiSelect._wrapperElement.dispatchEvent(event)
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+      expect(multiSelect._searchElement.value).toBe('r')
+      expect(multiSelect._menu.querySelector('.list-box-option[tabindex="0"]').textContent.trim()).toBe('Angular')
 
-      // Should focus the search element (no error thrown)
-      expect(multiSelect._searchElement).not.toBeNull()
+      await userEvent.keyboard('e')
+
+      expect(multiSelect._searchElement.value).toBe('re')
     })
 
-    it('should focus search on global search keydown on menu', () => {
-      fixtureEl.innerHTML = '<select></select>'
-      const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, {
-        options: [{ value: '1', text: 'Option 1' }],
-        search: true
-      })
+    it('should move a letter typed on the select all button into the search field', async () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option><option value="r">React</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true, selectAll: true })
 
       multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-select-all]').focus()
+      await userEvent.keyboard('r')
 
-      const event = new KeyboardEvent('keydown', { key: 'b', bubbles: true })
-      multiSelect._menu.dispatchEvent(event)
-
-      expect(multiSelect._searchElement).not.toBeNull()
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+      expect(multiSelect._searchElement.value).toBe('r')
     })
 
-    it('should focus search on Backspace keydown on clone in global search mode', () => {
-      fixtureEl.innerHTML = '<select></select>'
-      const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, {
-        options: [{ value: '1', text: 'Option 1' }],
-        search: true
-      })
+    it('should move Backspace pressed on an option into the search field without deselecting', async () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>Angular</option><option value="r">React</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
 
       multiSelect.show()
+      await userEvent.keyboard('an')
+      multiSelect._menu.querySelector('.list-box-option').focus()
+      await userEvent.keyboard('{Backspace}')
 
-      const event = new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true })
-      multiSelect._wrapperElement.dispatchEvent(event)
-
-      expect(multiSelect._searchElement).not.toBeNull()
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+      expect(multiSelect._searchElement.value).toBe('a')
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
     })
 
-    it('should focus search on Delete keydown on menu in global search mode', () => {
-      fixtureEl.innerHTML = '<select></select>'
-      const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, {
-        options: [{ value: '1', text: 'Option 1' }],
-        search: true
-      })
+    it('should leave the space bar and Ctrl+A to the option under the focus', async () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option><option value="r">React</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
 
       multiSelect.show()
+      const option = multiSelect._menu.querySelector('.list-box-option')
+      option.focus()
+      await userEvent.keyboard(' ')
 
-      const event = new KeyboardEvent('keydown', { key: 'Delete', bubbles: true })
-      multiSelect._menu.dispatchEvent(event)
+      expect(document.activeElement).toBe(option)
+      expect(multiSelect.getValue().map(item => item.value)).toEqual(['a'])
 
-      expect(multiSelect._searchElement).not.toBeNull()
+      await userEvent.keyboard('{Control>}a{/Control}')
+
+      expect(document.activeElement).toBe(option)
+      expect(multiSelect.getValue().map(item => item.value)).toEqual(['a', 'r'])
+      expect(multiSelect._searchElement.value).toBe('')
+    })
+
+    it('should move a character typed with AltGr into the search field and keep a Ctrl chord on the option', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option><option value="r">React</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
+
+      multiSelect.show()
+      const option = multiSelect._menu.querySelector('.list-box-option')
+      option.focus()
+      option.dispatchEvent(new KeyboardEvent('keydown', { key: 'r', ctrlKey: true, bubbles: true }))
+
+      expect(document.activeElement).toBe(option)
+
+      option.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ą', ctrlKey: true, altKey: true, bubbles: true
+      }))
+
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+    })
+
+    it('should leave a key of an IME composition on the option', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option><option value="r">React</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
+
+      multiSelect.show()
+      const option = multiSelect._menu.querySelector('.list-box-option')
+      option.focus()
+      option.dispatchEvent(new KeyboardEvent('keydown', { key: 'r', isComposing: true, bubbles: true }))
+
+      expect(document.activeElement).toBe(option)
+    })
+
+    it('should leave letters typed on an option to the list typeahead when globalSearch is false', async () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option><option value="r">React</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { globalSearch: false, search: true })
+
+      multiSelect.show()
+      multiSelect._menu.querySelector('.list-box-option').focus()
+      await userEvent.keyboard('r')
+
+      expect(document.activeElement.textContent.trim()).toBe('React')
+      expect(multiSelect._searchElement.value).toBe('')
     })
 
     it('should handle _deselectLastOption when no options are selected', () => {
