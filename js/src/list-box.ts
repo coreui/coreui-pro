@@ -129,6 +129,7 @@ type ListBoxConfig = {
   indicator: string
   items: ListBoxEntry[]
   loading: boolean
+  resetSelectionOnItemsChange: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   search: boolean | string
@@ -152,6 +153,7 @@ const Default: ListBoxConfig = {
   indicator: 'none',
   items: [],
   loading: false,
+  resetSelectionOnItemsChange: false,
   sanitize: true,
   sanitizeFn: null,
   search: false,
@@ -175,6 +177,7 @@ const DefaultType: Record<string, string> = {
   indicator: 'string',
   items: 'array',
   loading: 'boolean',
+  resetSelectionOnItemsChange: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   search: '(boolean|string)',
@@ -312,20 +315,20 @@ class ListBox extends BaseComponent {
 
   setItems(items: ListBoxEntry[]): void {
     const previous = this.getSelectedValues()
+    const previousValues = new Set(this._allOptions().map(option => this._optionValue(option)))
 
     this._items = this._normalizeItems(items)
     this._render()
 
-    const values = new Set(this._flatItems().map(item => item.value))
-    const kept = previous.filter(value => values.has(value))
-    const marked = this._flatItems().filter(item => item.selected).map(item => item.value)
-    const next = [...new Set([...kept, ...marked])]
+    const values = new Set(this._allOptions().map(option => this._optionValue(option)))
+    const reset = this._config.resetSelectionOnItemsChange && (values.size !== previousValues.size || [...values].some(value => !previousValues.has(value)))
+    const marked = this._selectable(this._flatItems().filter(item => item.selected).map(item => item.value))
 
     this._anchor = null
-    this._selected = new Set(this._selectable(toSelectionValues(next, this._config.selectionMode as SelectionMode)))
+    this._selected = new Set(toSelectionValues([...new Set([...(reset ? [] : previous), ...marked])], this._config.selectionMode as SelectionMode))
     this.update()
 
-    if (previous.length !== this._selected.size || previous.some(value => !this._selected.has(value))) {
+    if (this._selected.size !== previous.length || previous.some(value => !this._selected.has(value))) {
       this._triggerChange()
     }
   }

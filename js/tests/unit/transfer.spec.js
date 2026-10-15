@@ -689,6 +689,17 @@ describe('Transfer', () => {
       expect(option(el, 'target', 'cleo').getAttribute('aria-selected')).toEqual('false')
     })
 
+    it('should leave nothing selected after setItems on a disabled transfer', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { disabled: true, items: [{ value: 'ada', label: 'Ada', selected: true }, { value: 'bob', label: 'Bob' }] })
+
+      expect(transfer.getSelectedValues('source')).toEqual(['ada'])
+
+      transfer.setItems([{ value: 'cleo', label: 'Cleo' }])
+
+      expect(transfer.getSelectedValues('source')).toEqual([])
+    })
+
     it('should let a target option be toggled after an external re-fetch', () => {
       const el = setMarkup('', [], [])
       const transfer = new Transfer(el, { items: users, search: 'external', value: ['cleo'] })

@@ -96,6 +96,7 @@ describe('ListBox', () => {
         indicator: 'none',
         items: [],
         loading: false,
+        resetSelectionOnItemsChange: false,
         sanitize: true,
         sanitizeFn: null,
         search: false,
@@ -1242,7 +1243,7 @@ describe('ListBox', () => {
       ])
     })
 
-    it('should keep the selection of the values that are still there', () => {
+    it('should keep the selection of the values the new items no longer carry', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
         items: [
@@ -1263,9 +1264,180 @@ describe('ListBox', () => {
         { value: 'cheese', label: 'Cheese' }
       ])
 
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato', 'onion'])
+      expect(changed).toEqual([])
+      expect(item(el, 'tomato').classList.contains('selected')).toBeTrue()
+      expect(item(el, 'cheese').classList.contains('selected')).toBeFalse()
+    })
+
+    it('should replace a value the new items no longer carry in single selection mode', () => {
+      const el = setEmptyMarkup()
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const events = []
+
+      el.addEventListener('deselected.coreui.list-box', event => events.push(`deselected:${event.value}`))
+      el.addEventListener('change.coreui.list-box', event => events.push(`change:${event.value}`))
+
+      listBox.setItems([{ value: 'tomato', label: 'Tomato' }])
+      click(item(el, 'tomato'))
+
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
+      expect(events).toEqual(['deselected:lettuce', 'change:tomato'])
+    })
+
+    it('should count the values the new items no longer carry against the selection limit', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, {
+        items: [
+          { value: 'lettuce', label: 'Lettuce' },
+          { value: 'tomato', label: 'Tomato' }
+        ],
+        selectionLimit: 2
+      })
+      const reported = []
+
+      el.addEventListener('selectionLimit.coreui.list-box', event => reported.push(event.value))
+
+      listBox.selectAll()
+      listBox.setItems([{ value: 'onion', label: 'Onion' }])
+      click(item(el, 'onion'))
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
+      expect(reported).toEqual(['onion'])
+    })
+
+    it('should clear the values the new items no longer carry', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const changed = []
+
+      listBox.setItems([{ value: 'tomato', label: 'Tomato' }])
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.clear()
+
+      expect(listBox.getSelectedValues()).toEqual([])
+      expect(changed).toEqual([[]])
+    })
+
+    it('should deselect a value the new items no longer carry', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const changed = []
+
+      listBox.setItems([{ value: 'tomato', label: 'Tomato' }])
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.deselect('lettuce')
+
+      expect(listBox.getSelectedValues()).toEqual([])
+      expect(changed).toEqual([[]])
+    })
+
+    it('should keep the held value over an item marked selected in single selection mode', () => {
+      const el = setEmptyMarkup()
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const changed = []
+
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.setItems([{ value: 'tomato', label: 'Tomato', selected: true }])
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
+      expect(changed).toEqual([])
+    })
+
+    it('should start from the marked items when resetSelectionOnItemsChange is set and the values change', () => {
+      const el = setEmptyMarkup()
+      const listBox = new ListBox(el, {
+        items: [{ value: 'lettuce', label: 'Lettuce' }],
+        resetSelectionOnItemsChange: true,
+        selected: 'lettuce'
+      })
+      const changed = []
+
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.setItems([{ value: 'tomato', label: 'Tomato', selected: true }, { value: 'onion', label: 'Onion' }])
+
       expect(listBox.getSelectedValues()).toEqual(['tomato'])
       expect(changed).toEqual([['tomato']])
-      expect(item(el, 'tomato').classList.contains('selected')).toBeTrue()
+    })
+
+    it('should keep the selection when resetSelectionOnItemsChange is set and the values stay the same', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const items = [{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }]
+      const listBox = new ListBox(el, { items, resetSelectionOnItemsChange: true, selected: 'tomato' })
+      const changed = []
+
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.setItems([{ value: 'tomato', label: 'Tomato, fresh' }, { value: 'lettuce', label: 'Lettuce, fresh' }])
+
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
+      expect(changed).toEqual([])
+
+      listBox.setItems([{ value: 'onion', label: 'Onion' }])
+
+      expect(listBox.getSelectedValues()).toEqual([])
+      expect(changed).toEqual([[]])
+    })
+
+    it('should reset the selection when resetSelectionOnItemsChange is set and the selected values are still listed', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, {
+        items: [{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }],
+        resetSelectionOnItemsChange: true,
+        selected: 'lettuce'
+      })
+      const changed = []
+
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.setItems([{ value: 'lettuce', label: 'Lettuce' }, { value: 'onion', label: 'Onion' }])
+
+      expect(listBox.getSelectedValues()).toEqual([])
+      expect(changed).toEqual([[]])
+    })
+
+    it('should compare the values of a list box built from markup when resetSelectionOnItemsChange is set', () => {
+      const el = setMarkup(' data-coreui-reset-selection-on-items-change="true"')
+      const listBox = new ListBox(el)
+
+      click(item(el, 'tomato'))
+      listBox.setItems([...el.querySelectorAll('.list-box-option')].map(option => ({ value: option.dataset.coreuiValue, label: option.textContent })))
+
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
+    })
+
+    it('should reset the selection of a disabled list box with resetSelectionOnItemsChange', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, {
+        disabled: true,
+        items: [{ value: 'lettuce', label: 'Lettuce' }],
+        resetSelectionOnItemsChange: true,
+        selected: 'lettuce'
+      })
+
+      listBox.setItems([{ value: 'tomato', label: 'Tomato' }])
+
+      expect(listBox.getSelectedValues()).toEqual([])
+    })
+
+    it('should keep a selected value that comes back disabled', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+
+      listBox.setItems([{ value: 'lettuce', label: 'Lettuce', disabled: true }])
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
+      expect(item(el, 'lettuce').classList.contains('selected')).toBeTrue()
+    })
+
+    it('should fire change when setItems marks a value that was not selected', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const changed = []
+
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.setItems([{ value: 'tomato', label: 'Tomato', selected: true }])
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
+      expect(changed).toEqual([['lettuce', 'tomato']])
     })
 
     it('should keep the selection mode when setItems marks several items', () => {
