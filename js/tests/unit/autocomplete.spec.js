@@ -72,6 +72,21 @@ describe('Autocomplete', () => {
       expect(autocomplete._selected.map(option => option.value)).toEqual(['1'])
     })
 
+    it('should name the field by the aria-label or aria-labelledby on the host', () => {
+      fixtureEl.innerHTML = [
+        '<h2 id="country-heading">Shipping country</h2>',
+        '<div id="labelled" aria-labelledby="country-heading"></div>',
+        '<div id="named" aria-label="Country"></div>'
+      ].join('')
+      const labelled = new Autocomplete(fixtureEl.querySelector('#labelled'), { options: ['Poland'] })
+      const named = new Autocomplete(fixtureEl.querySelector('#named'), { options: ['Poland'] })
+
+      expect(labelled._inputElement.getAttribute('aria-labelledby')).toBe('country-heading')
+      expect(labelled._element.hasAttribute('aria-labelledby')).toBeFalse()
+      expect(named._inputElement.getAttribute('aria-label')).toBe('Country')
+      expect(named._element.hasAttribute('aria-label')).toBeFalse()
+    })
+
     it('should take care of element either passed as a CSS selector or DOM element', () => {
       fixtureEl.innerHTML = [
         '<div class="autocomplete" data-coreui-autocomplete>',
@@ -3221,6 +3236,20 @@ describe('Autocomplete', () => {
 
       expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
       expect(autocompleteEl.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should give the aria-label and aria-labelledby back to the host', () => {
+      fixtureEl.innerHTML = '<div aria-label="Country" aria-labelledby="country-heading"></div><div id="bare"></div>'
+      const autocompleteEl = fixtureEl.querySelector('[aria-label]')
+      const bare = fixtureEl.querySelector('#bare')
+
+      new Autocomplete(autocompleteEl, { options: [] }).dispose()
+      new Autocomplete(bare, { options: [] }).dispose()
+
+      expect(autocompleteEl.getAttribute('aria-label')).toBe('Country')
+      expect(autocompleteEl.getAttribute('aria-labelledby')).toBe('country-heading')
+      expect(bare.hasAttribute('aria-label')).toBeFalse()
+      expect(bare.hasAttribute('aria-labelledby')).toBeFalse()
     })
 
     it('should leave no class attribute on an element that had none, and keep a disabled class the page wrote', () => {
