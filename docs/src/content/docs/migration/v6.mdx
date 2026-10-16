@@ -1047,8 +1047,8 @@ check, radio, carousel and toggler icons already work:
   **Multi Select's `value` wins over options marked `selected`.** It used to
   add to them, in the markup and in `options`, and a later `setConfig()` with
   new options applied the start value again; now a given `value` is the
-  selection, and a `setConfig()` that brings `options` without `value` takes
-  the options marked `selected`. An array of numbers matches the options, and `value: ''` reads
+  selection, also for options that arrive later for the first time, as in the
+  React and Vue editions, while options shown before keep their state. An array of numbers matches the options, and `value: ''` reads
   like an empty `data-coreui-value`.
 - **Multi Select takes `search: 'external'`.** The search box then filters
   nothing, `search.coreui.multi-select` carries the `query`, and

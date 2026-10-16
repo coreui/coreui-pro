@@ -252,6 +252,8 @@ class MultiSelect extends ComboboxBase {
   protected declare _initialSelection: any[]
   protected declare _loading: boolean
   protected declare _offListOptions: HTMLOptionElement[]
+  protected declare _seenValues: Set<string>
+  protected declare _startValues: Set<string> | null
   protected declare _validation: FieldValidation
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
@@ -299,6 +301,8 @@ class MultiSelect extends ComboboxBase {
     this._nativeFocusHandler = null
     this._nativeKeydownHandler = null
     this._selected = []
+    this._seenValues = new Set()
+    this._startValues = null
     this._options = this._getOptions()
     this._configureNativeSelect()
     this._floatingCleanup = null
@@ -482,11 +486,14 @@ class MultiSelect extends ComboboxBase {
     this._config.options = options
     this._config.value = null
     this._selected = []
+
+    const seen = new Set(this._seenValues)
+
     this._options = this._getOptionsFromConfig(options)
 
     const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
     const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || [...values].some(value => !previous.has(value)))
-    const next = reset ? this._selected : selected
+    const next = reset ? this._selected : [...selected, ...(this._startValues ? this._selected.filter((option: any) => !seen.has(option.value)) : [])]
 
     this._selected = selected
     this._element.replaceChildren()
@@ -773,7 +780,10 @@ class MultiSelect extends ComboboxBase {
   }
 
   _getOptionsFromConfig(options: any = this._config.options, disabled = false): any[] {
-    const values = this._config.value && new Set(this._config.value)
+    if (this._config.value) {
+      this._startValues = new Set(this._config.value)
+    }
+
     const _options = []
     for (const option of options) {
       if (isOptionGroup(option)) {
@@ -792,7 +802,10 @@ class MultiSelect extends ComboboxBase {
       }
 
       const value = String(option.value)
+      const values = this._config.value || !this._seenValues.has(value) ? this._startValues : null
       const isSelected = values ? values.has(value) : option.selected
+
+      this._seenValues.add(value)
 
       const customProperties = typeof option === 'object' ? { ...option } : {}
 

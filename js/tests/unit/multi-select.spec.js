@@ -1843,11 +1843,41 @@ describe('MultiSelect', () => {
       expect(new MultiSelect(second).getValue().map(option => option.value)).toEqual(['a'])
     })
 
-    it('should take the options marked selected over a value given at the start once setConfig brings new options', () => {
+    it('should take the marks of the options it has shown and the start value for new ones when setConfig brings options', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: 'a', text: 'A' }, { value: 'b', text: 'B' }], value: ['a', 'c'] })
+
+      multiSelect.setConfig({ options: [{ value: 'a', text: 'A' }, { value: 'b', text: 'B', selected: true }, { value: 'c', text: 'C' }] })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['b', 'c'])
+    })
+
+    it('should select the start value once its options arrive through setOptions', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [], value: ['a'] })
+
+      multiSelect.setOptions([{ value: 'a', text: 'A' }, { value: 'b', text: 'B' }])
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should not select the start value again on options it has shown', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const options = [{ value: 'a', text: 'A' }, { value: 'b', text: 'B' }]
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options, value: ['a'] })
+
+      multiSelect.deselectAll()
+      multiSelect.setOptions([...options, { value: 'c', text: 'C' }])
+
+      expect(multiSelect.getValue()).toEqual([])
+    })
+
+    it('should seed later options from the value setConfig gives last', () => {
       fixtureEl.innerHTML = '<select multiple></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: 'a', text: 'A' }], value: ['a'] })
 
-      multiSelect.setConfig({ options: [{ value: 'a', text: 'A' }, { value: 'x', text: 'X', selected: true }] })
+      multiSelect.setConfig({ value: ['x'] })
+      multiSelect.setOptions([{ value: 'a', text: 'A' }, { value: 'x', text: 'X' }])
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['x'])
     })
