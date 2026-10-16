@@ -4251,6 +4251,24 @@ describe('Autocomplete', () => {
   })
 
   describe('disabled options', () => {
+    it('should disable every option of a disabled group in the list and in the hints', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        showHints: true,
+        options: [
+          { label: 'Closed', disabled: true, options: [{ label: 'Option 1', value: '1' }] },
+          { label: 'Option 2', value: '2' }
+        ]
+      })
+
+      autocomplete._inputElement.value = 'Opt'
+      autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
+
+      expect(autocomplete._optionsElement.querySelector('[data-coreui-value="1"]').getAttribute('aria-disabled')).toBe('true')
+      expect(autocomplete._inputHintElement.value).toBe('Option 2')
+    })
+
     it('should render disabled options with disabled class', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
