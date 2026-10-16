@@ -413,8 +413,8 @@ class ComboboxBase extends BaseComponent {
 
     this._listBoxElement.addEventListener(EVENT_LIST_BOX_CHANGE, this._listBoxChangeHandler)
 
-    EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTION_LIMIT, () => {
-      this._onSelectionLimit()
+    EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTION_LIMIT, (event: any) => {
+      this._onSelectionLimit(event.limit, String(event.value))
     })
   }
 
@@ -424,7 +424,7 @@ class ComboboxBase extends BaseComponent {
 
   _onSelectionChange(): void {}
 
-  _onSelectionLimit(): void {}
+  _onSelectionLimit(limit: number, value: string): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
 
   _projectSelection(values: any[]): void {
     this._listBox?._setSelection(values.map(String))

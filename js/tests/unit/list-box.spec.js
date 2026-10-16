@@ -232,19 +232,18 @@ describe('ListBox', () => {
       expect(listBox.getSelectedValues()).toEqual([])
     })
 
-    it('should take nothing when the first value of a single selection is disabled', () => {
+    it('should take the first value of a single selection even when it is disabled', () => {
       const listBox = new ListBox(setMarkup(), { selected: ['ham', 'tomato'] })
 
-      expect(listBox.getSelectedValues()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual(['ham'])
     })
 
-    it('should not take a disabled option from the selected config', () => {
+    it('should take a disabled option from the selected config, as a native select does', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple', selected: ['ham', 'tomato'] })
 
-      expect(listBox.getSelectedValues()).toEqual(['tomato'])
-      expect(item(el, 'ham')).not.toHaveClass('selected')
-      expect(item(el, 'ham').getAttribute('aria-selected')).toEqual('false')
+      expect(listBox.getSelectedValues()).toEqual(['ham', 'tomato'])
+      expect(item(el, 'ham').getAttribute('aria-selected')).toEqual('true')
     })
 
     it('should toggle, deselect and clear', () => {
@@ -477,6 +476,81 @@ describe('ListBox', () => {
   })
 
   describe('selectionLimit', () => {
+    it('should keep the values it holds past the limit when setItems brings them again', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 1, selected: ['lettuce', 'tomato'] })
+      const changes = []
+
+      el.addEventListener('change.coreui.list-box', () => changes.push(true))
+      listBox.setItems([{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }])
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
+      expect(changes).toEqual([])
+    })
+
+    it('should report the item setItems left out even when a change listener selects', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
+      const reported = []
+
+      listBox.select('lettuce')
+      el.addEventListener('selectionLimit.coreui.list-box', event => reported.push(event.value))
+      el.addEventListener('change.coreui.list-box', () => listBox.select('cheese'), { once: true })
+      listBox.setItems([
+        { value: 'lettuce', label: 'Lettuce' },
+        { value: 'tomato', label: 'Tomato', selected: true },
+        { value: 'onion', label: 'Onion', selected: true },
+        { value: 'cheese', label: 'Cheese' }
+      ])
+
+      expect(reported).toEqual(['cheese', 'onion'])
+    })
+
+    it('should press select all once setItems leaves a selected value off the list and the limit is used up', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple"', null, selectAllMarkup)
+      const listBox = new ListBox(el, { selectionLimit: 2 })
+      const selectAll = el.querySelector('[data-coreui-select-all]')
+
+      listBox.select('lettuce')
+      listBox.select('tomato')
+      listBox.setItems([{ value: 'tomato', label: 'Tomato' }, { value: 'onion', label: 'Onion' }])
+
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('true')
+
+      click(selectAll)
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
+    })
+
+    it('should leave select all unpressed when the values off the screen fill the limit and none on it is selected', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple"', null, selectAllMarkup)
+      const listBox = new ListBox(el, { selectionLimit: 2 })
+
+      listBox.select('lettuce')
+      listBox.select('tomato')
+      item(el, 'lettuce').hidden = true
+      item(el, 'tomato').hidden = true
+      listBox.update()
+
+      expect(el.querySelector('[data-coreui-select-all]').getAttribute('aria-pressed')).toEqual('false')
+    })
+
+    it('should disable select all while no option is left to take', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple"', [
+        '<div class="list-box-option" data-coreui-value="lettuce" hidden>Lettuce</div>',
+        '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>'
+      ], selectAllMarkup)
+      const listBox = new ListBox(el)
+      const selectAll = el.querySelector('[data-coreui-select-all]')
+
+      expect(selectAll.disabled).toBeTrue()
+
+      item(el, 'lettuce').hidden = false
+      listBox.update()
+
+      expect(selectAll.disabled).toBeFalse()
+    })
+
     it('should add marked items from setItems only up to the limit and report the first one left out', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
@@ -1083,16 +1157,16 @@ describe('ListBox', () => {
       expect(empty.hasAttribute('hidden')).toBeFalse()
     })
 
-    it('should keep the empty state hidden while a disabled option is on the screen', () => {
+    it('should show the empty state when only disabled options are left on the screen', () => {
       const el = setMarkup('', [
         '<div class="list-box-option" data-coreui-value="lettuce" hidden>Lettuce</div>',
         '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>',
-        '<div class="list-box-empty">No results</div>'
+        '<div class="list-box-empty" hidden>No results</div>'
       ])
       // eslint-disable-next-line no-new
       new ListBox(el)
 
-      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeTrue()
+      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeFalse()
     })
   })
 
@@ -1194,6 +1268,22 @@ describe('ListBox', () => {
       return fixtureEl.querySelector('.list-box')
     }
 
+    it('should disable every item of a disabled group', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, {
+        items: [
+          { label: 'Meat', disabled: true, items: [{ value: 'ham', label: 'Ham' }] },
+          { value: 'lettuce', label: 'Lettuce' }
+        ]
+      })
+
+      click(item(el, 'ham'))
+
+      expect(item(el, 'ham').getAttribute('aria-disabled')).toEqual('true')
+      expect(listBox.getSelectedValues()).toEqual([])
+      expect(listBox.getItems()[0].disabled).toBeTrue()
+    })
+
     it('should render flat items and create the options element', () => {
       const el = setEmptyMarkup()
       const listBox = new ListBox(el, {
@@ -1274,7 +1364,7 @@ describe('ListBox', () => {
       expect(item(el, 'lettuce').getAttribute('aria-selected')).toEqual('true')
     })
 
-    it('should not take a disabled item into the initial selection', () => {
+    it('should take a disabled item marked selected into the initial selection', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
         items: [
@@ -1285,8 +1375,8 @@ describe('ListBox', () => {
         ]
       })
 
-      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
-      expect(item(el, 'ham')).not.toHaveClass('selected')
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'ham'])
+      expect(item(el, 'ham')).toHaveClass('selected')
     })
 
     it('should replace the markup already present in the options', () => {
@@ -1558,7 +1648,7 @@ describe('ListBox', () => {
       expect(none.getSelectedValues()).toEqual([])
     })
 
-    it('should not take a disabled item into the selection on setItems', () => {
+    it('should take a disabled item marked selected into the selection on setItems', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }] })
 
@@ -1569,7 +1659,7 @@ describe('ListBox', () => {
         }
       ])
 
-      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'ham'])
     })
 
     it('should not fire change when the selection survived the rebuild', () => {
@@ -1928,30 +2018,77 @@ describe('ListBox', () => {
 
     const label = (element, index) => element.querySelectorAll('.list-box-section-label')[index]
 
-    it('should disable a section label with no option to take, and take it out of the tab order', () => {
+    it('should disable a section label with no option to take and keep it out of the tab and arrow-key order', () => {
       const el = setMarkup('', [
+        '<div class="list-box-section">',
+        '<div class="list-box-section-label">Meat</div>',
+        '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>',
+        '</div>',
         '<div class="list-box-section">',
         '<div class="list-box-section-label">Veggies</div>',
         '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
-        '</div>',
+        '</div>'
+      ])
+      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
+      const visited = []
+
+      expect(label(el, 0).getAttribute('aria-disabled')).toEqual('true')
+      expect(label(el, 0).getAttribute('tabindex')).toEqual('-1')
+      expect(label(el, 1).getAttribute('tabindex')).toEqual('0')
+
+      list(el).focus()
+      for (let step = 0; step < 3; step++) {
+        keydown(list(el), 'ArrowDown')
+        visited.push(listBox.getActive())
+      }
+
+      expect(visited).not.toContain(label(el, 0).dataset.coreuiValue)
+
+      item(el, 'ham').classList.remove('disabled')
+      listBox.update()
+      expect(label(el, 0).hasAttribute('aria-disabled')).toBeFalse()
+    })
+
+    it('should keep an aria-disabled the page wrote on a section label', () => {
+      const el = setMarkup('', [
+        '<div class="list-box-section">',
+        '<div class="list-box-section-label" aria-disabled="true">Veggies</div>',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '</div>'
+      ])
+      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
+
+      listBox.update()
+
+      expect(label(el, 0).getAttribute('aria-disabled')).toEqual('true')
+    })
+
+    it('should show the state of the disabled options on the label of a section with nothing to take', () => {
+      const el = setMarkup('', [
         '<div class="list-box-section">',
         '<div class="list-box-section-label">Meat</div>',
         '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>',
         '</div>'
       ])
-      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
+      // eslint-disable-next-line no-new
+      new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true, selected: ['ham'] })
 
-      expect(label(el, 1).getAttribute('aria-disabled')).toEqual('true')
-      expect(label(el, 1).getAttribute('tabindex')).toEqual('-1')
-      expect(label(el, 0).hasAttribute('aria-disabled')).toBeFalse()
+      expect(label(el, 0).getAttribute('aria-pressed')).toEqual('true')
+    })
 
-      item(el, 'lettuce').hidden = true
-      listBox.update()
-      expect(label(el, 0).getAttribute('aria-disabled')).toEqual('true')
+    it('should press a section label once values off the screen use up the limit, and clear its visible values', () => {
+      const el = setSections()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true, selectionLimit: 2 })
 
-      item(el, 'lettuce').hidden = false
-      listBox.update()
-      expect(label(el, 0).hasAttribute('aria-disabled')).toBeFalse()
+      listBox.select('ham')
+      item(el, 'ham').hidden = true
+      listBox.select('lettuce')
+
+      expect(label(el, 0).getAttribute('aria-pressed')).toEqual('true')
+
+      click(label(el, 0))
+
+      expect(listBox.getSelectedValues()).toEqual(['ham'])
     })
 
     it('should turn the section label into a tri-state button', () => {

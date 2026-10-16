@@ -539,7 +539,7 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `disabled` | boolean | `false` | Turns the control off: the panel never opens and the list box is disabled. The combobox sets the `.disabled` class and, on a button toggle, the `disabled` attribute from it. |
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option. |
-| `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. Replaces whatever the panel already holds. |
+| `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever the panel already holds. |
 | `multiple` | boolean | `false` | Toggles options instead of replacing the selection, and keeps the panel open. |
 | `name` | string, null | `null` | Name of the hidden select the value is submitted under, inserted right before the toggle. With `multiple` it posts one key per value, as a `<select multiple>` does: `tags=a&tags=b&tags=c`. Without a name the combobox is not submitted with the form. |
 | `placeholder` | string | `''` | Text shown in the toggle while nothing is selected. |
@@ -583,6 +583,7 @@ Events fire on the toggle button.
 | `hidden.coreui.combobox` | Fired when the panel has been hidden. |
 | `hide.coreui.combobox` | Fires immediately when `hide` is called. |
 | `search.coreui.combobox` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setItems()`. |
+| `selectionLimit.coreui.combobox` | Fired when a pick is refused because `selectionLimit` is reached; `event.limit` is the limit and `event.value` the value that did not fit. |
 | `show.coreui.combobox` | Fires immediately when `show` is called. |
 | `shown.coreui.combobox` | Fired when the panel has been made visible. |
 

@@ -96,7 +96,7 @@ A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the
     </div>
   </div>`} />
 
-"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the button take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides which values a second click drops, so a value the filter hid stays selected. The button reads as pressed once that set is selected, or once `selectionLimit` has no room left for it, values the filter hid counted too; a click then drops the visible values. Pass an explicit list to `selectAll(values)` to select beyond the filter, and call `clear()` to empty the selection whatever the filter shows.
+"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the button take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides which values a second click drops, so a value the filter hid stays selected. The button reads as pressed once that set is selected, or once the values of it you selected fill what `selectionLimit` leaves after the values the filter hid; a click then drops the visible values. With nothing in the set, the button is disabled. Pass an explicit list to `selectAll(values)` to select beyond the filter, and call `clear()` to empty the selection whatever the filter shows.
 
 ### Selection limit
 
@@ -260,7 +260,7 @@ Group options in a `.list-box-section` and name it with a `.list-box-section-lab
 
 ### Selectable sections
 
-`sectionsSelectable` turns every section label into a tri-state button that toggles its own section: `aria-pressed` reads `false`, `mixed` or `true`, and with `indicator: 'checkbox'` the label carries the same checkbox as the options. It works in `multiple` mode and covers the section's visible, enabled options only, so a filtered list toggles what is on screen; `selectionLimit` still applies. A label whose section has no such option carries `aria-disabled="true"` and leaves the arrow-key order. The labels join the arrow-key order in document position, so <kbd>↓</kbd> walks label, options, next label.
+`sectionsSelectable` turns every section label into a tri-state button that toggles its own section: `aria-pressed` reads `false`, `mixed` or `true`, and with `indicator: 'checkbox'` the label carries the same checkbox as the options. It works in `multiple` mode and covers the section's visible, enabled options only, so a filtered list toggles what is on screen; `selectionLimit` still applies, with the same reading as the select-all button. A label whose section has no such option carries `aria-disabled="true"`, leaves the arrow-key order and shows the state of the section's disabled options. The labels join the arrow-key order in document position, so <kbd>↓</kbd> walks label, options, next label.
 
 <Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple" data-coreui-sections-selectable="true" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
@@ -330,7 +330,7 @@ An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</
 
 ## Disabled items
 
-`.disabled` (with `aria-disabled="true"` for assistive technology) takes an option out of the keyboard order and out of every selection method. The initial selection is one of them: a disabled value passed in `selected`, or an item carrying both `disabled` and `selected`, is dropped. A value that is already selected when `setItems()` brings it back disabled stays selected, like a selected option a native `<select>` disables, and comes off with `deselect()` or `clear()`. `data-coreui-disabled="true"` on the list box does the same for all of it: `aria-disabled` lands on the options element and the select-all button is disabled.
+`.disabled` (with `aria-disabled="true"` for assistive technology) keeps the user out: it takes an option out of the keyboard order and out of every selection the user makes, the arrows, a click, a section label, a range and select all. Your code is not kept out, as with a native `<select>`: a disabled value passed in `selected`, an item carrying both `disabled` and `selected`, and a value that is already selected when `setItems()` brings it back disabled are selected and read as selected, and come off with `deselect()` or `clear()`. `data-coreui-disabled="true"` on the list box does the same for all of it: `aria-disabled` lands on the options element and the select-all button is disabled.
 
 <Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
@@ -342,7 +342,7 @@ An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</
 
 ## Empty state
 
-A `.list-box-empty` element inside the options is shown whenever no option is left on the screen and hidden as soon as one is, a disabled one included, so filtering a list has somewhere to land. `update()` re-evaluates it.
+A `.list-box-empty` element inside the options is shown whenever nothing is left to navigate and hidden as soon as something is, so filtering a list has somewhere to land. `update()` re-evaluates it.
 
 <Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Results">
@@ -435,7 +435,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `disabled` | boolean | `false` | Turns the whole list box off: `aria-disabled` on `.list-box-options` and the select-all button disabled. |
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and marks the container with `data-coreui-indicator="checkbox"`, which is what lays the options out in two columns. |
-| `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. Replaces whatever `.list-box-options` already holds. |
+| `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever `.list-box-options` already holds. |
 | `loading` | boolean | `false` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. |
 | `resetSelectionOnItemsChange` | boolean | `false` | Empties the selection when `setItems()` brings items with different values, then takes the items marked `selected`. For a list that depends on another field. |
 | `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`. |

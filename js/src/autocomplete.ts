@@ -794,10 +794,6 @@ class Autocomplete extends ComboboxBase {
   }
 
   _applySelection(option: any): void {
-    if (option.disabled) {
-      return
-    }
-
     this.deselectAll()
     this._selected.push(option)
     this._projectSelection(this._selected.map((option: any) => option.value))

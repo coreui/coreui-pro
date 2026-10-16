@@ -2683,6 +2683,21 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue()).toEqual([])
     })
 
+    it('should read a value listed twice from its first option in selectAll', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [
+          { value: 'a', text: 'A' },
+          { label: 'Closed', disabled: true, options: [{ value: 'a', text: 'A2' }] },
+          { value: 'b', text: 'B' }
+        ]
+      })
+
+      multiSelect.selectAll()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b'])
+    })
+
     it('should skip a disabled group nested in another group', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -5595,6 +5610,22 @@ describe('MultiSelect', () => {
       expect(multiSelect._menu.querySelector('[data-coreui-value="1"]').getAttribute('aria-selected')).toEqual('true')
     })
 
+    it('should report the limit once when a group label reaches it with a value the options no longer carry', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { selectionLimit: 2, optionsGroupsSelectable: true })
+      const limits = []
+
+      multiSelect.setOptions([{ label: 'G', options: [{ value: 'b', text: 'B' }, { value: 'c', text: 'C' }, { value: 'd', text: 'D' }] }])
+      multiSelect.setConfig({ placeholder: 'Pick' })
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', () => limits.push(true))
+      multiSelect.show()
+      multiSelect._menu.querySelector('.list-box-section-label').click()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b'])
+      expect(limits).toHaveSize(1)
+    })
+
     it('should count a selected value the options no longer carry against the limit in the list', () => {
       fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b">B</option><option value="c">C</option></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -6076,9 +6107,13 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { selectionLimit: 1 })
 
+      const native = []
+
       selectEl.addEventListener('change.coreui.multi-select', () => multiSelect.dispose(), { once: true })
+      selectEl.addEventListener('change', () => native.push('change'))
 
       expect(() => multiSelect.selectAll()).not.toThrow()
+      expect(native).toEqual(['change'])
     })
 
     it('should let a change listener dispose the component when Backspace removes the last chip', () => {
@@ -6098,6 +6133,16 @@ describe('MultiSelect', () => {
       window.removeEventListener('error', onError)
 
       expect(errors).toEqual([])
+    })
+
+    it('should let a change listener dispose the component during setOptions()', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { search: 'external', options: [], value: ['a'] })
+
+      selectEl.addEventListener('change.coreui.multi-select', () => multiSelect.dispose(), { once: true })
+
+      expect(() => multiSelect.setOptions([{ value: 'a', text: 'A' }])).not.toThrow()
     })
 
     it('should let a native change listener dispose the component', () => {
@@ -6258,16 +6303,45 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
     })
 
-    it('should keep the reset snapshot apart from the selection the options relabel', async () => {
-      fixtureEl.innerHTML = '<form><select multiple name="tech"><option value="a" selected>Angular</option></select></form>'
-      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external' })
+    it('should bring a start value the options delivered later back on a form reset after a pick in single mode', async () => {
+      fixtureEl.innerHTML = '<form><select name="tech"></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        multiple: false,
+        search: 'external',
+        options: [{ value: 'a', text: 'A' }, { value: 'b', text: 'B' }],
+        value: 'x'
+      })
 
-      multiSelect.setOptions([{ value: 'a', text: 'Angular 20', disabled: true }])
-      multiSelect.setOptions([{ value: 'r', text: 'React' }])
+      multiSelect.selectAll([{ value: 'a', text: 'A' }])
+      multiSelect.setOptions([{ value: 'x', text: 'X' }, { value: 'y', text: 'Y' }])
       fixtureEl.querySelector('form').reset()
       await new Promise(resolve => {
         setTimeout(resolve)
       })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['x'])
+    })
+
+    it('should keep the reset snapshot apart from the selection the options relabel', async () => {
+      fixtureEl.innerHTML = '<form><select multiple name="tech"><option value="a" selected>Angular</option></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external' })
+
+      const reset = async () => {
+        fixtureEl.querySelector('form').reset()
+        await new Promise(resolve => {
+          setTimeout(resolve)
+        })
+      }
+
+      multiSelect.setOptions([{ value: 'a', text: 'Angular 20', disabled: true }])
+      multiSelect.setOptions([{ value: 'r', text: 'React' }])
+      await reset()
+
+      expect(multiSelect.getValue()).toEqual([{ value: 'a', text: 'Angular' }])
+
+      multiSelect.setOptions([{ value: 'a', text: 'Angular 21' }])
+      multiSelect.setOptions([{ value: 'r', text: 'React' }])
+      await reset()
 
       expect(multiSelect.getValue()).toEqual([{ value: 'a', text: 'Angular' }])
     })

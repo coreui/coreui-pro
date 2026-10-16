@@ -496,8 +496,8 @@ class MultiSelect extends ComboboxBase {
 
     const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
     const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || [...values].some(value => !previous.has(value)))
-    const seeded = this._startValues && (this._config.multiple || selected.length === 0) ? this._selected.filter((option: any) => !seen.has(option.value)) : []
-    const next = reset ? this._selected : [...selected, ...seeded]
+    const seeded = this._startValues ? this._selected.filter((option: any) => !seen.has(option.value)) : []
+    const next = reset ? this._selected : [...selected, ...(this._config.multiple || selected.length === 0 ? seeded : [])]
 
     this._selected = selected
     this._initialSelection = this._fit([...this._initialSelection, ...seeded.map((option: any) => ({ ...option }))])
@@ -506,6 +506,10 @@ class MultiSelect extends ComboboxBase {
     this._listBox?.setItems(this._getListBoxItems())
     this._filterOptionsList()
     this._commit(next)
+
+    if (!this._config) {
+      return
+    }
 
     const focused = (this._menu.getRootNode() as Document | ShadowRoot).activeElement
 
@@ -1283,7 +1287,11 @@ class MultiSelect extends ComboboxBase {
   }
 
   _lockedValues(): Set<string> {
-    return new Set(flattenOptions(this._options).filter((option: any) => option.disabled).map((option: any) => String(option.value)))
+    return new Set([...this._listedOptions()].filter(([, option]) => option.disabled).map(([value]) => value))
+  }
+
+  _listedOptions(): Map<string, any> {
+    return new Map(flattenOptions(this._options).toReversed().map((option: any) => [String(option.value), option]))
   }
 
   _enabledOptions(options: any[], locked: Set<string> = this._lockedValues()): any[] {
@@ -1368,7 +1376,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   _render(): void {
-    const options = new Map(flattenOptions(this._options).toReversed().map((option: any) => [String(option.value), option]))
+    const options = this._listedOptions()
 
     for (const option of this._selected) {
       const listed = options.get(option.value)

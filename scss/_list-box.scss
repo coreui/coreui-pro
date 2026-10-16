@@ -151,6 +151,12 @@ $list-box-tokens: defaults(
       background-color: var(--#{$prefix}list-box-option-hover-bg);
     }
 
+    &[aria-disabled="true"] {
+      color: var(--#{$prefix}list-box-option-disabled-color);
+      pointer-events: none;
+      background-color: transparent;
+    }
+
     &:focus-visible {
       z-index: 5;
       @include focus-ring(true);
@@ -269,6 +275,7 @@ $list-box-tokens: defaults(
   }
 
   .disabled > .list-box-option-indicator,
+  [aria-disabled="true"] > .list-box-option-indicator,
   :disabled > .list-box-option-indicator {
     opacity: var(--#{$prefix}check-disabled-opacity);
   }

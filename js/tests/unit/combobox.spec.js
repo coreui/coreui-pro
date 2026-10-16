@@ -537,6 +537,40 @@ describe('Combobox', () => {
       expect(value(toggle)).toEqual('NYC metro')
     })
 
+    it('should take a disabled option from value and bring it back on a form reset', async () => {
+      fixtureEl.innerHTML = '<form><button class="form-control" type="button"></button></form>'
+      const toggle = fixtureEl.querySelector('button')
+      const combobox = new Combobox(toggle, {
+        items: [{ value: 'a', label: 'A' }, { value: 'd', label: 'D', disabled: true }],
+        value: 'd'
+      })
+
+      expect(combobox.getValue()).toEqual('d')
+
+      combobox.setValue('a')
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(combobox.getValue()).toEqual('d')
+    })
+
+    it('should disable every item of a disabled group', () => {
+      fixtureEl.innerHTML = '<button class="form-control" type="button"></button>'
+      const toggle = fixtureEl.querySelector('button')
+      const combobox = new Combobox(toggle, {
+        multiple: true,
+        items: [{ label: 'Closed', disabled: true, items: [{ value: 'a', label: 'A' }] }, { value: 'b', label: 'B' }]
+      })
+
+      combobox.show()
+      menu(combobox).querySelector('[data-coreui-value="a"]').click()
+
+      expect(menu(combobox).querySelector('[data-coreui-value="a"]').getAttribute('aria-disabled')).toEqual('true')
+      expect(combobox.getValue()).toEqual([])
+    })
+
     it('should take a numeric value attribute', () => {
       const options = [
         '<div class="list-box-option" data-coreui-value="123">Order 123</div>',
@@ -1285,6 +1319,20 @@ describe('Combobox', () => {
       combobox.hide()
 
       expect(fired).toEqual(['show', 'shown', 'hide', 'hidden'])
+    })
+
+    it('should fire selectionLimit with the limit and the value that did not fit', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true, selectionLimit: 1 })
+      const reported = []
+
+      toggle.addEventListener('selectionLimit.coreui.combobox', event => reported.push([event.limit, event.value]))
+      combobox.show()
+      menu(combobox).querySelector('[data-coreui-value="us"]').click()
+      menu(combobox).querySelector('[data-coreui-value="uk"]').click()
+
+      expect(combobox.getValue()).toEqual(['us'])
+      expect(reported).toEqual([[1, 'uk']])
     })
 
     it('should fire change with the value', () => {

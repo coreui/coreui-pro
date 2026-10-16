@@ -43,6 +43,7 @@ const RIGHT_MOUSE_BUTTON = 2
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
+const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
@@ -622,6 +623,10 @@ class Combobox extends ComboboxBase {
       this.hide()
       this._element.focus()
     }
+  }
+
+  override _onSelectionLimit(limit: number, value: string): void {
+    EventHandler.trigger(this._element, EVENT_SELECTION_LIMIT, { limit, value })
   }
 
   _restoreValue(): void {
