@@ -339,7 +339,7 @@ class ChipInput extends ChipSet {
         }
       }
 
-      if (event.key.length === 1) {
+      if (event.key?.length === 1) {
         this._input.focus()
       }
     })

@@ -1,5 +1,7 @@
 import SearchButton from '../../src/search-button.js'
-import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+import {
+  captureErrors, clearFixture, getFixture, jQueryMock
+} from '../helpers/fixture.js'
 
 describe('SearchButton', () => {
   let fixtureEl
@@ -564,6 +566,23 @@ describe('SearchButton', () => {
 
         expect(keyboardEvent.defaultPrevented).toBeTrue()
       })
+    })
+
+    it('should ignore key events without a key on the document, as autofill sends them', () => {
+      fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
+
+      const buttonEl = fixtureEl.querySelector('button')
+      new SearchButton(buttonEl) // eslint-disable-line no-new
+      const spy = jasmine.createSpy('trigger')
+      buttonEl.addEventListener('trigger.coreui.search-button', spy)
+
+      const errors = captureErrors(() => {
+        buttonEl.dispatchEvent(new Event('keydown', { bubbles: true }))
+        buttonEl.dispatchEvent(new Event('keyup', { bubbles: true }))
+      })
+
+      expect(errors).toEqual([])
+      expect(spy).not.toHaveBeenCalled()
     })
   })
 

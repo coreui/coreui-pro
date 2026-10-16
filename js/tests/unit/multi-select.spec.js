@@ -7,7 +7,7 @@ import Form from '../../src/form.js'
 import MultiSelect from '../../src/multi-select.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import {
-  getFixture, clearFixture, jQueryMock
+  captureErrors, getFixture, clearFixture, jQueryMock
 } from '../helpers/fixture.js'
 
 describe('MultiSelect', () => {
@@ -4437,6 +4437,73 @@ describe('MultiSelect', () => {
   })
 
   describe('keyboard navigation', () => {
+    it('should ignore keydown events without a key, as autofill sends them', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }],
+        search: true
+      })
+
+      multiSelect.show()
+
+      const targets = [multiSelect._wrapperElement, multiSelect._menu, selectEl, multiSelect._searchElement]
+      const errors = captureErrors(() => {
+        for (const target of targets) {
+          target.dispatchEvent(new Event('keydown', { bubbles: true }))
+        }
+      })
+
+      expect(errors).toEqual([])
+    })
+
+    it('should ignore a keydown without a key in the option list with typeahead', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }]
+      })
+
+      multiSelect.show()
+
+      const target = multiSelect._listBox._field ?? multiSelect._listBox._list
+      const errors = captureErrors(() => {
+        target.dispatchEvent(new Event('keydown', { bubbles: true }))
+      })
+
+      expect(errors).toEqual([])
+    })
+
+    it('should ignore a keydown without a key in the search field while closed', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }],
+        search: true
+      })
+
+      const errors = captureErrors(() => {
+        multiSelect._searchElement.dispatchEvent(new Event('keydown', { bubbles: true }))
+      })
+
+      expect(errors).toEqual([])
+      expect(multiSelect._isShown()).toBe(false)
+    })
+
+    it('should not prevent the default of a keydown without a key on the native select', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      new MultiSelect(selectEl, { // eslint-disable-line no-new
+        options: [{ value: '1', text: 'Option 1' }],
+        search: true
+      })
+
+      const event = new Event('keydown', { bubbles: true, cancelable: true })
+      selectEl.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBe(false)
+    })
+
     it('should open dropdown on Enter key on toggler', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

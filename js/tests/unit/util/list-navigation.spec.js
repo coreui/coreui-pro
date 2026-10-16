@@ -35,6 +35,15 @@ describe('List navigation utilities', () => {
       expect(buffer.push('a')).toBe('ba')
     })
 
+    it('should ignore a key event without a key', () => {
+      const buffer = createTypeaheadBuffer()
+
+      buffer.push('b')
+
+      expect(buffer.push(undefined)).toBeNull()
+      expect(buffer.push('a')).toBe('ba')
+    })
+
     it('should empty the text once no character comes for the timeout', () => {
       vi.useFakeTimers()
       const buffer = createTypeaheadBuffer(300)

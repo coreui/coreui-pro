@@ -3,7 +3,7 @@ import ChipInput from '../../src/chip-input.js'
 import Chip from '../../src/chip.js'
 import ChipSet from '../../src/chip-set.js'
 import { updateValidationState } from '../../src/util/form-validation.js'
-import { clearFixture, getFixture } from '../helpers/fixture.js'
+import { captureErrors, clearFixture, getFixture } from '../helpers/fixture.js'
 
 describe('ChipInput', () => {
   let fixtureEl
@@ -1842,6 +1842,25 @@ describe('ChipInput', () => {
       expect(document.activeElement).toEqual(input)
 
       document.documentElement.dir = ''
+    })
+
+    it('should ignore a keydown without a key on a chip, as autofill sends it', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+
+      chipInput.add('React')
+
+      const chip = el.querySelector('.chip')
+      chip.focus()
+
+      const errors = captureErrors(() => {
+        chip.dispatchEvent(new Event('keydown', { bubbles: true }))
+      })
+
+      expect(errors).toEqual([])
+      expect(document.activeElement).toEqual(chip)
     })
   })
 })

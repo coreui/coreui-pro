@@ -709,7 +709,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._nativeKeydownHandler = (event: any) => {
-      if (event.key === TAB_KEY || event.key === ESCAPE_KEY) {
+      if (!event.key || event.key === TAB_KEY || event.key === ESCAPE_KEY) {
         return
       }
 
@@ -759,7 +759,7 @@ class MultiSelect extends ComboboxBase {
     })
 
     EventHandler.on(this._searchElement, EVENT_KEYDOWN, (event: any) => {
-      if ((!this._isShown() && event.key.length === 1 && !event.ctrlKey && !event.metaKey) || event.key === ARROW_DOWN_KEY) {
+      if ((!this._isShown() && event.key?.length === 1 && !event.ctrlKey && !event.metaKey) || event.key === ARROW_DOWN_KEY) {
         this.show()
       }
 
