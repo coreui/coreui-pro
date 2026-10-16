@@ -1,5 +1,5 @@
 import {
-  filterOptionTree, findOptionByLabel, findOptionByValue, flattenOptions, getOptionLabel, getOptionValue, getSelectableOptions, highlightMatches,
+  disableGroupOptions, filterOptionTree, findOptionByLabel, findOptionByValue, flattenOptions, getOptionLabel, getOptionValue, getSelectableOptions, highlightMatches,
   isOptionDisabled, isOptionGroup, normalizeSearchText
 } from '../../../src/util/option-tree.js'
 
@@ -32,6 +32,22 @@ describe('Option tree utilities', () => {
       expect(flattenOptions(options).map(getOptionLabel)).toEqual(['Plain', 'Option 1', 'Option 2', 'Option 3', 'Deep'])
       expect(flattenOptions([])).toEqual([])
       expect(flattenOptions([{ label: 'Empty', options: [] }, 'A'])).toEqual(['A'])
+    })
+  })
+
+  describe('disableGroupOptions', () => {
+    it('should pass the flag of a disabled group down to its options at any depth', () => {
+      const tree = disableGroupOptions([
+        'Plain',
+        { label: 'Closed', disabled: true, options: ['A', { label: 'B', value: 'b' }, { label: 'Inner', options: [{ label: 'C', value: 'c' }] }] },
+        { label: 'Open', options: [{ label: 'D', value: 'd' }] }
+      ])
+
+      expect(tree[0]).toBe('Plain')
+      expect(tree[1].options[0]).toEqual({ label: 'A', value: 'A', disabled: true })
+      expect(tree[1].options[1]).toEqual({ label: 'B', value: 'b', disabled: true })
+      expect(tree[1].options[2].options[0].disabled).toBeTrue()
+      expect(tree[2].options[0]).toEqual({ label: 'D', value: 'd' })
     })
   })
 
