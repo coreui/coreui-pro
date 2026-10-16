@@ -1281,10 +1281,14 @@ class MultiSelect extends ComboboxBase {
     this._triggerSelectionLimit()
   }
 
-  _enabledOptions(options: any[]): any[] {
+  _lockedValues(): Set<string> {
+    return new Set(flattenOptions(this._options).filter((option: any) => option.disabled).map((option: any) => String(option.value)))
+  }
+
+  _enabledOptions(options: any[], locked: Set<string> = this._lockedValues()): any[] {
     return options
-      .filter(option => !option.disabled)
-      .flatMap(option => (isOptionGroup(option) ? this._enabledOptions(option.options) : [option]))
+      .filter(option => !option.disabled && !locked.has(String(option.value)))
+      .flatMap(option => (isOptionGroup(option) ? this._enabledOptions(option.options, locked) : [option]))
   }
 
   _selectUpToLimit(options: any[]): void {

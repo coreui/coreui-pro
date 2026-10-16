@@ -2655,6 +2655,19 @@ describe('MultiSelect', () => {
       expect(changeCount).toBe(1)
     })
 
+    it('should skip the options of a disabled group handed over on their own', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const options = [
+        { label: 'Group 1', disabled: true, options: [{ value: '1', text: 'Option 1' }] },
+        { value: '2', text: 'Option 2' }
+      ]
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options })
+
+      multiSelect.selectAll(options[0].options)
+
+      expect(multiSelect.getValue()).toEqual([])
+    })
+
     it('should skip a disabled group nested in another group', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
