@@ -1002,6 +1002,18 @@ class ListBox extends BaseComponent {
     return true
   }
 
+  _setSelection(values: string[]): void {
+    const options = new Map(this._allOptions().map(option => [this._optionValue(option), option]))
+    const next = toSelectionValues([...new Set(values)], this._config.selectionMode as SelectionMode)
+      .filter(value => this._selected.has(value) || (options.has(value) && !this._isDisabled(options.get(value)!)))
+    const limited = next.slice(0, this._selectionLimit() ?? next.length)
+
+    if (limited.join('\u0000') !== this.getSelectedValues().join('\u0000')) {
+      this._selected = new Set(limited)
+      this.update()
+    }
+  }
+
   _removeSelection(value: string): void {
     this._selected.delete(value)
     this.update()

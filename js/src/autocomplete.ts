@@ -338,9 +338,7 @@ class Autocomplete extends ComboboxBase {
     this._setListBoxItems()
     this._syncInputName()
 
-    for (const option of this._selected) {
-      this._syncOptionElementState(option.value, true)
-    }
+    this._projectSelection(this._selected.map((option: any) => option.value))
 
     if (config?.value !== undefined) {
       this._valueApplied = false
@@ -802,15 +800,14 @@ class Autocomplete extends ComboboxBase {
 
     this.deselectAll()
     this._selected.push(option)
-    this._syncOptionElementState(option.value, true)
+    this._projectSelection(this._selected.map((option: any) => option.value))
     this._setText(option.label)
     this._updateCleaner()
   }
 
   _deselectOption(value: any): void {
     this._selected = this._selected.filter((option: any) => option.value !== value)
-
-    this._syncOptionElementState(value, false)
+    this._projectSelection(this._selected.map((option: any) => option.value))
   }
 
   _findHintOption(text: string): any {

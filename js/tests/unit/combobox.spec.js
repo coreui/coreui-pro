@@ -987,6 +987,39 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toEqual(['uk', 'us'])
     })
 
+    it('should take the values setValue gives in their order up to the selection limit', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true, selectionLimit: 2 })
+
+      combobox.setValue(['us', 'ca'])
+      combobox.setValue(['us', 'uk', 'ca'])
+
+      expect(combobox.getValue()).toEqual(['us', 'uk'])
+    })
+
+    it('should not send list box events from setValue', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true })
+      const events = []
+      const listener = event => events.push(event.type)
+
+      combobox.setValue(['us'])
+      combobox.show()
+
+      for (const name of ['select', 'selected', 'deselect', 'deselected', 'change']) {
+        document.addEventListener(`${name}.coreui.list-box`, listener)
+      }
+
+      combobox.setValue(['uk', 'ca'])
+
+      for (const name of ['select', 'selected', 'deselect', 'deselected', 'change']) {
+        document.removeEventListener(`${name}.coreui.list-box`, listener)
+      }
+
+      expect(combobox.getValue()).toEqual(['uk', 'ca'])
+      expect(events).toEqual([])
+    })
+
     it('should keep a held value that comes back disabled when setValue reorders it', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { multiple: true })

@@ -57,7 +57,6 @@ class ComboboxBase extends BaseComponent {
   protected declare _selected: any
   protected declare _options: any[]
   protected declare _search: any
-  protected declare _syncing: boolean
   protected declare _floatingCleanup: (() => void) | null
   protected declare _widthObserver: ResizeObserver | null
   protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
@@ -284,7 +283,6 @@ class ComboboxBase extends BaseComponent {
 
     this._optionsElement = optionsDiv
     this._menu = popupDiv
-    this._syncing = false
 
     this._listBox = new ListBox(listBoxDiv, this._getListBoxConfig())
     this._addListBoxListeners()
@@ -402,31 +400,21 @@ class ComboboxBase extends BaseComponent {
 
   _addListBoxListeners(): void {
     EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTED, (event: any) => {
-      if (!this._syncing) {
-        this._onOptionSelected(String(event.value))
-      }
+      this._onOptionSelected(String(event.value))
     })
 
     EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_DESELECTED, (event: any) => {
-      if (!this._syncing) {
-        this._onOptionDeselected(String(event.value))
-      }
+      this._onOptionDeselected(String(event.value))
     })
 
     // `change` is a native event name, so EventHandler registers the listener
     // under the bare type while the list dispatches the namespaced one.
-    this._listBoxChangeHandler = () => {
-      if (!this._syncing) {
-        this._onSelectionChange()
-      }
-    }
+    this._listBoxChangeHandler = () => this._onSelectionChange()
 
     this._listBoxElement.addEventListener(EVENT_LIST_BOX_CHANGE, this._listBoxChangeHandler)
 
     EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTION_LIMIT, () => {
-      if (!this._syncing) {
-        this._onSelectionLimit()
-      }
+      this._onSelectionLimit()
     })
   }
 
@@ -438,21 +426,8 @@ class ComboboxBase extends BaseComponent {
 
   _onSelectionLimit(): void {}
 
-  // Reflect the model's state on the list without the list reporting it back.
-  _syncOptionElementState(value: any, selected: boolean): void {
-    if (!this._listBox) {
-      return
-    }
-
-    this._syncing = true
-
-    if (selected) {
-      this._listBox.select(String(value))
-    } else {
-      this._listBox.deselect(String(value))
-    }
-
-    this._syncing = false
+  _projectSelection(values: any[]): void {
+    this._listBox?._setSelection(values.map(String))
   }
 
   // Option model

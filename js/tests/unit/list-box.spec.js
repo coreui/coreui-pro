@@ -423,6 +423,60 @@ describe('ListBox', () => {
     })
   })
 
+  describe('_setSelection', () => {
+    it('should replace the selection in the given order without selection events', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple' })
+      const events = []
+
+      listBox.select('lettuce')
+
+      for (const name of ['select', 'selected', 'deselect', 'deselected', 'change']) {
+        el.addEventListener(`${name}.coreui.list-box`, () => events.push(name))
+      }
+
+      listBox._setSelection(['cheese', 'tomato'])
+
+      expect(listBox.getSelectedValues()).toEqual(['cheese', 'tomato'])
+      expect(item(el, 'lettuce')).not.toHaveClass('selected')
+      expect(item(el, 'cheese').getAttribute('aria-selected')).toEqual('true')
+      expect(events).toEqual([])
+    })
+
+    it('should skip a disabled or missing value unless it is already selected', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple' })
+
+      listBox.select('tomato')
+      item(el, 'tomato').classList.add('disabled')
+      listBox._setSelection(['ham', 'bacon', 'tomato', 'onion'])
+
+      expect(listBox.getSelectedValues()).toEqual(['tomato', 'onion'])
+    })
+
+    it('should stop at the selection limit and keep one value in single mode', () => {
+      const limited = new ListBox(setMarkup(), { selectionMode: 'multiple', selectionLimit: 2 })
+
+      limited._setSelection(['lettuce', 'tomato', 'onion'])
+      expect(limited.getSelectedValues()).toEqual(['lettuce', 'tomato'])
+
+      const single = new ListBox(setMarkup())
+
+      single._setSelection(['lettuce', 'tomato'])
+      expect(single.getSelectedValues()).toEqual(['lettuce'])
+    })
+
+    it('should not redraw the list when the selection stays the same', () => {
+      const listBox = new ListBox(setMarkup(), { selectionMode: 'multiple' })
+
+      listBox.select('lettuce')
+      const update = spyOn(listBox, 'update').and.callThrough()
+      listBox._setSelection(['lettuce'])
+
+      expect(update).not.toHaveBeenCalled()
+    })
+  })
+
   describe('selectionLimit', () => {
     it('stops selecting at the selection limit and reports it', () => {
       const el = setMarkup()

@@ -568,7 +568,7 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `hide` | Closes the panel. |
 | `setConfig(config)` | Changes the validation state: `setConfig({ validationState })`. Other options are ignored for now. See [Validation](#validation). |
 | `setItems(items)` | Rebuilds the list from an `items` array. The value stays, also when the new items no longer carry it, and the toggle keeps the label it had; items marked `selected` join a multiple value, or a single one that is empty. With `resetSelectionOnItemsChange` new values drop the value first. |
-| `setValue(value)` | Replaces the selection with `value` (a string, an array, or `null` to empty it). |
+| `setValue(value)` | Replaces the selection with `value` (a string, an array, or `null` to empty it), in the order given and up to `selectionLimit`. |
 | `show` | Opens the panel. |
 | `toggle` | Opens the panel, or closes it when it is open. |
 | `update` | Re-reads the panel: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, and the toggle text is read again. |

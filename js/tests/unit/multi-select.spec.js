@@ -5507,11 +5507,12 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
 
       multiSelect.show()
-      const sync = spyOn(multiSelect, '_syncOptionElementState').and.callThrough()
       multiSelect._menu.querySelector('[data-coreui-value="3"]').click()
+      const update = spyOn(multiSelect._listBox, 'update').and.callThrough()
+      multiSelect._render()
 
       expect(multiSelect.getValue()).toHaveSize(3)
-      expect(sync).not.toHaveBeenCalled()
+      expect(update).not.toHaveBeenCalled()
     })
 
     it('should report the limit once when a range in the list stops at it', () => {
@@ -5548,6 +5549,29 @@ describe('MultiSelect', () => {
   })
 
   describe('setConfig', () => {
+    it('should not send list box events when the page changes the selection', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="1" selected>One</option><option value="2">Two</option><option value="3">Three</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
+      const events = []
+      const listener = event => events.push(event.type)
+
+      multiSelect.show()
+
+      for (const name of ['select', 'selected', 'deselect', 'deselected', 'change']) {
+        document.addEventListener(`${name}.coreui.list-box`, listener)
+      }
+
+      multiSelect.selectAll()
+      multiSelect.deselectAll()
+
+      for (const name of ['select', 'selected', 'deselect', 'deselected', 'change']) {
+        document.removeEventListener(`${name}.coreui.list-box`, listener)
+      }
+
+      expect(multiSelect.getValue()).toEqual([])
+      expect(events).toEqual([])
+    })
+
     it('should pick nothing when it turns an empty single select with a placeholder into a multiple one', () => {
       fixtureEl.innerHTML = '<select><option value="" disabled selected>Choose</option><option value="a">A</option><option value="b">B</option></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false })
