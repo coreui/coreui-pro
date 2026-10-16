@@ -71,6 +71,20 @@ export const getSelectionState = (selected: number, total: number, limit?: numbe
 }
 
 /**
+ * Tells how much of a scope of options is selected when values outside the scope, hidden by a
+ * filter or missing from the current options, count against the same selection limit: the scope
+ * reads `'all'` once its selected options fill what the limit leaves after those values.
+ *
+ * @param selected - How many options of the scope are selected
+ * @param total - How many options the scope holds
+ * @param selectedOverall - How many values are selected in all, the scope included
+ * @param limit - The selection limit, `null` or left out for none
+ * @returns The state of the selection within the scope
+ */
+export const getScopeSelectionState = (selected: number, total: number, selectedOverall: number, limit?: number | null): SelectionState =>
+  getSelectionState(selected, total, limit === null || limit === undefined ? null : limit - selectedOverall + selected)
+
+/**
  * Gives the `aria-pressed` value of a control that selects a whole set, such as a select-all
  * button or a selectable section label.
  *

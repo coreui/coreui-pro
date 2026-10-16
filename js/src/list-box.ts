@@ -17,8 +17,8 @@ import {
   type CountLabel,
   fillSelection,
   getAriaPressed,
+  getScopeSelectionState,
   getSelectionLimit,
-  getSelectionState,
   isSelectionLimitReached,
   resolveCountLabel,
   type SelectionMode,
@@ -921,9 +921,8 @@ class ListBox extends BaseComponent {
 
   _scopeState(options: HTMLElement[]): SelectionState {
     const selected = options.filter(option => this._selected.has(this._optionValue(option))).length
-    const limit = this._selectionLimit()
 
-    return getSelectionState(selected, options.length, limit === null ? null : limit - this._selected.size + selected)
+    return getScopeSelectionState(selected, options.length, this._selected.size, this._selectionLimit())
   }
 
   _showSelectionState(element: HTMLElement, state: SelectionState): void {

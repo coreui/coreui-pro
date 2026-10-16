@@ -19,7 +19,7 @@ import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { isTypingKey } from './util/list-navigation.js'
 import { flattenOptions, isOptionGroup } from './util/option-tree.js'
 import {
-  type CountLabel, fillSelection, getAriaPressed, getSelectionLimit, getSelectionState,
+  type CountLabel, fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit,
   resolveCountLabel, type SelectionState
 } from './util/selection-state.js'
 import {
@@ -1592,9 +1592,8 @@ class MultiSelect extends ComboboxBase {
   _getSelectAllState(): SelectionState {
     const scope = this._config.selectAllMode === 'filtered' ? this._getDisplayedItems() : this._getSelectableElements()
     const selected = scope.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length
-    const limit = this._selectionLimit()
 
-    return getSelectionState(selected, scope.length, limit === null ? null : limit - this._selected.length + selected)
+    return getScopeSelectionState(selected, scope.length, this._selected.length, this._selectionLimit())
   }
 
   _isFilteredScopeNarrowed(): boolean {
