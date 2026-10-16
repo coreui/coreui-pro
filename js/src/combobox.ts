@@ -533,7 +533,10 @@ class Combobox extends ComboboxBase {
       return
     }
 
-    this._listBox._setSelection(values)
+    const listed = new Set(SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).map(option => this._valueOf(option as HTMLElement)))
+    const held = new Set(this._listBox.getSelectedValues())
+
+    this._listBox._setSelection(values.filter(value => listed.has(value) || held.has(value)))
     this._commitValue()
   }
 

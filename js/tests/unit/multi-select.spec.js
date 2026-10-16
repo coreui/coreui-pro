@@ -5558,6 +5558,34 @@ describe('MultiSelect', () => {
   })
 
   describe('setConfig', () => {
+    it('should show a selected disabled option as selected in the list', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="1" selected disabled>One</option><option value="2">Two</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
+
+      multiSelect.show()
+
+      expect(multiSelect._menu.querySelector('[data-coreui-value="1"]').getAttribute('aria-selected')).toEqual('true')
+    })
+
+    it('should count a selected value the options no longer carry against the limit in the list', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b">B</option><option value="c">C</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { selectionLimit: 2 })
+      const limits = []
+
+      multiSelect.setOptions([{ value: 'b', text: 'B' }, { value: 'c', text: 'C' }])
+      multiSelect.setConfig({ placeholder: 'Pick' })
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', () => limits.push(true))
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="b"]').click()
+      multiSelect._menu.querySelector('[data-coreui-value="c"]').click()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b'])
+      expect(multiSelect._listBox.getSelectedValues()).toEqual(['a', 'b'])
+      expect(multiSelect._menu.querySelector('[data-coreui-value="c"]').getAttribute('aria-selected')).toEqual('false')
+      expect(limits).toHaveSize(1)
+    })
+
     it('should not send list box events when the page changes the selection', () => {
       fixtureEl.innerHTML = '<select multiple><option value="1" selected>One</option><option value="2">Two</option><option value="3">Three</option></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))

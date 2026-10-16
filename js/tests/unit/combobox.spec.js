@@ -997,6 +997,19 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toEqual(['us', 'uk'])
     })
 
+    it('should take a disabled option from setValue and skip a value the list does not carry', () => {
+      const toggle = setMarkup('', [
+        '<div class="list-box-option disabled" aria-disabled="true" data-coreui-value="us">United States</div>',
+        '<div class="list-box-option" data-coreui-value="uk">United Kingdom</div>'
+      ])
+      const combobox = new Combobox(toggle, { multiple: true })
+
+      combobox.setValue(['us', 'zz', 'uk'])
+
+      expect(combobox.getValue()).toEqual(['us', 'uk'])
+      expect(menu(combobox).querySelector('[data-coreui-value="us"]').getAttribute('aria-selected')).toEqual('true')
+    })
+
     it('should take setValue on a disabled combobox, like a disabled native select', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { disabled: true, multiple: true })

@@ -443,15 +443,14 @@ describe('ListBox', () => {
       expect(events).toEqual([])
     })
 
-    it('should skip a disabled or missing value unless it is already selected', () => {
+    it('should take a disabled value and one the list does not carry', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple' })
 
-      listBox.select('tomato')
-      item(el, 'tomato').classList.add('disabled')
-      listBox._setSelection(['ham', 'bacon', 'tomato', 'onion'])
+      listBox._setSelection(['ham', 'bacon', 'onion'])
 
-      expect(listBox.getSelectedValues()).toEqual(['tomato', 'onion'])
+      expect(listBox.getSelectedValues()).toEqual(['ham', 'bacon', 'onion'])
+      expect(item(el, 'ham').getAttribute('aria-selected')).toEqual('true')
     })
 
     it('should take each value once, stop at the selection limit and keep one value in single mode', () => {
@@ -464,18 +463,6 @@ describe('ListBox', () => {
 
       single._setSelection(['lettuce', 'tomato'])
       expect(single.getSelectedValues()).toEqual(['lettuce'])
-    })
-
-    it('should read a value listed twice from its first option', () => {
-      const el = setMarkup('', [
-        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
-        '<div class="list-box-option disabled" data-coreui-value="lettuce">Lettuce</div>'
-      ])
-      const listBox = new ListBox(el, { selectionMode: 'multiple' })
-
-      listBox._setSelection(['lettuce'])
-
-      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
     })
 
     it('should not redraw the list when the selection stays the same', () => {

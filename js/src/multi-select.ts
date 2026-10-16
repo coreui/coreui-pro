@@ -1252,16 +1252,12 @@ class MultiSelect extends ComboboxBase {
     const kept = this._config.multiple ?
       this._selected.filter((option: any) => option.disabled === true || !listed.has(option.value) || proposed.includes(option.value)) :
       []
-    const { added, refused } = fillSelection(kept.map((option: any) => option.value), proposed, this._selectionLimit())
+    const held = new Set(kept.map((option: any) => option.value))
 
-    this._validation.runAsUser(() => this._commit([...kept, ...added.map(value => ({ value }))]))
+    this._validation.runAsUser(() => this._commit([...kept, ...proposed.filter(value => !held.has(value)).map(value => ({ value }))]))
 
     if (!this._config) {
       return
-    }
-
-    if (refused !== null) {
-      this._triggerSelectionLimit()
     }
 
     if (!this._config.multiple) {
