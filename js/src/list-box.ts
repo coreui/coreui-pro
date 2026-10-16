@@ -324,13 +324,19 @@ class ListBox extends BaseComponent {
     const reset = this._config.resetSelectionOnItemsChange && (values.size !== previousValues.size || [...values].some(value => !previousValues.has(value)))
     const marked = this._selectable(this._flatItems().filter(item => item.selected).map(item => item.value))
 
+    const next = toSelectionValues([...new Set([...(reset ? [] : previous), ...marked])], this._config.selectionMode as SelectionMode)
+    const kept = next.slice(0, this._selectionLimit() ?? next.length)
+
     this._anchor = null
-    this._selected = new Set(toSelectionValues([...new Set([...(reset ? [] : previous), ...marked])], this._config.selectionMode as SelectionMode))
+    this._limited = next[kept.length] ?? null
+    this._selected = new Set(kept)
     this.update()
 
     if (this._selected.size !== previous.length || previous.some(value => !this._selected.has(value))) {
       this._triggerChange()
     }
+
+    this._reportLimit()
   }
 
   getItems(): ListBoxEntry[] {

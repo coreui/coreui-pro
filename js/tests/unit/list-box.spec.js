@@ -477,6 +477,23 @@ describe('ListBox', () => {
   })
 
   describe('selectionLimit', () => {
+    it('should add marked items from setItems only up to the limit and report the first one left out', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
+      const reported = []
+
+      el.addEventListener('selectionLimit.coreui.list-box', event => reported.push(event.value))
+      listBox.select('lettuce')
+      listBox.setItems([
+        { value: 'lettuce', label: 'Lettuce' },
+        { value: 'tomato', label: 'Tomato', selected: true },
+        { value: 'onion', label: 'Onion', selected: true }
+      ])
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
+      expect(reported).toEqual(['onion'])
+    })
+
     it('should press select all once values off the screen use up the limit, and clear the visible ones', () => {
       const el = setMarkup(' data-coreui-selection-mode="multiple"', [
         '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
