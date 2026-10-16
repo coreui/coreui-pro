@@ -601,7 +601,7 @@ class Autocomplete extends ComboboxBase {
     this._inputElement.removeAttribute('name')
   }
 
-  _getOptionsFromConfig(options: any = this._config.options): any[] {
+  _getOptionsFromConfig(options: any = this._config.options, disabled = false): any[] {
     if (!options || !Array.isArray(options)) {
       return []
     }
@@ -617,7 +617,7 @@ class Autocomplete extends ComboboxBase {
         _options.push({
           ...customGroupProperties,
           label: option.label,
-          options: this._getOptionsFromConfig(option.options)
+          options: this._getOptionsFromConfig(option.options, disabled || option.disabled)
         })
 
         continue
@@ -639,7 +639,7 @@ class Autocomplete extends ComboboxBase {
         label,
         value: String(value),
         ...isSelected && { selected: true },
-        ...option.disabled && { disabled: true }
+        ...(disabled || option.disabled) && { disabled: true }
       })
     }
 
@@ -794,10 +794,6 @@ class Autocomplete extends ComboboxBase {
   }
 
   _applySelection(option: any): void {
-    if (option.disabled) {
-      return
-    }
-
     this.deselectAll()
     this._selected.push(option)
     this._projectSelection(this._selected.map((option: any) => option.value))

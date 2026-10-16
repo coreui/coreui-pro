@@ -42,7 +42,7 @@ describe('Autocomplete', () => {
   })
 
   describe('constructor', () => {
-    it('should skip a disabled preselected option', () => {
+    it('should take a disabled preselected option, as a native select does', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -51,8 +51,8 @@ describe('Autocomplete', () => {
         }, { label: 'Y', value: 'y' }]
       })
 
-      expect(autocomplete._selected).toEqual([])
-      expect(autocomplete._inputElement.value).toBe('')
+      expect(autocomplete._selected.map(option => option.value)).toEqual(['x'])
+      expect(autocomplete._inputElement.value).toBe('X')
     })
 
     it('should apply a preselected option without firing change or input', () => {
@@ -4251,6 +4251,34 @@ describe('Autocomplete', () => {
   })
 
   describe('disabled options', () => {
+    it('should take a start value inside a disabled group', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+        options: [{ label: 'Closed', disabled: true, options: [{ label: 'X', value: 'x' }] }, 'b'],
+        value: 'x'
+      })
+
+      expect(autocomplete._inputElement.value).toBe('X')
+    })
+
+    it('should disable every option of a disabled group in the list and in the hints', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        showHints: true,
+        options: [
+          { label: 'Closed', disabled: true, options: [{ label: 'Option 1', value: '1' }] },
+          { label: 'Option 2', value: '2' }
+        ]
+      })
+
+      autocomplete._inputElement.value = 'Opt'
+      autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
+
+      expect(autocomplete._optionsElement.querySelector('[data-coreui-value="1"]').getAttribute('aria-disabled')).toBe('true')
+      expect(autocomplete._inputHintElement.value).toBe('Option 2')
+    })
+
     it('should render disabled options with disabled class', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')

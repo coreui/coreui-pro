@@ -582,6 +582,21 @@ describe('Transfer', () => {
       expect(option(el, 'source', 'bob').textContent).toEqual('Bob')
     })
 
+    it('should keep the items of a disabled group disabled on both sides and out of the move', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, {
+        items: [{ label: 'Closed', disabled: true, items: [{ value: 'a', label: 'A', selected: true }, { value: 'b', label: 'B' }] }],
+        value: ['b']
+      })
+
+      expect(transfer.getSelectedValues('source')).toEqual([])
+      expect(option(el, 'target', 'b').getAttribute('aria-disabled')).toEqual('true')
+
+      transfer.moveToSource(['b'])
+
+      expect(transfer.getTarget()).toEqual(['b'])
+    })
+
     it('should not offer a disabled item for moving', () => {
       const el = setMarkup('', [], [])
       const transfer = new Transfer(el, {

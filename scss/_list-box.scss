@@ -142,13 +142,25 @@ $list-box-tokens: defaults(
     grid-template-columns: minmax(0, 1fr);
     column-gap: var(--#{$prefix}list-box-option-gap);
     align-items: center;
+    width: 100%;
     padding-inline: var(--#{$prefix}list-box-option-padding-x);
+    font-family: inherit;
+    line-height: inherit;
+    text-align: start;
     cursor: pointer;
+    background-color: transparent;
+    border: 0;
     @include border-radius(var(--#{$prefix}list-box-option-border-radius), 0);
 
     &:hover,
     &.active {
       background-color: var(--#{$prefix}list-box-option-hover-bg);
+    }
+
+    &[aria-disabled="true"] {
+      color: var(--#{$prefix}list-box-option-disabled-color);
+      pointer-events: none;
+      background-color: transparent;
     }
 
     &:focus-visible {
@@ -269,6 +281,7 @@ $list-box-tokens: defaults(
   }
 
   .disabled > .list-box-option-indicator,
+  [aria-disabled="true"] > .list-box-option-indicator,
   :disabled > .list-box-option-indicator {
     opacity: var(--#{$prefix}check-disabled-opacity);
   }

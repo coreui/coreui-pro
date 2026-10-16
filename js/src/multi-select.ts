@@ -19,7 +19,7 @@ import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { isTypingKey } from './util/list-navigation.js'
 import { flattenOptions, isOptionGroup } from './util/option-tree.js'
 import {
-  type CountLabel, fillSelection, getAriaPressed, getSelectionLimit, getSelectionState,
+  type CountLabel, fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit,
   resolveCountLabel, type SelectionState
 } from './util/selection-state.js'
 import {
@@ -319,7 +319,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._createSelect()
-    this._initialSelection = [...this._selected]
+    this._initialSelection = this._selected.map((option: any) => ({ ...option }))
     this._addEventListeners()
     Data.set(this._element, DATA_KEY, this)
   }
@@ -496,15 +496,20 @@ class MultiSelect extends ComboboxBase {
 
     const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
     const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || [...values].some(value => !previous.has(value)))
-    const seeded = this._startValues && (this._config.multiple || selected.length === 0) ? this._selected.filter((option: any) => !seen.has(option.value)) : []
-    const next = reset ? this._selected : [...selected, ...seeded]
+    const seeded = this._startValues ? this._selected.filter((option: any) => !seen.has(option.value)) : []
+    const next = reset ? this._selected : [...selected, ...(this._config.multiple || selected.length === 0 ? seeded : [])]
 
     this._selected = selected
+    this._initialSelection = this._fit([...this._initialSelection, ...seeded.map((option: any) => ({ ...option }))])
     this._element.replaceChildren()
     this._createNativeOptions(this._element, this._options)
     this._listBox?.setItems(this._getListBoxItems())
     this._filterOptionsList()
     this._commit(next)
+
+    if (!this._config) {
+      return
+    }
 
     const focused = (this._menu.getRootNode() as Document | ShadowRoot).activeElement
 
@@ -767,7 +772,7 @@ class MultiSelect extends ComboboxBase {
         this._deselectLastOption()
       }
 
-      this._searchElement.focus()
+      this._searchElement?.focus()
     })
 
     if (this._selectAllElement) {
@@ -1252,16 +1257,12 @@ class MultiSelect extends ComboboxBase {
     const kept = this._config.multiple ?
       this._selected.filter((option: any) => option.disabled === true || !listed.has(option.value) || proposed.includes(option.value)) :
       []
-    const { added, refused } = fillSelection(kept.map((option: any) => option.value), proposed, this._selectionLimit())
+    const held = new Set(kept.map((option: any) => option.value))
 
-    this._validation.runAsUser(() => this._commit([...kept, ...added.map(value => ({ value }))]))
+    this._validation.runAsUser(() => this._commit([...kept, ...proposed.filter(value => !held.has(value)).map(value => ({ value }))]))
 
     if (!this._config) {
       return
-    }
-
-    if (refused !== null) {
-      this._triggerSelectionLimit()
     }
 
     if (!this._config.multiple) {
@@ -1285,10 +1286,18 @@ class MultiSelect extends ComboboxBase {
     this._triggerSelectionLimit()
   }
 
-  _enabledOptions(options: any[]): any[] {
+  _lockedValues(): Set<string> {
+    return new Set([...this._listedOptions()].filter(([, option]) => option.disabled).map(([value]) => value))
+  }
+
+  _listedOptions(): Map<string, any> {
+    return new Map(flattenOptions(this._options).toReversed().map((option: any) => [String(option.value), option]))
+  }
+
+  _enabledOptions(options: any[], locked: Set<string> = this._lockedValues()): any[] {
     return options
-      .filter(option => !option.disabled)
-      .flatMap(option => (isOptionGroup(option) ? this._enabledOptions(option.options) : [option]))
+      .filter(option => !option.disabled && !locked.has(String(option.value)))
+      .flatMap(option => (isOptionGroup(option) ? this._enabledOptions(option.options, locked) : [option]))
   }
 
   _selectUpToLimit(options: any[]): void {
@@ -1301,13 +1310,19 @@ class MultiSelect extends ComboboxBase {
     )
     this._commit([...this._selected, ...added.map(value => ({ value, text: texts.get(value) }))])
 
-    if (refused !== null) {
+    if (this._config && refused !== null) {
       this._triggerSelectionLimit()
     }
   }
 
   _getDisplayedItems(): HTMLElement[] {
-    return this._getDisplayedOptions().filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
+    return this._takeable(this._getDisplayedOptions())
+  }
+
+  _takeable(elements: HTMLElement[]): HTMLElement[] {
+    const locked = this._lockedValues()
+
+    return elements.filter(element => !element.classList.contains(CLASS_NAME_DISABLED) && !locked.has(String(element.dataset.coreuiValue)))
   }
 
   _getTotalCount(): number {
@@ -1344,6 +1359,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   _commit(selected: any[], notify = true): void {
+    const element = this._element
     const next = this._fit(selected)
     const current = new Set(this._selected.map((option: any) => option.value))
     const changed = next.length !== current.size || next.some((option: any) => !current.has(option.value))
@@ -1357,16 +1373,16 @@ class MultiSelect extends ComboboxBase {
     this._render()
 
     if (changed && notify) {
-      EventHandler.trigger(this._element, EVENT_CHANGE, {
-        value: this._selected
+      EventHandler.trigger(element, EVENT_CHANGE, {
+        value: next
       })
-      this._element.dispatchEvent(new Event('input', { bubbles: true }))
-      this._element.dispatchEvent(new Event('change', { bubbles: true }))
+      element.dispatchEvent(new Event('input', { bubbles: true }))
+      element.dispatchEvent(new Event('change', { bubbles: true }))
     }
   }
 
   _render(): void {
-    const options = new Map(flattenOptions(this._options).toReversed().map((option: any) => [String(option.value), option]))
+    const options = this._listedOptions()
 
     for (const option of this._selected) {
       const listed = options.get(option.value)
@@ -1420,7 +1436,7 @@ class MultiSelect extends ComboboxBase {
 
   _restoreSelection(): void {
     this._onSearchChange(this._searchElement)
-    this._commit(this._initialSelection, false)
+    this._commit(this._initialSelection.map((option: any) => ({ ...option })), false)
   }
 
   _updateSelection(): void {
@@ -1582,9 +1598,8 @@ class MultiSelect extends ComboboxBase {
   _getSelectAllState(): SelectionState {
     const scope = this._config.selectAllMode === 'filtered' ? this._getDisplayedItems() : this._getSelectableElements()
     const selected = scope.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length
-    const limit = this._selectionLimit()
 
-    return getSelectionState(selected, scope.length, limit === null ? null : limit - this._selected.length + selected)
+    return getScopeSelectionState(selected, scope.length, this._selected.length, this._selectionLimit())
   }
 
   _isFilteredScopeNarrowed(): boolean {
@@ -1643,8 +1658,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   _getSelectableElements(): HTMLElement[] {
-    return SelectorEngine.find(SELECTOR_OPTION, this._optionsElement)
-      .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
+    return this._takeable(SelectorEngine.find(SELECTOR_OPTION, this._optionsElement))
   }
 
   _getSelectionState(): any {

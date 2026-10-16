@@ -1,9 +1,19 @@
 import {
-  fillSelection, getAriaPressed, getSelectionLimit, getSelectionState, isSelectionLimitReached, resolveCountLabel,
-  toSelectionValues
+  fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit, getSelectionState, isSelectionLimitReached,
+  resolveCountLabel, toSelectionValues
 } from '../../../src/util/selection-state.js'
 
 describe('Selection utilities', () => {
+  describe('getScopeSelectionState', () => {
+    it('should read the scope against the room the values outside it leave under the limit', () => {
+      expect(getScopeSelectionState(1, 3, 2, 2)).toBe('all')
+      expect(getScopeSelectionState(1, 3, 1, 2)).toBe('some')
+      expect(getScopeSelectionState(0, 3, 2, 2)).toBe('none')
+      expect(getScopeSelectionState(2, 3, 2, null)).toBe('some')
+      expect(getScopeSelectionState(3, 3, 5)).toBe('all')
+    })
+  })
+
   describe('getSelectionState', () => {
     it('should count the selection against the set at its boundaries', () => {
       expect(getSelectionState(0, 3)).toBe('none')

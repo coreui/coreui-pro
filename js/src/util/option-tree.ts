@@ -28,6 +28,30 @@ export const flattenOptions = <T extends OptionItem>(options: readonly T[]): T[]
   options.flatMap(option => (isOptionGroup(option) ? flattenOptions((option as { options: T[] }).options) : [option]))
 
 /**
+ * Passes the `disabled` flag of a group down to every option it holds, at any depth, so every
+ * reader of an option sees one flag. A plain string option of a disabled group becomes an object
+ * with the string as its label and value; everything else is returned as it was.
+ *
+ * @param options - The options list, groups included
+ * @param disabled - Whether the list sits in a disabled group
+ * @returns The options list with every option of a disabled group marked `disabled: true`
+ */
+export const disableGroupOptions = <T extends OptionItem>(options: readonly T[], disabled = false): T[] =>
+  options.map(option => {
+    if (isOptionGroup(option)) {
+      const group = option as { disabled?: boolean, options: T[] }
+
+      return { ...group, options: disableGroupOptions(group.options, disabled || Boolean(group.disabled)) } as unknown as T
+    }
+
+    if (!disabled) {
+      return option
+    }
+
+    return (typeof option === 'string' ? { label: option, value: option, disabled: true } : { ...option as object, disabled: true }) as T
+  })
+
+/**
  * Reads the label of an option: the string itself for a plain string option.
  *
  * @param option - The option

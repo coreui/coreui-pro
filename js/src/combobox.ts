@@ -43,6 +43,7 @@ const RIGHT_MOUSE_BUTTON = 2
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
+const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
@@ -333,6 +334,10 @@ class Combobox extends ComboboxBase {
   override _configAfterMerge(config: any): any {
     config = this._normalizeContainerConfig(config)
 
+    if (typeof config.value === 'number') {
+      config.value = String(config.value)
+    }
+
     if (config.multiple && this._valueFromMarkup && typeof config.value === 'string') {
       config.value = config.value.split(/,\s*/)
     }
@@ -533,7 +538,10 @@ class Combobox extends ComboboxBase {
       return
     }
 
-    this._listBox._setSelection(values)
+    const listed = new Set(SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).map(option => this._valueOf(option as HTMLElement)))
+    const held = new Set(this._listBox.getSelectedValues())
+
+    this._listBox._setSelection(values.filter(value => listed.has(value) || held.has(value)))
     this._commitValue()
   }
 
@@ -615,6 +623,10 @@ class Combobox extends ComboboxBase {
       this.hide()
       this._element.focus()
     }
+  }
+
+  override _onSelectionLimit(limit: number, value: string): void {
+    EventHandler.trigger(this._element, EVENT_SELECTION_LIMIT, { limit, value })
   }
 
   _restoreValue(): void {

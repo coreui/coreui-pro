@@ -15,7 +15,9 @@ import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
   type CountLabel,
+  fillSelection,
   getAriaPressed,
+  getScopeSelectionState,
   getSelectionLimit,
   getSelectionState,
   isSelectionLimitReached,
@@ -115,6 +117,7 @@ type ListBoxItem = {
 type ListBoxGroup = {
   label: string
   items: ListBoxItem[]
+  disabled?: boolean
 }
 
 type ListBoxEntry = ListBoxItem | ListBoxGroup
@@ -199,6 +202,7 @@ class ListBox extends BaseComponent {
   protected declare _active: string | null
   protected declare _anchor: string | null
   protected declare _counter: HTMLElement | null
+  protected declare _disabledSections: WeakSet<HTMLElement>
   protected declare _field: HTMLElement | null
   protected declare _items: ListBoxEntry[] | null
   protected declare _focused: boolean
@@ -215,6 +219,7 @@ class ListBox extends BaseComponent {
 
     this._active = null
     this._anchor = null
+    this._disabledSections = new WeakSet()
     this._field = getElement(this._config.activeDescendant)
     this._items = this._config.items.length > 0 ? this._normalizeItems(this._config.items) : null
     this._focused = false
@@ -322,15 +327,23 @@ class ListBox extends BaseComponent {
 
     const values = new Set(this._allOptions().map(option => this._optionValue(option)))
     const reset = this._config.resetSelectionOnItemsChange && (values.size !== previousValues.size || [...values].some(value => !previousValues.has(value)))
-    const marked = this._selectable(this._flatItems().filter(item => item.selected).map(item => item.value))
+    const marked = this._flatItems().filter(item => item.selected).map(item => item.value)
+    const { refused, values: filled } = fillSelection(reset ? [] : previous, marked, this._selectionLimit())
 
     this._anchor = null
-    this._selected = new Set(toSelectionValues([...new Set([...(reset ? [] : previous), ...marked])], this._config.selectionMode as SelectionMode))
+    this._selected = new Set(toSelectionValues(filled, this._config.selectionMode as SelectionMode))
     this.update()
 
     if (this._selected.size !== previous.length || previous.some(value => !this._selected.has(value))) {
       this._triggerChange()
     }
+
+    if (!this._config) {
+      return
+    }
+
+    this._limited = refused
+    this._reportLimit()
   }
 
   getItems(): ListBoxEntry[] {
@@ -420,6 +433,12 @@ class ListBox extends BaseComponent {
   override dispose(): void {
     this._typeaheadBuffer.clear()
 
+    for (const label of SelectorEngine.find(SELECTOR_SECTION_TOGGLE, this._list)) {
+      if (this._disabledSections.has(label)) {
+        label.removeAttribute('aria-disabled')
+      }
+    }
+
     this._element.removeAttribute(ATTRIBUTE_INDICATOR)
     this._element.classList.remove(CLASS_NAME_LOADING)
 
@@ -462,7 +481,6 @@ class ListBox extends BaseComponent {
   }
 
   _updateOptions(): void {
-    const navigable = this._navigableOptions()
     const roving = this._rovingStop()
 
     for (const option of this._allOptions()) {
@@ -495,7 +513,7 @@ class ListBox extends BaseComponent {
 
     const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._list)
     if (empty) {
-      empty.toggleAttribute('hidden', this._config.loading || navigable.length > 0)
+      empty.toggleAttribute('hidden', this._config.loading || this._navigableOptions().length > 0)
     }
   }
 
@@ -600,13 +618,7 @@ class ListBox extends BaseComponent {
     const configured = toSelectionValues(selected, SELECTION_MODE_MULTIPLE)
     const marked = this._flatItems().filter(item => item.selected).map(item => item.value)
 
-    return this._selectable(toSelectionValues([...new Set([...configured, ...marked])], this._config.selectionMode as SelectionMode))
-  }
-
-  _selectable(values: string[]): string[] {
-    const disabled = new Set(this._allOptions().filter(option => this._isDisabled(option)).map(option => this._optionValue(option)))
-
-    return values.filter(value => !disabled.has(value))
+    return toSelectionValues([...new Set([...configured, ...marked])], this._config.selectionMode as SelectionMode)
   }
 
   _normalizeItems(items: ListBoxEntry[]): ListBoxEntry[] {
@@ -618,7 +630,8 @@ class ListBox extends BaseComponent {
   _normalizeGroup(group: ListBoxGroup): ListBoxGroup {
     return {
       label: String(group.label ?? ''),
-      items: group.items.filter(item => item !== null && typeof item === 'object').map(item => this._normalizeItem(item))
+      items: group.items.filter(item => item !== null && typeof item === 'object').map(item => this._normalizeItem(item)),
+      ...group.disabled && { disabled: true }
     }
   }
 
@@ -688,7 +701,7 @@ class ListBox extends BaseComponent {
     section.classList.add(CLASS_NAME_SECTION)
     section.setAttribute('role', 'group')
     section.setAttribute('aria-labelledby', label.id)
-    section.append(label, ...group.items.map(item => this._renderOption(item)))
+    section.append(label, ...group.items.map(item => this._renderOption(group.disabled ? { ...item, disabled: true } : item)))
 
     return section
   }
@@ -780,6 +793,15 @@ class ListBox extends BaseComponent {
     label.setAttribute('role', 'button')
     label.dataset.coreuiValue = label.id
     this._decorateOption(label)
+
+    if (this._sectionOptions(section).length > 0) {
+      if (this._disabledSections.delete(label)) {
+        label.removeAttribute('aria-disabled')
+      }
+    } else if (!label.hasAttribute('aria-disabled')) {
+      label.setAttribute('aria-disabled', 'true')
+      this._disabledSections.add(label)
+    }
   }
 
   _updateSections(): void {
@@ -790,10 +812,14 @@ class ListBox extends BaseComponent {
     const roving = this._rovingStop()
 
     for (const label of SelectorEngine.find(SELECTOR_SECTION_TOGGLE, this._list)) {
-      const options = this._sectionOptions(label.closest(SELECTOR_SECTION) as HTMLElement)
-      const selected = options.filter(option => this._selected.has(this._optionValue(option))).length
+      const section = label.closest(SELECTOR_SECTION) as HTMLElement
+      const options = this._sectionOptions(section)
+      const shown = SelectorEngine.find(SELECTOR_OPTION, section).filter(option => !this._isHidden(option))
+      const state = options.length > 0 ?
+        this._scopeState(options) :
+        getSelectionState(shown.filter(option => this._selected.has(this._optionValue(option))).length, shown.length)
 
-      this._showSelectionState(label, getSelectionState(selected, options.length))
+      this._showSelectionState(label, state)
       label.classList.toggle(CLASS_NAME_ACTIVE, this._optionValue(label) === this._active && (this._focused || Boolean(this._field)))
 
       if (this._field) {
@@ -810,8 +836,9 @@ class ListBox extends BaseComponent {
       return
     }
 
-    const values = this._sectionOptions(section).map(option => this._optionValue(option))
-    const all = values.length > 0 && values.every(value => this._selected.has(value))
+    const options = this._sectionOptions(section)
+    const values = options.map(option => this._optionValue(option))
+    const all = this._scopeState(options) === 'all'
     let changed = false
 
     this._limited = null
@@ -903,10 +930,13 @@ class ListBox extends BaseComponent {
   }
 
   _selectionState(): SelectionState {
-    const options = this._navigableOptions()
+    return this._scopeState(this._navigableOptions())
+  }
+
+  _scopeState(options: HTMLElement[]): SelectionState {
     const selected = options.filter(option => this._selected.has(this._optionValue(option))).length
 
-    return getSelectionState(selected, options.length, this._selectionLimit())
+    return getScopeSelectionState(selected, options.length, this._selected.size, this._selectionLimit())
   }
 
   _showSelectionState(element: HTMLElement, state: SelectionState): void {
@@ -1003,9 +1033,7 @@ class ListBox extends BaseComponent {
   }
 
   _setSelection(values: string[]): void {
-    const options = new Map(this._allOptions().toReversed().map(option => [this._optionValue(option), option]))
     const next = toSelectionValues([...new Set(values)], this._config.selectionMode as SelectionMode)
-      .filter(value => this._selected.has(value) || (options.has(value) && !this._isDisabled(options.get(value)!)))
     const limited = next.slice(0, this._selectionLimit() ?? next.length)
 
     if (limited.join('\u0000') !== this.getSelectedValues().join('\u0000')) {

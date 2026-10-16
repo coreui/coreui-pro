@@ -433,22 +433,18 @@ class Transfer extends BaseComponent {
   }
 
   _forwardItems(entries: ListBoxEntry[]): ListBoxEntry[] {
-    if (!this._rendered) {
-      return entries
-    }
-
     return entries.map(entry => {
       if (Array.isArray((entry as ListBoxGroup).items)) {
         const group = entry as ListBoxGroup
-        return { label: group.label, items: group.items.map(item => this._unmarked(item)) }
+        return { ...group, items: group.items.map(item => this._unmarked(item, group.disabled)) }
       }
 
       return this._unmarked(entry as ListBoxItem)
     })
   }
 
-  _unmarked(item: ListBoxItem): ListBoxItem {
-    if (!item.selected) {
+  _unmarked(item: ListBoxItem, disabled = false): ListBoxItem {
+    if (!item.selected || (!this._rendered && !disabled && !item.disabled)) {
       return item
     }
 
@@ -477,7 +473,7 @@ class Transfer extends BaseComponent {
       const rest = group.items.filter(item => !taken.has(this._itemValue(item)))
 
       if (rest.length > 0) {
-        available.push({ label: group.label, items: rest })
+        available.push({ ...group, items: rest })
       }
     }
 
@@ -487,7 +483,15 @@ class Transfer extends BaseComponent {
   _flatItems(items: ListBoxEntry[]): ListBoxItem[] {
     return items
       .filter(entry => entry !== null && typeof entry === 'object')
-      .flatMap(entry => (Array.isArray((entry as ListBoxGroup).items) ? (entry as ListBoxGroup).items : [entry as ListBoxItem]))
+      .flatMap(entry => {
+        const group = entry as ListBoxGroup
+
+        if (!Array.isArray(group.items)) {
+          return [entry as ListBoxItem]
+        }
+
+        return group.disabled ? group.items.map(item => ({ ...item, disabled: true })) : group.items
+      })
   }
 
   _itemValue(item: ListBoxItem): string {

@@ -537,6 +537,54 @@ describe('Combobox', () => {
       expect(value(toggle)).toEqual('NYC metro')
     })
 
+    it('should take a disabled option from value and bring it back on a form reset', async () => {
+      fixtureEl.innerHTML = '<form><button class="form-control" type="button"></button></form>'
+      const toggle = fixtureEl.querySelector('button')
+      const combobox = new Combobox(toggle, {
+        items: [{ value: 'a', label: 'A' }, { value: 'd', label: 'D', disabled: true }],
+        value: 'd'
+      })
+
+      expect(combobox.getValue()).toEqual('d')
+
+      combobox.setValue('a')
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(combobox.getValue()).toEqual('d')
+    })
+
+    it('should disable every item of a disabled group', () => {
+      fixtureEl.innerHTML = '<button class="form-control" type="button"></button>'
+      const toggle = fixtureEl.querySelector('button')
+      const combobox = new Combobox(toggle, {
+        multiple: true,
+        items: [{ label: 'Closed', disabled: true, items: [{ value: 'a', label: 'A' }] }, { value: 'b', label: 'B' }]
+      })
+
+      combobox.show()
+      menu(combobox).querySelector('[data-coreui-value="a"]').click()
+
+      expect(menu(combobox).querySelector('[data-coreui-value="a"]').getAttribute('aria-disabled')).toEqual('true')
+      expect(combobox.getValue()).toEqual([])
+    })
+
+    it('should take a numeric value attribute', () => {
+      const options = [
+        '<div class="list-box-option" data-coreui-value="123">Order 123</div>',
+        '<div class="list-box-option" data-coreui-value="456">Order 456</div>'
+      ]
+      const single = new Combobox(setMarkup(' data-coreui-value="123"', options))
+
+      expect(single.getValue()).toEqual('123')
+
+      const multiple = new Combobox(setMarkup(' data-coreui-multiple="true" data-coreui-value="456"', options))
+
+      expect(multiple.getValue()).toEqual(['456'])
+    })
+
     it('should split a comma separated value attribute', () => {
       const toggle = setMarkup(' data-coreui-multiple="true" data-coreui-value="us,ca"')
       const combobox = new Combobox(toggle)
@@ -997,6 +1045,19 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toEqual(['us', 'uk'])
     })
 
+    it('should take a disabled option from setValue and skip a value the list does not carry', () => {
+      const toggle = setMarkup('', [
+        '<div class="list-box-option disabled" aria-disabled="true" data-coreui-value="us">United States</div>',
+        '<div class="list-box-option" data-coreui-value="uk">United Kingdom</div>'
+      ])
+      const combobox = new Combobox(toggle, { multiple: true })
+
+      combobox.setValue(['us', 'zz', 'uk'])
+
+      expect(combobox.getValue()).toEqual(['us', 'uk'])
+      expect(menu(combobox).querySelector('[data-coreui-value="us"]').getAttribute('aria-selected')).toEqual('true')
+    })
+
     it('should take setValue on a disabled combobox, like a disabled native select', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { disabled: true, multiple: true })
@@ -1258,6 +1319,36 @@ describe('Combobox', () => {
       combobox.hide()
 
       expect(fired).toEqual(['show', 'shown', 'hide', 'hidden'])
+    })
+
+    it('should fire selectionLimit with the limit and the value that did not fit', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true, selectionLimit: 1 })
+      const reported = []
+
+      toggle.addEventListener('selectionLimit.coreui.combobox', event => reported.push([event.limit, event.value]))
+      combobox.show()
+      menu(combobox).querySelector('[data-coreui-value="us"]').click()
+      menu(combobox).querySelector('[data-coreui-value="uk"]').click()
+
+      expect(combobox.getValue()).toEqual(['us'])
+      expect(reported).toEqual([[1, 'uk']])
+    })
+
+    it('should fire selectionLimit for an item setItems marks selected past the limit, and not for setValue', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true, selectionLimit: 1 })
+      const reported = []
+
+      toggle.addEventListener('selectionLimit.coreui.combobox', event => reported.push(event.value))
+      combobox.setValue(['us', 'uk'])
+      combobox.setItems([
+        { value: 'us', label: 'United States' },
+        { value: 'ca', label: 'Canada', selected: true }
+      ])
+
+      expect(combobox.getValue()).toEqual(['us'])
+      expect(reported).toEqual(['ca'])
     })
 
     it('should fire change with the value', () => {
