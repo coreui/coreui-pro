@@ -477,6 +477,26 @@ describe('ListBox', () => {
   })
 
   describe('selectionLimit', () => {
+    it('should press select all once values off the screen use up the limit, and clear the visible ones', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple"', [
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
+        '<div class="list-box-option" data-coreui-value="onion">Onion</div>'
+      ], selectAllMarkup)
+      const listBox = new ListBox(el, { selectionLimit: 2 })
+      const selectAll = el.querySelector('[data-coreui-select-all]')
+
+      listBox.select('lettuce')
+      item(el, 'lettuce').hidden = true
+      listBox.select('tomato')
+
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('true')
+
+      click(selectAll)
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
+    })
+
     it('stops selecting at the selection limit and reports it', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })

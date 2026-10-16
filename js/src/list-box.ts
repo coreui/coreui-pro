@@ -905,8 +905,9 @@ class ListBox extends BaseComponent {
   _selectionState(): SelectionState {
     const options = this._navigableOptions()
     const selected = options.filter(option => this._selected.has(this._optionValue(option))).length
+    const limit = this._selectionLimit()
 
-    return getSelectionState(selected, options.length, this._selectionLimit())
+    return getSelectionState(selected, options.length, limit === null ? null : limit - this._selected.size + selected)
   }
 
   _showSelectionState(element: HTMLElement, state: SelectionState): void {
