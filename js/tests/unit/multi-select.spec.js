@@ -1670,9 +1670,16 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._searchElement.placeholder).toBe('1 of 1250')
 
+      const search = multiSelect._searchElement
+
+      multiSelect.setConfig({ total: 1300 })
+
+      expect(multiSelect._searchElement).toBe(search)
+      expect(search.placeholder).toBe('1 of 1300')
+
       multiSelect.setConfig({ total: null })
 
-      expect(multiSelect._searchElement.placeholder).toBe('1 of 2')
+      expect(search.placeholder).toBe('1 of 2')
     })
 
     it('should give the search placeholder the same {total} as the counter', () => {
