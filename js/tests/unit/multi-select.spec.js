@@ -1810,7 +1810,7 @@ describe('MultiSelect', () => {
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
 
-      multiSelect.setConfig({ options, value: ['a'] })
+      multiSelect.setConfig({ options: [{ value: 'a', text: 'A' }, { value: 'b', text: 'B', selected: true }], value: ['a'] })
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
     })
@@ -1827,6 +1827,12 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
+    })
+
+    it('should reject a value of the wrong type with the option type error', () => {
+      fixtureEl.innerHTML = '<select data-coreui-value="true"><option value="true">T</option></select>'
+
+      expect(() => new MultiSelect(fixtureEl.querySelector('select'))).toThrowError(TypeError, /Option "value"/)
     })
 
     it('should read an empty value given in the config like an empty attribute', () => {

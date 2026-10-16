@@ -136,7 +136,7 @@ type MultiSelectConfig = {
   selectionType: 'chips' | 'counter' | 'tags' | 'text'
   valid: boolean
   validationState: ValidationState | null
-  value: number | string | string[] | null
+  value: number | string | Array<number | string> | null
 }
 
 const Default: MultiSelectConfig = {
@@ -1704,7 +1704,9 @@ class MultiSelect extends ComboboxBase {
       config.value = config.value === '' ? null : String(config.value).split(/,\s*/)
     }
 
-    config.value = config.value?.map(String) ?? null
+    if (Array.isArray(config.value)) {
+      config.value = config.value.map(String)
+    }
 
     return config
   }
