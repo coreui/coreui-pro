@@ -1316,7 +1316,13 @@ class MultiSelect extends ComboboxBase {
   }
 
   _getDisplayedItems(): HTMLElement[] {
-    return this._getDisplayedOptions().filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
+    return this._takeable(this._getDisplayedOptions())
+  }
+
+  _takeable(elements: HTMLElement[]): HTMLElement[] {
+    const locked = this._lockedValues()
+
+    return elements.filter(element => !element.classList.contains(CLASS_NAME_DISABLED) && !locked.has(String(element.dataset.coreuiValue)))
   }
 
   _getTotalCount(): number {
@@ -1652,8 +1658,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   _getSelectableElements(): HTMLElement[] {
-    return SelectorEngine.find(SELECTOR_OPTION, this._optionsElement)
-      .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
+    return this._takeable(SelectorEngine.find(SELECTOR_OPTION, this._optionsElement))
   }
 
   _getSelectionState(): any {

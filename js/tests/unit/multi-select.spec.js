@@ -2715,6 +2715,22 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b'])
     })
 
+    it('should read select all as pressed once the takeable options are selected, skipping a value whose first listing is disabled', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [
+          { label: 'Closed', disabled: true, options: [{ value: 'x', text: 'X' }] },
+          { value: 'x', text: 'X2' },
+          { value: 'a', text: 'A' }
+        ]
+      })
+
+      multiSelect.selectAll()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+      expect(multiSelect._getSelectAllState()).toEqual('all')
+    })
+
     it('should skip a disabled group nested in another group', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

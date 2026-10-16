@@ -583,7 +583,7 @@ Events fire on the toggle button.
 | `hidden.coreui.combobox` | Fired when the panel has been hidden. |
 | `hide.coreui.combobox` | Fires immediately when `hide` is called. |
 | `search.coreui.combobox` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setItems()`. |
-| `selectionLimit.coreui.combobox` | Fired when `selectionLimit` refuses a value, a pick or an item `setItems()` marks selected; `event.limit` is the limit and `event.value` the value that did not fit. |
+| `selectionLimit.coreui.combobox` | Fired when `selectionLimit` refuses a pick or an item `setItems()` marks selected; `setValue()` trims to the limit without it. `event.limit` is the limit and `event.value` the value that did not fit. |
 | `show.coreui.combobox` | Fires immediately when `show` is called. |
 | `shown.coreui.combobox` | Fired when the panel has been made visible. |
 

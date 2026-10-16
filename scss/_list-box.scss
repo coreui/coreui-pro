@@ -142,8 +142,14 @@ $list-box-tokens: defaults(
     grid-template-columns: minmax(0, 1fr);
     column-gap: var(--#{$prefix}list-box-option-gap);
     align-items: center;
+    width: 100%;
     padding-inline: var(--#{$prefix}list-box-option-padding-x);
+    font-family: inherit;
+    line-height: inherit;
+    text-align: start;
     cursor: pointer;
+    background-color: transparent;
+    border: 0;
     @include border-radius(var(--#{$prefix}list-box-option-border-radius), 0);
 
     &:hover,

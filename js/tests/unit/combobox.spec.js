@@ -1335,6 +1335,22 @@ describe('Combobox', () => {
       expect(reported).toEqual([[1, 'uk']])
     })
 
+    it('should fire selectionLimit for an item setItems marks selected past the limit, and not for setValue', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true, selectionLimit: 1 })
+      const reported = []
+
+      toggle.addEventListener('selectionLimit.coreui.combobox', event => reported.push(event.value))
+      combobox.setValue(['us', 'uk'])
+      combobox.setItems([
+        { value: 'us', label: 'United States' },
+        { value: 'ca', label: 'Canada', selected: true }
+      ])
+
+      expect(combobox.getValue()).toEqual(['us'])
+      expect(reported).toEqual(['ca'])
+    })
+
     it('should fire change with the value', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle)
