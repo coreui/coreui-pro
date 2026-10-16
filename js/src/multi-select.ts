@@ -505,7 +505,7 @@ class MultiSelect extends ComboboxBase {
     this._createNativeOptions(this._element, this._options)
     this._listBox?.setItems(this._getListBoxItems())
     this._filterOptionsList()
-    this._commit(next)
+    this._commit(next, reset)
 
     if (!this._config) {
       return
@@ -561,7 +561,7 @@ class MultiSelect extends ComboboxBase {
     const next = this._selected
 
     this._selected = previous
-    this._commit(next)
+    this._commit(next, false)
   }
 
   selectAll(options: any[] = this._options): void {
@@ -1436,7 +1436,7 @@ class MultiSelect extends ComboboxBase {
 
   _restoreSelection(): void {
     this._onSearchChange(this._searchElement)
-    this._commit(this._initialSelection.map((option: any) => ({ ...option })), false)
+    this._commit(this._initialSelection.map((option: any) => ({ ...option })))
   }
 
   _updateSelection(): void {
