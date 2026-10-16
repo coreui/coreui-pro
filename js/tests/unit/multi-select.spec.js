@@ -1662,6 +1662,19 @@ describe('MultiSelect', () => {
       expect(multiSelect._headerElement.textContent).toBe('4')
     })
 
+    it('should take {total} from the total option', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b">B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        search: true, selectionType: 'counter', selectedLabel: '{count} of {total}', total: 1250
+      })
+
+      expect(multiSelect._searchElement.placeholder).toBe('1 of 1250')
+
+      multiSelect.setConfig({ total: null })
+
+      expect(multiSelect._searchElement.placeholder).toBe('1 of 2')
+    })
+
     it('should give the search placeholder the same {total} as the counter', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

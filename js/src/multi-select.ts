@@ -134,6 +134,7 @@ type MultiSelectConfig = {
   selectFilteredLabel: string
   selectionLimit: number | null
   selectionType: 'chips' | 'counter' | 'tags' | 'text'
+  total: number | null
   valid: boolean
   validationState: ValidationState | null
   value: number | string | Array<number | string> | null
@@ -179,6 +180,7 @@ const Default: MultiSelectConfig = {
   selectFilteredLabel: 'Select filtered',
   selectionLimit: null,
   selectionType: 'tags',
+  total: null,
   valid: false,
   validationState: null,
   value: null
@@ -224,6 +226,7 @@ const DefaultType: Record<string, string> = {
   selectFilteredLabel: 'string',
   selectionLimit: '(number|null)',
   selectionType: 'string',
+  total: '(number|null)',
   valid: 'boolean',
   validationState: '(string|null|undefined)',
   value: '(string|array|null)'
@@ -1303,6 +1306,10 @@ class MultiSelect extends ComboboxBase {
   }
 
   _getTotalCount(): number {
+    if (this._config.total !== null) {
+      return this._config.total
+    }
+
     const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
 
     return values.size + this._selected.filter((option: any) => !values.has(option.value)).length
