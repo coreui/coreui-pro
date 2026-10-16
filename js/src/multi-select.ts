@@ -17,7 +17,7 @@ import FocusTrap from './util/focustrap.js'
 import { type ValidationState } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { isTypingKey } from './util/list-navigation.js'
-import { flattenOptions, getSelectableOptions, isOptionGroup } from './util/option-tree.js'
+import { flattenOptions, isOptionGroup } from './util/option-tree.js'
 import {
   type CountLabel, fillSelection, getAriaPressed, getSelectionLimit, getSelectionState,
   resolveCountLabel, type SelectionState
@@ -1302,8 +1302,8 @@ class MultiSelect extends ComboboxBase {
     return this._getDisplayedOptions().filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
   }
 
-  _getSelectableOptionsCount(): number {
-    const values = new Set(getSelectableOptions(this._options).map((option: any) => String(option.value)))
+  _getTotalCount(): number {
+    const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
 
     return values.size + this._selected.filter((option: any) => !values.has(option.value)).length
   }
@@ -1438,7 +1438,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     if (this._config.multiple && this._config.selectionType === 'counter' && !this._config.search) {
-      selection.textContent = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._getSelectableOptionsCount())
+      selection.textContent = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._getTotalCount())
     }
 
     // `tags` and `chips` were the same idea built twice; both render the Chip
@@ -1533,7 +1533,7 @@ class MultiSelect extends ComboboxBase {
     } else if (!this._config.multiple) {
       this._searchElement.placeholder = this._selected[0].text
     } else if (this._config.selectionType === 'counter') {
-      this._searchElement.placeholder = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._getSelectableOptionsCount())
+      this._searchElement.placeholder = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._getTotalCount())
     } else {
       this._searchElement.removeAttribute('placeholder')
     }

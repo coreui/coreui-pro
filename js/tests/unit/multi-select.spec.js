@@ -1636,7 +1636,7 @@ describe('MultiSelect', () => {
       expect(selection.textContent).toContain('items selected')
     })
 
-    it('should count the selectable options inside groups toward {total} of the counter', () => {
+    it('should count every option in the list toward {total} of the counter, disabled and grouped ones included, and only the selectable ones in the header total', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -1658,7 +1658,7 @@ describe('MultiSelect', () => {
       })
 
       const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
-      expect(selection.textContent).toBe('1 of 4')
+      expect(selection.textContent).toBe('1 of 5')
       expect(multiSelect._headerElement.textContent).toBe('4')
     })
 
@@ -1682,7 +1682,7 @@ describe('MultiSelect', () => {
         selectedLabel: '{count} of {total}'
       })
 
-      expect(multiSelect._searchElement.placeholder).toBe('1 of 3')
+      expect(multiSelect._searchElement.placeholder).toBe('1 of 4')
     })
 
     it('should handle selectionType text', () => {
@@ -2884,7 +2884,7 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
     })
 
-    it('should leave the unselected options of a disabled group out of the counter total', () => {
+    it('should count the options of a disabled group in the counter total', () => {
       fixtureEl.innerHTML = '<select></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
         options: [
@@ -2895,7 +2895,7 @@ describe('MultiSelect', () => {
         selectedLabel: '{count}/{total}'
       })
 
-      expect(multiSelect._selectionElement.textContent).toBe('1/2')
+      expect(multiSelect._selectionElement.textContent).toBe('1/3')
     })
 
     it('should send the selected option of a disabled group with the form no more than a disabled option', () => {
