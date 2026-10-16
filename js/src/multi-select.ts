@@ -319,7 +319,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._createSelect()
-    this._initialSelection = [...this._selected]
+    this._initialSelection = this._selected.map((option: any) => ({ ...option }))
     this._addEventListeners()
     Data.set(this._element, DATA_KEY, this)
   }
@@ -500,6 +500,7 @@ class MultiSelect extends ComboboxBase {
     const next = reset ? this._selected : [...selected, ...seeded]
 
     this._selected = selected
+    this._initialSelection = this._fit([...this._initialSelection, ...seeded.map((option: any) => ({ ...option }))])
     this._element.replaceChildren()
     this._createNativeOptions(this._element, this._options)
     this._listBox?.setItems(this._getListBoxItems())
@@ -1420,7 +1421,7 @@ class MultiSelect extends ComboboxBase {
 
   _restoreSelection(): void {
     this._onSearchChange(this._searchElement)
-    this._commit(this._initialSelection, false)
+    this._commit(this._initialSelection.map((option: any) => ({ ...option })), false)
   }
 
   _updateSelection(): void {

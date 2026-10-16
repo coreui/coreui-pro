@@ -6187,6 +6187,34 @@ describe('MultiSelect', () => {
       expect(new FormData(fixtureEl.querySelector('form')).getAll('tech')).toEqual(['a'])
     })
 
+    it('should bring a start value the options delivered later back on a form reset', async () => {
+      fixtureEl.innerHTML = '<form><select multiple name="tech"></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external', options: [], value: ['a'] })
+
+      multiSelect.setOptions([{ value: 'a', text: 'Angular' }, { value: 'r', text: 'React' }])
+      multiSelect.deselectAll()
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should keep the reset snapshot apart from the selection the options relabel', async () => {
+      fixtureEl.innerHTML = '<form><select multiple name="tech"><option value="a" selected>Angular</option></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external' })
+
+      multiSelect.setOptions([{ value: 'a', text: 'Angular 20', disabled: true }])
+      multiSelect.setOptions([{ value: 'r', text: 'React' }])
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue()).toEqual([{ value: 'a', text: 'Angular' }])
+    })
+
     it('should report the query on every change of the text and not on navigation keys', async () => {
       const multiSelect = mountExternal()
       const queries = []
