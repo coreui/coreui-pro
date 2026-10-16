@@ -373,6 +373,10 @@ class Autocomplete extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_KEYDOWN, event => {
+      if (!event.key) {
+        return
+      }
+
       if (event.key === ESCAPE_KEY) {
         this.hide()
         if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
@@ -389,6 +393,10 @@ class Autocomplete extends BaseComponent {
     })
 
     EventHandler.on(this._menu, EVENT_KEYDOWN, event => {
+      if (!event.key) {
+        return
+      }
+
       if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
         this._inputElement.focus()
       }
@@ -485,6 +493,10 @@ class Autocomplete extends BaseComponent {
     })
 
     EventHandler.on(this._inputElement, EVENT_KEYUP, event => {
+      if (!event.key) {
+        return
+      }
+
       if (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY) {
         const { value } = event.target
         this.search(value)

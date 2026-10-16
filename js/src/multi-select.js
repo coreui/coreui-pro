@@ -430,6 +430,10 @@ class MultiSelect extends BaseComponent {
     })
 
     EventHandler.on(this._wrapperElement, EVENT_KEYDOWN, event => {
+      if (!event.key) {
+        return
+      }
+
       if (event.key === ESCAPE_KEY) {
         this.hide()
         return
@@ -441,6 +445,10 @@ class MultiSelect extends BaseComponent {
     })
 
     EventHandler.on(this._menu, EVENT_KEYDOWN, event => {
+      if (!event.key) {
+        return
+      }
+
       if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
         this._searchElement.focus()
       }
@@ -461,7 +469,7 @@ class MultiSelect extends BaseComponent {
 
     // Validation focuses the overlay select; hand its keystrokes to the custom control.
     EventHandler.on(this._element, EVENT_KEYDOWN, event => {
-      if (event.key === TAB_KEY || event.key === ESCAPE_KEY) {
+      if (!event.key || event.key === TAB_KEY || event.key === ESCAPE_KEY) {
         return
       }
 
@@ -499,6 +507,10 @@ class MultiSelect extends BaseComponent {
     })
 
     EventHandler.on(this._searchElement, EVENT_KEYDOWN, event => {
+      if (!event.key) {
+        return
+      }
+
       if ((!this._isShown() && event.key.length === 1 && !event.ctrlKey && !event.metaKey) || event.key === ARROW_DOWN_KEY) {
         this.show()
       }

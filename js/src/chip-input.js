@@ -170,7 +170,7 @@ class ChipInput extends ChipSet {
 
   _addInputEventListeners() {
     EventHandler.on(this._element, EVENT_KEYDOWN, event => {
-      if (event.target === this._input) {
+      if (!event.key || event.target === this._input) {
         return
       }
 

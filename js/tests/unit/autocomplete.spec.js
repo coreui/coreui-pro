@@ -1,7 +1,7 @@
 import Autocomplete from '../../src/autocomplete.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import {
-  clearFixture, createEvent, getFixture, jQueryMock
+  captureErrors, clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
 
 describe('Autocomplete', () => {
@@ -1606,6 +1606,25 @@ describe('Autocomplete', () => {
       autocomplete._menu.dispatchEvent(keydownEvent)
 
       expect(spy).toHaveBeenCalled()
+    })
+
+    it('should ignore key events without a key, as autofill sends them', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }],
+        search: ['global']
+      })
+
+      autocomplete.show()
+
+      const errors = captureErrors(() => {
+        autocompleteEl.dispatchEvent(new Event('keydown', { bubbles: true }))
+        autocomplete._menu.dispatchEvent(new Event('keydown', { bubbles: true }))
+        autocomplete._inputElement.dispatchEvent(new Event('keyup', { bubbles: true }))
+      })
+
+      expect(errors).toEqual([])
     })
   })
 
