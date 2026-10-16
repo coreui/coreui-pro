@@ -333,6 +333,10 @@ class Combobox extends ComboboxBase {
   override _configAfterMerge(config: any): any {
     config = this._normalizeContainerConfig(config)
 
+    if (typeof config.value === 'number') {
+      config.value = String(config.value)
+    }
+
     if (config.multiple && this._valueFromMarkup && typeof config.value === 'string') {
       config.value = config.value.split(/,\s*/)
     }

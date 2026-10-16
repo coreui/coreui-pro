@@ -537,6 +537,20 @@ describe('Combobox', () => {
       expect(value(toggle)).toEqual('NYC metro')
     })
 
+    it('should take a numeric value attribute', () => {
+      const options = [
+        '<div class="list-box-option" data-coreui-value="123">Order 123</div>',
+        '<div class="list-box-option" data-coreui-value="456">Order 456</div>'
+      ]
+      const single = new Combobox(setMarkup(' data-coreui-value="123"', options))
+
+      expect(single.getValue()).toEqual('123')
+
+      const multiple = new Combobox(setMarkup(' data-coreui-multiple="true" data-coreui-value="456"', options))
+
+      expect(multiple.getValue()).toEqual(['456'])
+    })
+
     it('should split a comma separated value attribute', () => {
       const toggle = setMarkup(' data-coreui-multiple="true" data-coreui-value="us,ca"')
       const combobox = new Combobox(toggle)
