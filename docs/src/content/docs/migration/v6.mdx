@@ -1043,6 +1043,13 @@ check, radio, carousel and toggler icons already work:
   typing local: the search box then filters only while it has the focus, and
   a keystroke over the options list jumps to the first option starting with
   it. Any other string throws a `TypeError`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Multi Select's `value` wins over options marked `selected`.** It used to
+  add to them, in the markup and in `options`, and a later `setConfig()` with
+  new options applied the start value again; now a given `value` is the
+  selection, also for options that arrive later for the first time, as in the
+  React and Vue editions, while options shown before keep their state. An array of numbers matches the options, and `value: ''` reads
+  like an empty `data-coreui-value`.
 - **Multi Select takes `search: 'external'`.** The search box then filters
   nothing, `search.coreui.multi-select` carries the `query`, and
   `setOptions()` replaces the options without rebuilding the control or
