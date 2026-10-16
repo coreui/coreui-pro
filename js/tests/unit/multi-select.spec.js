@@ -2629,6 +2629,23 @@ describe('MultiSelect', () => {
       expect(events).toEqual([])
     })
 
+    it('should keep select all working when the search leaves only a disabled option on the screen', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">A</option><option value="b">B</option><option value="d" disabled>D</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true, selectAll: true })
+
+      multiSelect.show()
+      multiSelect._searchElement.value = 'D'
+      multiSelect._searchElement.dispatchEvent(new Event('input', { bubbles: true }))
+
+      const selectAll = multiSelect._menu.querySelector('[data-coreui-select-all]')
+
+      expect(selectAll.disabled).toBeFalse()
+
+      selectAll.click()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b'])
+    })
+
     it('should trigger one changed event for select all', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

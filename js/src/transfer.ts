@@ -483,7 +483,15 @@ class Transfer extends BaseComponent {
   _flatItems(items: ListBoxEntry[]): ListBoxItem[] {
     return items
       .filter(entry => entry !== null && typeof entry === 'object')
-      .flatMap(entry => (Array.isArray((entry as ListBoxGroup).items) ? (entry as ListBoxGroup).items : [entry as ListBoxItem]))
+      .flatMap(entry => {
+        const group = entry as ListBoxGroup
+
+        if (!Array.isArray(group.items)) {
+          return [entry as ListBoxItem]
+        }
+
+        return group.disabled ? group.items.map(item => ({ ...item, disabled: true })) : group.items
+      })
   }
 
   _itemValue(item: ListBoxItem): string {

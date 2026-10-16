@@ -19,6 +19,7 @@ import {
   getAriaPressed,
   getScopeSelectionState,
   getSelectionLimit,
+  getSelectionState,
   isSelectionLimitReached,
   resolveCountLabel,
   type SelectionMode,
@@ -201,7 +202,7 @@ class ListBox extends BaseComponent {
   protected declare _active: string | null
   protected declare _anchor: string | null
   protected declare _counter: HTMLElement | null
-  protected declare _disabledSections: Set<HTMLElement>
+  protected declare _disabledSections: WeakSet<HTMLElement>
   protected declare _field: HTMLElement | null
   protected declare _items: ListBoxEntry[] | null
   protected declare _focused: boolean
@@ -218,7 +219,7 @@ class ListBox extends BaseComponent {
 
     this._active = null
     this._anchor = null
-    this._disabledSections = new Set()
+    this._disabledSections = new WeakSet()
     this._field = getElement(this._config.activeDescendant)
     this._items = this._config.items.length > 0 ? this._normalizeItems(this._config.items) : null
     this._focused = false
@@ -337,6 +338,10 @@ class ListBox extends BaseComponent {
       this._triggerChange()
     }
 
+    if (!this._config) {
+      return
+    }
+
     this._limited = refused
     this._reportLimit()
   }
@@ -427,6 +432,12 @@ class ListBox extends BaseComponent {
 
   override dispose(): void {
     this._typeaheadBuffer.clear()
+
+    for (const label of SelectorEngine.find(SELECTOR_SECTION_TOGGLE, this._list)) {
+      if (this._disabledSections.has(label)) {
+        label.removeAttribute('aria-disabled')
+      }
+    }
 
     this._element.removeAttribute(ATTRIBUTE_INDICATOR)
     this._element.classList.remove(CLASS_NAME_LOADING)
@@ -619,7 +630,7 @@ class ListBox extends BaseComponent {
   _normalizeGroup(group: ListBoxGroup): ListBoxGroup {
     return {
       label: String(group.label ?? ''),
-      items: group.items.filter(item => item !== null && typeof item === 'object').map(item => this._normalizeItem(group.disabled ? { ...item, disabled: true } : item)),
+      items: group.items.filter(item => item !== null && typeof item === 'object').map(item => this._normalizeItem(item)),
       ...group.disabled && { disabled: true }
     }
   }
@@ -690,7 +701,7 @@ class ListBox extends BaseComponent {
     section.classList.add(CLASS_NAME_SECTION)
     section.setAttribute('role', 'group')
     section.setAttribute('aria-labelledby', label.id)
-    section.append(label, ...group.items.map(item => this._renderOption(item)))
+    section.append(label, ...group.items.map(item => this._renderOption(group.disabled ? { ...item, disabled: true } : item)))
 
     return section
   }
@@ -803,9 +814,12 @@ class ListBox extends BaseComponent {
     for (const label of SelectorEngine.find(SELECTOR_SECTION_TOGGLE, this._list)) {
       const section = label.closest(SELECTOR_SECTION) as HTMLElement
       const options = this._sectionOptions(section)
-      const shown = options.length > 0 ? options : SelectorEngine.find(SELECTOR_OPTION, section).filter(option => !this._isHidden(option))
+      const shown = SelectorEngine.find(SELECTOR_OPTION, section).filter(option => !this._isHidden(option))
+      const state = options.length > 0 ?
+        this._scopeState(options) :
+        getSelectionState(shown.filter(option => this._selected.has(this._optionValue(option))).length, shown.length)
 
-      this._showSelectionState(label, this._scopeState(shown))
+      this._showSelectionState(label, state)
       label.classList.toggle(CLASS_NAME_ACTIVE, this._optionValue(label) === this._active && (this._focused || Boolean(this._field)))
 
       if (this._field) {
@@ -941,7 +955,7 @@ class ListBox extends BaseComponent {
     }
 
     this._selectAll.setAttribute('aria-controls', this._list.id)
-    this._selectAll.disabled = this._config.disabled || this._config.selectionMode !== SELECTION_MODE_MULTIPLE || this._navigableOptions().length === 0
+    this._selectAll.disabled = this._config.disabled || this._config.selectionMode !== SELECTION_MODE_MULTIPLE
 
     this._decorateOption(this._selectAll)
     this._showSelectionState(this._selectAll, this._selectionState())

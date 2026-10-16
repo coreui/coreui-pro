@@ -96,7 +96,7 @@ A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the
     </div>
   </div>`} />
 
-"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the button take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides which values a second click drops, so a value the filter hid stays selected. The button reads as pressed once that set is selected, or once the values of it you selected fill what `selectionLimit` leaves after the values the filter hid; a click then drops the visible values. With nothing in the set, the button is disabled. Pass an explicit list to `selectAll(values)` to select beyond the filter, and call `clear()` to empty the selection whatever the filter shows.
+"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the button take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides which values a second click drops, so a value the filter hid stays selected. The button reads as pressed once that set is selected, or once the values of it you selected fill what `selectionLimit` leaves after the values selected outside it, hidden by the filter or missing from the items; a click then drops the visible values. Pass an explicit list to `selectAll(values)` to select beyond the filter, and call `clear()` to empty the selection whatever the filter shows.
 
 ### Selection limit
 
@@ -330,7 +330,7 @@ An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</
 
 ## Disabled items
 
-`.disabled` (with `aria-disabled="true"` for assistive technology) keeps the user out: it takes an option out of the keyboard order and out of every selection the user makes, the arrows, a click, a section label, a range and select all. Your code is not kept out, as with a native `<select>`: a disabled value passed in `selected`, an item carrying both `disabled` and `selected`, and a value that is already selected when `setItems()` brings it back disabled are selected and read as selected, and come off with `deselect()` or `clear()`. `data-coreui-disabled="true"` on the list box does the same for all of it: `aria-disabled` lands on the options element and the select-all button is disabled.
+`.disabled` (with `aria-disabled="true"` for assistive technology) keeps the user out: it takes an option out of the keyboard order and out of every selection the user makes, the arrows, a click, a section label, a range and select all. Your code is not kept out of the values it sets, as with a native `<select>`: a disabled value passed in `selected`, an item carrying both `disabled` and `selected`, and a value that is already selected when `setItems()` brings it back disabled are selected and read as selected, and come off with `deselect()` or `clear()`. `select()`, `toggle()` and `selectAll()` act as the user would and leave a disabled option alone. `data-coreui-disabled="true"` on the list box does the same for all of it: `aria-disabled` lands on the options element and the select-all button is disabled.
 
 <Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">

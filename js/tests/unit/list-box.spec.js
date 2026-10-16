@@ -535,20 +535,28 @@ describe('ListBox', () => {
       expect(el.querySelector('[data-coreui-select-all]').getAttribute('aria-pressed')).toEqual('false')
     })
 
-    it('should disable select all while no option is left to take', () => {
+    it('should keep select all enabled with nothing on the screen to take', () => {
       const el = setMarkup(' data-coreui-selection-mode="multiple"', [
-        '<div class="list-box-option" data-coreui-value="lettuce" hidden>Lettuce</div>',
         '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>'
       ], selectAllMarkup)
-      const listBox = new ListBox(el)
-      const selectAll = el.querySelector('[data-coreui-select-all]')
+      // eslint-disable-next-line no-new
+      new ListBox(el)
 
-      expect(selectAll.disabled).toBeTrue()
+      expect(el.querySelector('[data-coreui-select-all]').disabled).toBeFalse()
+    })
 
-      item(el, 'lettuce').hidden = false
-      listBox.update()
+    it('should not let a change listener that disposes the list box break setItems over the limit', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
 
-      expect(selectAll.disabled).toBeFalse()
+      listBox.select('lettuce')
+      el.addEventListener('change.coreui.list-box', () => listBox.dispose(), { once: true })
+
+      expect(() => listBox.setItems([
+        { value: 'lettuce', label: 'Lettuce' },
+        { value: 'tomato', label: 'Tomato', selected: true },
+        { value: 'onion', label: 'Onion', selected: true }
+      ])).not.toThrow()
     })
 
     it('should add marked items from setItems only up to the limit and report the first one left out', () => {
@@ -1282,6 +1290,17 @@ describe('ListBox', () => {
       expect(item(el, 'ham').getAttribute('aria-disabled')).toEqual('true')
       expect(listBox.getSelectedValues()).toEqual([])
       expect(listBox.getItems()[0].disabled).toBeTrue()
+    })
+
+    it('should enable the items of a group again when setItems drops the group flag', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, { items: [{ label: 'Meat', disabled: true, items: [{ value: 'ham', label: 'Ham' }] }] })
+      const items = listBox.getItems()
+
+      items[0].disabled = false
+      listBox.setItems(items)
+
+      expect(item(el, 'ham').hasAttribute('aria-disabled')).toBeFalse()
     })
 
     it('should render flat items and create the options element', () => {
@@ -2047,6 +2066,38 @@ describe('ListBox', () => {
       item(el, 'ham').classList.remove('disabled')
       listBox.update()
       expect(label(el, 0).hasAttribute('aria-disabled')).toBeFalse()
+    })
+
+    it('should take back the aria-disabled it wrote on a section label when it is disposed', () => {
+      const el = setMarkup('', [
+        '<div class="list-box-section">',
+        '<div class="list-box-section-label">Meat</div>',
+        '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>',
+        '</div>'
+      ])
+      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
+
+      expect(label(el, 0).getAttribute('aria-disabled')).toEqual('true')
+
+      listBox.dispose()
+
+      expect(label(el, 0).hasAttribute('aria-disabled')).toBeFalse()
+    })
+
+    it('should read the state of a section with nothing to take without the selection limit', () => {
+      const el = setMarkup('', [
+        '<div class="list-box-section">',
+        '<div class="list-box-section-label">Meat</div>',
+        '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>',
+        '<div class="list-box-option disabled" data-coreui-value="bacon">Bacon</div>',
+        '</div>'
+      ])
+      // eslint-disable-next-line no-new
+      new ListBox(el, {
+        selectionMode: 'multiple', sectionsSelectable: true, selectionLimit: 1, selected: ['ham']
+      })
+
+      expect(label(el, 0).getAttribute('aria-pressed')).toEqual('mixed')
     })
 
     it('should keep an aria-disabled the page wrote on a section label', () => {
