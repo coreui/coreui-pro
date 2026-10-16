@@ -1073,8 +1073,11 @@ check, radio, carousel and toggler icons already work:
   option they touched; they send one now, once the native select holds the new
   value and the control shows it, the way the native `change` works. An action
   that changes nothing sends no event, native ones included, and the component
-  no longer sends one for each preselected option while it builds or rebuilds;
-  `setConfig()` sends one when it changes the selection.
+  no longer sends one for each preselected option while it builds or rebuilds.
+  A selection the page gives sends none, from `setConfig()` or from a given
+  `value` that options from `setOptions()` bring later, and a native reset of
+  the form that changes the selection sends one, as Autocomplete, Chip Input
+  and Combobox do.
 - **Multi Select keeps its selection through `setConfig()`** when the config
   carries neither `options` nor `value`, fitted to a new `multiple` or
   `selectionLimit`; with options from the config it used to fall back to the
