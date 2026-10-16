@@ -2731,6 +2731,22 @@ describe('MultiSelect', () => {
       expect(multiSelect._getSelectAllState()).toEqual('all')
     })
 
+    it('should leave a value whose first listing is disabled out of selectFiltered', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [
+          { label: 'Closed', disabled: true, options: [{ value: 'x', text: 'X' }] },
+          { value: 'x', text: 'X2' },
+          { value: 'a', text: 'A' }
+        ],
+        selectAllMode: 'filtered'
+      })
+
+      multiSelect.selectFiltered()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+
     it('should skip a disabled group nested in another group', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
