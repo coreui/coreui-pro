@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO chip-input.js v5.29.1 (https://coreui.io)
+  * CoreUI PRO chip-input.js v5.29.2 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -163,7 +163,7 @@
     }
     _addInputEventListeners() {
       EventHandler.on(this._element, EVENT_KEYDOWN, event => {
-        if (event.target === this._input) {
+        if (!event.key || event.target === this._input) {
           return;
         }
 

@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO search-button.js v5.29.1 (https://coreui.io)
+  * CoreUI PRO search-button.js v5.29.2 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -284,6 +284,9 @@
       data._triggerEvent('click');
     }
     static _handleDataApiKeydown(event) {
+      if (!event.key) {
+        return;
+      }
       for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
         const data = SearchButton.getOrCreateInstance(button);
         data._syncActiveKeys(event);
@@ -293,6 +296,9 @@
       }
     }
     static _handleDataApiKeyup(event) {
+      if (!event.key) {
+        return;
+      }
       for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
         SearchButton.getOrCreateInstance(button)._syncActiveKeys(event);
       }

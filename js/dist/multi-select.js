@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO multi-select.js v5.29.1 (https://coreui.io)
+  * CoreUI PRO multi-select.js v5.29.2 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -396,6 +396,9 @@
         }
       });
       EventHandler.on(this._wrapperElement, EVENT_KEYDOWN, event => {
+        if (!event.key) {
+          return;
+        }
         if (event.key === ESCAPE_KEY) {
           this.hide();
           return;
@@ -405,6 +408,9 @@
         }
       });
       EventHandler.on(this._menu, EVENT_KEYDOWN, event => {
+        if (!event.key) {
+          return;
+        }
         if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
           this._searchElement.focus();
         }
@@ -423,7 +429,7 @@
 
       // Validation focuses the overlay select; hand its keystrokes to the custom control.
       EventHandler.on(this._element, EVENT_KEYDOWN, event => {
-        if (event.key === TAB_KEY || event.key === ESCAPE_KEY) {
+        if (!event.key || event.key === TAB_KEY || event.key === ESCAPE_KEY) {
           return;
         }
 
@@ -455,6 +461,9 @@
         this._onSearchChange(this._searchElement);
       });
       EventHandler.on(this._searchElement, EVENT_KEYDOWN, event => {
+        if (!event.key) {
+          return;
+        }
         if (!this._isShown() && event.key.length === 1 && !event.ctrlKey && !event.metaKey || event.key === ARROW_DOWN_KEY) {
           this.show();
         }

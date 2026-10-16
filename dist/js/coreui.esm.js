@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO v5.29.1 (https://coreui.io)
+  * CoreUI PRO v5.29.2 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -703,7 +703,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '5.29.1';
+const VERSION = '5.29.2';
 
 /**
  * Class definition
@@ -1447,6 +1447,9 @@ class Autocomplete extends BaseComponent {
       }
     });
     EventHandler.on(this._element, EVENT_KEYDOWN$c, event => {
+      if (!event.key) {
+        return;
+      }
       if (event.key === ESCAPE_KEY$7) {
         this.hide();
         if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
@@ -1460,6 +1463,9 @@ class Autocomplete extends BaseComponent {
       }
     });
     EventHandler.on(this._menu, EVENT_KEYDOWN$c, event => {
+      if (!event.key) {
+        return;
+      }
       if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$2 || event.key === DELETE_KEY$1)) {
         this._inputElement.focus();
       }
@@ -1534,6 +1540,9 @@ class Autocomplete extends BaseComponent {
       }
     });
     EventHandler.on(this._inputElement, EVENT_KEYUP$1, event => {
+      if (!event.key) {
+        return;
+      }
       if (event.key.length === 1 || event.key === BACKSPACE_KEY$2 || event.key === DELETE_KEY$1) {
         const {
           value
@@ -5660,7 +5669,7 @@ class ChipInput extends ChipSet {
   }
   _addInputEventListeners() {
     EventHandler.on(this._element, EVENT_KEYDOWN$7, event => {
-      if (event.target === this._input) {
+      if (!event.key || event.target === this._input) {
         return;
       }
 
@@ -9905,6 +9914,9 @@ class MultiSelect extends BaseComponent {
       }
     });
     EventHandler.on(this._wrapperElement, EVENT_KEYDOWN$4, event => {
+      if (!event.key) {
+        return;
+      }
       if (event.key === ESCAPE_KEY$2) {
         this.hide();
         return;
@@ -9914,6 +9926,9 @@ class MultiSelect extends BaseComponent {
       }
     });
     EventHandler.on(this._menu, EVENT_KEYDOWN$4, event => {
+      if (!event.key) {
+        return;
+      }
       if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY)) {
         this._searchElement.focus();
       }
@@ -9932,7 +9947,7 @@ class MultiSelect extends BaseComponent {
 
     // Validation focuses the overlay select; hand its keystrokes to the custom control.
     EventHandler.on(this._element, EVENT_KEYDOWN$4, event => {
-      if (event.key === TAB_KEY || event.key === ESCAPE_KEY$2) {
+      if (!event.key || event.key === TAB_KEY || event.key === ESCAPE_KEY$2) {
         return;
       }
 
@@ -9964,6 +9979,9 @@ class MultiSelect extends BaseComponent {
       this._onSearchChange(this._searchElement);
     });
     EventHandler.on(this._searchElement, EVENT_KEYDOWN$4, event => {
+      if (!event.key) {
+        return;
+      }
       if (!this._isShown() && event.key.length === 1 && !event.ctrlKey && !event.metaKey || event.key === ARROW_DOWN_KEY$2) {
         this.show();
       }
@@ -14540,6 +14558,9 @@ class SearchButton extends BaseComponent {
     data._triggerEvent('click');
   }
   static _handleDataApiKeydown(event) {
+    if (!event.key) {
+      return;
+    }
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE$3)) {
       const data = SearchButton.getOrCreateInstance(button);
       data._syncActiveKeys(event);
@@ -14549,6 +14570,9 @@ class SearchButton extends BaseComponent {
     }
   }
   static _handleDataApiKeyup(event) {
+    if (!event.key) {
+      return;
+    }
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE$3)) {
       SearchButton.getOrCreateInstance(button)._syncActiveKeys(event);
     }

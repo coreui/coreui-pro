@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO autocomplete.js v5.29.1 (https://coreui.io)
+  * CoreUI PRO autocomplete.js v5.29.2 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -339,6 +339,9 @@
         }
       });
       EventHandler.on(this._element, EVENT_KEYDOWN, event => {
+        if (!event.key) {
+          return;
+        }
         if (event.key === ESCAPE_KEY) {
           this.hide();
           if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
@@ -352,6 +355,9 @@
         }
       });
       EventHandler.on(this._menu, EVENT_KEYDOWN, event => {
+        if (!event.key) {
+          return;
+        }
         if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
           this._inputElement.focus();
         }
@@ -426,6 +432,9 @@
         }
       });
       EventHandler.on(this._inputElement, EVENT_KEYUP, event => {
+        if (!event.key) {
+          return;
+        }
         if (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY) {
           const {
             value
