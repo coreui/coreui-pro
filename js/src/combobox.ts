@@ -209,7 +209,6 @@ class Combobox extends ComboboxBase {
     this._floatingCleanup = null
     this._anchoredPosition = null
     this._search = ''
-    this._syncing = false
 
     this._createCombobox()
     this._addEventListeners()
@@ -534,27 +533,7 @@ class Combobox extends ComboboxBase {
       return
     }
 
-    const next = toSelectionValues(values, this._config.multiple ? 'multiple' : 'single')
-    const selectable = new Set(SelectorEngine.find(SELECTOR_OPTION, this._optionsElement)
-      .filter(option => !option.classList.contains(CLASS_NAME_DISABLED) && option.getAttribute('aria-disabled') !== 'true')
-      .map(option => this._valueOf(option as HTMLElement)))
-    const kept = this._listBox.getSelectedValues().filter(value => next.includes(value))
-    const reorder = kept.join('\u0000') !== next.filter(value => kept.includes(value)).join('\u0000')
-
-    this._syncing = true
-
-    for (const value of this._listBox.getSelectedValues()) {
-      if (!next.includes(value) || (reorder && selectable.has(value))) {
-        this._listBox.deselect(value)
-      }
-    }
-
-    for (const value of next) {
-      this._listBox.select(value)
-    }
-
-    this._syncing = false
-
+    this._listBox._setSelection(values)
     this._commitValue()
   }
 

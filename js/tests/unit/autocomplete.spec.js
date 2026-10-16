@@ -1510,6 +1510,31 @@ describe('Autocomplete', () => {
   })
 
   describe('setConfig', () => {
+    it('should not send list box events when the page changes the value', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+        options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }],
+        value: '1'
+      })
+      const events = []
+      const listener = event => events.push(event.type)
+
+      autocomplete.show()
+
+      for (const name of ['select', 'selected', 'deselect', 'deselected', 'change']) {
+        document.addEventListener(`${name}.coreui.list-box`, listener)
+      }
+
+      autocomplete.setConfig({ value: '2' })
+      autocomplete.deselectAll()
+
+      for (const name of ['select', 'selected', 'deselect', 'deselected', 'change']) {
+        document.removeEventListener(`${name}.coreui.list-box`, listener)
+      }
+
+      expect(events).toEqual([])
+    })
+
     it('should apply invalid and valid given to setConfig', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')

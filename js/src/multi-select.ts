@@ -1367,14 +1367,6 @@ class MultiSelect extends ComboboxBase {
 
   _render(): void {
     const options = new Map(flattenOptions(this._options).toReversed().map((option: any) => [String(option.value), option]))
-    const values = new Set<string>(this._selected.map((option: any) => option.value))
-    const held = new Set<string>(this._listBox ? this._listBox.getSelectedValues() : [])
-
-    for (const value of held) {
-      if (!values.has(value)) {
-        this._syncOptionElementState(value, false)
-      }
-    }
 
     for (const option of this._selected) {
       const listed = options.get(option.value)
@@ -1389,13 +1381,10 @@ class MultiSelect extends ComboboxBase {
         option.disabled = true
       } else {
         delete option.disabled
-
-        if (!held.has(option.value)) {
-          this._syncOptionElementState(option.value, true)
-        }
       }
     }
 
+    this._projectSelection(this._selected.map((option: any) => option.value))
     this._syncNativeSelection(options)
     this._validation.userAction = false
     this._updateSelection()
