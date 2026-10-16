@@ -424,13 +424,14 @@ export const getHourCycle = (layout: DateSection[]): EditableSection['cycle'] =>
 /**
  * Tells whether a key press types its character into a section: one character
  * with no Alt, Control or Meta held. A character such a press composes, as
- * AltGr or Option do, reaches the section through `beforeinput` instead.
+ * AltGr or Option do, reaches the section through `beforeinput` instead, and a
+ * key event without a key, such as the ones autofill sends, types nothing.
  *
  * @param event - The key press
  * @returns `true` for a typed character
  */
 export const isTypedKey = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'key' | 'metaKey'>): boolean =>
-  event.key.length === 1 && !hasShortcutModifier(event)
+  event.key?.length === 1 && !hasShortcutModifier(event)
 
 /**
  * Applies a typed digit to a section: digits add up while the value is still

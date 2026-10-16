@@ -370,7 +370,7 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_RATING_ITEM_INPUT, (event: any) => {
-      if (this._config.readonly && event.key.startsWith('Arrow')) {
+      if (this._config.readonly && event.key?.startsWith('Arrow')) {
         event.preventDefault()
       }
     })

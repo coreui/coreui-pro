@@ -5,7 +5,7 @@ import EventHandler from '../../src/dom/event-handler.js'
 import Form from '../../src/form.js'
 import Tooltip from '../../src/tooltip.js'
 import {
-  getFixture, clearFixture, createEvent, jQueryMock
+  captureErrors, getFixture, clearFixture, createEvent, jQueryMock
 } from '../helpers/fixture.js'
 
 describe('Rating', () => {
@@ -2415,6 +2415,18 @@ describe('Rating', () => {
         const changeEvent = createEvent('change', { bubbles: true })
         input.dispatchEvent(changeEvent)
       })
+    })
+
+    it('should ignore a keydown without a key on a read-only rating, as autofill sends it', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Rating(div, { readonly: true, value: 2 }) // eslint-disable-line no-new
+
+      const errors = captureErrors(() => {
+        div.querySelector('.rating-item-input').dispatchEvent(new Event('keydown', { bubbles: true }))
+      })
+
+      expect(errors).toEqual([])
     })
   })
 

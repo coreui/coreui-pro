@@ -405,6 +405,10 @@ describe('Date Sections Utilities', () => {
         expect(isTypedKey(press(key, { altKey: true }))).toBeFalse()
       }
     })
+
+    it('should type nothing for a key event without a key', () => {
+      expect(isTypedKey(new Event('keydown'))).toBeFalse()
+    })
   })
 
   describe('applyDigitToSection', () => {

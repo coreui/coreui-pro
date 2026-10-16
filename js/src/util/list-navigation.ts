@@ -2,7 +2,7 @@ export { getNextActiveElement } from './index.js'
 
 export type TypeaheadBuffer = {
   clear: () => void
-  push: (key: string) => string | null
+  push: (key: string | undefined) => string | null
 }
 
 /**
@@ -12,8 +12,8 @@ export type TypeaheadBuffer = {
  * @param timeout - How long, in milliseconds, the text survives without a new character, 500 when
  * left out
  * @returns `push(key)`, which adds a key value of one character other than the space and returns
- * the text, or returns `null` for any other key, and `clear()`, which empties the text and stops the
- * timer
+ * the text, or returns `null` for any other key or for a key event without a key, and `clear()`,
+ * which empties the text and stops the timer
  */
 export const createTypeaheadBuffer = (timeout = 500): TypeaheadBuffer => {
   let text = ''
@@ -25,7 +25,7 @@ export const createTypeaheadBuffer = (timeout = 500): TypeaheadBuffer => {
       text = ''
     },
     push(key) {
-      if (key.length !== 1 || key === ' ') {
+      if (key?.length !== 1 || key === ' ') {
         return null
       }
 
