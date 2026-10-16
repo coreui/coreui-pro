@@ -454,16 +454,28 @@ describe('ListBox', () => {
       expect(listBox.getSelectedValues()).toEqual(['tomato', 'onion'])
     })
 
-    it('should stop at the selection limit and keep one value in single mode', () => {
+    it('should take each value once, stop at the selection limit and keep one value in single mode', () => {
       const limited = new ListBox(setMarkup(), { selectionMode: 'multiple', selectionLimit: 2 })
 
-      limited._setSelection(['lettuce', 'tomato', 'onion'])
+      limited._setSelection(['lettuce', 'lettuce', 'tomato', 'onion'])
       expect(limited.getSelectedValues()).toEqual(['lettuce', 'tomato'])
 
       const single = new ListBox(setMarkup())
 
       single._setSelection(['lettuce', 'tomato'])
       expect(single.getSelectedValues()).toEqual(['lettuce'])
+    })
+
+    it('should read a value listed twice from its first option', () => {
+      const el = setMarkup('', [
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option disabled" data-coreui-value="lettuce">Lettuce</div>'
+      ])
+      const listBox = new ListBox(el, { selectionMode: 'multiple' })
+
+      listBox._setSelection(['lettuce'])
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
     })
 
     it('should not redraw the list when the selection stays the same', () => {

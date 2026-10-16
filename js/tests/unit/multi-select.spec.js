@@ -5507,12 +5507,21 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
 
       multiSelect.show()
+      const listBox = multiSelect._listBox
+      const update = spyOn(listBox, 'update').and.callThrough()
+      const project = listBox._setSelection.bind(listBox)
+      let redraws = 0
+
+      spyOn(listBox, '_setSelection').and.callFake(values => {
+        const before = update.calls.count()
+        project(values)
+        redraws += update.calls.count() - before
+      })
       multiSelect._menu.querySelector('[data-coreui-value="3"]').click()
-      const update = spyOn(multiSelect._listBox, 'update').and.callThrough()
-      multiSelect._render()
 
       expect(multiSelect.getValue()).toHaveSize(3)
-      expect(update).not.toHaveBeenCalled()
+      expect(listBox._setSelection).toHaveBeenCalled()
+      expect(redraws).toEqual(0)
     })
 
     it('should report the limit once when a range in the list stops at it', () => {

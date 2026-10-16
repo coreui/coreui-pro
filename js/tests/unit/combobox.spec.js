@@ -997,6 +997,15 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toEqual(['us', 'uk'])
     })
 
+    it('should take setValue on a disabled combobox, like a disabled native select', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { disabled: true, multiple: true })
+
+      combobox.setValue(['uk'])
+
+      expect(combobox.getValue()).toEqual(['uk'])
+    })
+
     it('should not send list box events from setValue', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { multiple: true })
