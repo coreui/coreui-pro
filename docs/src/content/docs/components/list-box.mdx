@@ -96,7 +96,7 @@ A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the
     </div>
   </div>`} />
 
-"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the button take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides which values a second click drops, so a value the filter hid stays selected. The button reads as pressed once that set is selected, or once `selectionLimit` is reached within it. Pass an explicit list to `selectAll(values)` to select beyond the filter, and call `clear()` to empty the selection whatever the filter shows.
+"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the button take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides which values a second click drops, so a value the filter hid stays selected. The button reads as pressed once that set is selected, or once `selectionLimit` has no room left for it, values the filter hid counted too; a click then drops the visible values. Pass an explicit list to `selectAll(values)` to select beyond the filter, and call `clear()` to empty the selection whatever the filter shows.
 
 ### Selection limit
 
@@ -129,7 +129,7 @@ Leave an empty `.list-box-options` in the markup so you can name it; the plugin 
 
 ## Remote data
 
-`setItems(items)` rebuilds the list at any time and leaves the selection alone. A value the new items no longer carry stays selected, counts against `selectionLimit`, and comes off with `deselect()`, `clear()` or the next pick in single mode. An item marked `selected` joins a multiple selection and fires `change.coreui.list-box` once; in single mode it is taken only while nothing is selected. Otherwise nothing fires, so re-fetching the same page or answering a search costs the user nothing. `getItems()` hands back the normalized array.
+`setItems(items)` rebuilds the list at any time and leaves the selection alone. A value the new items no longer carry stays selected, counts against `selectionLimit`, and comes off with `deselect()`, `clear()` or the next pick in single mode. An item marked `selected` joins a multiple selection up to `selectionLimit` and fires `change.coreui.list-box` once, and the first one the limit leaves out fires `selectionLimit.coreui.list-box`; in single mode it is taken only while nothing is selected. Otherwise nothing fires, so re-fetching the same page or answering a search costs the user nothing. `getItems()` hands back the normalized array.
 
 A list that depends on another field, such as the cities of the chosen country, sets `resetSelectionOnItemsChange: true`. Whenever the values of the new items differ from the ones before, `setItems` then starts from an empty selection and takes the items marked `selected`, so the city of the previous country never travels on with the next one. The same values again, in any order, keep the selection. Leave it off with `search: 'external'`, where every answer brings different values and would drop the pick.
 
@@ -260,7 +260,7 @@ Group options in a `.list-box-section` and name it with a `.list-box-section-lab
 
 ### Selectable sections
 
-`sectionsSelectable` turns every section label into a tri-state button that toggles its own section: `aria-pressed` reads `false`, `mixed` or `true`, and with `indicator: 'checkbox'` the label carries the same checkbox as the options. It works in `multiple` mode and covers the section's visible, enabled options only, so a filtered list toggles what is on screen; `selectionLimit` still applies. The labels join the arrow-key order in document position, so <kbd>↓</kbd> walks label, options, next label.
+`sectionsSelectable` turns every section label into a tri-state button that toggles its own section: `aria-pressed` reads `false`, `mixed` or `true`, and with `indicator: 'checkbox'` the label carries the same checkbox as the options. It works in `multiple` mode and covers the section's visible, enabled options only, so a filtered list toggles what is on screen; `selectionLimit` still applies. A label whose section has no such option carries `aria-disabled="true"` and leaves the arrow-key order. The labels join the arrow-key order in document position, so <kbd>↓</kbd> walks label, options, next label.
 
 <Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple" data-coreui-sections-selectable="true" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
@@ -342,7 +342,7 @@ An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</
 
 ## Empty state
 
-A `.list-box-empty` element inside the options is shown whenever nothing is left to navigate and hidden as soon as something is, so filtering a list has somewhere to land. `update()` re-evaluates it.
+A `.list-box-empty` element inside the options is shown whenever no option is left on the screen and hidden as soon as one is, a disabled one included, so filtering a list has somewhere to land. `update()` re-evaluates it.
 
 <Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Results">
