@@ -6043,6 +6043,48 @@ describe('MultiSelect', () => {
       expect(events).toEqual([])
     })
 
+    it('should let a change listener dispose the component during deselectAll() and keep the native events', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+      const native = []
+
+      selectEl.addEventListener('change.coreui.multi-select', () => multiSelect.dispose(), { once: true })
+      selectEl.addEventListener('change', () => native.push('change'))
+
+      expect(() => multiSelect.deselectAll()).not.toThrow()
+      expect(native).toEqual(['change'])
+    })
+
+    it('should let a change listener dispose the component during selectAll() at the limit', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">A</option><option value="b">B</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { selectionLimit: 1 })
+
+      selectEl.addEventListener('change.coreui.multi-select', () => multiSelect.dispose(), { once: true })
+
+      expect(() => multiSelect.selectAll()).not.toThrow()
+    })
+
+    it('should let a change listener dispose the component when Backspace removes the last chip', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { search: true })
+      const search = multiSelect._searchElement
+      const errors = []
+      const onError = event => {
+        event.preventDefault()
+        errors.push(event.message)
+      }
+
+      selectEl.addEventListener('change.coreui.multi-select', () => multiSelect.dispose(), { once: true })
+      window.addEventListener('error', onError)
+      search.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+      window.removeEventListener('error', onError)
+
+      expect(errors).toEqual([])
+    })
+
     it('should let a native change listener dispose the component', () => {
       fixtureEl.innerHTML = '<select multiple><option value="a">A</option><option value="b">B</option></select>'
       const selectEl = fixtureEl.querySelector('select')

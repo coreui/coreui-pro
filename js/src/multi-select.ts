@@ -768,7 +768,7 @@ class MultiSelect extends ComboboxBase {
         this._deselectLastOption()
       }
 
-      this._searchElement.focus()
+      this._searchElement?.focus()
     })
 
     if (this._selectAllElement) {
@@ -1302,7 +1302,7 @@ class MultiSelect extends ComboboxBase {
     )
     this._commit([...this._selected, ...added.map(value => ({ value, text: texts.get(value) }))])
 
-    if (refused !== null) {
+    if (this._config && refused !== null) {
       this._triggerSelectionLimit()
     }
   }
@@ -1345,6 +1345,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   _commit(selected: any[], notify = true): void {
+    const element = this._element
     const next = this._fit(selected)
     const current = new Set(this._selected.map((option: any) => option.value))
     const changed = next.length !== current.size || next.some((option: any) => !current.has(option.value))
@@ -1358,11 +1359,11 @@ class MultiSelect extends ComboboxBase {
     this._render()
 
     if (changed && notify) {
-      EventHandler.trigger(this._element, EVENT_CHANGE, {
-        value: this._selected
+      EventHandler.trigger(element, EVENT_CHANGE, {
+        value: next
       })
-      this._element.dispatchEvent(new Event('input', { bubbles: true }))
-      this._element.dispatchEvent(new Event('change', { bubbles: true }))
+      element.dispatchEvent(new Event('input', { bubbles: true }))
+      element.dispatchEvent(new Event('change', { bubbles: true }))
     }
   }
 
