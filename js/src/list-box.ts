@@ -468,7 +468,6 @@ class ListBox extends BaseComponent {
   }
 
   _updateOptions(): void {
-    const navigable = this._navigableOptions()
     const roving = this._rovingStop()
 
     for (const option of this._allOptions()) {
@@ -501,7 +500,7 @@ class ListBox extends BaseComponent {
 
     const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._list)
     if (empty) {
-      empty.toggleAttribute('hidden', this._config.loading || navigable.length > 0)
+      empty.toggleAttribute('hidden', this._config.loading || this._allOptions().some(option => !this._isHidden(option)))
     }
   }
 
@@ -786,6 +785,12 @@ class ListBox extends BaseComponent {
     label.setAttribute('role', 'button')
     label.dataset.coreuiValue = label.id
     this._decorateOption(label)
+
+    if (this._sectionOptions(section).length > 0) {
+      label.removeAttribute('aria-disabled')
+    } else {
+      label.setAttribute('aria-disabled', 'true')
+    }
   }
 
   _updateSections(): void {

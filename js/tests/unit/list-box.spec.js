@@ -1082,6 +1082,18 @@ describe('ListBox', () => {
 
       expect(empty.hasAttribute('hidden')).toBeFalse()
     })
+
+    it('should keep the empty state hidden while a disabled option is on the screen', () => {
+      const el = setMarkup('', [
+        '<div class="list-box-option" data-coreui-value="lettuce" hidden>Lettuce</div>',
+        '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>',
+        '<div class="list-box-empty">No results</div>'
+      ])
+      // eslint-disable-next-line no-new
+      new ListBox(el)
+
+      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeTrue()
+    })
   })
 
   describe('first, last, next, prev and setActive', () => {
@@ -1915,6 +1927,32 @@ describe('ListBox', () => {
     ])
 
     const label = (element, index) => element.querySelectorAll('.list-box-section-label')[index]
+
+    it('should disable a section label with no option to take, and take it out of the tab order', () => {
+      const el = setMarkup('', [
+        '<div class="list-box-section">',
+        '<div class="list-box-section-label">Veggies</div>',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '</div>',
+        '<div class="list-box-section">',
+        '<div class="list-box-section-label">Meat</div>',
+        '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>',
+        '</div>'
+      ])
+      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
+
+      expect(label(el, 1).getAttribute('aria-disabled')).toEqual('true')
+      expect(label(el, 1).getAttribute('tabindex')).toEqual('-1')
+      expect(label(el, 0).hasAttribute('aria-disabled')).toBeFalse()
+
+      item(el, 'lettuce').hidden = true
+      listBox.update()
+      expect(label(el, 0).getAttribute('aria-disabled')).toEqual('true')
+
+      item(el, 'lettuce').hidden = false
+      listBox.update()
+      expect(label(el, 0).hasAttribute('aria-disabled')).toBeFalse()
+    })
 
     it('should turn the section label into a tri-state button', () => {
       const el = setSections()
