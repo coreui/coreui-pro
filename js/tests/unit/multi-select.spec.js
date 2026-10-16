@@ -1796,11 +1796,54 @@ describe('MultiSelect', () => {
       expect(selectEl.value).toBe('2')
     })
 
-    it('should add a given value to the options marked selected in a multiple select', () => {
+    it('should take the given value over the selected options of a multiple select', () => {
       fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b">B</option></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { value: ['b'] })
 
-      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b'])
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
+    })
+
+    it('should take the given value over the options marked selected in the config', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const options = [{ value: 'a', text: 'A', selected: true }, { value: 'b', text: 'B' }]
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options, value: ['b'] })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
+
+      multiSelect.setConfig({ options, value: ['a'] })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should take the given value over a selected option further down a single select', () => {
+      fixtureEl.innerHTML = '<select><option value="a">A</option><option value="b" selected>B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false, value: 'a' })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should match a value given as numbers', () => {
+      fixtureEl.innerHTML = '<select multiple data-coreui-value="[1,2]"><option value="1">One</option><option value="2">Two</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
+    })
+
+    it('should read an empty value given in the config like an empty attribute', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option></select><select multiple data-coreui-value=""><option value="a" selected>A</option></select>'
+      const [first, second] = fixtureEl.querySelectorAll('select')
+
+      expect(new MultiSelect(first, { value: '' }).getValue().map(option => option.value)).toEqual(['a'])
+      expect(new MultiSelect(second).getValue().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should take the options marked selected over a value given at the start once setConfig brings new options', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: 'a', text: 'A' }], value: ['a'] })
+
+      multiSelect.setConfig({ options: [{ value: 'a', text: 'A' }, { value: 'x', text: 'X', selected: true }] })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['x'])
     })
 
     it('should take the given value over the first option of a single select', () => {

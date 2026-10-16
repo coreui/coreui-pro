@@ -513,7 +513,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   setConfig(config: Partial<MultiSelectConfig> | null): void {
-    this._config = this._getConfig({ ...this._config, ...config })
+    this._config = this._getConfig({ ...this._config, value: null, ...config })
 
     if (this._validation.configure(config)) {
       return
@@ -773,6 +773,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   _getOptionsFromConfig(options: any = this._config.options, disabled = false): any[] {
+    const values = this._config.value && new Set(this._config.value)
     const _options = []
     for (const option of options) {
       if (isOptionGroup(option)) {
@@ -791,7 +792,7 @@ class MultiSelect extends ComboboxBase {
       }
 
       const value = String(option.value)
-      const isSelected = option.selected || this._config.value?.includes(value)
+      const isSelected = values ? values.has(value) : option.selected
 
       const customProperties = typeof option === 'object' ? { ...option } : {}
 
@@ -1699,13 +1700,11 @@ class MultiSelect extends ComboboxBase {
       throw new TypeError(`${NAME.toUpperCase()}: Option "search" takes true, false or "external".`)
     }
 
-    if (typeof config.value === 'number') {
-      config.value = [String(config.value)]
+    if (typeof config.value === 'number' || typeof config.value === 'string') {
+      config.value = config.value === '' ? null : String(config.value).split(/,\s*/)
     }
 
-    if (typeof config.value === 'string') {
-      config.value = config.value.split(/,\s*/).map(String)
-    }
+    config.value = config.value?.map(String) ?? null
 
     return config
   }
