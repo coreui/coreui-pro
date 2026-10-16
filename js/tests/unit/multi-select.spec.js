@@ -2614,6 +2614,21 @@ describe('MultiSelect', () => {
       expect(multiSelect._selected[0].value).toBe('3')
     })
 
+    it('should send no event when select all finds every option selected', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="1" selected>One</option><option value="2" selected>Two</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+      const events = []
+
+      for (const type of ['change.coreui.multi-select', 'input', 'change']) {
+        selectEl.addEventListener(type, () => events.push(type))
+      }
+
+      multiSelect.selectAll()
+
+      expect(events).toEqual([])
+    })
+
     it('should trigger one changed event for select all', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
