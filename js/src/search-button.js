@@ -353,6 +353,10 @@ class SearchButton extends BaseComponent {
   }
 
   static _handleDataApiKeydown(event) {
+    if (!event.key) {
+      return
+    }
+
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
       const data = SearchButton.getOrCreateInstance(button)
       data._syncActiveKeys(event)
@@ -364,6 +368,10 @@ class SearchButton extends BaseComponent {
   }
 
   static _handleDataApiKeyup(event) {
+    if (!event.key) {
+      return
+    }
+
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
       SearchButton.getOrCreateInstance(button)._syncActiveKeys(event)
     }

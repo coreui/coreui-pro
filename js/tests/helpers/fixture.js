@@ -27,6 +27,24 @@ export const createEvent = (eventName, parameters = {}) => {
   return new Event(eventName, parameters)
 }
 
+export const captureErrors = callback => {
+  const errors = []
+  const handler = event => {
+    errors.push(event.error)
+    event.preventDefault()
+  }
+
+  window.addEventListener('error', handler)
+
+  try {
+    callback()
+  } finally {
+    window.removeEventListener('error', handler)
+  }
+
+  return errors
+}
+
 export const jQueryMock = {
   elements: undefined,
   fn: {},
