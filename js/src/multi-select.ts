@@ -493,7 +493,8 @@ class MultiSelect extends ComboboxBase {
 
     const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
     const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || [...values].some(value => !previous.has(value)))
-    const next = reset ? this._selected : [...selected, ...(this._startValues ? this._selected.filter((option: any) => !seen.has(option.value)) : [])]
+    const seeded = this._startValues && (this._config.multiple || selected.length === 0) ? this._selected.filter((option: any) => !seen.has(option.value)) : []
+    const next = reset ? this._selected : [...selected, ...seeded]
 
     this._selected = selected
     this._element.replaceChildren()

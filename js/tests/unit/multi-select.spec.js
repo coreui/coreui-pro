@@ -1861,6 +1861,16 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
     })
 
+    it('should keep the pick of a single select over a start value that arrives later', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false, options: [{ value: 'b', text: 'B' }], value: ['a'] })
+
+      multiSelect.selectAll([{ value: 'b', text: 'B' }])
+      multiSelect.setOptions([{ value: 'a', text: 'A' }, { value: 'b', text: 'B' }])
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
+    })
+
     it('should not select the start value again on options it has shown', () => {
       fixtureEl.innerHTML = '<select multiple></select>'
       const options = [{ value: 'a', text: 'A' }, { value: 'b', text: 'B' }]
