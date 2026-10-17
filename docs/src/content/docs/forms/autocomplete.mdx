@@ -367,7 +367,7 @@ The Autocomplete component exposes several events for integrating with applicati
 
 | Event | Description |
 | --- | --- |
-| `change.coreui.autocomplete` | Fires when the user selects an option, types over a selection or clears it. The initial `value`, a preselected option and a `setConfig()` call do not fire it. |
+| `change.coreui.autocomplete` | Fires when the user selects an option, types over a selection or clears it, and when `clear()` empties a field that held a value or text. The initial `value`, a preselected option and a `setConfig()` call do not fire it. |
 | `hidden.coreui.autocomplete` | Fired when the dropdown has been hidden and CSS transitions completed. |
 | `hide.coreui.autocomplete` | Event fires immediately when the hide method is called. Call `event.preventDefault()` to keep the menu open. |
 | `input.coreui.autocomplete` | Fires when the search input value changes. |

@@ -801,6 +801,22 @@ describe('Rating', () => {
       expect(div.outerHTML).toEqual(markup)
     })
 
+    it('should report a reset that changes the value once, and one that does not never', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 5, value: 4 })
+      const values = []
+
+      div.addEventListener('change.coreui.rating', event => values.push(event.value))
+      rating.reset(4)
+      rating.reset(2)
+      rating.reset(2)
+      rating.reset()
+      rating.reset()
+
+      expect(values).toEqual([2, null])
+    })
+
     it('should reset the rating to the new given value', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -1718,6 +1734,32 @@ describe('Rating', () => {
       expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
       expect(changeSpy).toHaveBeenCalledTimes(1)
       expect(changeSpy.calls.mostRecent().args[0].value).toEqual('2')
+    })
+
+    it('should go back to the value it was built with, not one setConfig gave later, when the form resets', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { name: 'score', value: 2 })
+
+      rating.setConfig({ value: 4 })
+      form.reset()
+      await wait()
+
+      expect(new FormData(form).get('score')).toEqual('2')
+    })
+
+    it('should keep the restored star of a read-only rating the one tab stop after a form reset', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { readonly: true, value: 2 })
+
+      rating.setConfig({ value: 4 })
+      form.reset()
+      await wait()
+
+      expect([...div.querySelectorAll('.rating-item-input')].map(input => input.tabIndex)).toEqual([-1, 0, -1, -1, -1])
     })
 
     it('should keep the rating when a listener cancels the form reset', async () => {

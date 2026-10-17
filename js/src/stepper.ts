@@ -384,7 +384,13 @@ class Stepper extends BaseComponent {
     if (!this._validatedForms.has(form)) {
       this._validatedForms.add(form)
       EventHandler.on(form, EVENT_INPUT, () => updateValidationState(form, this._validationMarks))
-      EventHandler.on(form, EVENT_RESET, () => this._untrackValidatedForm(form))
+      EventHandler.on(form, EVENT_RESET, (event: Event) => {
+        setTimeout(() => {
+          if (this._element && !event.defaultPrevented && this._validatedForms.has(form)) {
+            this._untrackValidatedForm(form)
+          }
+        })
+      })
     }
   }
 

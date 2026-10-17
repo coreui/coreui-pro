@@ -512,6 +512,25 @@ describe('Range', () => {
         inputEl.dispatchEvent(createEvent('input'))
       })
     })
+    it('should trigger changed once per value, not when it starts, on change after input or on update() without a new value', () => {
+      fixtureEl.innerHTML = getRangeHtml()
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      const values = []
+
+      inputEl.addEventListener('changed.coreui.range', event => values.push(event.value))
+      const range = new Range(rangeEl)
+
+      inputEl.value = '90'
+      inputEl.dispatchEvent(createEvent('input'))
+      inputEl.dispatchEvent(createEvent('change'))
+      range.update()
+      inputEl.value = '20'
+      range.update()
+
+      expect(values).toEqual([90, 20])
+    })
   })
 
   describe('form reset', () => {
@@ -532,6 +551,29 @@ describe('Range', () => {
 
       expect(rangeEl.style.getPropertyValue('--cui-range-fill')).toEqual('0.5')
       expect(fixtureEl.querySelector('.tooltip-inner').textContent).toEqual('50')
+    })
+
+    it('should trigger changed for a form reset that moves the value, and not for one that does not', async () => {
+      fixtureEl.innerHTML = `<form>${getRangeHtml()}</form>`
+
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      const form = fixtureEl.querySelector('form')
+      const values = []
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      inputEl.value = '5'
+      inputEl.dispatchEvent(createEvent('input'))
+      inputEl.addEventListener('changed.coreui.range', event => values.push(event.value))
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(values).toEqual([50])
     })
 
     it('should stop following resets after dispose', async () => {

@@ -109,6 +109,7 @@ class OTPInput extends BaseComponent {
   protected declare _requiredSlots: Set<HTMLInputElement>
   protected declare _resetCode: string | null
   protected declare _validation: FieldValidation
+  protected declare _value: string
 
   constructor(element?: string | Element | null, config?: Partial<OtpInputConfig> | null) {
     super(element, config)
@@ -121,6 +122,7 @@ class OTPInput extends BaseComponent {
     this._readOnlySlots = new Set()
     this._requiredSlots = new Set()
     this._resetCode = null
+    this._value = ''
     this._validation = new FieldValidation(this._element, {
       config: () => this._config,
       fields: () => (this._inputElement ? [this._inputElement] : []),
@@ -196,9 +198,7 @@ class OTPInput extends BaseComponent {
   }
 
   reset(): void {
-    this._seedSlots({ clearWhenEmpty: true })
-    this._setValue(this._readSlots() || null)
-    this._setInputsTabIndexes()
+    this._restoreValue()
   }
 
   setConfig(config: Partial<OtpInputConfig> | null): void {
@@ -224,7 +224,9 @@ class OTPInput extends BaseComponent {
     this._syncValueField()
 
     if (repaint) {
-      this._setValue(this._readSlots() || null)
+      this._value = this._readSlots()
+      writeValueField(this._inputElement!, this._value)
+      this._validation.update()
     }
   }
 
@@ -428,7 +430,8 @@ class OTPInput extends BaseComponent {
     const field = createValueField('input', () => this._getFirstEmptySlot())
     this._resetCode = this._extractValidChars(String(this._config.value ?? '')) ? this._readSlots() : null
     field.defaultValue = this._resetCode ?? this._getInputs().map(input => input.defaultValue).join('')
-    field.value = this._readSlots()
+    this._value = this._readSlots()
+    field.value = this._value
 
     this._element.append(field)
     this._inputElement = field
@@ -484,20 +487,27 @@ class OTPInput extends BaseComponent {
   }
 
   _setValue(value: string | null, byUser = false): void {
-    if (this._inputElement) {
-      const isChanged = writeValueField(this._inputElement, value || '')
-
-      if (isChanged && byUser) {
-        this._validation.dismiss()
-      }
-
-      this._validation.update()
-
-      if (isChanged) {
-        dispatchValueChange(this._inputElement)
-      }
+    if (!this._inputElement) {
+      return
     }
 
+    const code = value || ''
+    const isChanged = code !== this._value
+
+    this._value = code
+    writeValueField(this._inputElement, code)
+
+    if (isChanged && byUser) {
+      this._validation.dismiss()
+    }
+
+    this._validation.update()
+
+    if (!isChanged) {
+      return
+    }
+
+    dispatchValueChange(this._inputElement)
     EventHandler.trigger(this._element, EVENT_CHANGE, { value })
 
     if (value && value.length === this._getInputs().length) {
@@ -508,12 +518,11 @@ class OTPInput extends BaseComponent {
   _restoreValue(): void {
     const code = this._resetCode
 
-    if (code !== null) {
-      for (const [index, input] of this._getInputs().entries()) {
-        input.value = code[index] ?? ''
-      }
+    for (const [index, input] of this._getInputs().entries()) {
+      input.value = code === null ? input.defaultValue : code[index] ?? ''
     }
 
+    this._setValue(this._readSlots() || null)
     this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
   }

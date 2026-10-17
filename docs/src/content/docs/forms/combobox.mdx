@@ -579,7 +579,7 @@ Events fire on the toggle button.
 
 | Event type | Description |
 | --- | --- |
-| `change.coreui.combobox` | Fired after the selection settled; `event.value` is what `getValue()` would return. |
+| `change.coreui.combobox` | Fired after the value changed and the selection settled, from the list, `setValue()`, `clear()` or a native form reset; `event.value` is what `getValue()` would return. A call that leaves the value as it was does not fire it. |
 | `hidden.coreui.combobox` | Fired when the panel has been hidden. |
 | `hide.coreui.combobox` | Fires immediately when `hide` is called. |
 | `search.coreui.combobox` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setItems()`. |

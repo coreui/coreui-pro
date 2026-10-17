@@ -221,8 +221,8 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | --- | --- |
 | `clear` | Clear all sections |
 | `getDate` | Return the current time as a `Date` on 1970-01-01, or `null` when incomplete or invalid |
-| `reset` | Reset the field to its initial time |
-| `setConfig` | Merges the given options over the current configuration and re-renders the field. Options you leave out keep their current value. Without `date` the field keeps what the user typed, and when the new options change the sections, such as a new format, only a complete time carries over. A call that only changes `validationState` updates the state without re-rendering. |
+| `reset` | Reset the field to the time it was created with, emitting `timeChange` and the native `input` and `change` of the value field when the value moves. A native form reset does the same. |
+| `setConfig` | Merges the given options over the current configuration and re-renders the field. Options you leave out keep their current value. Without `date` the field keeps what the user typed, and when the new options change the sections, such as a new format, only a complete time carries over. A `date` that moves the value fires `timeChange`, as this is the way to set the time from code. A call that only changes `validationState` updates the state without re-rendering. |
 
 ```javascript
 const timeInput = coreui.TimeInput.getInstance(document.querySelector('#myTimeInput'))
