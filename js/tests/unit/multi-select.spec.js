@@ -909,6 +909,25 @@ describe('MultiSelect', () => {
       expect(reported).toEqual([])
     })
 
+    it('should not report a native reset that brings the same values back in their first order', async () => {
+      fixtureEl.innerHTML = '<form><select multiple><option value="1" selected>One</option><option value="2" selected>Two</option></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+      const reported = []
+
+      multiSelect.deselectAll([{ value: '1', text: 'One' }])
+      multiSelect.selectAll([{ value: '1', text: 'One' }])
+      selectEl.addEventListener('change.coreui.multi-select', () => reported.push('change.coreui.multi-select'))
+      selectEl.addEventListener('change', () => reported.push('change'))
+      selectEl.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
+      expect(reported).toEqual([])
+    })
+
     it('should forget a reported state on a native reset', async () => {
       fixtureEl.innerHTML = '<form novalidate><select></select></form>'
       const selectEl = fixtureEl.querySelector('select')
@@ -6425,6 +6444,21 @@ describe('MultiSelect', () => {
       })
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['x'])
+    })
+
+    it('should bring the label of a start value the options delivered later back once they drop it', async () => {
+      fixtureEl.innerHTML = '<form><select multiple name="tech"></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external', options: [], value: ['a'] })
+
+      multiSelect.setOptions([{ value: 'a', text: 'Angular' }])
+      multiSelect.setOptions([{ value: 'r', text: 'React' }])
+      multiSelect.deselectAll()
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue()).toEqual([{ value: 'a', text: 'Angular' }])
     })
 
     it('should keep the reset snapshot apart from the selection the options relabel', async () => {
