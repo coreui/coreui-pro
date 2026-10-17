@@ -1321,6 +1321,21 @@ describe('Combobox', () => {
       expect(fired).toEqual(['show', 'shown', 'hide', 'hidden'])
     })
 
+    it('should fire change once for a setValue or clear that changes the value, and never for one that does not', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+      const reported = []
+
+      toggle.addEventListener('change.coreui.combobox', event => reported.push(event.value))
+      combobox.clear()
+      combobox.setValue('us')
+      combobox.setValue('us')
+      combobox.clear()
+      combobox.clear()
+
+      expect(reported).toEqual(['us', null])
+    })
+
     it('should fire selectionLimit with the limit and the value that did not fit', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { multiple: true, selectionLimit: 1 })
