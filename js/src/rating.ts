@@ -132,6 +132,7 @@ class Rating extends BaseComponent {
   protected declare _name: string
   protected declare _sizeClassName: string | null
   protected declare _sizeClassNames: Set<string>
+  protected declare _startValue: number | string | null
   protected declare _tooltip: any
   protected declare _validation: FieldValidation
 
@@ -170,6 +171,7 @@ class Rating extends BaseComponent {
     this._sizeClassNames = new Set()
     this._config = this._getConfig(config)
     this._currentValue = this._config.value
+    this._startValue = this._config.value
     this._name = this._config.name || getUID(`${this.constructor.NAME}-name-`).toString()
     this._tooltip = null
 
@@ -207,13 +209,17 @@ class Rating extends BaseComponent {
   }
 
   reset(value: number | null = null): void {
-    this._currentValue = value
+    // eslint-disable-next-line eqeqeq
+    const isChanged = value != this._currentValue
 
+    this._currentValue = value
     this._createRating(this._removeRating())
 
-    EventHandler.trigger(this._element, EVENT_CHANGE, {
-      value
-    })
+    if (isChanged) {
+      EventHandler.trigger(this._element, EVENT_CHANGE, {
+        value
+      })
+    }
   }
 
   override dispose(): void {
@@ -625,7 +631,7 @@ class Rating extends BaseComponent {
       ratingItemInputElement.required = this._isRequired()
 
       // eslint-disable-next-line eqeqeq
-      ratingItemInputElement.defaultChecked = this._config.value == value
+      ratingItemInputElement.defaultChecked = this._startValue == value
       // eslint-disable-next-line eqeqeq
       ratingItemInputElement.checked = this._currentValue == value
 
