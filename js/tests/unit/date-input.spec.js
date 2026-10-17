@@ -186,7 +186,7 @@ describe('DateInput', () => {
       expect(submitted).toBeFalse()
     })
 
-    it('should report a change of its value to the form from the value field, and stay silent when a reset puts the initial date back', async () => {
+    it('should report a change of its value to the form from the value field, also when a reset puts the initial date back', async () => {
       const { dateInput, form } = mountForm({ date: new Date(2026, 0, 15) })
       const events = []
       form.addEventListener('input', event => events.push(`${event.type}:${event.target.tagName}`))
@@ -203,7 +203,7 @@ describe('DateInput', () => {
       })
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 0, 15))
-      expect(events).toEqual([])
+      expect(events).toEqual(['input:TEXTAREA', 'change:TEXTAREA'])
     })
 
     it('should not report a change while it is built or rebuilt with the same date', () => {

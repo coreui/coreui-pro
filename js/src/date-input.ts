@@ -238,6 +238,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   protected declare _allSelected: boolean
   protected declare _error: string | null
   protected declare _errorHolds: number
+  protected declare _fieldValue: string
   protected declare _hostAriaLabel: string | null
   protected declare _hostClasses: HostClasses
   protected declare _hostNodes: ChildNode[]
@@ -260,6 +261,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._allSelected = false
     this._error = null
     this._errorHolds = 0
+    this._fieldValue = ''
     this._inputElement = null
     this._isBuilt = false
     this._rejected = false
@@ -708,12 +710,13 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     const error = this._getValidationError(date, isFilled)
     const isDisabled = error !== null && error !== 'incomplete'
     const value = date && !isDisabled ? formatSections(this._sections) : ''
-    const isChanged = this._inputElement!.value !== value
+    const isChanged = this._fieldValue !== value
 
     this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
     this._rejected = isDisabled
+    this._fieldValue = value
 
-    if (isChanged) {
+    if (this._inputElement!.value !== value) {
       this._inputElement!.value = value
     }
 
