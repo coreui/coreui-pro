@@ -547,6 +547,12 @@ class Rating extends BaseComponent {
     this._currentValue = value
     this._highlightLabels(checkedInput)
 
+    if (this._config.readonly) {
+      for (const input of SelectorEngine.find<HTMLInputElement>(SELECTOR_RATING_ITEM_INPUT, this._element)) {
+        input.tabIndex = input.checked ? 0 : -1
+      }
+    }
+
     EventHandler.trigger(this._element, EVENT_CHANGE, {
       value
     })

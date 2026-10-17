@@ -1429,6 +1429,21 @@ describe('Autocomplete', () => {
       expect(values).toEqual([null])
     })
 
+    it('should report a clear that empties typed text once', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [{ label: 'Option 1', value: '1' }] })
+      const values = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => values.push(event.value))
+      autocomplete._inputElement.value = 'Opt'
+      autocomplete._inputElement.dispatchEvent(new Event('input', { bubbles: true }))
+      autocomplete.clear()
+      autocomplete.clear()
+
+      expect(values).toEqual([null])
+    })
+
     it('should trigger changed event with null value', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div class="autocomplete"></div>'

@@ -1749,6 +1749,19 @@ describe('Rating', () => {
       expect(new FormData(form).get('score')).toEqual('2')
     })
 
+    it('should keep the restored star of a read-only rating the one tab stop after a form reset', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { readonly: true, value: 2 })
+
+      rating.setConfig({ value: 4 })
+      form.reset()
+      await wait()
+
+      expect([...div.querySelectorAll('.rating-item-input')].map(input => input.tabIndex)).toEqual([-1, 0, -1, -1, -1])
+    })
+
     it('should keep the rating when a listener cancels the form reset', async () => {
       fixtureEl.innerHTML = '<form><div></div></form>'
       const form = fixtureEl.querySelector('form')
