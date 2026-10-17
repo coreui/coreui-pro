@@ -396,7 +396,7 @@ class ComboboxBase extends BaseComponent {
     this._listBox = null
   }
 
-  // Selection — the surface and its list read one store.
+  // Selection
 
   _addListBoxListeners(): void {
     EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTED, (event: any) => {
