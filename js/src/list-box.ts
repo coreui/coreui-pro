@@ -1046,14 +1046,6 @@ class ListBox extends BaseComponent {
     return true
   }
 
-  _setSelection(values: string[]): void {
-    const next = this._fit(values)
-
-    if (this._store.commit(next.slice(0, this._selectionLimit() ?? next.length))) {
-      this.update()
-    }
-  }
-
   _removeSelection(value: string): void {
     this._store.commit(this._store.values().filter(selected => selected !== value))
     this.update()

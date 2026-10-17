@@ -1,5 +1,6 @@
 import ListBox from '../../src/list-box.js'
 import { DefaultAllowlist } from '../../src/util/sanitizer.js'
+import { createSelectionStore } from '../../src/util/selection-state.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('ListBox', () => {
@@ -422,56 +423,68 @@ describe('ListBox', () => {
     })
   })
 
-  describe('_setSelection', () => {
-    it('should replace the selection in the given order without selection events', () => {
-      const el = setMarkup()
-      const listBox = new ListBox(el, { selectionMode: 'multiple' })
+  describe('shared selection store', () => {
+    it('should render the selection of the store it is given, without selection events and without the markup', () => {
+      const el = setMarkup('', [
+        '<div class="list-box-option selected" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
+        '<div class="list-box-option" data-coreui-value="cheese">Cheese</div>'
+      ])
+      const store = createSelectionStore()
       const events = []
-
-      listBox.select('lettuce')
 
       for (const name of ['select', 'selected', 'deselect', 'deselected', 'change']) {
         el.addEventListener(`${name}.coreui.list-box`, () => events.push(name))
       }
 
-      listBox._setSelection(['cheese', 'tomato'])
+      store.commit(['cheese', 'tomato'])
+      const listBox = new ListBox(el, { selectionMode: 'multiple' }, store)
 
       expect(listBox.getSelectedValues()).toEqual(['cheese', 'tomato'])
-      expect(item(el, 'lettuce')).not.toHaveClass('selected')
+      expect(item(el, 'lettuce').getAttribute('aria-selected')).toEqual('false')
       expect(item(el, 'cheese').getAttribute('aria-selected')).toEqual('true')
       expect(events).toEqual([])
     })
 
-    it('should take a disabled value and one the list does not carry', () => {
+    it('should write the selection the user makes to the store it shares', () => {
+      const store = createSelectionStore()
+      const listBox = new ListBox(setMarkup(), { selectionMode: 'multiple' }, store)
+
+      listBox.select('tomato')
+      listBox.select('lettuce')
+
+      expect(store.values()).toEqual(['tomato', 'lettuce'])
+    })
+
+    it('should show what the owner commits once it is updated', () => {
       const el = setMarkup()
-      const listBox = new ListBox(el, { selectionMode: 'multiple' })
-
-      listBox._setSelection(['ham', 'bacon', 'onion'])
-
-      expect(listBox.getSelectedValues()).toEqual(['ham', 'bacon', 'onion'])
-      expect(item(el, 'ham').getAttribute('aria-selected')).toEqual('true')
-    })
-
-    it('should take each value once, stop at the selection limit and keep one value in single mode', () => {
-      const limited = new ListBox(setMarkup(), { selectionMode: 'multiple', selectionLimit: 2 })
-
-      limited._setSelection(['lettuce', 'lettuce', 'tomato', 'onion'])
-      expect(limited.getSelectedValues()).toEqual(['lettuce', 'tomato'])
-
-      const single = new ListBox(setMarkup())
-
-      single._setSelection(['lettuce', 'tomato'])
-      expect(single.getSelectedValues()).toEqual(['lettuce'])
-    })
-
-    it('should not redraw the list when the selection stays the same', () => {
-      const listBox = new ListBox(setMarkup(), { selectionMode: 'multiple' })
+      const store = createSelectionStore()
+      const listBox = new ListBox(el, { selectionMode: 'multiple' }, store)
 
       listBox.select('lettuce')
-      const update = spyOn(listBox, 'update').and.callThrough()
-      listBox._setSelection(['lettuce'])
+      store.commit(['onion', 'cheese'])
+      listBox.update()
 
-      expect(update).not.toHaveBeenCalled()
+      expect(listBox.getSelectedValues()).toEqual(['onion', 'cheese'])
+      expect(item(el, 'lettuce')).not.toHaveClass('selected')
+      expect(item(el, 'onion').getAttribute('aria-selected')).toEqual('true')
+    })
+
+    it('should not report a value the owner refuses', () => {
+      const el = setMarkup()
+      const store = createSelectionStore(next => next.filter(value => value !== 'tomato'))
+      const listBox = new ListBox(el, { selectionMode: 'multiple' }, store)
+      const events = []
+
+      for (const name of ['selected', 'change']) {
+        el.addEventListener(`${name}.coreui.list-box`, () => events.push(name))
+      }
+
+      listBox.select('tomato')
+
+      expect(store.values()).toEqual([])
+      expect(item(el, 'tomato').getAttribute('aria-selected')).toEqual('false')
+      expect(events).toEqual([])
     })
   })
 
