@@ -1,9 +1,55 @@
 import {
-  fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit, getSelectionState, isSelectionLimitReached,
+  createSelectionStore, fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit, getSelectionState, isSelectionLimitReached,
   resolveCountLabel, toSelectionValues
 } from '../../../src/util/selection-state.js'
 
 describe('Selection utilities', () => {
+  describe('createSelectionStore', () => {
+    it('should keep the values in the order they were committed, each once', () => {
+      const store = createSelectionStore()
+
+      expect(store.commit(['b', 'a', 'b'])).toBeTrue()
+      expect(store.values()).toEqual(['b', 'a'])
+      expect(store.has('a')).toBeTrue()
+      expect(store.has('c')).toBeFalse()
+      expect(store.size()).toBe(2)
+    })
+
+    it('should report a commit that keeps the values and their order as no change', () => {
+      const store = createSelectionStore()
+
+      store.commit(['a', 'b'])
+
+      expect(store.commit(['a', 'b'])).toBeFalse()
+      expect(store.commit(['b', 'a'])).toBeTrue()
+    })
+
+    it('should store what the owner rule returns, given the proposal and the current values', () => {
+      const calls = []
+      const store = createSelectionStore((next, current) => {
+        calls.push([next, current])
+        return next.slice(-1)
+      })
+
+      store.commit(['a'])
+      store.commit(['a', 'b'])
+
+      expect(store.values()).toEqual(['b'])
+      expect(calls).toEqual([[['a'], []], [['a', 'b'], ['a']]])
+    })
+
+    it('should hand out copies the caller cannot change the store through', () => {
+      const store = createSelectionStore()
+      const proposal = ['a']
+
+      store.commit(proposal)
+      proposal.push('b')
+      store.values().push('c')
+
+      expect(store.values()).toEqual(['a'])
+    })
+  })
+
   describe('getScopeSelectionState', () => {
     it('should read the scope against the room the values outside it leave under the limit', () => {
       expect(getScopeSelectionState(1, 3, 2, 2)).toBe('all')
