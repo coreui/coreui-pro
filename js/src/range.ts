@@ -95,6 +95,7 @@ class Range extends BaseComponent {
   protected declare _form: HTMLFormElement | null
   protected declare _input: HTMLInputElement | null
   protected declare _resetTimeout: ReturnType<typeof setTimeout> | null
+  protected declare _shownValue: string
   protected declare _tickPoints: RangeTickPoint[]
   protected declare _ticks: HTMLElement | null
   protected declare _tooltip: HTMLElement | null
@@ -148,6 +149,7 @@ class Range extends BaseComponent {
     }
 
     this._addEventListeners()
+    this._shownValue = this._input.value
     this._update()
   }
 
@@ -236,7 +238,11 @@ class Range extends BaseComponent {
     }
 
     this._updateValueText(value, typeof this._config.tooltipsFormat === 'function' ? html : null)
-    EventHandler.trigger(input, EVENT_CHANGED, { value })
+
+    if (input.value !== this._shownValue) {
+      this._shownValue = input.value
+      EventHandler.trigger(input, EVENT_CHANGED, { value })
+    }
   }
 
   protected _format(value: number): string {
