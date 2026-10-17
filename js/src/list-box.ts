@@ -932,7 +932,7 @@ class ListBox extends BaseComponent {
   }
 
   _fit(next: string[]): string[] {
-    return toSelectionValues([...new Set(next)], this._config.selectionMode as SelectionMode)
+    return toSelectionValues(next, this._config.selectionMode as SelectionMode)
   }
 
   _selectionLimit(): number | null {
@@ -993,7 +993,7 @@ class ListBox extends BaseComponent {
   }
 
   _selectValue(value: string): boolean {
-    if (this._config.disabled || this._config.selectionMode === SELECTION_MODE_NONE) {
+    if (this._config.disabled || this._config.loading || this._config.selectionMode === SELECTION_MODE_NONE) {
       return false
     }
 
@@ -1033,7 +1033,7 @@ class ListBox extends BaseComponent {
   }
 
   _deselectValue(value: string): boolean {
-    if (this._config.disabled || !this._store.has(value)) {
+    if (this._config.disabled || this._config.loading || !this._store.has(value)) {
       return false
     }
 

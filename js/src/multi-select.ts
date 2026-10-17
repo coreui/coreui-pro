@@ -20,7 +20,7 @@ import { isTypingKey } from './util/list-navigation.js'
 import { flattenOptions, isOptionGroup } from './util/option-tree.js'
 import {
   type CountLabel, createSelectionStore, fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit,
-  resolveCountLabel, type SelectionState, type SelectionStore
+  resolveCountLabel, type SelectionState
 } from './util/selection-state.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
@@ -74,8 +74,6 @@ const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_CHIP_REMOVE = 'remove.coreui.chip'
-const EVENT_LIST_BOX_DESELECT = 'deselect.coreui.list-box'
-const EVENT_LIST_BOX_SELECT = 'select.coreui.list-box'
 
 const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
@@ -256,12 +254,10 @@ class MultiSelect extends ComboboxBase {
   protected declare _hostOptions: ChildNode[]
   protected declare _initialSelection: any[]
   protected declare _known: Map<string, any>
-  protected declare _listBoxGuard: (event: Event) => void
   protected declare _loading: boolean
   protected declare _offListOptions: HTMLOptionElement[]
   protected declare _seenValues: Set<string>
   protected declare _startValues: Set<string> | null
-  protected declare _store: SelectionStore
   protected declare _validation: FieldValidation
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
@@ -308,12 +304,6 @@ class MultiSelect extends ComboboxBase {
     this._menu = null
     this._nativeFocusHandler = null
     this._nativeKeydownHandler = null
-    this._listBoxGuard = event => {
-      if (this._loading) {
-        event.preventDefault()
-      }
-    }
-
     this._initialSelection = []
     this._known = new Map()
     this._seenValues = new Set()
@@ -1247,14 +1237,6 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
-  override _addListBoxListeners(): void {
-    super._addListBoxListeners()
-
-    for (const type of [EVENT_LIST_BOX_SELECT, EVENT_LIST_BOX_DESELECT]) {
-      this._listBoxElement.addEventListener(type, this._listBoxGuard)
-    }
-  }
-
   override _onSelectionChange(): void {
     this._validation.runAsUser(() => this._settle(true))
 
@@ -1374,10 +1356,7 @@ class MultiSelect extends ComboboxBase {
   _commit(values: string[], notify = true): void {
     const previous = new Set(this._store.values())
 
-    if (this._store.commit(values)) {
-      this._listBox?.update()
-    }
-
+    this._commitSelection(values)
     this._settle(this._store.size() !== previous.size || this._store.values().some(value => !previous.has(value)), notify)
   }
 

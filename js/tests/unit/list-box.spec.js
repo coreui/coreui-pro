@@ -2293,6 +2293,26 @@ describe('ListBox', () => {
       expect(empty.hasAttribute('hidden')).toBeTrue()
     })
 
+    it('should neither select nor deselect an option while loading', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple' })
+      const events = []
+
+      listBox.select('lettuce')
+      listBox.setLoading(true)
+
+      for (const name of ['select', 'deselect', 'change']) {
+        el.addEventListener(`${name}.coreui.list-box`, () => events.push(name))
+      }
+
+      item(el, 'tomato').focus()
+      keydown(item(el, 'tomato'), ' ')
+      listBox.deselect('lettuce')
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
+      expect(events).toEqual([])
+    })
+
     it('should drop the loading class on dispose', () => {
       const el = setLoadingMarkup(' data-coreui-loading="true"')
       const listBox = new ListBox(el)

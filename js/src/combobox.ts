@@ -19,12 +19,7 @@ import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import {
-  type CountLabel,
-  createSelectionStore,
-  getSelectionLimit,
-  resolveCountLabel,
-  type SelectionStore,
-  toSelectionValues
+  type CountLabel, createSelectionStore, getSelectionLimit, resolveCountLabel, toSelectionValues
 } from './util/selection-state.js'
 import {
   captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
@@ -181,7 +176,6 @@ class Combobox extends ComboboxBase {
   protected declare _labels: Map<string, string>
   protected declare _resetValues: string[]
   protected declare _searchElement: HTMLInputElement | null
-  protected declare _store: SelectionStore
   protected declare _validation: FieldValidation
   protected declare _valueElement: HTMLElement
   protected declare _valueField: HTMLSelectElement
@@ -550,10 +544,7 @@ class Combobox extends ComboboxBase {
     const listed = new Set(SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).map(option => this._valueOf(option as HTMLElement)))
     const next = values.filter(value => listed.has(value) || this._store.has(value))
 
-    if (this._store.commit(next.slice(0, getSelectionLimit(this._config.multiple, this._config.selectionLimit) ?? next.length))) {
-      this._listBox.update()
-    }
-
+    this._commitSelection(next.slice(0, getSelectionLimit(this._config.multiple, this._config.selectionLimit) ?? next.length))
     this._commitValue()
   }
 

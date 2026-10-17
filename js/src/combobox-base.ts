@@ -55,7 +55,7 @@ class ComboboxBase extends BaseComponent {
   protected declare _listBoxElement: any
   protected declare _listBoxChangeHandler: (() => void) | null
   protected declare _menu: any
-  protected declare _store: SelectionStore | undefined
+  protected declare _store: SelectionStore
   protected declare _options: any[]
   protected declare _search: any
   protected declare _floatingCleanup: (() => void) | null
@@ -423,6 +423,12 @@ class ComboboxBase extends BaseComponent {
   _onOptionDeselected(value: string): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
 
   _onSelectionChange(): void {}
+
+  _commitSelection(values: string[]): void {
+    if (this._store.commit(values)) {
+      this._listBox?.update()
+    }
+  }
 
   _onSelectionLimit(limit: number, value: string): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
 
