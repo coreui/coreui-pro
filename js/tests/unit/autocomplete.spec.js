@@ -1413,6 +1413,22 @@ describe('Autocomplete', () => {
       expect(autocomplete._search).toBe('')
     })
 
+    it('should report a clear that empties the field once, and one on an empty field never', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }],
+        value: '1'
+      })
+      const values = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => values.push(event.value))
+      autocomplete.clear()
+      autocomplete.clear()
+
+      expect(values).toEqual([null])
+    })
+
     it('should trigger changed event with null value', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div class="autocomplete"></div>'
