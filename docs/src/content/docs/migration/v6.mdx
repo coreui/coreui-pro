@@ -1073,8 +1073,27 @@ check, radio, carousel and toggler icons already work:
   option they touched; they send one now, once the native select holds the new
   value and the control shows it, the way the native `change` works. An action
   that changes nothing sends no event, native ones included, and the component
-  no longer sends one for each preselected option while it builds or rebuilds;
-  `setConfig()` sends one when it changes the selection.
+  no longer sends one for each preselected option while it builds or rebuilds.
+  A selection the page gives sends none, from `setConfig()` or from a given
+  `value` that options from `setOptions()` bring later, and a native reset of
+  the form that changes the selection sends one, as Autocomplete, Chip Input
+  and Combobox do.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Form controls fire their change event once per change of the value, on a
+  form reset as well, and never from a value the page gives.** OTP Input's
+  `change.coreui.otp-input`, Combobox's `setValue()` and `clear()`, Rating's
+  `reset()`, Autocomplete's `clear()` and Range's `changed.coreui.range` used
+  to fire even when the value stayed; they fire only when it changes now, and
+  Range no longer fires while it starts or on the `change` after an `input`.
+  OTP Input and Range Slider now fire on a native form reset that changes the
+  value, and Date Input sends the native `input` and `change` of its value
+  field there too. `setConfig({ value })` of OTP Input no longer fires. A form
+  reset brings Rating and Range Slider back to the value they were created
+  with, not one a later `setConfig()` gave, and OTP Input's `reset()` puts back
+  the code it started with, as a native reset does. A stepper keeps the
+  validation marks of a form reset a listener cancels. Date Input and Time Input
+  still fire from `setConfig({ date })`, their only way to set the value from
+  code.
 - **Multi Select keeps its selection through `setConfig()`** when the config
   carries neither `options` nor `value`, fitted to a new `multiple` or
   `selectionLimit`; with options from the config it used to fall back to the

@@ -443,12 +443,12 @@ describe('MultiSelect', () => {
       expect(seen).toEqual([expected])
     })
 
-    it('should keep a state a change listener gives while setConfig gives a value', () => {
+    it('should keep a given state while setConfig gives a value', () => {
       fixtureEl.innerHTML = '<form><select multiple></select></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2', selected: true }] })
 
-      selectEl.addEventListener('change', () => multiSelect.setConfig({ validationState: 'invalid' }), { once: true })
+      multiSelect.setConfig({ validationState: 'invalid' })
       multiSelect.setConfig({ value: ['1'] })
 
       expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBe(true)
@@ -869,6 +869,44 @@ describe('MultiSelect', () => {
       })
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
+    })
+
+    it('should report the selection a native reset restores once', async () => {
+      fixtureEl.innerHTML = '<form><select multiple required></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2' }] })
+      const reported = []
+
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+      selectEl.addEventListener('change.coreui.multi-select', event => reported.push(event.value.map(option => option.value)))
+      selectEl.addEventListener('input', () => reported.push('input'))
+      selectEl.addEventListener('change', () => reported.push('change'))
+      selectEl.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue()).toEqual([])
+      expect(reported).toEqual([[], 'input', 'change'])
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(multiSelect._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it('should not report a native reset that leaves the selection as it was', async () => {
+      fixtureEl.innerHTML = '<form><select multiple><option value="1" selected>One</option><option value="2">Two</option></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+      const reported = []
+
+      selectEl.addEventListener('change.coreui.multi-select', () => reported.push('change.coreui.multi-select'))
+      selectEl.addEventListener('change', () => reported.push('change'))
+      selectEl.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
+      expect(reported).toEqual([])
     })
 
     it('should forget a reported state on a native reset', async () => {
@@ -1879,6 +1917,21 @@ describe('MultiSelect', () => {
       multiSelect.setOptions([{ value: 'a', text: 'A' }, { value: 'b', text: 'B' }])
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should not report the start value its options bring through setOptions', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], value: ['a'] })
+      const reported = []
+
+      selectEl.addEventListener('change.coreui.multi-select', () => reported.push('change.coreui.multi-select'))
+      selectEl.addEventListener('input', () => reported.push('input'))
+      selectEl.addEventListener('change', () => reported.push('change'))
+      multiSelect.setOptions([{ value: 'a', text: 'A' }, { value: 'b', text: 'B' }])
+
+      expect([...selectEl.selectedOptions].map(option => option.value)).toEqual(['a'])
+      expect(reported).toEqual([])
     })
 
     it('should keep the pick of a single select over a start value that arrives later', () => {
@@ -6015,21 +6068,22 @@ describe('MultiSelect', () => {
       expect(shown).toEqual([[['B'], 'B ']])
     })
 
-    it('should report the value setConfig gives once, and nothing when it is already held', () => {
+    it('should not report the value setConfig gives', () => {
       fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b">B</option></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl)
       const reported = []
 
       selectEl.addEventListener('change.coreui.multi-select', event => reported.push(event.value.map(option => option.value)))
-      multiSelect.setConfig({ value: ['b'] })
+      selectEl.addEventListener('change', () => reported.push('native'))
       multiSelect.setConfig({ value: ['b'] })
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
-      expect(reported).toEqual([['b']])
+      expect([...selectEl.selectedOptions].map(option => option.value)).toEqual(['b'])
+      expect(reported).toEqual([])
     })
 
-    it('should report the selection that new options bring through setConfig', () => {
+    it('should not report the selection that new options bring through setConfig', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: 'a', text: 'A' }] })
@@ -6038,7 +6092,8 @@ describe('MultiSelect', () => {
       selectEl.addEventListener('change.coreui.multi-select', event => reported.push(event.value.map(option => option.value)))
       multiSelect.setConfig({ options: [{ value: 'x', text: 'X', selected: true }] })
 
-      expect(reported).toEqual([['x']])
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['x'])
+      expect(reported).toEqual([])
     })
 
     it('should send no change while it builds', () => {
@@ -6187,11 +6242,13 @@ describe('MultiSelect', () => {
     it('should let a change listener dispose the component during setOptions()', () => {
       fixtureEl.innerHTML = '<select multiple></select>'
       const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, { search: 'external', options: [], value: ['a'] })
+      const multiSelect = new MultiSelect(selectEl, { search: 'external', options: [{ value: 'b', text: 'B', selected: true }], resetSelectionOnOptionsChange: true })
+      const dispose = vi.fn(() => multiSelect.dispose())
 
-      selectEl.addEventListener('change.coreui.multi-select', () => multiSelect.dispose(), { once: true })
+      selectEl.addEventListener('change.coreui.multi-select', dispose, { once: true })
 
       expect(() => multiSelect.setOptions([{ value: 'a', text: 'A' }])).not.toThrow()
+      expect(dispose).toHaveBeenCalledTimes(1)
     })
 
     it('should let a native change listener dispose the component', () => {

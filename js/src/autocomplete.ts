@@ -307,13 +307,17 @@ class Autocomplete extends ComboboxBase {
   }
 
   clear(): void {
+    const isChanged = this._selected.length > 0 || this._shownText !== ''
+
     this.deselectAll()
     this.search('')
     this._filterOptionsList()
     this._setText('')
     this._validation.update()
 
-    this._triggerChangeEvent(null)
+    if (isChanged) {
+      this._triggerChangeEvent(null)
+    }
   }
 
   search(label: string): void {

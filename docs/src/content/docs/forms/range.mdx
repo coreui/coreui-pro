@@ -177,7 +177,7 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 
 | Event | Description |
 | --- | --- |
-| `changed.coreui.range` | Fired on the input when the value updates (on `input` and `change`). The event's `value` property holds the current numeric value. |
+| `changed.coreui.range` | Fired on the input when its value changes: on `input`, on `update()` after code set a new value, and on a form reset that moves it. A `change` after `input` with the same value, `update()` without a new value and the start do not fire it. The event's `value` property holds the current numeric value. |
 
 ```js
 const input = document.querySelector('.form-range-input')

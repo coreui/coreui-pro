@@ -546,13 +546,12 @@ class Combobox extends ComboboxBase {
   }
 
   _commitValue(): void {
-    const isChanged = this._updateValue()
+    if (!this._updateValue()) {
+      return
+    }
 
     EventHandler.trigger(this._element, EVENT_CHANGE, { value: this.getValue() })
-
-    if (isChanged) {
-      dispatchValueChange(this._valueField)
-    }
+    dispatchValueChange(this._valueField)
   }
 
   _updateValue(): boolean {
