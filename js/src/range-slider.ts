@@ -157,6 +157,7 @@ class RangeSlider extends BaseComponent {
   protected declare _inputs: HTMLInputElement[]
   protected declare _press: RangeSliderPress | null
   protected declare _shownValues: string[]
+  protected declare _startValues: number[]
   protected declare _tickPoints: RangeTickPoint[]
   protected declare _ticks: HTMLElement | null
   protected declare _tooltips: HTMLElement[]
@@ -181,6 +182,7 @@ class RangeSlider extends BaseComponent {
     this._inputs = []
     this._press = null
     this._shownValues = []
+    this._startValues = [...this._config.value as number[]]
     this._tickPoints = []
     this._ticks = null
     this._tooltips = []
@@ -191,7 +193,7 @@ class RangeSlider extends BaseComponent {
       frames: () => [this._element, ...this._inputs],
       invalidTargets: () => this._inputs,
       pageDescribed: () => (this._addedRole ? this._inputs : [this._element]),
-      restore: () => this._update()
+      restore: () => this._restoreValue()
     })
     this._wrapper = null
     this._hostAttributes = new Map()
@@ -344,12 +346,9 @@ class RangeSlider extends BaseComponent {
     input.min = `${min}`
     input.max = `${max}`
     input.step = `${step}`
-    input.defaultValue = `${value}`
+    input.defaultValue = `${this._startValues[index] ?? value}`
+    input.value = `${current ?? value}`
     input.disabled = disabled
-
-    if (current !== undefined) {
-      input.value = `${current}`
-    }
 
     const name = Array.isArray(this._config.name) ?
       this._config.name[index] :
@@ -439,6 +438,16 @@ class RangeSlider extends BaseComponent {
 
   _values(): number[] {
     return this._inputs.map(input => Number(input.value))
+  }
+
+  _restoreValue(): void {
+    const isChanged = this._inputs.some((input, index) => input.value !== this._shownValues[index])
+
+    this._update()
+
+    if (isChanged) {
+      EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._values() })
+    }
   }
 
   _update(): void {

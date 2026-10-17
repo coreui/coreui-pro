@@ -565,6 +565,45 @@ describe('RangeSlider', () => {
       expect(wrapperOf(element).style.getPropertyValue('--cui-range-fill')).toEqual('0.75')
       expect([...element.querySelectorAll('.tooltip-inner')].map(inner => inner.textContent)).toEqual(['25', '75'])
     })
+
+    it('should report a form reset that moves a handle once, and one that does not never', async () => {
+      fixtureEl.innerHTML = '<form><div id="slider"></div></form>'
+      const element = fixtureEl.querySelector('#slider')
+      const form = fixtureEl.querySelector('form')
+      new RangeSlider(element, { value: [25, 75] }) // eslint-disable-line no-new
+      const [low] = inputsOf(element)
+      const values = []
+
+      move(low, 5)
+      element.addEventListener('change.coreui.range-slider', event => values.push(event.value))
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(values).toEqual([[25, 75]])
+    })
+
+    it('should restore the values it was built with, not the ones setConfig gave later', async () => {
+      fixtureEl.innerHTML = '<form><div id="slider"></div></form>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: [25, 75] })
+
+      rangeSlider.setConfig({ value: [10, 90] })
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['10', '90'])
+
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['25', '75'])
+    })
   })
 
   describe('value ownership', () => {
