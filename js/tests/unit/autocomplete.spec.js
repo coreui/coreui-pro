@@ -7,6 +7,14 @@ import {
 } from '../helpers/fixture.js'
 
 describe('Autocomplete', () => {
+  const holdSelection = (autocomplete, options) => {
+    for (const option of options) {
+      autocomplete._known.set(String(option.value), option)
+    }
+
+    autocomplete._store.commit(options.map(option => String(option.value)))
+  }
+
   let fixtureEl
 
   beforeAll(() => {
@@ -51,7 +59,7 @@ describe('Autocomplete', () => {
         }, { label: 'Y', value: 'y' }]
       })
 
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['x'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['x'])
       expect(autocomplete._inputElement.value).toBe('X')
     })
 
@@ -69,7 +77,7 @@ describe('Autocomplete', () => {
 
       expect(seen).toEqual([])
       expect(autocomplete._inputElement.value).toBe('Option 1')
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['1'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['1'])
     })
 
     it('should name the field by the aria-label or aria-labelledby on the host', () => {
@@ -402,8 +410,8 @@ describe('Autocomplete', () => {
         ]
       })
 
-      expect(autocomplete._selected.length).toBe(1)
-      expect(autocomplete._selected[0].value).toBe('2')
+      expect(autocomplete._selectedOptions().length).toBe(1)
+      expect(autocomplete._selectedOptions()[0].value).toBe('2')
       expect(autocomplete._inputElement.value).toBe('Option 2')
     })
 
@@ -417,8 +425,8 @@ describe('Autocomplete', () => {
         ]
       })
 
-      expect(autocomplete._selected.length).toBe(1)
-      expect(autocomplete._selected[0].value).toBe('2')
+      expect(autocomplete._selectedOptions().length).toBe(1)
+      expect(autocomplete._selectedOptions()[0].value).toBe('2')
     })
 
     it('should handle string options', () => {
@@ -863,7 +871,7 @@ describe('Autocomplete', () => {
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
       }
 
-      expect(autocomplete._selected.map(option => option.label)).toEqual(['Apple'])
+      expect(autocomplete._selectedOptions().map(option => option.label)).toEqual(['Apple'])
     })
 
     it.each([['leaving the field', 'blur'], ['Enter', 'enter']])('should open on a padded query, hint nothing for spaces alone and confirm a label padded on its own side on %s', (_, how) => {
@@ -885,7 +893,7 @@ describe('Autocomplete', () => {
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
       }
 
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['apple'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['apple'])
     })
 
     it('should keep a given state when an input leaves the text as it was', () => {
@@ -1404,11 +1412,11 @@ describe('Autocomplete', () => {
       })
 
       autocomplete._inputElement.value = 'some text'
-      autocomplete._selected.push({ label: 'Option 1', value: '1' })
+      holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 
       autocomplete.clear()
 
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
       expect(autocomplete._inputElement.value).toBe('')
       expect(autocomplete._search).toBe('')
     })
@@ -1610,11 +1618,11 @@ describe('Autocomplete', () => {
         value: '1'
       })
 
-      autocomplete._selected.push({ label: 'Option 1', value: '1' })
+      holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 
       autocomplete.setConfig({ value: '2' })
 
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
 
     it('should keep the pick across an options refresh, even when the new options lack it', () => {
@@ -1629,7 +1637,7 @@ describe('Autocomplete', () => {
       autocomplete._onOptionSelected('z')
       autocomplete.setConfig({ options: [{ label: 'Anna', value: 'a' }] })
 
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['z'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['z'])
       expect(autocomplete._inputElement.value).toBe('Zoe')
       expect(autocomplete._cleanerElement.style.display).not.toBe('none')
     })
@@ -1645,13 +1653,13 @@ describe('Autocomplete', () => {
       autocomplete.setConfig({ options })
 
       expect(autocomplete._inputElement.value).toBe('Opt')
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
 
       autocomplete.clear()
       autocomplete.setConfig({ options, invalid: true })
 
       expect(autocomplete._inputElement.value).toBe('')
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
 
     it('should select a value given to setConfig over a selected flag, and clear the field for null', () => {
@@ -1663,12 +1671,12 @@ describe('Autocomplete', () => {
 
       autocomplete.setConfig({ value: 'b' })
 
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['b'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['b'])
       expect(autocomplete._inputElement.value).toBe('B')
 
       autocomplete.setConfig({ value: null })
 
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
       expect(autocomplete._inputElement.value).toBe('')
     })
 
@@ -1731,14 +1739,14 @@ describe('Autocomplete', () => {
         ]
       })
 
-      autocomplete._selected = [
+      holdSelection(autocomplete, [
         { label: 'Option 1', value: '1' },
         { label: 'Option 2', value: '2' }
-      ]
+      ])
 
       autocomplete.deselectAll()
 
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
 
     it('should skip disabled options when deselecting', () => {
@@ -1751,14 +1759,14 @@ describe('Autocomplete', () => {
         ]
       })
 
-      autocomplete._selected = [
+      holdSelection(autocomplete, [
         { label: 'Option 1', value: '1' },
         { label: 'Option 2', value: '2', disabled: true }
-      ]
+      ])
 
       autocomplete.deselectAll()
 
-      expect(autocomplete._selected).toEqual([{ label: 'Option 2', value: '2', disabled: true }])
+      expect(autocomplete._selectedOptions()).toEqual([{ label: 'Option 2', value: '2', disabled: true }])
     })
 
     it('should do nothing if no options are selected', () => {
@@ -1768,10 +1776,10 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      autocomplete._selected = []
+      holdSelection(autocomplete, [])
       autocomplete.deselectAll()
 
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
 
     it('should handle nested group options when deselecting', () => {
@@ -1789,14 +1797,14 @@ describe('Autocomplete', () => {
         ]
       })
 
-      autocomplete._selected = [
+      holdSelection(autocomplete, [
         { label: 'Option 1', value: '1' },
         { label: 'Option 2', value: '2' }
-      ]
+      ])
 
       // The deselectAll should deselect all flat options
       autocomplete.deselectAll()
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
   })
 
@@ -2074,7 +2082,7 @@ describe('Autocomplete', () => {
 
       autocomplete.show()
       autocomplete._inputElement.value = 'Option 1'
-      autocomplete._selected = [{ label: 'Option 1', value: '1' }]
+      holdSelection(autocomplete, [{ label: 'Option 1', value: '1' }])
 
       const keydownEvent = createEvent('keydown')
       keydownEvent.key = 'Escape'
@@ -2216,7 +2224,7 @@ describe('Autocomplete', () => {
       keydownEvent.key = 'Enter'
       autocomplete._inputElement.dispatchEvent(keydownEvent)
 
-      expect(autocomplete._selected.length).toBe(0)
+      expect(autocomplete._selectedOptions().length).toBe(0)
     })
 
     it('should trigger change event on Enter with non-matching value when allowOnlyDefinedOptions is false', () => {
@@ -2496,7 +2504,7 @@ describe('Autocomplete', () => {
       autocomplete._selectOption(option)
 
       expect(autocomplete._inputElement.value).toBe('Option 1')
-      expect(autocomplete._selected).toContain(option)
+      expect(autocomplete._selectedOptions()).toContain(option)
     })
 
     it('should hide dropdown after selection', () => {
@@ -2539,7 +2547,7 @@ describe('Autocomplete', () => {
       autocomplete._selectOption(option)
       autocomplete._selectOption(option)
 
-      expect(autocomplete._selected.length).toBe(1)
+      expect(autocomplete._selectedOptions().length).toBe(1)
     })
 
     it('should clear hint when selecting with showHints enabled', () => {
@@ -2588,8 +2596,8 @@ describe('Autocomplete', () => {
       autocomplete._selectOption({ label: 'Option 1', value: '1' })
       autocomplete._selectOption({ label: 'Option 2', value: '2' })
 
-      expect(autocomplete._selected.length).toBe(1)
-      expect(autocomplete._selected[0].value).toBe('2')
+      expect(autocomplete._selectedOptions().length).toBe(1)
+      expect(autocomplete._selectedOptions()[0].value).toBe('2')
     })
   })
 
@@ -2629,7 +2637,7 @@ describe('Autocomplete', () => {
       autocomplete._optionsElement.append(labelEl)
 
       labelEl.dispatchEvent(new Event('click', { bubbles: true }))
-      expect(autocomplete._selected.length).toBe(0)
+      expect(autocomplete._selectedOptions().length).toBe(0)
     })
 
     it('should find closest option element when clicking on child', () => {
@@ -2666,7 +2674,7 @@ describe('Autocomplete', () => {
       autocomplete.show()
 
       autocomplete._optionsElement.dispatchEvent(new Event('click', { bubbles: true }))
-      expect(autocomplete._selected.length).toBe(0)
+      expect(autocomplete._selectedOptions().length).toBe(0)
     })
   })
 
@@ -2941,12 +2949,12 @@ describe('Autocomplete', () => {
       })
 
       autocomplete._inputElement.value = 'test'
-      autocomplete._selected.push({ label: 'Option 1', value: '1' })
+      holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 
       autocomplete._cleanerElement.click()
 
       expect(autocomplete._inputElement.value).toBe('')
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
 
     it('should show cleaner button when there are selections', () => {
@@ -2957,7 +2965,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      autocomplete._selected.push({ label: 'Option 1', value: '1' })
+      holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
       autocomplete._updateCleaner()
 
       expect(autocomplete._cleanerElement.style.display).not.toBe('none')
@@ -2971,7 +2979,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      autocomplete._selected = []
+      holdSelection(autocomplete, [])
       autocomplete._updateCleaner()
 
       expect(autocomplete._cleanerElement.style.display).toBe('none')
@@ -2988,7 +2996,7 @@ describe('Autocomplete', () => {
       // Manually make it disabled after creation to test the event handler guard
       autocomplete._config.disabled = true
       autocomplete._inputElement.value = 'test'
-      autocomplete._selected.push({ label: 'Option 1', value: '1' })
+      holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 
       const clickEvent = new Event('click', { bubbles: true })
       autocomplete._cleanerElement.dispatchEvent(clickEvent)
@@ -3005,14 +3013,14 @@ describe('Autocomplete', () => {
       })
 
       autocomplete._inputElement.value = 'test'
-      autocomplete._selected.push({ label: 'Option 1', value: '1' })
+      holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 
       const keydownEvent = createEvent('keydown')
       keydownEvent.key = 'Enter'
       autocomplete._cleanerElement.dispatchEvent(keydownEvent)
 
       expect(autocomplete._inputElement.value).toBe('')
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
 
     it('should not clear on Enter key press on cleaner button when disabled', () => {
@@ -3025,7 +3033,7 @@ describe('Autocomplete', () => {
 
       autocomplete._config.disabled = true
       autocomplete._inputElement.value = 'test'
-      autocomplete._selected.push({ label: 'Option 1', value: '1' })
+      holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 
       const keydownEvent = createEvent('keydown')
       keydownEvent.key = 'Enter'
@@ -3135,7 +3143,7 @@ describe('Autocomplete', () => {
       form.reset()
       await settle()
 
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['1'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['1'])
       expect(autocomplete._inputElement.value).toBe('Option 1')
       expect(changes).toEqual(['1'])
     })
@@ -3154,12 +3162,12 @@ describe('Autocomplete', () => {
       form.reset()
       await settle()
 
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['1'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['1'])
 
       form.reset()
       await settle()
 
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
       expect(autocomplete._inputElement.value).toBe('')
       expect(autocomplete._cleanerElement.style.display).toBe('none')
     })
@@ -3213,7 +3221,7 @@ describe('Autocomplete', () => {
       form.reset()
       await settle()
 
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['a'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['a'])
     })
 
     it('should report the restored option over typed text equal to its value', async () => {
@@ -3264,7 +3272,7 @@ describe('Autocomplete', () => {
         setTimeout(resolve, 40)
       })
 
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['react'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['react'])
       expect(changes.at(-1)).toBe('react')
     })
 
@@ -3699,7 +3707,7 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.dispatchEvent(createEvent('blur'))
 
       expect(changes).toEqual([])
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['4'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['4'])
     })
 
     it('should put the label back when the field is left with the selection typed in another case', () => {
@@ -3761,7 +3769,7 @@ describe('Autocomplete', () => {
       autocomplete._selectOption({ label: 'Cherry', value: '3', disabled: true })
 
       expect(changes).toEqual([])
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
 
     it('should clear on blur when allowOnlyDefinedOptions and no exact match', () => {
@@ -3915,7 +3923,7 @@ describe('Autocomplete', () => {
           options: [{ label: 'Option 1', value: '1' }]
         })
 
-        autocomplete._selected = [{ label: 'Option 1', value: '1' }]
+        holdSelection(autocomplete, [{ label: 'Option 1', value: '1' }])
         autocomplete._inputElement.value = 'O'
 
         autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
@@ -3953,7 +3961,7 @@ describe('Autocomplete', () => {
       autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
       autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Backspace' }))
 
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
       expect(changes).toEqual([null])
     })
 
@@ -3966,7 +3974,7 @@ describe('Autocomplete', () => {
       let selectedDuringInput = null
 
       autocompleteEl.addEventListener('input.coreui.autocomplete', () => {
-        selectedDuringInput = autocomplete._selected.length
+        selectedDuringInput = autocomplete._selectedOptions().length
       })
       autocomplete._inputElement.value = 'Ann'
       autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
@@ -4048,7 +4056,7 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.focus()
       await userEvent.keyboard('Opt{Tab}')
 
-      expect(autocomplete._selected.map(option => option.value)).toEqual(['2'])
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['2'])
       expect(autocomplete._inputElement.value).toBe('Option 2')
     })
 
@@ -4064,7 +4072,7 @@ describe('Autocomplete', () => {
       await userEvent.keyboard('Ap{Escape}{Tab}')
 
       expect(autocomplete._inputElement.value).toBe('Ap')
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
   })
 
@@ -4091,7 +4099,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      autocomplete._selected.push({ label: 'Option 1', value: '1' })
+      holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
       autocomplete._inputElement.value = 'Option 1'
       autocomplete._inputElement.dispatchEvent(createEvent('blur'))
 
@@ -4345,7 +4353,7 @@ describe('Autocomplete', () => {
 
       optionEl.click()
 
-      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
   })
 
@@ -4797,9 +4805,9 @@ describe('Autocomplete', () => {
       autocomplete._selectOption(option)
 
       expect(autocomplete._inputElement.value).toBe('Option 1')
-      expect(autocomplete._selected).toContain(option)
-      expect(autocomplete._selected[0].value).toBe('1')
-      expect(typeof autocomplete._selected[0].value).toBe('string')
+      expect(autocomplete._selectedOptions()).toContain(option)
+      expect(autocomplete._selectedOptions()[0].value).toBe('1')
+      expect(typeof autocomplete._selectedOptions()[0].value).toBe('string')
     })
 
     it('should filter options with number values based on search term', () => {
@@ -4908,9 +4916,9 @@ describe('Autocomplete', () => {
         ]
       })
 
-      expect(autocomplete._selected).toHaveSize(1)
-      expect(autocomplete._selected[0].value).toBe('1')
-      expect(autocomplete._selected[0].label).toBe('Option 1')
+      expect(autocomplete._selectedOptions()).toHaveSize(1)
+      expect(autocomplete._selectedOptions()[0].value).toBe('1')
+      expect(autocomplete._selectedOptions()[0].label).toBe('Option 1')
     })
   })
 
@@ -4957,15 +4965,15 @@ describe('Autocomplete', () => {
         ]
       })
 
-      autocomplete._selected = [
+      holdSelection(autocomplete, [
         { label: 'Option 1', value: '1' },
         { label: 'Option 2', value: '2' }
-      ]
+      ])
 
       autocomplete._deselectOption('1')
 
-      expect(autocomplete._selected.length).toBe(1)
-      expect(autocomplete._selected[0].value).toBe('2')
+      expect(autocomplete._selectedOptions().length).toBe(1)
+      expect(autocomplete._selectedOptions()[0].value).toBe('2')
     })
 
     it('should remove selected class from DOM element', () => {

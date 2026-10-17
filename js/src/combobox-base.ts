@@ -13,6 +13,7 @@ import { createAnchoredPosition } from './util/floating-ui.js'
 import { findOptionByValue, isOptionGroup } from './util/option-tree.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { escapeHtml } from './util/sanitizer.js'
+import { type SelectionStore } from './util/selection-state.js'
 import { executeAfterTransition, getElement } from './util/index.js'
 
 /**
@@ -55,6 +56,7 @@ class ComboboxBase extends BaseComponent {
   protected declare _listBoxChangeHandler: (() => void) | null
   protected declare _menu: any
   protected declare _selected: any
+  protected declare _store: SelectionStore | undefined
   protected declare _options: any[]
   protected declare _search: any
   protected declare _floatingCleanup: (() => void) | null
@@ -284,7 +286,7 @@ class ComboboxBase extends BaseComponent {
     this._optionsElement = optionsDiv
     this._menu = popupDiv
 
-    this._listBox = new ListBox(listBoxDiv, this._getListBoxConfig())
+    this._listBox = new ListBox(listBoxDiv, this._getListBoxConfig(), this._store)
     this._addListBoxListeners()
     this._afterMenuCreated()
   }

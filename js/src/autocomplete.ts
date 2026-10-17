@@ -20,6 +20,7 @@ import { isTypingKey } from './util/list-navigation.js'
 import {
   filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, highlightMatches, isOptionGroup
 } from './util/option-tree.js'
+import { createSelectionStore } from './util/selection-state.js'
 import {
   captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
 } from './util/index.js'
@@ -187,6 +188,7 @@ class Autocomplete extends ComboboxBase {
   protected declare _hostAria: Array<[string, string]>
   protected declare _hostTabIndex: string | null
   protected declare _keySerial: number | null
+  protected declare _known: Map<string, any>
   protected declare _initialValue: any
   protected declare _reportSeed: boolean
   protected declare _seenOptionValues: Set<string>
@@ -216,7 +218,8 @@ class Autocomplete extends ComboboxBase {
     this._optionsElement = null
 
     this._menu = null
-    this._selected = []
+    this._known = new Map()
+    this._store = createSelectionStore(next => next.slice(-1))
     this._options = this._getOptionsFromConfig()
     this._floatingCleanup = null
     this._anchoredPosition = null
@@ -307,7 +310,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   clear(): void {
-    const isChanged = this._selected.length > 0 || this._shownText !== ''
+    const isChanged = this._selectedOptions().length > 0 || this._shownText !== ''
 
     this.deselectAll()
     this.search('')
@@ -342,8 +345,6 @@ class Autocomplete extends ComboboxBase {
     this._setListBoxItems()
     this._syncInputName()
 
-    this._projectSelection(this._selected.map((option: any) => option.value))
-
     if (config?.value !== undefined) {
       this._valueApplied = false
       this.deselectAll()
@@ -354,8 +355,8 @@ class Autocomplete extends ComboboxBase {
     this._validation.update()
   }
 
-  deselectAll(options: any[] = this._selected): void {
-    if (this._selected.length === 0) {
+  deselectAll(options: any[] = this._selectedOptions()): void {
+    if (this._selectedOptions().length === 0) {
       return
     }
 
@@ -408,7 +409,7 @@ class Autocomplete extends ComboboxBase {
         }
 
         this.hide()
-        if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
+        if (this._config.allowOnlyDefinedOptions && this._selectedOptions().length === 0) {
           this._emptyByUser()
           this.search('')
         }
@@ -420,7 +421,7 @@ class Autocomplete extends ComboboxBase {
         this._inputElement.focus()
       }
 
-      if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._selected.length > 0) {
+      if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._selectedOptions().length > 0) {
         this._validation.dismiss(this._keySerial)
         this.deselectAll()
         this._validation.update()
@@ -512,7 +513,7 @@ class Autocomplete extends ComboboxBase {
       this._shownText = value
       this._validation.update()
 
-      if (this._selected.length > 0) {
+      if (this._selectedOptions().length > 0) {
         this.deselectAll()
         this._triggerChangeEvent(null)
       }
@@ -573,7 +574,7 @@ class Autocomplete extends ComboboxBase {
     const options = getSelectableOptions(this._options).filter(option => option.label.trim().toLowerCase() === this._inputElement.value.trim().toLowerCase())
 
     if (options.length > 0) {
-      if (this._selected.some((option: any) => option.value === options[0].value)) {
+      if (this._selectedOptions().some((option: any) => option.value === options[0].value)) {
         this.hide()
       } else {
         this._selectOption(options[0])
@@ -798,16 +799,24 @@ class Autocomplete extends ComboboxBase {
   }
 
   _applySelection(option: any): void {
-    this.deselectAll()
-    this._selected.push(option)
-    this._projectSelection(this._selected.map((option: any) => option.value))
+    this._known.set(String(option.value), option)
+
+    if (this._store!.commit([String(option.value)])) {
+      this._listBox?.update()
+    }
+
     this._setText(option.label)
     this._updateCleaner()
   }
 
   _deselectOption(value: any): void {
-    this._selected = this._selected.filter((option: any) => option.value !== value)
-    this._projectSelection(this._selected.map((option: any) => option.value))
+    if (this._store!.commit(this._store!.values().filter(selected => selected !== String(value)))) {
+      this._listBox?.update()
+    }
+  }
+
+  _selectedOptions(): any[] {
+    return this._store!.values().map(value => this._known.get(value) ?? this._findOptionByValue(value)).filter(Boolean)
   }
 
   _findHintOption(text: string): any {
@@ -815,11 +824,11 @@ class Autocomplete extends ComboboxBase {
   }
 
   _namesSelection(text: string): boolean {
-    return this._selected.some((option: any) => option.label.trim() === text.trim())
+    return this._selectedOptions().some((option: any) => option.label.trim() === text.trim())
   }
 
   _clearByUser(): void {
-    if (this._selected.length > 0 || this._inputElement.value !== '') {
+    if (this._selectedOptions().length > 0 || this._inputElement.value !== '') {
       this._validation.dismiss()
     }
 
@@ -845,7 +854,7 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
-    if (this._selected.length > 0) {
+    if (this._selectedOptions().length > 0) {
       this._cleanerElement.style.removeProperty('display')
       return
     }
@@ -858,7 +867,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   _restoreInitialSelection(): void {
-    const previous = this._selected[0]?.value
+    const previous = this._selectedOptions()[0]?.value
     const text = this._shownText
 
     this._reportSeed = false
@@ -879,7 +888,7 @@ class Autocomplete extends ComboboxBase {
     this._seedSelection()
     this._validation.update()
 
-    const current = this._selected[0]
+    const current = this._selectedOptions()[0]
 
     if (current ? current.value !== previous : previous !== undefined || text !== '') {
       this._triggerChangeEvent(current ?? null)
@@ -906,10 +915,10 @@ class Autocomplete extends ComboboxBase {
       this._seenOptionValues.add(option.value)
     }
 
-    if (seed && !this._selected.some((option: any) => option.value === seed.value)) {
+    if (seed && !this._selectedOptions().some((option: any) => option.value === seed.value)) {
       this._applySelection(seed)
 
-      if (this._reportSeed && this._selected.includes(seed)) {
+      if (this._reportSeed && this._selectedOptions().includes(seed)) {
         this._reportSeed = false
         this._validation.update()
         this._triggerChangeEvent(seed)
@@ -988,7 +997,7 @@ class Autocomplete extends ComboboxBase {
       }
 
       context.hide()
-      if (context._config.allowOnlyDefinedOptions && context._selected.length === 0) {
+      if (context._config.allowOnlyDefinedOptions && context._selectedOptions().length === 0) {
         context._emptyByUser()
       }
 
