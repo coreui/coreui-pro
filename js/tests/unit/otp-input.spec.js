@@ -519,7 +519,7 @@ describe('OTPInput', () => {
       expect(inputs[2].value).toBe('3')
     })
 
-    it('should clear inputs when no initial value was set', () => {
+    it('should put back the code of the markup when no initial value was set', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control" value="1">
@@ -529,12 +529,41 @@ describe('OTPInput', () => {
 
       const otpContainer = fixtureEl.querySelector('.form-otp')
       const otpInput = new OTPInput(otpContainer)
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
 
+      inputs[0].value = '7'
+      inputs[0].dispatchEvent(new Event('input', { bubbles: true }))
       otpInput.reset()
 
+      expect([...inputs].map(input => input.value)).toEqual(['1', '2'])
+    })
+
+    it('should put back the code it started with, not one setConfig gave later', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer, { value: '12' })
+
+      otpInput.setConfig({ value: '34' })
+      otpInput.reset()
+
+      expect(otpInput._inputElement.value).toBe('12')
+    })
+
+    it('should report a reset that changes the code once, and one that does not never', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer, { value: '12' })
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      expect(inputs[0].value).toBe('')
-      expect(inputs[1].value).toBe('')
+      const values = []
+
+      otpContainer.addEventListener('change.coreui.otp-input', event => values.push(event.value))
+      otpInput.reset()
+      inputs[1].value = '5'
+      inputs[1].dispatchEvent(new Event('input', { bubbles: true }))
+      otpInput.reset()
+      otpInput.reset()
+
+      expect(values).toEqual(['15', '12'])
     })
   })
 
@@ -600,7 +629,7 @@ describe('OTPInput', () => {
       expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('')
     })
 
-    it('should report a value it repainted', () => {
+    it('should not report a value it repainted', () => {
       fixtureEl.innerHTML = MARKUP
       const otpElement = fixtureEl.querySelector('.form-otp')
       const otpInput = new OTPInput(otpElement, { value: '12' })
@@ -609,10 +638,14 @@ describe('OTPInput', () => {
       otpElement.addEventListener('change.coreui.otp-input', event => {
         values.push(event.value)
       })
+      otpElement.addEventListener('complete.coreui.otp-input', event => {
+        values.push(event.value)
+      })
 
       otpInput.setConfig({ value: '987' })
 
-      expect(values).toEqual(['987'])
+      expect(otpInput._inputElement.value).toBe('987')
+      expect(values).toEqual([])
     })
 
     it('should take a null config as a no-op', () => {
@@ -1966,7 +1999,30 @@ describe('OTPInput', () => {
       otpInput.clear()
       otpInput.clear()
 
-      expect(events).toEqual([['input', '1'], ['change', '1'], ['input', '12'], ['change', '12'], ['input', ''], ['change', '']])
+      expect(events).toEqual([['input', '1'], ['change', '1'], ['input', ''], ['change', '']])
+    })
+
+    it('should report a native reset that changes the code once, with input and change from the value field', async () => {
+      const { form, otpInput, slots, valueField } = mountForm({ value: '12' })
+      const events = []
+
+      type(slots[1], '5')
+      otpInput._element.addEventListener('change.coreui.otp-input', event => events.push(['change.coreui.otp-input', event.value]))
+      for (const name of ['input', 'change']) {
+        valueField.addEventListener(name, () => events.push([name, valueField.value]))
+      }
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(slots.map(slot => slot.value)).toEqual(['1', '2'])
+      expect(events).toEqual([['input', '12'], ['change', '12'], ['change.coreui.otp-input', '12']])
     })
 
     it.each([['before the reset', 'before', false], ['in a reset listener', 'listener', true], ['right after form.reset()', 'after', true]])('should put back the code it started with on a native reset and treat a state given %s as the reset says', async (_, when, kept) => {
