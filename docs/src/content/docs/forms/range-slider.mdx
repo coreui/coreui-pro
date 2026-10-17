@@ -272,10 +272,10 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 
 | Event | Description |
 | --- | --- |
-| `change.coreui.range-slider` | Fired when a handle's value changes and the user finishes interacting: on release of the pointer, and on every key press. The event's `value` holds the values of all handles as numbers. |
+| `change.coreui.range-slider` | Fired when a handle's value changes and the user finishes interacting: on release of the pointer, and on every key press; also when a native form reset moves a handle. The event's `value` holds the values of all handles as numbers. |
 | `input.coreui.range-slider` | Fired continuously while a handle moves. The event's `value` holds the values of all handles as numbers. |
 
-A press on the track or on a clickable tick dispatches the native `input` event on the handle it moves, and `change` when the pointer is released, the way the browser does when a handle is dragged, so listeners on the inputs see the same events either way. A form reset puts the handles back on their configured values.
+A press on the track or on a clickable tick dispatches the native `input` event on the handle it moves, and `change` when the pointer is released, the way the browser does when a handle is dragged, so listeners on the inputs see the same events either way. A form reset puts the handles back on the values the slider was built with, not on ones a later `setConfig({ value })` gave.
 
 ```js
 const myRangeSlider = document.getElementById('myRangeSlider')
