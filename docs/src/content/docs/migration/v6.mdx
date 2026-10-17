@@ -1091,7 +1091,9 @@ check, radio, carousel and toggler icons already work:
   reset brings Rating and Range Slider back to the value they were created
   with, not one a later `setConfig()` gave, and OTP Input's `reset()` puts back
   the code it started with, as a native reset does. A stepper keeps the
-  validation marks of a form reset a listener cancels.
+  validation marks of a form reset a listener cancels. Date Input and Time Input
+  still fire from `setConfig({ date })`, their only way to set the value from
+  code.
 - **Multi Select keeps its selection through `setConfig()`** when the config
   carries neither `options` nor `value`, fitted to a new `multiple` or
   `selectionLimit`; with options from the config it used to fall back to the

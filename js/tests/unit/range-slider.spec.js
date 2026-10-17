@@ -588,6 +588,21 @@ describe('RangeSlider', () => {
       expect(values).toEqual([[25, 75]])
     })
 
+    it('should restore a handle setConfig added to the value it was added with', async () => {
+      fixtureEl.innerHTML = '<form><div id="slider"></div></form>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: [10, 80] })
+
+      rangeSlider.setConfig({ value: [10, 80, 90] })
+      rangeSlider.setConfig({ value: [20, 70, 50] })
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['10', '80', '90'])
+    })
+
     it('should restore the values it was built with, not the ones setConfig gave later', async () => {
       fixtureEl.innerHTML = '<form><div id="slider"></div></form>'
       const element = fixtureEl.querySelector('#slider')
