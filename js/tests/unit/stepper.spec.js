@@ -758,6 +758,48 @@ describe('Stepper', () => {
       expect(stepper._isFinished).toBeFalse()
       expect(fixtureEl.querySelector('input')).toHaveClass('is-invalid')
     })
+
+    it.each([['clear the marks of a native reset', false], ['keep the marks of a cancelled reset', true]])('should %s of a validated step form', async (_, cancelled) => {
+      fixtureEl.innerHTML = `
+        <div class="stepper">
+          <ol class="stepper-steps">
+            <li class="stepper-step">
+              <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
+                <span class="stepper-step-indicator">1</span>
+              </button>
+            </li>
+            <li class="stepper-step">
+              <button type="button" class="stepper-step-button" data-coreui-target="#step2">
+                <span class="stepper-step-indicator">2</span>
+              </button>
+            </li>
+          </ol>
+          <div id="step1" class="stepper-pane active show">
+            <form novalidate>
+              <input type="text" required value="">
+            </form>
+          </div>
+          <div id="step2" class="stepper-pane"></div>
+        </div>
+      `
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const form = fixtureEl.querySelector('form')
+
+      stepper.next()
+
+      expect(fixtureEl.querySelector('input')).toHaveClass('is-invalid')
+
+      if (cancelled) {
+        form.addEventListener('reset', event => event.preventDefault())
+      }
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(fixtureEl.querySelector('input').classList.contains('is-invalid')).toBe(cancelled)
+    })
   })
 
   describe('prev()', () => {
@@ -2091,7 +2133,7 @@ describe('Stepper', () => {
       expect(input).not.toHaveClass('is-valid')
     })
 
-    it('should clear the state of a form the page resets and stop updating it', () => {
+    it('should clear the state of a form the page resets and stop updating it', async () => {
       fixtureEl.innerHTML = validationFixture('novalidate data-coreui-validate="valid"')
       fixtureEl.querySelector('#empty').value = 'filled'
       const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
@@ -2104,6 +2146,9 @@ describe('Stepper', () => {
 
       stepper.prev()
       form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
 
       expect(empty).not.toHaveClass('is-valid')
 
