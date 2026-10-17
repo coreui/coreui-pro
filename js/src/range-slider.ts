@@ -248,7 +248,7 @@ class RangeSlider extends BaseComponent {
   setConfig(config: Partial<RangeSliderConfig>): void {
     const current = config && 'value' in config ? null : this._values()
     this._config = this._getConfig({ ...this._config, ...config }) as RangeSliderConfig
-    this._startValues.push(...(this._config.value as number[]).slice(this._startValues.length))
+    this._startValues = (this._config.value as number[]).map((value, index) => this._startValues[index] ?? value)
 
     if (this._validation.configure(config)) {
       return
