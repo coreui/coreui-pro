@@ -1192,6 +1192,45 @@ describe('ChipInput', () => {
 
       expect(chipInput._valueField.value).toEqual('')
     })
+
+    it('should report clear when a listener puts a chip back while the field empties', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+      const changes = []
+      const events = []
+
+      chipInput.add('First')
+      chipInput._valueField.addEventListener('change', () => events.push('change'))
+      el.addEventListener('remove.coreui.chip-input', () => {
+        if (chipInput.getValues().length === 1) {
+          chipInput.add('Default')
+        }
+      })
+      el.addEventListener('change.coreui.chip-input', event => changes.push(event.value))
+      chipInput.clear()
+
+      expect(chipInput._valueField.value).toEqual('Default')
+      expect(changes).toEqual([['Default']])
+      expect(events).toEqual(['change'])
+    })
+
+    it('should send one native input and change for clear', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+      const events = []
+
+      chipInput.add('First')
+      chipInput.add('Second')
+      chipInput._valueField.addEventListener('input', () => events.push('input'))
+      chipInput._valueField.addEventListener('change', () => events.push('change'))
+      chipInput.clear()
+
+      expect(events).toEqual(['input', 'change'])
+    })
   })
 
   describe('getSelectedValues', () => {

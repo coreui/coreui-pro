@@ -128,6 +128,7 @@ class ChipSet extends BaseComponent {
   protected declare _anchor: HTMLElement | null
   protected declare _typeaheadBuffer: TypeaheadBuffer
   protected declare _announcedFrom: string[] | null
+  protected declare _batch: { added: boolean, removed: boolean } | null
   protected declare _settled: boolean
 
   constructor(element?: string | Element | null, config?: Partial<ChipSetConfig> | null) {
@@ -142,6 +143,7 @@ class ChipSet extends BaseComponent {
     this._anchor = null
     this._typeaheadBuffer = createTypeaheadBuffer()
     this._announcedFrom = null
+    this._batch = null
     this._settled = false
 
     this._applyAccessibilityRoles()
@@ -200,7 +202,12 @@ class ChipSet extends BaseComponent {
     this._setupChip(element)
     this._noteChange()
     this._chips.push(value)
-    this._triggerChange()
+
+    if (this._batch) {
+      this._batch.added = true
+    } else {
+      this._triggerChange()
+    }
 
     return element
   }
@@ -247,15 +254,11 @@ class ChipSet extends BaseComponent {
   }
 
   removeSelected(): void {
-    for (const chip of this._getSelectedChipElements()) {
-      this.remove(chip)
-    }
+    this._removeChips(this._getSelectedChipElements())
   }
 
   clear(): void {
-    for (const chip of this._getChipElements()) {
-      this.remove(chip)
-    }
+    this._removeChips(this._getChipElements())
   }
 
   selectChip(chip: HTMLElement): void {
@@ -687,6 +690,39 @@ class ChipSet extends BaseComponent {
       this._chips.splice(index, 1)
     }
 
+    if (this._batch) {
+      this._batch.removed = true
+    } else {
+      this._reportRemoval()
+    }
+  }
+
+  _removeChips(chips: HTMLElement[]): void {
+    const outer = !this._batch
+    const batch = this._batch ?? { added: false, removed: false }
+
+    this._batch = batch
+
+    try {
+      for (const chip of chips) {
+        if (this._element.contains(chip)) {
+          this.remove(chip)
+        }
+      }
+    } finally {
+      if (outer) {
+        this._batch = null
+
+        if (batch.removed) {
+          this._reportRemoval()
+        } else if (batch.added) {
+          this._triggerChange()
+        }
+      }
+    }
+  }
+
+  _reportRemoval(): void {
     this._triggerChange()
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
       selected: this.getSelectedValues()
