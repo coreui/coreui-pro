@@ -990,7 +990,9 @@ export const constrainDateTime = (date: Date, minDate: Date | null, maxDate: Dat
  * field's precision: to the smallest unit the field shows when it has a time,
  * where a latest date without a time of day covers its whole day, by the day
  * when it has none, by the whole period when it picks weeks, months, quarters
- * or years.
+ * or years. A field with only a time compares the time of day of both bounds,
+ * where a latest time at midnight still covers the whole day, and ignores their
+ * days.
  *
  * @param layout - The sections and literals of the field
  * @param date - The date the field holds
@@ -1002,8 +1004,9 @@ export const constrainDateTime = (date: Date, minDate: Date | null, maxDate: Dat
 export const getDateLimitError = (layout: DateSection[], date: Date, minDate: Date | null, maxDate: Date | null, disabledDates?: DisabledDate | DisabledDate[]): DateLimitError => {
   const period = getLayoutPeriod(layout)
   const timed = layout.some(section => section.type === 'hour')
+  const timeOnly = timed && !period && !layout.some(section => section.type === 'day')
   const min = period || timed ? getDateWithin(layout, minDate) : minDate && removeTimeFromDate(minDate)
-  const max = timed ? getInclusiveMax(maxDate) : maxDate
+  const max = timed ? getInclusiveMax(timeOnly ? getDateWithin(layout, maxDate) : maxDate) : maxDate
 
   if (min && date < min) {
     return 'minDate'
@@ -1013,7 +1016,7 @@ export const getDateLimitError = (layout: DateSection[], date: Date, minDate: Da
     return 'maxDate'
   }
 
-  if (isCellDisabled(date, period ?? 'days', minDate, maxDate, disabledDates)) {
+  if (timeOnly ? isCellDisabled(date, 'days', null, null, disabledDates) : isCellDisabled(date, period ?? 'days', minDate, maxDate, disabledDates)) {
     return 'disabledDate'
   }
 

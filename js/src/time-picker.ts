@@ -12,8 +12,10 @@ import TimeInput, { type TimeInputConfig } from './time-input.js'
 import type { TimeSelectionConfig } from './time-selection/base.js'
 import TimeRoll from './time-selection/roll.js'
 import { type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
-import { isSameInstantAs } from './util/calendar.js'
-import { getHourCycle } from './util/date-sections.js'
+import { createDate, isSameInstantAs } from './util/calendar.js'
+import {
+  constrainDateTime, convertValue, getDateWithin, getHourCycle
+} from './util/date-sections.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -276,12 +278,25 @@ class TimePicker extends PickerBase {
       return
     }
 
+    const { locale, maxDate: max, minDate: min } = this._input._config
+    const [minDate, maxDate] = [min, max].map(limit => getDateWithin(this._input._sections, convertValue(limit, 'time', locale)))
+
     this._selection = new TimeRoll(this._selectionElement, this._forwardConfig(TimeRoll, {
       hourCycle: getHourCycle(this._input._sections) ?? null,
       locale: this._config.locale,
-      onChange: (time: Date | null) => this._runAsUser(() => this._write(() => this._input.setConfig({ date: time }), 'selection')),
+      maxDate: maxDate ?? (minDate && createDate(1970)),
+      minDate,
+      onChange: (time: Date | null) => this._runAsUser(() => this._applyTime(time && constrainDateTime(time, minDate, maxDate), time)),
       time: this.getTime()
     }, this._config.selectionOptions))
+  }
+
+  _applyTime(time: Date | null, picked: Date | null): void {
+    this._write(() => this._input.setConfig({ date: time }), 'selection')
+
+    if (time !== picked) {
+      this._selection.setTime(time)
+    }
   }
 
   _write(action: () => void, source: 'selection' | null = null): void {

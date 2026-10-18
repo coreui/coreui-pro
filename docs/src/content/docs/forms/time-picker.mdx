@@ -86,6 +86,17 @@ Add `.form-floating-always` to the component element to keep the label [always f
     </div>
   </div>`} />
 
+## Min and max times
+
+Constrain the times the user can pick with `minDate` and `maxDate`, given as time strings like `09:30` or as dates, of which only the time of day counts. The panel disables the hours that hold no allowed time and, once an hour is chosen, the minutes and seconds outside the range, and a time picked in the panel that crosses a limit moves to it. A time typed in the field outside the range gets the `.is-invalid` class, the picker reports `null` and submits no time until the value is corrected. A `maxDate` at midnight covers the whole day; any other `maxDate` before the `minDate` leaves no time to pick. The limits also apply when you give them through `inputOptions`.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <label class="form-label" id="timePickerOpeningHoursLabel">Opening hours (09:30–17:00)</label>
+      <div data-coreui-time-picker data-coreui-locale="en-GB" data-coreui-min-date="09:30" data-coreui-max-date="17:00" data-coreui-seconds="false" aria-labelledby="timePickerOpeningHoursLabel"></div>
+    </div>
+  </div>`} />
+
 ## Validation
 
 The picker takes its validation state [the way the date picker does](/forms/date-picker/#validation): the `validationState` option (with `invalid` and `valid` as deprecated aliases) or an `.is-invalid` or `.is-valid` class written on the picker element, read once when the picker starts. A given state drops on the next change of the time the user makes, a time picked in the panel, the cleaner, a footer button that changes the time through the context, or typing in the field, and stays through `setTime()`, `clear()`, `reset()` and `now()` called by your code. `setConfig({ validationState })` sets it again; for now `setConfig` changes only the validation options. While the given state is `'invalid'`, the sections of the field carry `aria-invalid="true"`, are described by the message after the picker, and the picker blocks the submit with its text, or `Invalid value.` when there is none.
@@ -244,6 +255,8 @@ picker itself.
 | `inputOptions` | object | `{}` | Programmatic escape hatch for time input options, except `validationState`, which the picker owns. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives the mask and the 12/24-hour split. |
+| `maxDate` | date, string, null | `null` | The latest time the user can pick, a time string or a date of which only the time of day counts. |
+| `minDate` | date, string, null | `null` | The earliest time the user can pick, a time string or a date of which only the time of day counts. |
 | `minutes` | array, boolean, function | `true` | Allowed minutes, or `false` to drop the column. |
 | `name` | string, null | `null` | Name of the generated value input. Without it the field is not submitted with the form. |
 | `pickerIcon` | string, boolean | `true` | The button that opens the time selection: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Without it the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |

@@ -105,6 +105,7 @@ class TimeRoll extends TimeSelection {
         cell.addEventListener('click', () => {
           if (!cell.classList.contains(CLASS_NAME_DISABLED)) {
             this._change(part.name, (option as HTMLSelectElement).value)
+            this._moveFocusToColumn(cell, 0)
           }
         })
         cell.addEventListener('keydown', event => {
@@ -116,7 +117,7 @@ class TimeRoll extends TimeSelection {
             }
 
             this._change(part.name, (option as HTMLSelectElement).value)
-            this._moveFocusToColumn(cell, 1)
+            this._moveFocusToColumn(cell, cell.parentElement?.nextElementSibling ? 1 : 0)
           }
         })
 
@@ -181,6 +182,7 @@ class TimeRoll extends TimeSelection {
 
   _entryCell(column: HTMLElement): HTMLElement | null {
     return SelectorEngine.findOne(SELECTOR_CELL_SELECTED, column) ??
+      SelectorEngine.findOne(`${SELECTOR_CELL}:not(.${CLASS_NAME_DISABLED})`, column) ??
       SelectorEngine.findOne(SELECTOR_CELL, column)
   }
 

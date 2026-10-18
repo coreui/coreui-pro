@@ -208,7 +208,15 @@ class TimeSelection extends Config {
   }
 
   _isOutsideLimits(part: string, value: number | string): boolean {
-    if (!this._minDate && !this._maxDate) {
+    if (part === 'meridiem' && (this._minDate || this._maxDate)) {
+      return this._firstAllowedHour(value as string) === undefined
+    }
+
+    return this._isValueOutsideLimits(part, part === 'hours' ? this._hourOf(value) : value)
+  }
+
+  _isValueOutsideLimits(part: string, value: number | string): boolean {
+    if ((!this._minDate && !this._maxDate) || (!this._date && (part === 'minutes' || part === 'seconds'))) {
       return false
     }
 
@@ -218,11 +226,32 @@ class TimeSelection extends Config {
       date.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
     }
 
-    const hour = part === 'hours' ? this._hourOf(value) : value
     const offered = (part === 'hours' && this._config.minutes ? this._partials.listOfMinutes : (part === 'minutes' && this._config.seconds ? this._partials.listOfSeconds : []))
       .map((option: any) => option.value)
 
-    return isTimeOutsideLimits(date, part as 'hours' | 'meridiem' | 'minutes' | 'seconds', hour, { max: this._maxDate, min: this._minDate }, offered)
+    return isTimeOutsideLimits(date, part as 'hours' | 'meridiem' | 'minutes' | 'seconds', value, { max: this._maxDate, min: this._minDate }, offered)
+  }
+
+  _firstAllowedHour(period?: string): number | undefined {
+    return this._partials.listOfHours.flatMap((option: FormattedPartial) => option.hours ?? [])
+      .toSorted((a: number, b: number) => a - b)
+      .find((hour: number) => (!period || (hour >= 12) === (period === 'pm')) && !this._isValueOutsideLimits('hours', hour))
+  }
+
+  _startTime(): Date | null {
+    const hour = this._minDate || this._maxDate ? this._firstAllowedHour() : undefined
+
+    if (hour === undefined) {
+      return null
+    }
+
+    const date = new Date('1970-01-01T00:00:00')
+    date.setHours(hour, this._config.minutes ? Number(this._partials.listOfMinutes[0]?.value ?? 0) : 0, this._config.seconds ? Number(this._partials.listOfSeconds[0]?.value ?? 0) : 0)
+    return date
+  }
+
+  _shownTime(): Date | null {
+    return this._date
   }
 
   _hourOf(value: number | string): number {
@@ -238,7 +267,7 @@ class TimeSelection extends Config {
   }
 
   _dayPeriod(): string {
-    const hour = this._date ? this._date.getHours() : this._partials.listOfHours[0]?.hours?.[0] ?? 0
+    const hour = this._date?.getHours() ?? this._startTime()?.getHours() ?? this._partials.listOfHours[0]?.hours?.[0] ?? 0
 
     return hour >= 12 ? 'pm' : 'am'
   }
@@ -292,7 +321,8 @@ class TimeSelection extends Config {
   }
 
   _change(part: string, value: any): void {
-    const date = this._date ? new Date(this._date) : new Date('1970-01-01T00:00:00')
+    const start = this._date ? null : this._startTime()
+    const date = new Date(this._date ?? start ?? new Date('1970-01-01T00:00:00'))
 
     if (part === 'meridiem') {
       const hours = date.getHours()
@@ -307,8 +337,11 @@ class TimeSelection extends Config {
       }
 
       const allowed: number[] = this._partials.listOfHours.flatMap((option: FormattedPartial) => option.hours ?? [])
+      const first = start ? this._firstAllowedHour(value) : undefined
 
-      if (!allowed.includes(date.getHours())) {
+      if (first !== undefined) {
+        date.setHours(first)
+      } else if (!allowed.includes(date.getHours())) {
         date.setHours(allowed.find(hour => (hour >= 12) === (value === 'pm')) ?? date.getHours())
       }
     }
@@ -336,11 +369,12 @@ class TimeSelection extends Config {
   }
 
   _markSelected(instant = false): void {
+    const time = this._shownTime()
     const selected = {
-      hours: getSelectedHour(this._date, this._config.locale, this._ampmOption()),
-      meridiem: this._date ? this._ampm : '',
-      minutes: getSelectedMinutes(this._date),
-      seconds: getSelectedSeconds(this._date)
+      hours: getSelectedHour(time, this._config.locale, this._ampmOption()),
+      meridiem: time ? this._ampm : '',
+      minutes: getSelectedMinutes(time),
+      seconds: getSelectedSeconds(time)
     }
 
     for (const [part, value] of Object.entries(selected)) {
