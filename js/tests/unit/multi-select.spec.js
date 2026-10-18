@@ -183,8 +183,8 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl)
 
       expect(multiSelect._options.length).toBe(3)
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('2')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('2')
     })
 
     it('should read optgroup structure from native select element', () => {
@@ -909,6 +909,25 @@ describe('MultiSelect', () => {
       expect(reported).toEqual([])
     })
 
+    it('should not report a native reset that brings the same values back in their first order', async () => {
+      fixtureEl.innerHTML = '<form><select multiple><option value="1" selected>One</option><option value="2" selected>Two</option></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+      const reported = []
+
+      multiSelect.deselectAll([{ value: '1', text: 'One' }])
+      multiSelect.selectAll([{ value: '1', text: 'One' }])
+      selectEl.addEventListener('change.coreui.multi-select', () => reported.push('change.coreui.multi-select'))
+      selectEl.addEventListener('change', () => reported.push('change'))
+      selectEl.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
+      expect(reported).toEqual([])
+    })
+
     it('should forget a reported state on a native reset', async () => {
       fixtureEl.innerHTML = '<form novalidate><select></select></form>'
       const selectEl = fixtureEl.querySelector('select')
@@ -1132,9 +1151,9 @@ describe('MultiSelect', () => {
       ]
       const multiSelect = new MultiSelect(selectEl, { options })
 
-      expect(multiSelect._selected.length).toBe(2)
-      expect(multiSelect._selected[0].value).toBe('1')
-      expect(multiSelect._selected[1].value).toBe('3')
+      expect(multiSelect.getValue().length).toBe(2)
+      expect(multiSelect.getValue()[0].value).toBe('1')
+      expect(multiSelect.getValue()[1].value).toBe('3')
     })
 
     it('should handle value config to pre-select options', () => {
@@ -1147,9 +1166,9 @@ describe('MultiSelect', () => {
       ]
       const multiSelect = new MultiSelect(selectEl, { options, value: ['1', '3'] })
 
-      expect(multiSelect._selected.length).toBe(2)
-      expect(multiSelect._selected[0].value).toBe('1')
-      expect(multiSelect._selected[1].value).toBe('3')
+      expect(multiSelect.getValue().length).toBe(2)
+      expect(multiSelect.getValue()[0].value).toBe('1')
+      expect(multiSelect.getValue()[1].value).toBe('3')
     })
 
     it('should handle string value config (comma-separated)', () => {
@@ -1162,7 +1181,7 @@ describe('MultiSelect', () => {
       ]
       const multiSelect = new MultiSelect(selectEl, { options, value: '1, 3' })
 
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
     })
 
     it('should handle numeric value config', () => {
@@ -1174,8 +1193,8 @@ describe('MultiSelect', () => {
       ]
       const multiSelect = new MultiSelect(selectEl, { options, value: 1 })
 
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('1')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('1')
     })
 
     it('should create select all button when selectAll and multiple are true', () => {
@@ -2344,7 +2363,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
     })
 
     it('should not select disabled options', () => {
@@ -2358,8 +2377,8 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.length).toBe(2)
-      expect(multiSelect._selected.find(item => item.value === '2')).toBeUndefined()
+      expect(multiSelect.getValue().length).toBe(2)
+      expect(multiSelect.getValue().find(item => item.value === '2')).toBeUndefined()
     })
 
     it('should not select more options than selectionLimit', () => {
@@ -2376,7 +2395,7 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
     })
 
     it('should ignore the selection limit when only one value can be selected', () => {
@@ -2392,7 +2411,7 @@ describe('MultiSelect', () => {
       selectEl.addEventListener('selectionLimit.coreui.multi-select', onLimit)
       multiSelect.selectAll([{ value: '1', text: 'Option 1' }])
 
-      expect(multiSelect._selected.map(item => item.value)).toEqual(['1'])
+      expect(multiSelect.getValue().map(item => item.value)).toEqual(['1'])
       expect(onLimit).not.toHaveBeenCalled()
     })
 
@@ -2411,7 +2430,7 @@ describe('MultiSelect', () => {
       selectEl.addEventListener('selectionLimit.coreui.multi-select', onLimit)
       multiSelect.selectAll()
 
-      expect(multiSelect._selected.map(item => item.value)).toEqual(['1', '2'])
+      expect(multiSelect.getValue().map(item => item.value)).toEqual(['1', '2'])
       expect(onLimit).toHaveBeenCalledTimes(1)
     })
 
@@ -2447,8 +2466,8 @@ describe('MultiSelect', () => {
       multiSelect.selectAll([{ value: '1', text: 'Option 1' }])
       multiSelect.selectAll([{ value: '2', text: 'Option 2' }])
 
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('1')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('1')
     })
 
     it('should trigger selectionLimit event when selectionLimit is reached', () => {
@@ -2583,7 +2602,7 @@ describe('MultiSelect', () => {
 
       multiSelect.selectAll()
 
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
       expect(eventCount).toBe(1)
       expect(eventValue.selectionLimit).toBe(2)
     })
@@ -2601,7 +2620,7 @@ describe('MultiSelect', () => {
         selectionLimit: 2
       })
 
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
     })
 
     it('should select all options within groups', () => {
@@ -2625,7 +2644,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
     })
 
     it('should not select disabled options within groups', () => {
@@ -2643,7 +2662,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
     })
 
     it('should skip disabled groups', () => {
@@ -2663,8 +2682,8 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('3')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('3')
     })
 
     it('should send no event when select all finds every option selected', () => {
@@ -2734,7 +2753,7 @@ describe('MultiSelect', () => {
 
       multiSelect.selectAll()
       expect(changeCount).toBe(1)
-      expect(multiSelect._selected.map(item => item.value)).toEqual(['1', '2', '3'])
+      expect(multiSelect.getValue().map(item => item.value)).toEqual(['1', '2', '3'])
 
       multiSelect.selectAll()
       expect(changeCount).toBe(1)
@@ -2815,7 +2834,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.map(item => item.value)).toEqual(['2'])
+      expect(multiSelect.getValue().map(item => item.value)).toEqual(['2'])
     })
 
     it('should keep the text of the first option that carries a value', () => {
@@ -2828,7 +2847,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.map(item => item.text)).toEqual(['X in A'])
+      expect(multiSelect.getValue().map(item => item.text)).toEqual(['X in A'])
     })
 
     it('should end on the last enabled option in single mode, however often it runs', () => {
@@ -2842,10 +2861,10 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { multiple: false, options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.map(item => item.value)).toEqual(['3'])
+      expect(multiSelect.getValue().map(item => item.value)).toEqual(['3'])
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.map(item => item.value)).toEqual(['3'])
+      expect(multiSelect.getValue().map(item => item.value)).toEqual(['3'])
     })
 
     it('should update native select options', () => {
@@ -2878,10 +2897,10 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
 
       multiSelect.deselectAll()
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
 
     it('should not deselect disabled options', () => {
@@ -2894,10 +2913,10 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
 
       multiSelect.deselectAll()
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
 
     it('should deselect all options within groups', () => {
@@ -2915,10 +2934,10 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
 
       multiSelect.deselectAll()
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
 
     it('should update native select options', () => {
@@ -3140,8 +3159,8 @@ describe('MultiSelect', () => {
       multiSelect.search('av')
       multiSelect.selectFiltered()
 
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('3')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('3')
     })
 
     it('should select all options when no filter is applied', () => {
@@ -3155,7 +3174,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectFiltered()
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
     })
 
     it('should not select disabled options', () => {
@@ -3169,8 +3188,8 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect.selectFiltered()
-      expect(multiSelect._selected.length).toBe(2)
-      expect(multiSelect._selected.find(item => item.value === '2')).toBeUndefined()
+      expect(multiSelect.getValue().length).toBe(2)
+      expect(multiSelect.getValue().find(item => item.value === '2')).toBeUndefined()
     })
 
     it('should respect selectionLimit', () => {
@@ -3184,7 +3203,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options, selectionLimit: 2 })
 
       multiSelect.selectFiltered()
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
     })
 
     it('should not report the selection limit when the filtered options are already selected', () => {
@@ -3220,13 +3239,13 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options, search: true })
 
       multiSelect.selectAll()
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
 
       multiSelect.search('av')
       multiSelect.deselectFiltered()
 
-      expect(multiSelect._selected.length).toBe(2)
-      expect(multiSelect._selected.find(item => item.value === '3')).toBeUndefined()
+      expect(multiSelect.getValue().length).toBe(2)
+      expect(multiSelect.getValue().find(item => item.value === '3')).toBeUndefined()
     })
   })
 
@@ -3358,7 +3377,7 @@ describe('MultiSelect', () => {
       })
 
       multiSelect._headerElement.click()
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
   })
 
@@ -3388,11 +3407,11 @@ describe('MultiSelect', () => {
       expect(multiSelect._selectAllElement.textContent).toBe('Select all')
 
       multiSelect._selectAllElement.click()
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
       expect(multiSelect._selectAllElement.textContent).toBe('Deselect all')
 
       multiSelect._selectAllElement.click()
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
       expect(multiSelect._selectAllElement.textContent).toBe('Select all')
     })
 
@@ -3408,11 +3427,11 @@ describe('MultiSelect', () => {
       expect(multiSelect._selectAllElement.textContent).toBe('Select all')
 
       multiSelect._selectAllElement.click()
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
       expect(multiSelect._selectAllElement.textContent).toBe('Deselect all')
 
       multiSelect._selectAllElement.click()
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
       expect(multiSelect._selectAllElement.textContent).toBe('Select all')
     })
 
@@ -3455,7 +3474,7 @@ describe('MultiSelect', () => {
       multiSelect.search('ap')
       multiSelect._selectAllElement.click()
 
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
     })
 
     it("in 'filtered' mode the button selects only the search-filtered options", () => {
@@ -3470,7 +3489,7 @@ describe('MultiSelect', () => {
       multiSelect.search('ap') // Apple + Apricot visible, Banana hidden
       multiSelect._selectAllElement.click()
 
-      expect(multiSelect._selected.map(option => option.value).toSorted()).toEqual(['1', '2'])
+      expect(multiSelect.getValue().map(option => option.value).toSorted()).toEqual(['1', '2'])
     })
 
     it("in 'filtered' mode with no active filter behaves like 'all'", () => {
@@ -3484,7 +3503,7 @@ describe('MultiSelect', () => {
 
       multiSelect._selectAllElement.click()
 
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
     })
 
     it("in 'filtered' mode the checkbox tracks the filtered set and drops to indeterminate after clearing search", () => {
@@ -3596,11 +3615,11 @@ describe('MultiSelect', () => {
       const groupLabel = multiSelect._menu.querySelector('.list-box-section-label')
 
       groupLabel.click()
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
       expect(groupLabel.classList.contains('selected')).toBe(true)
 
       groupLabel.click()
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
 
     it('should mark the group label as indeterminate on partial selection', () => {
@@ -3627,7 +3646,7 @@ describe('MultiSelect', () => {
       const groupLabel = multiSelect._menu.querySelector('.list-box-section-label')
       groupLabel.click()
 
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
     })
 
     it('should highlight a selectable group label during arrow navigation', () => {
@@ -3710,10 +3729,10 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
 
       multiSelect._selectAllElement.click()
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
 
       multiSelect._selectAllElement.click()
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
   })
 
@@ -4091,8 +4110,8 @@ describe('MultiSelect', () => {
       const option = multiSelect._optionsElement.querySelector('[data-coreui-value="1"]')
       option.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('1')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('1')
     })
 
     it('should not activate a disabled option on click or Enter', () => {
@@ -4112,7 +4131,7 @@ describe('MultiSelect', () => {
 
       option.click()
 
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
 
       multiSelect._listBox.last()
 
@@ -4134,7 +4153,7 @@ describe('MultiSelect', () => {
       const option = multiSelect._optionsElement.querySelector('[data-coreui-value="1"]')
       option.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
 
     it('should only allow one selection in single mode', () => {
@@ -4153,15 +4172,15 @@ describe('MultiSelect', () => {
       const option1 = multiSelect._optionsElement.querySelector('[data-coreui-value="1"]')
       option1.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('1')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('1')
 
       multiSelect.show()
       const option2 = multiSelect._optionsElement.querySelector('[data-coreui-value="2"]')
       option2.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('2')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('2')
     })
 
     it('should hide dropdown after selection in single mode', () => {
@@ -4198,8 +4217,8 @@ describe('MultiSelect', () => {
       const option = multiSelect._optionsElement.querySelector('[data-coreui-value="1"]')
 
       expect(() => option.click()).not.toThrow()
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('1')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('1')
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
@@ -4249,7 +4268,7 @@ describe('MultiSelect', () => {
       labelEl.classList.add('label')
       labelEl.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
 
     it('should find closest option element when clicking child element', () => {
@@ -4264,7 +4283,7 @@ describe('MultiSelect', () => {
       const innerElement = multiSelect._optionsElement.querySelector('.inner')
       innerElement.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
     })
 
     it('should do nothing when clicking outside option area', () => {
@@ -4278,7 +4297,7 @@ describe('MultiSelect', () => {
       multiSelect._optionsElement.append(randomEl)
       randomEl.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
 
     it('should not allow duplicate selections', () => {
@@ -4291,7 +4310,7 @@ describe('MultiSelect', () => {
       multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
       multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
 
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
     })
 
     it('should trigger changed event on selection', () => {
@@ -4374,12 +4393,12 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
 
       const tagDelete = multiSelect._wrapperElement.querySelector('.chip-remove')
       tagDelete.click()
 
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
     })
 
     it('should not open the dropdown when clicking a tag delete button', () => {
@@ -4394,7 +4413,7 @@ describe('MultiSelect', () => {
 
       multiSelect._wrapperElement.querySelector('.chip-remove').click()
 
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
@@ -4416,8 +4435,8 @@ describe('MultiSelect', () => {
 
       newTagDelete.click()
 
-      expect(multiSelect._selected.some(option => option.value === '2')).toBe(false)
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().some(option => option.value === '2')).toBe(false)
+      expect(multiSelect.getValue().length).toBe(1)
     })
 
     it('should update search size based on selections', () => {
@@ -4797,7 +4816,7 @@ describe('MultiSelect', () => {
       multiSelect._searchElement.dispatchEvent(event)
 
       expect(event.defaultPrevented).toBe(true)
-      expect(multiSelect._selected.map(option => option.value)).toEqual(['2'])
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['2'])
     })
 
     it('should leave the space bar to the option under the focus', () => {
@@ -4818,7 +4837,7 @@ describe('MultiSelect', () => {
 
       option.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }))
 
-      expect(multiSelect._selected.map(item => item.value)).toEqual(['1'])
+      expect(multiSelect.getValue().map(item => item.value)).toEqual(['1'])
       expect(document.activeElement).toBe(option)
     })
 
@@ -4842,7 +4861,7 @@ describe('MultiSelect', () => {
         key: 'a', ctrlKey: true, bubbles: true, cancelable: true
       }))
 
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
       expect(document.activeElement).toBe(option)
     })
 
@@ -5033,8 +5052,8 @@ describe('MultiSelect', () => {
       const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
       multiSelect._optionsElement.querySelector('.list-box-option').dispatchEvent(enterEvent)
 
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('1')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('1')
     })
 
     it('should select option on Space key in options list', () => {
@@ -5054,8 +5073,8 @@ describe('MultiSelect', () => {
       multiSelect._optionsElement.querySelector('.list-box-option').dispatchEvent(spaceEvent)
 
       expect(spaceEvent.defaultPrevented).toBe(true)
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('1')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('1')
     })
 
     it('should navigate options with ArrowDown in options list', () => {
@@ -5111,14 +5130,14 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
 
       multiSelect._searchElement.value = ''
       const event = new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true })
       Object.defineProperty(event, 'target', { value: multiSelect._searchElement })
       multiSelect._searchElement.dispatchEvent(event)
 
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
     })
 
     it('should deselect last option on Delete in empty search', () => {
@@ -5133,14 +5152,14 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
 
       multiSelect._searchElement.value = ''
       const event = new KeyboardEvent('keydown', { key: 'Delete', bubbles: true })
       Object.defineProperty(event, 'target', { value: multiSelect._searchElement })
       multiSelect._searchElement.dispatchEvent(event)
 
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
     })
 
     it('should not deselect if search has text on Backspace', () => {
@@ -5159,7 +5178,7 @@ describe('MultiSelect', () => {
       Object.defineProperty(event, 'target', { value: multiSelect._searchElement })
       multiSelect._searchElement.dispatchEvent(event)
 
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
     })
 
     it('should open dropdown when typing in search input', () => {
@@ -5335,7 +5354,7 @@ describe('MultiSelect', () => {
 
       // Should not throw when nothing is selected
       multiSelect._deselectLastOption()
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
   })
 
@@ -5377,7 +5396,7 @@ describe('MultiSelect', () => {
 
       cleaner.click()
 
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
@@ -5424,7 +5443,7 @@ describe('MultiSelect', () => {
 
       cleaner.click()
 
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
       expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).toBeNull()
     })
 
@@ -5440,12 +5459,12 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
 
       const cleaner = multiSelect._wrapperElement.querySelector('.form-control-cleaner')
       cleaner.click()
 
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
       expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).toBeNull()
     })
 
@@ -5473,7 +5492,7 @@ describe('MultiSelect', () => {
       // Force trigger the cleaner click handler
       multiSelect._selectionCleanerElement.dispatchEvent(event)
 
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
     })
   })
 
@@ -5519,7 +5538,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       multiSelect._selectAllElement.click()
 
-      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect.getValue().length).toBe(3)
     })
 
     it('should keep selectAll button enabled and select up to the limit on click', () => {
@@ -5544,7 +5563,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._selectAllElement.disabled).toBe(false)
 
       multiSelect._selectAllElement.click()
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
       expect(eventCount).toBe(1)
     })
 
@@ -5564,7 +5583,7 @@ describe('MultiSelect', () => {
       })
 
       multiSelect._selectAllElement.click()
-      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect.getValue().length).toBe(2)
 
       // At the limit the toggle flips to "deselect all" and the checkbox reads as full.
       expect(multiSelect._isAllSelected()).toBe(true)
@@ -5572,7 +5591,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._selectAllElement.classList.contains('selected')).toBe(true)
 
       multiSelect._selectAllElement.click()
-      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect.getValue().length).toBe(0)
     })
 
     it('should keep the selectAll button enabled regardless of search with a limit', () => {
@@ -5647,25 +5666,24 @@ describe('MultiSelect', () => {
       expect(limits).toHaveSize(1)
     })
 
-    it('should touch only the list options whose state changes', () => {
+    it('should not redraw the list again for a selection the list made', () => {
       fixtureEl.innerHTML = '<select multiple><option value="1" selected>One</option><option value="2" selected>Two</option><option value="3">Three</option></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
 
       multiSelect.show()
-      const listBox = multiSelect._listBox
-      const update = spyOn(listBox, 'update').and.callThrough()
-      const project = listBox._setSelection.bind(listBox)
+      const update = spyOn(multiSelect._listBox, 'update').and.callThrough()
+      const settle = multiSelect._onSelectionChange.bind(multiSelect)
       let redraws = 0
 
-      spyOn(listBox, '_setSelection').and.callFake(values => {
+      spyOn(multiSelect, '_onSelectionChange').and.callFake(() => {
         const before = update.calls.count()
-        project(values)
+        settle()
         redraws += update.calls.count() - before
       })
       multiSelect._menu.querySelector('[data-coreui-value="3"]').click()
 
       expect(multiSelect.getValue()).toHaveSize(3)
-      expect(listBox._setSelection).toHaveBeenCalled()
+      expect(multiSelect._onSelectionChange).toHaveBeenCalled()
       expect(redraws).toEqual(0)
     })
 
@@ -5855,15 +5873,15 @@ describe('MultiSelect', () => {
       ]
       const multiSelect = new MultiSelect(selectEl, { options })
 
-      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect.getValue().length).toBe(1)
 
       multiSelect.setConfig({
         options: [{ value: '3', text: 'Option 3' }],
         value: ['3']
       })
 
-      expect(multiSelect._selected.length).toBe(1)
-      expect(multiSelect._selected[0].value).toBe('3')
+      expect(multiSelect.getValue().length).toBe(1)
+      expect(multiSelect.getValue()[0].value).toBe('3')
     })
 
     it('should rebuild DOM on update', () => {
@@ -6428,6 +6446,21 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['x'])
     })
 
+    it('should bring the label of a start value the options delivered later back once they drop it', async () => {
+      fixtureEl.innerHTML = '<form><select multiple name="tech"></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external', options: [], value: ['a'] })
+
+      multiSelect.setOptions([{ value: 'a', text: 'Angular' }])
+      multiSelect.setOptions([{ value: 'r', text: 'React' }])
+      multiSelect.deselectAll()
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue()).toEqual([{ value: 'a', text: 'Angular' }])
+    })
+
     it('should keep the reset snapshot apart from the selection the options relabel', async () => {
       fixtureEl.innerHTML = '<form><select multiple name="tech"><option value="a" selected>Angular</option></select></form>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: 'external' })
@@ -6878,6 +6911,30 @@ describe('MultiSelect', () => {
 
       expect(multiSelect.getValue()).toEqual([])
       expect(multiSelect._menu.querySelector('[data-coreui-value="a"]').getAttribute('aria-selected')).toBe('false')
+    })
+
+    it('should not drop a selected option from the keyboard while the list loads', async () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option><option value="r">React</option></select>')
+
+      multiSelect.show()
+      multiSelect.setLoading(true)
+      multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
+      await userEvent.keyboard(' ')
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+      expect(multiSelect._menu.querySelector('[data-coreui-value="a"]').getAttribute('aria-selected')).toBe('true')
+    })
+
+    it('should keep refusing a pick while the list loads after setConfig rebuilds it', async () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.setLoading(true)
+      multiSelect.setConfig({ placeholder: 'Search' })
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
+      await userEvent.keyboard(' ')
+
+      expect(multiSelect.getValue()).toEqual([])
     })
 
     it('should report the search text as typed, once per change', () => {

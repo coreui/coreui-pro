@@ -13,6 +13,7 @@ import { createAnchoredPosition } from './util/floating-ui.js'
 import { findOptionByValue, isOptionGroup } from './util/option-tree.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { escapeHtml } from './util/sanitizer.js'
+import { type SelectionStore } from './util/selection-state.js'
 import { executeAfterTransition, getElement } from './util/index.js'
 
 /**
@@ -54,7 +55,7 @@ class ComboboxBase extends BaseComponent {
   protected declare _listBoxElement: any
   protected declare _listBoxChangeHandler: (() => void) | null
   protected declare _menu: any
-  protected declare _selected: any
+  protected declare _store: SelectionStore
   protected declare _options: any[]
   protected declare _search: any
   protected declare _floatingCleanup: (() => void) | null
@@ -284,7 +285,7 @@ class ComboboxBase extends BaseComponent {
     this._optionsElement = optionsDiv
     this._menu = popupDiv
 
-    this._listBox = new ListBox(listBoxDiv, this._getListBoxConfig())
+    this._listBox = new ListBox(listBoxDiv, this._getListBoxConfig(), this._store)
     this._addListBoxListeners()
     this._afterMenuCreated()
   }
@@ -395,8 +396,7 @@ class ComboboxBase extends BaseComponent {
     this._listBox = null
   }
 
-  // Selection — the list holds the state it renders, every surface keeps its
-  // own model and mirrors it here.
+  // Selection
 
   _addListBoxListeners(): void {
     EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTED, (event: any) => {
@@ -424,11 +424,13 @@ class ComboboxBase extends BaseComponent {
 
   _onSelectionChange(): void {}
 
-  _onSelectionLimit(limit: number, value: string): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
-
-  _projectSelection(values: any[]): void {
-    this._listBox?._setSelection(values.map(String))
+  _commitSelection(values: string[]): void {
+    if (this._store.commit(values)) {
+      this._listBox?.update()
+    }
   }
+
+  _onSelectionLimit(limit: number, value: string): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
 
   // Option model
 

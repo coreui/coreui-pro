@@ -8,6 +8,13 @@ export type FilledSelection<T extends number | string> = {
 
 export type SelectionMode = 'multiple' | 'none' | 'single'
 
+export type SelectionStore = {
+  commit: (next: readonly string[]) => boolean
+  has: (value: string) => boolean
+  size: () => number
+  values: () => string[]
+}
+
 export type SelectionState = 'all' | 'none' | 'some'
 
 /**
@@ -130,6 +137,40 @@ export const fillSelection = <T extends number | string>(selected: readonly T[],
   }
 
   return { added, refused: null, values }
+}
+
+/**
+ * Creates the one place a selection lives: its values in the order they were selected, written
+ * only through `commit`, which hands the proposed values to the owner's rule first. A list and
+ * the component that owns it read the same store, so no copy has to be kept in step.
+ *
+ * @param fit - The owner's rule: gets the proposed values and the current ones, and returns the
+ * values to keep; left out, the proposal is kept as it is. Either way each value is kept once
+ * @returns `commit(next)`, which stores what the rule returns and tells whether the selection
+ * changed, `has(value)`, `size()` and `values()`, a copy of the values in order
+ */
+export const createSelectionStore = (
+  fit: (next: string[], current: readonly string[]) => string[] = next => next
+): SelectionStore => {
+  let selected: string[] = []
+  let present = new Set<string>()
+
+  return {
+    commit(next) {
+      const values = [...new Set(fit([...next], selected))]
+      const changed = values.length !== selected.length || values.some((value, index) => value !== selected[index])
+
+      if (changed) {
+        selected = values
+        present = new Set(values)
+      }
+
+      return changed
+    },
+    has: value => present.has(value),
+    size: () => selected.length,
+    values: () => [...selected]
+  }
 }
 
 /**

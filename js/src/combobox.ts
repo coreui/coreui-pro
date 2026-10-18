@@ -18,7 +18,9 @@ import { CARET_ICON } from './util/icons.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
-import { type CountLabel, resolveCountLabel, toSelectionValues } from './util/selection-state.js'
+import {
+  type CountLabel, createSelectionStore, getSelectionLimit, resolveCountLabel, toSelectionValues
+} from './util/selection-state.js'
 import {
   captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
 } from './util/index.js'
@@ -363,7 +365,9 @@ class Combobox extends ComboboxBase {
     this._createSearchInput()
     this._validation.refresh()
 
-    this._listBox = new ListBox(this._listBoxElement, this._getListBoxConfig())
+    this._store = createSelectionStore(next => toSelectionValues(next, this._config.multiple ? 'multiple' : 'single'))
+    this._store.commit(this._initialValues())
+    this._listBox = new ListBox(this._listBoxElement, this._getListBoxConfig(), this._store)
     this._addListBoxListeners()
     this._addPanelEscapeListener(this._menu)
 
@@ -513,7 +517,7 @@ class Combobox extends ComboboxBase {
       search: this._config.search,
       searchNormalize: this._config.searchNormalize,
       searchPlaceholder: this._config.searchPlaceholder,
-      selected: this._initialValues(),
+      selected: null,
       selectionLimit: this._config.selectionLimit,
       selectionMode: this._config.multiple ? 'multiple' : 'single',
       typeahead: this._config.typeahead
@@ -539,9 +543,9 @@ class Combobox extends ComboboxBase {
     }
 
     const listed = new Set(SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).map(option => this._valueOf(option as HTMLElement)))
-    const held = new Set(this._listBox.getSelectedValues())
+    const next = [...new Set(values)].filter(value => listed.has(value) || this._store.has(value))
 
-    this._listBox._setSelection(values.filter(value => listed.has(value) || held.has(value)))
+    this._commitSelection(next.slice(0, getSelectionLimit(this._config.multiple, this._config.selectionLimit) ?? next.length))
     this._commitValue()
   }
 

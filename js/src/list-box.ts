@@ -15,6 +15,7 @@ import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
   type CountLabel,
+  createSelectionStore,
   fillSelection,
   getAriaPressed,
   getScopeSelectionState,
@@ -24,6 +25,7 @@ import {
   resolveCountLabel,
   type SelectionMode,
   type SelectionState,
+  type SelectionStore,
   toSelectionValues
 } from './util/selection-state.js'
 import {
@@ -210,11 +212,11 @@ class ListBox extends BaseComponent {
   protected declare _list: HTMLElement
   protected declare _query: string | null
   protected declare _searchField: HTMLInputElement | null
-  protected declare _selected: Set<string>
   protected declare _selectAll: HTMLButtonElement | null
+  protected declare _store: SelectionStore
   protected declare _typeaheadBuffer: TypeaheadBuffer
 
-  constructor(element?: string | Element | null, config?: Partial<ListBoxConfig> | null) {
+  constructor(element?: string | Element | null, config?: Partial<ListBoxConfig> | null, store?: SelectionStore) {
     super(element, config)
 
     this._active = null
@@ -229,12 +231,12 @@ class ListBox extends BaseComponent {
     this._query = null
     this._searchField = this._resolveSearch()
     this._selectAll = SelectorEngine.findOne(SELECTOR_SELECT_ALL, this._element) as HTMLButtonElement | null
-    this._selected = new Set()
+    this._store = store ?? createSelectionStore(next => this._fit(next))
     this._typeaheadBuffer = createTypeaheadBuffer()
 
     this._render()
 
-    this._selected = new Set(this._initialSelection())
+    this._store.commit([...this._store.values(), ...this._initialSelection()])
 
     this._addEventListeners()
     this.update()
@@ -272,7 +274,7 @@ class ListBox extends BaseComponent {
   }
 
   toggle(value: string): void {
-    if (this._selected.has(value)) {
+    if (this._store.has(value)) {
       this.deselect(value)
       return
     }
@@ -315,7 +317,7 @@ class ListBox extends BaseComponent {
   }
 
   getSelectedValues(): string[] {
-    return [...this._selected]
+    return this._store.values()
   }
 
   setItems(items: ListBoxEntry[]): void {
@@ -331,10 +333,11 @@ class ListBox extends BaseComponent {
     const { refused, values: filled } = fillSelection(reset ? [] : previous, marked, this._selectionLimit())
 
     this._anchor = null
-    this._selected = new Set(toSelectionValues(filled, this._config.selectionMode as SelectionMode))
+
+    this._store.commit(filled)
     this.update()
 
-    if (this._selected.size !== previous.length || previous.some(value => !this._selected.has(value))) {
+    if (this._store.size() !== previous.length || previous.some(value => !this._store.has(value))) {
       this._triggerChange()
     }
 
@@ -497,10 +500,10 @@ class ListBox extends BaseComponent {
       if (this._config.selectionMode === SELECTION_MODE_NONE) {
         option.removeAttribute('aria-selected')
       } else {
-        option.setAttribute('aria-selected', String(this._selected.has(value)))
+        option.setAttribute('aria-selected', String(this._store.has(value)))
       }
 
-      option.classList.toggle(CLASS_NAME_SELECTED, this._selected.has(value))
+      option.classList.toggle(CLASS_NAME_SELECTED, this._store.has(value))
       option.classList.toggle(CLASS_NAME_ACTIVE, value === this._active && (this._focused || Boolean(this._field)))
 
       if (this._field) {
@@ -554,7 +557,7 @@ class ListBox extends BaseComponent {
     }
 
     const navigable = this._navigableOptions()
-    const count = navigable.filter(option => this._selected.has(this._optionValue(option))).length
+    const count = navigable.filter(option => this._store.has(this._optionValue(option))).length
 
     this._counter.textContent = resolveCountLabel(this._config.selectedLabel, count, navigable.length)
   }
@@ -817,7 +820,7 @@ class ListBox extends BaseComponent {
       const shown = SelectorEngine.find(SELECTOR_OPTION, section).filter(option => !this._isHidden(option))
       const state = options.length > 0 ?
         this._scopeState(options) :
-        getSelectionState(shown.filter(option => this._selected.has(this._optionValue(option))).length, shown.length)
+        getSelectionState(shown.filter(option => this._store.has(this._optionValue(option))).length, shown.length)
 
       this._showSelectionState(label, state)
       label.classList.toggle(CLASS_NAME_ACTIVE, this._optionValue(label) === this._active && (this._focused || Boolean(this._field)))
@@ -908,7 +911,7 @@ class ListBox extends BaseComponent {
   }
 
   _atLimit(): boolean {
-    return isSelectionLimitReached(this._selected.size, this._selectionLimit())
+    return isSelectionLimitReached(this._store.size(), this._selectionLimit())
   }
 
   _reportLimit(): void {
@@ -925,6 +928,10 @@ class ListBox extends BaseComponent {
     })
   }
 
+  _fit(next: string[]): string[] {
+    return toSelectionValues(next, this._config.selectionMode as SelectionMode)
+  }
+
   _selectionLimit(): number | null {
     return getSelectionLimit(this._config.selectionMode === SELECTION_MODE_MULTIPLE, this._config.selectionLimit)
   }
@@ -934,9 +941,9 @@ class ListBox extends BaseComponent {
   }
 
   _scopeState(options: HTMLElement[]): SelectionState {
-    const selected = options.filter(option => this._selected.has(this._optionValue(option))).length
+    const selected = options.filter(option => this._store.has(this._optionValue(option))).length
 
-    return getScopeSelectionState(selected, options.length, this._selected.size, this._selectionLimit())
+    return getScopeSelectionState(selected, options.length, this._store.size(), this._selectionLimit())
   }
 
   _showSelectionState(element: HTMLElement, state: SelectionState): void {
@@ -989,7 +996,7 @@ class ListBox extends BaseComponent {
 
     const option = this._findOption(value)
 
-    if (!option || this._isDisabled(option) || this._selected.has(value)) {
+    if (!option || this._isDisabled(option) || this._store.has(value)) {
       return false
     }
 
@@ -1010,8 +1017,12 @@ class ListBox extends BaseComponent {
       }
     }
 
-    this._selected.add(value)
+    this._store.commit([...this._store.values(), value])
     this.update()
+
+    if (!this._store.has(value)) {
+      return false
+    }
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECTED), { value })
 
@@ -1019,7 +1030,7 @@ class ListBox extends BaseComponent {
   }
 
   _deselectValue(value: string): boolean {
-    if (this._config.disabled || !this._selected.has(value)) {
+    if (this._config.disabled || !this._store.has(value)) {
       return false
     }
 
@@ -1032,18 +1043,8 @@ class ListBox extends BaseComponent {
     return true
   }
 
-  _setSelection(values: string[]): void {
-    const next = toSelectionValues([...new Set(values)], this._config.selectionMode as SelectionMode)
-    const limited = next.slice(0, this._selectionLimit() ?? next.length)
-
-    if (limited.join('\u0000') !== this.getSelectedValues().join('\u0000')) {
-      this._selected = new Set(limited)
-      this.update()
-    }
-  }
-
   _removeSelection(value: string): void {
-    this._selected.delete(value)
+    this._store.commit(this._store.values().filter(selected => selected !== value))
     this.update()
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_DESELECTED), { value })
