@@ -105,6 +105,7 @@ class TimeRoll extends TimeSelection {
         cell.addEventListener('click', () => {
           if (!cell.classList.contains(CLASS_NAME_DISABLED)) {
             this._change(part.name, (option as HTMLSelectElement).value)
+            this._moveFocusToColumn(cell, 0)
           }
         })
         cell.addEventListener('keydown', event => {

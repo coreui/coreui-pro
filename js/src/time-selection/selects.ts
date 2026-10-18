@@ -41,6 +41,10 @@ class TimeSelects extends TimeSelection {
     return SelectorEngine.find(SELECTOR_TIME_SELECT, this._element as HTMLElement)
   }
 
+  override _shownTime(): Date | null {
+    return this._date ?? this._startTime()
+  }
+
   override _markPart(part: string, value: string): void {
     const select = SelectorEngine.findOne(`select.${part}`, this._element as ParentNode)
 

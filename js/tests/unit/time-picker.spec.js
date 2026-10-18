@@ -397,6 +397,59 @@ describe('TimePicker', () => {
       expect(document.activeElement).toBe(cell('minutes', '30'))
     })
 
+    it('should start a day period picked first on its first allowed hour', () => {
+      const picker = buildPicker({
+        locale: 'en-US', maxDate: '17:00', minDate: '09:00', seconds: false
+      })
+      picker.show()
+
+      cell('meridiem', 'pm').click()
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 12))
+    })
+
+    it('should start on the first listed minute within the limits while the field is empty', () => {
+      const picker = buildPicker({
+        locale: 'en-GB', minDate: '09:00', minutes: [15, 30, 45], seconds: false
+      })
+      picker.show()
+
+      cell('hours', '10').click()
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 10, 15))
+    })
+
+    it('should keep the focus on the minute a time moved into the limits holds after a click', () => {
+      const picker = buildPicker({ locale: 'en-GB', minDate: '09:30', seconds: false })
+      picker.show()
+      const minute = cell('minutes', '15')
+
+      minute.focus()
+      minute.click()
+
+      expect(document.activeElement).toBe(cell('minutes', '30'))
+    })
+
+    it('should keep the focus in the clicked column after a click', () => {
+      const picker = buildPicker({ locale: 'en-GB', minDate: '09:30', seconds: false })
+      picker.show()
+      const hour = cell('hours', '9')
+
+      hour.focus()
+      hour.click()
+
+      expect(document.activeElement).toBe(cell('hours', '9'))
+    })
+
+    it('should build a first pick on midnight without limits, whatever hours are listed', () => {
+      const picker = buildPicker({ hours: [9, 10, 11], locale: 'en-GB', seconds: false })
+      picker.show()
+
+      cell('minutes', '30').click()
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 0, 30))
+    })
+
     it('should offer no time for a minDate after the maxDate', () => {
       const picker = buildPicker({
         locale: 'en-GB', maxDate: '09:00', minDate: '17:00', seconds: false

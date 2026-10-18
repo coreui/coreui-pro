@@ -2343,6 +2343,15 @@ describe('DatePicker', () => {
       expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 12))
     })
 
+    it('should show the first allowed time in the selects while no date is picked', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 9, 1, 9))
+      onTestFinished(() => vi.useRealTimers())
+      buildPicker({ timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30) }).show()
+
+      expect(fixtureEl.querySelector('select.date-picker-time-select.hours').value).toEqual('10')
+    })
+
     it('should judge no minute by the limits while no date is picked', () => {
       vi.useFakeTimers({ toFake: ['Date'] })
       vi.setSystemTime(new Date(2026, 9, 1, 9))
