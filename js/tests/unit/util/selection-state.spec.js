@@ -15,6 +15,14 @@ describe('Selection utilities', () => {
       expect(store.size()).toBe(2)
     })
 
+    it('should keep each value once that the owner rule returns', () => {
+      const store = createSelectionStore(() => ['a', 'a'])
+
+      store.commit(['x'])
+
+      expect(store.values()).toEqual(['a'])
+    })
+
     it('should report a commit that keeps the values and their order as no change', () => {
       const store = createSelectionStore()
 

@@ -517,6 +517,7 @@ class Combobox extends ComboboxBase {
       search: this._config.search,
       searchNormalize: this._config.searchNormalize,
       searchPlaceholder: this._config.searchPlaceholder,
+      selected: null,
       selectionLimit: this._config.selectionLimit,
       selectionMode: this._config.multiple ? 'multiple' : 'single',
       typeahead: this._config.typeahead

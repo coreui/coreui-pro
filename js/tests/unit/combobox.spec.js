@@ -561,6 +561,15 @@ describe('Combobox', () => {
       expect(value(toggle)).toEqual('NYC metro')
     })
 
+    it('should not take a value from the selected option of the list box it builds on', () => {
+      const toggle = setMarkup()
+
+      fixtureEl.querySelector('.list-box').dataset.coreuiSelected = 'ca'
+      const combobox = new Combobox(toggle)
+
+      expect(combobox.getValue()).toBeNull()
+    })
+
     it('should seed the selection from items marked selected and bring it back on a form reset', async () => {
       fixtureEl.innerHTML = '<form><button class="form-control" type="button"></button></form>'
       const toggle = fixtureEl.querySelector('button')

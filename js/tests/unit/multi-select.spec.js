@@ -6913,6 +6913,30 @@ describe('MultiSelect', () => {
       expect(multiSelect._menu.querySelector('[data-coreui-value="a"]').getAttribute('aria-selected')).toBe('false')
     })
 
+    it('should not drop a selected option from the keyboard while the list loads', async () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option><option value="r">React</option></select>')
+
+      multiSelect.show()
+      multiSelect.setLoading(true)
+      multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
+      await userEvent.keyboard(' ')
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+      expect(multiSelect._menu.querySelector('[data-coreui-value="a"]').getAttribute('aria-selected')).toBe('true')
+    })
+
+    it('should keep refusing a pick while the list loads after setConfig rebuilds it', async () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.setLoading(true)
+      multiSelect.setConfig({ placeholder: 'Search' })
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
+      await userEvent.keyboard(' ')
+
+      expect(multiSelect.getValue()).toEqual([])
+    })
+
     it('should report the search text as typed, once per change', () => {
       const multiSelect = mountExternal()
       const queries = []
