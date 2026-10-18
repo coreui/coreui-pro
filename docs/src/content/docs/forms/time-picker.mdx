@@ -88,7 +88,7 @@ Add `.form-floating-always` to the component element to keep the label [always f
 
 ## Min and max times
 
-Constrain the times the user can pick with `minDate` and `maxDate`, given as time strings like `09:30` or as dates, of which only the time of day counts. The panel disables the hours, minutes and seconds outside the range, and a time picked in the panel that crosses a limit moves to it. A time typed in the field outside the range gets the `.is-invalid` class, the picker reports `null` and submits no time until the value is corrected. A `maxDate` at midnight covers the whole day; any other `maxDate` before the `minDate` leaves no time to pick. The limits also apply when you give them through `inputOptions`.
+Constrain the times the user can pick with `minDate` and `maxDate`, given as time strings like `09:30` or as dates, of which only the time of day counts. The panel disables the hours that hold no allowed time and, once an hour is chosen, the minutes and seconds outside the range, and a time picked in the panel that crosses a limit moves to it. A time typed in the field outside the range gets the `.is-invalid` class, the picker reports `null` and submits no time until the value is corrected. A `maxDate` at midnight covers the whole day; any other `maxDate` before the `minDate` leaves no time to pick. The limits also apply when you give them through `inputOptions`.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4">

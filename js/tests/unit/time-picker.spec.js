@@ -450,6 +450,39 @@ describe('TimePicker', () => {
       expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 0, 30))
     })
 
+    it('should disable a day period with no hour the limits and the lists allow', () => {
+      buildPicker({
+        locale: 'en-US', maxDate: '12:20', minDate: '11:50', minutes: [15, 30, 45], seconds: false
+      }).show()
+
+      expect(cell('meridiem', 'am').getAttribute('aria-disabled')).toEqual('true')
+      expect(cell('meridiem', 'pm').getAttribute('aria-disabled')).toEqual('false')
+    })
+
+    it('should select nothing in an empty roll with limits', () => {
+      buildPicker({ locale: 'en-GB', maxDate: '17:00', minDate: '09:30' }).show()
+
+      expect(fixtureEl.querySelector('.time-picker-popup .selected')).toBeNull()
+    })
+
+    it('should offer the hours up to maxDate and judge no second while the field is empty', () => {
+      buildPicker({ locale: 'en-GB', maxDate: '12:00' }).show()
+
+      expect(['11', '12', '13'].map(hour => cell('hours', hour).getAttribute('aria-disabled'))).toEqual(['false', 'false', 'true'])
+      expect(cell('seconds', '30').getAttribute('aria-disabled')).toEqual('false')
+    })
+
+    it('should start on the first listed hour the limits allow', () => {
+      const picker = buildPicker({
+        hours: [8, 10, 12], locale: 'en-GB', minDate: '09:00', seconds: false
+      })
+      picker.show()
+
+      cell('minutes', '15').click()
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 10, 15))
+    })
+
     it('should offer no time for a minDate after the maxDate', () => {
       const picker = buildPicker({
         locale: 'en-GB', maxDate: '09:00', minDate: '17:00', seconds: false

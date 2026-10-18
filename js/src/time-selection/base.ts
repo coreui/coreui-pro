@@ -208,6 +208,10 @@ class TimeSelection extends Config {
   }
 
   _isOutsideLimits(part: string, value: number | string): boolean {
+    if (part === 'meridiem' && (this._minDate || this._maxDate)) {
+      return this._firstAllowedHour(value as string) === undefined
+    }
+
     return this._isValueOutsideLimits(part, part === 'hours' ? this._hourOf(value) : value)
   }
 
