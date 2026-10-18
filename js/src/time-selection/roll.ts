@@ -116,7 +116,7 @@ class TimeRoll extends TimeSelection {
             }
 
             this._change(part.name, (option as HTMLSelectElement).value)
-            this._moveFocusToColumn(cell, 1)
+            this._moveFocusToColumn(cell, cell.parentElement?.nextElementSibling ? 1 : 0)
           }
         })
 

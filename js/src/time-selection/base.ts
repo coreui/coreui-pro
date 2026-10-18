@@ -228,6 +228,14 @@ class TimeSelection extends Config {
     return isTimeOutsideLimits(date, part as 'hours' | 'meridiem' | 'minutes' | 'seconds', value, { max: this._maxDate, min: this._minDate }, offered)
   }
 
+  _startTime(): Date {
+    const hours: number[] = this._partials.listOfHours.flatMap((option: FormattedPartial) => option.hours ?? []).toSorted((a: number, b: number) => a - b)
+    const date = new Date('1970-01-01T00:00:00')
+
+    date.setHours(hours.find(hour => !this._isValueOutsideLimits('hours', hour)) ?? hours[0] ?? 0)
+    return date
+  }
+
   _hourOf(value: number | string): number {
     const hour = Number(value)
 
@@ -241,10 +249,7 @@ class TimeSelection extends Config {
   }
 
   _dayPeriod(): string {
-    const hours: number[] = this._partials.listOfHours.flatMap((option: FormattedPartial) => option.hours ?? [])
-    const hour = this._date ? this._date.getHours() : hours.find(hour => !this._isValueOutsideLimits('hours', hour)) ?? hours[0] ?? 0
-
-    return hour >= 12 ? 'pm' : 'am'
+    return (this._date ?? this._startTime()).getHours() >= 12 ? 'pm' : 'am'
   }
 
   _isUnavailable(part: string, value: number | string): boolean {
@@ -296,7 +301,7 @@ class TimeSelection extends Config {
   }
 
   _change(part: string, value: any): void {
-    const date = this._date ? new Date(this._date) : new Date('1970-01-01T00:00:00')
+    const date = new Date(this._date ?? this._startTime())
 
     if (part === 'meridiem') {
       const hours = date.getHours()

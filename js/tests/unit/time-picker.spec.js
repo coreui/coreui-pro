@@ -365,6 +365,47 @@ describe('TimePicker', () => {
       expect(cell('hours', '9').tabIndex).toEqual(0)
     })
 
+    it('should start on the morning for a morning range while the field is empty', () => {
+      const picker = buildPicker({
+        locale: 'en-US', maxDate: '17:00', minDate: '09:00', seconds: false
+      })
+      picker.show()
+
+      expect(['8', '9', '11'].map(hour => cell('hours', hour).getAttribute('aria-disabled'))).toEqual(['true', 'false', 'false'])
+    })
+
+    it('should build a pick on the first allowed hour while the field is empty', () => {
+      const picker = buildPicker({
+        locale: 'en-GB', maxDate: '17:00', minDate: '09:30', seconds: false
+      })
+      picker.show()
+
+      cell('minutes', '45').click()
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 9, 45))
+    })
+
+    it('should keep the focus in the last column on the minute a time moved into the limits holds', () => {
+      const picker = buildPicker({ locale: 'en-GB', minDate: '09:30', seconds: false })
+      picker.show()
+      const minute = cell('minutes', '15')
+
+      minute.focus()
+      minute.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 9, 30))
+      expect(document.activeElement).toBe(cell('minutes', '30'))
+    })
+
+    it('should offer no time for a minDate after the maxDate', () => {
+      const picker = buildPicker({
+        locale: 'en-GB', maxDate: '09:00', minDate: '17:00', seconds: false
+      })
+      picker.show()
+
+      expect(fixtureEl.querySelectorAll('.time-picker-popup [data-coreui-hours]:not(.disabled)')).toHaveSize(0)
+    })
+
     it('should start on the day period the limits allow while the field is empty', () => {
       const picker = buildPicker({
         locale: 'en-US', maxDate: '17:00', minDate: '13:00', seconds: false
@@ -555,7 +596,7 @@ describe('TimePicker', () => {
     })
 
     it('should empty the panel when a refused pick is cleared', () => {
-      const picker = buildPicker({ time: '09:15', seconds: false, inputOptions: { maxDate: '12:00' } })
+      const picker = buildPicker({ time: '09:15', seconds: false, inputOptions: { disabledDates: date => date.getHours() >= 12 } })
 
       picker.show()
       cell('meridiem', 'pm').click()
