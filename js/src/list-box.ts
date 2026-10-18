@@ -236,9 +236,7 @@ class ListBox extends BaseComponent {
 
     this._render()
 
-    if (!store) {
-      this._store.commit(this._initialSelection())
-    }
+    this._store.commit([...this._store.values(), ...this._initialSelection()])
 
     this._addEventListeners()
     this.update()
@@ -336,11 +334,10 @@ class ListBox extends BaseComponent {
 
     this._anchor = null
 
-    const changed = this._store.commit(filled)
-
+    this._store.commit(filled)
     this.update()
 
-    if (changed) {
+    if (this._store.size() !== previous.length || previous.some(value => !this._store.has(value))) {
       this._triggerChange()
     }
 
@@ -993,7 +990,7 @@ class ListBox extends BaseComponent {
   }
 
   _selectValue(value: string): boolean {
-    if (this._config.disabled || this._config.loading || this._config.selectionMode === SELECTION_MODE_NONE) {
+    if (this._config.disabled || this._config.selectionMode === SELECTION_MODE_NONE) {
       return false
     }
 
@@ -1033,7 +1030,7 @@ class ListBox extends BaseComponent {
   }
 
   _deselectValue(value: string): boolean {
-    if (this._config.disabled || this._config.loading || !this._store.has(value)) {
+    if (this._config.disabled || !this._store.has(value)) {
       return false
     }
 

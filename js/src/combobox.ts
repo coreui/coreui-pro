@@ -542,7 +542,7 @@ class Combobox extends ComboboxBase {
     }
 
     const listed = new Set(SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).map(option => this._valueOf(option as HTMLElement)))
-    const next = values.filter(value => listed.has(value) || this._store.has(value))
+    const next = [...new Set(values)].filter(value => listed.has(value) || this._store.has(value))
 
     this._commitSelection(next.slice(0, getSelectionLimit(this._config.multiple, this._config.selectionLimit) ?? next.length))
     this._commitValue()

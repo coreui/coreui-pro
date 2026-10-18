@@ -145,7 +145,7 @@ export const fillSelection = <T extends number | string>(selected: readonly T[],
  * the component that owns it read the same store, so no copy has to be kept in step.
  *
  * @param fit - The owner's rule: gets the proposed values and the current ones, and returns the
- * values to keep; left out, the proposal is kept as it is
+ * values to keep; left out, the proposal is kept as it is. Either way each value is kept once
  * @returns `commit(next)`, which stores what the rule returns and tells whether the selection
  * changed, `has(value)`, `size()` and `values()`, a copy of the values in order
  */

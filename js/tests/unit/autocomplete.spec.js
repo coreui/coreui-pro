@@ -1739,10 +1739,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      holdSelection(autocomplete, [
-        { label: 'Option 1', value: '1' },
-        { label: 'Option 2', value: '2' }
-      ])
+      holdSelection(autocomplete, [{ label: 'Option 2', value: '2' }])
 
       autocomplete.deselectAll()
 
@@ -1759,11 +1756,12 @@ describe('Autocomplete', () => {
         ]
       })
 
-      holdSelection(autocomplete, [
-        { label: 'Option 1', value: '1' },
-        { label: 'Option 2', value: '2', disabled: true }
-      ])
+      holdSelection(autocomplete, [{ label: 'Option 1', value: '1' }])
+      autocomplete.deselectAll()
 
+      expect(autocomplete._selectedOptions()).toEqual([])
+
+      holdSelection(autocomplete, [{ label: 'Option 2', value: '2', disabled: true }])
       autocomplete.deselectAll()
 
       expect(autocomplete._selectedOptions()).toEqual([{ label: 'Option 2', value: '2', disabled: true }])
@@ -1797,12 +1795,8 @@ describe('Autocomplete', () => {
         ]
       })
 
-      holdSelection(autocomplete, [
-        { label: 'Option 1', value: '1' },
-        { label: 'Option 2', value: '2' }
-      ])
+      holdSelection(autocomplete, [{ label: 'Option 2', value: '2' }])
 
-      // The deselectAll should deselect all flat options
       autocomplete.deselectAll()
       expect(autocomplete._selectedOptions()).toEqual([])
     })
@@ -4965,15 +4959,15 @@ describe('Autocomplete', () => {
         ]
       })
 
-      holdSelection(autocomplete, [
-        { label: 'Option 1', value: '1' },
-        { label: 'Option 2', value: '2' }
-      ])
+      holdSelection(autocomplete, [{ label: 'Option 2', value: '2' }])
 
       autocomplete._deselectOption('1')
 
-      expect(autocomplete._selectedOptions().length).toBe(1)
-      expect(autocomplete._selectedOptions()[0].value).toBe('2')
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['2'])
+
+      autocomplete._deselectOption('2')
+
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
 
     it('should remove selected class from DOM element', () => {

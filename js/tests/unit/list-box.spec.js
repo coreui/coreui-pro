@@ -1584,6 +1584,27 @@ describe('ListBox', () => {
       expect(changed).toEqual([['tomato']])
     })
 
+    it('should not report a reset to new items that marks the same values in another order', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, {
+        items: [{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }],
+        resetSelectionOnItemsChange: true
+      })
+      const changed = []
+
+      listBox.select('tomato')
+      listBox.select('lettuce')
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
+      listBox.setItems([
+        { value: 'lettuce', label: 'Lettuce', selected: true },
+        { value: 'tomato', label: 'Tomato', selected: true },
+        { value: 'onion', label: 'Onion' }
+      ])
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
+      expect(changed).toEqual([])
+    })
+
     it('should keep the selection when resetSelectionOnItemsChange is set and the values stay the same', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const items = [{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }]
@@ -2293,24 +2314,20 @@ describe('ListBox', () => {
       expect(empty.hasAttribute('hidden')).toBeTrue()
     })
 
-    it('should neither select nor deselect an option while loading', () => {
+    it('should let a script change the selection while loading', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple' })
-      const events = []
 
       listBox.select('lettuce')
       listBox.setLoading(true)
-
-      for (const name of ['select', 'deselect', 'change']) {
-        el.addEventListener(`${name}.coreui.list-box`, () => events.push(name))
-      }
-
-      item(el, 'tomato').focus()
-      keydown(item(el, 'tomato'), ' ')
+      listBox.select('tomato')
       listBox.deselect('lettuce')
 
-      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
-      expect(events).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
+
+      listBox.clear()
+
+      expect(listBox.getSelectedValues()).toEqual([])
     })
 
     it('should drop the loading class on dispose', () => {

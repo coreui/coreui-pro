@@ -466,6 +466,30 @@ describe('Combobox', () => {
 
       expect(combobox.getValue()).toEqual(['us', 'uk'])
     })
+
+    it('should count a value given twice once against selectionLimit', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true, selectionLimit: 2 })
+
+      combobox.setValue(['us', 'us', 'uk'])
+
+      expect(combobox.getValue()).toEqual(['us', 'uk'])
+    })
+
+    it('should not redraw the list when setValue keeps the selection', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+
+      combobox.setValue('uk')
+      const update = spyOn(combobox._listBox, 'update').and.callThrough()
+      combobox.setValue('uk')
+
+      expect(update).not.toHaveBeenCalled()
+
+      combobox.setValue('ca')
+
+      expect(update).toHaveBeenCalled()
+    })
   })
 
   describe('value and selected markup', () => {
@@ -535,6 +559,25 @@ describe('Combobox', () => {
 
       expect(combobox.getValue()).toEqual('New York, NY')
       expect(value(toggle)).toEqual('NYC metro')
+    })
+
+    it('should seed the selection from items marked selected and bring it back on a form reset', async () => {
+      fixtureEl.innerHTML = '<form><button class="form-control" type="button"></button></form>'
+      const toggle = fixtureEl.querySelector('button')
+      const combobox = new Combobox(toggle, {
+        items: [{ value: 'a', label: 'A', selected: true }, { value: 'b', label: 'B' }]
+      })
+
+      expect(combobox.getValue()).toEqual('a')
+      expect(option(combobox, 'a').getAttribute('aria-selected')).toEqual('true')
+
+      combobox.setValue('b')
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(combobox.getValue()).toEqual('a')
     })
 
     it('should take a disabled option from value and bring it back on a form reset', async () => {
