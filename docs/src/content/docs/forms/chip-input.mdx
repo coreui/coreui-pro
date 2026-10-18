@@ -271,10 +271,10 @@ chipInput.clear()
 | Event | Description |
 | --- | --- |
 | `add.coreui.chip-input` | Fired before a chip is added. Call `event.preventDefault()` to cancel. |
-| `change.coreui.chip-input` | Fired after any chip is added or removed; `event.value` is the array of chip values. `clear()` and `removeSelected()` fire it once, together with one native `input` and `change`, while `remove.coreui.chip-input` still fires for every chip. |
+| `change.coreui.chip-input` | Fired after any chip is added or removed; `event.value` is the array of chip values. `clear()` and `removeSelected()` fire it once, after the last chip is gone and only when one went, together with one native `input` and `change`, while `remove.coreui.chip-input` still fires for every chip. |
 | `input.coreui.chip-input` | Fired when the inline input value changes; `event.value` is the typed text, not the chips. Contains `relatedTarget`. |
 | `remove.coreui.chip-input` | Fired before a chip is removed. Call `event.preventDefault()` to cancel. |
-| `select.coreui.chip-input` | Fired when chip selection changes. Contains `selected`. |
+| `select.coreui.chip-input` | Fired when chip selection changes. Contains `selected`. `clear()` and `removeSelected()` fire it once, together with `change`. |
 
 ```js
 const chipInputElement = document.querySelector('.chip-input')

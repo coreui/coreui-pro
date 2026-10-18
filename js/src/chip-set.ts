@@ -128,7 +128,7 @@ class ChipSet extends BaseComponent {
   protected declare _anchor: HTMLElement | null
   protected declare _typeaheadBuffer: TypeaheadBuffer
   protected declare _announcedFrom: string[] | null
-  protected declare _removingAll: boolean
+  protected declare _removal: { removed: boolean } | null
   protected declare _settled: boolean
 
   constructor(element?: string | Element | null, config?: Partial<ChipSetConfig> | null) {
@@ -143,7 +143,7 @@ class ChipSet extends BaseComponent {
     this._anchor = null
     this._typeaheadBuffer = createTypeaheadBuffer()
     this._announcedFrom = null
-    this._removingAll = false
+    this._removal = null
     this._settled = false
 
     this._applyAccessibilityRoles()
@@ -685,25 +685,28 @@ class ChipSet extends BaseComponent {
       this._chips.splice(index, 1)
     }
 
-    if (!this._removingAll) {
+    if (this._removal) {
+      this._removal.removed = true
+    } else {
       this._reportRemoval()
     }
   }
 
   _removeChips(chips: HTMLElement[]): void {
-    const count = this._chips.length
+    const previous = this._removal
+    const removal = { removed: false }
 
-    this._removingAll = true
+    this._removal = removal
 
     try {
       for (const chip of chips) {
         this.remove(chip)
       }
     } finally {
-      this._removingAll = false
+      this._removal = previous
     }
 
-    if (this._chips.length !== count) {
+    if (removal.removed) {
       this._reportRemoval()
     }
   }

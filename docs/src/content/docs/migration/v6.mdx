@@ -2746,10 +2746,10 @@ field behind that kept submitting.
   `role="group"`. `aria-disabled` is only stamped on chips that carry a role —
   on a role-less chip the attribute was invalid and is now removed.
 - **`clear()` and `removeSelected()` report the change once.** Chip set and Chip
-  input fired `change.coreui.chip-set`/`change.coreui.chip-input`, and Chip input
-  its native `input` and `change`, once for every chip removed; they fire once
-  now, after the last chip is gone. The cancelable `remove` still fires for every
-  chip.
+  input fired `change` and `select` (`.coreui.chip-set`/`.coreui.chip-input`), and
+  Chip input its native `input` and `change`, once for every chip removed; they
+  fire once now, after the last chip is gone, and not at all when no chip went.
+  The cancelable `remove` still fires for every chip.
 - **Adding and removing chips is announced.** Chip set and Chip input announce
   each change through `announce()`; the wording is configurable via
   `ariaAddedAnnouncement`/`ariaRemovedAnnouncement`.

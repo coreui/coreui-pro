@@ -774,6 +774,19 @@ describe('ChipSet', () => {
       expect(changes).toEqual([['Second']])
     })
 
+    it('should not report clear when a listener keeps every chip', () => {
+      const el = setMarkup(['First', 'Second'])
+      const chipSet = new ChipSet(el, { removable: true })
+      const changes = []
+
+      el.addEventListener('remove.coreui.chip-set', event => event.preventDefault())
+      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
+      chipSet.clear()
+
+      expect(el.querySelectorAll('.chip')).toHaveSize(2)
+      expect(changes).toEqual([])
+    })
+
     it('should not report clear when nothing is removed', () => {
       const el = setMarkup([])
       const chipSet = new ChipSet(el, { removable: true })
@@ -783,6 +796,40 @@ describe('ChipSet', () => {
       chipSet.clear()
 
       expect(changes).toEqual([])
+    })
+
+    it('should report removeSelected for a chip the set did not add', () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el, { selectable: true, removable: true })
+      const selects = []
+
+      el.insertAdjacentHTML('beforeend', '<span class="chip active" data-coreui-chip-value="X">X</span>')
+      el.addEventListener('select.coreui.chip-set', event => selects.push(event.selected))
+      chipSet.removeSelected()
+
+      expect(el.querySelectorAll('.chip')).toHaveSize(0)
+      expect(selects).toEqual([[]])
+    })
+
+    it('should report each of two nested removals once', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { selectable: true, removable: true })
+      const changes = []
+      let nested = false
+
+      Chip.getInstance(el.querySelectorAll('.chip')[0]).select()
+      Chip.getInstance(el.querySelectorAll('.chip')[1]).select()
+      el.addEventListener('remove.coreui.chip-set', () => {
+        if (!nested) {
+          nested = true
+          chipSet.clear()
+        }
+      })
+      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
+      chipSet.removeSelected()
+
+      expect(changes).toHaveSize(2)
+      expect(changes.at(-1)).toEqual([])
     })
 
     it('should report a removal after clear on its own again', () => {
