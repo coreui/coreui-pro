@@ -128,7 +128,7 @@ class ChipSet extends BaseComponent {
   protected declare _anchor: HTMLElement | null
   protected declare _typeaheadBuffer: TypeaheadBuffer
   protected declare _announcedFrom: string[] | null
-  protected declare _batch: { changed: boolean } | null
+  protected declare _batch: { added: boolean, removed: boolean } | null
   protected declare _settled: boolean
 
   constructor(element?: string | Element | null, config?: Partial<ChipSetConfig> | null) {
@@ -204,7 +204,7 @@ class ChipSet extends BaseComponent {
     this._chips.push(value)
 
     if (this._batch) {
-      this._batch.changed = true
+      this._batch.added = true
     } else {
       this._triggerChange()
     }
@@ -691,7 +691,7 @@ class ChipSet extends BaseComponent {
     }
 
     if (this._batch) {
-      this._batch.changed = true
+      this._batch.removed = true
     } else {
       this._reportRemoval()
     }
@@ -699,7 +699,7 @@ class ChipSet extends BaseComponent {
 
   _removeChips(chips: HTMLElement[]): void {
     const outer = !this._batch
-    const batch = this._batch ?? { changed: false }
+    const batch = this._batch ?? { added: false, removed: false }
 
     this._batch = batch
 
@@ -713,8 +713,10 @@ class ChipSet extends BaseComponent {
       if (outer) {
         this._batch = null
 
-        if (batch.changed && this._config) {
+        if (batch.removed) {
           this._reportRemoval()
+        } else if (batch.added) {
+          this._triggerChange()
         }
       }
     }

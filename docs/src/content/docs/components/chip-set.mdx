@@ -154,7 +154,7 @@ Chip set events are fired from the chip set element. Individual `*.coreui.chip` 
 | Event type | Description |
 | --- | --- |
 | `add.coreui.chip-set` | Fires immediately before a chip is added through `add`. Cancelable. Carries the `value`. |
-| `change.coreui.chip-set` | Fired when the set's membership changes (a chip is added or removed); `event.value` is the array of chip values. `clear` and `removeSelected` fire it once, after the last chip is gone and only when one went, also for a chip a listener adds or removes meanwhile, while `remove.coreui.chip-set` still fires for every chip. |
+| `change.coreui.chip-set` | Fired when the set's membership changes (a chip is added or removed); `event.value` is the array of chip values. `clear` and `removeSelected` fire it once, after the last chip is gone and only when the chips changed, a chip a listener adds or removes meanwhile included, while `remove.coreui.chip-set` still fires for every chip. |
 | `remove.coreui.chip-set` | Fires immediately before a chip is removed through `remove`. Cancelable. Carries the `value` and `chip` element. |
 | `select.coreui.chip-set` | Fired when the selection changes. Carries the `selected` array of chip values. A removal fires it too, and `clear` and `removeSelected` fire it once, together with `change`. |
 

@@ -787,6 +787,29 @@ describe('ChipSet', () => {
       expect(changes).toEqual([])
     })
 
+    it('should report only the change of a chip a listener adds while it keeps every chip', () => {
+      const el = setMarkup(['First', 'Second'])
+      const chipSet = new ChipSet(el, { selectable: true, removable: true })
+      const changes = []
+      const selects = []
+      let added = false
+
+      el.addEventListener('remove.coreui.chip-set', event => {
+        event.preventDefault()
+
+        if (!added) {
+          added = true
+          chipSet.add('Third')
+        }
+      })
+      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
+      el.addEventListener('select.coreui.chip-set', event => selects.push(event.selected))
+      chipSet.clear()
+
+      expect(changes).toEqual([['First', 'Second', 'Third']])
+      expect(selects).toEqual([])
+    })
+
     it('should not report clear when nothing is removed', () => {
       const el = setMarkup([])
       const chipSet = new ChipSet(el, { removable: true })
