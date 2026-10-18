@@ -1192,6 +1192,22 @@ describe('ChipInput', () => {
 
       expect(chipInput._valueField.value).toEqual('')
     })
+
+    it('should send one native input and change for clear', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+      const events = []
+
+      chipInput.add('First')
+      chipInput.add('Second')
+      chipInput._valueField.addEventListener('input', () => events.push('input'))
+      chipInput._valueField.addEventListener('change', () => events.push('change'))
+      chipInput.clear()
+
+      expect(events).toEqual(['input', 'change'])
+    })
   })
 
   describe('getSelectedValues', () => {

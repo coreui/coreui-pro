@@ -128,6 +128,7 @@ class ChipSet extends BaseComponent {
   protected declare _anchor: HTMLElement | null
   protected declare _typeaheadBuffer: TypeaheadBuffer
   protected declare _announcedFrom: string[] | null
+  protected declare _removingAll: boolean
   protected declare _settled: boolean
 
   constructor(element?: string | Element | null, config?: Partial<ChipSetConfig> | null) {
@@ -142,6 +143,7 @@ class ChipSet extends BaseComponent {
     this._anchor = null
     this._typeaheadBuffer = createTypeaheadBuffer()
     this._announcedFrom = null
+    this._removingAll = false
     this._settled = false
 
     this._applyAccessibilityRoles()
@@ -247,15 +249,11 @@ class ChipSet extends BaseComponent {
   }
 
   removeSelected(): void {
-    for (const chip of this._getSelectedChipElements()) {
-      this.remove(chip)
-    }
+    this._removeChips(this._getSelectedChipElements())
   }
 
   clear(): void {
-    for (const chip of this._getChipElements()) {
-      this.remove(chip)
-    }
+    this._removeChips(this._getChipElements())
   }
 
   selectChip(chip: HTMLElement): void {
@@ -687,6 +685,30 @@ class ChipSet extends BaseComponent {
       this._chips.splice(index, 1)
     }
 
+    if (!this._removingAll) {
+      this._reportRemoval()
+    }
+  }
+
+  _removeChips(chips: HTMLElement[]): void {
+    const count = this._chips.length
+
+    this._removingAll = true
+
+    try {
+      for (const chip of chips) {
+        this.remove(chip)
+      }
+    } finally {
+      this._removingAll = false
+    }
+
+    if (this._chips.length !== count) {
+      this._reportRemoval()
+    }
+  }
+
+  _reportRemoval(): void {
     this._triggerChange()
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
       selected: this.getSelectedValues()

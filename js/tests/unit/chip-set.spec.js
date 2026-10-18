@@ -727,6 +727,77 @@ describe('ChipSet', () => {
       expect(remaining).toHaveSize(1)
       expect(remaining[0].textContent).toContain('Second')
     })
+
+    it('should report clear once, after every chip is gone, and each removal on its own', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { removable: true })
+      const changes = []
+      const selects = []
+      const removals = []
+
+      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
+      el.addEventListener('select.coreui.chip-set', event => selects.push(event.selected))
+      el.addEventListener('remove.coreui.chip-set', event => removals.push(event.value))
+      chipSet.clear()
+
+      expect(changes).toEqual([[]])
+      expect(selects).toEqual([[]])
+      expect(removals).toEqual(['First', 'Second', 'Third'])
+    })
+
+    it('should report removeSelected once', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { selectable: true, removable: true })
+      const changes = []
+
+      Chip.getInstance(el.querySelectorAll('.chip')[0]).select()
+      Chip.getInstance(el.querySelectorAll('.chip')[2]).select()
+      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
+      chipSet.removeSelected()
+
+      expect(changes).toEqual([['Second']])
+    })
+
+    it('should report clear once with the chip a listener kept', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { removable: true })
+      const changes = []
+
+      el.addEventListener('remove.coreui.chip-set', event => {
+        if (event.value === 'Second') {
+          event.preventDefault()
+        }
+      })
+      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
+      chipSet.clear()
+
+      expect(changes).toEqual([['Second']])
+    })
+
+    it('should not report clear when nothing is removed', () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el, { removable: true })
+      const changes = []
+
+      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
+      chipSet.clear()
+
+      expect(changes).toEqual([])
+    })
+
+    it('should report a removal after clear on its own again', () => {
+      const el = setMarkup(['First', 'Second'])
+      const chipSet = new ChipSet(el, { removable: true })
+      const changes = []
+
+      chipSet.clear()
+      chipSet.add('Third')
+      chipSet.add('Fourth')
+      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
+      chipSet.remove('Third')
+
+      expect(changes).toEqual([['Fourth']])
+    })
   })
 
   describe('values', () => {
