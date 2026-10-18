@@ -208,7 +208,11 @@ class TimeSelection extends Config {
   }
 
   _isOutsideLimits(part: string, value: number | string): boolean {
-    if (!this._minDate && !this._maxDate) {
+    return this._isValueOutsideLimits(part, part === 'hours' ? this._hourOf(value) : value)
+  }
+
+  _isValueOutsideLimits(part: string, value: number | string): boolean {
+    if ((!this._minDate && !this._maxDate) || (!this._date && (part === 'minutes' || part === 'seconds'))) {
       return false
     }
 
@@ -218,11 +222,10 @@ class TimeSelection extends Config {
       date.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
     }
 
-    const hour = part === 'hours' ? this._hourOf(value) : value
     const offered = (part === 'hours' && this._config.minutes ? this._partials.listOfMinutes : (part === 'minutes' && this._config.seconds ? this._partials.listOfSeconds : []))
       .map((option: any) => option.value)
 
-    return isTimeOutsideLimits(date, part as 'hours' | 'meridiem' | 'minutes' | 'seconds', hour, { max: this._maxDate, min: this._minDate }, offered)
+    return isTimeOutsideLimits(date, part as 'hours' | 'meridiem' | 'minutes' | 'seconds', value, { max: this._maxDate, min: this._minDate }, offered)
   }
 
   _hourOf(value: number | string): number {
@@ -238,7 +241,8 @@ class TimeSelection extends Config {
   }
 
   _dayPeriod(): string {
-    const hour = this._date ? this._date.getHours() : this._partials.listOfHours[0]?.hours?.[0] ?? 0
+    const hours: number[] = this._partials.listOfHours.flatMap((option: FormattedPartial) => option.hours ?? [])
+    const hour = this._date ? this._date.getHours() : hours.find(hour => !this._isValueOutsideLimits('hours', hour)) ?? hours[0] ?? 0
 
     return hour >= 12 ? 'pm' : 'am'
   }

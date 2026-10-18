@@ -181,6 +181,7 @@ class TimeRoll extends TimeSelection {
 
   _entryCell(column: HTMLElement): HTMLElement | null {
     return SelectorEngine.findOne(SELECTOR_CELL_SELECTED, column) ??
+      SelectorEngine.findOne(`${SELECTOR_CELL}:not(.${CLASS_NAME_DISABLED})`, column) ??
       SelectorEngine.findOne(SELECTOR_CELL, column)
   }
 

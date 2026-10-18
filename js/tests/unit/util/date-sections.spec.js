@@ -1025,6 +1025,19 @@ describe('Date Sections Utilities', () => {
       expect(getDateLimitError(dateTime, new Date(2026, 8, 23), null, new Date(2026, 8, 22))).toBe('maxDate')
     })
 
+    it('should compare only the time of day in a field with only a time', () => {
+      const time = getTimeSectionsFromLocale('en-GB')
+      const min = new Date(2026, 9, 15, 9, 30)
+      const max = new Date(2026, 9, 15, 17)
+
+      expect(getDateLimitError(time, new Date(1970, 0, 1, 9, 29), min, max)).toBe('minDate')
+      expect(getDateLimitError(time, new Date(1970, 0, 1, 12), min, max)).toBeNull()
+      expect(getDateLimitError(time, new Date(1970, 0, 1, 12, 30), null, null, date => date.getHours() === 12)).toBe('disabledDate')
+      expect(getDateLimitError(time, new Date(1970, 0, 1, 17), min, max)).toBeNull()
+      expect(getDateLimitError(time, new Date(1970, 0, 1, 17, 1), min, max)).toBe('maxDate')
+      expect(getDateLimitError(time, new Date(1970, 0, 1, 23, 59), null, new Date(2026, 9, 15))).toBeNull()
+    })
+
     it('should compare a field without a time by the day', () => {
       expect(getDateLimitError(date, new Date(2026, 9, 15), new Date(2026, 9, 15, 10), null)).toBeNull()
       expect(getDateLimitError(date, new Date(2026, 9, 14), new Date(2026, 9, 15, 10), null)).toBe('minDate')

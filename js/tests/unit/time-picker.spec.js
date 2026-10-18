@@ -1,3 +1,4 @@
+import { onTestFinished, vi } from 'vitest'
 import TimeInput from '../../src/time-input.js'
 import TimePicker from '../../src/time-picker.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -320,6 +321,75 @@ describe('TimePicker', () => {
 
     const cell = (type, value) => fixtureEl.querySelector(`.time-picker-popup [data-coreui-${type}="${value}"]`)
 
+    it('should offer only the hours within minDate and maxDate, for strings and for dates on any day', () => {
+      for (const limits of [{ maxDate: '17:00', minDate: '09:30' }, { maxDate: new Date(2026, 9, 15, 17), minDate: new Date(2026, 9, 15, 9, 30) }]) {
+        const picker = buildPicker({
+          ...limits, locale: 'en-GB', seconds: false, time: '12:00'
+        })
+        picker.show()
+
+        expect(['8', '9', '17', '18'].map(hour => cell('hours', hour).getAttribute('aria-disabled'))).toEqual(['true', 'false', 'false', 'true'])
+        picker.dispose()
+        fixtureEl.innerHTML = '<div id="picker"></div>'
+      }
+    })
+
+    it('should offer only the hours after minDate while the field is empty', () => {
+      const picker = buildPicker({ locale: 'en-GB', seconds: false }, '<div id="picker" data-coreui-min-date="09:30"></div>')
+      picker.show()
+
+      expect(cell('hours', '8').getAttribute('aria-disabled')).toEqual('true')
+      expect(cell('hours', '23').getAttribute('aria-disabled')).toEqual('false')
+    })
+
+    it('should move a time picked in the panel into minDate and maxDate', () => {
+      const picker = buildPicker({
+        locale: 'en-GB', maxDate: '17:00', minDate: '09:30', seconds: false, time: '10:15'
+      })
+      picker.show()
+
+      cell('hours', '9').click()
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 9, 30))
+      expect(cell('minutes', '30').classList.contains('selected')).toBeTrue()
+      expect(cell('minutes', '15').classList.contains('selected')).toBeFalse()
+    })
+
+    it('should judge no minute by the limits while the field is empty, and start on the first allowed hour', () => {
+      const picker = buildPicker({
+        locale: 'en-GB', maxDate: '17:00', minDate: '09:30', seconds: false
+      })
+      picker.show()
+
+      expect(cell('minutes', '15').getAttribute('aria-disabled')).toEqual('false')
+      expect(cell('hours', '9').tabIndex).toEqual(0)
+    })
+
+    it('should start on the day period the limits allow while the field is empty', () => {
+      const picker = buildPicker({
+        locale: 'en-US', maxDate: '17:00', minDate: '13:00', seconds: false
+      })
+      picker.show()
+
+      expect(['12', '1', '5', '6'].map(hour => cell('hours', hour).getAttribute('aria-disabled'))).toEqual(['true', 'false', 'false', 'true'])
+    })
+
+    it('should offer only the hours within the limits given through inputOptions', () => {
+      const picker = buildPicker({ inputOptions: { minDate: '09:30' }, locale: 'en-GB', seconds: false })
+      picker.show()
+
+      expect(cell('hours', '8').getAttribute('aria-disabled')).toEqual('true')
+    })
+
+    it('should reject a typed time outside minDate and maxDate', () => {
+      const picker = buildPicker({
+        locale: 'en-GB', maxDate: '17:00', minDate: '09:30', time: '18:00'
+      })
+
+      expect(picker.getTime()).toBeNull()
+      expect(fixtureEl.querySelector('.form-date-time')).toHaveClass('is-invalid')
+    })
+
     it('should read hours as 0 to 23 and take the day period from an hour only one period allows', () => {
       const picker = buildPicker({ locale: 'en-US', hours: [8, 9, 10, 11, 12, 13, 14, 15, 16], seconds: false })
       picker.show()
@@ -455,7 +525,7 @@ describe('TimePicker', () => {
     })
 
     it('should report null when the field refuses a panel pick, and let the next pick build on the panel', () => {
-      const picker = buildPicker({ time: '09:15', seconds: false, inputOptions: { maxDate: '12:00' } })
+      const picker = buildPicker({ time: '09:15', seconds: false, inputOptions: { disabledDates: date => date.getHours() >= 12 } })
       const emitted = listen()
 
       picker.show()
@@ -960,7 +1030,10 @@ describe('TimePicker', () => {
     })
 
     it('should disable a projected now action when the current time is not selectable', () => {
-      const picker = buildPicker({ maxDate: new Date(1969, 11, 31) }, [
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 9, 15, 18))
+      onTestFinished(() => vi.useRealTimers())
+      const picker = buildPicker({ maxDate: '17:00' }, [
         '<div id="picker">',
         '  <template data-coreui-template="footer">',
         '    <button type="button" data-coreui-picker-action="now">Now</button>',
