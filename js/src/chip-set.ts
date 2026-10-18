@@ -128,7 +128,7 @@ class ChipSet extends BaseComponent {
   protected declare _anchor: HTMLElement | null
   protected declare _typeaheadBuffer: TypeaheadBuffer
   protected declare _announcedFrom: string[] | null
-  protected declare _removal: { removed: boolean } | null
+  protected declare _batch: { changed: boolean } | null
   protected declare _settled: boolean
 
   constructor(element?: string | Element | null, config?: Partial<ChipSetConfig> | null) {
@@ -143,7 +143,7 @@ class ChipSet extends BaseComponent {
     this._anchor = null
     this._typeaheadBuffer = createTypeaheadBuffer()
     this._announcedFrom = null
-    this._removal = null
+    this._batch = null
     this._settled = false
 
     this._applyAccessibilityRoles()
@@ -202,7 +202,12 @@ class ChipSet extends BaseComponent {
     this._setupChip(element)
     this._noteChange()
     this._chips.push(value)
-    this._triggerChange()
+
+    if (this._batch) {
+      this._batch.changed = true
+    } else {
+      this._triggerChange()
+    }
 
     return element
   }
@@ -685,29 +690,33 @@ class ChipSet extends BaseComponent {
       this._chips.splice(index, 1)
     }
 
-    if (this._removal) {
-      this._removal.removed = true
+    if (this._batch) {
+      this._batch.changed = true
     } else {
       this._reportRemoval()
     }
   }
 
   _removeChips(chips: HTMLElement[]): void {
-    const previous = this._removal
-    const removal = { removed: false }
+    const outer = !this._batch
+    const batch = this._batch ?? { changed: false }
 
-    this._removal = removal
+    this._batch = batch
 
     try {
       for (const chip of chips) {
-        this.remove(chip)
+        if (this._element.contains(chip)) {
+          this.remove(chip)
+        }
       }
     } finally {
-      this._removal = previous
-    }
+      if (outer) {
+        this._batch = null
 
-    if (removal.removed) {
-      this._reportRemoval()
+        if (batch.changed && this._config) {
+          this._reportRemoval()
+        }
+      }
     }
   }
 

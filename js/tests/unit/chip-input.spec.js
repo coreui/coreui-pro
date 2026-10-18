@@ -1199,8 +1199,10 @@ describe('ChipInput', () => {
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
       const changes = []
+      const events = []
 
       chipInput.add('First')
+      chipInput._valueField.addEventListener('change', () => events.push('change'))
       el.addEventListener('remove.coreui.chip-input', () => {
         if (chipInput.getValues().length === 1) {
           chipInput.add('Default')
@@ -1210,7 +1212,8 @@ describe('ChipInput', () => {
       chipInput.clear()
 
       expect(chipInput._valueField.value).toEqual('Default')
-      expect(changes.at(-1)).toEqual(['Default'])
+      expect(changes).toEqual([['Default']])
+      expect(events).toEqual(['change'])
     })
 
     it('should send one native input and change for clear', () => {

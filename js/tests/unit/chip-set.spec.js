@@ -811,15 +811,18 @@ describe('ChipSet', () => {
       expect(selects).toEqual([[]])
     })
 
-    it('should report each of two nested removals once', () => {
+    it('should report a clear a listener runs inside removeSelected as part of it, once', () => {
       const el = setMarkup(['First', 'Second', 'Third'])
       const chipSet = new ChipSet(el, { selectable: true, removable: true })
       const changes = []
+      const removals = []
       let nested = false
 
       Chip.getInstance(el.querySelectorAll('.chip')[0]).select()
       Chip.getInstance(el.querySelectorAll('.chip')[1]).select()
-      el.addEventListener('remove.coreui.chip-set', () => {
+      el.addEventListener('remove.coreui.chip-set', event => {
+        removals.push(event.value)
+
         if (!nested) {
           nested = true
           chipSet.clear()
@@ -828,8 +831,47 @@ describe('ChipSet', () => {
       el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
       chipSet.removeSelected()
 
-      expect(changes).toHaveSize(2)
-      expect(changes.at(-1)).toEqual([])
+      expect(changes).toEqual([[]])
+      expect(removals.filter(value => value === 'Second')).toHaveSize(1)
+    })
+
+    it('should report a chip a listener removes or adds during clear with the clear, once', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { removable: true })
+      const changes = []
+
+      el.addEventListener('remove.coreui.chip-set', event => {
+        if (event.value === 'First') {
+          chipSet.remove('Third')
+          chipSet.add('Fourth')
+        }
+      })
+      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
+      chipSet.clear()
+
+      expect(changes).toEqual([['Fourth']])
+    })
+
+    it('should report the chips removed before a removal throws', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { removable: true })
+      const remove = chipSet.remove.bind(chipSet)
+      const changes = []
+      let calls = 0
+
+      spyOn(chipSet, 'remove').and.callFake(chip => {
+        calls++
+
+        if (calls === 3) {
+          throw new Error('stop')
+        }
+
+        return remove(chip)
+      })
+      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
+
+      expect(() => chipSet.clear()).toThrowError('stop')
+      expect(changes).toEqual([['Third']])
     })
 
     it('should report a removal after clear on its own again', () => {
