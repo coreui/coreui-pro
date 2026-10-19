@@ -3,10 +3,10 @@
 - name: primary
   hex: "oklch(52.945% 0.19103 278.34)"
 - name: success
-  hex: "oklch(61.237% 0.17298 146.95)"
+  hex: "oklch(55.1% 0.173 145)"
 - name: info
-  hex: "oklch(67.55% 0.17646 252.26)"
+  hex: "oklch(57.4% 0.196 256)"
 - name: warning
-  hex: "oklch(80.791% 0.16473 78.5)"
+  hex: "oklch(84% 0.172 85)"
 - name: danger
-  hex: "oklch(63.864% 0.18175 23.81)"
+  hex: "oklch(58.7% 0.237 23.81)"
