@@ -345,29 +345,41 @@ describe('PasswordInput', () => {
       expect(fixtureEl.querySelector('.form-control-action').disabled).toBe(true)
     })
 
-    it('should not reveal a control the page disabled after init, and keep focus on its button', () => {
+    it('should keep a revealed password and disable its button when pressed after the page disabled the control', () => {
       initialized('<input type="password" class="form-control" data-coreui-password-input>')
       const input = fixtureEl.querySelector('input')
       const button = fixtureEl.querySelector('.form-control-action')
 
-      button.focus()
+      button.click()
       input.disabled = true
       button.click()
 
-      expect(input.type).toBe('password')
-      expect(document.activeElement).toBe(button)
+      expect(input.type).toBe('text')
+      expect(button.disabled).toBe(true)
     })
 
-    it('should still hide a password revealed before the page disabled the control', () => {
+    it('should change nothing through toggle() on a control the page disabled after init', () => {
       initialized('<input type="password" class="form-control" data-coreui-password-input>')
       const input = fixtureEl.querySelector('input')
+      const passwordInput = PasswordInput.getInstance(input)
+
+      passwordInput.toggle()
+      input.disabled = true
+      passwordInput.toggle()
+
+      expect(input.type).toBe('text')
+      expect(fixtureEl.querySelector('.form-control-action').disabled).toBe(true)
+    })
+
+    it('should leave the button of a control disabled by its fieldset to the fieldset', () => {
+      initialized('<fieldset disabled><input type="password" class="form-control" data-coreui-password-input></fieldset>')
       const button = fixtureEl.querySelector('.form-control-action')
 
-      button.click()
-      input.disabled = true
-      button.click()
+      expect(button.matches(':disabled')).toBe(true)
 
-      expect(input.type).toBe('password')
+      fixtureEl.querySelector('fieldset').disabled = false
+
+      expect(button.matches(':disabled')).toBe(false)
     })
 
     it('should not reveal a control disabled by its fieldset through toggle()', () => {

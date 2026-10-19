@@ -77,6 +77,7 @@ class PasswordInput extends BaseComponent {
     this._hostType = this._element.getAttribute('type')
     this._createToggle()
     this._updateToggleState()
+    this._updateDisabledState()
   }
 
   // Getters
@@ -94,7 +95,8 @@ class PasswordInput extends BaseComponent {
 
   // Public
   toggle(): any {
-    if (this._element.type === 'password' && this._element.matches(':disabled')) {
+    if (this._element.matches(':disabled')) {
+      this._updateDisabledState()
       return
     }
 
@@ -135,17 +137,20 @@ class PasswordInput extends BaseComponent {
 
     this._toggleElement = createControlGroupAction({
       className: CLASS_NAME_ACTION,
-      disabled: this._element.disabled,
       icon: this._config.showIcon,
       label: this._config.ariaToggleLabel,
       sanitizeIcon: (icon: string) => sanitizeByConfig(icon, this._config)
     })
 
     EventHandler.on(this._toggleElement, EVENT_CLICK, () => this.toggle())
-    EventHandler.on(this._element, EVENT_FOCUS, () => {
-      this._toggleElement!.disabled = false
-    })
+    EventHandler.on(this._element, EVENT_FOCUS, () => this._updateDisabledState())
     this._group.element.append(this._toggleElement)
+  }
+
+  _updateDisabledState(): void {
+    if (this._toggleElement) {
+      this._toggleElement.disabled = this._element.disabled
+    }
   }
 
   // The toggle reflects the input's type: the pressed state for assistive

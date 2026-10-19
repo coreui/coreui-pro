@@ -2270,6 +2270,15 @@ adornment in the library — so the button needs no icon markup at all:
   your own — the same data-API pass Chip, Chip Set, Chip Input and Search
   Button already make.
 
+#### Password Input: the toggle is disabled with the field
+
+The toggle button used to stay enabled on a disabled field and ignore the
+click, while `toggle()` flipped a disabled field anyway. The button is now
+disabled with the field and leaves the tab order, like the other action
+buttons, and neither the button nor `toggle()` changes what a disabled field
+shows: a password revealed before the field is disabled stays visible, and
+can be hidden once the field is enabled again.
+
 #### Icons rendered by JavaScript
 
 - New components render their icons as **inline SVG on `currentColor`** (the
