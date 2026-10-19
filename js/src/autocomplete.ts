@@ -22,7 +22,7 @@ import {
 } from './util/option-tree.js'
 import { createSelectionStore } from './util/selection-state.js'
 import {
-  defineJQueryPlugin, getUID, jQueryDispatch
+  defineJQueryPlugin, getUID, jQueryDispatch, writeAttribute
 } from './util/index.js'
 
 /**
@@ -76,7 +76,7 @@ const HOST_FIELD_ATTRIBUTES = new Set([
 ])
 
 const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]'
-const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
+const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete.${CLASS_NAME_SHOW}`
 const SELECTOR_INDICATOR = '.form-control-action'
 
 type AutocompleteConfig = {
@@ -197,6 +197,7 @@ class Autocomplete extends ComboboxBase {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(`${this.constructor.NAME}`)
+    this._cleanerElement = null
     this._indicatorElement = null
     this._inputElement = null
     this._inputHintElement = null
@@ -344,6 +345,12 @@ class Autocomplete extends ComboboxBase {
     }
 
     this._seedSelection()
+    this._applyState()
+
+    if (this._config.disabled) {
+      this.hide()
+    }
+
     this._validation.update()
   }
 
@@ -441,7 +448,7 @@ class Autocomplete extends ComboboxBase {
     EventHandler.on(this._inputElement, EVENT_BLUR, () => {
       const inputValue = this._inputElement.value
 
-      if (inputValue.length === 0) {
+      if (this._config.disabled || inputValue.length === 0) {
         return
       }
 
@@ -479,7 +486,7 @@ class Autocomplete extends ComboboxBase {
         return
       }
 
-      if (event.key === TAB_KEY && this._config.showHints && this._inputHintElement.value) {
+      if (event.key === TAB_KEY && this._inputHintElement?.value) {
         event.preventDefault()
         event.stopPropagation()
 
@@ -511,7 +518,7 @@ class Autocomplete extends ComboboxBase {
       }
 
       this.search(value)
-      if (this._config.showHints) {
+      if (this._inputHintElement) {
         const option = value.trim() ? this._findHintOption(value) : undefined
         this._inputHintElement.value = option ? `${value}${option.label.slice(value.trimStart().length)}` : ''
       }
@@ -646,12 +653,26 @@ class Autocomplete extends ComboboxBase {
   _createAutocomplete(): void {
     this._element.classList.add(CLASS_NAME_AUTOCOMPLETE)
 
-    this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
-
     this._createInputGroup()
     this._createButtons()
     this._createOptionsContainer()
     this._seedSelection()
+    this._applyState()
+  }
+
+  _applyState(): void {
+    const { disabled, required } = this._config
+
+    this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
+    this._inputElement.disabled = disabled
+    this._inputElement.required = required
+    writeAttribute(this._inputElement, 'tabindex', disabled ? '-1' : null)
+
+    if (this._indicatorElement) {
+      this._indicatorElement.disabled = disabled
+    }
+
+    this._updateCleaner()
   }
 
   _createInputGroup(): void {
@@ -666,7 +687,7 @@ class Autocomplete extends ComboboxBase {
     applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
 
-    if (!this._config.disabled && this._config.showHints) {
+    if (this._config.showHints) {
       const inputHintEl = document.createElement('input')
       inputHintEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_HINT)
       inputHintEl.autocomplete = 'off'
@@ -695,15 +716,6 @@ class Autocomplete extends ComboboxBase {
     inputEl.setAttribute('aria-expanded', 'false')
     inputEl.setAttribute('aria-haspopup', 'listbox')
 
-    if (this._config.disabled) {
-      inputEl.setAttribute('disabled', true as any)
-      inputEl.tabIndex = -1
-    }
-
-    if (this._config.required) {
-      inputEl.setAttribute('required', true as any)
-    }
-
     togglerEl.append(inputEl)
     this._inputElement = inputEl
     this._syncInputName()
@@ -718,7 +730,7 @@ class Autocomplete extends ComboboxBase {
     // wrapper's.
     const buttons = this._togglerElement
 
-    if (!this._config.disabled && this._config.cleaner) {
+    if (this._config.cleaner) {
       const cleaner = document.createElement('button')
       cleaner.type = 'button'
       cleaner.classList.add(CLASS_NAME_CLEANER)
@@ -734,7 +746,6 @@ class Autocomplete extends ComboboxBase {
       const indicator = document.createElement('button')
       indicator.type = 'button'
       indicator.classList.add(CLASS_NAME_INDICATOR)
-      indicator.disabled = this._config.disabled
       indicator.setAttribute('aria-label', this._config.ariaPickerLabel)
       indicator.innerHTML = sanitizeByConfig(
         this._config.pickerIcon === true ? PICKER_ICON : this._config.pickerIcon,
@@ -759,7 +770,7 @@ class Autocomplete extends ComboboxBase {
   override _onOptionSelected(value: string): void {
     const foundOption = this._findOptionByValue(value)
 
-    if (foundOption) {
+    if (foundOption && !this._config.disabled) {
       this._selectOption(foundOption)
       this._inputElement.focus()
     }
@@ -778,7 +789,7 @@ class Autocomplete extends ComboboxBase {
     this._validation.update()
     this._triggerChangeEvent(option)
 
-    if (this._config.showHints) {
+    if (this._inputHintElement) {
       this._inputHintElement.value = ''
     }
 
@@ -835,11 +846,11 @@ class Autocomplete extends ComboboxBase {
   }
 
   _updateCleaner(): void {
-    if (!this._config.cleaner || this._cleanerElement === null) {
+    if (!this._cleanerElement) {
       return
     }
 
-    if (this._store.size() > 0) {
+    if (this._store.size() > 0 && !this._config.disabled) {
       this._cleanerElement.style.removeProperty('display')
       return
     }
