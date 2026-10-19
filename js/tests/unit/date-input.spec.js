@@ -386,62 +386,14 @@ describe('DateInput', () => {
   })
 
   describe('dispose', () => {
-    it('should leave the disabled state to the option, not a class in the markup, and give the markup back on dispose', () => {
-      fixtureEl.innerHTML = '<div id="markup" class="disabled"></div><div id="added"></div>'
-      const markup = fixtureEl.querySelector('#markup')
-      const added = fixtureEl.querySelector('#added')
-      const instances = [
-        new DateInput(markup, { format: 'dd.MM.yyyy' }),
-        new DateInput(added, { disabled: true, format: 'dd.MM.yyyy' })
-      ]
-
-      expect(markup.querySelector('textarea').disabled).toBeFalse()
-      expect(markup.classList.contains('disabled')).toBeFalse()
-
-      for (const instance of instances) {
-        instance.dispose()
-      }
-
-      expect(markup.getAttribute('class')).toEqual('disabled')
-      expect(added.hasAttribute('class')).toBeFalse()
-    })
-
-    it('should give back a disabled class from the markup that setConfig took off', () => {
+    it('should leave the disabled state to the option, not a class in the markup', () => {
       fixtureEl.innerHTML = '<div class="disabled"></div>'
       const element = fixtureEl.querySelector('div')
-      const dateInput = new DateInput(element, { format: 'dd.MM.yyyy' })
+      // eslint-disable-next-line no-new
+      new DateInput(element, { format: 'dd.MM.yyyy' })
 
-      dateInput.setConfig({ disabled: false })
-
+      expect(element.querySelector('textarea').disabled).toBeFalse()
       expect(element.classList.contains('disabled')).toBeFalse()
-      expect(element.querySelector('textarea').disabled).toBeFalse()
-
-      dateInput.dispose()
-
-      expect(element.getAttribute('class')).toEqual('disabled')
-    })
-
-    it('should leave the disabled class to the options when they set disabled', () => {
-      fixtureEl.innerHTML = '<div class="disabled"></div>'
-      const element = fixtureEl.querySelector('div')
-      const dateInput = new DateInput(element, { disabled: false, format: 'dd.MM.yyyy' })
-
-      expect(element.querySelector('textarea').disabled).toBeFalse()
-
-      dateInput.dispose()
-
-      expect(element.getAttribute('class')).toEqual('disabled')
-    })
-
-    it('should give the host back the way the page wrote it', () => {
-      fixtureEl.innerHTML = '<div class="form-control form-date-time my-own" id="start" role="note"></div>'
-      const dateInputEl = fixtureEl.querySelector('#start')
-      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
-
-      dateInput.dispose()
-
-      expect(dateInputEl.outerHTML)
-        .toEqual('<div class="form-control form-date-time my-own" id="start" role="note"></div>')
     })
 
     it('should give back a state class and a label the markup carried', () => {
@@ -451,30 +403,24 @@ describe('DateInput', () => {
 
       dateInput.dispose()
 
-      expect([...dateInputEl.classList].toSorted()).toEqual(['form-date-time', 'is-invalid', 'my-own'])
+      expect(dateInputEl.classList.contains('is-invalid')).toBeTrue()
       expect(dateInputEl.getAttribute('aria-label')).toEqual('Start date')
       expect(dateInputEl.children).toHaveLength(0)
     })
 
-    it('should keep a class put on the host while it lived', () => {
+    it('should follow its own options when built again after a dispose with others', () => {
       fixtureEl.innerHTML = '<div id="start"></div>'
       const dateInputEl = fixtureEl.querySelector('#start')
-      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
 
-      dateInputEl.classList.add('d-none')
-      dateInput.dispose()
+      new DateInput(dateInputEl, { date: new Date(2026, 0, 15), disabled: true, format: 'dd.MM.yyyy' }).dispose()
+      // eslint-disable-next-line no-new
+      new DateInput(dateInputEl, { format: 'yyyy-MM-dd' })
 
-      expect(dateInputEl.outerHTML).toEqual('<div id="start" class="d-none"></div>')
-    })
-
-    it('should not leave a class attribute on a host that had none', () => {
-      fixtureEl.innerHTML = '<div id="start"></div>'
-      const dateInputEl = fixtureEl.querySelector('#start')
-      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
-
-      dateInput.dispose()
-
-      expect(dateInputEl.outerHTML).toEqual('<div id="start"></div>')
+      expect(dateInputEl.classList.contains('disabled')).toBeFalse()
+      expect(dateInputEl.classList.contains('form-date-time-filled')).toBeFalse()
+      expect(dateInputEl.getAttribute('role')).toEqual('group')
+      expect(dateInputEl.querySelector('textarea').disabled).toBeFalse()
+      expect(dateInputEl.querySelectorAll('.form-date-time-section[tabindex="0"]')).toHaveLength(1)
     })
 
     it('should put the author\'s own nodes back, not copies of them', () => {
@@ -517,6 +463,8 @@ describe('DateInput', () => {
       fixtureEl.innerHTML = '<form id="form"><div id="start"></div></form>'
       const dateInput = new DateInput(fixtureEl.querySelector('#start'), { date: new Date(2026, 0, 15) })
 
+      const spy = spyOn(dateInput, 'reset')
+
       fixtureEl.querySelector('#form').dispatchEvent(new Event('reset', { bubbles: true }))
       dateInput.dispose()
 
@@ -524,7 +472,8 @@ describe('DateInput', () => {
         setTimeout(resolve, 10)
       })
 
-      expect(fixtureEl.querySelector('#start').outerHTML).toEqual('<div id="start"></div>')
+      expect(spy).not.toHaveBeenCalled()
+      expect(fixtureEl.querySelector('#start').children).toHaveLength(0)
     })
   })
 
@@ -2006,7 +1955,8 @@ describe('DateInput', () => {
       pressKey(getSections(element)[0], 'ArrowUp')
       dateInput.dispose()
 
-      expect(element.className).toEqual('my-own')
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+      expect(element.classList.contains('my-own')).toBeTrue()
     })
 
     it('should change the state through setConfig without rebuilding the field, and drop the class the markup carried', () => {

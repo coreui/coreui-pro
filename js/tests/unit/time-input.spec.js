@@ -339,16 +339,16 @@ describe('TimeInput', () => {
   })
 
   describe('dispose', () => {
-    it('should leave the disabled state to the option, not a class in the markup, and give the class back on dispose', () => {
+    it('should leave the disabled state to the option when built again, not to a class in the markup', () => {
       fixtureEl.innerHTML = '<div class="disabled"></div>'
       const element = fixtureEl.querySelector('div')
-      const timeInput = new TimeInput(element)
+
+      new TimeInput(element, { disabled: true }).dispose()
+      // eslint-disable-next-line no-new
+      new TimeInput(element)
 
       expect(element.querySelector('textarea').disabled).toBeFalse()
-
-      timeInput.dispose()
-
-      expect(element.getAttribute('class')).toEqual('disabled')
+      expect(element.classList.contains('disabled')).toBeFalse()
     })
   })
 

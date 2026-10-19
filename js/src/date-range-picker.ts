@@ -11,7 +11,6 @@ import type { DateInputConfig } from './date-input.js'
 import DateRangeInput, { type DateRangeInputConfig } from './date-range-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { captureHostClasses } from './util/form-control-group.js'
 import type { ValidationState } from './util/form-validation.js'
 import {
   formatSelectionRangeName, getDateBySelectionType, isSameDateAs, type SelectionTypes
@@ -184,7 +183,6 @@ class DateRangePicker extends PickerBase {
     this._calendarElement = null
     this._selectEndDate = false
 
-    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createDateRangePicker()
     this._nameToggle()
     this._createPopup()
@@ -255,14 +253,6 @@ class DateRangePicker extends PickerBase {
     return ORIGINAL_DEFAULT
   }
 
-  override _managedClassNames(): string[] {
-    return [
-      CLASS_NAME_DATE_PICKER,
-      CLASS_NAME_DATE_RANGE_PICKER,
-      CLASS_NAME_PICKER
-    ].filter(Boolean) as string[]
-  }
-
   _setSelectEndDate(value: boolean): void {
     if (this._selectEndDate === value) {
       return
@@ -297,13 +287,10 @@ class DateRangePicker extends PickerBase {
   _createDateRangePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
 
-    if (!this._element.hasAttribute('role')) {
-      this._writeAdoptedAttribute(this._element, 'role', 'group')
-    }
+    this._element.setAttribute('role', 'group')
 
     const describedBy = this._element.getAttribute('aria-describedby')
     const inputGroup = document.createElement('div')
-    inputGroup.setAttribute('role', 'none')
 
     if (describedBy !== null) {
       inputGroup.setAttribute('aria-describedby', describedBy)
@@ -324,6 +311,7 @@ class DateRangePicker extends PickerBase {
       validationState: null,
       ...(format ? { format } : {})
     }, { inputOptions: this._config.inputOptions }))
+    inputGroup.setAttribute('role', 'none')
     this._validation.adopt(this._rangeInput._validation)
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('startDateChange'), (event: any) => {

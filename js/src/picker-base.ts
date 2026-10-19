@@ -11,7 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
 import FieldValidation from './util/field-validation.js'
-import { createControlGroupAction, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
+import { createControlGroupAction } from './util/form-control-group.js'
 import { getUID } from './util/index.js'
 import Popup from './util/popup.js'
 import { sanitizeByConfig } from './util/sanitizer.js'
@@ -39,7 +39,6 @@ abstract class PickerBase extends BaseComponent {
   protected declare _cleanerElement: HTMLElement | null
   protected declare _fieldElement: HTMLElement
   protected declare _footerTemplate: HTMLTemplateElement | null
-  protected declare _hostClasses: HostClasses
   protected declare _menu: HTMLElement
   protected declare _popup: Popup
   protected declare _toggleElement: HTMLElement | null
@@ -99,7 +98,6 @@ abstract class PickerBase extends BaseComponent {
     this._disposeParts()
     this._restoreAdoptedAttributes()
     this._validation.dispose()
-    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
   }
@@ -243,14 +241,11 @@ abstract class PickerBase extends BaseComponent {
     }
 
     for (const svg of SelectorEngine.find(SELECTOR_SVG, element)) {
-      if (!svg.hasAttribute('aria-hidden')) {
-        this._writeAdoptedAttribute(svg, 'aria-hidden', 'true')
-      }
+      svg.setAttribute('aria-hidden', 'true')
     }
 
-    if (this._config.disabled && 'disabled' in element) {
-      this._writeAdoptedAttribute(element, 'disabled', '');
-      (element as HTMLButtonElement).disabled = true
+    if ('disabled' in element) {
+      (element as HTMLButtonElement).disabled = this._config.disabled
     }
 
     return element
@@ -326,8 +321,6 @@ abstract class PickerBase extends BaseComponent {
   abstract _onPopupShow(): void
 
   abstract _disposeParts(): void
-
-  abstract _managedClassNames(): string[]
 
   abstract _isNowSelectable(): boolean
 
