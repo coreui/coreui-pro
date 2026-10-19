@@ -552,6 +552,7 @@ class OTPInput extends BaseComponent {
       }
 
       input.disabled = this._config.disabled
+      input.readOnly = false
 
       if (this._config.id && !input.id) {
         input.id = `${this._config.id}-${index}`

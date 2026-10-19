@@ -2652,9 +2652,10 @@ field behind that kept submitting.
   code the field started with. A change of the code sends `input` and `change`
   from the input that holds the value.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **The `readonly` option is removed.** A code the user cannot type has no use
-  in a form, so `data-coreui-readonly` and `{ readonly: true }` no longer do
-  anything; use `disabled` to show a code the user cannot change.
+  **The `readonly` option is removed, and every slot is editable.** A code the
+  user cannot type has no use in a form, so `data-coreui-readonly`,
+  `{ readonly: true }` and a `readonly` written on a slot no longer make it
+  read-only; use `disabled` to show a code the user cannot change.
 
 #### Rating
 

@@ -758,10 +758,10 @@ describe('OTPInput', () => {
       }
     })
 
-    it('should let the disabled option decide over the slot markup, and give back its placeholder when the option turns off', () => {
+    it('should let the disabled option decide over the slot markup, keep every slot editable, and give back its placeholder when the option turns off', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
-          <input type="text" class="form-otp-control" disabled placeholder="a">
+          <input type="text" class="form-otp-control" disabled readonly placeholder="a">
           <input type="text" class="form-otp-control">
         </div>
       `
@@ -775,6 +775,7 @@ describe('OTPInput', () => {
       const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
 
       expect(first.disabled).toBeFalse()
+      expect(first.readOnly).toBeFalse()
       expect(first.getAttribute('placeholder')).toEqual('a')
       expect(second.disabled).toBeFalse()
       expect(second.hasAttribute('placeholder')).toBeFalse()
@@ -801,7 +802,7 @@ describe('OTPInput', () => {
       expect(second.getAttribute('placeholder')).toEqual('x')
     })
 
-    it('should keep the placeholder of a slot added after init', () => {
+    it('should keep the placeholder of a slot added after init and make it editable', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control">
@@ -810,12 +811,13 @@ describe('OTPInput', () => {
       const otpElement = fixtureEl.querySelector('.form-otp')
       const otpInput = new OTPInput(otpElement)
 
-      otpElement.insertAdjacentHTML('afterbegin', '<input type="text" class="form-otp-control" placeholder="0">')
+      otpElement.insertAdjacentHTML('afterbegin', '<input type="text" class="form-otp-control" placeholder="0" readonly>')
       otpInput.setConfig({})
 
       const added = otpElement.querySelector('.form-otp-control')
 
       expect(added.getAttribute('placeholder')).toEqual('0')
+      expect(added.readOnly).toBeFalse()
     })
   })
 
