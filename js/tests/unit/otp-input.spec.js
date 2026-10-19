@@ -139,12 +139,6 @@ describe('OTPInput', () => {
         expect(input.required).toBeFalse()
         expect(input.getAttribute('aria-required')).toBe('true')
       }
-
-      otpInput.setConfig({ required: false })
-
-      for (const input of otpContainer.querySelectorAll('.form-otp-control')) {
-        expect(input.hasAttribute('aria-required')).toBeFalse()
-      }
     })
 
     it('should shrink the first slot back to a single character once it is filled', () => {
@@ -317,7 +311,7 @@ describe('OTPInput', () => {
       expect([...formData.entries()]).toEqual([['code', '42']])
     })
 
-    it('should submit what the slots show after setConfig', () => {
+    it('should submit what the slots show after disable() and enable()', () => {
       fixtureEl.innerHTML = `
         <form id="form">
           <div class="form-otp">
@@ -336,7 +330,8 @@ describe('OTPInput', () => {
         inputs[index].dispatchEvent(new Event('input', { bubbles: true }))
       }
 
-      otpInput.setConfig({ masked: true })
+      otpInput.disable()
+      otpInput.enable()
 
       const formData = new FormData(fixtureEl.querySelector('#form'))
       const onScreen = [...otpContainer.querySelectorAll('.form-otp-control')].map(input => input.value).join('')
@@ -521,12 +516,12 @@ describe('OTPInput', () => {
       expect([...inputs].map(input => input.value)).toEqual(['1', '2'])
     })
 
-    it('should put back the code it started with, not one setConfig gave later', () => {
+    it('should put back the code it started with, not one setValue gave later', () => {
       fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
       const otpContainer = fixtureEl.querySelector('.form-otp')
       const otpInput = new OTPInput(otpContainer, { value: '12' })
 
-      otpInput.setConfig({ value: '34' })
+      otpInput.setValue('34')
       otpInput.reset()
 
       expect(otpInput._inputElement.value).toBe('12')
@@ -550,7 +545,7 @@ describe('OTPInput', () => {
     })
   })
 
-  describe('setConfig', () => {
+  describe('setters', () => {
     const MARKUP = `
       <div class="form-otp">
         <input type="text" class="form-otp-control">
@@ -561,7 +556,7 @@ describe('OTPInput', () => {
 
     const slots = () => [...fixtureEl.querySelectorAll('.form-otp-control')].map(input => input.value)
 
-    it('should leave what the user typed alone when the call carries no value', () => {
+    it('should leave what the user typed alone when disable() and enable() rebuild it', () => {
       fixtureEl.innerHTML = MARKUP
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '12' })
       const inputs = fixtureEl.querySelectorAll('.form-otp-control')
@@ -571,7 +566,8 @@ describe('OTPInput', () => {
         inputs[index].dispatchEvent(createEvent('input', { bubbles: true }))
       }
 
-      otpInput.setConfig({ masked: true })
+      otpInput.disable()
+      otpInput.enable()
 
       expect(slots()).toEqual(['9', '8', '7'])
       expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('987')
@@ -581,13 +577,13 @@ describe('OTPInput', () => {
       fixtureEl.innerHTML = MARKUP
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '123' })
 
-      otpInput.setConfig({ value: '98' })
+      otpInput.setValue('98')
 
       expect(slots()).toEqual(['9', '8', ''])
       expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('98')
     })
 
-    it('should not repaint when the call carries the same value it already had', () => {
+    it('should repaint what the user typed when the call carries the value it was configured with', () => {
       fixtureEl.innerHTML = MARKUP
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '12' })
       const inputs = fixtureEl.querySelectorAll('.form-otp-control')
@@ -597,16 +593,17 @@ describe('OTPInput', () => {
         inputs[index].dispatchEvent(createEvent('input', { bubbles: true }))
       }
 
-      otpInput.setConfig({ ...otpInput._config, masked: true })
+      otpInput.setValue('12')
 
-      expect(slots()).toEqual(['9', '8', '7'])
+      expect(slots()).toEqual(['1', '2', ''])
+      expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('12')
     })
 
     it('should clear the field when the call carries an empty value', () => {
       fixtureEl.innerHTML = MARKUP
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '123' })
 
-      otpInput.setConfig({ value: null })
+      otpInput.setValue(null)
 
       expect(slots()).toEqual(['', '', ''])
       expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('')
@@ -625,18 +622,10 @@ describe('OTPInput', () => {
         values.push(event.value)
       })
 
-      otpInput.setConfig({ value: '987' })
+      otpInput.setValue('987')
 
       expect(otpInput._inputElement.value).toBe('987')
       expect(values).toEqual([])
-    })
-
-    it('should take a null config as a no-op', () => {
-      fixtureEl.innerHTML = MARKUP
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '12' })
-
-      expect(() => otpInput.setConfig(null)).not.toThrow()
-      expect(slots()).toEqual(['1', '2', ''])
     })
 
     it('should drop characters the type does not accept', () => {
@@ -657,47 +646,20 @@ describe('OTPInput', () => {
       `
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
 
-      otpInput.setConfig({ masked: true })
+      otpInput.disable()
+      otpInput.enable()
 
       expect(slots()).toEqual(['5', '5', ''])
     })
 
-    it('should update config', () => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control">
-          <input type="text" class="form-otp-control">
-        </div>
-      `
+    it('should not expose setConfig', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
 
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      const otpInput = new OTPInput(otpContainer, { masked: false })
-
-      otpInput.setConfig({ masked: true })
-
-      expect(otpInput._config.masked).toBe(true)
+      expect(typeof otpInput.setConfig).toEqual('undefined')
     })
 
-    it('should update input attributes', () => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control">
-          <input type="text" class="form-otp-control">
-        </div>
-      `
-
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      const otpInput = new OTPInput(otpContainer, { masked: false })
-
-      otpInput.setConfig({ masked: true })
-
-      const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      for (const input of inputs) {
-        expect(input.type).toBe('password')
-      }
-    })
-
-    it('should put every slot back into the tab order when linear is switched off', () => {
+    it('should leave every slot in the tab order when linear is off', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control">
@@ -712,33 +674,34 @@ describe('OTPInput', () => {
 
       expect(inputs[2].getAttribute('tabindex')).toBe('-1')
 
-      otpInput.setConfig({ linear: false })
+      otpInput.dispose()
+      // eslint-disable-next-line no-new
+      new OTPInput(otpContainer, { linear: false })
 
       for (const input of inputs) {
         expect(input.hasAttribute('tabindex')).toBe(false)
       }
     })
 
-    it('should handle non-object config gracefully', () => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control">
-        </div>
-      `
+    it('should disable every slot and the value field', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '12' })
 
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      const otpInput = new OTPInput(otpContainer)
+      otpInput.disable()
 
-      expect(() => {
-        otpInput.setConfig('string')
-      }).not.toThrow()
+      for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
+        expect(input.disabled).toBeTrue()
+      }
+
+      expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').disabled).toBeTrue()
+      expect(slots()).toEqual(['1', '2', ''])
     })
 
     it('should enable the slots again when disabled is turned off', () => {
       fixtureEl.innerHTML = MARKUP
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { disabled: true })
 
-      otpInput.setConfig({ disabled: false })
+      otpInput.enable()
 
       for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
         expect(input.disabled).toBeFalse()
@@ -747,18 +710,7 @@ describe('OTPInput', () => {
       expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').disabled).toBeFalse()
     })
 
-    it('should drop the placeholder when it is turned off', () => {
-      fixtureEl.innerHTML = MARKUP
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { placeholder: '•' })
-
-      otpInput.setConfig({ placeholder: null })
-
-      for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
-        expect(input.hasAttribute('placeholder')).toBeFalse()
-      }
-    })
-
-    it('should let the disabled option decide over the slot markup, keep every slot editable, and give back its placeholder when the option turns off', () => {
+    it('should let the disabled option decide over the slot markup, keep every slot editable, and give back its placeholder on dispose', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control" disabled readonly placeholder="a">
@@ -770,18 +722,21 @@ describe('OTPInput', () => {
         placeholder: '•'
       })
 
-      otpInput.setConfig({ disabled: false, placeholder: null })
+      otpInput.enable()
 
       const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
 
       expect(first.disabled).toBeFalse()
       expect(first.readOnly).toBeFalse()
-      expect(first.getAttribute('placeholder')).toEqual('a')
       expect(second.disabled).toBeFalse()
+
+      otpInput.dispose()
+
+      expect(first.getAttribute('placeholder')).toEqual('a')
       expect(second.hasAttribute('placeholder')).toBeFalse()
     })
 
-    it('should let the options decide disabled on every slot at init and on an unrelated call, and keep a placeholder the page wrote', () => {
+    it('should let the options decide disabled on every slot at init and on setValue, and keep a placeholder the page wrote', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control" disabled>
@@ -795,29 +750,11 @@ describe('OTPInput', () => {
 
       second.disabled = true
       second.placeholder = 'x'
-      otpInput.setConfig({ masked: true })
+      otpInput.setValue('1')
 
       expect(first.disabled).toBeFalse()
       expect(second.disabled).toBeFalse()
       expect(second.getAttribute('placeholder')).toEqual('x')
-    })
-
-    it('should keep the placeholder of a slot added after init and make it editable', () => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control">
-        </div>
-      `
-      const otpElement = fixtureEl.querySelector('.form-otp')
-      const otpInput = new OTPInput(otpElement)
-
-      otpElement.insertAdjacentHTML('afterbegin', '<input type="text" class="form-otp-control" placeholder="0" readonly>')
-      otpInput.setConfig({})
-
-      const added = otpElement.querySelector('.form-otp-control')
-
-      expect(added.getAttribute('placeholder')).toEqual('0')
-      expect(added.readOnly).toBeFalse()
     })
   })
 
@@ -839,8 +776,7 @@ describe('OTPInput', () => {
         expect(input.hasAttribute('placeholder')).toBeFalse()
       }
 
-      const otpInput = new OTPInput(otpElement, { placeholder: 'X' })
-      otpInput.setConfig({ placeholder: null })
+      new OTPInput(otpElement, { placeholder: 'X' }).dispose()
 
       expect(fixtureEl.querySelector('.form-otp-control').hasAttribute('placeholder')).toBeFalse()
     })
@@ -881,8 +817,8 @@ describe('OTPInput', () => {
 
       // eslint-disable-next-line no-new
       new OTPInput(otpElement, { disabled: true })
-      const otpInput = new OTPInput(otpElement)
-      otpInput.setConfig({ disabled: false })
+      // eslint-disable-next-line no-new
+      new OTPInput(otpElement)
 
       for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
         expect(input.disabled).toBeFalse()
@@ -1661,11 +1597,12 @@ describe('OTPInput', () => {
       expect(slotStates(slots)).toEqual([[null, null], [null, null]])
     })
 
-    it('should keep the value field and its state through setConfig', () => {
+    it('should keep the value field and its state through disable() and enable()', () => {
       const { form, otpInput, slots, valueField } = mountForm({ required: true }, 'data-coreui-validate novalidate')
       Form.getOrCreateInstance(form).validate()
 
-      otpInput.setConfig({ placeholder: '0' })
+      otpInput.disable()
+      otpInput.enable()
 
       expect(otpInput._inputElement).toBe(valueField)
       expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
@@ -1734,18 +1671,18 @@ describe('OTPInput', () => {
       expect(form.checkValidity()).toBeFalse()
       expect(valueField.validationMessage).toBe('Enter the code.')
 
-      otpInput.setConfig({ validationState: 'valid' })
+      otpInput.setValidationState('valid')
 
       expect(group).toHaveClass('is-valid')
       expect(group).not.toHaveClass('is-invalid')
       expect(slotStates(slots)).toEqual([[null, null], [null, null]])
       expect(form.checkValidity()).toBeTrue()
 
-      otpInput.setConfig({ validationState: null })
+      otpInput.setValidationState(null)
 
       expect(group.classList.contains('is-valid')).toBeFalse()
 
-      otpInput.setConfig({ validationState: 'invalid' })
+      otpInput.setValidationState('invalid')
       otpInput.dispose()
 
       expect(group.className).toBe('form-otp')
@@ -1845,7 +1782,7 @@ describe('OTPInput', () => {
 
       const otpInput = new OTPInput(group)
 
-      otpInput.setConfig({ validationState: null })
+      otpInput.setValidationState(null)
 
       expect(group).not.toHaveClass('is-invalid')
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
@@ -1875,11 +1812,12 @@ describe('OTPInput', () => {
       expect(slotStates(slots)).toEqual([[null, null], [null, null]])
     })
 
-    it('should give a slot added after start the state and keep it from the form plugin', () => {
+    it('should give a slot added before a new instance the state and keep it from the form plugin', () => {
       const { form, otpInput } = mountForm({ validationState: 'invalid' }, 'data-coreui-validate="valid" novalidate')
       const group = fixtureEl.querySelector('.form-otp')
       group.insertAdjacentHTML('afterbegin', '<input class="form-otp-control">')
-      otpInput.setConfig({})
+      otpInput.dispose()
+      OTPInput.getOrCreateInstance(group, { name: 'code', validationState: 'invalid' })
       const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
 
       Form.getOrCreateInstance(form).validate()
@@ -1888,12 +1826,12 @@ describe('OTPInput', () => {
       expect(slots[0].className).toBe('form-otp-control')
     })
 
-    it('should not repaint the slots when setConfig changes only the validation state', () => {
+    it('should not repaint the slots when setValidationState changes the state', () => {
       const ariaLabel = jasmine.createSpy('ariaLabel').and.returnValue('Digit')
       const { otpInput } = mountForm({ ariaLabel })
       ariaLabel.calls.reset()
 
-      otpInput.setConfig({ validationState: 'invalid' })
+      otpInput.setValidationState('invalid')
 
       expect(ariaLabel).not.toHaveBeenCalled()
       expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
@@ -1929,7 +1867,7 @@ describe('OTPInput', () => {
       slots[0].dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData }))
       otpInput.clear()
       otpInput.reset()
-      otpInput.setConfig({ value: '12' })
+      otpInput.setValue('12')
 
       expect(otpInput._inputElement.value).toBe('12')
       expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
@@ -1950,7 +1888,7 @@ describe('OTPInput', () => {
           seen.push(valueField.validity.valid)
         }
       }, true)
-      getTarget({ group, valueField }).addEventListener(type_, () => otpInput.setConfig({ validationState: 'invalid' }), { once: true })
+      getTarget({ group, valueField }).addEventListener(type_, () => otpInput.setValidationState('invalid'), { once: true })
       type(slots[1], '2')
 
       expect(seen).toEqual([true])
@@ -1968,7 +1906,7 @@ describe('OTPInput', () => {
 
       type(slots[0], '1')
       type(slots[0], '1')
-      otpInput.setConfig({ value: '12' })
+      otpInput.setValue('12')
       otpInput.clear()
       otpInput.clear()
 
@@ -2000,7 +1938,7 @@ describe('OTPInput', () => {
 
     it.each([['before the reset', 'before', false], ['in a reset listener', 'listener', true], ['right after form.reset()', 'after', true]])('should put back the code it started with on a native reset and treat a state given %s as the reset says', async (_, when, kept) => {
       const { form, otpInput, slots, valueField } = mountForm({ value: '4' }, '', '<input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control">')
-      const giveState = () => otpInput.setConfig({ validationState: 'invalid' })
+      const giveState = () => otpInput.setValidationState('invalid')
 
       type(slots[1], '5')
       type(slots[2], '6')
@@ -2096,17 +2034,13 @@ describe('OTPInput', () => {
     })
 
     it('should let the required option decide aria-required on every slot over the markup', () => {
-      const { otpInput, slots } = mountForm({}, '', '<input class="form-otp-control" aria-required="true"><input class="form-otp-control">')
+      const { slots } = mountForm({}, '', '<input class="form-otp-control" aria-required="true"><input class="form-otp-control">')
 
       expect(slots.map(slot => slot.getAttribute('aria-required'))).toEqual([null, null])
 
-      otpInput.setConfig({ required: true })
+      const { slots: requiredSlots } = mountForm({ required: true }, '', '<input class="form-otp-control"><input class="form-otp-control" aria-required="false">')
 
-      expect(slots.map(slot => slot.getAttribute('aria-required'))).toEqual(['true', 'true'])
-
-      otpInput.setConfig({ required: false })
-
-      expect(slots.map(slot => slot.getAttribute('aria-required'))).toEqual([null, null])
+      expect(requiredSlots.map(slot => slot.getAttribute('aria-required'))).toEqual(['true', 'true'])
     })
 
     it('should give the slots back their attributes on dispose', () => {
@@ -2131,7 +2065,7 @@ describe('OTPInput', () => {
       expect(host.hasAttribute('aria-describedby')).toBe(false)
       expect(slots.map(slot => slot.getAttribute('aria-describedby'))).toEqual(['hint', null])
 
-      described.setConfig({ validationState: 'invalid' })
+      described.setValidationState('invalid')
 
       expect(slots.map(slot => slot.getAttribute('aria-describedby'))).toEqual([`hint ${feedback.id}`, `hint ${feedback.id}`])
 
@@ -2140,28 +2074,34 @@ describe('OTPInput', () => {
       expect(host.getAttribute('aria-describedby')).toBe('hint')
     })
 
-    it('should take the aria-invalid it wrote off a slot added later on dispose', () => {
+    it('should take the aria-invalid it wrote over the markup of a slot added before a new instance off on dispose', () => {
       const { otpInput, slots } = mountForm({ validationState: 'invalid' }, '', '<input class="form-otp-control">')
+      const group = fixtureEl.querySelector('.form-otp')
       const added = document.createElement('input')
 
       added.className = 'form-otp-control'
       added.setAttribute('aria-invalid', 'false')
       slots[0].after(added)
-      otpInput.setConfig({ placeholder: '-' })
+      otpInput.dispose()
+      const rebuilt = new OTPInput(group, { name: 'code', validationState: 'invalid' })
 
       expect(added.getAttribute('aria-invalid')).toBe('true')
 
-      otpInput.dispose()
+      rebuilt.dispose()
 
       expect(added.hasAttribute('aria-invalid')).toBe(false)
     })
 
     it('should still answer a native reset when a capturing reset listener reconfigures it', async () => {
       const { form, otpInput, slots } = mountForm({ validationState: 'invalid', value: '12' }, '', '<input class="form-otp-control"><input class="form-otp-control">')
-      const listener = () => otpInput.setConfig({ placeholder: '*' })
+      const listener = () => {
+        otpInput.disable()
+        otpInput.enable()
+      }
 
       document.addEventListener('reset', listener, true)
-      otpInput.setConfig({ placeholder: '-' })
+      otpInput.disable()
+      otpInput.enable()
       form.reset()
       await new Promise(resolve => {
         setTimeout(resolve)
@@ -2251,13 +2191,13 @@ describe('OTPInput', () => {
         `
         const otpContainer = fixtureEl.querySelector('.form-otp')
         const otpInput = new OTPInput(otpContainer)
-        const spy = spyOn(otpInput, 'setConfig')
+        const spy = spyOn(otpInput, 'setValue')
 
         jQueryMock.fn.otpInput = OTPInput.jQueryInterface
         jQueryMock.elements = [otpContainer]
-        jQueryMock.fn.otpInput.call(jQueryMock, 'setConfig', { disabled: true })
+        jQueryMock.fn.otpInput.call(jQueryMock, 'setValue', '1')
 
-        expect(spy).toHaveBeenCalledWith({ disabled: true })
+        expect(spy).toHaveBeenCalledWith('1')
         otpInput.dispose()
       })
 

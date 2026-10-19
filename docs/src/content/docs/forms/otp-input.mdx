@@ -326,7 +326,7 @@ The state comes from four places, in this order:
 - A validation that reports the code invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the group shows it invalid whenever the code is invalid, until a native reset of the form.
 - In a form with `data-coreui-validate`, the `:user-invalid` state of the input that holds the value, and with `data-coreui-validate="valid"` also its `:user-valid` state.
 
-A state you give, with the option or with the class, is a verdict on the code it was given for, so the next change of the code the user makes drops it: typing or deleting a character, a paste or an autofill. A keystroke that leaves the code as it was keeps it. One action drops the state once, at its first change, so a state you give from a `change.coreui.otp-input`, `input` or `change` listener while the action runs stays. A change your own code makes with `clear()`, `reset()` or `setConfig({ value })` keeps it. To set it again, call `setConfig({ validationState })`: it also replaces a class written in the markup, so `setConfig({ validationState: null })` withdraws that class. The component does not read `aria-invalid` on the group or a slot, and a state class written after it started only paints the group: the slots get no `aria-invalid` and the submit is not blocked, so change the state after start with `setConfig`. While the given state is `'invalid'`, the code blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled code does not block. A message placed where the stylesheet does not show it for the group can be named in `data-coreui-invalid-feedback` on the `.form-otp` element. A native reset of the form puts back the code the field started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays.
+A state you give, with the option or with the class, is a verdict on the code it was given for, so the next change of the code the user makes drops it: typing or deleting a character, a paste or an autofill. A keystroke that leaves the code as it was keeps it. One action drops the state once, at its first change, so a state you give from a `change.coreui.otp-input`, `input` or `change` listener while the action runs stays. A change your own code makes with `clear()`, `reset()` or `setValue()` keeps it. To set it again, call `setValidationState()`: it also replaces a class written in the markup, so `setValidationState(null)` withdraws that class. The component does not read `aria-invalid` on the group or a slot, and a state class written after it started only paints the group: the slots get no `aria-invalid` and the submit is not blocked, so change the state after start with `setValidationState()`. While the given state is `'invalid'`, the code blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled code does not block. A message placed where the stylesheet does not show it for the group can be named in `data-coreui-invalid-feedback` on the `.form-otp` element. A native reset of the form puts back the code the field started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays.
 
 <Example pro code={`<span class="form-label" id="otpServerLabel">Verification code</span>
   <div class="form-otp is-invalid" data-coreui-otp aria-labelledby="otpServerLabel" data-coreui-name="code" data-coreui-value="482910">
@@ -433,20 +433,23 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | --- | --- |
 | `clear` | Clear all OTP input fields |
 | `reset` | Puts back the code the input started with, its `value` or the code in the markup, as a native form reset does. |
-| `setConfig` | Merges the given options over the current configuration and re-renders the inputs. Options you leave out keep their current value, and so does the code in the field: the slots are repainted only when the call changes `value`, and then they show exactly that value, cleared where it does not reach. A repaint fires no event. `setConfig({ validationState })` sets the state without touching the code. |
+| `disable()` | Disables the field. |
+| `enable()` | Enables the field. |
+| `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
+| `setValue(value)` | Sets the code. The slots show exactly that value, cleared where it does not reach; a repaint fires no event. |
 
 ```javascript
 const otp = coreui.OTPInput.getInstance(document.querySelector('.form-otp'))
 otp.clear() // Clear all fields
 otp.reset() // Reset to initial value
-otp.setConfig({ type: 'number', masked: true }) // Update configuration
+otp.setValue('123456') // Set the code
 ```
 
 ### Events
 
 | Event | Description |
 | --- | --- |
-| `change.coreui.otp-input` | Fired when the code changes: typing, a paste, `clear()`, `reset()` or a native form reset, together with the native `input` and `change` of the hidden field. A call that leaves the code as it was, and `setConfig()`, do not fire it. |
+| `change.coreui.otp-input` | Fired when the code changes: typing, a paste, `clear()`, `reset()` or a native form reset, together with the native `input` and `change` of the hidden field. A call that leaves the code as it was, and `setValue()`, do not fire it. |
 | `complete.coreui.otp-input` | Fired when all OTP fields are filled |
 
 ```javascript

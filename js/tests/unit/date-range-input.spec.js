@@ -161,6 +161,39 @@ describe('DateRangeInput', () => {
       expect(log).toEqual(['startDateChange:null', 'error:maxDate', 'endDateChange:null', 'error:maxDate'])
     })
 
+    it('should change one end through setStartDate and setEndDate, keeping the other', () => {
+      const range = build({ endDate: new Date(2026, 6, 20), startDate: new Date(2026, 6, 14) })
+
+      range.setStartDate(new Date(2026, 6, 10))
+
+      expect([range.getStartDate(), range.getEndDate()]).toEqual([new Date(2026, 6, 10), new Date(2026, 6, 20)])
+
+      range.setEndDate(new Date(2026, 6, 25))
+
+      expect([range.getStartDate(), range.getEndDate()]).toEqual([new Date(2026, 6, 10), new Date(2026, 6, 25)])
+    })
+
+    it('should leave the other end, its typed draft and its focus alone in setStartDate and setEndDate', () => {
+      const range = build()
+      const [startDay] = fields()[0].querySelectorAll('.form-date-time-section')
+
+      startDay.focus()
+      startDay.dispatchEvent(new KeyboardEvent('keydown', { key: '1', bubbles: true, cancelable: true }))
+      range.setEndDate(new Date(2026, 6, 25))
+
+      expect(fields()[0].querySelector('.form-date-time-section')).toBe(startDay)
+      expect(startDay.getAttribute('aria-valuenow')).toBe('1')
+      expect(document.activeElement).toBe(startDay)
+
+      const [endDay] = fields()[1].querySelectorAll('.form-date-time-section')
+
+      endDay.focus()
+      range.setStartDate(new Date(2026, 6, 10))
+
+      expect(fields()[1].querySelector('.form-date-time-section')).toBe(endDay)
+      expect(document.activeElement).toBe(endDay)
+    })
+
     it('should fire each change once when a range event listener sets another range', () => {
       const range = build({ endDate: new Date(2026, 6, 10), startDate: new Date(2026, 6, 1) })
       const seen = []
@@ -323,7 +356,7 @@ describe('DateRangeInput', () => {
       const seen = []
       root().addEventListener('endDateChange.coreui.date-range-input', event => seen.push(event))
 
-      range._endInput.setConfig({ date: new Date(2026, 6, 20) })
+      range._endInput.setDate(new Date(2026, 6, 20))
 
       expect(range.getEndDate()).toEqual(new Date(2026, 6, 20))
       expect(range.getStartDate()).toEqual(new Date(2026, 6, 14))
@@ -350,7 +383,7 @@ describe('DateRangeInput', () => {
       expect(() => range.setRange(undefined, null)).toThrowError(TypeError)
 
       range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
-      range._endInput.setConfig({ date: new Date(2026, 6, 21) })
+      range._endInput.setDate(new Date(2026, 6, 21))
 
       expect(seen).toEqual([
         ['startDateChange', new Date(2026, 6, 14)],
@@ -383,7 +416,7 @@ describe('DateRangeInput', () => {
       expect(() => range.setRange(new Date(2026, 6, 14))).toThrowError(TypeError)
       expect(hiddenInputs().map(input => input.value)).toEqual(['', ''])
 
-      range._endInput.setConfig({ date: new Date(2026, 6, 20) })
+      range._endInput.setDate(new Date(2026, 6, 20))
 
       expect(range.getStartDate()).toBeNull()
       expect(seen).toEqual([['endDateChange', new Date(2026, 6, 20)]])
@@ -598,7 +631,7 @@ describe('DateRangeInput', () => {
 
       expect(fields().some(field => field.classList.contains('is-invalid'))).toBeFalse()
 
-      range.setConfig({ validationState: 'invalid' })
+      range.setValidationState('invalid')
       typeIn(fields()[0])
 
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
@@ -625,25 +658,27 @@ describe('DateRangeInput', () => {
       expect(() => range.dispose()).not.toThrow()
     })
 
-    it('should change the state through setConfig without rebuilding, leave the other options as they are, and drop the class the markup carried', () => {
+    it('should change the state through setValidationState without rebuilding, leave the other options as they are, and drop the class the markup carried', () => {
       const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" class="is-invalid"></div></form>')
       const [day] = root().querySelectorAll('.form-date-time-section')
 
-      range.setConfig({ format: 'yyyy-MM-dd', validationState: 'valid' })
+      range.setValidationState('valid')
 
       expect(root().querySelector('.form-date-time-section')).toBe(day)
       expect(range._config.format).toEqual('dd.MM.yyyy')
       expect(root().classList.contains('is-valid')).toBeTrue()
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
 
-      range.setConfig({ validationState: null })
+      range.setValidationState(null)
 
       expect(root().classList.contains('is-valid')).toBeFalse()
       expect(root().classList.contains('is-invalid')).toBeFalse()
+    })
 
-      range.setConfig({ format: 'yyyy-MM-dd' })
+    it('should not expose setConfig', () => {
+      const range = build()
 
-      expect(range._config.format).toEqual('dd.MM.yyyy')
+      expect(typeof range.setConfig).toEqual('undefined')
     })
 
     it('should drop the given state through a native form reset', async () => {
@@ -670,7 +705,7 @@ describe('DateRangeInput', () => {
       instances.push(range)
 
       fixtureEl.querySelector('form').reset()
-      range.setConfig({ validationState: 'invalid' })
+      range.setValidationState('invalid')
       await new Promise(resolve => {
         setTimeout(resolve, 20)
       })

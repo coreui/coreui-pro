@@ -60,17 +60,6 @@ describe('DateInput', () => {
         .toEqual([['from', '15.01.2026']])
     })
 
-    it('should submit under a name given by setConfig', () => {
-      fixtureEl.innerHTML = '<form id="form"><div class="date-input" id="start"></div></form>'
-      const dateInputEl = fixtureEl.querySelector('.date-input')
-      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
-
-      dateInput.setConfig({ name: 'later' })
-
-      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
-        .toEqual([['later', '15.01.2026']])
-    })
-
     it('should submit no date while the field rejects it, as getDate does', () => {
       fixtureEl.innerHTML = '<form id="form"><div class="date-input"></div></form>'
       const dateInputEl = fixtureEl.querySelector('.date-input')
@@ -81,7 +70,9 @@ describe('DateInput', () => {
       expect(dateInput.getDate()).toBeNull()
       expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['from', '']])
 
-      dateInput.setConfig({ maxDate: null })
+      dateInput.dispose()
+      // eslint-disable-next-line no-new
+      new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy', name: 'from' })
 
       expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['from', '15.01.2026']])
     })
@@ -115,17 +106,14 @@ describe('DateInput', () => {
     })
 
     it('should make a required empty field, and a required field holding a rejected date, block the form', () => {
-      const { dateInput, form } = mountForm({ required: true })
+      const { dateInput, form } = mountForm({ maxDate: new Date(2026, 0, 10), required: true })
 
       expect(form.checkValidity()).toBeFalse()
 
-      dateInput.setConfig({ date: new Date(2026, 0, 15), maxDate: new Date(2026, 0, 10) })
+      dateInput.setDate(new Date(2026, 0, 15))
 
       expect(form.checkValidity()).toBeFalse()
-
-      dateInput.setConfig({ maxDate: null })
-
-      expect(form.checkValidity()).toBeTrue()
+      expect(mountForm({ date: new Date(2026, 0, 15), required: true }).form.checkValidity()).toBeTrue()
     })
 
     it('should leave a read-only or disabled field out of the form validation', () => {
@@ -139,7 +127,7 @@ describe('DateInput', () => {
     it('should hand the focus the browser gives the value field to the first empty section', () => {
       const { dateInput } = mountForm({ date: new Date(2026, 0, 15) })
 
-      dateInput.setConfig({ date: null })
+      dateInput.setDate(null)
       fixtureEl.querySelector('.form-date-time > textarea').focus()
 
       expect(document.activeElement).toEqual(fixtureEl.querySelector('.form-date-time-section'))
@@ -171,14 +159,13 @@ describe('DateInput', () => {
     })
 
     it('should judge the date a reset restores under the current limits when a submit follows it in the same task', () => {
-      const { dateInput, form } = mountForm({ date: new Date(2026, 0, 15), required: true })
+      const { dateInput, form } = mountForm({ date: new Date(2026, 0, 15), maxDate: new Date(2026, 0, 10), required: true })
       let submitted = false
       form.addEventListener('submit', event => {
         submitted = true
         event.preventDefault()
       })
 
-      dateInput.setConfig({ maxDate: new Date(2026, 0, 10) })
       dateInput.clear()
       form.reset()
       form.requestSubmit()
@@ -213,7 +200,7 @@ describe('DateInput', () => {
       fixtureEl.addEventListener('change', listener)
 
       const { dateInput } = mountForm({ date: new Date(2026, 0, 15) })
-      dateInput.setConfig({ locale: 'en-US' })
+      dateInput.setDate(new Date(2026, 0, 15))
 
       fixtureEl.removeEventListener('input', listener)
       fixtureEl.removeEventListener('change', listener)
@@ -235,12 +222,8 @@ describe('DateInput', () => {
       expect(document.activeElement).toEqual(month)
     })
 
-    it('should make an incomplete required field block the form, and a field that stops being read-only', () => {
-      const { dateInput, form } = mountForm({ required: true, readonly: true })
-
-      expect(form.checkValidity()).toBeTrue()
-
-      dateInput.setConfig({ readonly: false })
+    it('should make an incomplete required field block the form', () => {
+      const { form } = mountForm({ required: true })
       const [day] = fixtureEl.querySelectorAll('.form-date-time-section')
       day.focus()
       pressKey(day, '1')
@@ -630,10 +613,6 @@ describe('DateInput', () => {
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { ariaLabel: 'Appointment', format: 'dd.MM.yyyy' })
 
       expect(dateInput._element.getAttribute('aria-label')).toEqual('Birth date')
-
-      dateInput.setConfig({ ariaLabel: 'Meeting' })
-
-      expect(dateInput._element.getAttribute('aria-label')).toEqual('Birth date')
     })
 
     it('should leave a label the page rewrites after init, also once disposed', () => {
@@ -642,7 +621,7 @@ describe('DateInput', () => {
       const dateInput = new DateInput(element, { format: 'dd.MM.yyyy' })
 
       element.setAttribute('aria-label', 'Geburtsdatum')
-      dateInput.setConfig({ date: new Date(2026, 6, 14) })
+      dateInput.setDate(new Date(2026, 6, 14))
 
       expect(element.getAttribute('aria-label')).toEqual('Geburtsdatum')
 
@@ -695,7 +674,7 @@ describe('DateInput', () => {
       const element = fixtureEl.querySelector('div')
       const dateInput = new DateInput(element, { format: 'dd.MM.yyyy' })
 
-      dateInput.setConfig({ date: new Date(2026, 6, 14) })
+      dateInput.setDate(new Date(2026, 6, 14))
 
       expect(element.getAttribute('aria-labelledby')).toEqual('birth-label')
 
@@ -1734,7 +1713,7 @@ describe('DateInput', () => {
       expect(field.validationMessage).toEqual('Already booked.')
 
       for (const state of ['valid', 'warning', undefined]) {
-        dateInput.setConfig({ validationState: state })
+        dateInput.setValidationState(state)
 
         expect(form.checkValidity()).toBeTrue()
       }
@@ -1762,8 +1741,8 @@ describe('DateInput', () => {
       const field = fixtureEl.querySelector('.form-date-time > textarea')
 
       field.setCustomValidity('Taken.')
-      dateInput.setConfig({ validationState: 'invalid' })
-      dateInput.setConfig({ validationState: undefined })
+      dateInput.setValidationState('invalid')
+      dateInput.setValidationState(undefined)
 
       expect(field.validationMessage).toEqual('Taken.')
     })
@@ -1776,7 +1755,7 @@ describe('DateInput', () => {
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
 
-      dateInput.setConfig({ validationState: 'valid' })
+      dateInput.setValidationState('valid')
 
       expect(dateInput._element.classList.contains('is-valid')).toBeTrue()
       expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
@@ -1797,10 +1776,11 @@ describe('DateInput', () => {
       fixtureEl.innerHTML = '<div class="is-invalid"></div>'
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
 
-      dateInput.setConfig({ date: new Date(2026, 6, 15) })
+      dateInput.setDate(new Date(2026, 6, 15))
       dateInput.clear()
       dateInput.reset()
-      dateInput.setConfig({ locale: 'en-US' })
+      dateInput.disable()
+      dateInput.enable()
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
     })
@@ -1876,23 +1856,24 @@ describe('DateInput', () => {
     })
 
     it('should not block with a given invalid state while the field is read-only or disabled, and stop blocking once the state goes', () => {
-      fixtureEl.innerHTML = '<form><div></div></form>'
-      const form = fixtureEl.querySelector('form')
-      const dateInput = new DateInput(fixtureEl.querySelector('form > div'), {
-        date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', readonly: true, validationState: 'invalid'
-      })
+      fixtureEl.innerHTML = '<form id="readonly"><div></div></form><form id="editable"><div></div></form>'
+      const [readonlyForm, editableForm] = fixtureEl.querySelectorAll('form')
+      const config = { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', validationState: 'invalid' }
+      const readonlyInput = new DateInput(readonlyForm.querySelector('div'), { ...config, readonly: true })
+      const dateInput = new DateInput(editableForm.querySelector('div'), config)
 
-      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
-      expect(form.checkValidity()).toBeTrue()
+      expect(readonlyInput._element.classList.contains('is-invalid')).toBeTrue()
+      expect(readonlyForm.checkValidity()).toBeTrue()
+      expect(editableForm.checkValidity()).toBeFalse()
 
-      dateInput.setConfig({ readonly: false })
+      dateInput.disable()
 
-      expect(form.checkValidity()).toBeFalse()
+      expect(editableForm.checkValidity()).toBeTrue()
 
-      dateInput.setConfig({ disabled: true })
-      dateInput.setConfig({ disabled: false, validationState: null })
+      dateInput.enable()
+      dateInput.setValidationState(null)
 
-      expect(form.checkValidity()).toBeTrue()
+      expect(editableForm.checkValidity()).toBeTrue()
     })
 
     it('should settle a given state set while a fieldset around it is disabled, as an async submit does', () => {
@@ -1903,8 +1884,8 @@ describe('DateInput', () => {
       const blocked = new DateInput(fixtureEl.querySelector('#blocked'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
 
       fieldset.disabled = true
-      cleared.setConfig({ validationState: null })
-      blocked.setConfig({ validationState: 'invalid' })
+      cleared.setValidationState(null)
+      blocked.setValidationState('invalid')
       fieldset.disabled = false
 
       expect(cleared._element.querySelector('textarea').validity.valid).toBeTrue()
@@ -1916,7 +1897,7 @@ describe('DateInput', () => {
       fixtureEl.innerHTML = '<div class="is-warning"></div>'
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', validationState: 'warning' })
 
-      dateInput.setConfig({ validationState: null })
+      dateInput.setValidationState(null)
 
       expect(dateInput._element.classList.contains('is-warning')).toBeTrue()
     })
@@ -1953,7 +1934,7 @@ describe('DateInput', () => {
         document.addEventListener(type, event => seen.push(event.target.validity.valid), { capture: true, once: true })
       }
 
-      element.addEventListener('dateChange.coreui.date-input', () => dateInput.setConfig({ validationState: 'warning' }))
+      element.addEventListener('dateChange.coreui.date-input', () => dateInput.setValidationState('warning'))
       getSections(element)[0].focus()
       pressKey(getSections(element)[0], 'ArrowUp')
 
@@ -1974,18 +1955,18 @@ describe('DateInput', () => {
       expect(element.classList.contains('my-own')).toBeTrue()
     })
 
-    it('should change the state through setConfig without rebuilding the field, and drop the class the markup carried', () => {
+    it('should change the state through setValidationState without rebuilding the field, and drop the class the markup carried', () => {
       fixtureEl.innerHTML = '<div class="is-invalid"></div>'
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
       const [day] = getSections(dateInput._element)
 
-      dateInput.setConfig({ validationState: 'valid' })
+      dateInput.setValidationState('valid')
 
       expect(getSections(dateInput._element)[0]).toBe(day)
       expect(dateInput._element.classList.contains('is-valid')).toBeTrue()
       expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
 
-      dateInput.setConfig({ validationState: undefined })
+      dateInput.setValidationState(undefined)
 
       expect([...dateInput._element.classList].filter(name => name.startsWith('is-'))).toEqual([])
     })
@@ -1999,17 +1980,13 @@ describe('DateInput', () => {
       expect(field.matches(':user-invalid')).toBeTrue()
 
       field.setCustomValidity('Pick a weekday.')
-      dateInput.setConfig({ locale: 'en-US', minDate: new Date(2026, 0, 1) })
+      dateInput.disable()
+      dateInput.enable()
 
       expect(dateInput._element.querySelector('textarea')).toBe(field)
       expect(field.matches(':user-invalid')).toBeTrue()
       expect(field.validationMessage).toEqual('Pick a weekday.')
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
-
-      dateInput.setConfig({ name: 'when' })
-      dateInput.setConfig({ name: null })
-
-      expect(field.hasAttribute('name')).toBeFalse()
     })
 
     it('should drop a given state on a native form reset', async () => {
@@ -2032,11 +2009,11 @@ describe('DateInput', () => {
       const dateInput = new DateInput(fixtureEl.querySelector('form > div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
 
       if (inListener) {
-        form.addEventListener('reset', () => dateInput.setConfig({ validationState: 'invalid' }))
+        form.addEventListener('reset', () => dateInput.setValidationState('invalid'))
         form.reset()
       } else {
         form.reset()
-        dateInput.setConfig({ validationState: 'invalid' })
+        dateInput.setValidationState('invalid')
       }
 
       await new Promise(resolve => {
@@ -2100,7 +2077,7 @@ describe('DateInput', () => {
       expect(invalid()).toEqual(['true', 'true', 'true'])
       expect(dateInput._element.hasAttribute('aria-invalid')).toBeFalse()
 
-      dateInput.setConfig({ date: new Date(2026, 6, 10) })
+      dateInput.setDate(new Date(2026, 6, 10))
 
       expect(invalid()).toEqual([null, null, null])
     })
@@ -2121,7 +2098,7 @@ describe('DateInput', () => {
 
       expect(invalid()).toEqual(['grammar', null, null, null])
 
-      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+      dateInput.setDate(new Date(2026, 6, 20))
 
       expect(invalid()).toEqual(['grammar', 'true', 'true', 'true'])
 
@@ -2180,11 +2157,11 @@ describe('DateInput', () => {
 
       expect(describedBy()).toEqual(['help', null, null])
 
-      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+      dateInput.setDate(new Date(2026, 6, 20))
 
       expect(describedBy()).toEqual(['help', 'help', 'help'])
 
-      dateInput.setConfig({ date: new Date(2026, 6, 10) })
+      dateInput.setDate(new Date(2026, 6, 10))
 
       expect(describedBy()).toEqual(['help', null, null])
     })
@@ -2217,11 +2194,11 @@ describe('DateInput', () => {
 
       expect(describedBy()).toEqual(['help', null, null])
 
-      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+      dateInput.setDate(new Date(2026, 6, 20))
 
       expect(describedBy()).toEqual(Array.from({ length: 3 }, () => `help ${feedback.id}`))
 
-      dateInput.setConfig({ date: new Date(2026, 6, 10) })
+      dateInput.setDate(new Date(2026, 6, 10))
 
       expect(describedBy()).toEqual(['help', null, null])
     })
@@ -2238,7 +2215,7 @@ describe('DateInput', () => {
           element.insertAdjacentHTML('afterend', '<div id="late" class="invalid-feedback">Too late</div>')
         }
       })
-      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+      dateInput.setDate(new Date(2026, 6, 20))
 
       expect([...getSections(element)].map(section => section.getAttribute('aria-describedby'))).toEqual(['late', 'late', 'late'])
     })
@@ -2254,7 +2231,7 @@ describe('DateInput', () => {
         fixtureEl.querySelector('#early').hidden = event.error !== 'minDate'
         fixtureEl.querySelector('#late').hidden = event.error !== 'maxDate'
       })
-      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+      dateInput.setDate(new Date(2026, 6, 20))
 
       expect([...getSections(element)].map(section => section.getAttribute('aria-describedby'))).toEqual(['late', 'late', 'late'])
     })
@@ -2284,10 +2261,6 @@ describe('DateInput', () => {
 
       expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-required'))).toEqual(['true', 'true', 'true'])
       expect(dateInput._element.hasAttribute('aria-required')).toBeFalse()
-
-      dateInput.setConfig({ required: false })
-
-      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-required'))).toEqual([null, null, null])
     })
 
     it('should mark a filled field as valid on submit of a form opted into valid styling', () => {
@@ -2303,7 +2276,7 @@ describe('DateInput', () => {
       const dateInput = createInForm({ required: true, date: new Date(2026, 6, 14) }, 'data-coreui-validate="valid"')
 
       fixtureEl.querySelector('form').requestSubmit()
-      dateInput.setConfig({ date: new Date(2026, 6, 15) })
+      dateInput.setDate(new Date(2026, 6, 15))
 
       expect(dateInput._element.classList.contains('is-valid')).toBeTrue()
     })
@@ -2407,7 +2380,7 @@ describe('DateInput', () => {
       expect(spy).toHaveBeenCalledTimes(3)
     })
 
-    it('should report the date before the error it changes, from the keyboard and from setConfig', () => {
+    it('should report the date before the error it changes, from the keyboard and from setDate', () => {
       const max = new Date(2026, 6, 14)
       const dateInput = createDateInput({ date: max, maxDate: max })
       const [day] = getSections(dateInput._element)
@@ -2418,7 +2391,7 @@ describe('DateInput', () => {
       day.focus()
       pressKey(day, 'ArrowUp')
       pressKey(day, 'ArrowDown')
-      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+      dateInput.setDate(new Date(2026, 6, 20))
 
       expect(log).toEqual(['date:null', 'error:maxDate', 'date:14', 'error:null', 'date:null', 'error:maxDate'])
     })
@@ -2430,7 +2403,7 @@ describe('DateInput', () => {
 
       dateInput._element.addEventListener('errorChange.coreui.date-input', event => {
         if (event.error === 'maxDate') {
-          dateInput.setConfig({ date: max })
+          dateInput.setDate(max)
         }
       })
       day.focus()
@@ -2452,7 +2425,7 @@ describe('DateInput', () => {
         log.push(`date:${event.date}`)
 
         if (event.date === null) {
-          dateInput.setConfig({ date: new Date(2026, 6, 20) })
+          dateInput.setDate(new Date(2026, 6, 20))
         }
       })
       day.focus()
@@ -2470,7 +2443,7 @@ describe('DateInput', () => {
 
       dateInput._element.addEventListener('dateChange.coreui.date-input', event => dates.push(event.date.getDate()))
       dateInput._element.querySelector('textarea').addEventListener('input', () => {
-        dateInput.setConfig({ date: new Date(2026, 6, 3) })
+        dateInput.setDate(new Date(2026, 6, 3))
       }, { once: true })
       day.focus()
       pressKey(day, 'ArrowUp')
@@ -2555,7 +2528,7 @@ describe('DateInput', () => {
       dateInput._element.addEventListener('dateChange.coreui.date-input', changeSpy)
       dateInput._element.addEventListener('errorChange.coreui.date-input', errorSpy)
 
-      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+      dateInput.setDate(new Date(2026, 6, 20))
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
       expect(dateInput.getDate()).toBeNull()
@@ -2571,7 +2544,7 @@ describe('DateInput', () => {
       const changeSpy = jasmine.createSpy('dateChange')
       dateInput._element.addEventListener('dateChange.coreui.date-input', changeSpy)
 
-      dateInput.setConfig({ date: new Date(2026, 6, 10) })
+      dateInput.setDate(new Date(2026, 6, 10))
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 10))
@@ -2703,7 +2676,7 @@ describe('DateInput', () => {
     it('should restore the initial date, not the last one set through update()', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
 
-      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+      dateInput.setDate(new Date(2026, 6, 20))
       dateInput.reset()
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
@@ -2816,7 +2789,7 @@ describe('DateInput', () => {
       const form = fixtureEl.querySelector('form')
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', date: new Date(2026, 6, 14), maxDate: new Date(2026, 6, 31) })
 
-      dateInput.setConfig({ date: new Date(2026, 7, 20) })
+      dateInput.setDate(new Date(2026, 7, 20))
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
 
@@ -2902,18 +2875,18 @@ describe('DateInput', () => {
     })
   })
 
-  describe('setConfig', () => {
-    it('should rebuild the component with the new config', () => {
-      const dateInput = createDateInput()
+  describe('setters', () => {
+    it('should show a date given to setDate in the format the field was built with', () => {
+      const dateInput = createDateInput({ format: 'yyyy-MM-dd' })
 
-      dateInput.setConfig({ format: 'yyyy-MM-dd', date: new Date(2026, 6, 14) })
+      dateInput.setDate(new Date(2026, 6, 14))
 
       const [year] = getSections(dateInput._element)
       expect(year.getAttribute('aria-label')).toEqual('Year')
       expect(dateInput._element.querySelector('.form-date-time > textarea').value).toEqual('2026-07-14')
     })
 
-    it('should keep the date the user typed when the new config sets none', () => {
+    it('should keep the date the user typed through disable() and enable()', () => {
       const dateInput = createDateInput({ locale: 'pl-PL' })
       const onChange = vi.fn()
 
@@ -2923,8 +2896,8 @@ describe('DateInput', () => {
       }
 
       dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
-      dateInput.setConfig({ minDate: new Date(2026, 6, 1) })
-      dateInput.setConfig({ format: null, locale: 'en-GB' })
+      dateInput.disable()
+      dateInput.enable()
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
       expect([...getSections(dateInput._element)].map(section => section.textContent)).toEqual(['14', '07', '2026'])
@@ -2938,33 +2911,13 @@ describe('DateInput', () => {
       day.focus()
       pressKey(day, '1')
       pressKey(day, '4')
-      dateInput.setConfig({ maxDate: new Date(2026, 11, 31) })
+      dateInput.disable()
+      dateInput.enable()
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
     })
 
-    it('should take a typed date its new limits accept', () => {
-      const dateInput = createDateInput({ maxDate: new Date(2026, 6, 10) })
-
-      getSections(dateInput._element)[0].focus()
-      for (const digit of '14072026') {
-        pressKey(document.activeElement, digit)
-      }
-
-      expect(dateInput.getDate()).toBeNull()
-
-      const onChange = vi.fn()
-
-      document.activeElement.blur()
-      dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
-      dateInput.setConfig({ maxDate: new Date(2026, 6, 31) })
-
-      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
-      expect(onChange).toHaveBeenCalledOnce()
-      expect(onChange.mock.calls[0][0].date).toEqual(new Date(2026, 6, 14))
-    })
-
-    it('should keep a partly typed date when the sections stay the same', () => {
+    it('should keep a partly typed date through disable() and enable()', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 1) })
       const [day] = getSections(dateInput._element)
       const onChange = vi.fn()
@@ -2972,31 +2925,10 @@ describe('DateInput', () => {
       day.focus()
       pressKey(day, 'Backspace')
       dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
-      dateInput.setConfig({ maxDate: new Date(2026, 11, 31) })
+      dateInput.disable()
+      dateInput.enable()
 
       expect([...getSections(dateInput._element)].map(section => section.textContent)).toEqual(['DD', '07', '2026'])
-      expect(onChange).not.toHaveBeenCalled()
-    })
-
-    it('should clear a partly typed date when the sections change', () => {
-      const dateInput = createDateInput({ date: new Date(2026, 6, 1) })
-      const [day] = getSections(dateInput._element)
-
-      day.focus()
-      pressKey(day, 'Backspace')
-      dateInput.setConfig({ format: 'yyyy-MM-dd' })
-
-      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-valuenow'))).toEqual([null, null, null])
-    })
-
-    it('should rebuild from the date it shows when the sections change', () => {
-      const dateInput = createDateInput({ date: new Date(2026, 6, 14, 9, 30) })
-      const onChange = vi.fn()
-
-      dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
-      dateInput.setConfig({ format: 'dd.MM.yyyy HH:mm' })
-
-      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
       expect(onChange).not.toHaveBeenCalled()
     })
 
@@ -3007,7 +2939,8 @@ describe('DateInput', () => {
       day.focus()
       pressKey(day, '1')
       pressKey(day, '4')
-      dateInput.setConfig({ maxDate: new Date(2026, 11, 31) })
+      dateInput.disable()
+      dateInput.enable()
       dateInput.reset()
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 1))
@@ -3020,9 +2953,30 @@ describe('DateInput', () => {
       day.focus()
       pressKey(day, '1')
       pressKey(day, '4')
-      dateInput.setConfig({ date: new Date(2026, 7, 20) })
+      dateInput.setDate(new Date(2026, 7, 20))
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 7, 20))
+    })
+
+    it('should disable and enable the field, keeping its date', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+
+      dateInput.disable()
+
+      expect(dateInput._element.classList.contains('disabled')).toBeTrue()
+      expect(dateInput._element.querySelector('textarea').disabled).toBeTrue()
+
+      dateInput.enable()
+
+      expect(dateInput._element.classList.contains('disabled')).toBeFalse()
+      expect(dateInput._element.querySelector('textarea').disabled).toBeFalse()
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should not expose setConfig', () => {
+      const dateInput = createDateInput()
+
+      expect(typeof dateInput.setConfig).toEqual('undefined')
     })
   })
 
@@ -3060,11 +3014,11 @@ describe('DateInput', () => {
       jQueryMock.elements = [div]
 
       const instance = DateInput.getOrCreateInstance(div)
-      const spy = spyOn(instance, 'setConfig')
+      const spy = spyOn(instance, 'setValidationState')
 
-      jQueryMock.fn.dateInput.call(jQueryMock, 'setConfig', { disabled: true })
+      jQueryMock.fn.dateInput.call(jQueryMock, 'setValidationState', 'invalid')
 
-      expect(spy).toHaveBeenCalledWith({ disabled: true })
+      expect(spy).toHaveBeenCalledWith('invalid')
       instance.dispose()
     })
   })
@@ -3188,9 +3142,11 @@ describe('DateInput', () => {
 
       expect(dateInput._element.getAttribute("aria-label")).toEqual("Date and time input")
 
-      dateInput.setConfig({ type: "date" })
+      dateInput.dispose()
+      // eslint-disable-next-line no-new
+      new DateInput(fixtureEl.querySelector("div"), { format: "dd.MM.yyyy", type: "date" })
 
-      expect(dateInput._element.getAttribute("aria-label")).toEqual("Date input")
+      expect(fixtureEl.querySelector("div").getAttribute("aria-label")).toEqual("Date input")
     })
 
     it("should keep a label the page wrote", () => {
@@ -3205,9 +3161,11 @@ describe('DateInput', () => {
 
       expect(dateInput._element.getAttribute("aria-label")).toEqual("Appointment")
 
-      dateInput.setConfig({ type: "date" })
+      dateInput.dispose()
+      // eslint-disable-next-line no-new
+      new DateInput(fixtureEl.querySelector("div"), { format: "dd.MM.yyyy", type: "date" })
 
-      expect(dateInput._element.getAttribute("aria-label")).toEqual("Appointment")
+      expect(fixtureEl.querySelector("div").getAttribute("aria-label")).toEqual("Appointment")
     })
   })
 

@@ -12,6 +12,7 @@ import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
 import FieldValidation from './util/field-validation.js'
 import { createControlGroupAction } from './util/form-control-group.js'
+import { type ValidationState } from './util/form-validation.js'
 import { getUID } from './util/index.js'
 import Popup from './util/popup.js'
 import { sanitizeByConfig } from './util/sanitizer.js'
@@ -27,8 +28,6 @@ const SELECTOR_ACTION = '[data-coreui-picker-action]'
 const SELECTOR_SECTION = '[data-coreui-section]'
 const SELECTOR_SVG = 'svg'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
-
-const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 /**
  * Class definition
@@ -61,6 +60,7 @@ abstract class PickerBase extends BaseComponent {
     })
   }
 
+  // Getters
   // Public
   show(): void {
     this._popup.show()
@@ -74,15 +74,8 @@ abstract class PickerBase extends BaseComponent {
     return this._popup.isShown ? this.hide() : this.show()
   }
 
-  setConfig(config: ComponentConfig | null): void {
-    const validation = Object.fromEntries(Object.entries(config ?? {}).filter(([key]) => VALIDATION_OPTIONS.has(key)))
-
-    if (Object.keys(validation).length === 0) {
-      return
-    }
-
-    this._config = this._getConfig({ ...this._config, ...validation })
-    this._validation.configure(validation)
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ invalid: false, valid: false, validationState })
   }
 
   override dispose(): void {
@@ -103,6 +96,15 @@ abstract class PickerBase extends BaseComponent {
   }
 
   // Private
+  _setConfig(config: ComponentConfig | null): void {
+    if (!config || Object.keys(config).length === 0) {
+      return
+    }
+
+    this._config = this._getConfig({ ...this._config, ...config })
+    this._validation.configure(config)
+  }
+
   _createPopup(): void {
     this._popup = new Popup({
       anchor: this._popupAnchor(),

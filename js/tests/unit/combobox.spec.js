@@ -760,15 +760,20 @@ describe('Combobox', () => {
       expect(toggle.classList.contains('is-invalid')).toBeTrue()
       expect(toggle.classList.contains('is-valid')).toBeFalse()
 
-      combobox.setConfig({ validationState: 'valid', placeholder: 'Other' })
+      combobox.setValidationState('valid')
 
       expect(toggle.classList.contains('is-valid')).toBeTrue()
-      expect(combobox._config.placeholder).toBe('')
 
-      combobox.setConfig({ invalid: true, validationState: null })
+      combobox.setValidationState(null)
 
       expect(toggle.classList.contains('is-valid')).toBeFalse()
       expect(toggle.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should not expose setConfig', () => {
+      const combobox = new Combobox(setMarkupInForm())
+
+      expect(typeof combobox.setConfig).toEqual('undefined')
     })
 
     it('should drop a given state through a pick in the list, and keep it through changes from code and a pick that changes nothing', () => {
@@ -834,7 +839,7 @@ describe('Combobox', () => {
       form.addEventListener('input', event => events.push(['input', event.target.value]))
       form.addEventListener('change', event => {
         events.push(['change', event.target.value])
-        combobox.setConfig({ validationState: 'invalid' })
+        combobox.setValidationState('invalid')
       })
       pick(combobox, 'ca')
 
@@ -859,7 +864,7 @@ describe('Combobox', () => {
       const combobox = new Combobox(toggle, { multiple: true, validationState: 'invalid' })
 
       pick(combobox, 'ca')
-      combobox.setConfig({ validationState: 'invalid' })
+      combobox.setValidationState('invalid')
       combobox.setItems([{ value: 'us', label: 'United States', selected: true }])
 
       expect(combobox.getValue()).toEqual(['ca', 'us'])
@@ -875,7 +880,7 @@ describe('Combobox', () => {
         seen.push(combobox._valueField.validity.valid)
 
         if (seen.length === 1) {
-          combobox.setConfig({ validationState: 'invalid' })
+          combobox.setValidationState('invalid')
           combobox.setValue(['us', 'uk'])
         }
       })
@@ -962,7 +967,7 @@ describe('Combobox', () => {
       const combobox = new Combobox(toggle, { name: 'country', value: 'us' })
       const form = fixtureEl.querySelector('form')
       const changes = []
-      const giveState = () => combobox.setConfig({ validationState: 'invalid' })
+      const giveState = () => combobox.setValidationState('invalid')
 
       pick(combobox, 'ca')
       toggle.addEventListener('change.coreui.combobox', event => changes.push(event.value))

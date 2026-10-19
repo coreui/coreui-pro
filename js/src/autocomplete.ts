@@ -327,31 +327,28 @@ class Autocomplete extends ComboboxBase {
     })
   }
 
-  setConfig(config: Partial<AutocompleteConfig> | null): void {
-    this._config = this._getConfig({ ...this._config, ...config })
-
-    if (this._validation.configure(config)) {
-      return
+  disable(): void {
+    if (!this._config.disabled) {
+      this._setConfig({ disabled: true })
     }
+  }
 
-    this._options = this._getOptionsFromConfig()
-    this._setListBoxItems()
-    this._syncInputName()
-
-    if (config?.value !== undefined) {
-      this._valueApplied = false
-      this.deselectAll()
-      this._setText('')
-    }
-
-    this._seedSelection()
-    this._applyState()
-
+  enable(): void {
     if (this._config.disabled) {
-      this.hide()
+      this._setConfig({ disabled: false })
     }
+  }
 
-    this._validation.update()
+  setOptions(options: AutocompleteConfig['options']): void {
+    this._setConfig({ options })
+  }
+
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ invalid: false, valid: false, validationState })
+  }
+
+  setValue(value: AutocompleteConfig['value']): void {
+    this._setConfig({ value })
   }
 
   deselectAll(options: any[] = this._selectedOptions()): void {
@@ -387,6 +384,31 @@ class Autocomplete extends ComboboxBase {
   }
 
   // Private
+  _setConfig(config: Partial<AutocompleteConfig> | null): void {
+    this._config = this._getConfig({ ...this._config, ...config })
+
+    if (this._validation.configure(config)) {
+      return
+    }
+
+    this._options = this._getOptionsFromConfig()
+    this._setListBoxItems()
+
+    if (config?.value !== undefined) {
+      this._valueApplied = false
+      this.deselectAll()
+      this._setText('')
+    }
+
+    this._seedSelection()
+    this._applyState()
+
+    if (this._config.disabled) {
+      this.hide()
+    }
+
+    this._validation.update()
+  }
 
   _addEventListeners(): void {
     EventHandler.on(this._element, EVENT_CLICK, (event: any) => {

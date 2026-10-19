@@ -319,15 +319,16 @@ class Calendar extends BaseComponent {
   }
 
   // Public
-  setConfig(config?: Partial<CalendarConfig> | null): void {
-    this._config = this._getConfig({ ...this._config, ...config })
-    this._initializeDates(Object.keys(config ?? {}))
+  setCalendarDate(calendarDate: CalendarConfig['calendarDate']): void {
+    this._setConfig({ calendarDate })
+  }
 
-    if (!config || 'selectionType' in config) {
-      this._initializeView()
-    }
+  setEndDate(endDate: CalendarConfig['endDate']): void {
+    this._setConfig({ endDate })
+  }
 
-    this._updateCalendar()
+  setStartDate(startDate: CalendarConfig['startDate']): void {
+    this._setConfig({ startDate })
   }
 
   refresh(): void {
@@ -345,6 +346,21 @@ class Calendar extends BaseComponent {
   }
 
   // Private
+  _setConfig(config?: Partial<CalendarConfig> | null): void {
+    this._config = this._getConfig({ ...this._config, ...config })
+    this._initializeDates(Object.keys(config ?? {}))
+
+    if (!config) {
+      this._initializeView()
+    }
+
+    this._updateCalendar()
+  }
+
+  _setAnnouncements(announcements: Pick<CalendarConfig, 'ariaSelectedDateAnnouncement' | 'ariaSelectedRangeAnnouncement'>): void {
+    this._config = this._getConfig({ ...this._config, ...announcements })
+  }
+
   _focusOnFirstAvailableCell(index: number): void {
     const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index] as ParentNode
     const target = (SelectorEngine.findOne(this._rovingSelector(), panel) ??
@@ -1006,20 +1022,17 @@ class Calendar extends BaseComponent {
   }
 
   _initializeDates(keys?: string[]): void {
-    const changed = (...names: string[]) => !keys || keys.includes('selectionType') || names.some(name => keys.includes(name))
+    const changed = (...names: string[]) => !keys || names.some(name => keys.includes(name))
 
-    if (changed('minDate')) {
+    if (!keys) {
       this._minDate = convertToLimitDate(this._config.minDate, this._config.selectionType)
-    }
-
-    if (changed('maxDate')) {
       this._maxDate = convertToLimitDate(this._config.maxDate, this._config.selectionType)
     }
 
     if (changed('calendarDate', 'startDate', 'endDate')) {
-      const source = !keys || keys.includes('selectionType') ?
-        this._config.calendarDate || this._config.startDate || this._config.endDate :
-        ['calendarDate', 'startDate', 'endDate'].filter(name => keys.includes(name)).map(name => this._config[name]).find(Boolean) ?? null
+      const source = keys ?
+        ['calendarDate', 'startDate', 'endDate'].filter(name => keys.includes(name)).map(name => this._config[name]).find(Boolean) ?? null :
+        this._config.calendarDate || this._config.startDate || this._config.endDate
 
       const date = source === this._config.calendarDate ?
         convertToDateObject(source, this._config.selectionType) :

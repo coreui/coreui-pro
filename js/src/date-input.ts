@@ -322,29 +322,24 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     return normalized !== null && this._getValidationError(normalized, true) === null
   }
 
-  setConfig(config: Partial<C> | null): void {
-    if (typeof config !== 'object') {
-      return
+  disable(): void {
+    if (!this._config.disabled) {
+      this._setConfig({ disabled: true })
     }
+  }
 
-    const keys = Object.keys(config ?? {})
-    const stateOnly = keys.length === 1 && keys[0] === 'validationState'
-    const sections = this._sections
-
-    this._config = this._getConfig(stateOnly ? { ...this._config, ...config } : { ...this._config, date: getDateFromSections(sections), ...config })
-
-    if (this._validation.configure(config)) {
-      return
+  enable(): void {
+    if (this._config.disabled) {
+      this._setConfig({ disabled: false })
     }
+  }
 
-    this._applyConfig()
+  setDate(date: DateInputConfig['date']): void {
+    this._setConfig({ date })
+  }
 
-    if (config?.date === undefined && this._getLayoutKey(this._sections) === this._getLayoutKey(sections)) {
-      this._sections = sections
-    }
-
-    this._createSectionInput()
-    this._commitSections()
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
   }
 
   override dispose(): void {
@@ -366,6 +361,27 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   }
 
   // Private
+  _setConfig(config: Partial<DateInputConfig>): void {
+    const keys = Object.keys(config)
+    const stateOnly = keys.length === 1 && keys[0] === 'validationState'
+    const sections = this._sections
+
+    this._config = this._getConfig(stateOnly ? { ...this._config, ...config } : { ...this._config, date: getDateFromSections(sections), ...config })
+
+    if (this._validation.configure(config)) {
+      return
+    }
+
+    this._applyConfig()
+
+    if (config?.date === undefined) {
+      this._sections = sections
+    }
+
+    this._createSectionInput()
+    this._commitSections()
+  }
+
   _getAriaLabel(): string {
     const { type } = this._config
     const ariaLabel = this._config.ariaLabel || this.constructor.Default.ariaLabel
@@ -385,10 +401,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._maxDate = this._convertDate(maxDate)
     this._sections = setSectionsFromDate(sections, date ? this._convertDate(date) : null)
     this._draft = ''
-  }
-
-  _getLayoutKey(sections: DateSection[]): string {
-    return JSON.stringify(sections.map(section => (isEditableSection(section) ? { ...section, value: null } : section)))
   }
 
   _getValueKey(sections: DateSection[]): string {

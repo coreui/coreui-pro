@@ -243,13 +243,8 @@ class Combobox extends ComboboxBase {
     this._updateValue()
   }
 
-  setConfig(config: Partial<ComboboxConfig> | null): void {
-    if (!config || !('validationState' in config)) {
-      return
-    }
-
-    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._validation.configure({ validationState: config.validationState })
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
   }
 
   override dispose(): void {
@@ -292,6 +287,15 @@ class Combobox extends ComboboxBase {
   }
 
   // Private
+  _setConfig(config: Partial<ComboboxConfig> | null): void {
+    if (!config || !('validationState' in config)) {
+      return
+    }
+
+    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
+    this._validation.configure({ validationState: config.validationState })
+  }
+
   override _getConfig(config?: any): any {
     this._valueFromMarkup = !(config !== null && typeof config === 'object' && 'value' in config)
 

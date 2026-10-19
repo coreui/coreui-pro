@@ -175,19 +175,24 @@ class Rating extends BaseComponent {
   }
 
   // Public
-  setConfig(config: Partial<RatingConfig> | null): void {
-    this._config = this._getConfig({ ...this._config, ...config })
-    this._name = this._config.name || this._name
-
-    if (this._validation.configure(config)) {
-      return
+  disable(): void {
+    if (!this._config.disabled) {
+      this._setConfig({ disabled: true })
     }
+  }
 
-    if (config?.value !== undefined) {
-      this._currentValue = this._config.value
+  enable(): void {
+    if (this._config.disabled) {
+      this._setConfig({ disabled: false })
     }
+  }
 
-    this._createRating(this._removeRating())
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
+  }
+
+  setValue(value: RatingConfig['value']): void {
+    this._setConfig({ value })
   }
 
   reset(value: number | null = null): void {
@@ -215,6 +220,19 @@ class Rating extends BaseComponent {
   }
 
   // Private
+  _setConfig(config: Partial<RatingConfig> | null): void {
+    this._config = this._getConfig({ ...this._config, ...config })
+
+    if (this._validation.configure(config)) {
+      return
+    }
+
+    if (config?.value !== undefined) {
+      this._currentValue = this._config.value
+    }
+
+    this._createRating(this._removeRating())
+  }
 
   _radios(): HTMLInputElement[] {
     return SelectorEngine.find<HTMLInputElement>(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)

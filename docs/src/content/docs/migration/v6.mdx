@@ -165,7 +165,7 @@ const version: string = Modal.VERSION
 Each component with options also exports its config type (ContextMenu and
 Dropdown take Menu's `MenuConfig`), so an options object can be typed and
 reused, and takes it in the constructor and
-`getOrCreateInstance`, and in `setConfig` where it has one, so an option it
+`getOrCreateInstance`, so an option it
 does not know is a type error; a picker also takes the options it forwards to
 its calendar, its field and its time columns, except those it sets itself. Declarations are generated from
 the sources, not maintained by hand, and CI type-checks a consumer file against
@@ -325,7 +325,7 @@ The promise always settles — a call that does nothing (already open, a prevent
 than stranding the caller. It resolves with no value, so it tells you the call
 finished, not whether the state changed.
 
-#### Replacing options is `setConfig()`, not `update()`
+#### Live changes go through setters, not `update(config)`
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 
@@ -336,26 +336,47 @@ Range Slider, Rating and the date/time inputs it took an options object and
 replaced the configuration. Calling it the first way on a component that meant
 the second one threw a `TypeError`.
 
-Configuration replacement now has its own name on every component:
+Options are now fixed once a component starts. What can change on a live
+instance, its value, its data and its state, has a method of its own, named
+after the option it changes:
 
 ```diff
 - multiSelect.update({ options })
-+ multiSelect.setConfig({ options })
++ multiSelect.setOptions(options)
+- rating.update({ value: 2 })
++ rating.setValue(2)
+- dateInput.update({ validationState: 'invalid' })
++ dateInput.setValidationState('invalid')
+- autocomplete.update({ disabled: true })
++ autocomplete.disable()
 ```
 
-`setConfig()` is defined once, so the three ways this used to differ are gone:
+| Component | Methods |
+| --- | --- |
+| Autocomplete | `setValue()`, `setOptions()`, `setValidationState()`, `disable()`, `enable()` |
+| Calendar | `setStartDate()`, `setEndDate()`, `setCalendarDate()` |
+| Chip Input, Combobox | `setValidationState()`; Combobox keeps `setValue()` and `setItems()` |
+| Date Input, Time Input | `setDate()`, `setValidationState()`, `disable()`, `enable()` |
+| Date Range Input, Date Range Picker | `setStartDate()`, `setEndDate()`, `setRange()`, `setValidationState()` |
+| Date Picker, Time Picker | `setDate()` / `setTime()`, `setValidationState()` |
+| Multi Select | `setValue()`, `setOptions()`, `setTotal()`, `setValidationState()`, `disable()`, `enable()` |
+| OTP Input, Range Slider, Rating | `setValue()`, `setValidationState()`, `disable()`, `enable()` |
 
-- **It merges.** Options you leave out keep their current value. Rating and Range
-  Slider used to resolve the given options against the defaults, so
-  `rating.setConfig({ value: 2 })` on a rating built with `{ itemCount: 3 }` no
-  longer brings back the default five items.
-- **It type-checks.** Autocomplete and MultiSelect skipped validation on this
-  path, so `multiSelect.update({ multiple: 'yes' })` stored the string in
-  silence; the same call now throws the `TypeError` the constructor throws, and
-  the configuration is left untouched.
-- **It is reachable the same way everywhere**, including through the static and
-  jQuery dispatchers, which pass the method name and whatever follows it:
-  `coreui.Rating.ratingInterface(el, 'setConfig', { value: 2 })`.
+- **A setter takes the type of its option.** A wrong type throws the
+  `TypeError` the constructor throws, and the component is left as it was;
+  Autocomplete and MultiSelect skipped that check on `update()`.
+- **Other options are fixed.** A new format, size, label, icon, `name`,
+  `required` or `readonly` means disposing the instance and creating a new one.
+  `update()` applied some of them, such as `format` on Date Input or `size` on
+  Rating, and ignored the rest in silence on Combobox, Chip Input, Date Range
+  Input and the pickers.
+- **A setter keeps what it does not set.** `setValue()` keeps a given
+  validation state, `setValidationState()` keeps the value, and Rating and
+  Range Slider no longer fall back to the defaults: `rating.setValue(2)` on a
+  rating built with `{ itemCount: 3 }` keeps three items.
+- **The setters are reachable the same way everywhere**, including through the
+  static and jQuery dispatchers, which pass the method name and whatever
+  follows it: `coreui.Rating.ratingInterface(el, 'setValue', 2)`.
 
 `Toaster.update(id, options)` is unchanged — it rewrites one toast in the store
 rather than reconfiguring the component.
@@ -1045,8 +1066,8 @@ check, radio, carousel and toggler icons already work:
   it. Any other string throws a `TypeError`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Multi Select's `value` wins over options marked `selected`.** It used to
-  add to them, in the markup and in `options`, and a later `setConfig()` with
-  new options applied the start value again; now a given `value` is the
+  add to them, in the markup and in `options`, and later options applied the
+  start value again; now a given `value` is the
   selection, also for options that arrive later for the first time, as in the
   React and Vue editions, while options shown before keep their state. An array of numbers matches the options, and `value: ''` reads
   like an empty `data-coreui-value`.
@@ -1063,7 +1084,7 @@ check, radio, carousel and toggler icons already work:
   the panel opens or closes over an empty box.
 - **Multi Select's `dispose()` gives the native select back the options it had
   before the component started.** A select built from `options` in the config,
-  or one whose options `setConfig()` or `setOptions()` replaced, used to keep
+  or one whose options `setOptions()` replaced, used to keep
   the generated options; an empty `<select>` given `options` is empty again
   after `dispose()`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -1074,7 +1095,7 @@ check, radio, carousel and toggler icons already work:
   value and the control shows it, the way the native `change` works. An action
   that changes nothing sends no event, native ones included, and the component
   no longer sends one for each preselected option while it builds or rebuilds.
-  A selection the page gives sends none, from `setConfig()` or from a given
+  A selection the page gives sends none, from `setValue()` or from a given
   `value` that options from `setOptions()` bring later, and a native reset of
   the form that changes the selection sends one, as Autocomplete, Chip Input
   and Combobox do.
@@ -1087,17 +1108,14 @@ check, radio, carousel and toggler icons already work:
   Range no longer fires while it starts or on the `change` after an `input`.
   OTP Input and Range Slider now fire on a native form reset that changes the
   value, and Date Input sends the native `input` and `change` of its value
-  field there too. `setConfig({ value })` of OTP Input no longer fires. A form
+  field there too. `setValue()` of OTP Input does not fire. A form
   reset brings Rating and Range Slider back to the value they were created
-  with, not one a later `setConfig()` gave, and OTP Input's `reset()` puts back
+  with, not one a later `setValue()` gave, and OTP Input's `reset()` puts back
   the code it started with, as a native reset does. A stepper keeps the
   validation marks of a form reset a listener cancels. Date Input and Time Input
-  still fire from `setConfig({ date })`, their only way to set the value from
-  code.
-- **Multi Select keeps its selection through `setConfig()`** when the config
-  carries neither `options` nor `value`, fitted to a new `multiple` or
-  `selectionLimit`; with options from the config it used to fall back to the
-  options marked `selected`. A selected option that is disabled, also inside a
+  still fire from `setDate()`.
+- **Multi Select keeps its selection through `setOptions()`**; it used to fall
+  back to the options marked `selected`. A selected option that is disabled, also inside a
   disabled group, shows as a disabled chip and stays through the clear button,
   `deselectAll()` and <kbd>Backspace</kbd>; the options of a disabled group
   are disabled in the list and in the native select as well, so, like any
@@ -1151,8 +1169,7 @@ check, radio, carousel and toggler icons already work:
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **An unnamed Autocomplete stays out of the form too.** Its input took a
   generated `name` when the option was not set, so a form carried a key nobody
-  chose. It does not now, and a name given later through `setConfig()` reaches
-  the input, which it never did. The generated `id` is unaffected.
+  chose. It does not now. The generated `id` is unaffected.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Validation state comes from `validationState`.** `invalid` and `valid` are
   deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
@@ -1383,11 +1400,11 @@ removed in favour of `$translucent-opacity` and
   / `data-coreui-show-adjacent-days` attributes and the picker passthrough alike. The
   typo is fixed in the React and Vue libraries in the same release.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **`update(config)` is `setConfig(config)`**, and it merges the given options
-  over the current configuration instead of resolving them against the defaults,
-  so a partial call like `calendar.setConfig({ selectEndDate: true })` no longer
-  resets every other option (`range`, `calendars`, `locale`, …). See
-  [Replacing options is `setConfig()`, not `update()`](#replacing-options-is-setconfig-not-update).
+  **`update(config)` is gone; the dates change through `setStartDate()`,
+  `setEndDate()` and `setCalendarDate()`**, and the other options are fixed once
+  the calendar starts. A call like `update({ startDate })` used to reset every
+  other option (`range`, `calendars`, `locale`, …). See
+  [Live changes go through setters, not `update(config)`](#live-changes-go-through-setters-not-updateconfig).
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Each grid is one tab stop, and `tabindex` no longer marks a selectable cell.**
   The arrows, `Home`, `End` and the page keys move within a calendar and Tab
@@ -1651,8 +1668,7 @@ change your code makes keep it. An `.is-invalid` or `.is-valid` class on the
 picker element is read once, when the picker starts. An `aria-invalid` on it is
 not read at all; remove it, since the date range picker makes its element a
 group and the attribute would be announced on that group. Set the state after
-start with `setConfig({ validationState })`, which for now changes only the
-validation options. See the Validation sections of the
+start with `setValidationState()`. See the Validation sections of the
 [date picker](/forms/date-picker/#validation),
 [date range picker](/forms/date-range-picker/#validation) and
 [time picker](/forms/time-picker/#validation).
@@ -2008,7 +2024,7 @@ state the same way, described under
 - **The state comes from the `validationState` option**, or from `.is-invalid`
   or `.is-valid` on the component's element, read once when the component
   starts. A class or an `aria-invalid` written on the element later is not
-  read; set the state with `setConfig({ validationState })`.
+  read; set the state with `setValidationState()`.
 - **A given `'invalid'` blocks the submit**, with the text of the component's
   invalid feedback as the browser's message, until the user changes the value
   or the form is reset, which removes the state.
@@ -2203,7 +2219,7 @@ submit.
   and the next change the user makes to the selection drops it. An `.is-invalid`
   or `.is-valid` class on the select is read once, when the component starts, and
   moves to the frame; a class or `aria-invalid` written on the select later is not
-  read, so set the state with `setConfig({ validationState })`. A native form
+  read, so set the state with `setValidationState()`. A native form
   reset restores the selection the control started with. See
   [Validation](/forms/multi-select/#validation).
 
@@ -2402,14 +2418,14 @@ field behind that kept submitting.
   starts, shows on the element and on the handles, and a given `'invalid'`
   blocks the submit through the first handle until the user moves a handle or
   the form is reset. A class written on the element later is not read; set
-  the state with `setConfig({ validationState })`. See
+  the state with `setValidationState()`. See
   [Validation](/forms/range-slider/#validation).
 - **Range slider interaction follows the native control.** Pressing a handle no
   longer moves it a step; a press on the track or a clickable tick moves the
   nearest handle and it follows the pointer (mouse, touch or pen), with
   `change.coreui.range-slider` on release instead of on press; the events carry
   numbers; a form reset restores the configured values instead of the middle of
-  the range; `setConfig()` and `dispose()` touch only what the slider built, so
+  the range; `setValue()` and `dispose()` touch only what the slider built, so
   content of the element stays.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The range slider's handles and track read the range's tokens.** The
@@ -2662,8 +2678,8 @@ field behind that kept submitting.
   an `.is-invalid`/`.is-valid` class on the `.form-otp` element or on a slot in
   the markup, shows the state on the group and the slots, and `'invalid'` blocks
   the submit. A class on one slot, which used to colour only that slot, now
-  marks the whole code. The user's next change of the code drops it, `setConfig({
-  validationState })` sets it again, and a native form reset puts back the
+  marks the whole code. The user's next change of the code drops it, `setValidationState()` sets it
+  again, and a native form reset puts back the
   code the field started with. A change of the code sends `input` and `change`
   from the input that holds the value.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -2690,7 +2706,7 @@ field behind that kept submitting.
 - **Its options decide `.disabled`, `.readonly`, the size class, the
   `radiogroup` role and `aria-readonly`, `aria-required` and `aria-invalid`.**
   The same classes and attributes written in the markup are replaced at init,
-  and a `rating-sm` or `rating-lg` without `size` is removed. `setConfig({ disabled: false })` used to leave
+  and a `rating-sm` or `rating-lg` without `size` is removed. `update({ disabled: false })` used to leave
   `.disabled` behind.
 - **A read-only rating submits its value under the `name` you give it.**
   `readonly` used to disable the radios, so the form left the value out; now
@@ -2698,17 +2714,15 @@ field behind that kept submitting.
   checked star takes focus, and the group carries `aria-readonly="true"`. A
   read-only rating without `name` still submits nothing.
 - **A star with keyboard focus shows the focus ring.**
-- **`setConfig()` keeps the value the user picked** unless you pass `value`,
-  and `setConfig({ name })` renames the radios; a value the new options cannot
-  show is dropped. Any option change used to reset the rating to its initial
-  value and ignore `name`.
+- **A rebuild keeps the value the user picked.** Any option change through
+  `update()` used to reset the rating to its initial value.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The rating takes a validation state.** The new `validationState` option,
   or `.is-invalid`/`.is-valid` on the rating element read once when it starts,
   colours the focus ring, and a given `'invalid'` sets
   `aria-invalid` on the group and blocks the submit until the user picks or
   clears a star or the form is reset. A class written on the element later is
-  not read; set the state with `setConfig({ validationState })`. See
+  not read; set the state with `setValidationState()`. See
   [Validation](/forms/rating/#validation).
 - **The rating can be required.** `required` makes every radio required and
   gives the group `aria-required="true"`.

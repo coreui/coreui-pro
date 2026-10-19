@@ -176,14 +176,30 @@ class OTPInput extends BaseComponent {
     this._restoreValue()
   }
 
-  setConfig(config: Partial<OtpInputConfig> | null): void {
-    if (typeof config !== 'object' || config === null) {
-      return
+  disable(): void {
+    if (!this._config.disabled) {
+      this._setConfig({ disabled: true })
     }
+  }
 
-    const previousValue = this._config.value
+  enable(): void {
+    if (this._config.disabled) {
+      this._setConfig({ disabled: false })
+    }
+  }
+
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
+  }
+
+  setValue(value: OtpInputConfig['value']): void {
+    this._setConfig({ value })
+  }
+
+  // Private
+  _setConfig(config: Partial<OtpInputConfig>): void {
     this._config = this._getConfig({ ...this._config, ...config })
-    const repaint = this._config.value !== previousValue
+    const repaint = 'value' in config
 
     if (this._validation.configure(config)) {
       return
@@ -205,7 +221,6 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  // Private
   _addEventListeners(): void {
     EventHandler.on(this._element, EVENT_BEFORE_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
       const { data, inputType } = event as unknown as { data: string | null, inputType: string }
@@ -532,8 +547,6 @@ class OTPInput extends BaseComponent {
 
         const placeholder = String(this._config.placeholder)
         input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder
-      } else if (this._placeholders.has(input)) {
-        this._restorePlaceholder(input)
       }
 
       writeAttribute(input, 'aria-required', this._config.required ? 'true' : null)

@@ -175,13 +175,8 @@ class ChipInput extends ChipSet {
     this._input?.focus()
   }
 
-  setConfig(config: Partial<ChipInputConfig> | null): void {
-    if (!config || !('validationState' in config)) {
-      return
-    }
-
-    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._validation.configure({ validationState: config.validationState })
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
   }
 
   override dispose(): void {
@@ -199,6 +194,14 @@ class ChipInput extends ChipSet {
   }
 
   // Private
+  _setConfig(config: Partial<ChipInputConfig> | null): void {
+    if (!config || !('validationState' in config)) {
+      return
+    }
+
+    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
+    this._validation.configure({ validationState: config.validationState })
+  }
 
   // The container mixes a label, the text input and chips — it is neither a
   // listbox nor a plain group, so no container role is stamped and the chips

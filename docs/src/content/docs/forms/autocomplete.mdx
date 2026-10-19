@@ -135,12 +135,10 @@ myAutoCompleteExternalDataExample.addEventListener('input.coreui.autocomplete', 
   const response = await fetch(`https://example.com/api?q=${query}`)
   const results = await response.json()
 
-  autocomplete.setConfig({
-    options: results.map(item => ({
-      value: item.id,
-      label: item.name
-    }))
-  })
+  autocomplete.setOptions(results.map(item => ({
+    value: item.id,
+    label: item.name
+  })))
 })
 ```
 
@@ -198,7 +196,7 @@ The state comes from four places, in this order:
   <div class="is-invalid" data-coreui-autocomplete data-coreui-id="autocompleteServerCountry" data-coreui-name="country" data-coreui-options="Germany, Poland, Spain" data-coreui-value="Spain"></div>
   <div class="invalid-feedback">We do not ship to Spain yet.</div>`} />
 
-A state you give, with the option or with the class, is a verdict on the value it was given for, so the next change of the value the user makes drops it: typing, a pick of a different option, the cleaner, <kbd>Backspace</kbd> or <kbd>Delete</kbd> on the selected option, and with `allowOnlyDefinedOptions` an <kbd>Escape</kbd>, a click outside or leaving the field that empties it. A pick of the option already selected keeps it. One action drops the state once, at its first change, so a state you give from a `change.coreui.autocomplete` listener while the action runs stays. A change your own code makes, with `clear()`, `deselectAll()`, `setConfig({ value })` or options that arrive later, keeps it. To set it again, call `setConfig({ validationState })`: a call that only changes `validationState`, `invalid` or `valid` updates the state without rebuilding the field, and it replaces a class written on the autocomplete, so `setConfig({ validationState: null })` withdraws that class. The component never reads `aria-invalid` on the autocomplete, and a state class written after it started only paints the frame: the input gets no `aria-invalid` and the submit is not blocked, so change the state after start with `setConfig`. A message placed where the stylesheet does not show it for the autocomplete can be named in `data-coreui-invalid-feedback` on the autocomplete. While the given state is `'invalid'`, the input blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled autocomplete does not block. A native reset of the form puts back the selection the autocomplete started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays.
+A state you give, with the option or with the class, is a verdict on the value it was given for, so the next change of the value the user makes drops it: typing, a pick of a different option, the cleaner, <kbd>Backspace</kbd> or <kbd>Delete</kbd> on the selected option, and with `allowOnlyDefinedOptions` an <kbd>Escape</kbd>, a click outside or leaving the field that empties it. A pick of the option already selected keeps it. One action drops the state once, at its first change, so a state you give from a `change.coreui.autocomplete` listener while the action runs stays. A change your own code makes, with `clear()`, `deselectAll()`, `setValue()` or options that arrive later, keeps it. To set it again, call `setValidationState()`: it updates the state without rebuilding the field and replaces a class written on the autocomplete or a state given with `invalid` or `valid`, so `setValidationState(null)` withdraws them. The component never reads `aria-invalid` on the autocomplete, and a state class written after it started only paints the frame: the input gets no `aria-invalid` and the submit is not blocked, so change the state after start with `setValidationState()`. A message placed where the stylesheet does not show it for the autocomplete can be named in `data-coreui-invalid-feedback` on the autocomplete. While the given state is `'invalid'`, the input blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled autocomplete does not block. A native reset of the form puts back the selection the autocomplete started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays.
 
 ## Disabled
 
@@ -346,7 +344,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `showHints` | boolean | `false` | Shows completion hints as users type. |
 | `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
 | `validationState` | string, null | `null` | The state the autocomplete shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's next change of the value drops it. See [Validation](#validation). |
-| `value` | number, string, null | `null` | Sets the initial value of the component: the option whose value, compared as text, equals it, so `1` and `'1'` select the same option. It is applied once, as soon as the options contain it; pass it to `setConfig()` to select another option, or `null` to clear the field. |
+| `value` | number, string, null | `null` | Sets the initial value of the component: the option whose value, compared as text, equals it, so `1` and `'1'` select the same option. It is applied once, as soon as the options contain it; pass it to `setValue()` to select another option, or `null` to clear the field. |
 
 ### Methods
 
@@ -358,7 +356,11 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `getInstance` | Static method to get the Bootstrap autocomplete instance associated with a DOM element. |
 | `hide` | Hides the Bootstrap autocomplete dropdown options. |
 | `search` | Performs a search with the provided text parameter. |
-| `setConfig` | Merges the given options over the current configuration and applies them: the options list, the value, `name`, `disabled` and `required`. `cleaner`, `pickerIcon`, `showHints`, `placeholder`, `id`, `ariaCleanerLabel`, `ariaPickerLabel`, `optionsMaxHeight` and `searchNoResultsLabel` take effect only when the component starts. Options you leave out keep their current value. A call that only changes `validationState`, `invalid` or `valid` updates the state without anything else. |
+| `disable()` | Disables the field. |
+| `enable()` | Enables the field. |
+| `setOptions(options)` | Replaces the options. |
+| `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
+| `setValue(value)` | Sets the value without firing a change event. |
 | `show` | Shows the Bootstrap autocomplete dropdown options. |
 | `toggle` | Toggles the visibility of the dropdown options. |
 
@@ -368,7 +370,7 @@ The Autocomplete component exposes several events for integrating with applicati
 
 | Event | Description |
 | --- | --- |
-| `change.coreui.autocomplete` | Fires when the user selects an option, types over a selection or clears it, and when `clear()` empties a field that held a value or text. The initial `value`, a preselected option and a `setConfig()` call do not fire it. |
+| `change.coreui.autocomplete` | Fires when the user selects an option, types over a selection or clears it, and when `clear()` empties a field that held a value or text. The initial `value`, a preselected option and a `setValue()` call do not fire it. |
 | `hidden.coreui.autocomplete` | Fired when the dropdown has been hidden and CSS transitions completed. |
 | `hide.coreui.autocomplete` | Event fires immediately when the hide method is called. Call `event.preventDefault()` to keep the menu open. |
 | `input.coreui.autocomplete` | Fires when the search input value changes. |

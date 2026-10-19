@@ -588,13 +588,13 @@ describe('RangeSlider', () => {
       expect(values).toEqual([[25, 75]])
     })
 
-    it('should restore a handle setConfig added to the value it was added with', async () => {
+    it('should restore a handle setValue added to the value it was added with', async () => {
       fixtureEl.innerHTML = '<form><div id="slider"></div></form>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { value: [10, 80] })
 
-      rangeSlider.setConfig({ value: [10, 80, 90] })
-      rangeSlider.setConfig({ value: [20, 70, 50] })
+      rangeSlider.setValue([10, 80, 90])
+      rangeSlider.setValue([20, 70, 50])
       fixtureEl.querySelector('form').reset()
       await new Promise(resolve => {
         setTimeout(resolve)
@@ -603,14 +603,14 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).map(input => input.value)).toEqual(['10', '80', '90'])
     })
 
-    it('should restore a handle setConfig removed and added again to the value it was added with the last time', async () => {
+    it('should restore a handle setValue removed and added again to the value it was added with the last time', async () => {
       fixtureEl.innerHTML = '<form><div id="slider"></div></form>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { value: [10, 80] })
 
-      rangeSlider.setConfig({ value: [10, 80, 90] })
-      rangeSlider.setConfig({ value: [10, 80] })
-      rangeSlider.setConfig({ value: [10, 80, 40] })
+      rangeSlider.setValue([10, 80, 90])
+      rangeSlider.setValue([10, 80])
+      rangeSlider.setValue([10, 80, 40])
       fixtureEl.querySelector('form').reset()
       await new Promise(resolve => {
         setTimeout(resolve)
@@ -619,12 +619,12 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).map(input => input.value)).toEqual(['10', '80', '40'])
     })
 
-    it('should restore the values it was built with, not the ones setConfig gave later', async () => {
+    it('should restore the values it was built with, not the ones setValue gave later', async () => {
       fixtureEl.innerHTML = '<form><div id="slider"></div></form>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { value: [25, 75] })
 
-      rangeSlider.setConfig({ value: [10, 90] })
+      rangeSlider.setValue([10, 90])
 
       expect(inputsOf(element).map(input => input.value)).toEqual(['10', '90'])
 
@@ -799,23 +799,14 @@ describe('RangeSlider', () => {
       expect(element.hasAttribute('aria-describedby')).toBeFalse()
     })
 
-    it('should keep naming the handles after setConfig', () => {
+    it('should keep naming the handles after setValue', () => {
       const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-label="Budget" aria-describedby="budgetHelp"')
 
-      rangeSlider.setConfig({ value: [10, 50, 90] })
+      rangeSlider.setValue([10, 50, 90])
 
       expect(element.getAttribute('aria-label')).toEqual('Budget')
       expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Value 1', 'Value 2', 'Value 3'])
       expect(inputsOf(element).every(input => input.getAttribute('aria-describedby') === 'budgetHelp')).toBeTrue()
-    })
-
-    it('should take a label the page gives the element later on setConfig', () => {
-      const { element, rangeSlider } = mount({ value: 40 }, 'aria-label="Budget"')
-
-      element.setAttribute('aria-label', 'Cost')
-      rangeSlider.setConfig({})
-
-      expect(inputsOf(element)[0].getAttribute('aria-label')).toEqual('Cost')
     })
 
     it('should make the element a group on every init and leave a role the page set later on dispose', () => {
@@ -878,9 +869,9 @@ describe('RangeSlider', () => {
       expect(fired).toEqual([])
     })
 
-    it('should fire once per change after setConfig', () => {
+    it('should fire once per change after setValue', () => {
       const { element, rangeSlider } = mount({ value: [20, 80] })
-      rangeSlider.setConfig({ value: [10, 90] })
+      rangeSlider.setValue([10, 90])
 
       const fired = []
       element.addEventListener('input.coreui.range-slider', event => fired.push(event.value))
@@ -909,15 +900,15 @@ describe('RangeSlider', () => {
       expect(element.querySelector('.form-range').style.getPropertyValue('--cui-range-fill')).toEqual('0.75')
     })
 
-    it('should reset to the configured values after a setConfig that leaves value out', async () => {
+    it('should reset to the configured values after disable() and enable()', async () => {
       fixtureEl.innerHTML = '<form><div id="slider" data-coreui-name="lo, hi" data-coreui-value="25, 75"></div></form>'
       const form = fixtureEl.querySelector('form')
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element)
 
       move(inputsOf(element)[0], 40)
-      rangeSlider.setConfig({ disabled: true })
-      rangeSlider.setConfig({ disabled: false })
+      rangeSlider.disable()
+      rangeSlider.enable()
       expect(inputsOf(element).map(input => input.value)).toEqual(['40', '75'])
 
       form.reset()
@@ -962,7 +953,7 @@ describe('RangeSlider', () => {
       const [input] = inputsOf(element)
 
       input.setAttribute('aria-invalid', 'false')
-      rangeSlider.setConfig({ validationState: 'invalid' })
+      rangeSlider.setValidationState('invalid')
 
       expect(inputsOf(element)[0]).toBe(input)
       expect(input.getAttribute('aria-invalid')).toEqual('true')
@@ -975,7 +966,7 @@ describe('RangeSlider', () => {
       expect(inputsOf(element)[0].hasAttribute('aria-invalid')).toBeFalse()
       expect(form.checkValidity()).toBeTrue()
 
-      rangeSlider.setConfig({ validationState: 'warning' })
+      rangeSlider.setValidationState('warning')
 
       expect(element).toHaveClass('is-warning')
       expect(element).not.toHaveClass('is-valid')
@@ -1036,23 +1027,23 @@ describe('RangeSlider', () => {
     it('should keep a given state when the value changes from code', () => {
       const { element, form, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] })
 
-      rangeSlider.setConfig({ value: [30, 70] })
+      rangeSlider.setValue([30, 70])
 
       expect(element).toHaveClass('is-invalid')
       expect(form.checkValidity()).toBeFalse()
     })
 
-    it('should change the state on setConfig without building the handles again', () => {
+    it('should change the state on setValidationState without building the handles again', () => {
       const { element, form, rangeSlider } = mountInForm({ value: [20, 80] })
       const before = inputsOf(element)
 
-      rangeSlider.setConfig({ validationState: 'invalid' })
+      rangeSlider.setValidationState('invalid')
 
       expect(inputsOf(element)).toEqual(before)
       expect(element).toHaveClass('is-invalid')
       expect(form.checkValidity()).toBeFalse()
 
-      rangeSlider.setConfig({ validationState: null })
+      rangeSlider.setValidationState(null)
 
       expect(element).not.toHaveClass('is-invalid')
       expect(inputsOf(element).some(input => input.classList.contains('is-invalid'))).toBeFalse()
@@ -1074,7 +1065,10 @@ describe('RangeSlider', () => {
     it('should drop a state given before a native reset when the page rebuilds the slider in the reset', async () => {
       const { element, form, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] })
 
-      form.addEventListener('reset', () => rangeSlider.setConfig({ max: 200 }))
+      form.addEventListener('reset', () => {
+        rangeSlider.disable()
+        rangeSlider.enable()
+      })
       form.reset()
       await new Promise(resolve => {
         setTimeout(resolve)
@@ -1088,7 +1082,7 @@ describe('RangeSlider', () => {
     it('should keep a state given in a reset listener of the form', async () => {
       const { element, form, rangeSlider } = mountInForm({ value: 40 })
 
-      form.addEventListener('reset', () => rangeSlider.setConfig({ validationState: 'invalid' }))
+      form.addEventListener('reset', () => rangeSlider.setValidationState('invalid'))
       form.reset()
       await new Promise(resolve => {
         setTimeout(resolve)
@@ -1104,7 +1098,7 @@ describe('RangeSlider', () => {
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual([`budgetHelp ${feedback.id}`, `budgetHelp ${feedback.id}`])
 
-      rangeSlider.setConfig({ validationState: null })
+      rangeSlider.setValidationState(null)
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp'])
     })
@@ -1132,7 +1126,8 @@ describe('RangeSlider', () => {
 
       inputsOf(element)[1].setCustomValidity('Too wide.')
       form.checkValidity()
-      rangeSlider.setConfig({ step: 5 })
+      rangeSlider.disable()
+      rangeSlider.enable()
 
       const [, second] = inputsOf(element)
 
@@ -1147,7 +1142,8 @@ describe('RangeSlider', () => {
 
       fixtureEl.querySelector('form').before(fixtureEl.querySelector('#budgetError'))
 
-      rangeSlider.setConfig({ step: 5 })
+      rangeSlider.disable()
+      rangeSlider.enable()
 
       expect(inputsOf(element)[0].validationMessage).toEqual('Pick a budget.')
     })
@@ -1182,13 +1178,13 @@ describe('RangeSlider', () => {
     })
   })
 
-  describe('setConfig', () => {
+  describe('setters', () => {
     it('should rebuild from the merged config and keep the page content of the element', () => {
       fixtureEl.innerHTML = '<div id="slider"><p class="note">Page content</p></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { tooltips: false, value: [20, 80] })
 
-      rangeSlider.setConfig({ value: [10, 30, 60] })
+      rangeSlider.setValue([10, 30, 60])
 
       expect(inputsOf(element).map(input => input.value)).toEqual(['10', '30', '60'])
       expect(element.querySelector('.note')).not.toBeNull()
@@ -1200,13 +1196,24 @@ describe('RangeSlider', () => {
       const { element, rangeSlider } = mount({ value: [10, 40] })
 
       move(inputsOf(element)[0], 30)
-      rangeSlider.setConfig({ disabled: true })
+      rangeSlider.disable()
 
       expect(inputsOf(element).map(input => input.value)).toEqual(['30', '40'])
       expect(inputsOf(element).every(input => input.disabled)).toBeTrue()
 
-      rangeSlider.setConfig({ value: [5, 15] })
+      rangeSlider.setValue([5, 15])
       expect(inputsOf(element).map(input => input.value)).toEqual(['5', '15'])
+    })
+
+    it('should not fire change from setValue', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] })
+      const spy = jasmine.createSpy('change')
+
+      element.addEventListener('change.coreui.range-slider', spy)
+      rangeSlider.setValue([10, 90])
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['10', '90'])
+      expect(spy).not.toHaveBeenCalled()
     })
 
     it('should stop handling the wrapper it replaces', () => {
@@ -1214,7 +1221,7 @@ describe('RangeSlider', () => {
       const wrapper = wrapperOf(element)
       const off = spyOn(EventHandler, 'off').and.callThrough()
 
-      rangeSlider.setConfig({ value: [10, 90] })
+      rangeSlider.setValue([10, 90])
 
       const removed = off.calls.allArgs().filter(([target]) => target === wrapper).map(([, type]) => type)
       expect(removed).toEqual(['input.coreui.range-slider', 'change.coreui.range-slider', 'keydown.coreui.range-slider', 'pointerdown.coreui.range-slider'])
@@ -1222,14 +1229,10 @@ describe('RangeSlider', () => {
       expect(wrapperOf(element)).not.toEqual(wrapper)
     })
 
-    it('should switch the orientation both ways', () => {
-      const { element, rangeSlider } = mount({ value: [20, 80], vertical: true })
+    it('should not expose setConfig', () => {
+      const { rangeSlider } = mount({ value: 40 })
 
-      rangeSlider.setConfig({ vertical: false })
-      expect(element.querySelector('.form-range')).not.toHaveClass('form-range-vertical')
-
-      rangeSlider.setConfig({ vertical: true })
-      expect(element.querySelector('.form-range')).toHaveClass('form-range-vertical')
+      expect(typeof rangeSlider.setConfig).toEqual('undefined')
     })
   })
 
@@ -1280,7 +1283,8 @@ describe('RangeSlider', () => {
       const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-describedby="budgetHelp"')
 
       element.setAttribute('aria-describedby', 'budgetNote')
-      rangeSlider.setConfig({ step: 5 })
+      rangeSlider.disable()
+      rangeSlider.enable()
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp'])
       expect(element.getAttribute('aria-describedby')).toEqual('budgetNote')
@@ -1358,9 +1362,9 @@ describe('RangeSlider', () => {
       const rangeSlider = RangeSlider.getInstance(element)
       expect(rangeSlider).toBeInstanceOf(RangeSlider)
 
-      spyOn(rangeSlider, 'setConfig')
-      RangeSlider.rangeSliderInterface(element, 'setConfig', { value: 20 })
-      expect(rangeSlider.setConfig).toHaveBeenCalledWith({ value: 20 })
+      spyOn(rangeSlider, 'setValue')
+      RangeSlider.rangeSliderInterface(element, 'setValue', 20)
+      expect(rangeSlider.setValue).toHaveBeenCalledWith(20)
 
       expect(() => {
         RangeSlider.rangeSliderInterface(element, 'nonExistentMethod')
@@ -1380,7 +1384,7 @@ describe('RangeSlider', () => {
       const rangeSlider = RangeSlider.getInstance(element)
       expect(rangeSlider).not.toBeNull()
 
-      jQueryMock.fn.rangeSlider.call(jQueryMock, 'setConfig', { value: 60 })
+      jQueryMock.fn.rangeSlider.call(jQueryMock, 'setValue', 60)
       expect(inputsOf(element).map(input => input.value)).toEqual(['60'])
     })
 

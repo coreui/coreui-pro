@@ -153,15 +153,19 @@ describe('TimeInput', () => {
 
     it('should keep the time sections when the type option asks for a date', () => {
       fixtureEl.innerHTML = '<div></div>'
-      const timeInput = new TimeInput(fixtureEl.querySelector('div'), { locale: 'pl-PL', type: 'date' })
-      const getSectionTypes = () => [...getSections(timeInput._element)].map(section => section.dataset.coreuiSection)
+      const element = fixtureEl.querySelector('div')
+      const getSectionTypes = () => [...getSections(element)].map(section => section.dataset.coreuiSection)
+
+      const timeInput = new TimeInput(element, { locale: 'pl-PL', type: 'date' })
 
       expect(getSectionTypes()).toEqual(['hour', 'minute'])
 
-      timeInput.setConfig({ type: 'datetime' })
+      timeInput.dispose()
+      // eslint-disable-next-line no-new
+      new TimeInput(element, { locale: 'pl-PL', type: 'datetime' })
 
       expect(getSectionTypes()).toEqual(['hour', 'minute'])
-      expect(timeInput._element.getAttribute('aria-label')).toEqual('Time input')
+      expect(element.getAttribute('aria-label')).toEqual('Time input')
     })
 
     it('should fill sections from the initial date', () => {
@@ -319,8 +323,8 @@ describe('TimeInput', () => {
     })
   })
 
-  describe('setConfig', () => {
-    it('should keep the time the user typed when the new config sets none', () => {
+  describe('setters', () => {
+    it('should keep the time the user typed through disable() and enable()', () => {
       const timeInput = createTimeInput()
       const onChange = vi.fn()
 
@@ -330,11 +334,54 @@ describe('TimeInput', () => {
       }
 
       timeInput._element.addEventListener('timeChange.coreui.time-input', onChange)
-      timeInput.setConfig({ format: 'hh:mm A', locale: 'en-US' })
+      timeInput.disable()
+      timeInput.enable()
 
       expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 14, 30))
-      expect([...getSections(timeInput._element)].map(section => section.textContent)).toEqual(['02', '30', 'PM'])
+      expect([...getSections(timeInput._element)].map(section => section.textContent)).toEqual(['14', '30'])
       expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('should show a time given to setDate', () => {
+      const timeInput = createTimeInput()
+
+      timeInput.setDate(new Date(2026, 6, 14, 9, 5))
+
+      expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 9, 5))
+      expect([...getSections(timeInput._element)].map(section => section.textContent)).toEqual(['09', '05'])
+    })
+
+    it('should disable and enable the field, keeping its time', () => {
+      const timeInput = createTimeInput({ date: new Date(2026, 6, 14, 14, 30) })
+
+      timeInput.disable()
+
+      expect(timeInput._element.classList.contains('disabled')).toBeTrue()
+      expect(timeInput._element.querySelector('textarea').disabled).toBeTrue()
+
+      timeInput.enable()
+
+      expect(timeInput._element.classList.contains('disabled')).toBeFalse()
+      expect(timeInput._element.querySelector('textarea').disabled).toBeFalse()
+      expect([...getSections(timeInput._element)].map(section => section.textContent)).toEqual(['14', '30'])
+    })
+
+    it('should change the state through setValidationState', () => {
+      const timeInput = createTimeInput()
+
+      timeInput.setValidationState('invalid')
+
+      expect(timeInput._element.classList.contains('is-invalid')).toBeTrue()
+
+      timeInput.setValidationState(null)
+
+      expect(timeInput._element.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should not expose setConfig', () => {
+      const timeInput = createTimeInput()
+
+      expect(typeof timeInput.setConfig).toEqual('undefined')
     })
   })
 
@@ -386,11 +433,11 @@ describe('TimeInput', () => {
       jQueryMock.elements = [div]
 
       const instance = TimeInput.getOrCreateInstance(div)
-      const spy = spyOn(instance, 'setConfig')
+      const spy = spyOn(instance, 'setValidationState')
 
-      jQueryMock.fn.timeInput.call(jQueryMock, 'setConfig', { disabled: true })
+      jQueryMock.fn.timeInput.call(jQueryMock, 'setValidationState', 'invalid')
 
-      expect(spy).toHaveBeenCalledWith({ disabled: true })
+      expect(spy).toHaveBeenCalledWith('invalid')
       instance.dispose()
     })
   })

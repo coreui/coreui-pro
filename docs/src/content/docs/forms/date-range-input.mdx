@@ -150,7 +150,7 @@ The state comes from these places, in this order:
 - An `.is-invalid` or `.is-valid` class written on the frame in the markup, for example by a server that has already checked the range. It is read once, when the component starts.
 - A validation that reports a field (a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well), and in a form with `data-coreui-validate` the `:user-invalid` state of each value field, with `data-coreui-validate="valid"` also its `:user-valid` state, as for the [date input](/forms/date-input/#validation).
 
-A state you give, with the option or with the class, is a verdict on the range it was given for, so the next change the user makes to either end drops it from both ends and the frame. A change your own code makes, with `setRange()`, `clear()` or `reset()`, keeps it. To set it again, call `setConfig({ validationState })`: it updates the state without rebuilding the fields and replaces a class written on the frame. For now `setConfig` changes only the validation options; the others are read when the component starts. A class or an `aria-invalid` written on the frame after the component starts is not read. While the given state is `'invalid'`, both ends block the submit with the text of the message after the frame, or `Invalid value.` when there is none, unless the range is disabled or read-only. A native form reset returns both ends to the dates they were created with and drops the state; a `reset` listener that calls `preventDefault()` cancels the whole reset.
+A state you give, with the option or with the class, is a verdict on the range it was given for, so the next change the user makes to either end drops it from both ends and the frame. A change your own code makes, with `setRange()`, `clear()` or `reset()`, keeps it. To set it again, call `setValidationState()`: it updates the state without rebuilding the fields and replaces a class written on the frame. A class or an `aria-invalid` written on the frame after the component starts is not read. While the given state is `'invalid'`, both ends block the submit with the text of the message after the frame, or `Invalid value.` when there is none, unless the range is disabled or read-only. A native form reset returns both ends to the dates they were created with and drops the state; a `reset` listener that calls `preventDefault()` cancels the whole reset.
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control. The error shows when the frame is invalid and when a field inside it is, which is where the state of a single date lands; the success message waits until nothing is invalid. While a field is invalid, the error message describes each of its sections.
 
@@ -354,7 +354,9 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `isDateSelectable` | Whether a date passes the shared limits |
 | `isRangeValid` | `false` while the end is before the start |
 | `reset` | Restore the dates the component was created with, emitting the change events when a value moves. A native form reset does the same and also drops a given validation state. |
-| `setConfig` | Changes `validationState` without rebuilding the fields. The other options are read when the component starts and are left as they are. |
+| `setEndDate(date)` | Sets the end date and keeps the start. |
+| `setValidationState(state)` | Gives the component a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
+| `setStartDate(date)` | Sets the start date and keeps the end. |
 | `setRange` | Set both ends: `setRange(start, end)`. Each end validates its own date, so what the range keeps is what the fields kept. |
 
 ```javascript

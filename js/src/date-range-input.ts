@@ -302,13 +302,18 @@ class DateRangeInput extends BaseComponent {
     return start === null || end === null || end >= start
   }
 
-  setConfig(config: Partial<DateRangeInputConfig> | null): void {
-    if (!config || !('validationState' in config)) {
-      return
-    }
+  setEndDate(endDate: Date | null): void {
+    this._typeCheckConfig({ endDate }, { endDate: DefaultType.endDate })
+    this._applyRange(undefined, endDate)
+  }
 
-    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._validation.configure({ validationState: config.validationState })
+  setStartDate(startDate: Date | null): void {
+    this._typeCheckConfig({ startDate }, { startDate: DefaultType.startDate })
+    this._applyRange(startDate)
+  }
+
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
   }
 
   override dispose(): void {
@@ -349,6 +354,15 @@ class DateRangeInput extends BaseComponent {
   }
 
   // Private
+  _setConfig(config: Partial<DateRangeInputConfig> | null): void {
+    if (!config || !('validationState' in config)) {
+      return
+    }
+
+    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
+    this._validation.configure({ validationState: config.validationState })
+  }
+
   _createDateRangeInput(): void {
     applyControlGroupClasses(this._element, CLASS_NAME_INPUT_GROUP, CLASS_NAME_DATE_RANGE)
     applyControlGroupSize(this._element, this._config.size)
@@ -478,7 +492,7 @@ class DateRangeInput extends BaseComponent {
     return separator
   }
 
-  _applyRange(startDate: Date | null, endDate: Date | null): void {
+  _applyRange(startDate: Date | null | undefined, endDate?: Date | null): void {
     const batching = this._batching
     const generation = ++this._generation
     this._batching = true
@@ -486,10 +500,12 @@ class DateRangeInput extends BaseComponent {
     this._endInput._holdErrors(true)
 
     try {
-      this._startInput.setConfig({ date: startDate })
+      if (startDate !== undefined) {
+        this._startInput.setDate(startDate)
+      }
 
-      if (generation === this._generation) {
-        this._endInput.setConfig({ date: endDate })
+      if (generation === this._generation && endDate !== undefined) {
+        this._endInput.setDate(endDate)
       }
 
       if (this._element) {
