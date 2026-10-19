@@ -104,7 +104,10 @@ describe('DateRangePicker', () => {
       }
 
       picker.show()
+      const update = spyOn(picker._calendar, '_updateCalendar').and.callThrough()
       picker.setRange(new Date(2026, 6, 3), new Date(2026, 6, 24))
+
+      expect(update).toHaveBeenCalledTimes(1)
 
       expect([...fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell.selected')].map(cell => cell.textContent.trim())).toEqual(['3', '24'])
       expect(toggle.getAttribute('aria-label')).not.toEqual(before)

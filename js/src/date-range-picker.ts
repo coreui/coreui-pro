@@ -275,7 +275,7 @@ class DateRangePicker extends PickerBase {
     }
 
     this._selectEndDate = value
-    this._calendar?._setConfig({ selectEndDate: value })
+    this._calendar?.setSelectEndDate(value)
     this._syncPickMessages()
   }
 
@@ -297,7 +297,7 @@ class DateRangePicker extends PickerBase {
   }
 
   _showRange(): void {
-    this._calendar?._setConfig({ endDate: this.getEndDate(), startDate: this.getStartDate() })
+    this._calendar?.setRange(this.getStartDate(), this.getEndDate())
   }
 
   _createDateRangePicker(): void {

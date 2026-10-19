@@ -354,7 +354,7 @@ after the option it changes:
 | Component | Methods |
 | --- | --- |
 | Autocomplete | `setValue()`, `setOptions()`, `setValidationState()`, `disable()`, `enable()` |
-| Calendar | `setStartDate()`, `setEndDate()`, `setCalendarDate()` |
+| Calendar | `setStartDate()`, `setEndDate()`, `setRange()`, `setCalendarDate()`, `setSelectEndDate()` |
 | Chip Input, Combobox | `setValidationState()`; Combobox keeps `setValue()` and `setItems()` |
 | Date Input, Time Input | `setDate()`, `setValidationState()`, `disable()`, `enable()` |
 | Date Range Input, Date Range Picker | `setStartDate()`, `setEndDate()`, `setRange()`, `setValidationState()` |
@@ -367,10 +367,12 @@ after the option it changes:
   Autocomplete and MultiSelect skipped that check on `update()`.
 - **The date and time setters fire no change event**, since the code that
   calls them already holds the value. `setDate()` of Date Input, Time Input and
-  Date Picker, `setTime()` of Time Picker and `setStartDate()`, `setEndDate()`
-  and `setRange()` of Date Range Input and Date Range Picker change the value
-  without `dateChange`, `timeChange`, `startDateChange`, `endDateChange` or the
-  native `input` and `change` of the value field;
+  Date Picker, `setTime()` of Time Picker, `setStartDate()`, `setEndDate()`
+  and `setRange()` of Date Range Input, Date Range Picker and Calendar, and
+  `setCalendarDate()` and `setSelectEndDate()` of Calendar change the value
+  without `dateChange`, `timeChange`, `startDateChange`, `endDateChange`,
+  `calendarDateChange`, `selectEndChange` or the native `input` and `change` of
+  the value field;
   `errorChange` still reports a date the field refuses. The verbs (`clear()`,
   `reset()`, `today()`, `now()`) and what the user does fire as before.
   `setDate(date, true)` of Date Input and Time Input and the same last argument
