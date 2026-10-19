@@ -6,6 +6,7 @@
  */
 
 import SelectorEngine from '../dom/selector-engine.js'
+import { getDateTimeFieldName } from '../util/calendar.js'
 import { CLOCK_ICON } from '../util/icons.js'
 import { isRTL } from '../util/index.js'
 import TimeSelection from './base.js'
@@ -41,15 +42,12 @@ class TimeSelects extends TimeSelection {
     return SelectorEngine.find(SELECTOR_TIME_SELECT, this._element as HTMLElement)
   }
 
-  override _shownTime(): Date | null {
-    return this._date ?? this._startTime()
-  }
-
   override _markPart(part: string, value: string): void {
     const select = SelectorEngine.findOne(`select.${part}`, this._element as ParentNode)
 
     if (select) {
-      (select as HTMLSelectElement).value = value
+      (select as HTMLSelectElement).value = value;
+      (select as HTMLSelectElement).options[0].hidden = value !== ''
     }
   }
 
@@ -58,7 +56,7 @@ class TimeSelects extends TimeSelection {
       const { options } = SelectorEngine.findOne(`select.${part.name}`, this._element as ParentNode) as HTMLSelectElement
 
       for (const [index, option] of part.options.entries()) {
-        options[index].disabled = option.disabled
+        options[index + 1].disabled = option.disabled
       }
     }
   }
@@ -100,15 +98,23 @@ class TimeSelects extends TimeSelection {
         list[index].focus()
       })
 
+      const placeholder = document.createElement('option')
+      const fieldName = getDateTimeFieldName(this._config.locale, part.name === 'meridiem' ? 'dayPeriod' : part.name.slice(0, -1))
+      placeholder.value = ''
+      placeholder.disabled = true
+      placeholder.textContent = '--'
+
+      if (fieldName) {
+        placeholder.setAttribute('aria-label', fieldName)
+      }
+
+      select.append(placeholder)
+
       for (const option of part.options) {
         const optionEl = document.createElement('option')
         optionEl.value = (option as HTMLSelectElement).value
         optionEl.textContent = option.label
         select.append(optionEl)
-      }
-
-      if (part.name === 'meridiem') {
-        select.value = this._ampm
       }
 
       this._element!.append(select)

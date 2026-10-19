@@ -250,10 +250,6 @@ class TimeSelection extends Config {
     return date
   }
 
-  _shownTime(): Date | null {
-    return this._date
-  }
-
   _hourOf(value: number | string): number {
     const hour = Number(value)
 
@@ -369,7 +365,7 @@ class TimeSelection extends Config {
   }
 
   _markSelected(instant = false): void {
-    const time = this._shownTime()
+    const time = this._date
     const selected = {
       hours: getSelectedHour(time, this._config.locale, this._ampmOption()),
       meridiem: time ? this._ampm : '',
@@ -378,10 +374,6 @@ class TimeSelection extends Config {
     }
 
     for (const [part, value] of Object.entries(selected)) {
-      if (value === '') {
-        continue
-      }
-
       this._markPart(part, value as string, instant)
     }
 
