@@ -147,6 +147,34 @@ describe('Config', () => {
     })
   })
 
+  describe('LIVE_OPTIONS', () => {
+    it('should list no option by default', () => {
+      expect(DummyConfigClass.LIVE_OPTIONS).toEqual([])
+    })
+  })
+
+  describe('checkLiveConfig', () => {
+    class LiveConfigClass extends DummyConfigClass {
+      static get LIVE_OPTIONS() {
+        return ['value']
+      }
+    }
+
+    it('should let the listed options and an empty call through', () => {
+      const obj = new LiveConfigClass()
+
+      expect(() => obj._checkLiveConfig({ value: 1 })).not.toThrow()
+      expect(() => obj._checkLiveConfig(null)).not.toThrow()
+      expect(() => obj._checkLiveConfig()).not.toThrow()
+    })
+
+    it('should throw with the name of an option that is not listed', () => {
+      const obj = new LiveConfigClass()
+
+      expect(() => obj._checkLiveConfig({ value: 1, size: 'lg' })).toThrowError(TypeError, 'DUMMY: setConfig() does not change "size". Dispose the instance and create a new one with it.')
+    })
+  })
+
   describe('typeCheckConfig', () => {
     it('should check type of the config object', () => {
       spyOnProperty(DummyConfigClass, 'DefaultType', 'get').and.returnValue({

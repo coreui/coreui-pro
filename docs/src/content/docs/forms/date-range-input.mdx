@@ -354,7 +354,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `isDateSelectable` | Whether a date passes the shared limits |
 | `isRangeValid` | `false` while the end is before the start |
 | `reset` | Restore the dates the component was created with, emitting the change events when a value moves. A native form reset does the same and also drops a given validation state. |
-| `setConfig` | Changes `validationState` without rebuilding the fields. The other options are read when the component starts and are left as they are. |
+| `setConfig` | Changes `validationState` without rebuilding the fields. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
 | `setRange` | Set both ends: `setRange(start, end)`. Each end validates its own date, so what the range keeps is what the fields kept. |
 
 ```javascript

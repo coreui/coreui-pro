@@ -1343,7 +1343,7 @@ describe('DatePicker', () => {
     it('should change the state through setConfig and leave the other options as they are', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div></form>')
 
-      picker.setConfig({ locale: 'pl-PL', valid: true })
+      picker.setConfig({ valid: true })
 
       expect(picker._config.locale).toEqual('en-US')
       expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-valid')).toBeTrue()
@@ -1357,6 +1357,15 @@ describe('DatePicker', () => {
       picker.setConfig({ validationState: null })
 
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
+    })
+
+    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div></form>')
+
+      expect(() => picker.setConfig({ locale: 'pl-PL', valid: true })).toThrowError(TypeError, 'DATE-PICKER: setConfig() does not change "locale". Dispose the instance and create a new one with it.')
+      expect(picker._config.locale).toEqual('en-US')
+      expect(picker._config.valid).toBeFalse()
+      expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-valid')).toBeFalse()
     })
 
     it.each([

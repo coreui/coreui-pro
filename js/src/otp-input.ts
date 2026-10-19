@@ -139,6 +139,10 @@ class OTPInput extends BaseComponent {
     return DefaultType
   }
 
+  static override get LIVE_OPTIONS(): string[] {
+    return ['disabled', 'required', 'validationState', 'value']
+  }
+
   static override get NAME(): string {
     return NAME
   }
@@ -181,6 +185,7 @@ class OTPInput extends BaseComponent {
       return
     }
 
+    this._checkLiveConfig(config)
     const previousValue = this._config.value
     this._config = this._getConfig({ ...this._config, ...config })
     const repaint = this._config.value !== previousValue
@@ -532,8 +537,6 @@ class OTPInput extends BaseComponent {
 
         const placeholder = String(this._config.placeholder)
         input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder
-      } else if (this._placeholders.has(input)) {
-        this._restorePlaceholder(input)
       }
 
       writeAttribute(input, 'aria-required', this._config.required ? 'true' : null)

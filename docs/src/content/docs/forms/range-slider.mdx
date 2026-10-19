@@ -266,7 +266,7 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | `dispose` | Destroys the instance and removes the range it built; content the page put in the element stays. |
 | `getInstance` | Static method which allows you to get the Range Slider instance associated to a DOM element, you can use it like this: `coreui.RangeSlider.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a Range Slider instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.RangeSlider.getOrCreateInstance(element)` |
-| `setConfig` | Merges the given options over the current configuration and rebuilds the range. Options you leave out keep their current value, and content the page put in the element stays. A `validationState` passed alone changes the state without a rebuild. |
+| `setConfig` | Changes `value`, `disabled` and `validationState` on the live slider and rebuilds the range; content the page put in the element stays. A `validationState` passed alone changes the state without a rebuild. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
 
 ### Events
 

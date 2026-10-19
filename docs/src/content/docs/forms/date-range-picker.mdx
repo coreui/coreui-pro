@@ -363,7 +363,7 @@ and `selectEndDate` are set by the picker itself.
 | `getStartDate` | Returns the start of the range (`Date` or `null`). |
 | `hide` | Closes the popup. |
 | `reset` | Restores the initial range. |
-| `setConfig` | Changes the validation options, `validationState`, `invalid` and `valid`, without rebuilding the picker. The other options are read when the picker starts and are left as they are. |
+| `setConfig` | Changes the validation options, `validationState`, `invalid` and `valid`, without rebuilding the picker. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
 | `setRange` | Sets both ends. Emits the change event of each end that changes. |
 | `show` | Opens the popup. |
 | `toggle` | Toggles the popup. |

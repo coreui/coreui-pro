@@ -340,6 +340,10 @@ class MultiSelect extends ComboboxBase {
     return DefaultType
   }
 
+  static override get LIVE_OPTIONS(): string[] {
+    return ['disabled', 'invalid', 'options', 'required', 'total', 'valid', 'validationState', 'value']
+  }
+
   static override get NAME(): string {
     return NAME
   }
@@ -533,6 +537,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   setConfig(config: Partial<MultiSelectConfig> | null): void {
+    this._checkLiveConfig(config)
     this._config = this._getConfig({ ...this._config, value: null, ...config })
 
     if (this._validation.configure(config)) {

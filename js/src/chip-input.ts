@@ -155,6 +155,10 @@ class ChipInput extends ChipSet {
     return DefaultType
   }
 
+  static override get LIVE_OPTIONS(): string[] {
+    return ['validationState']
+  }
+
   static override get NAME(): string {
     return NAME
   }
@@ -176,6 +180,8 @@ class ChipInput extends ChipSet {
   }
 
   setConfig(config: Partial<ChipInputConfig> | null): void {
+    this._checkLiveConfig(config)
+
     if (!config || !('validationState' in config)) {
       return
     }

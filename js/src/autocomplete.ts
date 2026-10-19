@@ -243,6 +243,10 @@ class Autocomplete extends ComboboxBase {
     return DefaultType
   }
 
+  static override get LIVE_OPTIONS(): string[] {
+    return ['disabled', 'invalid', 'options', 'required', 'valid', 'validationState', 'value']
+  }
+
   static override get NAME(): string {
     return NAME
   }
@@ -328,6 +332,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   setConfig(config: Partial<AutocompleteConfig> | null): void {
+    this._checkLiveConfig(config)
     this._config = this._getConfig({ ...this._config, ...config })
 
     if (this._validation.configure(config)) {
@@ -336,7 +341,6 @@ class Autocomplete extends ComboboxBase {
 
     this._options = this._getOptionsFromConfig()
     this._setListBoxItems()
-    this._syncInputName()
 
     if (config?.value !== undefined) {
       this._valueApplied = false

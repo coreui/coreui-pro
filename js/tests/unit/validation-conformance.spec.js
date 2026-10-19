@@ -45,7 +45,7 @@ const ADAPTERS = [
     changeAsUser: t => t.instance._optionsElement.querySelector('[data-coreui-value="1"]').click(),
     changeEvents: t => [[t.instance._element, 'change.coreui.multi-select'], ...nativeChange(t.instance._element)],
     changeFromCode: t => t.instance.selectAll(),
-    reconfigure: t => t.instance.setConfig({ placeholder: 'Pick one' }),
+    reconfigure: t => t.instance.setConfig({ disabled: false }),
     pageOwnsValueField: true,
     required: { required: true }
   },
@@ -65,7 +65,7 @@ const ADAPTERS = [
     changeAsUser: t => typeInto(t.instance._inputElement, 'x'),
     changeEvents: t => [[t.root.querySelector('.autocomplete'), 'input.coreui.autocomplete']],
     changeFromCode: t => t.instance.setConfig({ value: '2' }),
-    reconfigure: t => t.instance.setConfig({ placeholder: 'Pick one' }),
+    reconfigure: t => t.instance.setConfig({ disabled: false }),
     required: { required: true }
   },
   {
@@ -121,7 +121,7 @@ const ADAPTERS = [
     changeAsUser: t => pressArrowUp(sectionsOf(t)[0]),
     changeEvents: t => [[t.root.querySelector('#field'), 'dateChange.coreui.date-input'], ...nativeChange(t.instance._inputElement)],
     changeFromCode: t => t.instance.setConfig({ date: new Date(2026, 6, 15) }),
-    reconfigure: t => t.instance.setConfig({ locale: 'en-GB' }),
+    reconfigure: t => t.instance.setConfig({ disabled: false }),
     required: { required: true }
   },
   {
@@ -139,7 +139,7 @@ const ADAPTERS = [
     changeAsUser: t => pressArrowUp(sectionsOf(t)[0]),
     changeEvents: t => [[t.root.querySelector('#field'), 'timeChange.coreui.time-input'], ...nativeChange(t.instance._inputElement)],
     changeFromCode: t => t.instance.setConfig({ date: '11:45:00' }),
-    reconfigure: t => t.instance.setConfig({ locale: 'en-GB' }),
+    reconfigure: t => t.instance.setConfig({ disabled: false }),
     required: { required: true }
   },
   {
@@ -224,7 +224,7 @@ const ADAPTERS = [
     changeAsUser: t => typeInto(t.root.querySelector('.form-otp-control'), '1'),
     changeEvents: t => [[t.root.querySelector('.form-otp'), 'change.coreui.otp-input'], ...nativeChange(t.instance._inputElement)],
     changeFromCode: t => t.instance.setConfig({ value: '1' }),
-    reconfigure: t => t.instance.setConfig({ placeholder: '-' }),
+    reconfigure: t => t.instance.setConfig({ disabled: false }),
     required: { required: true }
   },
   {
@@ -240,7 +240,7 @@ const ADAPTERS = [
     changeAsUser: t => typeInto(t.root.querySelector('.form-range-input'), '30'),
     changeEvents: t => [[t.root.querySelector('#field'), 'input.coreui.range-slider']],
     changeFromCode: t => t.instance.setConfig({ value: [30, 70] }),
-    reconfigure: t => t.instance.setConfig({ step: 5 }),
+    reconfigure: t => t.instance.setConfig({ disabled: false }),
     required: null,
     makeInvalid: t => t.root.querySelector('.form-range-input').setCustomValidity('Pick a higher budget.'),
     notApplicable: {
@@ -261,7 +261,7 @@ const ADAPTERS = [
     changeAsUser: t => t.root.querySelectorAll('.rating-item-label')[3].click(),
     changeEvents: t => [[t.root.querySelector('#field'), 'change.coreui.rating']],
     changeFromCode: t => t.instance.setConfig({ value: 4 }),
-    reconfigure: t => t.instance.setConfig({ itemCount: 6 }),
+    reconfigure: t => t.instance.setConfig({ disabled: false }),
     required: { required: true }
   }
 ]

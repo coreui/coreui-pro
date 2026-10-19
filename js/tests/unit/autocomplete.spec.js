@@ -464,9 +464,9 @@ describe('Autocomplete', () => {
       expect(autocomplete._config.globalSearch).toBe(true)
       expect(autocomplete._isExternalSearch()).toBe(false)
 
-      autocomplete.setConfig({ search: 'external' })
+      autocomplete.dispose()
 
-      expect(Autocomplete.getInstance(autocompleteEl)._isExternalSearch()).toBe(true)
+      expect(new Autocomplete(autocompleteEl, { options: [], search: 'external' })._isExternalSearch()).toBe(true)
     })
 
     it('should create hint input while disabled, for the field to hint once enabled', () => {
@@ -505,21 +505,6 @@ describe('Autocomplete', () => {
 
       expect(autocomplete._inputElement.hasAttribute('name')).toBeFalse()
       expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
-    })
-
-    it('should submit under a name given by setConfig', () => {
-      fixtureEl.innerHTML = '<form id="form"><div class="autocomplete"></div></form>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, { options: ['Angular'] })
-
-      autocomplete.setConfig({ name: 'tech' })
-      autocomplete._inputElement.value = 'Angular'
-
-      expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['tech', 'Angular']])
-
-      autocomplete.setConfig({ name: null })
-
-      expect(autocomplete._inputElement.hasAttribute('name')).toBeFalse()
     })
 
     it('should submit the configured name once when showHints is true', () => {
@@ -1543,34 +1528,31 @@ describe('Autocomplete', () => {
   })
 
   describe('setConfig', () => {
-    it('should keep cleaner and showHints as they were at start', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="autocomplete"></div></form>'
       const element = fixtureEl.querySelector('.autocomplete')
-      const plain = new Autocomplete(element, { options: [{ label: 'Option 1', value: '1' }] })
-
-      expect(() => plain.setConfig({ cleaner: true, showHints: true })).not.toThrow()
-      expect(plain._cleanerElement).toBeNull()
-
-      plain._inputElement.value = 'Op'
-      expect(() => plain._inputElement.dispatchEvent(new Event('input', { bubbles: true }))).not.toThrow()
-
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const full = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+      const autocomplete = new Autocomplete(element, {
         cleaner: true,
+        name: 'tech',
         options: [{ label: 'Option 1', value: '1' }],
         showHints: true,
         value: '1'
       })
 
-      full.setConfig({ cleaner: false, showHints: false })
-      full._inputElement.value = 'Op'
-      full._inputElement.dispatchEvent(new Event('input', { bubbles: true }))
+      expect(() => autocomplete.setConfig({ name: 'other' })).toThrowError(TypeError, 'AUTOCOMPLETE: setConfig() does not change "name". Dispose the instance and create a new one with it.')
+      expect(() => autocomplete.setConfig({ value: '1', showHints: false })).toThrowError(TypeError, 'AUTOCOMPLETE: setConfig() does not change "showHints". Dispose the instance and create a new one with it.')
+      expect(autocomplete._config.name).toBe('tech')
+      expect(autocomplete._config.showHints).toBe(true)
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual(['tech'])
 
-      expect(full._inputHintElement.value).toBe('Option 1')
+      autocomplete._inputElement.value = 'Op'
+      autocomplete._inputElement.dispatchEvent(new Event('input', { bubbles: true }))
 
-      full.setConfig({ disabled: true })
+      expect(autocomplete._inputHintElement.value).toBe('Option 1')
 
-      expect(full._cleanerElement.style.display).toBe('none')
+      autocomplete.setConfig({ disabled: true })
+
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
     })
 
     it('should not commit typed text or drop the given state when it disables a focused field', () => {

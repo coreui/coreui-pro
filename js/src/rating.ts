@@ -170,14 +170,18 @@ class Rating extends BaseComponent {
     return DefaultType
   }
 
+  static override get LIVE_OPTIONS(): string[] {
+    return ['disabled', 'readonly', 'required', 'validationState', 'value']
+  }
+
   static override get NAME(): string {
     return NAME
   }
 
   // Public
   setConfig(config: Partial<RatingConfig> | null): void {
+    this._checkLiveConfig(config)
     this._config = this._getConfig({ ...this._config, ...config })
-    this._name = this._config.name || this._name
 
     if (this._validation.configure(config)) {
       return

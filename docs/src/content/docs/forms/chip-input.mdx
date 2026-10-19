@@ -251,7 +251,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `getValues()` | Returns an array of all chip values. |
 | `remove(chipOrValue)` | Removes a chip by element reference or value string. Focus moves to the text field only when the chip had it. Returns `true` if removed. |
 | `removeSelected()` | Removes all currently selected chips. |
-| `setConfig(config)` | Changes the validation state: `setConfig({ validationState })`. Other options are ignored for now. See [Validation](#validation). |
+| `setConfig(config)` | Changes the validation state: `setConfig({ validationState })`. Any other option throws a `TypeError`: dispose the instance and create a new one with it. See [Validation](#validation). |
 | `selectChip(chip)` | Selects a specific chip element. |
 
 ```js

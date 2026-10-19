@@ -279,7 +279,7 @@ picker itself.
 | `getTime` | Returns the current value (`Date` or `null`). |
 | `now` | Sets the current time. |
 | `reset` | Restores the initial value. |
-| `setConfig` | Changes the validation options, `validationState`, `invalid` and `valid`, without rebuilding the picker. The other options are read when the picker starts and are left as they are. |
+| `setConfig` | Changes the validation options, `validationState`, `invalid` and `valid`, without rebuilding the picker. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
 | `setTime` | Sets the value. Emits `timeChange` when the value changes. |
 | `show` / `hide` / `toggle` | Popup control. |
 

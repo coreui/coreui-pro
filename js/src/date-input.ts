@@ -292,6 +292,10 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     return DefaultType
   }
 
+  static override get LIVE_OPTIONS(): string[] {
+    return ['date', 'disabled', 'readonly', 'required', 'validationState']
+  }
+
   static override get NAME(): string {
     return NAME
   }
@@ -327,6 +331,8 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       return
     }
 
+    this._checkLiveConfig(config)
+
     const keys = Object.keys(config ?? {})
     const stateOnly = keys.length === 1 && keys[0] === 'validationState'
     const sections = this._sections
@@ -339,7 +345,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
     this._applyConfig()
 
-    if (config?.date === undefined && this._getLayoutKey(this._sections) === this._getLayoutKey(sections)) {
+    if (config?.date === undefined) {
       this._sections = sections
     }
 
@@ -385,10 +391,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._maxDate = this._convertDate(maxDate)
     this._sections = setSectionsFromDate(sections, date ? this._convertDate(date) : null)
     this._draft = ''
-  }
-
-  _getLayoutKey(sections: DateSection[]): string {
-    return JSON.stringify(sections.map(section => (isEditableSection(section) ? { ...section, value: null } : section)))
   }
 
   _getValueKey(sections: DateSection[]): string {

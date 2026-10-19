@@ -569,7 +569,7 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `getOrCreateInstance` | Static method which returns a combobox instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Combobox.getOrCreateInstance(element)`. |
 | `getValue()` | The selected value — an array in `multiple` mode, a string or `null` otherwise. |
 | `hide` | Closes the panel. |
-| `setConfig(config)` | Changes the validation state: `setConfig({ validationState })`. Other options are ignored for now. See [Validation](#validation). |
+| `setConfig(config)` | Changes the validation state: `setConfig({ validationState })`. Any other option throws a `TypeError`: dispose the instance and create a new one with it. See [Validation](#validation). |
 | `setItems(items)` | Rebuilds the list from an `items` array. The value stays, also when the new items no longer carry it, and the toggle keeps the label it had; items marked `selected` join a multiple value, or a single one that is empty. With `resetSelectionOnItemsChange` new values drop the value first. |
 | `setValue(value)` | Replaces the selection with `value` (a string, an array, or `null` to empty it), in the order given and up to `selectionLimit`. A value the list does not carry is skipped unless it is already selected. A disabled option and a disabled combobox take it, as a native select takes a value from a script; only the user is kept out. |
 | `show` | Opens the panel. |

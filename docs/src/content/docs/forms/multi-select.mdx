@@ -630,7 +630,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `selectFiltered` | Select only the currently filtered (search-matched) options. |
 | `setLoading` | Marks the list busy while you wait for options, for example with `search: 'external'`: a row with `loadingLabel` shows below the options and is announced, and the options it shows can still be picked. |
 | `setOptions` | Replaces the options without rebuilding the control: the selection, an open panel and the search box keep their state, and the focus stays where it was unless the element holding it goes. A selected option the new list lacks stays selected and is still sent with the form unless it is disabled; `selected` flags in the new options are ignored unless `resetSelectionOnOptionsChange` empties the selection first. |
-| `setConfig` | Merges the given options over the current configuration and rebuilds the interface. Options you leave out keep their current value. A call that only changes `validationState`, `invalid` or `valid` updates the state without rebuilding. |
+| `setConfig` | Changes `options`, `value`, `total`, `disabled`, `required` and the validation options (`validationState`, `invalid`, `valid`) on the live select and rebuilds the interface. A call that only changes the validation options updates the state without rebuilding. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
 | `show` | Shows the multi select's options. |
 
 ### Events

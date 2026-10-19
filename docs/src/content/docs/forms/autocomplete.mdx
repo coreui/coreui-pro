@@ -358,7 +358,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `getInstance` | Static method to get the Bootstrap autocomplete instance associated with a DOM element. |
 | `hide` | Hides the Bootstrap autocomplete dropdown options. |
 | `search` | Performs a search with the provided text parameter. |
-| `setConfig` | Merges the given options over the current configuration and applies them: the options list, the value, `name`, `disabled` and `required`. `cleaner`, `pickerIcon`, `showHints`, `placeholder`, `id`, `ariaCleanerLabel`, `ariaPickerLabel`, `optionsMaxHeight` and `searchNoResultsLabel` take effect only when the component starts. Options you leave out keep their current value. A call that only changes `validationState`, `invalid` or `valid` updates the state without anything else. |
+| `setConfig` | Changes `options`, `value`, `disabled`, `required` and the validation options (`validationState`, `invalid`, `valid`) on the live field. A call that only changes the validation options updates the state without anything else. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
 | `show` | Shows the Bootstrap autocomplete dropdown options. |
 | `toggle` | Toggles the visibility of the dropdown options. |
 

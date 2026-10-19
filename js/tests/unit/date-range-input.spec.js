@@ -629,7 +629,7 @@ describe('DateRangeInput', () => {
       const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" class="is-invalid"></div></form>')
       const [day] = root().querySelectorAll('.form-date-time-section')
 
-      range.setConfig({ format: 'yyyy-MM-dd', validationState: 'valid' })
+      range.setConfig({ validationState: 'valid' })
 
       expect(root().querySelector('.form-date-time-section')).toBe(day)
       expect(range._config.format).toEqual('dd.MM.yyyy')
@@ -640,10 +640,16 @@ describe('DateRangeInput', () => {
 
       expect(root().classList.contains('is-valid')).toBeFalse()
       expect(root().classList.contains('is-invalid')).toBeFalse()
+    })
 
-      range.setConfig({ format: 'yyyy-MM-dd' })
+    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
+      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range"></div></form>')
+      const [day] = root().querySelectorAll('.form-date-time-section')
 
+      expect(() => range.setConfig({ format: 'yyyy-MM-dd', validationState: 'valid' })).toThrowError(TypeError, 'DATE-RANGE-INPUT: setConfig() does not change "format". Dispose the instance and create a new one with it.')
+      expect(root().querySelector('.form-date-time-section')).toBe(day)
       expect(range._config.format).toEqual('dd.MM.yyyy')
+      expect(root().classList.contains('is-valid')).toBeFalse()
     })
 
     it('should drop the given state through a native form reset', async () => {

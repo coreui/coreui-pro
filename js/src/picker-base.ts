@@ -28,8 +28,6 @@ const SELECTOR_SECTION = '[data-coreui-section]'
 const SELECTOR_SVG = 'svg'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
-const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
-
 /**
  * Class definition
  */
@@ -61,6 +59,11 @@ abstract class PickerBase extends BaseComponent {
     })
   }
 
+  // Getters
+  static override get LIVE_OPTIONS(): string[] {
+    return ['invalid', 'valid', 'validationState']
+  }
+
   // Public
   show(): void {
     this._popup.show()
@@ -75,14 +78,14 @@ abstract class PickerBase extends BaseComponent {
   }
 
   setConfig(config: ComponentConfig | null): void {
-    const validation = Object.fromEntries(Object.entries(config ?? {}).filter(([key]) => VALIDATION_OPTIONS.has(key)))
+    this._checkLiveConfig(config)
 
-    if (Object.keys(validation).length === 0) {
+    if (!config || Object.keys(config).length === 0) {
       return
     }
 
-    this._config = this._getConfig({ ...this._config, ...validation })
-    this._validation.configure(validation)
+    this._config = this._getConfig({ ...this._config, ...config })
+    this._validation.configure(config)
   }
 
   override dispose(): void {

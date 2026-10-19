@@ -263,7 +263,7 @@ class DateRangePicker extends PickerBase {
     this._syncPickMessages()
   }
 
-  _pickMessages(): Partial<CalendarConfig> {
+  _pickMessages(): Pick<CalendarConfig, 'ariaSelectedDateAnnouncement' | 'ariaSelectedRangeAnnouncement'> {
     if (!this._footerTemplate && this._toggleElement && this._selectEndDate && this.getStartDate()) {
       return { ariaSelectedDateAnnouncement: '', ariaSelectedRangeAnnouncement: '' }
     }
@@ -277,7 +277,7 @@ class DateRangePicker extends PickerBase {
   }
 
   _syncPickMessages(): void {
-    queueMicrotask(() => this._calendar?.setConfig(this._pickMessages()))
+    queueMicrotask(() => this._calendar?._setAnnouncements(this._pickMessages()))
   }
 
   _showRange(): void {

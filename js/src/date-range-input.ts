@@ -257,6 +257,10 @@ class DateRangeInput extends BaseComponent {
     return DefaultType
   }
 
+  static override get LIVE_OPTIONS(): string[] {
+    return ['validationState']
+  }
+
   static override get NAME(): string {
     return NAME
   }
@@ -303,6 +307,8 @@ class DateRangeInput extends BaseComponent {
   }
 
   setConfig(config: Partial<DateRangeInputConfig> | null): void {
+    this._checkLiveConfig(config)
+
     if (!config || !('validationState' in config)) {
       return
     }

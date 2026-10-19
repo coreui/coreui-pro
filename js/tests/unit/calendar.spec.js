@@ -232,18 +232,6 @@ describe('Calendar', () => {
       }
     })
 
-    it('should re-read the locale when setConfig changes it', () => {
-      fixtureEl.innerHTML = '<div></div>'
-
-      const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { locale: 'en-US', calendarDate: new Date(2023, 0, 1) })
-
-      expect(div.querySelector('.btn-month').textContent.trim()).toEqual('January')
-
-      calendar.setConfig({ locale: 'de' })
-      expect(div.querySelector('.btn-month').textContent.trim()).toEqual('Januar')
-    })
-
     it('should render a calendar whose date cannot be parsed', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -902,7 +890,7 @@ describe('Calendar', () => {
 
       const [years, months] = fixtureEl.querySelectorAll('div')
       new Calendar(years, { calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'year' }) // eslint-disable-line no-new
-      const calendar = new Calendar(months, { calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'month' })
+      new Calendar(months, { calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'month' }) // eslint-disable-line no-new
 
       expect(years.querySelector('.btn-year').disabled).toBeTrue()
       expect(months.querySelector('.btn-year').disabled).toBeFalse()
@@ -914,11 +902,6 @@ describe('Calendar', () => {
       months.querySelector('.btn-year').click()
 
       expect(months.querySelector('.calendar-cell-inner.month')).not.toBeNull()
-
-      months.querySelector('.btn-year').click()
-      calendar.setConfig({ selectionType: 'year' })
-
-      expect(months.querySelector('.btn-year').disabled).toBeTrue()
     })
 
     it('should keep the navigation month and year across a page turn', () => {
@@ -1650,36 +1633,17 @@ describe('Calendar', () => {
       expect(div.querySelectorAll('.calendar-nav')).toHaveSize(2)
     })
 
-    it('should render the view of a new selection type', () => {
+    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div)
-      const oldHtml = div.innerHTML
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+      const html = div.innerHTML
 
-      calendar.setConfig({
-        selectionType: 'month'
-      })
-
-      expect(div.innerHTML).not.toEqual(oldHtml)
-      // Now we should see the months view
-      expect(div.querySelector('.calendar table thead')).toBeNull()
-      expect(div.querySelector('.calendar table tbody')).not.toBeNull()
-      expect(div.querySelector('.month')).not.toBeNull()
-    })
-
-    it('should use the new config object after update', () => {
-      fixtureEl.innerHTML = '<div></div>'
-
-      const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div)
-
-      calendar.setConfig({
-        showWeekNumber: true
-      })
-
-      expect(calendar._config.showWeekNumber).toBeTrue()
-      expect(div.classList).toContain('show-week-numbers')
+      expect(() => calendar.setConfig({ startDate: new Date(2026, 8, 15), selectionType: 'month' })).toThrowError(TypeError, 'CALENDAR: setConfig() does not change "selectionType". Dispose the instance and create a new one with it.')
+      expect(calendar._config.selectionType).toEqual('day')
+      expect(calendar._config.startDate).toBeNull()
+      expect(div.innerHTML).toEqual(html)
     })
 
     it('should keep the navigation month and year when the dates change', () => {
@@ -1718,17 +1682,16 @@ describe('Calendar', () => {
       observer.disconnect()
     })
 
-    it('should rebuild the panels when the number of calendars changes', () => {
+    it('should build one panel per calendar, each a month after the one before', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
-
-      calendar.setConfig({ calendars: 3 })
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), calendars: 3, locale: 'en-US' })
 
       expect([...div.querySelectorAll('.calendar table')].map(table => table.getAttribute('aria-label'))).toEqual(['September 2026', 'October 2026', 'November 2026'])
 
-      calendar.setConfig({ calendars: 1 })
+      calendar.dispose()
+      new Calendar(div, { calendarDate: new Date(2026, 8, 1), calendars: 1, locale: 'en-US' }) // eslint-disable-line no-new
 
       expect([...div.querySelectorAll('.calendar table')].map(table => table.getAttribute('aria-label'))).toEqual(['September 2026'])
     })
@@ -2718,9 +2681,7 @@ describe('Calendar', () => {
       expect(renderCalendar({ ariaNothingToPickLabel: '', minDate: new Date(2026, 8, 1) }).querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
       expect(renderCalendar({ minDate: new Date(2026, 8, 1) }, '<div data-coreui-aria-nothing-to-pick-label=""></div>').querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
 
-      const div = renderCalendar({ minDate: new Date(2026, 8, 1) })
-
-      Calendar.getInstance(div).setConfig({ ariaNothingToPickLabel: 'Brak dat do wyboru' })
+      const div = renderCalendar({ ariaNothingToPickLabel: 'Brak dat do wyboru', minDate: new Date(2026, 8, 1) })
 
       expect(div.querySelector('.calendar-nav-date .visually-hidden').textContent).toEqual('Brak dat do wyboru')
     })
@@ -2998,7 +2959,7 @@ describe('Calendar', () => {
 
         clickWithFocus(first.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`))
         Calendar.getInstance(div).refresh()
-        Calendar.getInstance(div).setConfig({ locale: 'en-US' })
+        Calendar.getInstance(div).setConfig({ selectEndDate: false })
         vi.advanceTimersByTime(110)
 
         expect(messages()).toEqual(['Selected date: Wednesday, August 12, 2026'])
@@ -3336,17 +3297,20 @@ describe('Calendar', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, {
-        calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'month', yearFormat: '2-digit'
+
+      for (const selectionType of ['month', 'day']) {
+        new Calendar(div, { // eslint-disable-line no-new
+          calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType, yearFormat: '2-digit'
+        })
+
+        expect(div.querySelector('.btn-year').textContent.trim()).toEqual('2026')
+
+        Calendar.getInstance(div).dispose()
+      }
+
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'year', yearFormat: '2-digit'
       })
-
-      expect(div.querySelector('.btn-year').textContent.trim()).toEqual('2026')
-
-      calendar.setConfig({ selectionType: 'day' })
-
-      expect(div.querySelector('.btn-year').textContent.trim()).toEqual('2026')
-
-      calendar.setConfig({ selectionType: 'year' })
 
       expect(div.querySelector('.calendar-cell').textContent.trim()).toEqual('20')
     })
@@ -6314,18 +6278,6 @@ describe('Calendar', () => {
       expect(div.children).toHaveLength(0)
     })
 
-    it('should write its selection and week number classes from setConfig both ways', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { selectionType: 'week', showWeekNumber: true })
-
-      calendar.setConfig({ selectionType: 'day', showWeekNumber: false })
-
-      expect(div.classList.contains('select-week')).toBeFalse()
-      expect(div.classList.contains('select-day')).toBeTrue()
-      expect(div.classList.contains('show-week-numbers')).toBeFalse()
-    })
-
     it('should follow its own options when built again after a dispose with others', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -6419,9 +6371,9 @@ describe('Calendar', () => {
       const instance = Calendar.getOrCreateInstance(element)
       const spy = spyOn(instance, 'setConfig')
 
-      jQueryMock.fn.calendar.call(jQueryMock, 'setConfig', { locale: 'en-US' })
+      jQueryMock.fn.calendar.call(jQueryMock, 'setConfig', { selectEndDate: true })
 
-      expect(spy).toHaveBeenCalledWith({ locale: 'en-US' })
+      expect(spy).toHaveBeenCalledWith({ selectEndDate: true })
       instance.dispose()
     })
 
@@ -6577,15 +6529,18 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       const picked = []
       div.addEventListener('startDateChange.coreui.calendar', event => picked.push([event.date, event.dateObject]))
-      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'week', showWeekNumber: true })
       for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
-        calendar.setConfig({ firstDayOfWeek, startDate: null })
+        const calendar = new Calendar(div, {
+          calendarDate: new Date(2026, 8, 1), firstDayOfWeek, selectionType: 'week', showWeekNumber: true
+        })
         const row = div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr')
         row.click()
 
         expect(row.querySelector('th').textContent).toEqual('36')
         expect(picked.length).toEqual(firstDayOfWeek + 1)
         expect(picked.at(-1)).toEqual(['2026W36', new Date(2026, 7, 31)])
+
+        calendar.dispose()
       }
     })
 
@@ -6593,15 +6548,18 @@ describe('Calendar', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { selectionType: 'week' })
 
       for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
         for (const startDate of ['2026W36', new Date(2026, 8, 6)]) {
-          calendar.setConfig({ calendarDate: new Date(2026, 8, 1), firstDayOfWeek, startDate })
+          const calendar = new Calendar(div, {
+            calendarDate: new Date(2026, 8, 1), firstDayOfWeek, selectionType: 'week', startDate
+          })
           const rows = div.querySelectorAll('tr.selected')
 
           expect(rows.length).toEqual(1)
           expect(rows[0].querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`)).not.toBeNull()
+
+          calendar.dispose()
         }
       }
     })
@@ -6610,15 +6568,16 @@ describe('Calendar', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, {
-        calendarDate: new Date(2026, 8, 1), endDate: '2026W38', range: true, selectionType: 'week', startDate: '2026W36'
-      })
       const row = day => div.querySelector(`td[data-coreui-date="${new Date(2026, 8, day).toDateString()}"]`).closest('tr')
 
       for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
-        calendar.setConfig({ firstDayOfWeek })
+        const calendar = new Calendar(div, {
+          calendarDate: new Date(2026, 8, 1), endDate: '2026W38', firstDayOfWeek, range: true, selectionType: 'week', startDate: '2026W36'
+        })
 
         expect([...div.querySelectorAll('tr.range')]).toEqual([3, 10, 17].map(day => row(day)))
+
+        calendar.dispose()
       }
     })
 
@@ -6626,12 +6585,15 @@ describe('Calendar', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { selectionType: 'week', startDate: '2026W36' })
 
       for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
-        calendar.setConfig({ calendarDate: new Date(2026, 7, 1), firstDayOfWeek })
+        const calendar = new Calendar(div, {
+          calendarDate: new Date(2026, 7, 1), firstDayOfWeek, selectionType: 'week', startDate: '2026W36'
+        })
 
         expect(div.querySelector('tr[tabindex="0"]')).toBe(div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr'))
+
+        calendar.dispose()
       }
     })
 
@@ -6639,20 +6601,23 @@ describe('Calendar', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'week' })
+      const build = config => new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'week', ...config })
       const row = () => div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr')
 
       for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
-        calendar.setConfig({ disabledDates: [new Date(2026, 7, 31), new Date(2026, 8, 6)], firstDayOfWeek })
+        build({ disabledDates: [new Date(2026, 7, 31), new Date(2026, 8, 6)], firstDayOfWeek })
 
         expect(row().hasAttribute('data-coreui-selectable')).toBeTrue()
 
-        calendar.setConfig({ disabledDates: [[new Date(2026, 7, 31), new Date(2026, 8, 6)]] })
+        Calendar.getInstance(div).dispose()
+        build({ disabledDates: [[new Date(2026, 7, 31), new Date(2026, 8, 6)]], firstDayOfWeek })
 
         expect(row().getAttribute('aria-disabled')).toEqual('true')
+
+        Calendar.getInstance(div).dispose()
       }
 
-      calendar.setConfig({ disabledDates: date => date.getDay() === 1, firstDayOfWeek: 1 })
+      build({ disabledDates: date => date.getDay() === 1, firstDayOfWeek: 1 })
 
       expect(div.querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
     })
@@ -6661,14 +6626,15 @@ describe('Calendar', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'week' })
+      const build = config => new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'week', ...config })
       const row = day => div.querySelector(`td[data-coreui-date="${new Date(2026, 8, day).toDateString()}"]`).closest('tr')
 
-      calendar.setConfig({ firstDayOfWeek: 0, maxDate: new Date(2026, 8, 9) })
+      build({ firstDayOfWeek: 0, maxDate: new Date(2026, 8, 9) })
 
       expect([row(6).hasAttribute('tabindex'), row(13).hasAttribute('tabindex')]).toEqual([true, false])
 
-      calendar.setConfig({ firstDayOfWeek: 2, maxDate: null, minDate: new Date(2026, 8, 9) })
+      Calendar.getInstance(div).dispose()
+      build({ firstDayOfWeek: 2, minDate: new Date(2026, 8, 9) })
 
       expect([row(1).hasAttribute('tabindex'), row(8).hasAttribute('tabindex')]).toEqual([false, true])
     })
@@ -6740,20 +6706,19 @@ describe('Calendar', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'week' })
 
       for (const limit of ['2026W36', new Date(2026, 8, 6)]) {
-        for (const firstDay of [0, 4]) {
-          calendar.setConfig({ firstDayOfWeek: firstDay, maxDate: limit, minDate: limit })
+        for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
+          const calendar = new Calendar(div, {
+            calendarDate: new Date(2026, 8, 1), firstDayOfWeek, maxDate: limit, minDate: limit, selectionType: 'week'
+          })
+          const rows = div.querySelectorAll('tr[data-coreui-selectable]')
 
-          for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
-            calendar.setConfig({ firstDayOfWeek })
-            const rows = div.querySelectorAll('tr[data-coreui-selectable]')
+          expect(rows.length).toEqual(1)
+          expect(rows[0].querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`)).not.toBeNull()
+          expect(div.querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
 
-            expect(rows.length).toEqual(1)
-            expect(rows[0].querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`)).not.toBeNull()
-            expect(div.querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
-          }
+          calendar.dispose()
         }
       }
     })
@@ -6827,26 +6792,6 @@ describe('Calendar', () => {
       }
     })
 
-    it('should read minDate and maxDate again when selectionType changes', () => {
-      fixtureEl.innerHTML = '<div></div><div></div>'
-
-      const [min, max] = fixtureEl.querySelectorAll('div')
-      const calendars = [
-        new Calendar(min, { calendarDate: new Date(2026, 8, 1), minDate: new Date(2026, 8, 2), selectionType: 'week' }),
-        new Calendar(max, {
-          calendarDate: new Date(2026, 8, 1), firstDayOfWeek: 2, maxDate: new Date(2026, 7, 31), selectionType: 'week'
-        })
-      ]
-
-      for (const calendar of calendars) {
-        calendar.setConfig({ selectionType: 'day' })
-      }
-
-      for (const div of [min, max]) {
-        expect(div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 1).toDateString()}"]`).getAttribute('aria-disabled')).toEqual('true')
-      }
-    })
-
     it('should compare the ends of a range of weeks by their weeks', () => {
       fixtureEl.innerHTML = '<div></div><div></div>'
 
@@ -6879,17 +6824,6 @@ describe('Calendar', () => {
       after.querySelector(`td[data-coreui-date="${new Date(2026, 8, 16).toDateString()}"]`).closest('tr').click()
 
       expect(events).toEqual([['start', '2026W38'], ['end', '2026W38']])
-    })
-
-    it('should keep the picked week when firstDayOfWeek changes', () => {
-      fixtureEl.innerHTML = '<div></div>'
-
-      const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), firstDayOfWeek: 0, selectionType: 'week' })
-      div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr').click()
-      calendar.setConfig({ firstDayOfWeek: 3 })
-
-      expect(div.querySelector('tr.selected').querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`)).not.toBeNull()
     })
 
     it('should keep a range of weeks across a week that holds a disabled day, and drop one across a disabled week', () => {
@@ -7080,7 +7014,10 @@ describe('Calendar', () => {
       expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Next 12 years')
       expect(div.querySelector('.btn-double-prev').getAttribute('aria-label')).toEqual('Previous 12 years')
 
-      calendar.setConfig({ ariaNavNextYearsLabel: 'Następne 12 lat', ariaNavPrevYearsLabel: 'Poprzednie 12 lat' })
+      calendar.dispose()
+      new Calendar(div, { // eslint-disable-line no-new
+        ariaNavNextYearsLabel: 'Następne 12 lat', ariaNavPrevYearsLabel: 'Poprzednie 12 lat', calendarDate: new Date(2026, 8, 1), selectionType: 'year'
+      })
 
       expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Następne 12 lat')
       expect(div.querySelector('.btn-double-prev').getAttribute('aria-label')).toEqual('Poprzednie 12 lat')
@@ -7096,12 +7033,14 @@ describe('Calendar', () => {
       expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Next year')
       expect(div.querySelector('.btn-double-prev').getAttribute('aria-label')).toEqual('Previous year')
 
-      calendar.setConfig({ selectionType: 'quarter' })
+      calendar.dispose()
+      const quarters = new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'quarter' })
 
-      expect(calendar._view).toBe('quarters')
+      expect(quarters._view).toBe('quarters')
       expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Next year')
 
-      calendar.setConfig({ selectionType: 'day' })
+      quarters.dispose()
+      new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'day' }) // eslint-disable-line no-new
 
       expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Next year')
     })

@@ -69,18 +69,6 @@ describe('MultiSelect', () => {
       expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
     })
 
-    it('should name the select from setConfig', () => {
-      fixtureEl.innerHTML = '<form id="form"><select class="multi-select" multiple><option value="1" selected>One</option></select></form>'
-
-      const multiSelectEl = fixtureEl.querySelector('.multi-select')
-      const multiSelect = new MultiSelect(multiSelectEl)
-
-      multiSelect.setConfig({ name: 'tech' })
-
-      expect(multiSelectEl.getAttribute('name')).toEqual('tech')
-      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual(['tech'])
-    })
-
     it('should create a MultiSelect instance with default config', () => {
       fixtureEl.innerHTML = '<select></select>'
 
@@ -400,7 +388,7 @@ describe('MultiSelect', () => {
       expect(option._wrapperElement.classList.contains('is-invalid')).toBeFalse()
 
       pick(server, '1')
-      option.setConfig({ search: true })
+      option.setConfig({ disabled: false })
 
       expect(server._wrapperElement.classList.contains('is-invalid')).toBeFalse()
       expect(option._wrapperElement.classList.contains('is-invalid')).toBeFalse()
@@ -669,10 +657,10 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
       expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
 
-      multiSelect.setConfig({ search: true })
+      multiSelect.setConfig({ disabled: false })
 
       expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
-      expect(multiSelect._searchElement.hasAttribute('aria-invalid')).toBeFalse()
+      expect(multiSelect._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
     })
 
     it('should change the state with setConfig without rebuilding the control', () => {
@@ -771,7 +759,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
 
       selectEl.form.checkValidity()
-      multiSelect.setConfig({ placeholder: 'Pick one' })
+      multiSelect.setConfig({ disabled: false })
 
       expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
       expect(multiSelect._togglerElement.getAttribute('aria-invalid')).toBe('true')
@@ -3115,8 +3103,8 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { optionsGroupsTemplate: group => `${group.label}${group.disabled ? ' (unavailable)' : ''}` })
 
-      multiSelect.setConfig({ placeholder: 'a' })
-      multiSelect.setConfig({ placeholder: 'b' })
+      multiSelect.setConfig({ disabled: false })
+      multiSelect.setConfig({ disabled: false })
 
       expect(multiSelect._menu.querySelector('.list-box-section-label').textContent).toBe('G (unavailable)')
     })
@@ -3126,9 +3114,9 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl)
 
-      multiSelect.setConfig({ placeholder: 'a' })
+      multiSelect.setConfig({ disabled: false })
       selectEl.querySelector('optgroup').disabled = false
-      multiSelect.setConfig({ placeholder: 'b' })
+      multiSelect.setConfig({ disabled: false })
 
       expect(multiSelect._menu.querySelector('[data-coreui-value="1"]').getAttribute('aria-disabled')).toBe('true')
     })
@@ -5737,7 +5725,7 @@ describe('MultiSelect', () => {
       const limits = []
 
       multiSelect.setOptions([{ label: 'G', options: [{ value: 'b', text: 'B' }, { value: 'c', text: 'C' }, { value: 'd', text: 'D' }] }])
-      multiSelect.setConfig({ placeholder: 'Pick' })
+      multiSelect.setConfig({ disabled: false })
       selectEl.addEventListener('selectionLimit.coreui.multi-select', () => limits.push(true))
       multiSelect.show()
       multiSelect._menu.querySelector('.list-box-section-label').click()
@@ -5753,7 +5741,7 @@ describe('MultiSelect', () => {
       const limits = []
 
       multiSelect.setOptions([{ value: 'b', text: 'B' }, { value: 'c', text: 'C' }])
-      multiSelect.setConfig({ placeholder: 'Pick' })
+      multiSelect.setConfig({ disabled: false })
       selectEl.addEventListener('selectionLimit.coreui.multi-select', () => limits.push(true))
       multiSelect.show()
       multiSelect._menu.querySelector('[data-coreui-value="b"]').click()
@@ -5788,15 +5776,6 @@ describe('MultiSelect', () => {
       expect(events).toEqual([])
     })
 
-    it('should pick nothing when it turns an empty single select with a placeholder into a multiple one', () => {
-      fixtureEl.innerHTML = '<select><option value="" disabled selected>Choose</option><option value="a">A</option><option value="b">B</option></select>'
-      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false })
-
-      multiSelect.setConfig({ multiple: true, value: null })
-
-      expect(multiSelect.getValue()).toEqual([])
-    })
-
     it('should update configuration and options', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -5822,8 +5801,8 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Option 1' }]
       })
 
-      expect(() => multiSelect.setConfig({ multiple: 'yes' })).toThrowError(TypeError)
-      expect(multiSelect._config.multiple).toBeFalse()
+      expect(() => multiSelect.setConfig({ required: 'yes' })).toThrowError(TypeError)
+      expect(multiSelect._config.required).toBeFalse()
     })
 
     it('should keep the selection when it rejects a value given with a wrong option', () => {
@@ -5836,9 +5815,22 @@ describe('MultiSelect', () => {
 
       selectEl.addEventListener('change', () => changes.push(selectEl.value))
 
-      expect(() => multiSelect.setConfig({ value: ['1'], multiple: 'yes' })).toThrowError(TypeError)
+      expect(() => multiSelect.setConfig({ value: ['1'], required: 'yes' })).toThrowError(TypeError)
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['2'])
       expect(changes).toEqual([])
+    })
+
+    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
+      fixtureEl.innerHTML = '<form id="form"><select><option value="1" selected>One</option><option value="2">Two</option></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+      const wrapper = multiSelect._wrapperElement
+
+      expect(() => multiSelect.setConfig({ value: ['2'], name: 'tech' })).toThrowError(TypeError, 'MULTI-SELECT: setConfig() does not change "name". Dispose the instance and create a new one with it.')
+      expect(multiSelect._config.name).toBeNull()
+      expect(selectEl.hasAttribute('name')).toBeFalse()
+      expect(multiSelect._wrapperElement).toBe(wrapper)
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
     })
 
     it('should refresh multiple and required on the native select', () => {
@@ -5853,15 +5845,20 @@ describe('MultiSelect', () => {
       expect(selectEl.getAttribute('multiple')).toBe('true')
       expect(selectEl.getAttribute('required')).toBe('true')
 
-      multiSelect.setConfig({ multiple: false, required: false })
+      multiSelect.setConfig({ required: false })
+
+      expect(selectEl.hasAttribute('required')).toBe(false)
+
+      multiSelect.setConfig({ required: true })
+
+      expect(selectEl.getAttribute('required')).toBe('true')
+
+      multiSelect.dispose()
+      // eslint-disable-next-line no-new
+      new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], multiple: false, required: false })
 
       expect(selectEl.hasAttribute('multiple')).toBe(false)
       expect(selectEl.hasAttribute('required')).toBe(false)
-
-      multiSelect.setConfig({ multiple: true, required: true })
-
-      expect(selectEl.getAttribute('multiple')).toBe('true')
-      expect(selectEl.getAttribute('required')).toBe('true')
     })
 
     it('should deselect all when value is provided in update config', () => {
@@ -5941,18 +5938,16 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.selectAll()
-      multiSelect.setConfig({ placeholder: 'Pick' })
+      multiSelect.setConfig({ disabled: false })
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['2', '1'])
       expect([...fixtureEl.querySelector('select').selectedOptions].map(option => option.value)).toEqual(['1', '2'])
     })
 
-    it('should keep the last value when setConfig turns a multiple select into a single one', () => {
+    it('should keep the last value of a multiple select built as a single one', () => {
       fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b" selected>B</option><option value="c" selected>C</option></select>'
       const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl)
-
-      multiSelect.setConfig({ multiple: false })
+      const multiSelect = new MultiSelect(selectEl, { multiple: false })
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['c'])
       expect(selectEl.value).toBe('c')
@@ -5961,9 +5956,7 @@ describe('MultiSelect', () => {
 
     it('should keep the first values up to a lower selection limit', () => {
       fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b" selected>B</option><option value="c" selected>C</option></select>'
-      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
-
-      multiSelect.setConfig({ selectionLimit: 1 })
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { selectionLimit: 1 })
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
     })
@@ -6694,7 +6687,7 @@ describe('MultiSelect', () => {
       const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option></select>')
 
       multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
-      multiSelect.setConfig({ placeholder: 'Pick' })
+      multiSelect.setConfig({ disabled: false })
 
       expect(multiSelect._getDisplayedOptions().map(option => option.dataset.coreuiValue)).toEqual(['v'])
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
@@ -6780,7 +6773,7 @@ describe('MultiSelect', () => {
       const multiSelect = mountExternal()
 
       multiSelect.setLoading(true)
-      multiSelect.setConfig({ placeholder: 'Search' })
+      multiSelect.setConfig({ disabled: false })
 
       expect(multiSelect._menu.querySelector('[role="listbox"]').getAttribute('aria-busy')).toBe('true')
     })
@@ -6794,18 +6787,6 @@ describe('MultiSelect', () => {
       multiSelect.setOptions([])
 
       expect(document.activeElement).toBe(multiSelect._menu)
-    })
-
-    it('should give the focus to the first option after setConfig takes the search field away', () => {
-      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option></select>'
-      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
-
-      multiSelect.setConfig({ search: false })
-      multiSelect.show()
-      multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
-      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
-
-      expect(document.activeElement).toBe(multiSelect._menu.querySelector('[data-coreui-value="v"]'))
     })
 
     it('should give the focus to the first option once options reach a panel holding it', () => {
@@ -7113,7 +7094,7 @@ describe('MultiSelect', () => {
       const multiSelectEl = fixtureEl.querySelector('.multi-select')
       const multiSelect = new MultiSelect(multiSelectEl, { name: 'tech' })
 
-      multiSelect.setConfig({ search: true })
+      multiSelect.setConfig({ disabled: false })
       multiSelect.dispose()
 
       expect(multiSelectEl.hasAttribute('name')).toBeFalse()
@@ -7962,12 +7943,11 @@ describe('MultiSelect', () => {
       expect(selectEl.parentNode.querySelector('.form-control-cleaner')).not.toBeNull()
     })
 
-    it('should keep the cleaner in the live control after setConfig turns the picker off', () => {
+    it('should keep the cleaner in the live control without a picker button once something is selected', () => {
       fixtureEl.innerHTML = '<select id="test-select" multiple></select>'
       const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, { cleaner: true, options: [{ value: '1', text: 'a' }] })
+      const multiSelect = new MultiSelect(selectEl, { cleaner: true, options: [{ value: '1', text: 'a' }], pickerIcon: false })
 
-      multiSelect.setConfig({ pickerIcon: false })
       multiSelect.selectAll()
 
       expect(fixtureEl.querySelector('.form-control-cleaner')).not.toBeNull()
@@ -8298,10 +8278,6 @@ describe('MultiSelect', () => {
       expect(searchableSelect._togglerElement.hasAttribute('aria-required')).toBeFalse()
       expect(searchableSelect._searchElement.getAttribute('aria-required')).toBe('true')
       expect(pageSelect._togglerElement.hasAttribute('aria-required')).toBeFalse()
-
-      searchableSelect.setConfig({ search: false })
-
-      expect(searchableSelect._togglerElement.getAttribute('aria-required')).toBe('true')
     })
   })
 

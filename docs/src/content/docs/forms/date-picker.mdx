@@ -492,7 +492,7 @@ by the picker itself.
 | `getOrCreateInstance` | Static — returns the instance, creating it if needed. |
 | `hide` | Closes the popup. |
 | `reset` | Restores the initial value. |
-| `setConfig` | Changes the validation options, `validationState`, `invalid` and `valid`, without rebuilding the picker. The other options are read when the picker starts and are left as they are. |
+| `setConfig` | Changes the validation options, `validationState`, `invalid` and `valid`, without rebuilding the picker. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
 | `setDate` | Sets the value. Emits `dateChange` when the value changes. |
 | `show` | Opens the popup. |
 | `today` | Sets today's date. |

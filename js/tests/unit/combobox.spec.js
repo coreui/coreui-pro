@@ -760,15 +760,25 @@ describe('Combobox', () => {
       expect(toggle.classList.contains('is-invalid')).toBeTrue()
       expect(toggle.classList.contains('is-valid')).toBeFalse()
 
-      combobox.setConfig({ validationState: 'valid', placeholder: 'Other' })
+      combobox.setConfig({ validationState: 'valid' })
 
       expect(toggle.classList.contains('is-valid')).toBeTrue()
-      expect(combobox._config.placeholder).toBe('')
 
-      combobox.setConfig({ invalid: true, validationState: null })
+      combobox.setConfig({ validationState: null })
 
       expect(toggle.classList.contains('is-valid')).toBeFalse()
       expect(toggle.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { validationState: 'invalid' })
+
+      expect(() => combobox.setConfig({ validationState: 'valid', placeholder: 'Other' })).toThrowError(TypeError, 'COMBOBOX: setConfig() does not change "placeholder". Dispose the instance and create a new one with it.')
+      expect(() => combobox.setConfig({ invalid: true })).toThrowError(TypeError, 'COMBOBOX: setConfig() does not change "invalid". Dispose the instance and create a new one with it.')
+      expect(combobox._config.placeholder).toBe('')
+      expect(combobox._config.validationState).toBe('invalid')
+      expect(toggle.classList.contains('is-invalid')).toBeTrue()
     })
 
     it('should drop a given state through a pick in the list, and keep it through changes from code and a pick that changes nothing', () => {

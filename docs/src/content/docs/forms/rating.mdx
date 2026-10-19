@@ -219,7 +219,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `getInstance` | Static method which allows you to get the rating instance associated to a DOM element, you can use it like this: `coreui.Rating.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a rating instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Rating.getOrCreateInstance(element)` |
 | `reset` | Reset the value to `null` or to provided value, firing `change.coreui.rating` when that changes the value. |
-| `setConfig` | Merges the given options over the current configuration and re-renders the rating. Options you leave out keep their current value. A `validationState` passed alone changes the state without a re-render. |
+| `setConfig` | Changes `value`, `disabled`, `readonly`, `required` and `validationState` on the live rating and re-renders it. A `validationState` passed alone changes the state without a re-render. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
 
 ### Events
 

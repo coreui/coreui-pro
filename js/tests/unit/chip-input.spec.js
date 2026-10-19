@@ -164,10 +164,16 @@ describe('ChipInput', () => {
 
       expect(element.classList.contains('is-valid')).toBeTrue()
 
-      chipInput.setConfig({ validationState: undefined, valid: true })
+      chipInput.setConfig({ validationState: undefined })
 
       expect(element.classList.contains('is-valid')).toBeFalse()
       expect(element.classList.contains('is-invalid')).toBeFalse()
+
+      chipInput.dispose()
+      // eslint-disable-next-line no-new
+      new ChipInput(element, { valid: true })
+
+      expect(element.classList.contains('is-valid')).toBeFalse()
     })
 
     it('should let the option win over a class from the markup', () => {
@@ -185,7 +191,7 @@ describe('ChipInput', () => {
       const chipInput = new ChipInput(element, { placeholder: 'Tags' })
       const input = chipInput._input
 
-      chipInput.setConfig({ validationState: 'valid', placeholder: 'Other' })
+      chipInput.setConfig({ validationState: 'valid' })
 
       expect(element.classList.contains('is-valid')).toBeTrue()
       expect(element.classList.contains('is-invalid')).toBeFalse()
@@ -198,6 +204,17 @@ describe('ChipInput', () => {
 
       expect(element.classList.contains('is-valid')).toBeFalse()
       expect(element.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { placeholder: 'Tags' })
+
+      expect(() => chipInput.setConfig({ validationState: 'valid', placeholder: 'Other' })).toThrowError(TypeError, 'CHIP-INPUT: setConfig() does not change "placeholder". Dispose the instance and create a new one with it.')
+      expect(chipInput._config.placeholder).toBe('Tags')
+      expect(chipInput._input.placeholder).toBe('Tags')
+      expect(element.classList.contains('is-valid')).toBeFalse()
     })
 
     it.each([

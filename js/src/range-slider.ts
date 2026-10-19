@@ -234,12 +234,17 @@ class RangeSlider extends BaseComponent {
     return DefaultType
   }
 
+  static override get LIVE_OPTIONS(): string[] {
+    return ['disabled', 'validationState', 'value']
+  }
+
   static override get NAME(): string {
     return NAME
   }
 
   // Public
   setConfig(config: Partial<RangeSliderConfig>): void {
+    this._checkLiveConfig(config)
     const current = config && 'value' in config ? null : this._values()
     this._config = this._getConfig({ ...this._config, ...config }) as RangeSliderConfig
     this._startValues = (this._config.value as number[]).map((value, index) => this._startValues[index] ?? value)

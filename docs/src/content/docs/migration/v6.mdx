@@ -356,6 +356,15 @@ Configuration replacement now has its own name on every component:
 - **It is reachable the same way everywhere**, including through the static and
   jQuery dispatchers, which pass the method name and whatever follows it:
   `coreui.Rating.ratingInterface(el, 'setConfig', { value: 2 })`.
+- **It changes only state and data.** Each component lists the options it
+  takes on a live instance in a static `LIVE_OPTIONS`: the validation state, the
+  value, `options`, `disabled` and `required` where the component has them
+  (Calendar takes its dates, Multi Select also `total`, Date Input and Rating
+  also `readonly`). Any other option, such as a format, a size, a label, an icon
+  or `name`, throws a `TypeError` naming it; dispose the instance and create a
+  new one with the option instead. Options that used to be applied live, such as
+  `format` on Date Input or `size` on Rating, and options that used to be
+  ignored in silence, such as `disabled` on Combobox, now throw.
 
 `Toaster.update(id, options)` is unchanged — it rewrites one toast in the store
 rather than reconfiguring the component.
@@ -2683,10 +2692,8 @@ field behind that kept submitting.
   checked star takes focus, and the group carries `aria-readonly="true"`. A
   read-only rating without `name` still submits nothing.
 - **A star with keyboard focus shows the focus ring.**
-- **`setConfig()` keeps the value the user picked** unless you pass `value`,
-  and `setConfig({ name })` renames the radios; a value the new options cannot
-  show is dropped. Any option change used to reset the rating to its initial
-  value and ignore `name`.
+- **`setConfig()` keeps the value the user picked** unless you pass `value`.
+  Any option change used to reset the rating to its initial value.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The rating takes a validation state.** The new `validationState` option,
   or `.is-invalid`/`.is-valid` on the rating element read once when it starts,

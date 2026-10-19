@@ -1074,7 +1074,7 @@ describe('RangeSlider', () => {
     it('should drop a state given before a native reset when the page rebuilds the slider in the reset', async () => {
       const { element, form, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] })
 
-      form.addEventListener('reset', () => rangeSlider.setConfig({ max: 200 }))
+      form.addEventListener('reset', () => rangeSlider.setConfig({ disabled: false }))
       form.reset()
       await new Promise(resolve => {
         setTimeout(resolve)
@@ -1132,7 +1132,7 @@ describe('RangeSlider', () => {
 
       inputsOf(element)[1].setCustomValidity('Too wide.')
       form.checkValidity()
-      rangeSlider.setConfig({ step: 5 })
+      rangeSlider.setConfig({ disabled: false })
 
       const [, second] = inputsOf(element)
 
@@ -1147,7 +1147,7 @@ describe('RangeSlider', () => {
 
       fixtureEl.querySelector('form').before(fixtureEl.querySelector('#budgetError'))
 
-      rangeSlider.setConfig({ step: 5 })
+      rangeSlider.setConfig({ disabled: false })
 
       expect(inputsOf(element)[0].validationMessage).toEqual('Pick a budget.')
     })
@@ -1222,14 +1222,15 @@ describe('RangeSlider', () => {
       expect(wrapperOf(element)).not.toEqual(wrapper)
     })
 
-    it('should switch the orientation both ways', () => {
+    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       const { element, rangeSlider } = mount({ value: [20, 80], vertical: true })
+      const wrapper = wrapperOf(element)
 
-      rangeSlider.setConfig({ vertical: false })
-      expect(element.querySelector('.form-range')).not.toHaveClass('form-range-vertical')
-
-      rangeSlider.setConfig({ vertical: true })
-      expect(element.querySelector('.form-range')).toHaveClass('form-range-vertical')
+      expect(() => rangeSlider.setConfig({ value: [10, 90], vertical: false })).toThrowError(TypeError, 'RANGE-SLIDER: setConfig() does not change "vertical". Dispose the instance and create a new one with it.')
+      expect(rangeSlider._config.vertical).toBeTrue()
+      expect(wrapperOf(element)).toBe(wrapper)
+      expect(wrapper).toHaveClass('form-range-vertical')
+      expect(inputsOf(element).map(input => input.value)).toEqual(['20', '80'])
     })
   })
 
@@ -1280,7 +1281,7 @@ describe('RangeSlider', () => {
       const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-describedby="budgetHelp"')
 
       element.setAttribute('aria-describedby', 'budgetNote')
-      rangeSlider.setConfig({ step: 5 })
+      rangeSlider.setConfig({ disabled: false })
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp'])
       expect(element.getAttribute('aria-describedby')).toEqual('budgetNote')

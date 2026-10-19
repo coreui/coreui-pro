@@ -153,15 +153,19 @@ describe('TimeInput', () => {
 
     it('should keep the time sections when the type option asks for a date', () => {
       fixtureEl.innerHTML = '<div></div>'
-      const timeInput = new TimeInput(fixtureEl.querySelector('div'), { locale: 'pl-PL', type: 'date' })
-      const getSectionTypes = () => [...getSections(timeInput._element)].map(section => section.dataset.coreuiSection)
+      const element = fixtureEl.querySelector('div')
+      const getSectionTypes = () => [...getSections(element)].map(section => section.dataset.coreuiSection)
+
+      const timeInput = new TimeInput(element, { locale: 'pl-PL', type: 'date' })
 
       expect(getSectionTypes()).toEqual(['hour', 'minute'])
 
-      timeInput.setConfig({ type: 'datetime' })
+      timeInput.dispose()
+      // eslint-disable-next-line no-new
+      new TimeInput(element, { locale: 'pl-PL', type: 'datetime' })
 
       expect(getSectionTypes()).toEqual(['hour', 'minute'])
-      expect(timeInput._element.getAttribute('aria-label')).toEqual('Time input')
+      expect(element.getAttribute('aria-label')).toEqual('Time input')
     })
 
     it('should fill sections from the initial date', () => {
@@ -330,11 +334,19 @@ describe('TimeInput', () => {
       }
 
       timeInput._element.addEventListener('timeChange.coreui.time-input', onChange)
-      timeInput.setConfig({ format: 'hh:mm A', locale: 'en-US' })
+      timeInput.setConfig({ required: true })
 
       expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 14, 30))
-      expect([...getSections(timeInput._element)].map(section => section.textContent)).toEqual(['02', '30', 'PM'])
+      expect([...getSections(timeInput._element)].map(section => section.textContent)).toEqual(['14', '30'])
       expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
+      const timeInput = createTimeInput({ date: new Date(2026, 6, 14, 14, 30) })
+
+      expect(() => timeInput.setConfig({ format: 'hh:mm A', locale: 'en-US' })).toThrowError(TypeError, 'TIME-INPUT: setConfig() does not change "format". Dispose the instance and create a new one with it.')
+      expect(timeInput._config.format).toEqual('HH:mm')
+      expect([...getSections(timeInput._element)].map(section => section.textContent)).toEqual(['14', '30'])
     })
   })
 
