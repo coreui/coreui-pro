@@ -157,6 +157,7 @@ const DefaultType: Record<string, string> = {
  */
 
 class Transfer extends BaseComponent {
+  protected declare _createdNodes: HTMLElement[]
   protected declare _itemRanks: Map<string, number>
   protected declare _items: ListBoxEntry[] | null
   protected declare _onListBoxChange: () => void
@@ -169,6 +170,7 @@ class Transfer extends BaseComponent {
   constructor(element?: string | Element | null, config?: Partial<TransferConfig> | null) {
     super(element, config)
 
+    this._createdNodes = []
     this._itemRanks = new Map()
     this._items = this._config.items.length > 0 ? this._config.items : null
     this._sides = {
@@ -278,6 +280,10 @@ class Transfer extends BaseComponent {
       side.listBox.dispose()
     }
 
+    for (const node of this._createdNodes) {
+      node.remove()
+    }
+
     super.dispose()
   }
 
@@ -334,6 +340,7 @@ class Transfer extends BaseComponent {
 
     options.classList.add(CLASS_NAME_OPTIONS)
     element.append(options)
+    this._createdNodes.push(options)
 
     return options
   }

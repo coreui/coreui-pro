@@ -353,7 +353,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Method | Description |
 | --- | --- |
 | `deselectAll` | Deselects all currently selected options. |
-| `dispose` | Destroys the instance and removes the input, buttons and panel it created, along with the classes it put on the host. |
+| `dispose` | Destroys the instance and removes the input, buttons and panel it created. An autocomplete disposed while open is closed first; the other classes it wrote on the host stay, and a new instance writes them again from its options. |
 | `getInstance` | Static method to get the Bootstrap autocomplete instance associated with a DOM element. |
 | `hide` | Hides the Bootstrap autocomplete dropdown options. |
 | `search` | Performs a search with the provided text parameter. |

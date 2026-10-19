@@ -26,7 +26,7 @@ import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, isVisible, jQueryDispatch, restoreHostClasses, writeAttribute
+  defineJQueryPlugin, getUID, isVisible, jQueryDispatch, writeAttribute
 } from './util/index.js'
 
 /**
@@ -83,7 +83,7 @@ const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SELECT = 'form-multi-select'
-const HOST_ATTRIBUTES = ['aria-hidden', 'disabled', 'id', 'multiple', 'name', 'required', 'tabindex']
+const HOST_ATTRIBUTES = ['id', 'name']
 const CLASS_NAME_SELECT_FILLED = 'form-multi-select-filled'
 const CLASS_NAME_SELECT_ALL = 'list-box-select-all'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
@@ -92,7 +92,6 @@ const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
-const HOST_CLASS_NAMES = [CLASS_NAME_DISABLED, CLASS_NAME_SELECT]
 
 type MultiSelectConfig = {
   allowList: SanitizerAllowList
@@ -255,7 +254,6 @@ class MultiSelectChipSet extends ChipSet {
 class MultiSelect extends ComboboxBase {
   protected declare _uniqueName: any
   protected declare _hostAttributes: Map<string, string | null>
-  protected declare _hostClasses: HostClasses
   protected declare _hostOptions: ChildNode[]
   protected declare _initialSelection: any[]
   protected declare _known: Map<string, any>
@@ -284,7 +282,6 @@ class MultiSelect extends ComboboxBase {
     super(element, config)
 
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
-    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostOptions = [...this._element.childNodes]
     this._validation = new FieldValidation(this._element, {
       aliases: true,
@@ -465,7 +462,6 @@ class MultiSelect extends ComboboxBase {
       writeAttribute(this._element, name, value)
     }
 
-    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
     super.dispose()
   }
 
@@ -932,10 +928,8 @@ class MultiSelect extends ComboboxBase {
   }
 
   _markRequired(): void {
-    const ariaRequired = this._element.getAttribute('aria-required') ?? (this._config.required ? 'true' : null)
-
-    if (ariaRequired) {
-      (this._config.search ? this._searchElement! : this._togglerElement).setAttribute('aria-required', ariaRequired)
+    if (this._config.required) {
+      (this._config.search ? this._searchElement! : this._togglerElement).setAttribute('aria-required', 'true')
     }
   }
 
@@ -1798,9 +1792,7 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   ])
 
   for (const ms of elements) {
-    if (ms.tabIndex !== -1) {
-      MultiSelect.multiSelectInterface(ms)
-    }
+    MultiSelect.multiSelectInterface(ms)
   }
 })
 EventHandler.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus)

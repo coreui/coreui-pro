@@ -67,18 +67,19 @@ Every option carries its value in `data-coreui-value`, exactly as in a List box;
 
 ### Pre-selected value
 
-Put `.selected` on an option and it starts selected — the toggle reads its label from the moment the page loads. `value` does the same from configuration and takes an array in `multiple` mode; the two are merged, so a page can carry a default in the markup and override it per user.
+Set `value` — `data-coreui-value` on the toggle — and that option starts selected: the toggle reads its label from the moment the page loads. It takes an array in `multiple` mode. A `.selected` class on an option in the markup does not select it; the combobox writes that class from its value.
 
 <Example code={`<button class="form-control combobox-toggle" type="button"
       data-coreui-toggle="combobox"
       data-coreui-name="role"
-      data-coreui-placeholder="Choose a role…">
+      data-coreui-placeholder="Choose a role…"
+      data-coreui-value="editor">
   </button>
   <div class="popup combobox-popup">
     <div class="list-box">
       <div class="list-box-options" role="listbox" aria-label="Role">
         <div class="list-box-option" data-coreui-value="admin">Admin</div>
-        <div class="list-box-option selected" data-coreui-value="editor">Editor</div>
+        <div class="list-box-option" data-coreui-value="editor">Editor</div>
         <div class="list-box-option" data-coreui-value="viewer">Viewer</div>
       </div>
     </div>
@@ -173,12 +174,13 @@ Nothing marks the selection on its own — `aria-selected` and the `.selected` b
       data-coreui-toggle="combobox"
       data-coreui-name="status"
       data-coreui-indicator="checkbox"
-      data-coreui-placeholder="Choose a status…">
+      data-coreui-placeholder="Choose a status…"
+      data-coreui-value="active">
   </button>
   <div class="popup combobox-popup">
     <div class="list-box">
       <div class="list-box-options" role="listbox" aria-label="Status">
-        <div class="list-box-option selected" data-coreui-value="active">
+        <div class="list-box-option" data-coreui-value="active">
           <span class="list-box-option-label">Active</span>
           <span class="list-box-option-description">Visible to users</span>
         </div>
@@ -447,12 +449,13 @@ The hidden `<select>` takes part in the browser's validation, so `required` bloc
       <label for="cbValidationRole" class="form-label">Role</label>
       <button class="form-control combobox-toggle is-invalid" type="button" id="cbValidationRole"
           data-coreui-toggle="combobox"
-          data-coreui-name="role">
+          data-coreui-name="role"
+          data-coreui-value="admin">
       </button>
       <div class="popup combobox-popup">
         <div class="list-box">
           <div class="list-box-options" role="listbox" aria-label="Role">
-            <div class="list-box-option selected" data-coreui-value="admin">Admin</div>
+            <div class="list-box-option" data-coreui-value="admin">Admin</div>
             <div class="list-box-option" data-coreui-value="editor">Editor</div>
           </div>
         </div>
@@ -479,7 +482,7 @@ The toggle is a `<button>`, a role that has neither an invalid nor a required st
 
 ### Via data attributes
 
-Add `data-coreui-toggle="combobox"` to the toggle and the plugin initializes it on page load — soon enough for a `.selected` option to reach the toggle text and the hidden select before anything is submitted.
+Add `data-coreui-toggle="combobox"` to the toggle and the plugin initializes it on page load — soon enough for its `value` to reach the toggle text and the hidden select before anything is submitted.
 
 | Attribute | Description |
 | --- | --- |
@@ -554,14 +557,14 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
 | `validationState` | string, null | `null` | The state the combobox shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's pick of a different value drops it. See [Validation](#validation). |
-| `value` | string, array, null | `null` | Initially selected values, merged with the options marked `.selected` in the markup. A string is one value, commas included; pass an array for several. |
+| `value` | string, array, null | `null` | Initially selected values. A string is one value, commas included; pass an array for several. A `.selected` class in the markup does not select an option. |
 
 ### Methods
 
 | Method | Description |
 | --- | --- |
 | `clear()` | Empties the selection. |
-| `dispose` | Destroys the combobox and removes what it created: the hidden select, the caret, the value element, the search field and the panel, or the parts of the panel your markup lacked. A panel from your markup goes back after the toggle with its classes and inline style, and the toggle gets back the classes and attributes your markup gave it. |
+| `dispose` | Destroys the combobox and removes what it created: the hidden select, the caret, the value element, the search field and the panel, or the parts of the panel your markup lacked. A panel from your markup goes back after the toggle, and a value element from your markup gets its content back. A combobox disposed while open is closed first. The other classes and attributes the combobox wrote on the toggle stay; a new instance writes them again from its options. |
 | `getInstance` | Static method which allows you to get the combobox instance associated to a DOM element, you can use it like this: `coreui.Combobox.getInstance(element)`. |
 | `getOrCreateInstance` | Static method which returns a combobox instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Combobox.getOrCreateInstance(element)`. |
 | `getValue()` | The selected value — an array in `multiple` mode, a string or `null` otherwise. |

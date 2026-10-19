@@ -165,9 +165,9 @@ describe('ListBox', () => {
       expect(listBox.getSelectedValues()).toEqual(['tomato'])
     })
 
-    it('should add a role to every section', () => {
+    it('should write the group role on every section over a role in the markup', () => {
       const el = setMarkup('', [
-        '<div class="list-box-section" aria-labelledby="veg"><div class="list-box-section-label" id="veg">Veggies</div>',
+        '<div class="list-box-section" role="presentation" aria-labelledby="veg"><div class="list-box-section-label" id="veg">Veggies</div>',
         '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div></div>'
       ])
       // eslint-disable-next-line no-new
@@ -1258,6 +1258,52 @@ describe('ListBox', () => {
   })
 
   describe('dispose', () => {
+    it('should remove the header, counter, search field and list it built', () => {
+      fixtureEl.innerHTML = '<div class="list-box"></div>'
+      const el = fixtureEl.querySelector('.list-box')
+
+      new ListBox(el, { counter: true, items: [{ value: 'a', label: 'A' }], search: true }).dispose()
+
+      expect(el.childElementCount).toEqual(0)
+
+      // eslint-disable-next-line no-new
+      new ListBox(el, { items: [{ value: 'a', label: 'A' }] })
+
+      expect(el.querySelector('[data-coreui-list-box-counter], .list-box-header, .list-box-search')).toBeNull()
+    })
+
+    it('should give a page list its own children back after setItems rendered into it', () => {
+      fixtureEl.innerHTML = '<div class="list-box"><div class="list-box-options" aria-label="Fruit"><div class="list-box-option" data-coreui-value="x">X</div></div></div>'
+      const el = fixtureEl.querySelector('.list-box')
+      const list = el.querySelector('.list-box-options')
+      const listBox = new ListBox(el)
+
+      listBox.setItems([{ value: 'a', label: 'A' }])
+      listBox.setItems([{ value: 'b', label: 'B' }])
+      listBox.dispose()
+
+      expect([...list.querySelectorAll('.list-box-option')].map(option => option.dataset.coreuiValue)).toEqual(['x'])
+    })
+
+    it('should remove a counter it added to a header from the markup', () => {
+      fixtureEl.innerHTML = '<div class="list-box"><div class="list-box-header"><span>Fruit</span></div><div class="list-box-options" aria-label="Fruit"><div class="list-box-option" data-coreui-value="a">A</div></div></div>'
+      const el = fixtureEl.querySelector('.list-box')
+
+      new ListBox(el, { counter: true }).dispose()
+
+      expect(el.querySelector('.list-box-header').innerHTML).toEqual('<span>Fruit</span>')
+    })
+
+    it('should give a page list its own children back after rendering items into it', () => {
+      fixtureEl.innerHTML = '<div class="list-box"><div class="list-box-options" aria-label="Fruit"><span class="page-note">Pick one</span></div></div>'
+      const el = fixtureEl.querySelector('.list-box')
+      const list = el.querySelector('.list-box-options')
+
+      new ListBox(el, { items: [{ value: 'a', label: 'A' }] }).dispose()
+
+      expect(list.innerHTML).toEqual('<span class="page-note">Pick one</span>')
+    })
+
     it('should stop reacting and clean the field up', () => {
       fixtureEl.innerHTML = [
         '<input type="text" id="field">',

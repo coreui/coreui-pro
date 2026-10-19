@@ -458,7 +458,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | --- | --- |
 | `clear()` | Empties the selection. |
 | `deselect(value)` | Removes the value from the selection. |
-| `dispose` | Destroys the list box and releases the field. |
+| `dispose` | Destroys the list box, releases the field, and removes the header, counter, search field, list and loading row it created. A list from your markup gets its own children back when `items` replaced them. |
 | `filter(query)` | Hides the options that do not contain `query`, and a section left without a match with them. `null` clears the filter. The selection is untouched. |
 | `first` / `last` | Moves the highlight to the first/last option. |
 | `focusActive()` | Moves the focus onto the highlighted option, or onto the first navigable one when nothing is highlighted, and makes that one the highlight. Does nothing while the list drives a field, where the focus belongs to that field. |

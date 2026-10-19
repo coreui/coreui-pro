@@ -552,16 +552,13 @@ describe('Autocomplete', () => {
       expect(keys).toEqual([])
     })
 
-    it('should keep a tab stop the page wrote on the host out of the tab order while it lives', () => {
+    it('should take a tab stop the page wrote off the host, so the field is the only one', () => {
       fixtureEl.innerHTML = '<div class="autocomplete" tabindex="0"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+      // eslint-disable-next-line no-new
+      new Autocomplete(autocompleteEl, { options: [] })
 
       expect(autocompleteEl.hasAttribute('tabindex')).toBe(false)
-
-      autocomplete.dispose()
-
-      expect(autocompleteEl.getAttribute('tabindex')).toBe('0')
     })
 
     it('should refuse a search option given as an array', () => {
@@ -674,10 +671,6 @@ describe('Autocomplete', () => {
       autocomplete.setConfig({ invalid: false })
 
       expect(element).not.toHaveClass('is-valid')
-
-      autocomplete.dispose()
-
-      expect(element.className).toBe('autocomplete')
     })
 
     it.each([
@@ -3335,30 +3328,14 @@ describe('Autocomplete', () => {
       expect(autocompleteEl.getAttribute('aria-label')).toBe('Kraj')
     })
 
-    it('should leave no class attribute on an element that had none, and keep a disabled class the page wrote', () => {
-      fixtureEl.innerHTML = '<div id="bare"></div><div id="marked" class="disabled"></div>'
-      const bare = fixtureEl.querySelector('#bare')
-      const marked = fixtureEl.querySelector('#marked')
-
-      for (const element of [bare, marked]) {
-        new Autocomplete(element, { disabled: true, options: [], validationState: 'invalid' }).dispose()
-      }
-
-      expect(bare.hasAttribute('class')).toBeFalse()
-      expect(marked.getAttribute('class')).toEqual('disabled')
-    })
-
-    it('should leave the disabled state to the option, not a class in the markup, and give the class back on dispose', () => {
+    it('should leave the disabled state to the option, not a class in the markup', () => {
       fixtureEl.innerHTML = '<div class="disabled"></div>'
       const element = fixtureEl.querySelector('div')
-      const autocomplete = new Autocomplete(element, { options: [] })
+      // eslint-disable-next-line no-new
+      new Autocomplete(element, { options: [] })
 
       expect(element.querySelector('input[role="combobox"]').disabled).toBeFalse()
       expect(element.classList.contains('disabled')).toBeFalse()
-
-      autocomplete.dispose()
-
-      expect(element.getAttribute('class')).toEqual('disabled')
     })
 
     it('should dispose autocomplete', () => {
@@ -3439,6 +3416,18 @@ describe('Autocomplete', () => {
       expect(optionSelectedSpy).not.toHaveBeenCalled()
     })
 
+    it('should leave no open state on the host when disposed while open', () => {
+      fixtureEl.innerHTML = '<div id="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [{ label: 'Option 1', value: '1' }] })
+
+      autocomplete.show()
+      autocomplete.dispose()
+
+      expect(autocompleteEl.classList.contains('show')).toBeFalse()
+      expect(new Autocomplete(autocompleteEl, { options: [] })._isShown()).toBeFalse()
+    })
+
     it('should remove the elements it generated from the host on dispose', () => {
       fixtureEl.innerHTML = '<div id="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('#autocomplete')
@@ -3452,8 +3441,7 @@ describe('Autocomplete', () => {
       autocomplete.dispose()
 
       expect(autocompleteEl.innerHTML).toEqual('')
-      expect(autocompleteEl.className).toEqual('')
-      expect(autocompleteEl.hasAttribute('tabindex')).toBeFalse()
+      expect(autocompleteEl.classList.contains('show')).toBeFalse()
     })
 
     it('should not accumulate generated elements across dispose and re-init cycles', () => {
@@ -3502,37 +3490,6 @@ describe('Autocomplete', () => {
       autocomplete.dispose()
 
       expect(() => autocomplete.dispose()).not.toThrow()
-    })
-
-    it('should keep the tab stop the page wrote on the host', () => {
-      fixtureEl.innerHTML = '<div id="autocomplete" tabindex="0"></div>'
-      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
-
-      autocomplete.dispose()
-
-      expect(autocompleteEl.getAttribute('tabindex')).toEqual('0')
-    })
-
-    it('should remove the disabled class it added even after setConfig', () => {
-      fixtureEl.innerHTML = '<div id="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, { disabled: true, options: [] })
-
-      autocomplete.setConfig({ disabled: false })
-      autocomplete.dispose()
-
-      expect(autocompleteEl.classList.contains('disabled')).toBeFalse()
-    })
-
-    it('should keep a disabled class the page wrote on the host', () => {
-      fixtureEl.innerHTML = '<div id="autocomplete" class="disabled"></div>'
-      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, { disabled: true, options: [] })
-
-      autocomplete.dispose()
-
-      expect(autocompleteEl.classList.contains('disabled')).toBeTrue()
     })
 
     it('should leave no style attribute behind on a host that had none', () => {

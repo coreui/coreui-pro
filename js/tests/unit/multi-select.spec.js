@@ -6996,49 +6996,50 @@ describe('MultiSelect', () => {
   })
 
   describe('dispose', () => {
-    it('should leave no class attribute on a select that had none, and keep a disabled class the page wrote', () => {
-      fixtureEl.innerHTML = [
-        '<select id="bare" multiple><option value="1">One</option></select>',
-        '<select id="marked" class="disabled" multiple><option value="1">One</option></select>'
-      ].join('')
-      const bare = fixtureEl.querySelector('#bare')
-      const marked = fixtureEl.querySelector('#marked')
-
-      for (const select of [bare, marked]) {
-        new MultiSelect(select, { disabled: true }).dispose()
-      }
-
-      expect(bare.hasAttribute('class')).toBeFalse()
-      expect(marked.getAttribute('class')).toEqual('disabled')
-    })
-
-    it('should leave the disabled state to the option, not a class or the disabled attribute on the select, and give them back on dispose', () => {
+    it('should leave the disabled state to the option, not a class or the disabled attribute on the select', () => {
       fixtureEl.innerHTML = '<select class="disabled" multiple disabled><option value="1">One</option></select>'
       const select = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(select)
+      // eslint-disable-next-line no-new
+      new MultiSelect(select)
 
       expect(fixtureEl.querySelector('[role="combobox"]').hasAttribute('aria-disabled')).toBeFalse()
       expect(select.disabled).toBeFalse()
       expect(select.classList.contains('disabled')).toBeFalse()
+    })
 
-      multiSelect.dispose()
+    it('should leave its state to the next instance, which writes it from its own options', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="1">One</option></select>'
+      const select = fixtureEl.querySelector('select')
 
-      expect(select.disabled).toBeTrue()
-      expect(select.getAttribute('class')).toEqual('disabled')
+      new MultiSelect(select, { disabled: true, required: true }).dispose()
+      // eslint-disable-next-line no-new
+      new MultiSelect(select)
+
+      expect(select.disabled).toBeFalse()
+      expect(select.required).toBeFalse()
+      expect(fixtureEl.querySelector('[role="combobox"]').hasAttribute('aria-disabled')).toBeFalse()
+      expect(fixtureEl.querySelectorAll('.form-multi-select:not(select)')).toHaveSize(1)
+    })
+
+    it('should leave the native select hidden after dispose', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="1">One</option></select>'
+      const select = fixtureEl.querySelector('select')
+
+      new MultiSelect(select).dispose()
+
+      expect(select.getAttribute('aria-hidden')).toEqual('true')
+      expect(select.tabIndex).toEqual(-1)
     })
 
     it('should disable the select with the component, so a required one does not block the form', () => {
       fixtureEl.innerHTML = '<form><select multiple required><option value="1">One</option></select></form>'
       const form = fixtureEl.querySelector('form')
       const select = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(select, { disabled: true })
+      // eslint-disable-next-line no-new
+      new MultiSelect(select, { disabled: true })
 
       expect(select.disabled).toBeTrue()
       expect(form.checkValidity()).toBeTrue()
-
-      multiSelect.dispose()
-
-      expect(select.hasAttribute('disabled')).toBeFalse()
     })
 
     it('should take back the disabled class it added once setConfig enables the select', () => {
@@ -7119,41 +7120,6 @@ describe('MultiSelect', () => {
       expect(multiSelectEl.hasAttribute('id')).toBeFalse()
     })
 
-    it('should give back the shape the select was handed in', () => {
-      fixtureEl.innerHTML = '<select id="mine" multiple></select>'
-
-      const multiSelectEl = fixtureEl.querySelector('#mine')
-      const multiSelect = new MultiSelect(multiSelectEl, { multiple: false, required: true })
-
-      multiSelect.dispose()
-
-      expect(multiSelectEl.hasAttribute('multiple')).toBeTrue()
-      expect(multiSelectEl.hasAttribute('required')).toBeFalse()
-      expect(multiSelectEl.classList.contains('form-multi-select')).toBeFalse()
-    })
-
-    it('should give back a tabindex the page wrote', () => {
-      fixtureEl.innerHTML = '<select class="multi-select" tabindex="3" multiple></select>'
-
-      const multiSelectEl = fixtureEl.querySelector('.multi-select')
-      const multiSelect = new MultiSelect(multiSelectEl)
-
-      multiSelect.dispose()
-
-      expect(multiSelectEl.getAttribute('tabindex')).toEqual('3')
-    })
-
-    it('should not leave the select hidden from assistive tech', () => {
-      fixtureEl.innerHTML = '<select class="multi-select" multiple></select>'
-
-      const multiSelectEl = fixtureEl.querySelector('.multi-select')
-      const multiSelect = new MultiSelect(multiSelectEl)
-
-      multiSelect.dispose()
-
-      expect(multiSelectEl.hasAttribute('aria-hidden')).toBeFalse()
-    })
-
     it('should dispose MultiSelect instance', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -7212,7 +7178,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._element).toBeNull()
     })
 
-    it('should remove the generated DOM and restore the native select', () => {
+    it('should remove the generated DOM and put the native select back in place', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -7231,7 +7197,6 @@ describe('MultiSelect', () => {
       expect(menu.isConnected).toBe(false)
       expect(selectEl.isConnected).toBe(true)
       expect(selectEl.parentNode).toBe(fixtureEl)
-      expect(selectEl.getAttribute('tabindex')).toBeNull()
     })
 
     it('should remove the menu appended to a container', () => {
@@ -7642,6 +7607,16 @@ describe('MultiSelect', () => {
 
       expect(MultiSelect.getInstance(selectEl)).toBeNull()
 
+      window.dispatchEvent(new Event('load'))
+
+      expect(MultiSelect.getInstance(selectEl)).toBeInstanceOf(MultiSelect)
+    })
+
+    it('should initialize on load a select whose earlier instance was disposed', () => {
+      fixtureEl.innerHTML = '<select class="form-multi-select"><option value="1">One</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+
+      MultiSelect.getOrCreateInstance(selectEl).dispose()
       window.dispatchEvent(new Event('load'))
 
       expect(MultiSelect.getInstance(selectEl)).toBeInstanceOf(MultiSelect)
@@ -8308,7 +8283,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._searchElement.hasAttribute('aria-labelledby')).toBeFalse()
     })
 
-    it('should mark the focused control as required, keeping a value the page sets', () => {
+    it('should mark the focused control as required from the required option only', () => {
       fixtureEl.innerHTML = [
         '<select id="plain"></select>',
         '<select id="searchable"></select>',
@@ -8322,7 +8297,7 @@ describe('MultiSelect', () => {
       expect(plainSelect._togglerElement.getAttribute('aria-required')).toBe('true')
       expect(searchableSelect._togglerElement.hasAttribute('aria-required')).toBeFalse()
       expect(searchableSelect._searchElement.getAttribute('aria-required')).toBe('true')
-      expect(pageSelect._togglerElement.getAttribute('aria-required')).toBe('true')
+      expect(pageSelect._togglerElement.hasAttribute('aria-required')).toBeFalse()
 
       searchableSelect.setConfig({ search: false })
 
