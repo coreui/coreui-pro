@@ -270,13 +270,15 @@ class TimePicker extends PickerBase {
     const [minDate, maxDate] = [min, max].map(limit => getDateWithin(this._input._sections, convertValue(limit, 'time', locale)))
 
     this._selection = new TimeRoll(this._selectionElement, this._forwardConfig(TimeRoll, {
-      hourCycle: getHourCycle(this._input._sections) ?? null,
       locale: this._config.locale,
       maxDate: maxDate ?? (minDate && createDate(1970)),
       minDate,
-      onChange: (time: Date | null) => this._runAsUser(() => this._applyTime(time && constrainDateTime(time, minDate, maxDate), time)),
       time: this.getTime()
-    }, this._config.selectionOptions))
+    }, {
+      ...this._config.selectionOptions,
+      hourCycle: getHourCycle(this._input._sections) ?? null,
+      onChange: (time: Date | null) => this._runAsUser(() => this._applyTime(time && constrainDateTime(time, minDate, maxDate), time))
+    }))
   }
 
   _applyTime(time: Date | null, picked: Date | null): void {

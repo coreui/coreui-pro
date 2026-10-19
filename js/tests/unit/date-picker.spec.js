@@ -1117,6 +1117,14 @@ describe('DatePicker', () => {
       expect(meridiem.value).toEqual('')
     })
 
+    it('should keep the hour cycle of its field over selectionOptions', () => {
+      const picker = buildPicker({ locale: 'en-US', selectionOptions: { hourCycle: 'h23', hours: [13, 14, 15] }, timepicker: true })
+      picker.show()
+
+      expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).not.toBeNull()
+      expect(fixtureEl.querySelector('select.date-picker-time-select.hours option[value="13"]')).toBeNull()
+    })
+
     it('should check the limits against the hour a listed entry stands for', () => {
       const picker = buildPicker({
         date: new Date(2026, 9, 15, 9),

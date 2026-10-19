@@ -389,11 +389,13 @@ class DatePicker extends PickerBase {
     }
 
     this._selection = new TimeSelects(this._selectionElement, this._forwardConfig(TimeSelects, {
+      locale: this._config.locale
+    }, {
+      ...this._config.selectionOptions,
       hourCycle: getHourCycle(this._input._sections) ?? null,
-      locale: this._config.locale,
       onChange: (time: Date | null) => this._runAsUser(() => this._applyTime(time)),
       time: this.getDate()
-    }, this._config.selectionOptions))
+    }))
   }
 
   _withinTimeLimits(date: Date): Date {
