@@ -1106,7 +1106,7 @@ describe('DatePicker', () => {
 
       expect(meridiem.querySelector('option[value="am"]').disabled).toBeTrue()
       expect(meridiem.querySelector('option[value="pm"]').disabled).toBeFalse()
-      expect(meridiem.value).toEqual('pm')
+      expect(meridiem.value).toEqual('')
     })
 
     it('should check the limits against the hour a listed entry stands for', () => {
@@ -2231,7 +2231,7 @@ describe('DatePicker', () => {
       pickMinutes(45)
 
       expect(picker.getDate().getMinutes()).toEqual(45)
-      expect(fixtureEl.querySelectorAll('.date-picker-popup select.date-picker-time-select option:disabled')).toHaveSize(0)
+      expect(fixtureEl.querySelectorAll('.date-picker-popup select.date-picker-time-select option:not([value=""]):disabled')).toHaveSize(0)
     })
 
     it('should let the day of a minDate with a time be picked and disable the time before it on that day', () => {
@@ -2239,7 +2239,7 @@ describe('DatePicker', () => {
         timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30), date: new Date(2026, 9, 15, 12)
       }).show()
       const popup = fixtureEl.querySelector('.date-picker-popup')
-      const disabled = part => [...popup.querySelectorAll(`select.date-picker-time-select.${part} option`)]
+      const disabled = part => [...popup.querySelectorAll(`select.date-picker-time-select.${part} option:not([value=""])`)]
         .filter(option => option.disabled)
         .map(option => Number(option.value))
 
@@ -2263,7 +2263,7 @@ describe('DatePicker', () => {
 
       expect(cell(14).getAttribute('aria-disabled')).toEqual('true')
       expect(cell(15).hasAttribute('aria-disabled')).toBeFalse()
-      expect(popup.querySelectorAll('select.date-picker-time-select.hours option:disabled')).toHaveSize(10)
+      expect(popup.querySelectorAll('select.date-picker-time-select.hours option:not([value=""]):disabled')).toHaveSize(10)
     })
 
     it('should disable the time after a maxDate with a time on its day only', () => {
@@ -2271,7 +2271,7 @@ describe('DatePicker', () => {
         timepicker: true, locale: 'pl-PL', maxDate: new Date(2026, 9, 20, 17, 45), date: new Date(2026, 9, 19, 12)
       })
       picker.show()
-      const disabled = () => [...fixtureEl.querySelectorAll('.date-picker-popup select.date-picker-time-select.hours option')]
+      const disabled = () => [...fixtureEl.querySelectorAll('.date-picker-popup select.date-picker-time-select.hours option:not([value=""])')]
         .filter(option => option.disabled)
         .map(option => Number(option.value))
 
@@ -2336,7 +2336,7 @@ describe('DatePicker', () => {
       picker.show()
       const hours = fixtureEl.querySelector('select.date-picker-time-select.hours')
 
-      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option:disabled')).toHaveSize(10)
+      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option:not([value=""]):disabled')).toHaveSize(10)
 
       hours.value = '12'
       hours.dispatchEvent(new Event('change'))
@@ -2344,13 +2344,64 @@ describe('DatePicker', () => {
       expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 12))
     })
 
-    it('should show the first allowed time in the selects while no date is picked', () => {
+    it('should leave every select on its placeholder while no date is picked', () => {
       vi.useFakeTimers({ toFake: ['Date'] })
       vi.setSystemTime(new Date(2026, 9, 1, 9))
       onTestFinished(() => vi.useRealTimers())
-      buildPicker({ timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30) }).show()
+      const picker = buildPicker({ timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30) })
+      picker.show()
+      const selects = () => [...fixtureEl.querySelectorAll('select.date-picker-time-select')]
 
-      expect(fixtureEl.querySelector('select.date-picker-time-select.hours').value).toEqual('10')
+      expect(selects().map(select => select.value)).toEqual(['', '', ''])
+      expect(selects().map(select => select.options[0].textContent)).toEqual(['--', '--', '--'])
+      expect(selects()[0].options[0].disabled).toBeTrue()
+
+      selects()[0].value = '10'
+      selects()[0].dispatchEvent(new Event('change'))
+
+      expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 10, 30))
+      expect(selects().map(select => select.value)).toEqual(['10', '30', '0'])
+      expect(selects().map(select => select.options[0].hidden)).toEqual([true, true, true])
+
+      picker.clear()
+
+      expect(selects().map(select => select.value)).toEqual(['', '', ''])
+      expect(selects()[0].options[0].hidden).toBeFalse()
+    })
+
+    it('should build a first pick on the start time of a 12-hour list', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 9, 1, 9))
+      onTestFinished(() => vi.useRealTimers())
+      const picker = buildPicker({ timepicker: true, locale: 'en-US', minDate: new Date(2026, 9, 15, 13) })
+      picker.show()
+      const select = part => fixtureEl.querySelector(`select.date-picker-time-select.${part}`)
+
+      expect(select('meridiem').value).toEqual('')
+
+      select('minutes').value = '30'
+      select('minutes').dispatchEvent(new Event('change'))
+
+      expect([picker.getDate().getHours(), picker.getDate().getMinutes()]).toEqual([13, 30])
+      expect([select('hours').value, select('meridiem').value]).toEqual(['1', 'pm'])
+    })
+
+    it('should keep the placeholder through a form reset while no date is picked', () => {
+      buildPicker({ timepicker: true, locale: 'en-GB' }, '<form><div id="picker"></div></form>').show()
+
+      fixtureEl.querySelector('form').reset()
+
+      expect(fixtureEl.querySelector('select.date-picker-time-select.hours').value).toEqual('')
+    })
+
+    it('should stand a select on its placeholder for a time its list does not offer', () => {
+      buildPicker({
+        timepicker: true, locale: 'en-GB', date: new Date(2026, 9, 15, 10, 7), selectionOptions: { minutes: [0, 15, 30, 45] }
+      }).show()
+      const minutes = fixtureEl.querySelector('select.date-picker-time-select.minutes')
+
+      expect(minutes.value).toEqual('')
+      expect(minutes.options[0].hidden).toBeFalse()
     })
 
     it('should judge no minute by the limits while no date is picked', () => {
@@ -2359,7 +2410,7 @@ describe('DatePicker', () => {
       onTestFinished(() => vi.useRealTimers())
       buildPicker({ timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30) }).show()
 
-      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.minutes option:disabled')).toHaveSize(0)
+      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.minutes option:not([value=""]):disabled')).toHaveSize(0)
     })
 
     it('should disable an hour none of whose offered minutes is allowed', () => {
@@ -2418,7 +2469,7 @@ describe('DatePicker', () => {
       const picker = buildPicker({ timepicker: true, locale: 'en-US', format: 'MM/dd/yyyy HH:mm:ss' })
       picker.show()
 
-      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option').length).toEqual(24)
+      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option:not([value=""])').length).toEqual(24)
       expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).toBeNull()
     })
 
@@ -2426,7 +2477,7 @@ describe('DatePicker', () => {
       const picker = buildPicker({ timepicker: true, locale: 'en-US', inputOptions: { format: 'MM/dd/yyyy HH:mm' } })
       picker.show()
 
-      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option').length).toEqual(24)
+      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option:not([value=""])').length).toEqual(24)
       expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).toBeNull()
     })
 
@@ -2435,7 +2486,7 @@ describe('DatePicker', () => {
         const picker = buildPicker({ timepicker: true, locale })
         picker.show()
 
-        expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option').length).toEqual(12)
+        expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option:not([value=""])').length).toEqual(12)
         expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).not.toBeNull()
         picker.dispose()
       }
