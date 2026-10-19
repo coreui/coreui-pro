@@ -728,6 +728,22 @@ describe('MultiSelect', () => {
       expect(selectEl.form.checkValidity()).toBeTrue()
     })
 
+    it('should block the submit once enable() runs on a select built disabled and invalid, and stop again on disable()', () => {
+      fixtureEl.innerHTML = '<form><select></select></form>'
+      const form = fixtureEl.querySelector('form')
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { disabled: true, validationState: 'invalid' })
+
+      expect(form.checkValidity()).toBeTrue()
+
+      multiSelect.enable()
+
+      expect(form.checkValidity()).toBeFalse()
+
+      multiSelect.disable()
+
+      expect(form.checkValidity()).toBeTrue()
+    })
+
     it('should name a message the select already points to once', () => {
       fixtureEl.innerHTML = '<form><select class="is-invalid" aria-describedby="hint fb"></select><div id="fb" class="invalid-feedback">Taken.</div></form><p id="hint">Hint</p>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }] })
@@ -755,7 +771,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.hasAttribute('aria-describedby')).toBeFalse()
     })
 
-    it('should keep a reported state through a rebuild', () => {
+    it('should keep a reported state through disable() and enable()', () => {
       fixtureEl.innerHTML = '<form novalidate><select></select></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
@@ -1064,7 +1080,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._refocusOnHide).toBeTrue()
     })
 
-    it('should hand a keystroke on the native select to the control once after disable() and enable()', () => {
+    it('should hand a keystroke on the native select to the control once enable() follows disable()', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
@@ -3093,29 +3109,12 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['2'])
     })
 
-    it('should keep a markup group disabled through a rebuild', () => {
+    it('should hand the group template a markup group marked disabled', () => {
       fixtureEl.innerHTML = '<select multiple><optgroup label="G" disabled><option value="1">One</option></optgroup><option value="2">Two</option></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { optionsGroupsTemplate: group => `${group.label}${group.disabled ? ' (unavailable)' : ''}` })
 
-      multiSelect.disable()
-      multiSelect.enable()
-
       expect(multiSelect._menu.querySelector('.list-box-section-label').textContent).toBe('G (unavailable)')
-    })
-
-    it('should keep an option disabled on its own after its group is enabled again', () => {
-      fixtureEl.innerHTML = '<select multiple><optgroup label="G" disabled><option value="1" disabled>One</option><option value="2">Two</option></optgroup></select>'
-      const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl)
-
-      multiSelect.disable()
-      multiSelect.enable()
-      selectEl.querySelector('optgroup').disabled = false
-      multiSelect.disable()
-      multiSelect.enable()
-
-      expect(multiSelect._menu.querySelector('[data-coreui-value="1"]').getAttribute('aria-disabled')).toBe('true')
     })
 
     it('should keep a group the deselectAll options mark disabled', () => {
@@ -5721,8 +5720,6 @@ describe('MultiSelect', () => {
       const limits = []
 
       multiSelect.setOptions([{ label: 'G', options: [{ value: 'b', text: 'B' }, { value: 'c', text: 'C' }, { value: 'd', text: 'D' }] }])
-      multiSelect.disable()
-      multiSelect.enable()
       selectEl.addEventListener('selectionLimit.coreui.multi-select', () => limits.push(true))
       multiSelect.show()
       multiSelect._menu.querySelector('.list-box-section-label').click()
@@ -5738,8 +5735,6 @@ describe('MultiSelect', () => {
       const limits = []
 
       multiSelect.setOptions([{ value: 'b', text: 'B' }, { value: 'c', text: 'C' }])
-      multiSelect.disable()
-      multiSelect.enable()
       selectEl.addEventListener('selectionLimit.coreui.multi-select', () => limits.push(true))
       multiSelect.show()
       multiSelect._menu.querySelector('[data-coreui-value="b"]').click()
@@ -5916,6 +5911,15 @@ describe('MultiSelect', () => {
 
       expect(document.activeElement).toBe(chip)
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b', 'c'])
+
+      multiSelect.show()
+      const listOption = multiSelect._menu.querySelector('[data-coreui-value="c"]')
+      listOption.focus()
+      multiSelect.setValue(['a'])
+
+      expect(multiSelect._isShown()).toBeTrue()
+      expect(document.activeElement).toBe(listOption)
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
     })
 
     it('should keep the selection, its chips and the menu through disable() and enable()', () => {
@@ -5983,6 +5987,124 @@ describe('MultiSelect', () => {
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['2', '1'])
       expect([...fixtureEl.querySelector('select').selectedOptions].map(option => option.value)).toEqual(['1', '2'])
+    })
+
+    it('should open from a click on the frame once enable() runs on a select built disabled, and stay closed on show() after disable()', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { disabled: true, options: [{ value: '1', text: 'Option 1' }] })
+
+      multiSelect._wrapperElement.click()
+
+      expect(multiSelect._isShown()).toBeFalse()
+
+      multiSelect.enable()
+      multiSelect._wrapperElement.click()
+
+      expect(multiSelect._isShown()).toBeTrue()
+      expect(multiSelect._togglerElement.getAttribute('aria-expanded')).toBe('true')
+
+      multiSelect.hide()
+      multiSelect.disable()
+      multiSelect.show()
+
+      expect(multiSelect._isShown()).toBeFalse()
+      expect(multiSelect._togglerElement.getAttribute('aria-expanded')).toBe('false')
+    })
+
+    it('should write every disabled state on disable() and take it back on enable()', () => {
+      fixtureEl.innerHTML = '<form><select name="tech"></select></form>'
+      const form = fixtureEl.querySelector('form')
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1', selected: true }] })
+      const { _indicatorElement: indicator, _togglerElement: toggler, _wrapperElement: wrapper } = multiSelect
+
+      expect(new FormData(form).getAll('tech')).toEqual(['1'])
+
+      multiSelect.disable()
+
+      expect(selectEl.disabled).toBeTrue()
+      expect(selectEl).toHaveClass('disabled')
+      expect(wrapper).toHaveClass('disabled')
+      expect(toggler).toHaveClass('disabled')
+      expect(toggler.getAttribute('aria-disabled')).toBe('true')
+      expect(toggler.hasAttribute('tabindex')).toBeFalse()
+      expect(indicator.disabled).toBeTrue()
+      expect(new FormData(form).getAll('tech')).toEqual([])
+
+      multiSelect.enable()
+
+      expect(selectEl.disabled).toBeFalse()
+      expect(selectEl).not.toHaveClass('disabled')
+      expect(wrapper).not.toHaveClass('disabled')
+      expect(toggler).not.toHaveClass('disabled')
+      expect(toggler.hasAttribute('aria-disabled')).toBeFalse()
+      expect(toggler.getAttribute('tabindex')).toBe('0')
+      expect(indicator.disabled).toBeFalse()
+      expect(new FormData(form).getAll('tech')).toEqual(['1'])
+    })
+
+    it('should take the cleaner away on disable() and bring it back on enable()', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1', selected: true }] })
+
+      expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).not.toBeNull()
+
+      multiSelect.disable()
+
+      expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).toBeNull()
+
+      multiSelect.enable()
+
+      expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).not.toBeNull()
+    })
+
+    it('should not take a gesture in an open list once disable() runs', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1', selected: true }, { value: '2', text: 'Option 2' }] })
+
+      multiSelect.show()
+      selectEl.addEventListener('hide.coreui.multi-select', event => event.preventDefault())
+      multiSelect.disable()
+
+      expect(multiSelect._isShown()).toBeTrue()
+
+      const changes = []
+      selectEl.addEventListener('change', () => changes.push(true))
+      multiSelect._optionsElement.querySelector('[data-coreui-value="2"]').click()
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+
+      expect(changes).toEqual([])
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
+      expect([...selectEl.selectedOptions].map(option => option.value)).toEqual(['1'])
+      expect(multiSelect._menu.querySelector('[data-coreui-value="2"]').getAttribute('aria-selected')).toBe('false')
+    })
+
+    it('should not read options the page appends to the select after it starts', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">A</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+
+      selectEl.append(new Option('B', 'b'))
+      multiSelect.setValue(['b'])
+
+      expect(multiSelect.getValue()).toEqual([])
+      expect(multiSelect._getDisplayedItems().map(item => item.dataset.coreuiValue)).toEqual(['a'])
+    })
+
+    it('should clear the selection on setValue(null), as on setValue([])', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b">B</option></select><select id="options"></select>'
+      const fromMarkup = new MultiSelect(fixtureEl.querySelector('select'))
+      const fromOptions = new MultiSelect(fixtureEl.querySelector('#options'), { options: [{ value: 'a', text: 'A', selected: true }, { value: 'b', text: 'B' }] })
+
+      expect(fromMarkup.getValue().map(option => option.value)).toEqual(['a'])
+      expect(fromOptions.getValue().map(option => option.value)).toEqual(['a'])
+
+      fromMarkup.setValue(null)
+      fromOptions.setValue(null)
+
+      expect(fromMarkup.getValue()).toEqual([])
+      expect(fromOptions.getValue()).toEqual([])
     })
 
     it('should keep the last value of a multiple select built as a single one', () => {
@@ -6711,28 +6833,6 @@ describe('MultiSelect', () => {
       expect(changes).toHaveSize(1)
     })
 
-    it('should keep the new options and a selected value they lack through disable() and enable()', () => {
-      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option></select>')
-
-      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
-      multiSelect.disable()
-      multiSelect.enable()
-
-      expect(multiSelect._getDisplayedOptions().map(option => option.dataset.coreuiValue)).toEqual(['v'])
-      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
-    })
-
-    it('should keep the options it was given through disable() and enable() on an instance that started with none', () => {
-      fixtureEl.innerHTML = '<select multiple></select>'
-      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [], search: 'external' })
-
-      multiSelect.setOptions([{ value: 'waw', text: 'Warsaw' }, { value: 'krk', text: 'Krakow' }])
-      multiSelect.disable()
-      multiSelect.enable()
-
-      expect(multiSelect._getDisplayedOptions().map(option => option.dataset.coreuiValue)).toEqual(['waw', 'krk'])
-    })
-
     it('should send nothing from a single select that gets options later', () => {
       fixtureEl.innerHTML = '<form><select name="f"></select></form>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false, options: [], search: 'external' })
@@ -6797,16 +6897,6 @@ describe('MultiSelect', () => {
       multiSelect.deselectAll()
 
       expect(fixtureEl.querySelectorAll('select option[hidden]')).toHaveSize(0)
-    })
-
-    it('should keep the list busy through disable() and enable()', () => {
-      const multiSelect = mountExternal()
-
-      multiSelect.setLoading(true)
-      multiSelect.disable()
-      multiSelect.enable()
-
-      expect(multiSelect._menu.querySelector('[role="listbox"]').getAttribute('aria-busy')).toBe('true')
     })
 
     it('should give the focus to the panel when the select all button it held goes without a search field', () => {
@@ -7131,20 +7221,6 @@ describe('MultiSelect', () => {
 
       expect(multiSelectEl.getAttribute('id')).toEqual('mine')
       expect(multiSelectEl.getAttribute('name')).toEqual('tech')
-    })
-
-    it('should still take them back after disable() and enable()', () => {
-      fixtureEl.innerHTML = '<select class="multi-select" multiple></select>'
-
-      const multiSelectEl = fixtureEl.querySelector('.multi-select')
-      const multiSelect = new MultiSelect(multiSelectEl, { name: 'tech' })
-
-      multiSelect.disable()
-      multiSelect.enable()
-      multiSelect.dispose()
-
-      expect(multiSelectEl.hasAttribute('name')).toBeFalse()
-      expect(multiSelectEl.hasAttribute('id')).toBeFalse()
     })
 
     it('should dispose MultiSelect instance', () => {

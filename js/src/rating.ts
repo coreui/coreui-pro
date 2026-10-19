@@ -233,7 +233,11 @@ class Rating extends BaseComponent {
       radio.disabled = disabled
     }
 
-    this._validation.refresh()
+    if (disabled) {
+      this._disposeTooltips()
+    }
+
+    this._paintValue()
   }
 
   _paintValue(): void {
@@ -254,7 +258,7 @@ class Rating extends BaseComponent {
 
     this._highlightLabels(checked)
     this._updateTabStop()
-    this._validation.refresh()
+    this._validation.update()
   }
 
   _radios(): HTMLInputElement[] {

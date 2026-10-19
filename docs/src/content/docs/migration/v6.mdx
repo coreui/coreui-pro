@@ -2714,8 +2714,10 @@ field behind that kept submitting.
   checked star takes focus, and the group carries `aria-readonly="true"`. A
   read-only rating without `name` still submits nothing.
 - **A star with keyboard focus shows the focus ring.**
-- **A rebuild keeps the value the user picked.** Any option change through
-  `update()` used to reset the rating to its initial value.
+- **The setters keep the value the user picked and the stars.** `setValue()`,
+  `disable()` and `enable()` change their part in place; any option change
+  through `update()` used to render the stars again and reset the rating to its
+  initial value.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The rating takes a validation state.** The new `validationState` option,
   or `.is-invalid`/`.is-valid` on the rating element read once when it starts,

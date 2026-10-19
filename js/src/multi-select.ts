@@ -290,6 +290,7 @@ class MultiSelect extends ComboboxBase {
     this._validation = new FieldValidation(this._element, {
       aliases: true,
       config: () => this._config,
+      canBlock: () => !this._disabled,
       fields: () => [this._element as HTMLSelectElement],
       frames: () => [this._wrapperElement],
       invalidTargets: () => [this._getFocusTarget()],
@@ -316,7 +317,7 @@ class MultiSelect extends ComboboxBase {
     this._disabled = this._config.disabled
     this._givenApplies = Boolean(this._config.value)
     this._givenValues = this._config.value ? new Set(this._config.value as string[]) : null
-    this._sourceOptions = this._config.options
+    this._sourceOptions = this._config.options || this._getOptionsFromElement()
     this._total = this._config.total
     this._store = createSelectionStore(next => this._fit(next))
     this._options = this._getOptions()
@@ -566,14 +567,12 @@ class MultiSelect extends ComboboxBase {
   setValue(value: MultiSelectConfig['value']): void {
     this._typeCheckConfig({ value }, { value: DefaultType.value })
 
-    const values = this._normalizeValue(value)
     const select = this._element as HTMLSelectElement
 
-    if (values) {
-      this._givenValues = new Set(values)
-    }
+    const values = this._normalizeValue(value)
 
-    this._givenApplies = Boolean(values)
+    this._givenValues = values ? new Set(values) : new Set()
+    this._givenApplies = true
     this._options = this._getOptions()
     select.selectedIndex = -1
     this._commit(this._markedValues(), false)
@@ -608,6 +607,10 @@ class MultiSelect extends ComboboxBase {
   }
 
   // Private
+  override _isDisabled(): boolean {
+    return this._disabled
+  }
+
   _setDisabled(disabled: boolean): void {
     if (disabled === this._disabled) {
       return
@@ -836,7 +839,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   _getOptions(): any[] {
-    return this._getOptionsFromConfig(this._sourceOptions || this._getOptionsFromElement())
+    return this._getOptionsFromConfig(this._sourceOptions)
   }
 
   _getOptionsFromConfig(options: any = this._sourceOptions, disabled = false): any[] {
@@ -1551,11 +1554,11 @@ class MultiSelect extends ComboboxBase {
   }
 
   _updateSelectionCleaner(): void {
-    if (!this._config.cleaner || this._disabled) {
+    if (!this._config.cleaner) {
       return
     }
 
-    if (this._store.size() > 0 && this._selectionCleanerElement === null) {
+    if (this._store.size() > 0 && !this._disabled && this._selectionCleanerElement === null) {
       const selectionCleaner = this._createSelectionCleaner()
 
       if (this._indicatorElement) {
@@ -1568,7 +1571,7 @@ class MultiSelect extends ComboboxBase {
       return
     }
 
-    if (this._store.size() === 0 && this._selectionCleanerElement !== null) {
+    if ((this._store.size() === 0 || this._disabled) && this._selectionCleanerElement !== null) {
       this._selectionCleanerElement.remove()
       this._selectionCleanerElement = null
     }

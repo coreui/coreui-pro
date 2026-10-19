@@ -42,7 +42,9 @@ const CLASS_NAME_OPTIONS = 'list-box-options'
 const SELECTOR_OPTION = '.list-box-option'
 
 const EVENT_LIST_BOX_CHANGE = 'change.coreui.list-box'
+const EVENT_LIST_BOX_DESELECT = 'deselect.coreui.list-box'
 const EVENT_LIST_BOX_DESELECTED = 'deselected.coreui.list-box'
+const EVENT_LIST_BOX_SELECT = 'select.coreui.list-box'
 const EVENT_LIST_BOX_SELECTED = 'selected.coreui.list-box'
 const EVENT_LIST_BOX_SELECTION_LIMIT = 'selectionLimit.coreui.list-box'
 
@@ -71,7 +73,7 @@ class ComboboxBase extends BaseComponent {
   }
 
   show(): void {
-    if (this._config.disabled || this._isShown() || !this._canShow()) {
+    if (this._isDisabled() || this._isShown() || !this._canShow()) {
       return
     }
 
@@ -135,6 +137,10 @@ class ComboboxBase extends BaseComponent {
         this._syncPanelReferences()
       }
     }, this._menu)
+  }
+
+  _isDisabled(): boolean {
+    return this._config.disabled
   }
 
   _isShown(): boolean {
@@ -400,6 +406,14 @@ class ComboboxBase extends BaseComponent {
   // Selection
 
   _addListBoxListeners(): void {
+    const refuseWhileDisabled = (event: Event) => {
+      if (this._isDisabled()) {
+        event.preventDefault()
+      }
+    }
+
+    EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_DESELECT, refuseWhileDisabled)
+
     EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTED, (event: any) => {
       this._onOptionSelected(String(event.value))
     })
@@ -408,11 +422,12 @@ class ComboboxBase extends BaseComponent {
       this._onOptionDeselected(String(event.value))
     })
 
-    // `change` is a native event name, so EventHandler registers the listener
-    // under the bare type while the list dispatches the namespaced one.
+    // `change` and `select` are native event names, so EventHandler registers the
+    // listener under the bare type while the list dispatches the namespaced one.
     this._listBoxChangeHandler = () => this._onSelectionChange()
 
     this._listBoxElement.addEventListener(EVENT_LIST_BOX_CHANGE, this._listBoxChangeHandler)
+    this._listBoxElement.addEventListener(EVENT_LIST_BOX_SELECT, refuseWhileDisabled)
 
     EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTION_LIMIT, (event: any) => {
       this._onSelectionLimit(event.limit, String(event.value))
