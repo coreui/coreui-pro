@@ -123,6 +123,7 @@ const DefaultType = {
 
 class Rating extends BaseComponent {
   protected declare _currentValue: number | string | null
+  protected declare _disabled: boolean
   protected declare _items: HTMLElement[]
   protected declare _name: string
   protected declare _sizeClassName: string | null
@@ -140,7 +141,7 @@ class Rating extends BaseComponent {
 
         return blocked ? [blocked] : []
       },
-      canBlock: () => !this._config.disabled && !this._config.readonly,
+      canBlock: () => !this._disabled && !this._config.readonly,
       config: () => this._config,
       describedTargets: () => this._radios(),
       fields: () => this._radios(),
@@ -153,6 +154,7 @@ class Rating extends BaseComponent {
     this._sizeClassName = null
     this._config = this._getConfig(config)
     this._currentValue = this._config.value
+    this._disabled = this._config.disabled
     this._startValue = this._config.value
     this._name = this._config.name || getUID(`${this.constructor.NAME}-name-`).toString()
     this._tooltip = null
@@ -176,23 +178,22 @@ class Rating extends BaseComponent {
 
   // Public
   disable(): void {
-    if (!this._config.disabled) {
-      this._setConfig({ disabled: true })
-    }
+    this._setDisabled(true)
   }
 
   enable(): void {
-    if (this._config.disabled) {
-      this._setConfig({ disabled: false })
-    }
+    this._setDisabled(false)
   }
 
   setValidationState(validationState: ValidationState | null): void {
-    this._setConfig({ validationState })
+    this._config = this._getConfig({ ...this._config, validationState })
+    this._validation.configure({ validationState })
   }
 
   setValue(value: RatingConfig['value']): void {
-    this._setConfig({ value })
+    this._typeCheckConfig({ value }, { value: DefaultType.value })
+    this._currentValue = value
+    this._paintValue()
   }
 
   reset(value: number | null = null): void {
@@ -200,7 +201,7 @@ class Rating extends BaseComponent {
     const isChanged = value != this._currentValue
 
     this._currentValue = value
-    this._createRating(this._removeRating())
+    this._paintValue()
 
     if (isChanged) {
       EventHandler.trigger(this._element, EVENT_CHANGE, {
@@ -220,18 +221,40 @@ class Rating extends BaseComponent {
   }
 
   // Private
-  _setConfig(config: Partial<RatingConfig> | null): void {
-    this._config = this._getConfig({ ...this._config, ...config })
-
-    if (this._validation.configure(config)) {
+  _setDisabled(disabled: boolean): void {
+    if (disabled === this._disabled) {
       return
     }
 
-    if (config?.value !== undefined) {
-      this._currentValue = this._config.value
+    this._disabled = disabled
+    this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
+
+    for (const radio of this._radios()) {
+      radio.disabled = disabled
     }
 
-    this._createRating(this._removeRating())
+    this._validation.refresh()
+  }
+
+  _paintValue(): void {
+    let checked: HTMLInputElement | null = null
+
+    for (const radio of this._radios()) {
+      // eslint-disable-next-line eqeqeq
+      radio.checked = radio.value == this._currentValue
+
+      if (radio.checked) {
+        checked = radio
+      }
+    }
+
+    if (!checked) {
+      this._currentValue = null
+    }
+
+    this._highlightLabels(checked)
+    this._updateTabStop()
+    this._validation.refresh()
   }
 
   _radios(): HTMLInputElement[] {
@@ -274,7 +297,7 @@ class Rating extends BaseComponent {
         return
       }
 
-      if (this._config.disabled) {
+      if (this._disabled) {
         return
       }
 
@@ -293,13 +316,13 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_INPUT, SELECTOR_RATING_ITEM_INPUT, () => {
-      if (!this._config.disabled && !this._config.readonly) {
+      if (!this._disabled && !this._config.readonly) {
         this._validation.dismiss()
       }
     })
 
     EventHandler.on(this._element, EVENT_CHANGE, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
-      if (this._config.disabled || this._config.readonly) {
+      if (this._disabled || this._config.readonly) {
         return
       }
 
@@ -315,7 +338,7 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_MOUSEENTER, SELECTOR_RATING_ITEM_LABEL, ({ target }) => {
-      if (this._config.disabled || this._config.readonly) {
+      if (this._disabled || this._config.readonly) {
         return
       }
 
@@ -346,7 +369,7 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_MOUSELEAVE, SELECTOR_RATING_ITEM_LABEL, () => {
-      if (this._config.disabled || this._config.readonly) {
+      if (this._disabled || this._config.readonly) {
         return
       }
 
@@ -371,7 +394,7 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_FOCUSIN, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
-      if (this._config.disabled || this._config.readonly) {
+      if (this._disabled || this._config.readonly) {
         return
       }
 
@@ -383,7 +406,7 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_FOCUSOUT, SELECTOR_RATING_ITEM_INPUT, () => {
-      if (this._config.disabled || this._config.readonly) {
+      if (this._disabled || this._config.readonly) {
         return
       }
 
@@ -467,7 +490,7 @@ class Rating extends BaseComponent {
 
   _createRating(anchor: ChildNode | null = null): void {
     this._element.classList.add(CLASS_NAME_RATING)
-    this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
+    this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
     this._element.classList.toggle(CLASS_NAME_READONLY, Boolean(this._config.readonly))
 
     this._element.classList.remove(...SIZE_CLASS_NAMES)
@@ -610,7 +633,7 @@ class Rating extends BaseComponent {
         ratingItemInputElement.setAttribute('aria-label', this._config.ariaLabel(value, this._config.itemCount))
       }
 
-      if (this._config.disabled) {
+      if (this._disabled) {
         ratingItemInputElement.setAttribute('disabled', true as any)
       }
 

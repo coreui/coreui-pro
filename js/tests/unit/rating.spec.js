@@ -594,7 +594,42 @@ describe('Rating', () => {
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
-    it('should dispose the tooltips of the items it replaces', () => {
+    it('should keep the focused star and the same elements through setValue, disable() and enable()', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { value: 2 })
+      const radios = [...div.querySelectorAll('input')]
+
+      radios[1].focus()
+      rating.setValue(4)
+
+      expect(document.activeElement).toBe(radios[1])
+      expect(radios[3].checked).toBeTrue()
+
+      rating.disable()
+
+      expect(div).toHaveClass('disabled')
+      expect(radios.every(radio => radio.disabled)).toBeTrue()
+
+      rating.enable()
+
+      expect([...div.querySelectorAll('input')]).toEqual(radios)
+      expect(radios.some(radio => radio.disabled)).toBeFalse()
+    })
+
+    it('should drop a value setValue gives that no star has', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 5, value: 2 })
+
+      rating.setValue(9)
+
+      expect(rating._currentValue).toBeNull()
+      expect(div.querySelector('input:checked')).toBeNull()
+      expect(div.querySelector('.rating-item-label.active')).toBeNull()
+    })
+
+    it('should keep the items and their tooltip through setValue', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 3, tooltips: true })
@@ -606,8 +641,8 @@ describe('Rating', () => {
 
       rating.setValue(2)
 
-      expect(Tooltip.getInstance(item)).toBeNull()
-      expect(rating._tooltip).toBeNull()
+      expect(div.querySelectorAll('.rating-item')[1]).toBe(item)
+      expect(Tooltip.getInstance(item)).not.toBeNull()
     })
 
     it('should update disabled state', () => {
