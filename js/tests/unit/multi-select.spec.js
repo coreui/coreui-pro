@@ -5464,8 +5464,7 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      // Simulate disabled state after creation
-      multiSelect._config.disabled = true
+      multiSelect._disabled = true
 
       // Trigger the event handler directly
       const event = new Event('click', { bubbles: true })
@@ -5873,52 +5872,103 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue()[0].value).toBe('3')
     })
 
-    it('should rebuild the DOM on setValue', () => {
+    it('should keep the DOM on setValue', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Option 1' }]
       })
 
-      const oldClone = multiSelect._wrapperElement
+      const wrapper = multiSelect._wrapperElement
 
       multiSelect.setValue(['1'])
 
-      expect(multiSelect._wrapperElement).not.toBe(oldClone)
+      expect(multiSelect._wrapperElement).toBe(wrapper)
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
     })
 
-    it('should tear down the previous selection and menu on disable() and enable()', () => {
+    it('should keep a value setValue gives until options bring it, without a change event', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
-      const options = [{ value: '1', text: 'Option 1', selected: true }]
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: 'a', text: 'A' }] })
+      const changes = []
+      selectEl.addEventListener('change.coreui.multi-select', event => changes.push(event))
+
+      multiSelect.setValue(['x'])
+
+      expect(multiSelect.getValue()).toEqual([])
+
+      multiSelect.setOptions([{ value: 'x', text: 'X' }, { value: 'y', text: 'Y' }])
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['x'])
+      expect(changes).toEqual([])
+    })
+
+    it('should keep the focused chip and an open panel through setValue', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: 'a', text: 'A', selected: true }, { value: 'b', text: 'B', selected: true }, { value: 'c', text: 'C' }]
+      })
+      const chip = multiSelect._selectionElement.querySelectorAll('.chip')[1]
+
+      chip.focus()
+      multiSelect.setValue(['a', 'b', 'c'])
+
+      expect(document.activeElement).toBe(chip)
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b', 'c'])
+    })
+
+    it('should keep the selection, its chips and the menu through disable() and enable()', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
-        options,
+        options: [{ value: '1', text: 'Option 1', selected: true }],
         search: true,
         selectionType: 'tags'
       })
-
-      const previousSelection = multiSelect._selectionElement
-      const previousChip = previousSelection.querySelector('.chip')
-      const previousMenu = multiSelect._menu
+      const selection = multiSelect._selectionElement
+      const menu = multiSelect._menu
+      const search = multiSelect._searchElement
 
       multiSelect.disable()
+
+      expect(selectEl.disabled).toBeTrue()
+      expect(search.disabled).toBeTrue()
+      expect(selection.querySelector('.chip-remove')).toBeNull()
+
       multiSelect.enable()
 
-      expect(Chip.getInstance(previousChip)).toBeNull()
-      expect(ChipSet.getInstance(previousSelection)).toBeNull()
+      expect(multiSelect._selectionElement).toBe(selection)
+      expect(multiSelect._menu).toBe(menu)
+      expect(multiSelect._searchElement).toBe(search)
+      expect(search.disabled).toBeFalse()
+      expect(selection.querySelector('.chip-remove')).not.toBeNull()
+    })
 
-      const deselectSpy = spyOn(multiSelect, '_deselectOption')
-      const focusSpy = spyOn(multiSelect._searchElement, 'focus')
+    it('should close an open panel on disable()', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }] })
 
-      EventHandler.trigger(previousChip, 'remove.coreui.chip')
-      previousMenu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'a' }))
+      multiSelect.show()
+      multiSelect.disable()
 
-      expect(deselectSpy).not.toHaveBeenCalled()
-      expect(focusSpy).not.toHaveBeenCalled()
+      expect(multiSelect._isShown()).toBeFalse()
+    })
 
-      EventHandler.trigger(multiSelect._selectionElement.querySelector('.chip'), 'remove.coreui.chip')
+    it('should let a select built disabled search once enable() runs', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        disabled: true,
+        options: [{ value: 'a', text: 'Alpha' }, { value: 'b', text: 'Beta' }],
+        search: true
+      })
 
-      expect(deselectSpy).toHaveBeenCalledTimes(1)
+      multiSelect.enable()
+      multiSelect.show()
+      multiSelect._searchElement.value = 'Be'
+      multiSelect._searchElement.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(multiSelect._getDisplayedItems().map(item => item.dataset.coreuiValue)).toEqual(['b'])
     })
 
     it('should keep the selection through disable() and enable()', () => {
