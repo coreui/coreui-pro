@@ -152,8 +152,7 @@ class Rating extends BaseComponent {
     this._items = []
     this._validation = new FieldValidation(this._element, {
       blockers: () => {
-        const radios = this._radios()
-        const blocked = radios.find(radio => radio.checked) ?? radios[0]
+        const blocked = this._blockedRadio()
 
         return blocked ? [blocked] : []
       },
@@ -253,6 +252,12 @@ class Rating extends BaseComponent {
 
   _radios(): HTMLInputElement[] {
     return SelectorEngine.find<HTMLInputElement>(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)
+  }
+
+  _blockedRadio(): HTMLInputElement | undefined {
+    const radios = this._radios()
+
+    return radios.find(radio => radio.checked) ?? radios[0]
   }
 
   _removeRating(): ChildNode | null {
@@ -528,11 +533,24 @@ class Rating extends BaseComponent {
       this._resetLabels()
     }
 
+    this._updateTabStop()
     this._validation.refresh()
   }
 
   _isRequired(): boolean {
     return this._config.required && !this._config.readonly
+  }
+
+  _updateTabStop(): void {
+    if (!this._config.readonly) {
+      return
+    }
+
+    const stop = this._blockedRadio()
+
+    for (const input of this._radios()) {
+      input.tabIndex = input === stop ? 0 : -1
+    }
   }
 
   _restoreValue(): void {
@@ -547,11 +565,7 @@ class Rating extends BaseComponent {
     this._currentValue = value
     this._highlightLabels(checkedInput)
 
-    if (this._config.readonly) {
-      for (const input of SelectorEngine.find<HTMLInputElement>(SELECTOR_RATING_ITEM_INPUT, this._element)) {
-        input.tabIndex = input.checked ? 0 : -1
-      }
-    }
+    this._updateTabStop()
 
     EventHandler.trigger(this._element, EVENT_CHANGE, {
       value
@@ -640,10 +654,6 @@ class Rating extends BaseComponent {
       ratingItemInputElement.defaultChecked = this._startValue == value
       // eslint-disable-next-line eqeqeq
       ratingItemInputElement.checked = this._currentValue == value
-
-      if (this._config.readonly && !ratingItemInputElement.checked) {
-        ratingItemInputElement.tabIndex = -1
-      }
 
       // Append elements
 

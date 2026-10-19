@@ -1118,7 +1118,60 @@ describe('Rating', () => {
       expect(changeSpy).not.toHaveBeenCalled()
     })
 
-    it('should leave only the checked star of a readonly rating in the tab order', () => {
+    it('should give a readonly rating without a value one tab stop, on its first star', async () => {
+      fixtureEl.innerHTML = '<button type="button">Before</button><div></div><button type="button">After</button>'
+      const div = fixtureEl.querySelector('div')
+      const [before, after] = fixtureEl.querySelectorAll('button')
+      // eslint-disable-next-line no-new
+      new Rating(div, { readonly: true })
+
+      before.focus()
+      await userEvent.tab()
+
+      expect(document.activeElement).toBe(div.querySelector('.rating-item-input'))
+
+      await userEvent.tab()
+
+      expect(document.activeElement).toBe(after)
+    })
+
+    it('should keep an empty readonly rating empty when its focused first star gets Space or an arrow key', async () => {
+      fixtureEl.innerHTML = '<button type="button">Before</button><div></div>'
+      const div = fixtureEl.querySelector('div')
+      const changeSpy = jasmine.createSpy('change')
+      // eslint-disable-next-line no-new
+      new Rating(div, { name: 'score', readonly: true })
+
+      div.addEventListener('change.coreui.rating', changeSpy)
+      fixtureEl.querySelector('button').focus()
+      await userEvent.tab()
+      await userEvent.keyboard(' {ArrowRight}')
+
+      expect(document.activeElement).toBe(div.querySelector('.rating-item-input'))
+      expect(div.querySelector('.rating-item-input:checked')).toBeNull()
+      expect(changeSpy).not.toHaveBeenCalled()
+    })
+
+    it('should put the tab stop of a readonly rating on its first star while no star is checked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Rating(div, { readonly: true, value: 4.3 })
+
+      expect([...div.querySelectorAll('.rating-item-input')].map(input => input.tabIndex)).toEqual([0, -1, -1, -1, -1])
+    })
+
+    it('should put the tab stop of a readonly half-star rating without a value on its first half', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Rating(div, { precision: 0.5, readonly: true })
+      const stops = [...div.querySelectorAll('.rating-item-input')].filter(input => input.tabIndex === 0)
+
+      expect(stops.map(input => input.value)).toEqual(['0.5'])
+    })
+
+    it('should leave only the checked star of a readonly rating in the tab order, and the first one without a value', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { readonly: true, value: 2 })
@@ -1128,7 +1181,7 @@ describe('Rating', () => {
 
       rating.setConfig({ value: null })
 
-      expect(tabIndexes()).toEqual([-1, -1, -1, -1, -1])
+      expect(tabIndexes()).toEqual([0, -1, -1, -1, -1])
 
       rating.setConfig({ readonly: false })
 
@@ -1734,6 +1787,23 @@ describe('Rating', () => {
       expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
       expect(changeSpy).toHaveBeenCalledTimes(1)
       expect(changeSpy.calls.mostRecent().args[0].value).toEqual('2')
+    })
+
+    it('should move the tab stop of a readonly rating to its first star when a form reset empties it', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { name: 'score', readonly: true })
+      const tabIndexes = () => [...div.querySelectorAll('.rating-item-input')].map(input => input.tabIndex)
+
+      rating.setConfig({ value: 3 })
+
+      expect(tabIndexes()).toEqual([-1, -1, 0, -1, -1])
+
+      form.reset()
+      await wait()
+
+      expect(tabIndexes()).toEqual([0, -1, -1, -1, -1])
     })
 
     it('should go back to the value it was built with, not one setConfig gave later, when the form resets', async () => {
