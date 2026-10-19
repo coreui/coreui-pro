@@ -76,7 +76,7 @@ const HOST_FIELD_ATTRIBUTES = new Set([
 ])
 
 const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]'
-const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
+const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete.${CLASS_NAME_SHOW}`
 const SELECTOR_INDICATOR = '.form-control-action'
 
 type AutocompleteConfig = {
@@ -197,6 +197,7 @@ class Autocomplete extends ComboboxBase {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(`${this.constructor.NAME}`)
+    this._cleanerElement = null
     this._indicatorElement = null
     this._inputElement = null
     this._inputHintElement = null
@@ -447,7 +448,7 @@ class Autocomplete extends ComboboxBase {
     EventHandler.on(this._inputElement, EVENT_BLUR, () => {
       const inputValue = this._inputElement.value
 
-      if (inputValue.length === 0) {
+      if (this._config.disabled || inputValue.length === 0) {
         return
       }
 
@@ -485,7 +486,7 @@ class Autocomplete extends ComboboxBase {
         return
       }
 
-      if (event.key === TAB_KEY && this._config.showHints && this._inputHintElement.value) {
+      if (event.key === TAB_KEY && this._inputHintElement?.value) {
         event.preventDefault()
         event.stopPropagation()
 
@@ -517,7 +518,7 @@ class Autocomplete extends ComboboxBase {
       }
 
       this.search(value)
-      if (this._config.showHints) {
+      if (this._inputHintElement) {
         const option = value.trim() ? this._findHintOption(value) : undefined
         this._inputHintElement.value = option ? `${value}${option.label.slice(value.trimStart().length)}` : ''
       }
@@ -769,7 +770,7 @@ class Autocomplete extends ComboboxBase {
   override _onOptionSelected(value: string): void {
     const foundOption = this._findOptionByValue(value)
 
-    if (foundOption) {
+    if (foundOption && !this._config.disabled) {
       this._selectOption(foundOption)
       this._inputElement.focus()
     }
@@ -788,7 +789,7 @@ class Autocomplete extends ComboboxBase {
     this._validation.update()
     this._triggerChangeEvent(option)
 
-    if (this._config.showHints) {
+    if (this._inputHintElement) {
       this._inputHintElement.value = ''
     }
 
@@ -845,7 +846,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   _updateCleaner(): void {
-    if (!this._config.cleaner || this._cleanerElement === null) {
+    if (!this._cleanerElement) {
       return
     }
 
