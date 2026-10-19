@@ -271,7 +271,7 @@ describe('Autocomplete', () => {
       })
 
       expect(autocompleteEl.classList.contains('disabled')).toBe(true)
-      expect(autocomplete._inputElement.getAttribute('disabled')).toBe('true')
+      expect(autocomplete._inputElement.disabled).toBeTrue()
       expect(autocomplete._inputElement.tabIndex).toBe(-1)
     })
 
@@ -318,7 +318,7 @@ describe('Autocomplete', () => {
         options: []
       })
 
-      expect(autocomplete._inputElement.getAttribute('required')).toBe('true')
+      expect(autocomplete._inputElement.required).toBeTrue()
     })
 
     it('should set placeholder on input', () => {
@@ -468,7 +468,7 @@ describe('Autocomplete', () => {
       expect(Autocomplete.getInstance(autocompleteEl)._isExternalSearch()).toBe(true)
     })
 
-    it('should not create hint input when disabled', () => {
+    it('should create hint input while disabled, for the field to hint once enabled', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -477,7 +477,7 @@ describe('Autocomplete', () => {
         options: []
       })
 
-      expect(autocomplete._inputHintElement).toBeNull()
+      expect(autocomplete._inputHintElement).not.toBeNull()
     })
 
     it('should create hint input when showHints is true and not disabled', () => {
@@ -1542,6 +1542,44 @@ describe('Autocomplete', () => {
   })
 
   describe('setConfig', () => {
+    it('should follow disabled and required given later in both directions', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const element = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(element, {
+        cleaner: true,
+        disabled: true,
+        options: [{ label: 'Option 1', value: '1' }],
+        pickerIcon: true,
+        showHints: true,
+        value: '1'
+      })
+      const input = autocomplete._inputElement
+
+      expect(input.disabled).toBeTrue()
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
+
+      autocomplete.setConfig({ disabled: false, required: true })
+
+      expect(element).not.toHaveClass('disabled')
+      expect(input.disabled).toBeFalse()
+      expect(input.hasAttribute('tabindex')).toBeFalse()
+      expect(input.required).toBeTrue()
+      expect(autocomplete._indicatorElement.disabled).toBeFalse()
+      expect(autocomplete._cleanerElement.style.display).toBe('')
+      expect(autocomplete._inputHintElement).not.toBeNull()
+
+      autocomplete.show()
+      autocomplete.setConfig({ disabled: true, required: false })
+
+      expect(element).toHaveClass('disabled')
+      expect(input.disabled).toBeTrue()
+      expect(input.tabIndex).toBe(-1)
+      expect(input.required).toBeFalse()
+      expect(autocomplete._indicatorElement.disabled).toBeTrue()
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
     it('should not send list box events when the page changes the value', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {

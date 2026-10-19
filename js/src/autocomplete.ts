@@ -22,7 +22,7 @@ import {
 } from './util/option-tree.js'
 import { createSelectionStore } from './util/selection-state.js'
 import {
-  defineJQueryPlugin, getUID, jQueryDispatch
+  defineJQueryPlugin, getUID, jQueryDispatch, writeAttribute
 } from './util/index.js'
 
 /**
@@ -344,6 +344,12 @@ class Autocomplete extends ComboboxBase {
     }
 
     this._seedSelection()
+    this._applyState()
+
+    if (this._config.disabled) {
+      this.hide()
+    }
+
     this._validation.update()
   }
 
@@ -646,12 +652,26 @@ class Autocomplete extends ComboboxBase {
   _createAutocomplete(): void {
     this._element.classList.add(CLASS_NAME_AUTOCOMPLETE)
 
-    this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
-
     this._createInputGroup()
     this._createButtons()
     this._createOptionsContainer()
     this._seedSelection()
+    this._applyState()
+  }
+
+  _applyState(): void {
+    const { disabled, required } = this._config
+
+    this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
+    this._inputElement.disabled = disabled
+    this._inputElement.required = required
+    writeAttribute(this._inputElement, 'tabindex', disabled ? '-1' : null)
+
+    if (this._indicatorElement) {
+      this._indicatorElement.disabled = disabled
+    }
+
+    this._updateCleaner()
   }
 
   _createInputGroup(): void {
@@ -666,7 +686,7 @@ class Autocomplete extends ComboboxBase {
     applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
 
-    if (!this._config.disabled && this._config.showHints) {
+    if (this._config.showHints) {
       const inputHintEl = document.createElement('input')
       inputHintEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_HINT)
       inputHintEl.autocomplete = 'off'
@@ -695,15 +715,6 @@ class Autocomplete extends ComboboxBase {
     inputEl.setAttribute('aria-expanded', 'false')
     inputEl.setAttribute('aria-haspopup', 'listbox')
 
-    if (this._config.disabled) {
-      inputEl.setAttribute('disabled', true as any)
-      inputEl.tabIndex = -1
-    }
-
-    if (this._config.required) {
-      inputEl.setAttribute('required', true as any)
-    }
-
     togglerEl.append(inputEl)
     this._inputElement = inputEl
     this._syncInputName()
@@ -718,7 +729,7 @@ class Autocomplete extends ComboboxBase {
     // wrapper's.
     const buttons = this._togglerElement
 
-    if (!this._config.disabled && this._config.cleaner) {
+    if (this._config.cleaner) {
       const cleaner = document.createElement('button')
       cleaner.type = 'button'
       cleaner.classList.add(CLASS_NAME_CLEANER)
@@ -734,7 +745,6 @@ class Autocomplete extends ComboboxBase {
       const indicator = document.createElement('button')
       indicator.type = 'button'
       indicator.classList.add(CLASS_NAME_INDICATOR)
-      indicator.disabled = this._config.disabled
       indicator.setAttribute('aria-label', this._config.ariaPickerLabel)
       indicator.innerHTML = sanitizeByConfig(
         this._config.pickerIcon === true ? PICKER_ICON : this._config.pickerIcon,
@@ -839,7 +849,7 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
-    if (this._store.size() > 0) {
+    if (this._store.size() > 0 && !this._config.disabled) {
       this._cleanerElement.style.removeProperty('display')
       return
     }
