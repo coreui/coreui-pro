@@ -74,8 +74,6 @@ const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_CHIP_REMOVE = 'remove.coreui.chip'
-const EVENT_LIST_BOX_DESELECT = 'deselect.coreui.list-box'
-const EVENT_LIST_BOX_SELECT = 'select.coreui.list-box'
 
 const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
@@ -114,6 +112,7 @@ type MultiSelectConfig = {
   id: string | null
   indicator: 'checkbox' | 'none'
   invalid: boolean
+  loadingLabel: string
   multiple: boolean
   name: string | null
   options: false | any[]
@@ -160,6 +159,7 @@ const Default: MultiSelectConfig = {
   id: null,
   indicator: 'checkbox',
   invalid: false,
+  loadingLabel: 'Loading…',
   multiple: true,
   name: null,
   options: false,
@@ -206,6 +206,7 @@ const DefaultType: Record<string, string> = {
   id: '(string|null)',
   indicator: 'string',
   invalid: 'boolean',
+  loadingLabel: 'string',
   multiple: 'boolean',
   name: '(string|null)',
   options: '(boolean|array)',
@@ -256,7 +257,6 @@ class MultiSelect extends ComboboxBase {
   protected declare _hostOptions: ChildNode[]
   protected declare _initialSelection: any[]
   protected declare _known: Map<string, any>
-  protected declare _listBoxGuard: (event: Event) => void
   protected declare _loading: boolean
   protected declare _offListOptions: HTMLOptionElement[]
   protected declare _seenValues: Set<string>
@@ -307,12 +307,6 @@ class MultiSelect extends ComboboxBase {
     this._menu = null
     this._nativeFocusHandler = null
     this._nativeKeydownHandler = null
-    this._listBoxGuard = event => {
-      if (this._loading) {
-        event.preventDefault()
-      }
-    }
-
     this._initialSelection = []
     this._known = new Map()
     this._seenValues = new Set()
@@ -1160,6 +1154,7 @@ class MultiSelect extends ComboboxBase {
       selectionLimit: this._config.selectionLimit,
       selectionMode: this._config.multiple ? 'multiple' : 'single',
       loading: this._loading,
+      loadingLabel: this._config.loadingLabel,
       typeahead: !this._routesTypingToSearch() && this._config.search !== 'external'
     }
   }
@@ -1243,14 +1238,6 @@ class MultiSelect extends ComboboxBase {
       }
 
       next = chip
-    }
-  }
-
-  override _addListBoxListeners(): void {
-    super._addListBoxListeners()
-
-    for (const type of [EVENT_LIST_BOX_SELECT, EVENT_LIST_BOX_DESELECT]) {
-      this._listBoxElement.addEventListener(type, this._listBoxGuard)
     }
   }
 

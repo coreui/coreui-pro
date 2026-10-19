@@ -1054,8 +1054,8 @@ check, radio, carousel and toggler icons already work:
   nothing, `search.coreui.multi-select` carries the `query`, and
   `setOptions()` replaces the options without rebuilding the control or
   touching the selection; a selected value the new options lack keeps its
-  chip and is still sent with the form, unless it is disabled. `setLoading()` dims the list
-  meanwhile. `resetSelectionOnOptionsChange` empties the selection when the new
+  chip and is still sent with the form, unless it is disabled. `setLoading()` shows a
+  `loadingLabel` row below the options meanwhile, and they stay usable. `resetSelectionOnOptionsChange` empties the selection when the new
   options carry different values, for options that depend on another field.
 - **Multi Select's `search.coreui.multi-select` follows the text, not the
   keys.** It fires when the text of the search box changes, a paste included,

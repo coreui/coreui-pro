@@ -21,7 +21,6 @@ $list-box-tokens: defaults(
     --#{$prefix}list-box-border-width: var(--#{$prefix}border-width),
     --#{$prefix}list-box-border-color: var(--#{$prefix}border-color),
     --#{$prefix}list-box-border-radius: var(--#{$prefix}radius-7),
-    --#{$prefix}list-box-loading-opacity: .65,
     --#{$prefix}list-box-header-border-width: var(--#{$prefix}border-width),
     --#{$prefix}list-box-header-border-color: var(--#{$prefix}border-color),
     --#{$prefix}list-box-title-font-size: var(--#{$prefix}body-font-size),
@@ -70,8 +69,12 @@ $list-box-tokens: defaults(
     @include border-radius(var(--#{$prefix}list-box-border-radius));
   }
 
-  .list-box.loading .list-box-options {
-    opacity: var(--#{$prefix}list-box-loading-opacity);
+  .list-box-loading {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    padding: var(--#{$prefix}list-box-option-padding-y) calc(var(--#{$prefix}list-box-padding-x) + var(--#{$prefix}list-box-option-padding-x));
+    color: var(--#{$prefix}list-box-option-disabled-color);
   }
 
   .list-box-translucent {

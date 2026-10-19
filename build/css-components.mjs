@@ -33,7 +33,7 @@ const renders = {
   'forms/form-multi-select': ['combobox', 'chip', 'chip-set', 'forms/form-control-group'],
   'forms/form-range': ['tooltip'],
   'forms/number-input': ['forms/form-control', 'forms/form-control-group'],
-  'list-box': ['forms/check', 'forms/form-control'],
+  'list-box': ['forms/check', 'forms/form-control', 'spinner'],
   'loading-button': ['buttons', 'spinner'],
   'range-slider': ['forms/form-range', 'tooltip'],
   rating: ['tooltip'],

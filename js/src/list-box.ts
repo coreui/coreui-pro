@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { announce } from './util/announce.js'
 import {
   createTypeaheadBuffer, findTypeaheadMatch, rangeBetween, type TypeaheadBuffer
 } from './util/list-navigation.js'
@@ -72,6 +73,7 @@ const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_LOADING = 'loading'
+const CLASS_NAME_LOADING_REGION = 'list-box-loading'
 const CLASS_NAME_OPTION = 'list-box-option'
 const CLASS_NAME_OPTION_DESCRIPTION = 'list-box-option-description'
 const CLASS_NAME_OPTION_INDICATOR = 'list-box-option-indicator'
@@ -134,6 +136,7 @@ type ListBoxConfig = {
   indicator: string
   items: ListBoxEntry[]
   loading: boolean
+  loadingLabel: string
   resetSelectionOnItemsChange: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
@@ -158,6 +161,7 @@ const Default: ListBoxConfig = {
   indicator: 'none',
   items: [],
   loading: false,
+  loadingLabel: 'Loading…',
   resetSelectionOnItemsChange: false,
   sanitize: true,
   sanitizeFn: null,
@@ -182,6 +186,7 @@ const DefaultType: Record<string, string> = {
   indicator: 'string',
   items: 'array',
   loading: 'boolean',
+  loadingLabel: 'string',
   resetSelectionOnItemsChange: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
@@ -210,6 +215,8 @@ class ListBox extends BaseComponent {
   protected declare _focused: boolean
   protected declare _limited: string | null
   protected declare _list: HTMLElement
+  protected declare _loadingAnnouncement: (() => void) | null
+  protected declare _loadingRegion: HTMLElement
   protected declare _query: string | null
   protected declare _searchField: HTMLInputElement | null
   protected declare _selectAll: HTMLButtonElement | null
@@ -227,7 +234,9 @@ class ListBox extends BaseComponent {
     this._focused = false
     this._limited = null
     this._list = this._resolveList()
+    this._loadingAnnouncement = null
     this._counter = this._resolveCounter()
+    this._loadingRegion = this._createLoadingRegion()
     this._query = null
     this._searchField = this._resolveSearch()
     this._selectAll = SelectorEngine.findOne(SELECTOR_SELECT_ALL, this._element) as HTMLButtonElement | null
@@ -444,6 +453,8 @@ class ListBox extends BaseComponent {
 
     this._element.removeAttribute(ATTRIBUTE_INDICATOR)
     this._element.classList.remove(CLASS_NAME_LOADING)
+    this._loadingRegion.remove()
+    this._loadingAnnouncement?.()
 
     EventHandler.off(this._list, EVENT_KEY)
 
@@ -481,6 +492,36 @@ class ListBox extends BaseComponent {
     } else {
       this._list.removeAttribute('aria-busy')
     }
+
+    this._loadingRegion.hidden = !this._config.loading
+    this._syncLoadingAnnouncement()
+  }
+
+  _syncLoadingAnnouncement(): void {
+    const loading = this._config.loading && this._element.isConnected
+
+    if (loading === Boolean(this._loadingAnnouncement)) {
+      return
+    }
+
+    this._loadingAnnouncement?.()
+    this._loadingAnnouncement = loading ? announce(this._config.loadingLabel, { context: this._element }) : null
+  }
+
+  _createLoadingRegion(): HTMLElement {
+    const region = document.createElement('div')
+    const spinner = document.createElement('span')
+
+    region.className = CLASS_NAME_LOADING_REGION
+    spinner.className = 'spinner-border spinner-border-sm'
+    spinner.setAttribute('aria-hidden', 'true')
+    region.append(spinner, this._config.loadingLabel)
+
+    if (this._list !== this._element) {
+      this._list.after(region)
+    }
+
+    return region
   }
 
   _updateOptions(): void {
