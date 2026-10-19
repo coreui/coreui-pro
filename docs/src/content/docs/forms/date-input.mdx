@@ -376,7 +376,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `reset` | Reset the field to the date it was created with, emitting `dateChange` and the native `input` and `change` of the value field when the value moves. A native form reset does the same. |
 | `disable()` | Disables the field. |
 | `enable()` | Enables the field. |
-| `setDate(date, triggerChange)` | Sets the date. By default it fires no `dateChange` and no native `input` or `change` of the value field, since the code that calls it already knows the value; `errorChange` still reports a date the field refuses. Pass `true` as `triggerChange` when the date comes from the user through another control, such as a calendar of your own: the field then fires what typing that date would. The focused section stays. Without a call the field keeps what the user typed. |
+| `setDate(date, triggerChange)` | Sets the date. By default it fires no `dateChange` and no native `input` or `change` of the value field, since the code that calls it already knows the value; `errorChange` still reports a date the field refuses. Pass `true` as `triggerChange` when the date comes from the user through another control, such as a calendar of your own: the field then fires the events typing that date would; a given validation state stays, as with any change from code. The focused section stays. Without a call the field keeps what the user typed. |
 | `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
 
 ```javascript

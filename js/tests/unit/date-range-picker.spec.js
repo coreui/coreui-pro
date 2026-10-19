@@ -58,6 +58,81 @@ describe('DateRangePicker', () => {
   })
 
   describe('setters', () => {
+    it('should show an end setStartDate and setEndDate give in the open calendar and the toggle name, without an event', () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) })
+      const el = fixtureEl.querySelector('#picker')
+      const toggle = el.querySelector('[aria-haspopup]')
+      const events = []
+      for (const type of ['startDateChange.coreui.date-range-input', 'endDateChange.coreui.date-range-input', 'startDateChange.coreui.date-range-picker', 'endDateChange.coreui.date-range-picker']) {
+        el.addEventListener(type, () => events.push(type))
+      }
+
+      picker.show()
+      const before = toggle.getAttribute('aria-label')
+      picker.setStartDate(new Date(2026, 6, 3))
+
+      expect([...fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell.selected')].map(cell => cell.textContent.trim())).toEqual(['3', '20'])
+      expect(toggle.getAttribute('aria-label')).not.toEqual(before)
+
+      picker.setEndDate(new Date(2026, 6, 24))
+
+      expect([...fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell.selected')].map(cell => cell.textContent.trim())).toEqual(['3', '24'])
+      expect(events).toEqual([])
+    })
+
+    it('should go back to picking the start after a setter', () => {
+      const picker = buildPicker({ locale: 'en-US', startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Fri Jul 03 2026"]').click()
+
+      expect(picker._selectEndDate).toBeTrue()
+
+      picker.setRange(new Date(2026, 6, 1), new Date(2026, 6, 5))
+
+      expect(picker._selectEndDate).toBeFalse()
+    })
+
+    it('should show a range setRange gives in the open calendar and the toggle name, without an event', () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) })
+      const el = fixtureEl.querySelector('#picker')
+      const toggle = el.querySelector('[aria-haspopup]')
+      const before = toggle.getAttribute('aria-label')
+      const events = []
+      for (const type of ['input', 'change', 'startDateChange.coreui.date-range-input', 'endDateChange.coreui.date-range-input', 'startDateChange.coreui.date-range-picker', 'endDateChange.coreui.date-range-picker']) {
+        el.addEventListener(type, () => events.push(type))
+      }
+
+      picker.show()
+      picker.setRange(new Date(2026, 6, 3), new Date(2026, 6, 24))
+
+      expect([...fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell.selected')].map(cell => cell.textContent.trim())).toEqual(['3', '24'])
+      expect(toggle.getAttribute('aria-label')).not.toEqual(before)
+      expect(toggle.getAttribute('aria-label')).toContain('Toggle calendar, ')
+      expect(events).toEqual([])
+    })
+
+    it('should report a range picked in the calendar', () => {
+      const picker = buildPicker({ locale: 'en-US', startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) })
+      const seen = []
+      for (const name of ['startDateChange', 'endDateChange']) {
+        fixtureEl.querySelector('#picker').addEventListener(`${name}.coreui.date-range-picker`, () => seen.push(name))
+      }
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Fri Jul 03 2026"]').click()
+
+      expect(seen).toContain('startDateChange')
+    })
+
+    it('should reject a date of the wrong type with its own option error', () => {
+      const picker = buildPicker()
+
+      expect(() => picker.setStartDate(0)).toThrow('DATE-RANGE-PICKER: Option "startDate" provided type "number" but expected type "(date|string|null)".')
+      expect(() => picker.setEndDate(0)).toThrow('DATE-RANGE-PICKER: Option "endDate" provided type "number" but expected type "(date|string|null)".')
+      expect(() => picker.setRange(0, null)).toThrow('DATE-RANGE-PICKER: Option "startDate" provided type "number" but expected type "(date|string|null)".')
+    })
+
     it('should change one end through setStartDate and setEndDate, keeping the other', () => {
       const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) })
 
@@ -336,7 +411,7 @@ describe('DateRangePicker', () => {
       el.addEventListener('startDateChange.coreui.date-range-picker', record)
       el.addEventListener('endDateChange.coreui.date-range-picker', record)
       picker.show()
-      picker.setRange(new Date(2026, 6, 5), new Date(2026, 6, 20))
+      picker.getContext().setRange(new Date(2026, 6, 5), new Date(2026, 6, 20))
 
       expect(selected).toEqual([['5', '10'], ['5', '20']])
     })

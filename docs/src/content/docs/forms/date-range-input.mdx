@@ -354,10 +354,10 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `isDateSelectable` | Whether a date passes the shared limits |
 | `isRangeValid` | `false` while the end is before the start |
 | `reset` | Restore the dates the component was created with, emitting the change events when a value moves. A native form reset does the same and also drops a given validation state. |
-| `setEndDate(date)` | Sets the end date and keeps the start. |
+| `setEndDate(date, triggerChange)` | Sets the end date and keeps the start, without an event by default; pass `true` as `triggerChange` to fire the events a date the user gives through another control would. |
 | `setValidationState(state)` | Gives the component a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
-| `setStartDate(date)` | Sets the start date and keeps the end. |
-| `setRange` | Set both ends: `setRange(start, end)`. Each end validates its own date, so what the range keeps is what the fields kept. |
+| `setStartDate(date, triggerChange)` | Sets the start date and keeps the end, without an event by default; pass `true` as `triggerChange` to fire the events a date the user gives through another control would. |
+| `setRange` | Set both ends: `setRange(start, end)`. Each end validates its own date, so what the range keeps is what the fields kept. It fires no `startDateChange` or `endDateChange`, since the code that calls it already knows the range; `setRange(start, end, true)` fires the events a range the user picked would; a given validation state stays, as with any change from code. |
 
 ```javascript
 const dateRangeInput = coreui.DateRangeInput.getInstance(document.querySelector('#myDateRangeInput'))
@@ -370,10 +370,10 @@ dateRangeInput.clear()
 
 | Event | Description |
 | --- | --- |
-| `endDateChange.coreui.date-range-input` | Fired when the end changes; `event.date` is a `Date`, or `null` when that end is incomplete or invalid |
-| `startDateChange.coreui.date-range-input` | Fired when the start changes, with the same payload shape as the end |
+| `endDateChange.coreui.date-range-input` | Fired when the user changes the end, or `clear()`, `reset()` or a setter called with `triggerChange` does; `event.date` is a `Date`, or `null` when that end is incomplete or invalid |
+| `startDateChange.coreui.date-range-input` | Fired when the start changes the same way, with the same payload shape as the end |
 
-`setRange()` writes both ends before either event fires. The range events come before the `errorChange.coreui.date-input` of the fields, whether the dates are typed or set, so a range an `errorChange` listener sets replaces the one just reported.
+`setRange(start, end, true)` writes both ends before either event fires. The range events come before the `errorChange.coreui.date-input` of the fields, whether the dates are typed or set that way, so a range an `errorChange` listener sets replaces the one just reported.
 
 Each event carries the date of its own end; a listener reads the whole range from the instance:
 

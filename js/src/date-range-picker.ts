@@ -212,14 +212,17 @@ class DateRangePicker extends PickerBase {
   }
 
   setEndDate(endDate: Date | null): void {
+    this._typeCheckConfig({ endDate }, { endDate: DefaultType.endDate })
     this._applyRange(() => this._rangeInput.setEndDate(endDate))
   }
 
   setRange(startDate: Date | null, endDate: Date | null): void {
+    this._typeCheckConfig({ endDate, startDate }, { endDate: DefaultType.endDate, startDate: DefaultType.startDate })
     this._applyRange(() => this._rangeInput.setRange(startDate, endDate))
   }
 
   setStartDate(startDate: Date | null): void {
+    this._typeCheckConfig({ startDate }, { startDate: DefaultType.startDate })
     this._applyRange(() => this._rangeInput.setStartDate(startDate))
   }
 
@@ -239,7 +242,7 @@ class DateRangePicker extends PickerBase {
       ...this._baseContext(),
       endDate: this.getEndDate(),
       isDateSelectable: (date: Date | null) => this._rangeInput.isDateSelectable(date),
-      setRange: (startDate: Date | null, endDate: Date | null) => this._runAsUser(() => this.setRange(startDate, endDate)),
+      setRange: (startDate: Date | null, endDate: Date | null) => this._runAsUser(() => this._applyRange(() => this._rangeInput.setRange(startDate, endDate, true))),
       startDate: this.getStartDate()
     }
   }
@@ -258,6 +261,7 @@ class DateRangePicker extends PickerBase {
   _applyRange(write: () => void): void {
     write()
     this._showRange()
+    this._nameToggle()
     this._setSelectEndDate(false)
   }
 
@@ -402,11 +406,11 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._runAsUser(() => this._rangeInput.setRange(event.dateObject, this.getEndDate()))
+      this._runAsUser(() => this._rangeInput.setRange(event.dateObject, this.getEndDate(), true))
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
-      this._runAsUser(() => this._rangeInput.setRange(this.getStartDate(), event.dateObject))
+      this._runAsUser(() => this._rangeInput.setRange(this.getStartDate(), event.dateObject, true))
 
       if (this.getEndDate() && this.getStartDate() && !this._footerTemplate) {
         this.hide()

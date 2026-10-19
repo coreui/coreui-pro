@@ -270,9 +270,9 @@ class DateRangeInput extends BaseComponent {
     return this._endInput?.getDate() ?? null
   }
 
-  setRange(startDate: Date | null, endDate: Date | null): void {
+  setRange(startDate: Date | null, endDate: Date | null, triggerChange = false): void {
     this._typeCheckConfig({ endDate, startDate }, { endDate: DefaultType.endDate, startDate: DefaultType.startDate })
-    this._applyRange(startDate, endDate)
+    this._applyRange(startDate, endDate, triggerChange)
   }
 
   clear(): void {
@@ -302,14 +302,14 @@ class DateRangeInput extends BaseComponent {
     return start === null || end === null || end >= start
   }
 
-  setEndDate(endDate: Date | null): void {
+  setEndDate(endDate: Date | null, triggerChange = false): void {
     this._typeCheckConfig({ endDate }, { endDate: DefaultType.endDate })
-    this._applyRange(undefined, endDate)
+    this._applyRange(undefined, endDate, triggerChange)
   }
 
-  setStartDate(startDate: Date | null): void {
+  setStartDate(startDate: Date | null, triggerChange = false): void {
     this._typeCheckConfig({ startDate }, { startDate: DefaultType.startDate })
-    this._applyRange(startDate)
+    this._applyRange(startDate, undefined, triggerChange)
   }
 
   setValidationState(validationState: ValidationState | null): void {
@@ -492,7 +492,7 @@ class DateRangeInput extends BaseComponent {
     return separator
   }
 
-  _applyRange(startDate: Date | null | undefined, endDate?: Date | null): void {
+  _applyRange(startDate: Date | null | undefined, endDate?: Date | null, triggerChange = true): void {
     const batching = this._batching
     const generation = ++this._generation
     this._batching = true
@@ -501,14 +501,14 @@ class DateRangeInput extends BaseComponent {
 
     try {
       if (startDate !== undefined) {
-        this._startInput.setDate(startDate, true)
+        this._startInput.setDate(startDate, triggerChange)
       }
 
       if (generation === this._generation && endDate !== undefined) {
-        this._endInput.setDate(endDate, true)
+        this._endInput.setDate(endDate, triggerChange)
       }
 
-      if (this._element) {
+      if (this._element && triggerChange) {
         this._reportDate('start')
         this._reportDate('end')
       }
@@ -516,6 +516,14 @@ class DateRangeInput extends BaseComponent {
       this._batching = batching
       this._startInput?._holdErrors(false)
       this._endInput?._holdErrors(false)
+
+      if (this._element && !batching && (triggerChange || startDate !== undefined)) {
+        this._reported.start = this.getStartDate()
+      }
+
+      if (this._element && !batching && (triggerChange || endDate !== undefined)) {
+        this._reported.end = this.getEndDate()
+      }
     }
   }
 

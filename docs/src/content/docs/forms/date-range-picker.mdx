@@ -363,10 +363,10 @@ and `selectEndDate` are set by the picker itself.
 | `getStartDate` | Returns the start of the range (`Date` or `null`). |
 | `hide` | Closes the popup. |
 | `reset` | Restores the initial range. |
-| `setEndDate(date)` | Sets the end date and keeps the start. |
+| `setEndDate(date)` | Sets the end date and keeps the start, without an event. |
 | `setValidationState(state)` | Gives the picker a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
-| `setStartDate(date)` | Sets the start date and keeps the end. |
-| `setRange` | Sets both ends. Emits the change event of each end that changes. |
+| `setStartDate(date)` | Sets the start date and keeps the end, without an event. |
+| `setRange` | Sets both ends without an event. The open calendar and the name of the toggle follow it. |
 | `show` | Opens the popup. |
 | `toggle` | Toggles the popup. |
 
@@ -396,7 +396,7 @@ context.disabled               // disabled state
 | `shown.coreui.date-range-picker` | Fired once the popup has finished its entry transition. Skipped when the popup closes first. |
 | `startDateChange.coreui.date-range-picker` | Fired when the start changes. `event.date` is the validated `Date`, or `null`; `event.formattedDate` is the same value in the shape of `selectionType` (`2026-01`, `2026W03`, `2026Q1`, `2026`, or the `Date` itself for `day`), with the year in at least four digits (`0026-01`). |
 
-`startDateChange` and `endDateChange` fire before the fields' `errorChange.coreui.date-input` for the same change, whether it comes from the calendar, the fields or a method.
+`startDateChange` and `endDateChange` fire before the fields' `errorChange.coreui.date-input` for the same change, whether it comes from the calendar, the fields or an action such as `clear()` or `getContext().setRange()`; the setters do not fire them.
 
 ```js
 const myPicker = document.getElementById('myPicker')

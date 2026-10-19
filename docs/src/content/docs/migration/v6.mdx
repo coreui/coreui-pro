@@ -367,12 +367,15 @@ after the option it changes:
   Autocomplete and MultiSelect skipped that check on `update()`.
 - **The date and time setters fire no change event**, since the code that
   calls them already holds the value. `setDate()` of Date Input, Time Input and
-  Date Picker and `setTime()` of Time Picker change the value without
-  `dateChange`, `timeChange` or the native `input` and `change` of the value field;
+  Date Picker, `setTime()` of Time Picker and `setStartDate()`, `setEndDate()`
+  and `setRange()` of Date Range Input and Date Range Picker change the value
+  without `dateChange`, `timeChange`, `startDateChange`, `endDateChange` or the
+  native `input` and `change` of the value field;
   `errorChange` still reports a date the field refuses. The verbs (`clear()`,
   `reset()`, `today()`, `now()`) and what the user does fire as before.
-  `setDate(date, true)` of Date Input and Time Input fires what typing the date
-  would, for a date the user gives through another control.
+  `setDate(date, true)` of Date Input and Time Input and the same last argument
+  of the Date Range Input setters fire the events typing the date would, for a date
+  the user gives through another control.
 - **Other options are fixed.** A new format, size, label, icon, `name`,
   `required` or `readonly` means disposing the instance and creating a new one.
   `update()` applied some of them, such as `format` on Date Input or `size` on
@@ -1741,8 +1744,9 @@ validation and the arrow between them. Two consequences:
   pick of the value already selected, and `clear()` or `reset()` when the
   picker already holds that value, no longer fire `dateChange`,
   `startDateChange`, `endDateChange` or `timeChange`; v5 fired them on every
-  pick and on every `clear()` and `reset()`. The new `setDate()` and
-  `setTime()` fire no change event at all.
+  pick and on every `clear()` and `reset()`. The new `setDate()`,
+  `setTime()`, `setStartDate()`, `setEndDate()` and `setRange()` fire no change
+  event at all.
 
 - **`shown` and `hidden` on the pickers wait for the popup's transition**, like
   the modal, dialog, toast and collapse events: `shown` fires once the panel
