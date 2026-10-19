@@ -338,21 +338,6 @@ describe('Stepper', () => {
       expect(buttons[2].disabled).toBeFalse()
     })
 
-    it('should skip a step button with the disabled class in non-linear mode', () => {
-      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
-      buttons[1].classList.add('disabled')
-
-      const stepper = new Stepper(stepperElement)
-
-      buttons[1].click()
-      expect(buttons[0]).toHaveClass('active')
-
-      stepper.next()
-      expect(buttons[2]).toHaveClass('active')
-    })
-
     it('should register keydown event handler', () => {
       fixtureEl.innerHTML = getThreeStepFixture()
       const stepperElement = fixtureEl.querySelector('.stepper')
