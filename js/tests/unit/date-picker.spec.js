@@ -1711,6 +1711,7 @@ describe('DatePicker', () => {
       expect(isDateSelectable(new Date(2026, 6, 21))).toBeFalse()
       expect(isDateSelectable(new Date(2026, 6, 9))).toBeFalse()
       expect(isDateSelectable(null)).toBeFalse()
+      expect(isDateSelectable('2026-07-14')).toBeFalse()
     })
 
     it('should check selectability at the mask granularity', () => {

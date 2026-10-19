@@ -1121,6 +1121,22 @@ describe('DateRangePicker', () => {
       expect(Object.keys(context).toSorted()).toEqual(['clear', 'close', 'disabled', 'endDate', 'isDateSelectable', 'reset', 'setRange', 'startDate'])
     })
 
+    it('should answer date selectability through the context', () => {
+      const picker = buildPicker({
+        disabledDates: [new Date(2026, 6, 15)],
+        maxDate: new Date(2026, 6, 20),
+        minDate: new Date(2026, 6, 10)
+      })
+      const { isDateSelectable } = picker.getContext()
+
+      expect(isDateSelectable(new Date(2026, 6, 14))).toBeTrue()
+      expect(isDateSelectable(new Date(2026, 6, 15))).toBeFalse()
+      expect(isDateSelectable(new Date(2026, 6, 21))).toBeFalse()
+      expect(isDateSelectable(new Date(2026, 6, 9))).toBeFalse()
+      expect(isDateSelectable(null)).toBeFalse()
+      expect(isDateSelectable('2026-07-14')).toBeFalse()
+    })
+
     it('should set a range through the context and emit both events', () => {
       const picker = buildPicker()
       const el = fixtureEl.querySelector('#picker')
