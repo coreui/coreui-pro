@@ -11,7 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import FieldValidation from './util/field-validation.js'
 import { type ValidationState } from './util/form-validation.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, isRTL, jQueryDispatch, restoreHostClasses
+  defineJQueryPlugin, getUID, isRTL, jQueryDispatch
 } from './util/index.js'
 import {
   constrainInput,
@@ -150,10 +150,8 @@ const DefaultType: Record<string, string> = {
  */
 
 class RangeSlider extends BaseComponent {
-  protected declare _addedRole: boolean
   protected declare _config: RangeSliderConfig
   protected declare _hostAttributes: Map<string, string>
-  protected declare _hostClasses: HostClasses
   protected declare _inputs: HTMLInputElement[]
   protected declare _press: RangeSliderPress | null
   protected declare _shownValues: string[]
@@ -177,8 +175,6 @@ class RangeSlider extends BaseComponent {
       return
     }
 
-    this._addedRole = !this._element.hasAttribute('role')
-    this._hostClasses = captureHostClasses(this._element, [])
     this._inputs = []
     this._press = null
     this._shownValues = []
@@ -192,15 +188,13 @@ class RangeSlider extends BaseComponent {
       fields: () => this._inputs,
       frames: () => [this._element, ...this._inputs],
       invalidTargets: () => this._inputs,
-      pageDescribed: () => (this._addedRole ? this._inputs : [this._element]),
+      pageDescribed: () => this._inputs,
       restore: () => this._restoreValue()
     })
     this._wrapper = null
     this._hostAttributes = new Map()
 
-    if (this._addedRole) {
-      this._element.setAttribute('role', 'group')
-    }
+    this._element.setAttribute('role', 'group')
 
     this._onInput = event => {
       const input = event.target as HTMLInputElement
@@ -265,12 +259,6 @@ class RangeSlider extends BaseComponent {
 
     this._validation.dispose()
     this._teardown()
-    restoreHostClasses(this._element, [], this._hostClasses)
-
-    if (this._addedRole && this._element.getAttribute('role') === 'group') {
-      this._element.removeAttribute('role')
-    }
-
     super.dispose()
   }
 

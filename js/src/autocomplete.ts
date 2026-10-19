@@ -22,7 +22,7 @@ import {
 } from './util/option-tree.js'
 import { createSelectionStore } from './util/selection-state.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
+  defineJQueryPlugin, getUID, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -64,7 +64,6 @@ const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_SHOW = 'show'
 
-const HOST_CLASS_NAMES = [CLASS_NAME_AUTOCOMPLETE, CLASS_NAME_DISABLED, CLASS_NAME_INPUT_GROUP, CLASS_NAME_SHOW]
 const HOST_FIELD_ATTRIBUTES = new Set([
   'aria-description',
   'aria-details',
@@ -184,9 +183,7 @@ class Autocomplete extends ComboboxBase {
   protected declare _cleanerElement: any
   protected declare _inputElement: any
   protected declare _inputHintElement: any
-  protected declare _hostClasses: HostClasses
   protected declare _hostAria: Array<[string, string]>
-  protected declare _hostTabIndex: string | null
   protected declare _keySerial: number | null
   protected declare _known: Map<string, any>
   protected declare _initialValue: any
@@ -204,7 +201,6 @@ class Autocomplete extends ComboboxBase {
     this._inputElement = null
     this._inputHintElement = null
     this._togglerElement = null
-    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._keySerial = null
     this._shownText = ''
     this._validation = new FieldValidation(this._element, {
@@ -294,16 +290,12 @@ class Autocomplete extends ComboboxBase {
       }
     }
 
-    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
+    this._element.classList.remove(CLASS_NAME_SHOW)
 
     for (const [name, value] of this._hostAria) {
       if (!this._element.hasAttribute(name)) {
         this._element.setAttribute(name, value)
       }
-    }
-
-    if (this._hostTabIndex !== null && !this._element.hasAttribute('tabindex')) {
-      this._element.setAttribute('tabindex', this._hostTabIndex)
     }
 
     super.dispose()
@@ -669,7 +661,6 @@ class Autocomplete extends ComboboxBase {
     this._hostAria = [...togglerEl.attributes]
       .filter(({ name }) => HOST_FIELD_ATTRIBUTES.has(name))
       .map(({ name, value }): [string, string] => [name, value])
-    this._hostTabIndex = togglerEl.getAttribute('tabindex')
     togglerEl.removeAttribute('tabindex')
 
     applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP)

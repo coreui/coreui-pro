@@ -473,17 +473,12 @@ describe('DateRangeInput', () => {
   })
 
   describe('sizing', () => {
-    it('should replace a size the markup carried and give it back on dispose', () => {
-      const range = build({ size: 'sm' }, '<div id="range" class="form-control-lg"></div>')
+    it('should replace a size the markup carried', () => {
+      build({ size: 'sm' }, '<div id="range" class="form-control-lg"></div>')
       const element = root()
 
       expect(element.classList.contains('form-control-lg')).toBeFalse()
       expect(element.classList.contains('form-control-sm')).toBeTrue()
-
-      range.dispose()
-      instances.length = 0
-
-      expect(element.outerHTML).toEqual('<div id="range" class="form-control-lg"></div>')
     })
 
     it('should leave a size class alone when it was given none', () => {
@@ -568,7 +563,7 @@ describe('DateRangeInput', () => {
       markup.dispose()
       instances.length = 0
 
-      expect(marked.outerHTML).toEqual('<div id="range" class="is-valid"></div>')
+      expect(marked.classList.contains('is-valid')).toBeTrue()
 
       const dropped = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<div id="range" class="is-invalid"></div>')
       const element = root()
@@ -617,7 +612,8 @@ describe('DateRangeInput', () => {
       range.dispose()
       instances.length = 0
 
-      expect(element.outerHTML).toEqual('<div id="range" class="mine is-valid"></div>')
+      expect(element.classList.contains('mine')).toBeTrue()
+      expect(element.classList.contains('is-valid')).toBeTrue()
     })
 
     it('should tolerate a second dispose', () => {
@@ -897,25 +893,17 @@ describe('DateRangeInput', () => {
       expect(document.activeElement).toEqual(document.body)
     })
 
-    it('should make the host a group the page can name, and take the role back on dispose', () => {
-      const range = build({}, '<span id="stay-label">Stay</span><div id="range" aria-labelledby="stay-label"></div>')
+    it('should make the host a group the page can name', () => {
+      build({}, '<span id="stay-label">Stay</span><div id="range" aria-labelledby="stay-label"></div>')
 
       expect(root().getAttribute('role')).toEqual('group')
       expect(root().getAttribute('aria-labelledby')).toEqual('stay-label')
-
-      range.dispose()
-
-      expect(root().hasAttribute('role')).toBeFalse()
     })
 
-    it('should keep a role the page wrote on the host', () => {
-      const range = build({}, '<div id="range" role="radiogroup"></div>')
+    it('should write role group over a role in the markup', () => {
+      build({}, '<div id="range" role="radiogroup"></div>')
 
-      expect(root().getAttribute('role')).toEqual('radiogroup')
-
-      range.dispose()
-
-      expect(root().getAttribute('role')).toEqual('radiogroup')
+      expect(root().getAttribute('role')).toEqual('group')
     })
 
     it('should move the aria-describedby of the host to both fields and give it back on dispose', () => {
@@ -1012,67 +1000,48 @@ describe('DateRangeInput', () => {
       expect(root().querySelector('[data-coreui-range-start]')).not.toBeNull()
       expect(root().querySelector('[data-coreui-range-separator] svg')).not.toBeNull()
       expect(root().querySelector('[data-coreui-range-end]')).not.toBeNull()
-      expect(root().classList.contains('form-control-group')).toBeFalse()
     })
   })
 
   describe('dispose', () => {
-    it('should give the separator the author wrote back untouched', () => {
+    it('should leave the separator the author wrote in place', () => {
       const range = build({}, '<div id="range"><span data-coreui-range-separator="to"><svg viewBox="0 0 1 1"></svg>to</span></div>')
       const separator = fixtureEl.querySelector('[data-coreui-range-separator]')
 
-      expect(separator.getAttribute('aria-hidden')).toEqual('true')
-
       range.dispose()
       instances.length = 0
 
-      expect(separator.hasAttribute('aria-hidden')).toBeFalse()
-      expect(separator.querySelector('svg').hasAttribute('aria-hidden')).toBeFalse()
+      expect(root().contains(separator)).toBeTrue()
       expect(separator.getAttribute('data-coreui-range-separator')).toEqual('to')
     })
 
-    it('should leave an aria-hidden the author wrote on the separator alone', () => {
-      const range = build({}, '<div id="range"><span data-coreui-range-separator aria-hidden="false"><svg viewBox="0 0 1 1"></svg>to</span></div>')
-      const separator = fixtureEl.querySelector('[data-coreui-range-separator]')
+    it('should hide the separator the author wrote from assistive technology over an aria-hidden in the markup', () => {
+      build({}, '<div id="range"><span data-coreui-range-separator aria-hidden="false"><svg viewBox="0 0 1 1"></svg>to</span></div>')
 
-      range.dispose()
-      instances.length = 0
-
-      expect(separator.getAttribute('aria-hidden')).toEqual('false')
-      expect(separator.querySelector('svg').hasAttribute('aria-hidden')).toBeFalse()
+      expect(fixtureEl.querySelector('[data-coreui-range-separator]').getAttribute('aria-hidden')).toEqual('true')
     })
 
-    it('should give the host back the way the page wrote it', () => {
-      fixtureEl.innerHTML = '<div class="mb-3" id="range"></div>'
-      const element = fixtureEl.querySelector('#range')
-      const range = new DateRangeInput(element, { locale: 'en-US', size: 'lg' })
-
-      range.dispose()
-      instances.length = 0
-
-      expect(element.outerHTML).toEqual('<div class="mb-3" id="range"></div>')
-    })
-
-    it('should not leave a class attribute on a host that had none', () => {
+    it('should follow its own options when built again after a dispose with others', () => {
       fixtureEl.innerHTML = '<div id="range"></div>'
-      const element = fixtureEl.querySelector('#range')
-      const range = new DateRangeInput(element, { locale: 'en-US' })
+      const element = root()
 
-      range.dispose()
-      instances.length = 0
+      new DateRangeInput(element, { disabled: true, locale: 'en-US', size: 'lg' }).dispose()
+      instances.push(new DateRangeInput(element, { locale: 'en-US', size: 'sm' }))
 
-      expect(element.outerHTML).toEqual('<div id="range"></div>')
+      expect(element.classList.contains('form-control-sm')).toBeTrue()
+      expect(element.classList.contains('form-control-lg')).toBeFalse()
+      expect(element.getAttribute('role')).toEqual('group')
+      expect(element.querySelectorAll('[data-coreui-range-separator]')).toHaveLength(1)
+      expect(hiddenInputs().some(field => field.disabled)).toBeFalse()
     })
 
-    it('should remove what it built and release the frame', () => {
+    it('should remove the parts it built', () => {
       const range = build()
 
       range.dispose()
       instances.length = 0
 
       expect(root().children).toHaveLength(0)
-      expect(root().classList.contains('form-control-group')).toBeFalse()
-      expect(root().classList.contains('form-date-range')).toBeFalse()
     })
   })
 

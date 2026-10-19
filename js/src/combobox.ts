@@ -21,9 +21,7 @@ import {
 import {
   type CountLabel, createSelectionStore, getSelectionLimit, resolveCountLabel, toSelectionValues
 } from './util/selection-state.js'
-import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
-} from './util/index.js'
+import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -63,14 +61,9 @@ const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_POPUP_COMBOBOX = 'combobox-popup'
 const CLASS_NAME_SEARCH = 'list-box-search'
 const CLASS_NAME_SELECT = 'combobox-select'
-const CLASS_NAME_SELECTED = 'selected'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TOGGLE = 'combobox-toggle'
 const CLASS_NAME_VALUE = 'combobox-value'
-
-const HOST_ATTRIBUTES = ['aria-activedescendant', 'aria-controls', 'aria-describedby', 'aria-expanded', 'aria-haspopup', 'disabled', 'type']
-const HOST_CLASS_NAMES = [CLASS_NAME_DISABLED, CLASS_NAME_SHOW, CLASS_NAME_TOGGLE]
-const MENU_STYLE_PROPERTIES = ['left', 'min-width', 'position', 'top']
 
 const SELECTOR_CARET = '.combobox-caret'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="combobox"]'
@@ -166,13 +159,8 @@ const DefaultType: Record<string, string> = {
  */
 
 class Combobox extends ComboboxBase {
-  protected declare _addedMenuClassNames: string[]
   protected declare _createdNodes: ChildNode[]
-  protected declare _hostAttributes: Map<string, string | null>
-  protected declare _hostClasses: HostClasses
-  protected declare _hostMenuStyle: Map<string, string> | null
-  protected declare _hostOptionsId: string
-  protected declare _hostValue: { nodes: Node[], placeholder: boolean } | null
+  protected declare _hostValue: Node[] | null
   protected declare _labels: Map<string, string>
   protected declare _resetValues: string[]
   protected declare _searchElement: HTMLInputElement | null
@@ -186,12 +174,7 @@ class Combobox extends ComboboxBase {
 
     this._uniqueId = this._element.id || getUID(NAME)
     this._togglerElement = this._element
-    this._addedMenuClassNames = []
     this._createdNodes = []
-    this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
-    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
-    this._hostMenuStyle = null
-    this._hostOptionsId = ''
     this._hostValue = null
     this._labels = new Map()
     this._resetValues = []
@@ -283,22 +266,8 @@ class Combobox extends ComboboxBase {
       EventHandler.off(this._menu, EVENT_KEY)
     }
 
-    if (this._hostMenuStyle) {
-      this._element.after(this._menu)
-      this._menu.classList.remove(CLASS_NAME_SHOW, ...this._addedMenuClassNames)
-
-      for (const [property, value] of this._hostMenuStyle) {
-        this._menu.style.setProperty(property, value)
-      }
-
-      if (this._menu.getAttribute('style') === '') {
-        this._menu.removeAttribute('style')
-      }
-    }
-
-    if (this._optionsElement && !this._hostOptionsId) {
-      this._optionsElement.removeAttribute('id')
-    }
+    this._element.after(this._menu)
+    this._menu.classList.remove(CLASS_NAME_SHOW)
 
     if (this._listBoxElement) {
       EventHandler.off(this._listBoxElement, EVENT_LIST_BOX)
@@ -313,15 +282,11 @@ class Combobox extends ComboboxBase {
     }
 
     if (this._hostValue) {
-      this._valueElement.replaceChildren(...this._hostValue.nodes)
-      this._valueElement.classList.toggle(CLASS_NAME_PLACEHOLDER, this._hostValue.placeholder)
+      this._valueElement.replaceChildren(...this._hostValue)
     }
 
-    for (const [name, value] of this._hostAttributes) {
-      writeAttribute(this._element, name, value)
-    }
-
-    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
+    this._element.classList.remove(CLASS_NAME_SHOW)
+    this._element.setAttribute('aria-expanded', 'false')
 
     super.dispose()
   }
@@ -366,7 +331,7 @@ class Combobox extends ComboboxBase {
     this._validation.refresh()
 
     this._store = createSelectionStore(next => toSelectionValues(next, this._config.multiple ? 'multiple' : 'single'))
-    this._store.commit(this._initialValues())
+    this._store.commit(toSelectionValues(this._config.value, 'multiple').map(String))
     this._listBox = new ListBox(this._listBoxElement, this._getListBoxConfig(), this._store)
     this._addListBoxListeners()
     this._addPanelEscapeListener(this._menu)
@@ -379,7 +344,7 @@ class Combobox extends ComboboxBase {
     const existing = SelectorEngine.findOne(SELECTOR_VALUE, this._element) as HTMLElement | null
 
     if (existing) {
-      this._hostValue = { nodes: [...existing.childNodes], placeholder: existing.classList.contains(CLASS_NAME_PLACEHOLDER) }
+      this._hostValue = [...existing.childNodes]
       this._valueElement = existing
       return
     }
@@ -437,13 +402,10 @@ class Combobox extends ComboboxBase {
     const pagePopup = SelectorEngine.next(this._element, SELECTOR_POPUP)[0] as HTMLElement | undefined
     const popup = pagePopup ?? document.createElement('div')
 
-    if (pagePopup) {
-      this._hostMenuStyle = new Map(MENU_STYLE_PROPERTIES.map(property => [property, pagePopup.style.getPropertyValue(property)]))
-    } else {
+    if (!pagePopup) {
       this._createdNodes.push(popup)
     }
 
-    this._addedMenuClassNames = [CLASS_NAME_POPUP, CLASS_NAME_POPUP_COMBOBOX].filter(name => !popup.classList.contains(name))
     popup.classList.add(CLASS_NAME_POPUP, CLASS_NAME_POPUP_COMBOBOX)
 
     let listBox = SelectorEngine.findOne(SELECTOR_LIST_BOX, popup) as HTMLElement | null
@@ -463,8 +425,6 @@ class Combobox extends ComboboxBase {
       listBox.append(options)
       this._createdNodes.push(options)
     }
-
-    this._hostOptionsId = options.id
 
     if (!options.id) {
       options.id = `${this._uniqueId}-listbox`
@@ -522,15 +482,6 @@ class Combobox extends ComboboxBase {
       selectionMode: this._config.multiple ? 'multiple' : 'single',
       typeahead: this._config.typeahead
     }
-  }
-
-  _initialValues(): string[] {
-    const { value } = this._config
-    const configured = toSelectionValues(value, 'multiple').map(String)
-    const marked = SelectorEngine.find(`${SELECTOR_OPTION}.${CLASS_NAME_SELECTED}`, this._optionsElement)
-      .map(option => this._valueOf(option as HTMLElement))
-
-    return [...new Set([...configured, ...marked])]
   }
 
   _valueOf(option: HTMLElement): string {

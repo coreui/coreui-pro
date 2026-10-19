@@ -18,7 +18,7 @@ import {
   configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
 } from './util/form-validation.js'
 import {
-  captureHostClasses, getUID, type HostClasses, isRTL, restoreHostClasses, writeAttribute
+  getUID, isRTL, writeAttribute
 } from './util/index.js'
 
 /**
@@ -45,8 +45,6 @@ const SELECTOR_CHIP_REMOVE = '.chip-remove'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_CHIP_INPUT_FIELD = 'chip-input-field'
 const CLASS_NAME_GROUP = 'form-control-group'
-
-const HOST_CLASS_NAMES = [CLASS_NAME_DISABLED, CLASS_NAME_GROUP]
 
 type ChipInputConfig = ChipSetConfig & {
   create: boolean
@@ -101,13 +99,9 @@ class ChipInput extends ChipSet {
   protected declare _uniqueId: string
   protected declare _valueField: HTMLTextAreaElement | null
   protected declare _input: HTMLInputElement
-  protected declare _inputDisabled: string | null
-  protected declare _inputReadonly: string | null
-  protected declare _hostClasses: HostClasses
   protected declare _initialChips: HTMLElement[]
   protected declare _removingByCode: boolean
   protected declare _validation: FieldValidation
-  private _addedAriaRequired = false
   private _createdInput = false
   private _labelledFor: Element | null = null
 
@@ -115,7 +109,6 @@ class ChipInput extends ChipSet {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(NAME)
-    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._valueField = null
     this._removingByCode = false
     this._validation = new FieldValidation(this._element, {
@@ -139,8 +132,6 @@ class ChipInput extends ChipSet {
       this._createInput()
     }
 
-    this._inputDisabled = this._input.getAttribute('disabled')
-    this._inputReadonly = this._input.getAttribute('readonly')
     this._applyInteractionState()
 
     // In the controlled mode (`create: false`) the chips come from the host —
@@ -195,7 +186,6 @@ class ChipInput extends ChipSet {
 
   override dispose(): void {
     this._validation.dispose()
-    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     EventHandler.off(this._input, EVENT_KEY)
     this._valueField?.remove()
@@ -203,13 +193,6 @@ class ChipInput extends ChipSet {
     if (this._createdInput) {
       this._input.remove()
       this._labelledFor?.removeAttribute('for')
-    } else {
-      writeAttribute(this._input, 'disabled', this._inputDisabled)
-      writeAttribute(this._input, 'readonly', this._inputReadonly)
-
-      if (this._addedAriaRequired) {
-        this._input.removeAttribute('aria-required')
-      }
     }
 
     super.dispose()
@@ -220,7 +203,9 @@ class ChipInput extends ChipSet {
   // The container mixes a label, the text input and chips — it is neither a
   // listbox nor a plain group, so no container role is stamped and the chips
   // stay generic (their remove buttons carry the actions).
-  override _applyAccessibilityRoles(): void {}
+  override _containerRole(): null {
+    return null
+  }
 
   override _canModify(): boolean {
     return !this._disabled && !this._config.readonly
@@ -293,7 +278,6 @@ class ChipInput extends ChipSet {
         hadFocus ||= containsFocus(chip)
         Chip.getInstance(chip)?.dispose()
         this._ownedChips.delete(chip)
-        this._optionChips.delete(chip)
         chip.remove()
       }
     }
@@ -372,7 +356,6 @@ class ChipInput extends ChipSet {
     const generatedInputId = labelFor || getUID(`${NAME}-input`)
 
     this._createdInput = true
-    this._labelledFor = label && !labelFor ? label : null
 
     input.type = 'text'
     input.className = CLASS_NAME_CHIP_INPUT_FIELD
@@ -383,6 +366,7 @@ class ChipInput extends ChipSet {
 
     if (label && !labelFor) {
       label.setAttribute('for', generatedInputId)
+      this._labelledFor = label
     }
 
     this._input = input
@@ -401,11 +385,6 @@ class ChipInput extends ChipSet {
       required: this._config.required
     })
     field.defaultValue = this.getValues().join(',')
-
-    if (this._config.required && !this._input.hasAttribute('aria-required')) {
-      this._input.setAttribute('aria-required', 'true')
-      this._addedAriaRequired = true
-    }
 
     this._element.append(field)
     this._valueField = field
@@ -431,6 +410,7 @@ class ChipInput extends ChipSet {
     // are not allowed on it — the native input states carry the semantics.
     this._input.disabled = this._disabled
     this._input.readOnly = !this._disabled && readonly
+    writeAttribute(this._input, 'aria-required', this._config.create && this._config.required ? 'true' : null)
   }
 
   _handleInputKeydown(event: any): void {

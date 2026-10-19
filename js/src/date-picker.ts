@@ -26,9 +26,7 @@ import {
 import {
   appendControlGroupField,
   applyControlGroupClasses,
-  applyControlGroupSize,
-  captureHostClasses,
-  managedSizeClassNames
+  applyControlGroupSize
 } from './util/form-control-group.js'
 import type { ValidationState } from './util/form-validation.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
@@ -194,7 +192,6 @@ class DatePicker extends PickerBase {
     this._selectionElement = null
     this._source = null
 
-    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createDatePicker()
     this._nameToggle()
     this._createPopup()
@@ -266,15 +263,6 @@ class DatePicker extends PickerBase {
   // Private
   override _originalDefault(): Record<string, any> {
     return ORIGINAL_DEFAULT
-  }
-
-  override _managedClassNames(): string[] {
-    return [
-      CLASS_NAME_DATE_PICKER,
-      CLASS_NAME_PICKER,
-      CLASS_NAME_INPUT_GROUP,
-      ...managedSizeClassNames(this._config.size)
-    ].filter(Boolean) as string[]
   }
 
   _createDatePicker(): void {
@@ -500,7 +488,7 @@ class DatePicker extends PickerBase {
       return
     }
 
-    if (this._created.toggle) {
+    if (this._created.toggle || (name !== 'aria-label' && name !== 'aria-controls')) {
       this._toggleElement.setAttribute(name, value)
       return
     }

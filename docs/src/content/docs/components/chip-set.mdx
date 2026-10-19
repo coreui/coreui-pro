@@ -28,13 +28,13 @@ Wrap your chips in `.chip-set` and enable the plugin with `data-coreui-chip-set`
 
 ## Selectable chips
 
-Set `data-coreui-selectable="true"` to make every chip in the set selectable. With the default `selectionMode` of `multiple`, any number of chips can be active at once — useful for filters.
+Set `data-coreui-selectable="true"` to make every chip in the set selectable. With the default `selectionMode` of `multiple`, any number of chips can be active at once — useful for filters. Mark the chips that start selected with `data-coreui-selected="true"`; an `active` class in the markup does not select a chip.
 
 <Example code={`<div class="chip-set" data-coreui-chip-set data-coreui-selectable="true">
     <span class="chip">Design</span>
-    <span class="chip active">Development</span>
+    <span class="chip" data-coreui-selected="true">Development</span>
     <span class="chip">Marketing</span>
-    <span class="chip active">Sales</span>
+    <span class="chip" data-coreui-selected="true">Sales</span>
   </div>`} />
 
 ### Single selection
@@ -42,7 +42,7 @@ Set `data-coreui-selectable="true"` to make every chip in the set selectable. Wi
 Use `data-coreui-selection-mode="single"` to allow only one selected chip at a time — selecting a chip deselects its siblings. This is useful for choice chips.
 
 <Example code={`<div class="chip-set" data-coreui-chip-set data-coreui-selectable="true" data-coreui-selection-mode="single">
-    <span class="chip active">Small</span>
+    <span class="chip" data-coreui-selected="true">Small</span>
     <span class="chip">Medium</span>
     <span class="chip">Large</span>
   </div>`} />
@@ -53,9 +53,9 @@ Add `data-coreui-filter="true"` to turn the chips into filter chips. A check ico
 
 <Example code={`<div class="chip-set" data-coreui-chip-set data-coreui-filter="true">
     <span class="chip">Design</span>
-    <span class="chip active">Development</span>
+    <span class="chip" data-coreui-selected="true">Development</span>
     <span class="chip">Marketing</span>
-    <span class="chip active">Sales</span>
+    <span class="chip" data-coreui-selected="true">Sales</span>
   </div>`} />
 
 Customize the check with the `selectedIcon` option (or `data-coreui-selected-icon`), the same way you customize the remove icon.
@@ -137,7 +137,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `clear` | Removes every chip from the set. |
 | `clearSelection` | Deselects all chips and emits a selection change. |
 | `deselectAll` | Deselects every selected chip in the set. |
-| `dispose` | Destroys a chip set instance and the chip instances it created, and takes back the roles and ARIA attributes it set on the set and its chips. The chips stay in the document. (Removes stored data on the DOM element) |
+| `dispose` | Destroys a chip set instance and the chip instances it created, and takes the `option` role off the chips of a selectable set. The chips stay in the document with the attributes their instances wrote; a new instance writes them again from its options. (Removes stored data on the DOM element) |
 | `getInstance` | Static method to get the chip set instance: `coreui.ChipSet.getInstance(element)`. |
 | `getOrCreateInstance` | Static method to get or create a chip set instance: `coreui.ChipSet.getOrCreateInstance(element)`. |
 | `getSelectedValues` | Returns the values of the selected chips. |

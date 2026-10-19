@@ -1038,6 +1038,20 @@ describe('Transfer', () => {
   })
 
   describe('dispose', () => {
+    it('should remove the option containers it built for its items', () => {
+      fixtureEl.innerHTML = [
+        '<div class="transfer">',
+        '<div class="list-box transfer-list" data-coreui-transfer-list="source"></div>',
+        '<div class="list-box transfer-list" data-coreui-transfer-list="target"></div>',
+        '</div>'
+      ].join('')
+      const el = fixtureEl.querySelector('.transfer')
+
+      new Transfer(el, { items: [{ value: 'a', label: 'A' }] }).dispose()
+
+      expect(el.querySelectorAll('.list-box-options')).toHaveSize(0)
+    })
+
     it('should destroy both list boxes', () => {
       const el = setMarkup()
       const transfer = new Transfer(el)

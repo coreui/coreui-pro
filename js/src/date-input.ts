@@ -41,7 +41,6 @@ import type {
 import { onLabelClick } from './util/field-label.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
-import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import { type ValidationState } from './util/form-validation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
@@ -79,14 +78,6 @@ const CLASS_NAME_FILLED = 'form-date-time-filled'
 const CLASS_NAME_SECTION = 'form-date-time-section'
 const CLASS_NAME_SECTION_EMPTY = 'form-date-time-section-empty'
 const CLASS_NAME_SEPARATOR = 'form-date-time-separator'
-
-const HOST_CLASS_NAMES = [
-  CLASS_NAME_ALL_SELECTED,
-  CLASS_NAME_DISABLED,
-  CLASS_NAME_FILLED,
-  CLASS_NAME_FORM_CONTROL,
-  CLASS_NAME_SECTION_INPUT
-]
 
 const SELECTOR_DATA_DATE_INPUT = '[data-coreui-date-input]'
 const SELECTOR_SECTION = '.form-date-time-section'
@@ -240,9 +231,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   protected declare _errorHolds: number
   protected declare _fieldValue: string
   protected declare _hostAriaLabel: string | null
-  protected declare _hostClasses: HostClasses
   protected declare _hostNodes: ChildNode[]
-  protected declare _hostRole: string | null
   protected declare _inputElement: HTMLTextAreaElement | null
   protected declare _initialDate: Date | null
   protected declare _isBuilt: boolean
@@ -267,9 +256,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._rejected = false
     this._validationError = null
     this._hostAriaLabel = this._element.getAttribute('aria-label')
-    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostNodes = [...this._element.childNodes]
-    this._hostRole = this._element.getAttribute('role')
     this._validation = new FieldValidation(this._element, {
       config: () => this._config as DateInputConfig,
       fields: () => [this._inputElement!],
@@ -368,13 +355,12 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._removeLabelClick()
     EventHandler.off(this._element, this.constructor.EVENT_KEY)
     this._validation.dispose()
-    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     if (!this._hostAriaLabel) {
       writeAttribute(this._element, 'aria-label', this._hostAriaLabel)
     }
 
-    writeAttribute(this._element, 'role', this._hostRole)
+    this._element.classList.remove(CLASS_NAME_ALL_SELECTED)
     this._element.replaceChildren(...this._hostNodes)
     super.dispose()
   }

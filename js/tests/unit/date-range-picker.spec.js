@@ -753,17 +753,13 @@ describe('DateRangePicker', () => {
       expect(fixtureEl.querySelector('.form-control-action').getAttribute('aria-label')).toEqual('Toggle calendar')
     })
 
-    it('should make the picker a group the page can name, and take the role back on dispose', () => {
-      const picker = buildPicker({}, '<span id="period-label">Reporting period</span><div id="picker" aria-labelledby="period-label"></div>')
+    it('should make the picker a group the page can name', () => {
+      buildPicker({}, '<span id="period-label">Reporting period</span><div id="picker" aria-labelledby="period-label"></div>')
       const element = fixtureEl.querySelector('#picker')
 
       expect(element.getAttribute('role')).toEqual('group')
       expect(element.querySelector('.form-date-range').getAttribute('role')).toEqual('none')
       expect(element.querySelector('.form-date-range').hasAttribute('aria-labelledby')).toBeFalse()
-
-      picker.dispose()
-
-      expect(element.hasAttribute('role')).toBeFalse()
     })
 
     it('should move focus to the first empty section of its own start date when a label of the picker is clicked', () => {
@@ -786,10 +782,10 @@ describe('DateRangePicker', () => {
       expect(document.activeElement).toEqual(document.body)
     })
 
-    it('should keep a role the page wrote on the picker', () => {
+    it('should write role group over a role in the markup', () => {
       buildPicker({}, '<div id="picker" role="region" aria-label="Reporting period"></div>')
 
-      expect(fixtureEl.querySelector('#picker').getAttribute('role')).toEqual('region')
+      expect(fixtureEl.querySelector('#picker').getAttribute('role')).toEqual('group')
     })
 
     it('should move the aria-describedby of the picker to both fields and give it back on dispose', () => {
@@ -1356,25 +1352,19 @@ describe('DateRangePicker', () => {
   })
 
   describe('dispose', () => {
-    it('should give the host back the way the page wrote it', () => {
-      fixtureEl.innerHTML = '<div class="form-control-group my-own" id="picker"></div>'
-      const element = fixtureEl.querySelector('#picker')
-      const instance = new DateRangePicker(fixtureEl.querySelector('#picker'))
-
-      instance.show()
-      instance.dispose()
-
-      expect(element.outerHTML).toEqual('<div class="form-control-group my-own" id="picker"></div>')
-    })
-
-    it('should not leave a class attribute on a host that had none', () => {
+    it('should follow its own options when built again after an open picker with others', () => {
       fixtureEl.innerHTML = '<div id="picker"></div>'
       const element = fixtureEl.querySelector('#picker')
-      const instance = new DateRangePicker(fixtureEl.querySelector('#picker'))
+      const first = new DateRangePicker(element, { size: 'lg' })
 
-      instance.dispose()
+      first.show()
+      first.dispose()
+      pickers.push(new DateRangePicker(element, { disabled: true }))
 
-      expect(element.outerHTML).toEqual('<div id="picker"></div>')
+      expect(element.getAttribute('role')).toEqual('group')
+      expect(element.classList.contains('show')).toBeFalse()
+      expect(element.querySelectorAll('.form-date-time')).toHaveLength(2)
+      expect(element.querySelector('.form-control-action').disabled).toBeTrue()
     })
 
     it('should drop the listeners on the controls it built', () => {

@@ -292,6 +292,14 @@ myToast.addEventListener('hidden.coreui.toast', () => {
 toast.hide()
 ```
 
+From a listener of any other event of the same component, such as `remove.coreui.chip-set` or `change.coreui.multi-select`, defer the call. The component may still be finishing the action that fired the event, and a disposed instance cannot do that:
+
+```js
+chipSetElement.addEventListener('remove.coreui.chip-set', () => {
+  queueMicrotask(() => chipSet.dispose())
+})
+```
+
 ### Default settings
 
 You can change the default settings for a plugin by modifying the plugin's `Constructor.Default` object:

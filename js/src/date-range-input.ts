@@ -17,11 +17,7 @@ import { type ValidationState } from './util/form-validation.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
-  applyControlGroupSize,
-  captureHostClasses,
-  type HostClasses,
-  managedSizeClassNames,
-  restoreHostClasses
+  applyControlGroupSize
 } from './util/form-control-group.js'
 import { SEPARATOR_ICON, SEPARATOR_ICON_RTL } from './util/icons.js'
 import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
@@ -55,7 +51,6 @@ const ATTRIBUTE_ROLE_START = 'data-coreui-range-start'
 const SELECTOR_DATA_DATE_RANGE_INPUT = '[data-coreui-date-range-input]'
 const SELECTOR_ROLE_SEPARATOR = `[${ATTRIBUTE_ROLE_SEPARATOR}]`
 const SELECTOR_SECTION = '.form-date-time-section'
-const SELECTOR_SVG = 'svg'
 
 type DateRangeInputConfig = {
   allowList: SanitizerAllowList
@@ -220,9 +215,6 @@ class DateRangeInput extends BaseComponent {
   protected declare _endElement: HTMLElement
   protected declare _separatorElement: HTMLElement
   protected declare _createdElements: HTMLElement[]
-  protected declare _hiddenFromAssistiveTech: Element[]
-  protected declare _hostClasses: HostClasses
-  protected declare _hostRole: string | null
   protected declare _hostDescribedBy: string | null
   protected declare _describedFields: [HTMLElement, string | null, string][]
   protected declare _initialStartDate: any
@@ -236,9 +228,6 @@ class DateRangeInput extends BaseComponent {
     super(element, config)
 
     this._createdElements = []
-    this._hiddenFromAssistiveTech = []
-    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
-    this._hostRole = this._element.getAttribute('role')
     this._hostDescribedBy = this._element.getAttribute('aria-describedby')
     this._describedFields = []
     this._validation = new FieldValidation(this._element, {
@@ -340,14 +329,6 @@ class DateRangeInput extends BaseComponent {
 
     this._validation.dispose()
 
-    for (const element of this._hiddenFromAssistiveTech) {
-      element.removeAttribute('aria-hidden')
-    }
-
-    if (this._hostRole === null) {
-      this._element.removeAttribute('role')
-    }
-
     for (const [element, own, written] of this._describedFields) {
       if (element.getAttribute('aria-describedby') !== written) {
         continue
@@ -364,40 +345,19 @@ class DateRangeInput extends BaseComponent {
       this._element.setAttribute('aria-describedby', this._hostDescribedBy)
     }
 
-    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
-
     super.dispose()
   }
 
   // Private
-  _hideFromAssistiveTech(element: Element): void {
-    if (element.hasAttribute('aria-hidden')) {
-      return
-    }
-
-    element.setAttribute('aria-hidden', 'true')
-    this._hiddenFromAssistiveTech.push(element)
-  }
-
-  _managedClassNames(): string[] {
-    return [
-      CLASS_NAME_DATE_RANGE,
-      CLASS_NAME_INPUT_GROUP,
-      ...managedSizeClassNames(this._config.size)
-    ].filter(Boolean) as string[]
-  }
-
   _createDateRangeInput(): void {
     applyControlGroupClasses(this._element, CLASS_NAME_INPUT_GROUP, CLASS_NAME_DATE_RANGE)
     applyControlGroupSize(this._element, this._config.size)
 
-    if (this._hostRole === null) {
-      this._element.setAttribute('role', 'group')
-    }
+    this._element.setAttribute('role', 'group')
 
     this._startElement = this._createField(ATTRIBUTE_ROLE_START, this._config.startFloatingLabel)
     this._separatorElement = SelectorEngine.findOne(SELECTOR_ROLE_SEPARATOR, this._element) ?? this._createSeparator()
-    this._hideFromAssistiveTech(this._separatorElement)
+    this._separatorElement.setAttribute('aria-hidden', 'true')
     this._endElement = this._createField(ATTRIBUTE_ROLE_END, this._config.endFloatingLabel)
     this._placeCreatedParts()
     this._moveDescriptionToFields()
@@ -570,12 +530,6 @@ class DateRangeInput extends BaseComponent {
     EventHandler.on(this._endElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), () => {
       this._onFieldChange('end')
     })
-
-    if (this._separatorElement.getAttribute('aria-hidden') !== 'true') {
-      for (const svg of SelectorEngine.find(SELECTOR_SVG, this._separatorElement)) {
-        this._hideFromAssistiveTech(svg)
-      }
-    }
 
     EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
       if ((event.key !== ARROW_LEFT_KEY && event.key !== ARROW_RIGHT_KEY) || hasShortcutModifier(event)) {

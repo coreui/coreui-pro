@@ -234,7 +234,7 @@ The component adopts the parts you write inside its element and generates the re
 | Role | Element | What the component does with it |
 | --- | --- | --- |
 | `data-coreui-range-start` | a `div` | Hosts the start field's sections. |
-| `data-coreui-range-separator` | any element | Sits between the ends; marked `aria-hidden`, as is an `<svg>` inside it. Without it an arrow is generated from `separatorIcon` / `separatorIconRtl`. |
+| `data-coreui-range-separator` | any element | Sits between the ends; marked `aria-hidden`. Without it an arrow is generated from `separatorIcon` / `separatorIconRtl`. |
 | `data-coreui-range-end` | a `div` | Hosts the end field's sections. |
 
 <Example pro code={`<div data-coreui-date-range-input data-coreui-locale="en-US">
@@ -247,7 +247,7 @@ The component adopts the parts you write inside its element and generates the re
 
 Each end is a [date input](/forms/date-input/#accessibility) with the spinbutton pattern per section, so the range is two labelled groups rather than one opaque control:
 
-- **Role attributes**: the element itself is a `role="group"` unless it carries a role of its own, each end has `role="group"`, every section is a `role="spinbutton"` with its value attributes.
+- **Role attributes**: the element itself is a `role="group"`, each end has `role="group"`, every section is a `role="spinbutton"` with its value attributes.
 - **Label click**: clicking a label that names the field, through `aria-labelledby` or a `<label for>` pointing at the element, moves focus to the first empty section of the start date, as clicking the label of an input focuses it.
 - **Names**: the start and end are named separately — `ariaStartLabel` and `ariaEndLabel` by default, or the floating label text when one is set. An end you wrote with an `aria-label` of its own keeps it. An `aria-labelledby` on the element, pointing at the visible label as the examples on this page do, names the pair, and an `aria-describedby` on it moves to both fields, after any description a field you wrote carries of its own.
 - **Separator**: hidden from assistive technology, as is any `<svg>` inside it.

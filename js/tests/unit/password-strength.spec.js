@@ -350,14 +350,13 @@ describe('PasswordStrength', () => {
 
       expect(element.querySelector('.password-strength-meter')).toBeNull()
       expect(element.querySelector('.password-strength-feedback')).toBeNull()
-      expect(element.hasAttribute('class')).toBeFalse()
 
       type(input, 'Str0ng!&Passphrase99')
 
       expect(element.querySelector('.password-strength-text')).toBeNull()
     })
 
-    it('should take back the busy class when disposed while a promise is pending', () => {
+    it('should take off the busy class when disposed while a promise is pending', () => {
       const { element, input, instance } = setup({ scorer: () => new Promise(() => {}) })
 
       type(input, 'anything')
@@ -366,7 +365,7 @@ describe('PasswordStrength', () => {
 
       instance.dispose()
 
-      expect(element.hasAttribute('class')).toBeFalse()
+      expect(element.classList.contains('password-strength-busy')).toBeFalse()
     })
 
     it('should keep the class the page wrote on the element', () => {

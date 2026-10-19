@@ -591,6 +591,14 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').hasAttribute('aria-label')).toBeFalse()
     })
 
+    it('should hide the icons of adopted buttons over an aria-hidden in the markup', () => {
+      buildPicker({}, OWN_MARKUP.replaceAll('<svg', '<svg aria-hidden="false"'))
+
+      for (const svg of fixtureEl.querySelectorAll('#picker svg')) {
+        expect(svg.getAttribute('aria-hidden')).toEqual('true')
+      }
+    })
+
     it('should give an adopted toggle the accessibility it would have given its own', () => {
       const picker = buildPicker({}, OWN_MARKUP)
       const el = fixtureEl.querySelector('#picker')
@@ -1879,7 +1887,7 @@ describe('DatePicker', () => {
   })
 
   describe('dispose', () => {
-    it('should take back what it wrote on the parts the author supplied', () => {
+    it('should take back the name and the reference it wrote on a toggle the author supplied', () => {
       const picker = buildPicker({}, `<div id="picker">
         <div data-coreui-picker-field></div>
         <button data-coreui-picker-toggle><svg viewBox="0 0 16 16"></svg></button>
@@ -1893,7 +1901,9 @@ describe('DatePicker', () => {
       picker.dispose()
       pickers.length = 0
 
-      expect(toggle.outerHTML).toEqual('<button data-coreui-picker-toggle=""><svg viewBox="0 0 16 16"></svg></button>')
+      expect(toggle.hasAttribute('aria-controls')).toBeFalse()
+      expect(toggle.hasAttribute('aria-label')).toBeFalse()
+      expect(toggle.getAttribute('aria-haspopup')).toEqual('dialog')
     })
 
     it('should take back the dated name it gave a toggle the author supplied', () => {
@@ -1915,7 +1925,7 @@ describe('DatePicker', () => {
       expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar, Friday, August 14, 2026')
     })
 
-    it('should take back what it wrote even when the picker was open', () => {
+    it('should take back the name and the reference it wrote even when the picker was open', () => {
       const picker = buildPicker({}, `<div id="picker">
         <div data-coreui-picker-field></div>
         <button data-coreui-picker-toggle>Pick</button>
@@ -1926,7 +1936,8 @@ describe('DatePicker', () => {
       picker.dispose()
       pickers.length = 0
 
-      expect(toggle.outerHTML).toEqual('<button data-coreui-picker-toggle="">Pick</button>')
+      expect(toggle.hasAttribute('aria-controls')).toBeFalse()
+      expect(toggle.hasAttribute('aria-label')).toBeFalse()
     })
 
     it('should keep a value the page changed while the picker lived', () => {
@@ -1943,7 +1954,7 @@ describe('DatePicker', () => {
       expect(toggle.getAttribute('aria-label')).toEqual('Wybierz datę')
     })
 
-    it('should give back a cleaner the author supplied too', () => {
+    it('should take back the name it gave a cleaner the author supplied', () => {
       const picker = buildPicker({}, `<div id="picker">
         <div data-coreui-picker-field></div>
         <button data-coreui-picker-cleaner><svg viewBox="0 0 16 16"></svg></button>
@@ -1956,10 +1967,10 @@ describe('DatePicker', () => {
       picker.dispose()
       pickers.length = 0
 
-      expect(cleaner.outerHTML).toEqual('<button data-coreui-picker-cleaner=""><svg viewBox="0 0 16 16"></svg></button>')
+      expect(cleaner.hasAttribute('aria-label')).toBeFalse()
     })
 
-    it('should give back an attribute the author wrote rather than dropping it', () => {
+    it('should give back a name the author wrote rather than dropping it', () => {
       const picker = buildPicker({}, `<div id="picker">
         <div data-coreui-picker-field></div>
         <button data-coreui-picker-toggle aria-label="Open the calendar" aria-haspopup="menu"></button>
@@ -1972,78 +1983,34 @@ describe('DatePicker', () => {
       pickers.length = 0
 
       expect(toggle.getAttribute('aria-label')).toEqual('Open the calendar')
-      expect(toggle.getAttribute('aria-haspopup')).toEqual('menu')
     })
 
-    it('should let the author button work again after a disabled picker is gone', () => {
-      const picker = buildPicker({ disabled: true }, `<div id="picker">
+    it('should follow its own options when built again after a disabled picker, and let the author button work again', () => {
+      fixtureEl.innerHTML = `<div id="picker">
         <div data-coreui-picker-field></div>
         <button data-coreui-picker-toggle>Pick</button>
-      </div>`)
+      </div>`
+      const element = fixtureEl.querySelector('#picker')
       const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
+      const disabled = new DatePicker(element, { disabled: true, size: 'lg' })
 
       expect(toggle.disabled).toBeTrue()
 
-      picker.dispose()
-      pickers.length = 0
+      disabled.dispose()
+      pickers.push(new DatePicker(element, { size: 'sm' }))
 
       expect(toggle.disabled).toBeFalse()
+      expect(element.classList.contains('form-control-sm')).toBeTrue()
+      expect(element.classList.contains('form-control-lg')).toBeFalse()
+      expect(element.querySelector('textarea').disabled).toBeFalse()
     })
 
-    it('should replace a size the markup carried and give it back', () => {
-      const picker = buildPicker({ size: 'sm' }, '<div class="form-control-lg" id="picker"></div>')
+    it('should replace a size the markup carried', () => {
+      buildPicker({ size: 'sm' }, '<div class="form-control-lg" id="picker"></div>')
       const element = fixtureEl.querySelector('#picker')
 
       expect(element.classList.contains('form-control-lg')).toBeFalse()
       expect(element.classList.contains('form-control-sm')).toBeTrue()
-
-      picker.dispose()
-      pickers.length = 0
-
-      expect(element.outerHTML).toEqual('<div class="form-control-lg" id="picker"></div>')
-    })
-
-    it('should give the host back the way the page wrote it', () => {
-      fixtureEl.innerHTML = '<div class="form-control-group my-own" id="picker"></div>'
-      const element = fixtureEl.querySelector('#picker')
-      const instance = new DatePicker(fixtureEl.querySelector('#picker'), { size: 'sm' })
-
-      instance.show()
-      instance.dispose()
-
-      expect(element.outerHTML).toEqual('<div class="form-control-group my-own" id="picker"></div>')
-    })
-
-    it('should leave a class the page removed while it lived removed', () => {
-      fixtureEl.innerHTML = '<div class="border-danger mb-3" id="picker"></div>'
-      const element = fixtureEl.querySelector('#picker')
-      const picker = new DatePicker(element)
-
-      element.classList.remove('border-danger')
-      picker.dispose()
-
-      expect(element.outerHTML).toEqual('<div class="mb-3" id="picker"></div>')
-    })
-
-    it('should keep classes the page added while it lived, its own names included', () => {
-      fixtureEl.innerHTML = '<div id="picker"></div>'
-      const element = fixtureEl.querySelector('#picker')
-      const picker = new DatePicker(element)
-
-      element.classList.add('form-control-lg', 'shadow')
-      picker.dispose()
-
-      expect(element.outerHTML).toEqual('<div id="picker" class="form-control-lg shadow"></div>')
-    })
-
-    it('should clean a size class whatever the size is called', () => {
-      fixtureEl.innerHTML = '<div id="picker"></div>'
-      const element = fixtureEl.querySelector('#picker')
-      const picker = new DatePicker(element, { size: 'xl' })
-
-      picker.dispose()
-
-      expect(element.outerHTML).toEqual('<div id="picker"></div>')
     })
 
     it('should tolerate a second dispose', () => {
@@ -2053,16 +2020,6 @@ describe('DatePicker', () => {
       picker.dispose()
 
       expect(() => picker.dispose()).not.toThrow()
-    })
-
-    it('should not leave a class attribute on a host that had none', () => {
-      fixtureEl.innerHTML = '<div id="picker"></div>'
-      const element = fixtureEl.querySelector('#picker')
-      const instance = new DatePicker(fixtureEl.querySelector('#picker'), { size: 'sm' })
-
-      instance.dispose()
-
-      expect(element.outerHTML).toEqual('<div id="picker"></div>')
     })
 
     it('should drop the listeners on the controls it built', () => {
@@ -2093,7 +2050,6 @@ describe('DatePicker', () => {
       picker.dispose()
 
       expect(el.children).toHaveLength(0)
-      expect(el.classList.contains('form-control-group')).toBe(false)
     })
 
     it('should build one set of controls when re-initialised on the same element', () => {

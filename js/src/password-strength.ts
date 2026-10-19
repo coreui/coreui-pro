@@ -12,7 +12,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
-  captureHostClasses, defineJQueryPlugin, type HostClasses, jQueryDispatch, restoreHostClasses
+  defineJQueryPlugin, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -35,8 +35,6 @@ const CLASS_NAME_SEGMENT = 'password-strength-segment'
 const CLASS_NAME_SUGGESTIONS = 'password-strength-suggestions'
 const CLASS_NAME_TEXT = 'password-strength-text'
 const CLASS_NAME_WARNING = 'password-strength-warning'
-
-const HOST_CLASS_NAMES = [CLASS_NAME_BUSY, CLASS_NAME_PASSWORD_STRENGTH]
 
 const SELECTOR_DATA_PASSWORD_STRENGTH = '[data-coreui-password-strength]'
 // Password Input switches `type` to reveal the value, so a field paired with it
@@ -100,7 +98,6 @@ const isThenable = (value: unknown): value is Promise<StrengthResult> =>
 
 class PasswordStrength extends BaseComponent {
   protected declare _config: PasswordStrengthConfig
-  private _hostClasses: HostClasses
   private _input: HTMLInputElement | null = null
   private _meterElement: HTMLElement | null = null
   private _textElement: HTMLElement | null = null
@@ -116,7 +113,6 @@ class PasswordStrength extends BaseComponent {
   constructor(element: string | Element, config?: Partial<PasswordStrengthConfig>) {
     super(element, config)
 
-    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._input = this._getInput()
     this._createMeter()
 
@@ -160,7 +156,7 @@ class PasswordStrength extends BaseComponent {
 
     this._meterElement?.remove()
     SelectorEngine.findOne(`.${CLASS_NAME_FEEDBACK}`, this._element)?.remove()
-    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
+    this._element.classList.remove(CLASS_NAME_BUSY)
 
     super.dispose()
   }

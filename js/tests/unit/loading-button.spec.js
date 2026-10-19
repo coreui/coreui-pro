@@ -517,7 +517,7 @@ describe('LoadingButton', () => {
       expect(link.getAttribute('aria-disabled')).toBe('true')
     })
 
-    it('should give back the disabled state when disposed while loading', () => {
+    it('should lift its own disabled block when disposed while loading', () => {
       fixtureEl.innerHTML = '<button>Save</button>'
       const button = fixtureEl.querySelector('button')
       const loadingButton = new LoadingButton(button, { disabledOnLoading: true })
@@ -528,10 +528,10 @@ describe('LoadingButton', () => {
 
       expect(button.hasAttribute('aria-disabled')).toBeFalse()
       expect(button).not.toHaveClass('disabled')
-      expect(button.hasAttribute('class')).toBeFalse()
+      expect(button).not.toHaveClass('is-loading')
     })
 
-    it('should take back its classes, the spinner and an unread message when disposed while loading', () => {
+    it('should take back is-loading, the spinner and an unread message when disposed while loading', () => {
       fixtureEl.innerHTML = '<button>Save</button>'
       const button = fixtureEl.querySelector('button')
       const loadingButton = new LoadingButton(button)
@@ -545,7 +545,8 @@ describe('LoadingButton', () => {
       loadingButton.dispose()
       vi.advanceTimersByTime(200)
 
-      expect(button.outerHTML).toEqual('<button>Save</button>')
+      expect(button).not.toHaveClass('is-loading')
+      expect(button.innerHTML).toEqual('Save')
       expect(messages()).toEqual([])
     })
 
@@ -590,7 +591,8 @@ describe('LoadingButton', () => {
       loadingButton.dispose()
       vi.advanceTimersByTime(200)
 
-      expect(button.outerHTML).toEqual('<button>Save</button>')
+      expect(button).not.toHaveClass('is-loading')
+      expect(button.innerHTML).toEqual('Save')
     })
 
     it('should not throw when a stop listener disposes the instance', () => {
@@ -659,17 +661,13 @@ describe('LoadingButton', () => {
       expect(Data.get(button, 'coreui.loading-button')).toBeNull()
     })
 
-    it('should leave no class attribute on a button that had none, and keep the classes the page wrote', () => {
-      fixtureEl.innerHTML = '<button id="bare">Save</button><button id="marked" class="btn btn-loading">Save</button>'
-      const bare = fixtureEl.querySelector('#bare')
-      const marked = fixtureEl.querySelector('#marked')
+    it('should keep the classes the page wrote', () => {
+      fixtureEl.innerHTML = '<button class="btn btn-loading">Save</button>'
+      const button = fixtureEl.querySelector('button')
 
-      for (const button of [bare, marked]) {
-        new LoadingButton(button).dispose()
-      }
+      new LoadingButton(button).dispose()
 
-      expect(bare.hasAttribute('class')).toBeFalse()
-      expect(marked.getAttribute('class')).toEqual('btn btn-loading')
+      expect(button.getAttribute('class')).toEqual('btn btn-loading')
     })
 
     it('should not let the timers fire after dispose', () => {

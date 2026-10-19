@@ -38,17 +38,13 @@ describe('Rating', () => {
   })
 
   describe('constructor', () => {
-    it('should let the options decide a state class the markup wrote, and give it back on dispose', () => {
+    it('should let the options decide a state class the markup wrote', () => {
       fixtureEl.innerHTML = '<div class="rating disabled"></div>'
       const div = fixtureEl.querySelector('div')
-      const markup = div.outerHTML
-      const rating = new Rating(div)
+
+      Rating.getOrCreateInstance(div)
 
       expect(div).not.toHaveClass('disabled')
-
-      rating.dispose()
-
-      expect(div.outerHTML).toEqual(markup)
     })
 
     it('should be created again after an invalid config', () => {
@@ -673,29 +669,33 @@ describe('Rating', () => {
       expect(div).not.toHaveClass('disabled')
     })
 
-    it('should replace a size class the page wrote and give it back on dispose', () => {
+    it('should replace a size class the page wrote', () => {
       fixtureEl.innerHTML = '<div class="rating rating-lg"></div>'
       const div = fixtureEl.querySelector('div')
-      const markup = div.outerHTML
       const rating = new Rating(div)
 
       rating.setConfig({ size: 'sm' })
 
       expect(div).toHaveClass('rating-sm')
       expect(div).not.toHaveClass('rating-lg')
-
-      rating.dispose()
-
-      expect(div.outerHTML).toEqual(markup)
     })
 
-    it('should leave a size class the page wrote alone while the size option is empty', () => {
+    it('should take off a size class the page wrote while the size option is empty', () => {
       fixtureEl.innerHTML = '<div class="rating-lg"></div>'
       const div = fixtureEl.querySelector('div')
-      const rating = new Rating(div)
+      // eslint-disable-next-line no-new
+      new Rating(div)
 
-      div.classList.remove('rating-lg')
-      rating.dispose()
+      expect(div).not.toHaveClass('rating-lg')
+    })
+
+    it('should take the size of a new instance from its options after dispose', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+
+      new Rating(div, { size: 'lg' }).dispose()
+      // eslint-disable-next-line no-new
+      new Rating(div)
 
       expect(div).not.toHaveClass('rating-lg')
     })
@@ -786,10 +786,9 @@ describe('Rating', () => {
   })
 
   describe('reset', () => {
-    it('should keep content the page put in the element and give the markup back on dispose', () => {
+    it('should keep content the page put in the element through a reset and dispose', () => {
       fixtureEl.innerHTML = '<div><span class="rating-note">12 reviews</span></div>'
       const div = fixtureEl.querySelector('div')
-      const markup = div.outerHTML
       const rating = new Rating(div, { size: 'lg' })
 
       rating.reset(2)
@@ -798,7 +797,7 @@ describe('Rating', () => {
 
       rating.dispose()
 
-      expect(div.outerHTML).toEqual(markup)
+      expect(div.innerHTML).toEqual('<span class="rating-note">12 reviews</span>')
     })
 
     it('should report a reset that changes the value once, and one that does not never', () => {
@@ -1204,10 +1203,9 @@ describe('Rating', () => {
       expect(Tooltip.getInstance(input.parentElement)).toBeNull()
     })
 
-    it('should mark a readonly rating with aria-readonly, drop it when readonly turns off, and give the markup back on dispose', () => {
+    it('should mark a readonly rating with aria-readonly and drop it when readonly turns off', () => {
       fixtureEl.innerHTML = '<div data-coreui-rating></div>'
       const div = fixtureEl.querySelector('div')
-      const markup = div.outerHTML
       const rating = new Rating(div, { readonly: true })
 
       expect(div.getAttribute('aria-readonly')).toEqual('true')
@@ -1217,25 +1215,24 @@ describe('Rating', () => {
       expect(div.hasAttribute('aria-readonly')).toBeFalse()
 
       rating.setConfig({ readonly: true })
-      rating.dispose()
 
-      expect(div.outerHTML).toEqual(markup)
+      expect(div.getAttribute('aria-readonly')).toEqual('true')
     })
 
-    it('should leave an aria-readonly the markup already has', () => {
-      fixtureEl.innerHTML = '<div aria-readonly="false"></div>'
-      const div = fixtureEl.querySelector('div')
-      const rating = new Rating(div, { readonly: true })
+    it('should let the readonly option decide over an aria-readonly the markup has', () => {
+      fixtureEl.innerHTML = '<div id="writable" aria-readonly="false"></div><div id="locked" aria-readonly="true"></div>'
+      const writable = fixtureEl.querySelector('#writable')
+      const locked = fixtureEl.querySelector('#locked')
+      const rating = new Rating(writable, { readonly: true })
 
-      expect(div.getAttribute('aria-readonly')).toEqual('false')
+      Rating.getOrCreateInstance(locked)
+
+      expect(writable.getAttribute('aria-readonly')).toEqual('true')
+      expect(locked.hasAttribute('aria-readonly')).toBeFalse()
 
       rating.setConfig({ readonly: false })
 
-      expect(div.getAttribute('aria-readonly')).toEqual('false')
-
-      rating.dispose()
-
-      expect(div.getAttribute('aria-readonly')).toEqual('false')
+      expect(writable.hasAttribute('aria-readonly')).toBeFalse()
     })
 
     it('should not change or hover if readonly is true', () => {
@@ -2281,23 +2278,24 @@ describe('Rating', () => {
       expect(radiosOf(element)[0].validationMessage).toEqual('Rate the delivery.')
     })
 
-    it('should leave aria-invalid and aria-required the page set on the element', () => {
+    it('should let the options decide aria-invalid and aria-required over what the page set on the element', () => {
       const { element, rating } = mountInForm({ required: true, validationState: 'invalid' }, 'aria-invalid="false" aria-required="false"')
 
-      expect(element.getAttribute('aria-invalid')).toEqual('false')
-      expect(element.getAttribute('aria-required')).toEqual('false')
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
+      expect(element.getAttribute('aria-required')).toEqual('true')
 
-      rating.setConfig({ validationState: null })
+      rating.setConfig({ required: false, validationState: null })
 
-      expect(element.getAttribute('aria-invalid')).toEqual('false')
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
+      expect(element.hasAttribute('aria-required')).toBeFalse()
 
-      rating.dispose()
+      const { element: marked } = mountInForm({}, 'aria-invalid="true" aria-required="true"')
 
-      expect(element.getAttribute('aria-invalid')).toEqual('false')
-      expect(element.getAttribute('aria-required')).toEqual('false')
+      expect(marked.hasAttribute('aria-invalid')).toBeFalse()
+      expect(marked.hasAttribute('aria-required')).toBeFalse()
     })
 
-    it('should give back the server class it still holds and take its own attributes back on dispose', () => {
+    it('should give back the server class it still holds and the description, and take off the aria-invalid it wrote on dispose', () => {
       const { element, rating } = mountInForm({ required: true }, 'class="is-invalid" aria-describedby="scoreHelp"')
 
       rating.dispose()
@@ -2305,7 +2303,6 @@ describe('Rating', () => {
       expect(element).toHaveClass('is-invalid')
       expect(element.getAttribute('aria-describedby')).toEqual('scoreHelp')
       expect(element.hasAttribute('aria-invalid')).toBeFalse()
-      expect(element.hasAttribute('aria-required')).toBeFalse()
 
       const { element: picked, rating: dismissed } = mountInForm({}, 'class="is-invalid"')
 
@@ -2316,13 +2313,31 @@ describe('Rating', () => {
 
       const { element: plain, rating: given } = mountInForm({ validationState: 'invalid' })
 
+      expect(plain.getAttribute('aria-invalid')).toEqual('true')
+
       given.dispose()
 
-      expect(plain.outerHTML).toEqual('<div id="score"></div>')
+      expect(plain).not.toHaveClass('is-invalid')
+      expect(plain.hasAttribute('aria-invalid')).toBeFalse()
     })
   })
 
   describe('dispose', () => {
+    it('should leave the role and the aria state it wrote for the next instance to rewrite', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+
+      new Rating(div, { readonly: true }).dispose()
+
+      expect(div.getAttribute('role')).toEqual('radiogroup')
+      expect(div.getAttribute('aria-readonly')).toEqual('true')
+
+      new Rating(div, { required: true }).dispose()
+
+      expect(div.hasAttribute('aria-readonly')).toBeFalse()
+      expect(div.getAttribute('aria-required')).toEqual('true')
+    })
+
     it('should take back the items and radios it rendered', () => {
       fixtureEl.innerHTML = '<form><div data-coreui-rating></div></form>'
       const form = fixtureEl.querySelector('form')
@@ -2335,30 +2350,32 @@ describe('Rating', () => {
       expect(new FormData(form).has('score')).toBeFalse()
     })
 
-    it('should give the element its markup back', () => {
+    it('should remove what it rendered and keep the page content', () => {
       fixtureEl.innerHTML = '<div data-coreui-rating data-coreui-value="3"><span class="rating-note">12 reviews</span></div>'
       const div = fixtureEl.querySelector('div')
-      const markup = div.outerHTML
       const rating = new Rating(div, { disabled: true, readonly: true, size: 'lg' })
 
       rating.dispose()
 
-      expect(div.outerHTML).toEqual(markup)
+      expect(div.innerHTML).toEqual('<span class="rating-note">12 reviews</span>')
+      expect(div.getAttribute('data-coreui-value')).toEqual('3')
     })
 
-    it('should keep a role the page wrote, while alive and after dispose', () => {
+    it('should make the element a radiogroup over a role the page wrote, on every init', () => {
       fixtureEl.innerHTML = '<div role="group" data-coreui-rating></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div)
 
-      expect(div.getAttribute('role')).toEqual('group')
+      expect(div.getAttribute('role')).toEqual('radiogroup')
 
       rating.dispose()
+      div.setAttribute('role', 'group')
+      Rating.getOrCreateInstance(div)
 
-      expect(div.getAttribute('role')).toEqual('group')
+      expect(div.getAttribute('role')).toEqual('radiogroup')
     })
 
-    it('should keep a role the page set after init', () => {
+    it('should make the element a radiogroup again on setConfig over a role the page set after init', () => {
       fixtureEl.innerHTML = '<div data-coreui-rating></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div)
@@ -2366,31 +2383,16 @@ describe('Rating', () => {
       div.setAttribute('role', 'group')
       rating.setConfig({ size: 'lg' })
 
-      expect(div.getAttribute('role')).toEqual('group')
-
-      rating.dispose()
-
-      expect(div.getAttribute('role')).toEqual('group')
-    })
-
-    it('should keep an empty class attribute the page wrote', () => {
-      fixtureEl.innerHTML = '<div class="" data-coreui-rating></div>'
-      const div = fixtureEl.querySelector('div')
-      const markup = div.outerHTML
-
-      new Rating(div).dispose()
-
-      expect(div.outerHTML).toEqual(markup)
+      expect(div.getAttribute('role')).toEqual('radiogroup')
     })
 
     it('should keep rating items the page wrote', () => {
       fixtureEl.innerHTML = '<div data-coreui-rating><div class="rating-item">Fallback</div></div>'
       const div = fixtureEl.querySelector('div')
-      const markup = div.outerHTML
 
       new Rating(div).dispose()
 
-      expect(div.outerHTML).toEqual(markup)
+      expect(div.innerHTML).toEqual('<div class="rating-item">Fallback</div>')
     })
 
     it('should dispose the tooltips of half-star items', () => {

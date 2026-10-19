@@ -64,7 +64,7 @@ export type FieldValidationOptions = {
 class FieldValidation {
   /** A user action runs that has not changed the value yet; only `runAsUser()` opens it. */
   declare userAction: boolean
-  protected declare _ariaInvalid: Map<Element, string | null>
+  protected declare _ariaInvalid: Element[]
   protected declare _described: Map<Element, string[]>
   protected declare _describedBy: string[]
   protected declare _fields: ValueField[]
@@ -93,7 +93,7 @@ class FieldValidation {
   constructor(host: Element, options: FieldValidationOptions) {
     const root = host.getRootNode()
 
-    this._ariaInvalid = new Map()
+    this._ariaInvalid = []
     this._described = new Map()
     this._describedBy = splitIds(host.getAttribute('aria-describedby'))
     this._fields = []
@@ -345,7 +345,7 @@ class FieldValidation {
 
   /**
    * Hands everything back: leaves its owner, stops following the fields and the form, lifts the
-   * block, takes off what it drew, gives back the `aria-invalid` it overwrote, gives the server
+   * block, takes off what it drew and the `aria-invalid` it wrote, gives the server
    * sources the state classes of their markup, unless that state was dropped meanwhile, and adds the
    * page's description back to the host next to what the host carries now. Call it before the
    * component takes its elements apart.
@@ -466,25 +466,21 @@ class FieldValidation {
 
   /**
    * Writes `aria-invalid` on the focus targets, `"true"` while the state is `'invalid'` and none
-   * otherwise, and gives the elements that were focus targets before and no longer are the value
-   * they had before the controller first wrote it.
+   * otherwise, and takes it off the elements that were focus targets before and no longer are.
    *
    * @param targets - The focus targets
    * @param isInvalid - Whether the state is `'invalid'`
    */
   _markInvalid(targets: Element[], isInvalid: boolean): void {
-    for (const [target, original] of this._ariaInvalid) {
+    for (const target of this._ariaInvalid) {
       if (!targets.includes(target)) {
-        writeAttribute(target, 'aria-invalid', original)
-        this._ariaInvalid.delete(target)
+        writeAttribute(target, 'aria-invalid', null)
       }
     }
 
-    for (const target of targets) {
-      if (!this._ariaInvalid.has(target)) {
-        this._ariaInvalid.set(target, target.getAttribute('aria-invalid'))
-      }
+    this._ariaInvalid = targets
 
+    for (const target of targets) {
       writeAttribute(target, 'aria-invalid', isInvalid ? 'true' : null)
     }
   }

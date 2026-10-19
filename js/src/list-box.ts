@@ -209,11 +209,13 @@ class ListBox extends BaseComponent {
   protected declare _active: string | null
   protected declare _anchor: string | null
   protected declare _counter: HTMLElement | null
+  protected declare _createdNodes: HTMLElement[]
   protected declare _disabledSections: WeakSet<HTMLElement>
   protected declare _field: HTMLElement | null
   protected declare _items: ListBoxEntry[] | null
   protected declare _focused: boolean
   protected declare _limited: string | null
+  protected declare _hostListNodes: ChildNode[] | null
   protected declare _list: HTMLElement
   protected declare _loadingAnnouncement: (() => void) | null
   protected declare _loadingRegion: HTMLElement
@@ -228,11 +230,13 @@ class ListBox extends BaseComponent {
 
     this._active = null
     this._anchor = null
+    this._createdNodes = []
     this._disabledSections = new WeakSet()
     this._field = getElement(this._config.activeDescendant)
     this._items = this._config.items.length > 0 ? this._normalizeItems(this._config.items) : null
     this._focused = false
     this._limited = null
+    this._hostListNodes = null
     this._list = this._resolveList()
     this._loadingAnnouncement = null
     this._counter = this._resolveCounter()
@@ -424,9 +428,7 @@ class ListBox extends BaseComponent {
     this._updateListAttributes()
 
     for (const section of SelectorEngine.find(SELECTOR_SECTION, this._list)) {
-      if (!section.hasAttribute('role')) {
-        section.setAttribute('role', 'group')
-      }
+      section.setAttribute('role', 'group')
 
       this._decorateSection(section)
     }
@@ -453,8 +455,15 @@ class ListBox extends BaseComponent {
 
     this._element.removeAttribute(ATTRIBUTE_INDICATOR)
     this._element.classList.remove(CLASS_NAME_LOADING)
-    this._loadingRegion.remove()
     this._loadingAnnouncement?.()
+
+    if (this._hostListNodes) {
+      this._list.replaceChildren(...this._hostListNodes)
+    }
+
+    for (const node of this._createdNodes) {
+      node.remove()
+    }
 
     EventHandler.off(this._list, EVENT_KEY)
 
@@ -521,6 +530,8 @@ class ListBox extends BaseComponent {
       this._list.after(region)
     }
 
+    this._createdNodes.push(region)
+
     return region
   }
 
@@ -573,6 +584,7 @@ class ListBox extends BaseComponent {
     counter.classList.add(CLASS_NAME_SUBTITLE)
     counter.setAttribute('data-coreui-list-box-counter', '')
     this._resolveHeader().append(counter)
+    this._createdNodes.push(counter)
 
     return counter
   }
@@ -588,6 +600,7 @@ class ListBox extends BaseComponent {
 
     header.classList.add(CLASS_NAME_HEADER)
     this._element.prepend(header)
+    this._createdNodes.push(header)
 
     return header
   }
@@ -616,6 +629,7 @@ class ListBox extends BaseComponent {
     search.className = `${CLASS_NAME_FORM_CONTROL} ${CLASS_NAME_SEARCH}`
     search.setAttribute('data-coreui-list-box-search', '')
     this._list.before(search)
+    this._createdNodes.push(search)
 
     return search
   }
@@ -716,6 +730,7 @@ class ListBox extends BaseComponent {
     const created = document.createElement('div')
     created.classList.add(CLASS_NAME_OPTIONS)
     this._element.append(created)
+    this._createdNodes.push(created)
 
     return created
   }
@@ -726,6 +741,10 @@ class ListBox extends BaseComponent {
     }
 
     const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._list)
+
+    if (this._hostListNodes === null && !this._createdNodes.includes(this._list)) {
+      this._hostListNodes = [...this._list.childNodes]
+    }
 
     this._list.replaceChildren(...this._items.map(entry => (Array.isArray((entry as ListBoxGroup).items) ? this._renderSection(entry as ListBoxGroup) : this._renderOption(entry as ListBoxItem))))
 

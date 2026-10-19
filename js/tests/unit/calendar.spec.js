@@ -6304,28 +6304,6 @@ describe('Calendar', () => {
       expect(spy.calls.count()).toBeGreaterThan(0)
     })
 
-    it('should leave no class attribute on an element that had none, and keep the classes the page wrote', () => {
-      fixtureEl.innerHTML = '<div id="bare"></div><div id="marked" class="calendars select-week"></div>'
-      const bare = fixtureEl.querySelector('#bare')
-      const marked = fixtureEl.querySelector('#marked')
-
-      for (const element of [bare, marked]) {
-        new Calendar(element, { selectionType: 'week', showWeekNumber: true }).dispose()
-      }
-
-      expect(bare.hasAttribute('class')).toBeFalse()
-      expect(marked.getAttribute('class')).toEqual('calendars select-week')
-    })
-
-    it('should take back the selection class of a selectionType it does not know', () => {
-      fixtureEl.innerHTML = '<div class="border"></div>'
-      const div = fixtureEl.querySelector('div')
-
-      new Calendar(div, { selectionType: 'days' }).dispose()
-
-      expect(div.getAttribute('class')).toEqual('border')
-    })
-
     it('should remove the panels it built', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -6334,7 +6312,31 @@ describe('Calendar', () => {
       calendar.dispose()
 
       expect(div.children).toHaveLength(0)
-      expect(div.className).toBe('')
+    })
+
+    it('should write its selection and week number classes from setConfig both ways', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { selectionType: 'week', showWeekNumber: true })
+
+      calendar.setConfig({ selectionType: 'day', showWeekNumber: false })
+
+      expect(div.classList.contains('select-week')).toBeFalse()
+      expect(div.classList.contains('select-day')).toBeTrue()
+      expect(div.classList.contains('show-week-numbers')).toBeFalse()
+    })
+
+    it('should follow its own options when built again after a dispose with others', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+
+      new Calendar(div, { calendars: 2, selectionType: 'week', showWeekNumber: true }).dispose()
+      new Calendar(div, { selectionType: 'day' }) // eslint-disable-line no-new
+
+      expect(div.querySelectorAll('.calendar')).toHaveLength(1)
+      expect(div.classList.contains('select-day')).toBeTrue()
+      expect(div.classList.contains('select-week')).toBeFalse()
+      expect(div.classList.contains('show-week-numbers')).toBeFalse()
     })
 
     it('should build one set of panels when re-initialised on the same element', () => {

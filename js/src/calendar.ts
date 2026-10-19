@@ -17,7 +17,7 @@ import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
 } from './util/icons.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, isRTL, jQueryDispatch, restoreHostClasses
+  defineJQueryPlugin, getUID, isRTL, jQueryDispatch
 } from './util/index.js'
 import {
   type CalendarKeyAction,
@@ -98,12 +98,6 @@ const CLASS_NAME_CALENDAR_ROW = 'calendar-row'
 const CLASS_NAME_CALENDARS = 'calendars'
 const CLASS_NAME_SHOW_WEEK_NUMBERS = 'show-week-numbers'
 const CLASS_NAME_VISUALLY_HIDDEN = 'visually-hidden'
-
-const HOST_CLASS_NAMES = [
-  CLASS_NAME_CALENDARS,
-  CLASS_NAME_SHOW_WEEK_NUMBERS,
-  ...['day', 'month', 'quarter', 'week', 'year'].map(selectionType => `select-${selectionType}`)
-]
 
 const SELECTOR_BTN_DOUBLE_NEXT = '.btn-double-next'
 const SELECTOR_BTN_DOUBLE_PREV = '.btn-double-prev'
@@ -295,7 +289,6 @@ class Calendar extends BaseComponent {
   protected declare _selectEndDate: boolean
   protected declare _view: ViewTypes
   protected declare _formatter: ReturnType<typeof createDateFormatter>
-  protected declare _hostClasses: HostClasses
   protected declare _announcements: Array<() => void>
   protected declare _selectionAnnouncement: (() => void) | null
 
@@ -306,7 +299,6 @@ class Calendar extends BaseComponent {
     this._announcements = []
     this._selectionAnnouncement = null
     this._config = this._getConfig(config)
-    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._initializeDates()
     this._initializeView()
     this._createCalendar()
@@ -348,7 +340,6 @@ class Calendar extends BaseComponent {
     }
 
     this._element.innerHTML = ''
-    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
   }
@@ -996,18 +987,20 @@ class Calendar extends BaseComponent {
     this._updateRovingTabIndex()
   }
 
-  _managedClassNames(): string[] {
-    return [...HOST_CLASS_NAMES, `select-${this._config.selectionType}`]
-  }
-
   _setCalendarClasses(): void {
-    if (this._config.selectionType && this._view === 'days') {
-      this._element.classList.add(`select-${this._config.selectionType}`)
+    const { selectionType, showWeekNumber } = this._config
+
+    for (const type of ['day', 'month', 'quarter', 'week', 'year']) {
+      if (type !== selectionType) {
+        this._element.classList.remove(`select-${type}`)
+      }
     }
 
-    if (this._config.showWeekNumber) {
-      this._element.classList.add(CLASS_NAME_SHOW_WEEK_NUMBERS)
+    if (selectionType && this._view === 'days') {
+      this._element.classList.add(`select-${selectionType}`)
     }
+
+    this._element.classList.toggle(CLASS_NAME_SHOW_WEEK_NUMBERS, Boolean(showWeekNumber))
 
     this._element.classList.add(CLASS_NAME_CALENDARS)
   }

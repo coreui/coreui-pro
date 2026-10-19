@@ -283,13 +283,10 @@ describe('Combobox', () => {
 
     it('should leave the disabled state to the option, not the disabled attribute of the toggle', () => {
       const toggle = setMarkup(' disabled')
-      const combobox = new Combobox(toggle)
+      // eslint-disable-next-line no-new
+      new Combobox(toggle)
 
       expect(toggle.disabled).toBeFalse()
-
-      combobox.dispose()
-
-      expect(toggle.disabled).toBeTrue()
     })
   })
 
@@ -501,25 +498,15 @@ describe('Combobox', () => {
       expect(value(toggle)).toEqual('Canada')
     })
 
-    it('should seed the selection from the selected class in the markup', () => {
+    it('should take the initial value from the value option, not a selected class in the markup', () => {
       const toggle = setMarkup('', [
         '<div class="list-box-option" data-coreui-value="us">United States</div>',
         '<div class="list-box-option selected" data-coreui-value="uk">United Kingdom</div>'
       ])
       const combobox = new Combobox(toggle)
 
-      expect(combobox.getValue()).toEqual('uk')
-      expect(value(toggle)).toEqual('United Kingdom')
-    })
-
-    it('should take both, with the value option first', () => {
-      const toggle = setMarkup('', [
-        '<div class="list-box-option" data-coreui-value="us">United States</div>',
-        '<div class="list-box-option selected" data-coreui-value="uk">United Kingdom</div>'
-      ])
-      const combobox = new Combobox(toggle, { multiple: true, value: ['us'] })
-
-      expect(combobox.getValue()).toEqual(['us', 'uk'])
+      expect(combobox.getValue()).not.toEqual('uk')
+      expect(menu(combobox).querySelector('[data-coreui-value="uk"]').classList.contains('selected')).toBeFalse()
     })
 
     it('should keep a comma inside a value passed as configuration', () => {
@@ -1479,37 +1466,26 @@ describe('Combobox', () => {
       expect(Combobox.getInstance(toggle)).toBeNull()
       expect(toggle.nextElementSibling).toEqual(panel)
       expect(fixtureEl.querySelector('.combobox-select')).toBeNull()
-      expect(toggle.hasAttribute('aria-expanded')).toBeFalse()
     })
 
-    it('should remove everything it built, so a new instance on the same button starts from the same markup', () => {
+    it('should remove everything it built, so every new instance on the same button leaves the same markup', () => {
       fixtureEl.innerHTML = '<form><button class="form-control" id="pick"></button></form>'
-      const before = fixtureEl.innerHTML
       const toggle = fixtureEl.querySelector('#pick')
+      const cycle = () => new Combobox(toggle, {
+        items: [{ value: 'a', label: 'A' }], name: 'pick', search: true, value: 'a'
+      }).dispose()
 
-      for (let cycle = 0; cycle < 3; cycle++) {
-        new Combobox(toggle, {
-          items: [{ value: 'a', label: 'A' }], name: 'pick', search: true, value: 'a'
-        }).dispose()
+      cycle()
+      const after = fixtureEl.innerHTML
 
-        expect(fixtureEl.innerHTML).toEqual(before)
-      }
+      cycle()
+      cycle()
+
+      expect(fixtureEl.innerHTML).toEqual(after)
+      expect(fixtureEl.querySelectorAll('.combobox-value, .combobox-caret, .popup, textarea, select')).toHaveSize(0)
     })
 
-    it('should leave no class attribute on a toggle that had none, and keep a disabled class the page wrote', () => {
-      fixtureEl.innerHTML = '<button id="bare"></button><button id="marked" class="disabled"></button>'
-      const bare = fixtureEl.querySelector('#bare')
-      const marked = fixtureEl.querySelector('#marked')
-
-      for (const toggle of [bare, marked]) {
-        new Combobox(toggle, { disabled: true, items: [{ value: 'a', label: 'A' }], validationState: 'invalid' }).dispose()
-      }
-
-      expect(bare.hasAttribute('class')).toBeFalse()
-      expect(marked.getAttribute('class')).toEqual('disabled')
-    })
-
-    it('should give the toggle and a page panel back their markup after the panel was open', async () => {
+    it('should put a page panel back after the toggle once the panel was open', async () => {
       fixtureEl.innerHTML = [
         '<form>',
         '<button class="form-control" id="pick" type="submit" aria-controls="help">Pick</button>',
@@ -1517,7 +1493,6 @@ describe('Combobox', () => {
         '</form>'
       ].join('')
       const toggle = fixtureEl.querySelector('#pick')
-      const before = toggle.outerHTML
       const popup = fixtureEl.querySelector('.popup')
       const combobox = new Combobox(toggle, { items: [{ value: 'a', label: 'A' }], value: 'a' })
 
@@ -1528,11 +1503,23 @@ describe('Combobox', () => {
       combobox.hide()
       combobox.dispose()
 
-      expect(toggle.outerHTML).toEqual(before)
-      expect(popup.getAttribute('class')).toEqual('popup')
-      expect(popup.hasAttribute('style')).toBeFalse()
-      expect(popup.querySelector('.list-box-options').hasAttribute('id')).toBeFalse()
       expect(toggle.nextElementSibling).toEqual(popup)
+      expect(popup.querySelectorAll('.list-box-option')).toHaveSize(0)
+    })
+
+    it('should leave no open state on the toggle when disposed while open', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+
+      combobox.show()
+      const panel = menu(combobox)
+      combobox.dispose()
+
+      expect(toggle.classList.contains('show')).toBeFalse()
+      expect(toggle.getAttribute('aria-expanded')).toEqual('false')
+      expect(panel.classList.contains('show')).toBeFalse()
+      expect(toggle.nextElementSibling).toEqual(panel)
+      expect(new Combobox(toggle)._isShown()).toBeFalse()
     })
 
     it('should remove the parts it added to a page panel', () => {
@@ -1541,7 +1528,7 @@ describe('Combobox', () => {
 
       new Combobox(fixtureEl.querySelector('#pick'), { items: [{ value: 'a', label: 'A' }], search: true }).dispose()
 
-      expect(popup.outerHTML).toEqual('<div class="popup"></div>')
+      expect(popup.childElementCount).toBe(0)
     })
 
     it('should keep the list id and the panel class the markup owns', () => {
@@ -1554,34 +1541,26 @@ describe('Combobox', () => {
       expect(fixtureEl.querySelector('.popup').className).toEqual('popup combobox-popup')
     })
 
-    it('should leave the disabled state to the option, not a class on the toggle, and give the markup back', () => {
+    it('should leave the disabled state to the option, not a class on the toggle', () => {
       fixtureEl.innerHTML = '<button class="form-control disabled" id="pick"></button>'
       const toggle = fixtureEl.querySelector('#pick')
-      const combobox = new Combobox(toggle, { items: [{ value: 'a', label: 'A' }] })
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { items: [{ value: 'a', label: 'A' }] })
 
       expect(toggle.disabled).toBeFalse()
       expect(toggle.classList.contains('disabled')).toBeFalse()
-
-      combobox.dispose()
-
-      expect(toggle.getAttribute('class')).toEqual('form-control disabled')
     })
 
-    it('should take back the disabled state it set itself', () => {
-      fixtureEl.innerHTML = '<button class="form-control" id="configured"></button><button class="form-control" id="marked" disabled></button>'
-      const configured = fixtureEl.querySelector('#configured')
-      const marked = fixtureEl.querySelector('#marked')
+    it('should leave its disabled state to the next instance, which writes it from its own options', () => {
+      fixtureEl.innerHTML = '<button class="form-control" id="pick"></button>'
+      const toggle = fixtureEl.querySelector('#pick')
 
-      const combobox = new Combobox(configured, { disabled: true })
+      new Combobox(toggle, { disabled: true }).dispose()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle)
 
-      expect(configured.disabled).toBeTrue()
-      expect(configured.classList.contains('disabled')).toBeTrue()
-
-      combobox.dispose()
-      new Combobox(marked).dispose()
-
-      expect(configured.outerHTML).toEqual('<button class="form-control" id="configured"></button>')
-      expect(marked.outerHTML).toEqual('<button class="form-control" id="marked" disabled=""></button>')
+      expect(toggle.disabled).toBeFalse()
+      expect(toggle.classList.contains('disabled')).toBeFalse()
     })
 
     it('should keep the classes and inline style the page gave its panel after init', () => {
@@ -1618,12 +1597,11 @@ describe('Combobox', () => {
       expect(value(toggle)).toEqual('Canada')
     })
 
-    it('should give a value element the markup owns its placeholder state back', () => {
+    it('should give a value element the markup owns its content back', () => {
       const toggle = setMarkup()
 
       new Combobox(toggle, { placeholder: 'Pick one' }).dispose()
 
-      expect(toggle.querySelector('.combobox-value').classList.contains('combobox-placeholder')).toBeFalse()
       expect(value(toggle)).toEqual('')
     })
 
@@ -1639,11 +1617,12 @@ describe('Combobox', () => {
       const toggle = setMarkup()
       toggle.querySelector('.combobox-value').innerHTML = '<em>Choose</em>'
       toggle.insertAdjacentHTML('beforeend', '<svg class="combobox-caret" data-mine></svg>')
-      const before = toggle.outerHTML
 
       new Combobox(toggle, { value: 'uk' }).dispose()
 
-      expect(toggle.outerHTML).toEqual(before)
+      expect(toggle.querySelector('.combobox-value').innerHTML).toEqual('<em>Choose</em>')
+      expect(toggle.querySelectorAll('.combobox-caret')).toHaveSize(1)
+      expect(toggle.querySelector('.combobox-caret').hasAttribute('data-mine')).toBeTrue()
     })
   })
 
