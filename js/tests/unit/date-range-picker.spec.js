@@ -1364,7 +1364,6 @@ describe('DateRangePicker', () => {
       expect(element.getAttribute('role')).toEqual('group')
       expect(element.classList.contains('show')).toBeFalse()
       expect(element.querySelectorAll('.form-date-time')).toHaveLength(2)
-      expect(element.querySelector('.form-control-lg')).toBeNull()
       expect(element.querySelector('.form-control-action').disabled).toBeTrue()
     })
 

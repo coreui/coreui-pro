@@ -591,6 +591,14 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').hasAttribute('aria-label')).toBeFalse()
     })
 
+    it('should hide the icons of adopted buttons over an aria-hidden in the markup', () => {
+      buildPicker({}, OWN_MARKUP.replaceAll('<svg', '<svg aria-hidden="false"'))
+
+      for (const svg of fixtureEl.querySelectorAll('#picker svg')) {
+        expect(svg.getAttribute('aria-hidden')).toEqual('true')
+      }
+    })
+
     it('should give an adopted toggle the accessibility it would have given its own', () => {
       const picker = buildPicker({}, OWN_MARKUP)
       const el = fixtureEl.querySelector('#picker')

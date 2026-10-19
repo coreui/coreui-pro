@@ -51,7 +51,6 @@ const ATTRIBUTE_ROLE_START = 'data-coreui-range-start'
 const SELECTOR_DATA_DATE_RANGE_INPUT = '[data-coreui-date-range-input]'
 const SELECTOR_ROLE_SEPARATOR = `[${ATTRIBUTE_ROLE_SEPARATOR}]`
 const SELECTOR_SECTION = '.form-date-time-section'
-const SELECTOR_SVG = 'svg'
 
 type DateRangeInputConfig = {
   allowList: SanitizerAllowList
@@ -531,12 +530,6 @@ class DateRangeInput extends BaseComponent {
     EventHandler.on(this._endElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), () => {
       this._onFieldChange('end')
     })
-
-    if (this._separatorElement.getAttribute('aria-hidden') !== 'true') {
-      for (const svg of SelectorEngine.find(SELECTOR_SVG, this._separatorElement)) {
-        svg.setAttribute('aria-hidden', 'true')
-      }
-    }
 
     EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
       if ((event.key !== ARROW_LEFT_KEY && event.key !== ARROW_RIGHT_KEY) || hasShortcutModifier(event)) {

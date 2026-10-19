@@ -360,6 +360,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       writeAttribute(this._element, 'aria-label', this._hostAriaLabel)
     }
 
+    this._element.classList.remove(CLASS_NAME_ALL_SELECTED)
     this._element.replaceChildren(...this._hostNodes)
     super.dispose()
   }

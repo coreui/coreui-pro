@@ -386,6 +386,21 @@ describe('DateInput', () => {
   })
 
   describe('dispose', () => {
+    it('should take off the selection of the whole value when disposed while it is on', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 0, 15) })
+      const element = dateInput._element
+      const [day] = getSections(element)
+
+      day.focus()
+      pressKey(day, 'a', { ctrlKey: true })
+
+      expect(element.classList.contains('form-date-time-all-selected')).toBeTrue()
+
+      dateInput.dispose()
+
+      expect(element.classList.contains('form-date-time-all-selected')).toBeFalse()
+    })
+
     it('should leave the disabled state to the option, not a class in the markup', () => {
       fixtureEl.innerHTML = '<div class="disabled"></div>'
       const element = fixtureEl.querySelector('div')
