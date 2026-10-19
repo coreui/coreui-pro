@@ -243,10 +243,6 @@ class Autocomplete extends ComboboxBase {
     return DefaultType
   }
 
-  static override get LIVE_OPTIONS(): string[] {
-    return ['disabled', 'invalid', 'options', 'required', 'valid', 'validationState', 'value']
-  }
-
   static override get NAME(): string {
     return NAME
   }
@@ -331,31 +327,24 @@ class Autocomplete extends ComboboxBase {
     })
   }
 
-  setConfig(config: Partial<AutocompleteConfig> | null): void {
-    this._checkLiveConfig(config)
-    this._config = this._getConfig({ ...this._config, ...config })
+  disable(): void {
+    this._setConfig({ disabled: true })
+  }
 
-    if (this._validation.configure(config)) {
-      return
-    }
+  enable(): void {
+    this._setConfig({ disabled: false })
+  }
 
-    this._options = this._getOptionsFromConfig()
-    this._setListBoxItems()
+  setOptions(options: AutocompleteConfig['options']): void {
+    this._setConfig({ options })
+  }
 
-    if (config?.value !== undefined) {
-      this._valueApplied = false
-      this.deselectAll()
-      this._setText('')
-    }
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
+  }
 
-    this._seedSelection()
-    this._applyState()
-
-    if (this._config.disabled) {
-      this.hide()
-    }
-
-    this._validation.update()
+  setValue(value: AutocompleteConfig['value']): void {
+    this._setConfig({ value })
   }
 
   deselectAll(options: any[] = this._selectedOptions()): void {
@@ -391,6 +380,31 @@ class Autocomplete extends ComboboxBase {
   }
 
   // Private
+  _setConfig(config: Partial<AutocompleteConfig> | null): void {
+    this._config = this._getConfig({ ...this._config, ...config })
+
+    if (this._validation.configure(config)) {
+      return
+    }
+
+    this._options = this._getOptionsFromConfig()
+    this._setListBoxItems()
+
+    if (config?.value !== undefined) {
+      this._valueApplied = false
+      this.deselectAll()
+      this._setText('')
+    }
+
+    this._seedSelection()
+    this._applyState()
+
+    if (this._config.disabled) {
+      this.hide()
+    }
+
+    this._validation.update()
+  }
 
   _addEventListeners(): void {
     EventHandler.on(this._element, EVENT_CLICK, (event: any) => {

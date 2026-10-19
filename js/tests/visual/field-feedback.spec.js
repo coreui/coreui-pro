@@ -238,7 +238,7 @@ describe('messages of a form field', () => {
       }
 
       form.requestSubmit()
-      instance.setConfig({ validationState: 'invalid' })
+      instance.setValidationState('invalid')
 
       expect(displayOf('.invalid-feedback')).toBe('block')
       expect(displayOf('.valid-feedback')).toBe('none')

@@ -292,10 +292,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     return DefaultType
   }
 
-  static override get LIVE_OPTIONS(): string[] {
-    return ['date', 'disabled', 'readonly', 'required', 'validationState']
-  }
-
   static override get NAME(): string {
     return NAME
   }
@@ -326,31 +322,20 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     return normalized !== null && this._getValidationError(normalized, true) === null
   }
 
-  setConfig(config: Partial<C> | null): void {
-    if (typeof config !== 'object') {
-      return
-    }
+  disable(): void {
+    this._setConfig({ disabled: true })
+  }
 
-    this._checkLiveConfig(config)
+  enable(): void {
+    this._setConfig({ disabled: false })
+  }
 
-    const keys = Object.keys(config ?? {})
-    const stateOnly = keys.length === 1 && keys[0] === 'validationState'
-    const sections = this._sections
+  setDate(date: DateInputConfig['date']): void {
+    this._setConfig({ date })
+  }
 
-    this._config = this._getConfig(stateOnly ? { ...this._config, ...config } : { ...this._config, date: getDateFromSections(sections), ...config })
-
-    if (this._validation.configure(config)) {
-      return
-    }
-
-    this._applyConfig()
-
-    if (config?.date === undefined) {
-      this._sections = sections
-    }
-
-    this._createSectionInput()
-    this._commitSections()
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
   }
 
   override dispose(): void {
@@ -372,6 +357,27 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   }
 
   // Private
+  _setConfig(config: Partial<DateInputConfig>): void {
+    const keys = Object.keys(config)
+    const stateOnly = keys.length === 1 && keys[0] === 'validationState'
+    const sections = this._sections
+
+    this._config = this._getConfig(stateOnly ? { ...this._config, ...config } : { ...this._config, date: getDateFromSections(sections), ...config })
+
+    if (this._validation.configure(config)) {
+      return
+    }
+
+    this._applyConfig()
+
+    if (config?.date === undefined) {
+      this._sections = sections
+    }
+
+    this._createSectionInput()
+    this._commitSections()
+  }
+
   _getAriaLabel(): string {
     const { type } = this._config
     const ariaLabel = this._config.ariaLabel || this.constructor.Default.ariaLabel

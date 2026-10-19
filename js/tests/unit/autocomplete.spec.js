@@ -198,7 +198,7 @@ describe('Autocomplete', () => {
       expect(autocomplete._menu.isConnected).toBeFalse()
       expect(input.getAttribute('aria-controls')).toBeNull()
 
-      autocomplete.setConfig({ options: ['Option 3'] })
+      autocomplete.setOptions(['Option 3'])
 
       expect(input.getAttribute('aria-controls')).toBeNull()
     })
@@ -599,7 +599,7 @@ describe('Autocomplete', () => {
       const seen = []
 
       typeInto(input, 'Opt')
-      autocomplete.setConfig({ validationState: 'invalid' })
+      autocomplete.setValidationState('invalid')
       element.addEventListener('input.coreui.autocomplete', () => seen.push([element.classList.contains('is-invalid'), input.getAttribute('aria-invalid')]))
       form.reset()
       await settle()
@@ -617,7 +617,7 @@ describe('Autocomplete', () => {
       expect(form.checkValidity()).toBeFalse()
       expect(input.validationMessage).toBe('Pick a country.')
 
-      autocomplete.setConfig({ validationState: 'warning' })
+      autocomplete.setValidationState('warning')
 
       expect(element.className).toContain('is-warning')
       expect(element).not.toHaveClass('is-invalid')
@@ -642,21 +642,22 @@ describe('Autocomplete', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should change only the state when setConfig gets only validation options', () => {
+    it('should change only the state on setValidationState', () => {
       const { autocomplete, element, input } = mountInForm({}, { classes: 'is-valid' })
       const items = autocomplete._options
       input.value = 'Opt'
 
-      autocomplete.setConfig({ invalid: true })
+      autocomplete.setValidationState('invalid')
 
       expect(autocomplete._options).toBe(items)
       expect(input.value).toBe('Opt')
       expect(element).toHaveClass('is-invalid')
       expect(element).not.toHaveClass('is-valid')
 
-      autocomplete.setConfig({ invalid: false })
+      autocomplete.setValidationState(null)
 
       expect(element).not.toHaveClass('is-valid')
+      expect(element).not.toHaveClass('is-invalid')
     })
 
     it.each([
@@ -686,7 +687,7 @@ describe('Autocomplete', () => {
       const { element, input } = mountInForm({ allowOnlyDefinedOptions: true, validationState: 'invalid' })
       input.focus()
       await userEvent.keyboard('Op')
-      Autocomplete.getInstance(element).setConfig({ validationState: 'invalid' })
+      Autocomplete.getInstance(element).setValidationState('invalid')
 
       if (how === 'escape') {
         await userEvent.keyboard('{Escape}')
@@ -713,8 +714,8 @@ describe('Autocomplete', () => {
       const { autocomplete, element, form } = mountInForm({ value: '1', validationState: 'invalid' }, { classes: 'is-invalid' })
 
       autocomplete._onOptionSelected('1')
-      autocomplete.setConfig({ options: [...OPTIONS, { label: 'Option 3', value: '3' }] })
-      autocomplete.setConfig({ value: '2' })
+      autocomplete.setOptions([...OPTIONS, { label: 'Option 3', value: '3' }])
+      autocomplete.setValue('2')
       autocomplete.clear()
       autocomplete.deselectAll()
 
@@ -732,7 +733,7 @@ describe('Autocomplete', () => {
 
       element.addEventListener('change.coreui.autocomplete', () => {
         seen.push(input.validity.valid)
-        autocomplete.setConfig({ validationState: 'invalid' })
+        autocomplete.setValidationState('invalid')
       }, { once: true })
       autocomplete._onOptionSelected('2')
 
@@ -744,7 +745,7 @@ describe('Autocomplete', () => {
     it('should keep a state the page gives on the change Backspace reports through the input of the same key', async () => {
       const { autocomplete, element, input } = mountInForm({ value: '1', validationState: 'invalid' })
 
-      element.addEventListener('change.coreui.autocomplete', () => autocomplete.setConfig({ validationState: 'invalid' }), { once: true })
+      element.addEventListener('change.coreui.autocomplete', () => autocomplete.setValidationState('invalid'), { once: true })
       input.focus()
       input.setSelectionRange(input.value.length, input.value.length)
       await userEvent.keyboard('{Backspace}')
@@ -793,13 +794,13 @@ describe('Autocomplete', () => {
       const observer = new MutationObserver(() => {})
       input.setAttribute('aria-describedby', 'help')
 
-      autocomplete.setConfig({ validationState: 'invalid' })
+      autocomplete.setValidationState('invalid')
       const { id } = fixtureEl.querySelector('.invalid-feedback')
 
       expect(input.getAttribute('aria-describedby')).toBe(`help ${id}`)
 
       observer.observe(input, { attributeFilter: ['aria-describedby', 'aria-invalid'] })
-      autocomplete.setConfig({ options: OPTIONS })
+      autocomplete.setOptions(OPTIONS)
       input.dispatchEvent(new Event('focusout'))
 
       expect(observer.takeRecords()).toHaveSize(0)
@@ -822,7 +823,7 @@ describe('Autocomplete', () => {
       for (const disabled of [false, true]) {
         const { autocomplete, element, input } = mountInForm({ options: [{ label: 'Option 1', value: '1', disabled }, { label: 'Option 2', value: '2' }] })
         typeInto(input, 'Option 1')
-        autocomplete.setConfig({ validationState: 'invalid' })
+        autocomplete.setValidationState('invalid')
 
         if (how === 'blur') {
           input.dispatchEvent(new FocusEvent('blur'))
@@ -878,14 +879,14 @@ describe('Autocomplete', () => {
     it('should keep a given state when an input leaves the text as it was', () => {
       const { autocomplete, element, input } = mountInForm()
       typeInto(input, 'Germany')
-      autocomplete.setConfig({ validationState: 'invalid' })
+      autocomplete.setValidationState('invalid')
 
       typeInto(input, 'Germany')
 
       expect(element).toHaveClass('is-invalid')
 
       autocomplete._onOptionSelected('1')
-      autocomplete.setConfig({ validationState: 'invalid' })
+      autocomplete.setValidationState('invalid')
       typeInto(input, 'Option 1')
 
       expect(element).toHaveClass('is-invalid')
@@ -896,7 +897,7 @@ describe('Autocomplete', () => {
 
       input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', bubbles: true }))
       input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Shift', bubbles: true }))
-      autocomplete.setConfig({ validationState: 'invalid' })
+      autocomplete.setValidationState('invalid')
       typeInto(input, 'x')
 
       expect(element).not.toHaveClass('is-invalid')
@@ -907,7 +908,7 @@ describe('Autocomplete', () => {
 
       element.addEventListener('input.coreui.autocomplete', event => {
         if (event.value === 'a') {
-          autocomplete.setConfig({ validationState: 'invalid' })
+          autocomplete.setValidationState('invalid')
         }
       })
       typeInto(input, 'a')
@@ -934,7 +935,7 @@ describe('Autocomplete', () => {
 
       element.addEventListener('input.coreui.autocomplete', event => {
         if (event.value === '') {
-          autocomplete.setConfig({ validationState: 'invalid' })
+          autocomplete.setValidationState('invalid')
         }
       })
       input.focus()
@@ -945,10 +946,10 @@ describe('Autocomplete', () => {
       expect(element).toHaveClass('is-invalid')
     })
 
-    it('should keep the state class from the markup when setConfig rejects the options', () => {
+    it('should keep the state class from the markup when setValidationState rejects the state', () => {
       const { autocomplete, element, input } = mountInForm({}, { classes: 'is-invalid' })
 
-      expect(() => autocomplete.setConfig({ validationState: 1 })).toThrowError(TypeError)
+      expect(() => autocomplete.setValidationState(1)).toThrowError(TypeError)
 
       input.dispatchEvent(new Event('focusout'))
 
@@ -962,7 +963,7 @@ describe('Autocomplete', () => {
       element.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
 
       form.reset()
-      autocomplete.setConfig({ validationState: 'invalid' })
+      autocomplete.setValidationState('invalid')
       await settle()
 
       expect(changes).toEqual([null])
@@ -984,14 +985,14 @@ describe('Autocomplete', () => {
       expect(element).toHaveClass('is-invalid')
 
       element.addEventListener('change.coreui.autocomplete', () => seen.push(element.classList.contains('is-invalid')))
-      autocomplete.setConfig({ options: [{ label: 'Option 3', value: '3' }] })
+      autocomplete.setOptions([{ label: 'Option 3', value: '3' }])
 
       expect(seen).toEqual([false])
     })
 
     it.each([['before the reset', 'before', false], ['in a reset listener', 'listener', true], ['right after form.reset()', 'after', true]])('should put back the value it started with on a native reset and treat a state given %s as the reset says', async (_, when, kept) => {
       const { autocomplete, element, form, input } = mountInForm({ value: '1' })
-      const giveState = () => autocomplete.setConfig({ validationState: 'invalid' })
+      const giveState = () => autocomplete.setValidationState('invalid')
 
       autocomplete._onOptionSelected('2')
 
@@ -1527,12 +1528,15 @@ describe('Autocomplete', () => {
     })
   })
 
-  describe('setConfig', () => {
-    it('should list the options setConfig changes', () => {
-      expect(Autocomplete.LIVE_OPTIONS).toEqual(['disabled', 'invalid', 'options', 'required', 'valid', 'validationState', 'value'])
+  describe('setters', () => {
+    it('should not expose setConfig', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'))
+
+      expect(typeof autocomplete.setConfig).toEqual('undefined')
     })
 
-    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
+    it('should keep the name and the hints, and hide the cleaner on disable()', () => {
       fixtureEl.innerHTML = '<form id="form"><div class="autocomplete"></div></form>'
       const element = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(element, {
@@ -1543,8 +1547,6 @@ describe('Autocomplete', () => {
         value: '1'
       })
 
-      expect(() => autocomplete.setConfig({ name: 'other' })).toThrowError(TypeError, 'AUTOCOMPLETE: setConfig() does not change "name". Dispose the instance and create a new one with it.')
-      expect(() => autocomplete.setConfig({ value: '1', showHints: false })).toThrowError(TypeError, 'AUTOCOMPLETE: setConfig() does not change "showHints". Dispose the instance and create a new one with it.')
       expect(autocomplete._config.name).toBe('tech')
       expect(autocomplete._config.showHints).toBe(true)
       expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual(['tech'])
@@ -1554,7 +1556,7 @@ describe('Autocomplete', () => {
 
       expect(autocomplete._inputHintElement.value).toBe('Option 1')
 
-      autocomplete.setConfig({ disabled: true })
+      autocomplete.disable()
 
       expect(autocomplete._cleanerElement.style.display).toBe('none')
     })
@@ -1573,7 +1575,8 @@ describe('Autocomplete', () => {
       input.focus()
       input.value = 'zz'
       input.dispatchEvent(new Event('input', { bubbles: true }))
-      autocomplete.setConfig({ disabled: true, validationState: 'invalid' })
+      autocomplete.setValidationState('invalid')
+      autocomplete.disable()
 
       expect(changes).toEqual([])
       expect(element).toHaveClass('is-invalid')
@@ -1589,7 +1592,7 @@ describe('Autocomplete', () => {
 
       autocomplete.show()
       element.addEventListener('hide.coreui.autocomplete', keepOpen)
-      autocomplete.setConfig({ disabled: true })
+      autocomplete.disable()
 
       expect(autocomplete._isShown()).toBeTrue()
 
@@ -1603,7 +1606,7 @@ describe('Autocomplete', () => {
       expect(autocomplete._isShown()).toBeFalse()
     })
 
-    it('should follow disabled and required given later in both directions', () => {
+    it('should follow disabled given later in both directions', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const element = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(element, {
@@ -1619,23 +1622,21 @@ describe('Autocomplete', () => {
       expect(input.disabled).toBeTrue()
       expect(autocomplete._cleanerElement.style.display).toBe('none')
 
-      autocomplete.setConfig({ disabled: false, required: true })
+      autocomplete.enable()
 
       expect(element).not.toHaveClass('disabled')
       expect(input.disabled).toBeFalse()
       expect(input.hasAttribute('tabindex')).toBeFalse()
-      expect(input.required).toBeTrue()
       expect(autocomplete._indicatorElement.disabled).toBeFalse()
       expect(autocomplete._cleanerElement.style.display).toBe('')
       expect(autocomplete._inputHintElement).not.toBeNull()
 
       autocomplete.show()
-      autocomplete.setConfig({ disabled: true, required: false })
+      autocomplete.disable()
 
       expect(element).toHaveClass('disabled')
       expect(input.disabled).toBeTrue()
       expect(input.tabIndex).toBe(-1)
-      expect(input.required).toBeFalse()
       expect(autocomplete._indicatorElement.disabled).toBeTrue()
       expect(autocomplete._cleanerElement.style.display).toBe('none')
       expect(autocomplete._isShown()).toBeFalse()
@@ -1656,7 +1657,7 @@ describe('Autocomplete', () => {
         document.addEventListener(`${name}.coreui.list-box`, listener)
       }
 
-      autocomplete.setConfig({ value: '2' })
+      autocomplete.setValue('2')
       autocomplete.deselectAll()
 
       for (const name of ['select', 'selected', 'deselect', 'deselected', 'change']) {
@@ -1666,19 +1667,19 @@ describe('Autocomplete', () => {
       expect(events).toEqual([])
     })
 
-    it('should apply invalid and valid given to setConfig', () => {
+    it('should apply invalid and valid given to setValidationState', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      autocomplete.setConfig({ invalid: true })
+      autocomplete.setValidationState('invalid')
 
       expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
       expect(autocomplete._inputElement.getAttribute('aria-invalid')).toBe('true')
 
-      autocomplete.setConfig({ invalid: false, valid: true })
+      autocomplete.setValidationState('valid')
 
       expect(autocompleteEl.classList.contains('is-invalid')).toBeFalse()
       expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
@@ -1697,7 +1698,7 @@ describe('Autocomplete', () => {
         { label: 'New Option 2', value: 'new2' }
       ]
 
-      autocomplete.setConfig({ options: newOptions })
+      autocomplete.setOptions(newOptions)
 
       expect(autocomplete._options).toEqual(newOptions)
     })
@@ -1712,7 +1713,7 @@ describe('Autocomplete', () => {
 
       holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 
-      autocomplete.setConfig({ value: '2' })
+      autocomplete.setValue('2')
 
       expect(autocomplete._selectedOptions()).toEqual([])
     })
@@ -1727,7 +1728,7 @@ describe('Autocomplete', () => {
       })
 
       autocomplete._onOptionSelected('z')
-      autocomplete.setConfig({ options: [{ label: 'Anna', value: 'a' }] })
+      autocomplete.setOptions([{ label: 'Anna', value: 'a' }])
 
       expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['z'])
       expect(autocomplete._inputElement.value).toBe('Zoe')
@@ -1742,31 +1743,31 @@ describe('Autocomplete', () => {
 
       autocomplete._inputElement.value = 'Opt'
       autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
-      autocomplete.setConfig({ options })
+      autocomplete.setOptions(options)
 
       expect(autocomplete._inputElement.value).toBe('Opt')
       expect(autocomplete._selectedOptions()).toEqual([])
 
       autocomplete.clear()
-      autocomplete.setConfig({ options, invalid: true })
+      autocomplete.setOptions(options)
 
       expect(autocomplete._inputElement.value).toBe('')
       expect(autocomplete._selectedOptions()).toEqual([])
     })
 
-    it('should select a value given to setConfig over a selected flag, and clear the field for null', () => {
+    it('should select a value given to setValue over a selected flag, and clear the field for null', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
         options: [{ label: 'A', value: 'a', selected: true }, { label: 'B', value: 'b' }]
       })
 
-      autocomplete.setConfig({ value: 'b' })
+      autocomplete.setValue('b')
 
       expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['b'])
       expect(autocomplete._inputElement.value).toBe('B')
 
-      autocomplete.setConfig({ value: null })
+      autocomplete.setValue(null)
 
       expect(autocomplete._selectedOptions()).toEqual([])
       expect(autocomplete._inputElement.value).toBe('')
@@ -1777,7 +1778,7 @@ describe('Autocomplete', () => {
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, { search: 'external', options: [], value: 'j' })
 
-      autocomplete.setConfig({ options: [{ label: 'John', value: 'j' }] })
+      autocomplete.setOptions([{ label: 'John', value: 'j' }])
 
       expect(autocomplete._inputElement.value).toBe('John')
 
@@ -1787,12 +1788,12 @@ describe('Autocomplete', () => {
         options: [{ label: 'A', value: 'a' }]
       })
 
-      other.setConfig({ options: [{ label: 'A', value: 'a' }, { label: 'B', value: 'b', selected: true }] })
+      other.setOptions([{ label: 'A', value: 'a' }, { label: 'B', value: 'b', selected: true }])
 
       expect(other._inputElement.value).toBe('B')
 
       other.clear()
-      other.setConfig({ options: [{ label: 'A', value: 'a' }, { label: 'B', value: 'b', selected: true }] })
+      other.setOptions([{ label: 'A', value: 'a' }, { label: 'B', value: 'b', selected: true }])
 
       expect(other._inputElement.value).toBe('')
     })
@@ -1804,13 +1805,11 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      autocomplete.setConfig({
-        options: [
-          { label: 'A', value: 'a' },
-          { label: 'B', value: 'b' },
-          { label: 'C', value: 'c' }
-        ]
-      })
+      autocomplete.setOptions([
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+        { label: 'C', value: 'c' }
+      ])
 
       const optionElements = autocomplete._optionsElement.querySelectorAll('.list-box-option')
       expect(optionElements.length).toBe(3)
@@ -3302,7 +3301,7 @@ describe('Autocomplete', () => {
         value: 'a'
       })
 
-      autocomplete.setConfig({ value: 'b' })
+      autocomplete.setValue('b')
       autocomplete._onOptionSelected('c')
       form.reset()
       await settle()
@@ -3344,7 +3343,7 @@ describe('Autocomplete', () => {
       const changes = []
 
       autocompleteEl.addEventListener('input.coreui.autocomplete', event => {
-        setTimeout(() => autocomplete.setConfig({ options: event.value ? [vue] : [react, vue] }), 10)
+        setTimeout(() => autocomplete.setOptions(event.value ? [vue] : [react, vue]), 10)
       })
       autocomplete._inputElement.focus()
       await userEvent.clear(autocomplete._inputElement)
@@ -3735,7 +3734,7 @@ describe('Autocomplete', () => {
 
       autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
       autocomplete._inputElement.dispatchEvent(createEvent('blur'))
-      autocomplete.setConfig({ options: [{ label: 'Apple', value: '1' }, { label: 'Cherry', value: '3', disabled: true }] })
+      autocomplete.setOptions([{ label: 'Apple', value: '1' }, { label: 'Cherry', value: '3', disabled: true }])
       autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
       autocomplete._inputElement.dispatchEvent(createEvent('blur'))
 
@@ -3787,7 +3786,7 @@ describe('Autocomplete', () => {
       autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
       autocomplete._inputElement.value = 'Cherry'
       autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
-      autocomplete.setConfig({ options: [{ label: 'Cherry', value: '3' }] })
+      autocomplete.setOptions([{ label: 'Cherry', value: '3' }])
       autocomplete._inputElement.dispatchEvent(createEvent('blur'))
 
       expect(changes.at(-1)?.value).toBe('3')

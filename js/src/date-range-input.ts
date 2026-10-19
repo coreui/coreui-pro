@@ -257,10 +257,6 @@ class DateRangeInput extends BaseComponent {
     return DefaultType
   }
 
-  static override get LIVE_OPTIONS(): string[] {
-    return ['validationState']
-  }
-
   static override get NAME(): string {
     return NAME
   }
@@ -306,15 +302,16 @@ class DateRangeInput extends BaseComponent {
     return start === null || end === null || end >= start
   }
 
-  setConfig(config: Partial<DateRangeInputConfig> | null): void {
-    this._checkLiveConfig(config)
+  setEndDate(endDate: Date | null): void {
+    this.setRange(this.getStartDate(), endDate)
+  }
 
-    if (!config || !('validationState' in config)) {
-      return
-    }
+  setStartDate(startDate: Date | null): void {
+    this.setRange(startDate, this.getEndDate())
+  }
 
-    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._validation.configure({ validationState: config.validationState })
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
   }
 
   override dispose(): void {
@@ -355,6 +352,15 @@ class DateRangeInput extends BaseComponent {
   }
 
   // Private
+  _setConfig(config: Partial<DateRangeInputConfig> | null): void {
+    if (!config || !('validationState' in config)) {
+      return
+    }
+
+    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
+    this._validation.configure({ validationState: config.validationState })
+  }
+
   _createDateRangeInput(): void {
     applyControlGroupClasses(this._element, CLASS_NAME_INPUT_GROUP, CLASS_NAME_DATE_RANGE)
     applyControlGroupSize(this._element, this._config.size)
@@ -492,10 +498,10 @@ class DateRangeInput extends BaseComponent {
     this._endInput._holdErrors(true)
 
     try {
-      this._startInput.setConfig({ date: startDate })
+      this._startInput.setDate(startDate)
 
       if (generation === this._generation) {
-        this._endInput.setConfig({ date: endDate })
+        this._endInput.setDate(endDate)
       }
 
       if (this._element) {

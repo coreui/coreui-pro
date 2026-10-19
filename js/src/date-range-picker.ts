@@ -211,10 +211,18 @@ class DateRangePicker extends PickerBase {
     return this._rangeInput?.getEndDate() ?? null
   }
 
+  setEndDate(endDate: Date | null): void {
+    this.setRange(this.getStartDate(), endDate)
+  }
+
   setRange(startDate: Date | null, endDate: Date | null): void {
     this._rangeInput.setRange(startDate, endDate)
     this._showRange()
     this._setSelectEndDate(false)
+  }
+
+  setStartDate(startDate: Date | null): void {
+    this.setRange(startDate, this.getEndDate())
   }
 
   clear(): void {
@@ -259,7 +267,7 @@ class DateRangePicker extends PickerBase {
     }
 
     this._selectEndDate = value
-    this._calendar?.setConfig({ selectEndDate: value })
+    this._calendar?._setConfig({ selectEndDate: value })
     this._syncPickMessages()
   }
 
@@ -281,7 +289,7 @@ class DateRangePicker extends PickerBase {
   }
 
   _showRange(): void {
-    this._calendar?.setConfig({ endDate: this.getEndDate(), startDate: this.getStartDate() })
+    this._calendar?._setConfig({ endDate: this.getEndDate(), startDate: this.getStartDate() })
   }
 
   _createDateRangePicker(): void {
@@ -319,7 +327,7 @@ class DateRangePicker extends PickerBase {
       this._syncPickMessages()
 
       if (this._calendar && !isSameDateAs(this._calendar._startDate, event.date)) {
-        this._calendar.setConfig({ startDate: event.date })
+        this._calendar.setStartDate(event.date)
       }
 
       this._triggerDateChange(EVENT_START_DATE_CHANGE, event.date)
@@ -329,7 +337,7 @@ class DateRangePicker extends PickerBase {
       this._nameToggle()
 
       if (this._calendar && !isSameDateAs(this._calendar._endDate, event.date)) {
-        this._calendar.setConfig({ endDate: event.date })
+        this._calendar.setEndDate(event.date)
       }
 
       this._triggerDateChange(EVENT_END_DATE_CHANGE, event.date)

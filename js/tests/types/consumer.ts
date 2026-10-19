@@ -84,7 +84,7 @@ const wrongResolution: Promise<Modal> = modal.show()
 
 // PRO components.
 const calendar = new Calendar(element, { calendars: 2, locale: 'en-US' })
-calendar.setConfig({ selectionType: 'week' })
+calendar.setStartDate(new Date())
 
 const multiSelect = new MultiSelect(element, { multiple: true, search: true })
 const selection = multiSelect.getValue()
@@ -113,8 +113,8 @@ const inputConfigs: [Partial<DateInputConfig>, Partial<DateInputConfig>, Partial
 const typoConfig: Partial<CalendarConfig> = { selectionType: 'weeks' }
 // @ts-expect-error — the constructor takes the same config
 const typoCalendar = new Calendar(element, { selectionType: 'weeks' })
-// @ts-expect-error — and so does setConfig
-calendar.setConfig({ selectionType: 'weeks' })
+// @ts-expect-error — options are fixed once the component starts
+calendar.setConfig({ selectionType: 'week' })
 // @ts-expect-error — day labels come from Intl, not a function
 const dayFormatFunction: Partial<CalendarConfig> = { dayFormat: (date: Date) => String(date.getDate()) }
 // @ts-expect-error — not an Intl month style
@@ -130,7 +130,7 @@ const rangeInputTypeTypo: Partial<DateRangeInputConfig> = { type: 'time' }
 // @ts-expect-error — the picker's calendar options are the calendar's
 const nestedTypo: Partial<DatePickerConfig> = { calendarOptions: { selectionType: 'weeks' } }
 
-new DateInput(element).setConfig(null)
+new DateInput(element).setDate(null)
 
 declare const popup: Popup
 const popupShown: boolean = popup.isShown
@@ -157,7 +157,7 @@ const values: string[] = chipSet.getValues()
 const chip: Chip | null = Chip.getInstance(element)
 
 // A component with a config type takes only its own options, through the
-// constructor, getOrCreateInstance and setConfig alike.
+// constructor and getOrCreateInstance alike, and a setter takes its option's type.
 const unknownOptions = [
   // @ts-expect-error — not a chip option
   new Chip(element, { removeable: true }),
@@ -193,10 +193,10 @@ const unknownOptions = [
   new Transfer(element, { searchable: true }),
   // @ts-expect-error — getOrCreateInstance takes the constructor's options
   Tooltip.getOrCreateInstance(element, { titel: 'Hello' }),
-  // @ts-expect-error — and so does a field's setConfig
-  new TimeInput(element).setConfig({ second: true }),
-  // @ts-expect-error — and the one-time password field's
-  new OTPInput(element).setConfig({ lenght: 4 })
+  // @ts-expect-error — setDate takes the type of the date option
+  new TimeInput(element).setDate({ second: true }),
+  // @ts-expect-error — and setValue the type of the value option
+  new OTPInput(element).setValue([4])
 ]
 
 // Every component with options type-checks them.
@@ -284,14 +284,14 @@ const otherOptions = [
   new SearchButton(element, { shortcuts: 'ctrl+k' }),
   // @ts-expect-error — not a stepper option
   new Stepper(element, { liner: false }),
-  // @ts-expect-error — setConfig takes the same options
-  new Autocomplete(element).setConfig({ searchable: true }),
+  // @ts-expect-error — setValidationState takes a state
+  new Autocomplete(element).setValidationState(true),
   // @ts-expect-error — search takes only 'external'
   new Autocomplete(element, { search: 'global' }),
-  // @ts-expect-error — and so does the multi select's
-  new MultiSelect(element).setConfig({ selectionType: 'pills' }),
-  // @ts-expect-error — and the rating's
-  new Rating(element).setConfig({ valu: 3 }),
+  // @ts-expect-error — setTotal takes a number
+  new MultiSelect(element).setTotal('many'),
+  // @ts-expect-error — and the rating's setValue a number
+  new Rating(element).setValue('three'),
   // @ts-expect-error — and the time columns'
   new TimeSelects(element).setConfig({ hourz: [9] })
 ]

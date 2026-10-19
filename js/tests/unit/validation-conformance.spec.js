@@ -14,7 +14,7 @@ import TimePicker from '../../src/time-picker.js'
 import { clearFixture, getFixture } from '../helpers/fixture.js'
 
 const FEEDBACK = '<div class="invalid-feedback" id="feedback">Fix this field.</div>'
-const VALIDATION_ONLY = 'its setConfig takes only the validation options'
+const VALIDATION_ONLY = 'its only setter of an option is setValidationState'
 
 const sectionsOf = t => [...t.root.querySelectorAll('.form-date-time-section')]
 const pressArrowUp = section => {
@@ -45,7 +45,7 @@ const ADAPTERS = [
     changeAsUser: t => t.instance._optionsElement.querySelector('[data-coreui-value="1"]').click(),
     changeEvents: t => [[t.instance._element, 'change.coreui.multi-select'], ...nativeChange(t.instance._element)],
     changeFromCode: t => t.instance.selectAll(),
-    reconfigure: t => t.instance.setConfig({ disabled: false }),
+    reconfigure: t => t.instance.enable(),
     pageOwnsValueField: true,
     required: { required: true }
   },
@@ -64,8 +64,8 @@ const ADAPTERS = [
     describedTargets: t => [t.instance._inputElement],
     changeAsUser: t => typeInto(t.instance._inputElement, 'x'),
     changeEvents: t => [[t.root.querySelector('.autocomplete'), 'input.coreui.autocomplete']],
-    changeFromCode: t => t.instance.setConfig({ value: '2' }),
-    reconfigure: t => t.instance.setConfig({ disabled: false }),
+    changeFromCode: t => t.instance.setValue('2'),
+    reconfigure: t => t.instance.enable(),
     required: { required: true }
   },
   {
@@ -120,8 +120,8 @@ const ADAPTERS = [
     describedTargets: sectionsOf,
     changeAsUser: t => pressArrowUp(sectionsOf(t)[0]),
     changeEvents: t => [[t.root.querySelector('#field'), 'dateChange.coreui.date-input'], ...nativeChange(t.instance._inputElement)],
-    changeFromCode: t => t.instance.setConfig({ date: new Date(2026, 6, 15) }),
-    reconfigure: t => t.instance.setConfig({ disabled: false }),
+    changeFromCode: t => t.instance.setDate(new Date(2026, 6, 15)),
+    reconfigure: t => t.instance.enable(),
     required: { required: true }
   },
   {
@@ -138,8 +138,8 @@ const ADAPTERS = [
     describedTargets: sectionsOf,
     changeAsUser: t => pressArrowUp(sectionsOf(t)[0]),
     changeEvents: t => [[t.root.querySelector('#field'), 'timeChange.coreui.time-input'], ...nativeChange(t.instance._inputElement)],
-    changeFromCode: t => t.instance.setConfig({ date: '11:45:00' }),
-    reconfigure: t => t.instance.setConfig({ disabled: false }),
+    changeFromCode: t => t.instance.setDate('11:45:00'),
+    reconfigure: t => t.instance.enable(),
     required: { required: true }
   },
   {
@@ -223,8 +223,8 @@ const ADAPTERS = [
     describedTargets: t => [...t.root.querySelectorAll('.form-otp-control')],
     changeAsUser: t => typeInto(t.root.querySelector('.form-otp-control'), '1'),
     changeEvents: t => [[t.root.querySelector('.form-otp'), 'change.coreui.otp-input'], ...nativeChange(t.instance._inputElement)],
-    changeFromCode: t => t.instance.setConfig({ value: '1' }),
-    reconfigure: t => t.instance.setConfig({ disabled: false }),
+    changeFromCode: t => t.instance.setValue('1'),
+    reconfigure: t => t.instance.enable(),
     required: { required: true }
   },
   {
@@ -239,8 +239,8 @@ const ADAPTERS = [
     pageDescribed: t => [...t.root.querySelectorAll('.form-range-input')],
     changeAsUser: t => typeInto(t.root.querySelector('.form-range-input'), '30'),
     changeEvents: t => [[t.root.querySelector('#field'), 'input.coreui.range-slider']],
-    changeFromCode: t => t.instance.setConfig({ value: [30, 70] }),
-    reconfigure: t => t.instance.setConfig({ disabled: false }),
+    changeFromCode: t => t.instance.setValue([30, 70]),
+    reconfigure: t => t.instance.enable(),
     required: null,
     makeInvalid: t => t.root.querySelector('.form-range-input').setCustomValidity('Pick a higher budget.'),
     notApplicable: {
@@ -260,8 +260,8 @@ const ADAPTERS = [
     pageDescribed: t => [t.root.querySelector('#field')],
     changeAsUser: t => t.root.querySelectorAll('.rating-item-label')[3].click(),
     changeEvents: t => [[t.root.querySelector('#field'), 'change.coreui.rating']],
-    changeFromCode: t => t.instance.setConfig({ value: 4 }),
-    reconfigure: t => t.instance.setConfig({ disabled: false }),
+    changeFromCode: t => t.instance.setValue(4),
+    reconfigure: t => t.instance.enable(),
     required: { required: true }
   }
 ]
@@ -381,31 +381,31 @@ describe('validation conformance', () => {
 
       expect(described.map(target => describedBy(target)[0])).toEqual(described.map(() => 'hint'))
 
-      t.instance.setConfig({ validationState: null })
+      t.instance.setValidationState(null)
 
       expect(describedBy(described[0])).toEqual(['hint'])
     })
   })
 
-  describe('setConfig with the state alone', () => {
-    conform('setConfig', 'should move between invalid, valid and none in place, blocking only while invalid', adapter => {
+  describe('setValidationState', () => {
+    conform('setValidationState', 'should move between invalid, valid and none in place, blocking only while invalid', adapter => {
       const t = mount(adapter)
       const nodes = [...adapter.frames(t), ...adapter.blockers(t), ...adapter.describedTargets(t)]
       const inPlace = () => [...adapter.frames(t), ...adapter.blockers(t), ...adapter.describedTargets(t)].every((node, index) => node === nodes[index])
 
-      t.instance.setConfig({ validationState: 'invalid' })
+      t.instance.setValidationState('invalid')
 
       expectFrames(adapter, t, ['is-invalid'])
       expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
 
-      t.instance.setConfig({ validationState: 'valid' })
+      t.instance.setValidationState('valid')
 
       expectFrames(adapter, t, ['is-valid'])
       expect(isBlocked(adapter, t).some(Boolean)).toBe(false)
       expect(ariaInvalid(t)).toHaveLength(0)
       expect(describesFeedback(adapter, t)).toBe(false)
 
-      t.instance.setConfig({ validationState: null })
+      t.instance.setValidationState(null)
 
       expect(shownStates(t)).toEqual([])
       expect(isBlocked(adapter, t).some(Boolean)).toBe(false)
@@ -413,11 +413,11 @@ describe('validation conformance', () => {
     })
   })
 
-  describe('a rejected setConfig', () => {
+  describe('a rejected setValidationState', () => {
     conform('rejectedState', 'should keep a state class from the markup through a state of the wrong type', adapter => {
       const t = mount(adapter, { serverClass: 'is-invalid' })
 
-      expect(() => t.instance.setConfig({ validationState: 1 })).toThrowError(TypeError)
+      expect(() => t.instance.setValidationState(1)).toThrowError(TypeError)
       adapter.changeFromCode(t)
 
       expectFrames(adapter, t, ['is-invalid'])
@@ -495,7 +495,7 @@ describe('validation conformance', () => {
     conform('reset', 'should keep a state given in a reset listener of the form', async adapter => {
       const t = mount(adapter, { config: adapter.filled })
 
-      t.form.addEventListener('reset', () => t.instance.setConfig({ validationState: 'invalid' }))
+      t.form.addEventListener('reset', () => t.instance.setValidationState('invalid'))
       t.form.reset()
       await tick()
 
@@ -507,14 +507,14 @@ describe('validation conformance', () => {
       const t = mount(adapter, { config: adapter.filled })
 
       t.form.reset()
-      t.instance.setConfig({ validationState: 'invalid' })
+      t.instance.setValidationState('invalid')
       await tick()
 
       expectFrames(adapter, t, ['is-invalid'])
       expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
     })
 
-    conform('resetReconfigure', 'should drop a state given before it after a setConfig of another option', async adapter => {
+    conform('resetReconfigure', 'should drop a state given before it after a setter of another option', async adapter => {
       const t = mount(adapter, { config: { ...adapter.filled, validationState: 'invalid' } })
 
       adapter.reconfigure(t)
@@ -543,7 +543,7 @@ describe('validation conformance', () => {
       expectFrames(adapter, t, ['is-invalid'])
     })
 
-    conform('reportedReconfigure', 'should keep it through a setConfig of another option', adapter => {
+    conform('reportedReconfigure', 'should keep it through a setter of another option', adapter => {
       const t = mountInvalid(adapter)
 
       t.form.checkValidity()
@@ -552,7 +552,7 @@ describe('validation conformance', () => {
       expectFrames(adapter, t, ['is-invalid'])
     })
 
-    conform('reportedResetReconfigure', 'should forget it when a reset listener of the form makes a setConfig of another option', async adapter => {
+    conform('reportedResetReconfigure', 'should forget it when a reset listener of the form calls a setter of another option', async adapter => {
       const t = mountInvalid(adapter)
 
       t.form.checkValidity()
@@ -602,8 +602,8 @@ describe('validation conformance', () => {
         const [field] = adapter.blockers(t)
 
         field.setCustomValidity('The page says no.')
-        t.instance.setConfig({ validationState: 'invalid' })
-        t.instance.setConfig({ validationState: null })
+        t.instance.setValidationState('invalid')
+        t.instance.setValidationState(null)
 
         expect(field.validationMessage).toBe('The page says no.')
       })
@@ -616,8 +616,8 @@ describe('validation conformance', () => {
       const [frame] = adapter.frames(t)
 
       frame.classList.add('is-invalid')
-      t.instance.setConfig({ validationState: 'invalid' })
-      t.instance.setConfig({ validationState: null })
+      t.instance.setValidationState('invalid')
+      t.instance.setValidationState(null)
 
       expect(stateClasses(frame)).toEqual(['is-invalid'])
     })

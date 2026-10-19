@@ -170,28 +170,25 @@ class Rating extends BaseComponent {
     return DefaultType
   }
 
-  static override get LIVE_OPTIONS(): string[] {
-    return ['disabled', 'readonly', 'required', 'validationState', 'value']
-  }
-
   static override get NAME(): string {
     return NAME
   }
 
   // Public
-  setConfig(config: Partial<RatingConfig> | null): void {
-    this._checkLiveConfig(config)
-    this._config = this._getConfig({ ...this._config, ...config })
+  disable(): void {
+    this._setConfig({ disabled: true })
+  }
 
-    if (this._validation.configure(config)) {
-      return
-    }
+  enable(): void {
+    this._setConfig({ disabled: false })
+  }
 
-    if (config?.value !== undefined) {
-      this._currentValue = this._config.value
-    }
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
+  }
 
-    this._createRating(this._removeRating())
+  setValue(value: RatingConfig['value']): void {
+    this._setConfig({ value })
   }
 
   reset(value: number | null = null): void {
@@ -219,6 +216,19 @@ class Rating extends BaseComponent {
   }
 
   // Private
+  _setConfig(config: Partial<RatingConfig> | null): void {
+    this._config = this._getConfig({ ...this._config, ...config })
+
+    if (this._validation.configure(config)) {
+      return
+    }
+
+    if (config?.value !== undefined) {
+      this._currentValue = this._config.value
+    }
+
+    this._createRating(this._removeRating())
+  }
 
   _radios(): HTMLInputElement[] {
     return SelectorEngine.find<HTMLInputElement>(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)

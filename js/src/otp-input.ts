@@ -139,10 +139,6 @@ class OTPInput extends BaseComponent {
     return DefaultType
   }
 
-  static override get LIVE_OPTIONS(): string[] {
-    return ['disabled', 'required', 'validationState', 'value']
-  }
-
   static override get NAME(): string {
     return NAME
   }
@@ -180,12 +176,24 @@ class OTPInput extends BaseComponent {
     this._restoreValue()
   }
 
-  setConfig(config: Partial<OtpInputConfig> | null): void {
-    if (typeof config !== 'object' || config === null) {
-      return
-    }
+  disable(): void {
+    this._setConfig({ disabled: true })
+  }
 
-    this._checkLiveConfig(config)
+  enable(): void {
+    this._setConfig({ disabled: false })
+  }
+
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
+  }
+
+  setValue(value: OtpInputConfig['value']): void {
+    this._setConfig({ value })
+  }
+
+  // Private
+  _setConfig(config: Partial<OtpInputConfig>): void {
     const previousValue = this._config.value
     this._config = this._getConfig({ ...this._config, ...config })
     const repaint = this._config.value !== previousValue
@@ -210,7 +218,6 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  // Private
   _addEventListeners(): void {
     EventHandler.on(this._element, EVENT_BEFORE_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
       const { data, inputType } = event as unknown as { data: string | null, inputType: string }

@@ -48,26 +48,6 @@ class Config {
     throw new Error('You have to implement the static method "NAME", for each component!')
   }
 
-  static get LIVE_OPTIONS(): string[] {
-    return []
-  }
-
-  /**
-   * Throws for an option that `setConfig()` does not change on a live instance: only the options
-   * the component lists in `LIVE_OPTIONS` (its state and data) can change after it starts.
-   *
-   * @param config - The options passed to `setConfig()`
-   */
-  _checkLiveConfig(config?: ComponentConfig | null): void {
-    for (const key of Object.keys(config ?? {})) {
-      if (!this.constructor.LIVE_OPTIONS.includes(key)) {
-        throw new TypeError(
-          `${this.constructor.NAME.toUpperCase()}: setConfig() does not change "${key}". Dispose the instance and create a new one with it.`
-        )
-      }
-    }
-  }
-
   _getConfig(config?: ComponentConfig | null): ComponentConfig {
     config = this._mergeConfigObj(config)
     config = this._configAfterMerge(config)

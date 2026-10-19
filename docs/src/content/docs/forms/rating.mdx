@@ -28,7 +28,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div class="form-text">Tell us how the delivery went.</div>
   </div>`} />
 
-Inside a `<form>`, the rating follows a form reset: it goes back to the `value` it was created with, or to no rating when it had none, whatever `setConfig({ value })` set later, and fires `change.coreui.rating` when that differs from the current value. A reset that a listener cancels changes nothing. The rating hears the reset through the document, or the shadow root, it sits in when it is created, so create it once its form is in the page, not inside a cloned `<template>` that is inserted later.
+Inside a `<form>`, the rating follows a form reset: it goes back to the `value` it was created with, or to no rating when it had none, whatever `setValue()` set later, and fires `change.coreui.rating` when that differs from the current value. A reset that a listener cancels changes nothing. The rating hears the reset through the document, or the shadow root, it sits in when it is created, so create it once its form is in the page, not inside a cloned `<template>` that is inserted later.
 
 ## Allow clear
 
@@ -64,10 +64,10 @@ Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out 
 A rating can be required, and it takes a validation state from the page.
 
 - `required` (`data-coreui-required="true"`) makes every radio required, so the browser stops the submit while no star is picked, and gives the rating `aria-required="true"`. A read-only rating is never required.
-- Give a state with the `validationState` option (`data-coreui-validation-state`), or with `.is-invalid` or `.is-valid` on the rating element in the HTML the server renders. The class is read once, when the rating starts; after that, use `setConfig({ validationState })`, which changes the state without rendering the stars again when it is the only option you pass.
+- Give a state with the `validationState` option (`data-coreui-validation-state`), or with `.is-invalid` or `.is-valid` on the rating element in the HTML the server renders. The class is read once, when the rating starts; after that, use `setValidationState()`, which changes the state without rendering the stars again when it is the only option you pass.
 - The state shows on the rating element: it colours the focus ring, the stars keep their colours, and `'invalid'` sets `aria-invalid` on the group and adds the invalid feedback that follows the rating, or the one named in its `data-coreui-invalid-feedback`, to the `aria-describedby` of every star.
 - `'invalid'` blocks the submit through the checked star, or the first one when none is picked, with the text of the feedback as the message the browser shows, or `Invalid value.` without one, and the browser moves the focus to that star. `'valid'` and a custom state do not block, and neither does a disabled or read-only rating.
-- Picking or clearing a star, or a native form reset, removes the state before `change.coreui.rating` fires. A change from code, such as `setConfig({ value })` or `reset()`, keeps it.
+- Picking or clearing a star, or a native form reset, removes the state before `change.coreui.rating` fires. A change from code, such as `setValue()` or `reset()`, keeps it.
 - A required rating without a value shows `'invalid'` once a validation reports it, and a given state shows over it.
 
 <Example pro code={`<form class="row g-4" data-coreui-validate novalidate>
@@ -219,13 +219,16 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `getInstance` | Static method which allows you to get the rating instance associated to a DOM element, you can use it like this: `coreui.Rating.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a rating instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Rating.getOrCreateInstance(element)` |
 | `reset` | Reset the value to `null` or to provided value, firing `change.coreui.rating` when that changes the value. |
-| `setConfig` | Changes `value`, `disabled`, `readonly`, `required` and `validationState` on the live rating and re-renders it. A `validationState` passed alone changes the state without a re-render. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
+| `disable()` | Disables the rating. |
+| `enable()` | Enables the rating. |
+| `setValidationState(state)` | Gives the rating a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
+| `setValue(value)` | Sets the value without firing a change event. |
 
 ### Events
 
 | Event | Description |
 | --- | --- |
-| `change.coreui.rating` | Fired when the value changes: a pick, a cleared star, `reset()`, or a form reset that changes it. `setConfig()` does not fire it. |
+| `change.coreui.rating` | Fired when the value changes: a pick, a cleared star, `reset()`, or a form reset that changes it. `setValue()` does not fire it. |
 | `hover.coreui.rating` | The callback fired when the cursor entered and leave the item. |
 
 ```js

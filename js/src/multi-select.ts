@@ -340,10 +340,6 @@ class MultiSelect extends ComboboxBase {
     return DefaultType
   }
 
-  static override get LIVE_OPTIONS(): string[] {
-    return ['disabled', 'invalid', 'options', 'required', 'total', 'valid', 'validationState', 'value']
-  }
-
   static override get NAME(): string {
     return NAME
   }
@@ -536,36 +532,24 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
-  setConfig(config: Partial<MultiSelectConfig> | null): void {
-    this._checkLiveConfig(config)
-    this._config = this._getConfig({ ...this._config, value: null, ...config })
+  disable(): void {
+    this._setConfig({ disabled: true })
+  }
 
-    if (this._validation.configure(config)) {
-      return
-    }
+  enable(): void {
+    this._setConfig({ disabled: false })
+  }
 
-    if (config && Object.keys(config).every(key => key === 'total')) {
-      this._render()
-      return
-    }
+  setTotal(total: MultiSelectConfig['total']): void {
+    this._setConfig({ total })
+  }
 
-    const keep = !config || !('options' in config || 'value' in config)
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
+  }
 
-    if (!keep) {
-      (this._element as HTMLSelectElement).selectedIndex = -1
-    }
-
-    this._options = this._getOptions()
-
-    const next = keep ? this._store.values() : this._markedValues()
-
-    this._destroySelect()
-    this._element.innerHTML = ''
-    this._configureNativeSelect()
-    this._createNativeOptions(this._element, this._options)
-    this._createSelect()
-    this._addEventListeners()
-    this._commit(next, false)
+  setValue(value: MultiSelectConfig['value']): void {
+    this._setConfig({ value })
   }
 
   selectAll(options: any[] = this._options): void {
@@ -597,6 +581,36 @@ class MultiSelect extends ComboboxBase {
   }
 
   // Private
+  _setConfig(config: Partial<MultiSelectConfig> | null): void {
+    this._config = this._getConfig({ ...this._config, value: null, ...config })
+
+    if (this._validation.configure(config)) {
+      return
+    }
+
+    if (config && Object.keys(config).every(key => key === 'total')) {
+      this._render()
+      return
+    }
+
+    const keep = !config || !('value' in config)
+
+    if (!keep) {
+      (this._element as HTMLSelectElement).selectedIndex = -1
+    }
+
+    this._options = this._getOptions()
+
+    const next = keep ? this._store.values() : this._markedValues()
+
+    this._destroySelect()
+    this._element.innerHTML = ''
+    this._configureNativeSelect()
+    this._createNativeOptions(this._element, this._options)
+    this._createSelect()
+    this._addEventListeners()
+    this._commit(next, false)
+  }
 
   _destroySelect(): void {
     this._releaseFocus()

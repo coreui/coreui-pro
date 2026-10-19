@@ -417,7 +417,9 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `getInstance` | Static method which allows you to get the calendar instance associated to a DOM element, you can use it like this: `coreui.Calendar.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a calendar instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Calendar.getOrCreateInstance(element)` |
 | `refresh` | Renders the calendar again with its current configuration, for example once the data a `renderDayCell` callback reads has loaded. Focus inside the calendar returns to the same date or button, or to the calendar's focusable date when that one is gone. |
-| `setConfig` | Changes `startDate`, `endDate`, `calendarDate` and `selectEndDate` on the live calendar and re-renders it. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
+| `setCalendarDate(date)` | Shows the month, quarter or year of the given date. |
+| `setEndDate(date)` | Sets the end of the selected range and renders the calendar again. |
+| `setStartDate(date)` | Sets the selected date, or the start of the range, and renders the calendar again. |
 
 ### Events
 

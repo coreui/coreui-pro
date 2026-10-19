@@ -74,7 +74,7 @@ describe('DatePicker', () => {
       picker.hide()
 
       // the same path a typed value takes: the field validates and emits
-      picker._input.setConfig({ date: '2026-08-20' })
+      picker._input.setDate('2026-08-20')
 
       picker.show()
 
@@ -857,7 +857,7 @@ describe('DatePicker', () => {
 
       fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-input', event => {
         if (event.date && event.date.getDate() !== 3) {
-          DateInput.getInstance(event.target).setConfig({ date: new Date(2026, 6, 3, event.date.getHours()) })
+          DateInput.getInstance(event.target).setDate(new Date(2026, 6, 3, event.date.getHours()))
         }
       })
       picker.show();
@@ -873,7 +873,7 @@ describe('DatePicker', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' })
 
       fixtureEl.querySelector('#picker textarea').addEventListener('input', () => {
-        DateInput.getInstance(fixtureEl.querySelector('#picker .form-date-time')).setConfig({ date: new Date(2026, 6, 3) })
+        DateInput.getInstance(fixtureEl.querySelector('#picker .form-date-time')).setDate(new Date(2026, 6, 3))
       }, { once: true })
       picker.show();
       [...fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell[data-coreui-selectable]')]
@@ -961,7 +961,7 @@ describe('DatePicker', () => {
       expect(() => picker.setDate(undefined)).toThrowError(TypeError)
 
       picker.setDate(new Date(2026, 6, 20))
-      picker._input.setConfig({ date: new Date(2026, 6, 21) })
+      picker._input.setDate(new Date(2026, 6, 21))
 
       expect(emitted).toEqual([new Date(2026, 6, 20), new Date(2026, 6, 21)])
       expect(picker.getDate()).toEqual(new Date(2026, 6, 21))
@@ -1340,36 +1340,29 @@ describe('DatePicker', () => {
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
     })
 
-    it('should change the state through setConfig and leave the other options as they are', () => {
+    it('should change the state through setValidationState and leave the other options as they are', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div></form>')
 
-      picker.setConfig({ valid: true })
+      picker.setValidationState('valid')
 
       expect(picker._config.locale).toEqual('en-US')
       expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-valid')).toBeTrue()
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
 
-      picker.setConfig({ valid: false, validationState: 'invalid' })
+      picker.setValidationState('invalid')
 
       expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
       expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
 
-      picker.setConfig({ validationState: null })
+      picker.setValidationState(null)
 
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
     })
 
-    it('should list the options setConfig changes', () => {
-      expect(DatePicker.LIVE_OPTIONS).toEqual(['invalid', 'valid', 'validationState'])
-    })
+    it('should not expose setConfig', () => {
+      const picker = buildPicker()
 
-    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
-      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div></form>')
-
-      expect(() => picker.setConfig({ locale: 'pl-PL', valid: true })).toThrowError(TypeError, 'DATE-PICKER: setConfig() does not change "locale". Dispose the instance and create a new one with it.')
-      expect(picker._config.locale).toEqual('en-US')
-      expect(picker._config.valid).toBeFalse()
-      expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-valid')).toBeFalse()
+      expect(typeof picker.setConfig).toEqual('undefined')
     })
 
     it.each([
@@ -1424,7 +1417,7 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('#picker').classList.contains('is-invalid')).toBeFalse()
 
       form.reset()
-      picker.setConfig({ validationState: 'invalid' })
+      picker.setValidationState('invalid')
       await nextTask()
 
       expect(form.checkValidity()).toBeFalse()
@@ -1445,7 +1438,7 @@ describe('DatePicker', () => {
       const seen = []
 
       document.addEventListener('change', event => seen.push(event.target.validity.valid), { capture: true, once: true })
-      fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-picker', () => picker.setConfig({ validationState: 'warning' }))
+      fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-picker', () => picker.setValidationState('warning'))
       picker.show()
       fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
 
@@ -1460,7 +1453,7 @@ describe('DatePicker', () => {
 
       element.addEventListener('dateChange.coreui.date-picker', event => {
         if (event.date?.getDate() === 20) {
-          picker.setConfig({ validationState: 'invalid' })
+          picker.setValidationState('invalid')
           picker.setDate(new Date(2026, 6, 21))
         }
       })
@@ -1476,7 +1469,7 @@ describe('DatePicker', () => {
 
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
 
-      picker.setConfig({ validationState: 'invalid' })
+      picker.setValidationState('invalid')
       picker.show()
       fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
 
@@ -1488,8 +1481,8 @@ describe('DatePicker', () => {
       const element = fixtureEl.querySelector('#picker')
 
       element.classList.add('is-invalid')
-      picker.setConfig({ validationState: 'invalid' })
-      picker.setConfig({ validationState: null })
+      picker.setValidationState('invalid')
+      picker.setValidationState(null)
 
       expect(element.classList.contains('is-invalid')).toBeTrue()
     })
@@ -1605,7 +1598,7 @@ describe('DatePicker', () => {
         emitted = event.date
       })
 
-      picker._input.setConfig({ date: '2026-08-20' })
+      picker._input.setDate('2026-08-20')
 
       expect(new Date(emitted).getDate()).toEqual(20)
     })

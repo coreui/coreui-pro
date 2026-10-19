@@ -172,7 +172,7 @@ class TimePicker extends PickerBase {
   }
 
   setTime(time: Date | null): void {
-    this._write(() => this._input.setConfig({ date: time }))
+    this._write(() => this._input.setDate(time))
   }
 
   now(): void {
@@ -280,7 +280,7 @@ class TimePicker extends PickerBase {
   }
 
   _applyTime(time: Date | null, picked: Date | null): void {
-    this._write(() => this._input.setConfig({ date: time }), 'selection')
+    this._write(() => this._input.setDate(time), 'selection')
 
     if (time !== picked) {
       this._selection.setTime(time)

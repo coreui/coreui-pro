@@ -57,17 +57,23 @@ describe('DateRangePicker', () => {
     })
   })
 
-  describe('setConfig', () => {
-    it('should list the options setConfig changes', () => {
-      expect(DateRangePicker.LIVE_OPTIONS).toEqual(['invalid', 'valid', 'validationState'])
+  describe('setters', () => {
+    it('should change one end through setStartDate and setEndDate, keeping the other', () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) })
+
+      picker.setStartDate(new Date(2026, 6, 10))
+
+      expect([picker.getStartDate(), picker.getEndDate()]).toEqual([new Date(2026, 6, 10), new Date(2026, 6, 20)])
+
+      picker.setEndDate(new Date(2026, 6, 25))
+
+      expect([picker.getStartDate(), picker.getEndDate()]).toEqual([new Date(2026, 6, 10), new Date(2026, 6, 25)])
     })
 
-    it('should throw for an option setConfig does not change', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const picker = new DateRangePicker(fixtureEl.querySelector('div'))
+    it('should not expose setConfig', () => {
+      const picker = buildPicker()
 
-      expect(() => picker.setConfig({ locale: 'pl-PL' })).toThrowError(TypeError, 'DATE-RANGE-PICKER: setConfig() does not change "locale". Dispose the instance and create a new one with it.')
-      picker.dispose()
+      expect(typeof picker.setConfig).toEqual('undefined')
     })
   })
 
@@ -289,7 +295,7 @@ describe('DateRangePicker', () => {
 
       el.addEventListener('dateChange.coreui.date-input', event => {
         if (event.date?.getDate() === 5) {
-          DateInput.getInstance(event.target).setConfig({ date: new Date(2026, 6, 3) })
+          DateInput.getInstance(event.target).setDate(new Date(2026, 6, 3))
         }
       })
       picker.show();
@@ -310,7 +316,7 @@ describe('DateRangePicker', () => {
 
       el.addEventListener('dateChange.coreui.date-input', event => {
         if (event.date?.getDate() === 22) {
-          DateInput.getInstance(event.target).setConfig({ date: new Date(2026, 6, 24) })
+          DateInput.getInstance(event.target).setDate(new Date(2026, 6, 24))
         }
       })
       picker.show()
@@ -872,7 +878,7 @@ describe('DateRangePicker', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
     })
 
-    it('should show a state given by the option or by setConfig on the picker element, with the message after it', () => {
+    it('should show a state given by the option or by setValidationState on the picker element, with the message after it', () => {
       const picker = buildPicker({
         endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'invalid'
       }, '<form><div id="picker"></div><div class="invalid-feedback">Already booked.</div></form>')
@@ -882,8 +888,8 @@ describe('DateRangePicker', () => {
       expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
       expect(fixtureEl.querySelector('textarea').validationMessage).toEqual('Already booked.')
 
-      picker.setConfig({ validationState: 'valid' })
-      picker.setConfig({ validationState: 'invalid' })
+      picker.setValidationState('valid')
+      picker.setValidationState('invalid')
 
       expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
       expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
@@ -964,7 +970,7 @@ describe('DateRangePicker', () => {
       }, '<form><div id="picker"></div></form>')
 
       fixtureEl.querySelector('#picker').addEventListener('endDateChange.coreui.date-range-picker', () => {
-        picker.setConfig({ validationState: 'invalid' })
+        picker.setValidationState('invalid')
         picker.setRange(new Date(2026, 6, 2), new Date(2026, 6, 8))
       }, { once: true })
       picker.getContext().setRange(new Date(2026, 6, 1), new Date(2026, 6, 7))
@@ -1097,7 +1103,7 @@ describe('DateRangePicker', () => {
       const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker" class="is-valid"></div></form>')
 
       fixtureEl.querySelector('form').reset()
-      picker.setConfig({ validationState: 'invalid' })
+      picker.setValidationState('invalid')
       await new Promise(resolve => {
         setTimeout(resolve, 20)
       })
@@ -1106,18 +1112,18 @@ describe('DateRangePicker', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
     })
 
-    it('should change the state through setConfig and keep it through changes made by code', () => {
+    it('should change the state through setValidationState and keep it through changes made by code', () => {
       const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker"></div></form>')
       const form = fixtureEl.querySelector('form')
 
-      picker.setConfig({ validationState: 'invalid' })
+      picker.setValidationState('invalid')
       picker.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21))
       picker.clear()
       picker.reset()
 
       expect(form.checkValidity()).toBeFalse()
 
-      picker.setConfig({ validationState: null })
+      picker.setValidationState(null)
 
       expect(form.checkValidity()).toBeTrue()
     })

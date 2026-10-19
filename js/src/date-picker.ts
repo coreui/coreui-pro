@@ -439,7 +439,7 @@ class DatePicker extends PickerBase {
     this._source = source
 
     try {
-      this._input.setConfig({ date })
+      this._input.setDate(date)
     } finally {
       this._source = previous
     }
@@ -449,7 +449,7 @@ class DatePicker extends PickerBase {
     }
 
     if (!source && isSameInstantAs(before, this.getDate())) {
-      this._calendar?.setConfig({ startDate: before })
+      this._calendar?.setStartDate(before)
       this._selection?.setConfig({ time: before })
     }
   }
@@ -459,7 +459,7 @@ class DatePicker extends PickerBase {
     this._source = null
 
     if (this._calendar && !isSameDateAs(this._calendar._startDate, date)) {
-      this._calendar.setConfig({ startDate: date })
+      this._calendar.setStartDate(date)
     }
 
     if (source !== 'selection') {

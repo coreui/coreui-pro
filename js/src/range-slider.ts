@@ -234,27 +234,25 @@ class RangeSlider extends BaseComponent {
     return DefaultType
   }
 
-  static override get LIVE_OPTIONS(): string[] {
-    return ['disabled', 'validationState', 'value']
-  }
-
   static override get NAME(): string {
     return NAME
   }
 
   // Public
-  setConfig(config: Partial<RangeSliderConfig>): void {
-    this._checkLiveConfig(config)
-    const current = config && 'value' in config ? null : this._values()
-    this._config = this._getConfig({ ...this._config, ...config }) as RangeSliderConfig
-    this._startValues = (this._config.value as number[]).map((value, index) => this._startValues[index] ?? value)
+  disable(): void {
+    this._setConfig({ disabled: true })
+  }
 
-    if (this._validation.configure(config)) {
-      return
-    }
+  enable(): void {
+    this._setConfig({ disabled: false })
+  }
 
-    this._teardown()
-    this._build(current)
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
+  }
+
+  setValue(value: RangeSliderConfig['value']): void {
+    this._setConfig({ value })
   }
 
   override dispose(): void {
@@ -268,6 +266,19 @@ class RangeSlider extends BaseComponent {
   }
 
   // Private
+  _setConfig(config: Partial<RangeSliderConfig>): void {
+    const current = config && 'value' in config ? null : this._values()
+    this._config = this._getConfig({ ...this._config, ...config }) as RangeSliderConfig
+    this._startValues = (this._config.value as number[]).map((value, index) => this._startValues[index] ?? value)
+
+    if (this._validation.configure(config)) {
+      return
+    }
+
+    this._teardown()
+    this._build(current)
+  }
+
   _build(current: number[] | null = null): void {
     const { tooltipClass, tooltips, vertical } = this._config
 

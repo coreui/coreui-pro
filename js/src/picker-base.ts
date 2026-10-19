@@ -12,6 +12,7 @@ import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
 import FieldValidation from './util/field-validation.js'
 import { createControlGroupAction } from './util/form-control-group.js'
+import { type ValidationState } from './util/form-validation.js'
 import { getUID } from './util/index.js'
 import Popup from './util/popup.js'
 import { sanitizeByConfig } from './util/sanitizer.js'
@@ -60,10 +61,6 @@ abstract class PickerBase extends BaseComponent {
   }
 
   // Getters
-  static override get LIVE_OPTIONS(): string[] {
-    return ['invalid', 'valid', 'validationState']
-  }
-
   // Public
   show(): void {
     this._popup.show()
@@ -77,15 +74,8 @@ abstract class PickerBase extends BaseComponent {
     return this._popup.isShown ? this.hide() : this.show()
   }
 
-  setConfig(config: ComponentConfig | null): void {
-    this._checkLiveConfig(config)
-
-    if (!config || Object.keys(config).length === 0) {
-      return
-    }
-
-    this._config = this._getConfig({ ...this._config, ...config })
-    this._validation.configure(config)
+  setValidationState(validationState: ValidationState | null): void {
+    this._setConfig({ validationState })
   }
 
   override dispose(): void {
@@ -106,6 +96,15 @@ abstract class PickerBase extends BaseComponent {
   }
 
   // Private
+  _setConfig(config: ComponentConfig | null): void {
+    if (!config || Object.keys(config).length === 0) {
+      return
+    }
+
+    this._config = this._getConfig({ ...this._config, ...config })
+    this._validation.configure(config)
+  }
+
   _createPopup(): void {
     this._popup = new Popup({
       anchor: this._popupAnchor(),

@@ -27,16 +27,12 @@ describe('TimePicker', () => {
     return picker
   }
 
-  describe('setConfig', () => {
-    it('should list the options setConfig changes', () => {
-      expect(TimePicker.LIVE_OPTIONS).toEqual(['invalid', 'valid', 'validationState'])
-    })
-
-    it('should throw for an option setConfig does not change', () => {
+  describe('setters', () => {
+    it('should not expose setConfig', () => {
       fixtureEl.innerHTML = '<div></div>'
       const picker = new TimePicker(fixtureEl.querySelector('div'))
 
-      expect(() => picker.setConfig({ locale: 'pl-PL' })).toThrowError(TypeError, 'TIME-PICKER: setConfig() does not change "locale". Dispose the instance and create a new one with it.')
+      expect(typeof picker.setConfig).toEqual('undefined')
       picker.dispose()
     })
   })
@@ -161,7 +157,7 @@ describe('TimePicker', () => {
       picker.show()
       picker.hide()
 
-      picker._input.setConfig({ date: '14:30:00' })
+      picker._input.setDate('14:30:00')
 
       picker.show()
 
@@ -685,7 +681,7 @@ describe('TimePicker', () => {
 
       fixtureEl.querySelector('#picker').addEventListener('timeChange.coreui.time-input', event => {
         if (event.date?.getHours() === 10) {
-          TimeInput.getInstance(event.target).setConfig({ date: '08:15' })
+          TimeInput.getInstance(event.target).setDate('08:15')
         }
       })
       picker.show()
@@ -725,7 +721,7 @@ describe('TimePicker', () => {
       expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 11, 30))
 
       const emitted = listen()
-      picker._input.setConfig({ date: '14:45' })
+      picker._input.setDate('14:45')
 
       expect(emitted.length).toEqual(1)
     })
@@ -1080,14 +1076,14 @@ describe('TimePicker', () => {
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
     })
 
-    it('should change the state through setConfig', () => {
+    it('should change the state through setValidationState', () => {
       const picker = buildPicker({ time: '10:30:00' }, '<form><div id="picker"></div></form>')
 
-      picker.setConfig({ validationState: 'invalid' })
+      picker.setValidationState('invalid')
 
       expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
 
-      picker.setConfig({ validationState: null })
+      picker.setValidationState(null)
 
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
@@ -1120,7 +1116,7 @@ describe('TimePicker', () => {
       const form = fixtureEl.querySelector('form')
 
       form.addEventListener('change', () => {
-        picker.setConfig({ validationState: 'invalid' })
+        picker.setValidationState('invalid')
         picker.clear()
       }, { once: true })
       picker.show()

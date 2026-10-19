@@ -160,11 +160,11 @@ describe('ChipInput', () => {
 
       expect(element.classList.contains('is-invalid')).toBeFalse()
 
-      chipInput.setConfig({ validationState: 'valid' })
+      chipInput.setValidationState('valid')
 
       expect(element.classList.contains('is-valid')).toBeTrue()
 
-      chipInput.setConfig({ validationState: undefined })
+      chipInput.setValidationState(undefined)
 
       expect(element.classList.contains('is-valid')).toBeFalse()
       expect(element.classList.contains('is-invalid')).toBeFalse()
@@ -185,13 +185,13 @@ describe('ChipInput', () => {
       expect(element.classList.contains('is-valid')).toBeFalse()
     })
 
-    it('should change only the state with setConfig, and withdraw a class from the markup with null', () => {
+    it('should change only the state with setValidationState, and withdraw a class from the markup with null', () => {
       fixtureEl.innerHTML = '<form><div class="chip-input is-invalid"></div></form>'
       const element = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(element, { placeholder: 'Tags' })
       const input = chipInput._input
 
-      chipInput.setConfig({ validationState: 'valid' })
+      chipInput.setValidationState('valid')
 
       expect(element.classList.contains('is-valid')).toBeTrue()
       expect(element.classList.contains('is-invalid')).toBeFalse()
@@ -199,26 +199,19 @@ describe('ChipInput', () => {
       expect(chipInput._input).toBe(input)
       expect(input.placeholder).toBe('Tags')
 
-      chipInput.setConfig({ validationState: null })
+      chipInput.setValidationState(null)
       chipInput.dispose()
 
       expect(element.classList.contains('is-valid')).toBeFalse()
       expect(element.classList.contains('is-invalid')).toBeFalse()
     })
 
-    it('should list the options setConfig changes', () => {
-      expect(ChipInput.LIVE_OPTIONS).toEqual(['validationState'])
-    })
-
-    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
+    it('should not expose setConfig', () => {
       fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
-      const element = fixtureEl.querySelector('.chip-input')
-      const chipInput = new ChipInput(element, { placeholder: 'Tags' })
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'))
 
-      expect(() => chipInput.setConfig({ validationState: 'valid', placeholder: 'Other' })).toThrowError(TypeError, 'CHIP-INPUT: setConfig() does not change "placeholder". Dispose the instance and create a new one with it.')
-      expect(chipInput._config.placeholder).toBe('Tags')
-      expect(chipInput._input.placeholder).toBe('Tags')
-      expect(element.classList.contains('is-valid')).toBeFalse()
+      expect(typeof chipInput.setConfig).toEqual('undefined')
+      chipInput.dispose()
     })
 
     it.each([
@@ -281,7 +274,7 @@ describe('ChipInput', () => {
         seen.push([chipInput._valueField.value, chipInput._valueField.validity.valid, element.classList.contains('is-invalid')])
 
         if (seen.length === 1) {
-          chipInput.setConfig({ validationState: 'invalid' })
+          chipInput.setValidationState('invalid')
         }
       })
       chipInput._input.value = 'one,two,'
@@ -384,7 +377,7 @@ describe('ChipInput', () => {
       const form = fixtureEl.querySelector('form')
       const element = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(element)
-      const giveState = () => chipInput.setConfig({ validationState: 'invalid' })
+      const giveState = () => chipInput.setValidationState('invalid')
 
       if (when === 'before') {
         giveState()

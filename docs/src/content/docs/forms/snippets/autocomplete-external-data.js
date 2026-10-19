@@ -29,7 +29,7 @@ let debounceTimer = null
 
 myAutoCompleteExternalData.addEventListener('show.coreui.autocomplete', async () => {
   const users = await getUsers()
-  autocomplete.setConfig({ options: users })
+  autocomplete.setOptions(users)
 })
 
 myAutoCompleteExternalData.addEventListener('input.coreui.autocomplete', event => {
@@ -45,6 +45,6 @@ myAutoCompleteExternalData.addEventListener('input.coreui.autocomplete', event =
 
   debounceTimer = setTimeout(async () => {
     const users = await getUsers(query)
-    autocomplete.setConfig({ options: users })
+    autocomplete.setOptions(users)
   }, 200)
 })

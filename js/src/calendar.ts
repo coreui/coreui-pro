@@ -314,25 +314,21 @@ class Calendar extends BaseComponent {
     return DefaultType
   }
 
-  static override get LIVE_OPTIONS(): string[] {
-    return ['calendarDate', 'endDate', 'selectEndDate', 'startDate']
-  }
-
   static override get NAME(): string {
     return NAME
   }
 
   // Public
-  setConfig(config?: Partial<CalendarConfig> | null): void {
-    this._checkLiveConfig(config)
-    this._config = this._getConfig({ ...this._config, ...config })
-    this._initializeDates(Object.keys(config ?? {}))
+  setCalendarDate(calendarDate: CalendarConfig['calendarDate']): void {
+    this._setConfig({ calendarDate })
+  }
 
-    if (!config) {
-      this._initializeView()
-    }
+  setEndDate(endDate: CalendarConfig['endDate']): void {
+    this._setConfig({ endDate })
+  }
 
-    this._updateCalendar()
+  setStartDate(startDate: CalendarConfig['startDate']): void {
+    this._setConfig({ startDate })
   }
 
   refresh(): void {
@@ -350,6 +346,17 @@ class Calendar extends BaseComponent {
   }
 
   // Private
+  _setConfig(config?: Partial<CalendarConfig> | null): void {
+    this._config = this._getConfig({ ...this._config, ...config })
+    this._initializeDates(Object.keys(config ?? {}))
+
+    if (!config) {
+      this._initializeView()
+    }
+
+    this._updateCalendar()
+  }
+
   _setAnnouncements(announcements: Pick<CalendarConfig, 'ariaSelectedDateAnnouncement' | 'ariaSelectedRangeAnnouncement'>): void {
     this._config = this._getConfig({ ...this._config, ...announcements })
   }

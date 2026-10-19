@@ -99,7 +99,7 @@ Constrain the times the user can pick with `minDate` and `maxDate`, given as tim
 
 ## Validation
 
-The picker takes its validation state [the way the date picker does](/forms/date-picker/#validation): the `validationState` option (with `invalid` and `valid` as deprecated aliases) or an `.is-invalid` or `.is-valid` class written on the picker element, read once when the picker starts. A given state drops on the next change of the time the user makes, a time picked in the panel, the cleaner, a footer button that changes the time through the context, or typing in the field, and stays through `setTime()`, `clear()`, `reset()` and `now()` called by your code. `setConfig({ validationState })` sets it again; for now `setConfig` changes only the validation options. While the given state is `'invalid'`, the sections of the field carry `aria-invalid="true"`, are described by the message after the picker, and the picker blocks the submit with its text, or `Invalid value.` when there is none.
+The picker takes its validation state [the way the date picker does](/forms/date-picker/#validation): the `validationState` option (with `invalid` and `valid` as deprecated aliases) or an `.is-invalid` or `.is-valid` class written on the picker element, read once when the picker starts. A given state drops on the next change of the time the user makes, a time picked in the panel, the cleaner, a footer button that changes the time through the context, or typing in the field, and stays through `setTime()`, `clear()`, `reset()` and `now()` called by your code. `setValidationState()` sets it again. While the given state is `'invalid'`, the sections of the field carry `aria-invalid="true"`, are described by the message after the picker, and the picker blocks the submit with its text, or `Invalid value.` when there is none.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4 form-field">
@@ -279,7 +279,7 @@ picker itself.
 | `getTime` | Returns the current value (`Date` or `null`). |
 | `now` | Sets the current time. |
 | `reset` | Restores the initial value. |
-| `setConfig` | Changes the validation options, `validationState`, `invalid` and `valid`, without rebuilding the picker. Any other option throws a `TypeError`: dispose the instance and create a new one with it. |
+| `setValidationState(state)` | Gives the picker a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
 | `setTime` | Sets the value. Emits `timeChange` when the value changes. |
 | `show` / `hide` / `toggle` | Popup control. |
 

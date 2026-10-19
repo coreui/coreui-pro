@@ -321,7 +321,7 @@ describe('Calendar', () => {
       div.querySelector('[aria-label="Next month"]').click()
 
       for (const calendarDate of ['', null]) {
-        calendar.setConfig({ calendarDate })
+        calendar.setCalendarDate(calendarDate)
         expect(div.querySelector('table').getAttribute('aria-label')).toEqual('July 2022')
       }
     })
@@ -332,7 +332,7 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, { calendarDate: new Date(2022, 5, 15), locale: 'en-US' })
 
-      calendar.setConfig({ calendarDate: 'not a date' })
+      calendar.setCalendarDate('not a date')
 
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('June 2022')
     })
@@ -1614,7 +1614,7 @@ describe('Calendar', () => {
     })
   })
 
-  describe('setConfig', () => {
+  describe('setters', () => {
     it('should merge the previous configuration on a partial update', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -1626,28 +1626,19 @@ describe('Calendar', () => {
 
       expect(div.querySelectorAll('.calendar-nav')).toHaveSize(2)
 
-      calendar.setConfig({ selectEndDate: true })
+      calendar._setConfig({ selectEndDate: true })
 
       expect(calendar._config.range).toBeTrue()
       expect(calendar._config.calendars).toEqual(2)
       expect(div.querySelectorAll('.calendar-nav')).toHaveSize(2)
     })
 
-    it('should list the options setConfig changes', () => {
-      expect(Calendar.LIVE_OPTIONS).toEqual(['calendarDate', 'endDate', 'selectEndDate', 'startDate'])
-    })
-
-    it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
+    it('should not expose setConfig', () => {
       fixtureEl.innerHTML = '<div></div>'
 
-      const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
-      const html = div.innerHTML
+      const calendar = new Calendar(fixtureEl.querySelector('div'))
 
-      expect(() => calendar.setConfig({ startDate: new Date(2026, 8, 15), selectionType: 'month' })).toThrowError(TypeError, 'CALENDAR: setConfig() does not change "selectionType". Dispose the instance and create a new one with it.')
-      expect(calendar._config.selectionType).toEqual('day')
-      expect(calendar._config.startDate).toBeNull()
-      expect(div.innerHTML).toEqual(html)
+      expect(typeof calendar.setConfig).toEqual('undefined')
     })
 
     it('should keep the navigation month and year when the dates change', () => {
@@ -1657,7 +1648,7 @@ describe('Calendar', () => {
       const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), calendars: 2, locale: 'en-US' })
       const regions = [...div.querySelectorAll('.calendar-nav-date')]
 
-      calendar.setConfig({ startDate: new Date(2027, 0, 10) })
+      calendar.setStartDate(new Date(2027, 0, 10))
 
       for (const [index, region] of div.querySelectorAll('.calendar-nav-date').entries()) {
         expect(region).toBe(regions[index])
@@ -1680,7 +1671,7 @@ describe('Calendar', () => {
       }
 
       calendar.refresh()
-      calendar.setConfig({ selectEndDate: true })
+      calendar._setConfig({ selectEndDate: true })
 
       expect(observer.takeRecords()).toHaveSize(0)
       observer.disconnect()
@@ -1700,14 +1691,14 @@ describe('Calendar', () => {
       expect([...div.querySelectorAll('.calendar table')].map(table => table.getAttribute('aria-label'))).toEqual(['September 2026'])
     })
 
-    it('should keep focus on the same date when setConfig() renders the calendar again', () => {
+    it('should keep focus on the same date when setStartDate() renders the calendar again', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
 
       div.querySelector('[data-coreui-date="Tue Sep 15 2026"]').focus()
-      calendar.setConfig({ selectEndDate: true })
+      calendar.setStartDate(new Date(2026, 8, 20))
 
       expect(document.activeElement.getAttribute('data-coreui-date')).toBe('Tue Sep 15 2026')
     })
@@ -1718,9 +1709,7 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div)
 
-      calendar.setConfig({
-        startDate: new Date(2024, 2, 15)
-      })
+      calendar.setStartDate(new Date(2024, 2, 15))
 
       expect(calendar._startDate).not.toBeNull()
       expect(calendar._startDate.getFullYear()).toEqual(2024)
@@ -1822,7 +1811,7 @@ describe('Calendar', () => {
       })
 
       div.querySelectorAll('.calendar')[1].querySelector('[data-coreui-date="Tue Oct 27 2026"]').focus()
-      calendar.setConfig({ calendarDate: new Date(2026, 9, 1) })
+      calendar.setCalendarDate(new Date(2026, 9, 1))
 
       expect(document.activeElement.getAttribute('data-coreui-date')).toBe('Tue Oct 27 2026')
       expect(document.activeElement.closest('.calendar')).toBe(div.querySelectorAll('.calendar')[0])
@@ -2524,7 +2513,7 @@ describe('Calendar', () => {
       const calendar = Calendar.getInstance(div)
 
       pressKey(focusDay(div, 2026, 0, 31), 'PageDown')
-      calendar.setConfig({ calendarDate: new Date(2026, 2, 1) })
+      calendar.setCalendarDate(new Date(2026, 2, 1))
       const grid = div.querySelector('table')
       grid.focus()
       pressKey(grid, 'ArrowLeft')
@@ -2909,7 +2898,7 @@ describe('Calendar', () => {
         const div = renderCalendar({ disabledDates: date => date.getMonth() > 7 }, '<div></div><input>')
 
         fixtureEl.querySelector('input').focus()
-        Calendar.getInstance(div).setConfig({ calendarDate: new Date(2026, 8, 1) })
+        Calendar.getInstance(div).setCalendarDate(new Date(2026, 8, 1))
         vi.advanceTimersByTime(110)
 
         expect(messages()).toEqual(['September 2026, Nothing on this page can be picked'])
@@ -2919,7 +2908,7 @@ describe('Calendar', () => {
         const div = renderCalendar()
 
         div.hidden = true
-        Calendar.getInstance(div).setConfig({ calendarDate: new Date(2026, 8, 1) })
+        Calendar.getInstance(div).setCalendarDate(new Date(2026, 8, 1))
         div.querySelector('.btn-next').click()
         vi.advanceTimersByTime(110)
 
@@ -2935,7 +2924,7 @@ describe('Calendar', () => {
         const calendar = new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US' })
 
         fixtureEl.querySelector('input').focus()
-        calendar.setConfig({ calendarDate: new Date(2026, 8, 1) })
+        calendar.setCalendarDate(new Date(2026, 8, 1))
         vi.advanceTimersByTime(110)
 
         expect([...modal.querySelectorAll(':scope > [data-coreui-live-announcer] [aria-live="polite"] > *')].map(message => message.textContent)).toEqual(['September 2026'])
@@ -2963,7 +2952,7 @@ describe('Calendar', () => {
 
         clickWithFocus(first.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`))
         Calendar.getInstance(div).refresh()
-        Calendar.getInstance(div).setConfig({ selectEndDate: false })
+        Calendar.getInstance(div)._setConfig({ selectEndDate: false })
         vi.advanceTimersByTime(110)
 
         expect(messages()).toEqual(['Selected date: Wednesday, August 12, 2026'])
@@ -4723,7 +4712,7 @@ describe('Calendar', () => {
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('May 2026')
     })
 
-    it('should keep a picked range when setConfig changes only selectEndDate', () => {
+    it('should keep a picked range when _setConfig changes only selectEndDate', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -4734,7 +4723,7 @@ describe('Calendar', () => {
 
       pick(11)
       pick(16)
-      calendar.setConfig({ selectEndDate: true })
+      calendar._setConfig({ selectEndDate: true })
 
       expect(calendar._startDate).toEqual(new Date(2026, 8, 11))
       expect(calendar._endDate).toEqual(new Date(2026, 8, 16))
@@ -4742,7 +4731,7 @@ describe('Calendar', () => {
       expect(div.querySelectorAll('.calendar-cell.selected').length).toEqual(2)
     })
 
-    it('should keep the month and the view when setConfig changes only selectEndDate', () => {
+    it('should keep the month and the view when _setConfig changes only selectEndDate', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -4750,34 +4739,34 @@ describe('Calendar', () => {
 
       div.querySelector('.btn-next').click()
       div.querySelector('.btn-next').click()
-      calendar.setConfig({ selectEndDate: true })
+      calendar._setConfig({ selectEndDate: true })
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('November 2026')
 
       div.querySelector('.btn-month').click()
-      calendar.setConfig({ selectEndDate: false })
+      calendar._setConfig({ selectEndDate: false })
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('2026')
     })
 
-    it('should keep the month when setConfig clears the start date', () => {
+    it('should keep the month when setStartDate clears the start date', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, { locale: 'en-US', startDate: new Date(2026, 8, 12) })
 
       div.querySelector('.btn-next').click()
-      calendar.setConfig({ startDate: null })
+      calendar.setStartDate(null)
 
       expect(calendar._startDate).toBeNull()
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('October 2026')
     })
 
-    it('should show the month of the date setConfig names, not of a stale configured one', () => {
+    it('should show the month of the date setEndDate names, not of a stale configured one', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, { locale: 'en-US', range: true, startDate: new Date(2026, 0, 10) })
 
-      calendar.setConfig({ endDate: new Date(2026, 8, 18) })
+      calendar.setEndDate(new Date(2026, 8, 18))
 
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('September 2026')
     })
@@ -6373,11 +6362,11 @@ describe('Calendar', () => {
       jQueryMock.elements = [element]
 
       const instance = Calendar.getOrCreateInstance(element)
-      const spy = spyOn(instance, 'setConfig')
+      const spy = spyOn(instance, 'setStartDate')
 
-      jQueryMock.fn.calendar.call(jQueryMock, 'setConfig', { selectEndDate: true })
+      jQueryMock.fn.calendar.call(jQueryMock, 'setStartDate', new Date(2026, 8, 15))
 
-      expect(spy).toHaveBeenCalledWith({ selectEndDate: true })
+      expect(spy).toHaveBeenCalledWith(new Date(2026, 8, 15))
       instance.dispose()
     })
 
@@ -6782,14 +6771,14 @@ describe('Calendar', () => {
 
       const div = fixtureEl.querySelector('div')
 
-      for (const name of ['startDate', 'endDate']) {
+      for (const [name, setter] of [['startDate', 'setStartDate'], ['endDate', 'setEndDate']]) {
         const calendar = new Calendar(div, {
           firstDayOfWeek: 0,
           locale: 'en-US',
           selectionType: 'week',
           [name]: new Date(2026, 10, 15)
         })
-        calendar.setConfig({ [name]: new Date(2026, 10, 1) })
+        calendar[setter](new Date(2026, 10, 1))
 
         expect(div.querySelector('.btn-month').textContent.trim()).toEqual('October')
         calendar.dispose()
