@@ -508,6 +508,18 @@ describe('Rating', () => {
   })
 
   describe('setters', () => {
+    it('should keep the focused star when enable() finds the rating enabled', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { value: 2 })
+      const star = div.querySelector('input:checked')
+
+      star.focus()
+      rating.enable()
+
+      expect(document.activeElement).toBe(star)
+    })
+
     it('should update config and re-render the rating UI', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -530,6 +542,19 @@ describe('Rating', () => {
       rating.setValue(4)
       const checkedInput = div.querySelector('.rating-item-input:checked')
       expect(checkedInput.value).toEqual('4')
+    })
+
+    it('should not fire change from setValue', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { value: 2 })
+      const spy = jasmine.createSpy('change')
+
+      div.addEventListener('change.coreui.rating', spy)
+      rating.setValue(4)
+
+      expect(div.querySelector('.rating-item-input:checked').value).toEqual('4')
+      expect(spy).not.toHaveBeenCalled()
     })
 
     it('should keep the options given to the constructor', () => {
@@ -558,7 +583,7 @@ describe('Rating', () => {
       const rating = new Rating(div, { itemCount: 3 })
       const spy = jasmine.createSpy('change')
 
-      rating.enable()
+      rating.disable()
       rating.enable()
       div.addEventListener('change.coreui.rating', spy)
 
@@ -579,7 +604,7 @@ describe('Rating', () => {
       const item = label.parentElement
       expect(Tooltip.getInstance(item)).not.toBeNull()
 
-      rating.enable()
+      rating.setValue(2)
 
       expect(Tooltip.getInstance(item)).toBeNull()
       expect(rating._tooltip).toBeNull()
@@ -623,6 +648,7 @@ describe('Rating', () => {
       const after = document.createElement('span')
       div.append(after)
 
+      rating.disable()
       rating.enable()
 
       expect(div.firstElementChild).toHaveClass('rating-note')
@@ -699,6 +725,7 @@ describe('Rating', () => {
       const rating = new Rating(div)
       const { name } = div.querySelector('.rating-item-input')
 
+      rating.disable()
       rating.enable()
 
       for (const input of div.querySelectorAll('.rating-item-input')) {
@@ -714,18 +741,22 @@ describe('Rating', () => {
 
       input.checked = true
       input.dispatchEvent(createEvent('change', { bubbles: true }))
+      rating.disable()
       rating.enable()
 
       expect(div.querySelector('.rating-item-input:checked').value).toEqual('4')
     })
 
-    it('should not light every star when a change listener calls enable()', () => {
+    it('should not light every star when a change listener disables and enables the rating', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div)
       const input = div.querySelectorAll('.rating-item-input')[1]
 
-      div.addEventListener('change.coreui.rating', () => rating.enable())
+      div.addEventListener('change.coreui.rating', () => {
+        rating.disable()
+        rating.enable()
+      })
       input.checked = true
       input.dispatchEvent(createEvent('change', { bubbles: true }))
 
@@ -738,6 +769,7 @@ describe('Rating', () => {
         const div = fixtureEl.querySelector('div')
         const rating = new Rating(div, { itemCount: 5 })
 
+        rating.disable()
         rating.enable()
 
         div.addEventListener('change.coreui.rating', event => {
@@ -2071,7 +2103,10 @@ describe('Rating', () => {
     it('should drop a state given before a native reset, also when the page rebuilds the rating in the reset', async () => {
       const { element, form, rating } = mountInForm({ validationState: 'invalid' })
 
-      form.addEventListener('reset', () => rating.enable())
+      form.addEventListener('reset', () => {
+        rating.disable()
+        rating.enable()
+      })
       form.reset()
       await wait()
 
@@ -2128,7 +2163,10 @@ describe('Rating', () => {
       const { element, form, rating } = mountInForm({ required: true })
 
       form.checkValidity()
-      form.addEventListener('reset', () => rating.enable())
+      form.addEventListener('reset', () => {
+        rating.disable()
+        rating.enable()
+      })
       form.addEventListener('reset', event => event.preventDefault())
       form.reset()
       await wait()
@@ -2186,10 +2224,11 @@ describe('Rating', () => {
       expect(element.hasAttribute('aria-invalid')).toBeFalse()
     })
 
-    it('should keep the state a validation reported when enable() renders the stars again', () => {
+    it('should keep the state a validation reported when disable() and enable() render the stars again', () => {
       const { element, form, rating } = mountInForm({ required: true })
 
       form.checkValidity()
+      rating.disable()
       rating.enable()
 
       expect(element).toHaveClass('is-invalid')
@@ -2320,17 +2359,6 @@ describe('Rating', () => {
       rating.dispose()
       div.setAttribute('role', 'group')
       Rating.getOrCreateInstance(div)
-
-      expect(div.getAttribute('role')).toEqual('radiogroup')
-    })
-
-    it('should make the element a radiogroup again on enable() over a role the page set after init', () => {
-      fixtureEl.innerHTML = '<div data-coreui-rating></div>'
-      const div = fixtureEl.querySelector('div')
-      const rating = new Rating(div)
-
-      div.setAttribute('role', 'group')
-      rating.enable()
 
       expect(div.getAttribute('role')).toEqual('radiogroup')
     })

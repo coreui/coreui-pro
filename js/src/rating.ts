@@ -176,11 +176,15 @@ class Rating extends BaseComponent {
 
   // Public
   disable(): void {
-    this._setConfig({ disabled: true })
+    if (!this._config.disabled) {
+      this._setConfig({ disabled: true })
+    }
   }
 
   enable(): void {
-    this._setConfig({ disabled: false })
+    if (this._config.disabled) {
+      this._setConfig({ disabled: false })
+    }
   }
 
   setValidationState(validationState: ValidationState | null): void {

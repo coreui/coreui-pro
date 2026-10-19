@@ -323,11 +323,15 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   }
 
   disable(): void {
-    this._setConfig({ disabled: true })
+    if (!this._config.disabled) {
+      this._setConfig({ disabled: true })
+    }
   }
 
   enable(): void {
-    this._setConfig({ disabled: false })
+    if (this._config.disabled) {
+      this._setConfig({ disabled: false })
+    }
   }
 
   setDate(date: DateInputConfig['date']): void {

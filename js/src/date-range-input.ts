@@ -303,11 +303,13 @@ class DateRangeInput extends BaseComponent {
   }
 
   setEndDate(endDate: Date | null): void {
-    this.setRange(this.getStartDate(), endDate)
+    this._typeCheckConfig({ endDate }, { endDate: DefaultType.endDate })
+    this._applyRange(undefined, endDate)
   }
 
   setStartDate(startDate: Date | null): void {
-    this.setRange(startDate, this.getEndDate())
+    this._typeCheckConfig({ startDate }, { startDate: DefaultType.startDate })
+    this._applyRange(startDate)
   }
 
   setValidationState(validationState: ValidationState | null): void {
@@ -490,7 +492,7 @@ class DateRangeInput extends BaseComponent {
     return separator
   }
 
-  _applyRange(startDate: Date | null, endDate: Date | null): void {
+  _applyRange(startDate: Date | null | undefined, endDate?: Date | null): void {
     const batching = this._batching
     const generation = ++this._generation
     this._batching = true
@@ -498,9 +500,11 @@ class DateRangeInput extends BaseComponent {
     this._endInput._holdErrors(true)
 
     try {
-      this._startInput.setDate(startDate)
+      if (startDate !== undefined) {
+        this._startInput.setDate(startDate)
+      }
 
-      if (generation === this._generation) {
+      if (generation === this._generation && endDate !== undefined) {
         this._endInput.setDate(endDate)
       }
 

@@ -1529,6 +1529,29 @@ describe('Autocomplete', () => {
   })
 
   describe('setters', () => {
+    it('should drop a state given with the invalid alias in setValidationState(null)', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const element = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(element, { invalid: true, options: [{ label: 'A', value: 'a' }] })
+
+      autocomplete.setValidationState(null)
+
+      expect(element).not.toHaveClass('is-invalid')
+    })
+
+    it('should not fire change from setValue', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const element = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(element, { options: [{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }] })
+      const changes = []
+      element.addEventListener('change.coreui.autocomplete', event => changes.push(event))
+
+      autocomplete.setValue('b')
+
+      expect(autocomplete._inputElement.value).toBe('B')
+      expect(changes).toEqual([])
+    })
+
     it('should not expose setConfig', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'))

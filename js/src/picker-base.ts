@@ -75,7 +75,7 @@ abstract class PickerBase extends BaseComponent {
   }
 
   setValidationState(validationState: ValidationState | null): void {
-    this._setConfig({ validationState })
+    this._setConfig({ invalid: false, valid: false, validationState })
   }
 
   override dispose(): void {

@@ -212,17 +212,15 @@ class DateRangePicker extends PickerBase {
   }
 
   setEndDate(endDate: Date | null): void {
-    this.setRange(this.getStartDate(), endDate)
+    this._applyRange(() => this._rangeInput.setEndDate(endDate))
   }
 
   setRange(startDate: Date | null, endDate: Date | null): void {
-    this._rangeInput.setRange(startDate, endDate)
-    this._showRange()
-    this._setSelectEndDate(false)
+    this._applyRange(() => this._rangeInput.setRange(startDate, endDate))
   }
 
   setStartDate(startDate: Date | null): void {
-    this.setRange(startDate, this.getEndDate())
+    this._applyRange(() => this._rangeInput.setStartDate(startDate))
   }
 
   clear(): void {
@@ -257,6 +255,12 @@ class DateRangePicker extends PickerBase {
   }
 
   // Private
+  _applyRange(write: () => void): void {
+    write()
+    this._showRange()
+    this._setSelectEndDate(false)
+  }
+
   override _originalDefault(): Record<string, any> {
     return ORIGINAL_DEFAULT
   }

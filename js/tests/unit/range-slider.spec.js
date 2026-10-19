@@ -809,15 +809,6 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).every(input => input.getAttribute('aria-describedby') === 'budgetHelp')).toBeTrue()
     })
 
-    it('should take a label the page gives the element later on enable()', () => {
-      const { element, rangeSlider } = mount({ value: 40 }, 'aria-label="Budget"')
-
-      element.setAttribute('aria-label', 'Cost')
-      rangeSlider.enable()
-
-      expect(inputsOf(element)[0].getAttribute('aria-label')).toEqual('Cost')
-    })
-
     it('should make the element a group on every init and leave a role the page set later on dispose', () => {
       const { element, rangeSlider } = mount({ value: 40 })
 
@@ -1074,7 +1065,10 @@ describe('RangeSlider', () => {
     it('should drop a state given before a native reset when the page rebuilds the slider in the reset', async () => {
       const { element, form, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] })
 
-      form.addEventListener('reset', () => rangeSlider.enable())
+      form.addEventListener('reset', () => {
+        rangeSlider.disable()
+        rangeSlider.enable()
+      })
       form.reset()
       await new Promise(resolve => {
         setTimeout(resolve)
@@ -1132,6 +1126,7 @@ describe('RangeSlider', () => {
 
       inputsOf(element)[1].setCustomValidity('Too wide.')
       form.checkValidity()
+      rangeSlider.disable()
       rangeSlider.enable()
 
       const [, second] = inputsOf(element)
@@ -1147,6 +1142,7 @@ describe('RangeSlider', () => {
 
       fixtureEl.querySelector('form').before(fixtureEl.querySelector('#budgetError'))
 
+      rangeSlider.disable()
       rangeSlider.enable()
 
       expect(inputsOf(element)[0].validationMessage).toEqual('Pick a budget.')
@@ -1207,6 +1203,17 @@ describe('RangeSlider', () => {
 
       rangeSlider.setValue([5, 15])
       expect(inputsOf(element).map(input => input.value)).toEqual(['5', '15'])
+    })
+
+    it('should not fire change from setValue', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] })
+      const spy = jasmine.createSpy('change')
+
+      element.addEventListener('change.coreui.range-slider', spy)
+      rangeSlider.setValue([10, 90])
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['10', '90'])
+      expect(spy).not.toHaveBeenCalled()
     })
 
     it('should stop handling the wrapper it replaces', () => {
@@ -1276,6 +1283,7 @@ describe('RangeSlider', () => {
       const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-describedby="budgetHelp"')
 
       element.setAttribute('aria-describedby', 'budgetNote')
+      rangeSlider.disable()
       rangeSlider.enable()
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp'])

@@ -328,11 +328,15 @@ class Autocomplete extends ComboboxBase {
   }
 
   disable(): void {
-    this._setConfig({ disabled: true })
+    if (!this._config.disabled) {
+      this._setConfig({ disabled: true })
+    }
   }
 
   enable(): void {
-    this._setConfig({ disabled: false })
+    if (this._config.disabled) {
+      this._setConfig({ disabled: false })
+    }
   }
 
   setOptions(options: AutocompleteConfig['options']): void {
@@ -340,7 +344,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   setValidationState(validationState: ValidationState | null): void {
-    this._setConfig({ validationState })
+    this._setConfig({ invalid: false, valid: false, validationState })
   }
 
   setValue(value: AutocompleteConfig['value']): void {

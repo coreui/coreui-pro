@@ -173,6 +173,27 @@ describe('DateRangeInput', () => {
       expect([range.getStartDate(), range.getEndDate()]).toEqual([new Date(2026, 6, 10), new Date(2026, 6, 25)])
     })
 
+    it('should leave the other end, its typed draft and its focus alone in setStartDate and setEndDate', () => {
+      const range = build()
+      const [startDay] = fields()[0].querySelectorAll('.form-date-time-section')
+
+      startDay.focus()
+      startDay.dispatchEvent(new KeyboardEvent('keydown', { key: '1', bubbles: true, cancelable: true }))
+      range.setEndDate(new Date(2026, 6, 25))
+
+      expect(fields()[0].querySelector('.form-date-time-section')).toBe(startDay)
+      expect(startDay.getAttribute('aria-valuenow')).toBe('1')
+      expect(document.activeElement).toBe(startDay)
+
+      const [endDay] = fields()[1].querySelectorAll('.form-date-time-section')
+
+      endDay.focus()
+      range.setStartDate(new Date(2026, 6, 10))
+
+      expect(fields()[1].querySelector('.form-date-time-section')).toBe(endDay)
+      expect(document.activeElement).toBe(endDay)
+    })
+
     it('should fire each change once when a range event listener sets another range', () => {
       const range = build({ endDate: new Date(2026, 6, 10), startDate: new Date(2026, 6, 1) })
       const seen = []

@@ -177,11 +177,15 @@ class OTPInput extends BaseComponent {
   }
 
   disable(): void {
-    this._setConfig({ disabled: true })
+    if (!this._config.disabled) {
+      this._setConfig({ disabled: true })
+    }
   }
 
   enable(): void {
-    this._setConfig({ disabled: false })
+    if (this._config.disabled) {
+      this._setConfig({ disabled: false })
+    }
   }
 
   setValidationState(validationState: ValidationState | null): void {
@@ -194,9 +198,8 @@ class OTPInput extends BaseComponent {
 
   // Private
   _setConfig(config: Partial<OtpInputConfig>): void {
-    const previousValue = this._config.value
     this._config = this._getConfig({ ...this._config, ...config })
-    const repaint = this._config.value !== previousValue
+    const repaint = 'value' in config
 
     if (this._validation.configure(config)) {
       return

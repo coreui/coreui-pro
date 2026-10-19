@@ -1633,6 +1633,28 @@ describe('Calendar', () => {
       expect(div.querySelectorAll('.calendar-nav')).toHaveSize(2)
     })
 
+    it('should set only its own date in setStartDate, setEndDate and setCalendarDate', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const calendar = new Calendar(fixtureEl.querySelector('div'), {
+        endDate: new Date(2026, 0, 10),
+        range: true,
+        startDate: new Date(2026, 0, 5)
+      })
+
+      calendar.setEndDate(new Date(2026, 0, 20))
+
+      expect([calendar._startDate, calendar._endDate]).toEqual([new Date(2026, 0, 5), new Date(2026, 0, 20)])
+
+      calendar.setStartDate(new Date(2026, 0, 2))
+
+      expect([calendar._startDate, calendar._endDate]).toEqual([new Date(2026, 0, 2), new Date(2026, 0, 20)])
+
+      calendar.setCalendarDate(new Date(2026, 5, 1))
+
+      expect([calendar._startDate, calendar._endDate]).toEqual([new Date(2026, 0, 2), new Date(2026, 0, 20)])
+      expect(calendar._calendarDate.getMonth()).toBe(5)
+    })
+
     it('should not expose setConfig', () => {
       fixtureEl.innerHTML = '<div></div>'
 

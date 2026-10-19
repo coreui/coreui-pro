@@ -1359,6 +1359,14 @@ describe('DatePicker', () => {
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
     })
 
+    it('should drop a state given with the invalid alias in setValidationState(null)', () => {
+      const picker = buildPicker({ invalid: true })
+
+      picker.setValidationState(null)
+
+      expect(fixtureEl.querySelector('#picker')).not.toHaveClass('is-invalid')
+    })
+
     it('should not expose setConfig', () => {
       const picker = buildPicker()
 

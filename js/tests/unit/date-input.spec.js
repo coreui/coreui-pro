@@ -1779,6 +1779,7 @@ describe('DateInput', () => {
       dateInput.setDate(new Date(2026, 6, 15))
       dateInput.clear()
       dateInput.reset()
+      dateInput.disable()
       dateInput.enable()
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
@@ -1979,6 +1980,7 @@ describe('DateInput', () => {
       expect(field.matches(':user-invalid')).toBeTrue()
 
       field.setCustomValidity('Pick a weekday.')
+      dateInput.disable()
       dateInput.enable()
 
       expect(dateInput._element.querySelector('textarea')).toBe(field)
@@ -2884,7 +2886,7 @@ describe('DateInput', () => {
       expect(dateInput._element.querySelector('.form-date-time > textarea').value).toEqual('2026-07-14')
     })
 
-    it('should keep the date the user typed when the new config sets none', () => {
+    it('should keep the date the user typed through disable() and enable()', () => {
       const dateInput = createDateInput({ locale: 'pl-PL' })
       const onChange = vi.fn()
 
@@ -2894,6 +2896,7 @@ describe('DateInput', () => {
       }
 
       dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
+      dateInput.disable()
       dateInput.enable()
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
@@ -2908,12 +2911,13 @@ describe('DateInput', () => {
       day.focus()
       pressKey(day, '1')
       pressKey(day, '4')
+      dateInput.disable()
       dateInput.enable()
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
     })
 
-    it('should keep a partly typed date when the new config sets no date', () => {
+    it('should keep a partly typed date through disable() and enable()', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 1) })
       const [day] = getSections(dateInput._element)
       const onChange = vi.fn()
@@ -2921,6 +2925,7 @@ describe('DateInput', () => {
       day.focus()
       pressKey(day, 'Backspace')
       dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
+      dateInput.disable()
       dateInput.enable()
 
       expect([...getSections(dateInput._element)].map(section => section.textContent)).toEqual(['DD', '07', '2026'])
@@ -2934,6 +2939,7 @@ describe('DateInput', () => {
       day.focus()
       pressKey(day, '1')
       pressKey(day, '4')
+      dateInput.disable()
       dateInput.enable()
       dateInput.reset()
 

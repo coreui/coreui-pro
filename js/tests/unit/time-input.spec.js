@@ -324,7 +324,7 @@ describe('TimeInput', () => {
   })
 
   describe('setters', () => {
-    it('should keep the time the user typed when the new config sets none', () => {
+    it('should keep the time the user typed through disable() and enable()', () => {
       const timeInput = createTimeInput()
       const onChange = vi.fn()
 
@@ -334,6 +334,7 @@ describe('TimeInput', () => {
       }
 
       timeInput._element.addEventListener('timeChange.coreui.time-input', onChange)
+      timeInput.disable()
       timeInput.enable()
 
       expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 14, 30))

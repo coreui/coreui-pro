@@ -486,6 +486,8 @@ class MultiSelect extends ComboboxBase {
       return
     }
 
+    this._typeCheckConfig({ options }, { options: DefaultType.options })
+
     const hadFocus = containsFocus(this._menu)
     const active = this._listBox?.getActive()
     const previous = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
@@ -533,11 +535,15 @@ class MultiSelect extends ComboboxBase {
   }
 
   disable(): void {
-    this._setConfig({ disabled: true })
+    if (!this._config.disabled) {
+      this._setConfig({ disabled: true })
+    }
   }
 
   enable(): void {
-    this._setConfig({ disabled: false })
+    if (this._config.disabled) {
+      this._setConfig({ disabled: false })
+    }
   }
 
   setTotal(total: MultiSelectConfig['total']): void {
@@ -545,7 +551,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   setValidationState(validationState: ValidationState | null): void {
-    this._setConfig({ validationState })
+    this._setConfig({ invalid: false, valid: false, validationState })
   }
 
   setValue(value: MultiSelectConfig['value']): void {
