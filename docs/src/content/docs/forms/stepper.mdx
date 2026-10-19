@@ -605,7 +605,7 @@ const stepperList = stepperElementList.map(stepperEl => {
 
 | Method | Description |
 | --- | --- |
-| `finish()` | Complete the form wizard and mark all steps as finished. |
+| `finish()` | On the last enabled step, complete the form wizard and mark all steps as finished. Called from an earlier step, it just advances to the next one, like `next()`. |
 | `getInstance(element)` | Retrieve the Stepper instance from a DOM element. |
 | `getOrCreateInstance(element)` | Get or create the Stepper instance associated with a DOM element. |
 | `next()` | Go to the next step. On the last enabled step, finish the wizard as `finish()` does. |
@@ -620,7 +620,7 @@ const stepperList = stepperElementList.map(stepperEl => {
 | `finish.coreui.stepper` | Triggered when the last step is completed. |
 | `reset.coreui.stepper` | Triggered when the stepper is reset. |
 | `stepChange.coreui.stepper` | Fired when the active step changes. |
-| `stepValidationComplete.coreui.stepper` | Fired when the current step's form is validated, before the stepper decides. `event.isValid` tells whether every control passed; a validity the handler sets with `setCustomValidity()` counts for the step. |
+| `stepValidationComplete.coreui.stepper` | Fired when the current step's form is validated, before the stepper decides. `event.stepIndex` is the 1-based number of the step validated; `event.isValid` tells whether every control passed; a validity the handler sets with `setCustomValidity()` counts for the step. |
 
 Example:
 

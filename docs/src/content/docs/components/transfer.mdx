@@ -184,7 +184,7 @@ Rebuilding is a fresh start for the selection: after `setItems()` neither list h
 
 `sourceTitle` and `targetTitle` name the two lists. The title is written into the select-all button when the button is empty, so a button with its own text keeps it, and it becomes the list's accessible name and the destination named in the move announcement.
 
-<Example code={`<div class="transfer" data-coreui-transfer data-coreui-source-title="Team" data-coreui-target-title="On call" data-coreui-selected-counter-text="picked">
+<Example code={`<div class="transfer" data-coreui-transfer data-coreui-source-title="Team" data-coreui-target-title="On call" data-coreui-selected-label="{count}/{total} picked">
     <div class="list-box transfer-list" data-coreui-transfer-list="source">
       <div class="list-box-header">
         <button type="button" class="list-box-select-all" data-coreui-select-all></button>
@@ -363,10 +363,10 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `items` | array | `[]` | The options of both lists, rendered instead of the markup: `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` keeps every item in it on its side. `value` decides which of them start in the target list, `selected` which start checked — on the first render only, and never a disabled item. |
 | `loading` | boolean | `false` | Marks both lists as busy: `aria-busy="true"` on the options element and a loading row below the options, while the lists stay usable. Release it with `setLoading(false)`, or scope it per list with `setLoading(value, list)`. |
 | `loadingLabel` | string | `'Loading…'` | Text of the loading row of a busy list, announced to screen readers when it starts loading. |
-| `moveAllToSourceIcon` | string | `cil-chevron-double-left-alt` | Icon of the button that moves everything back. Inline SVG, put in the button only when the markup left it empty. |
-| `moveAllToTargetIcon` | string | `cil-chevron-double-right-alt` | Icon of the button that moves everything across. |
-| `moveToSourceIcon` | string | `cil-chevron-left-alt` | Icon of the button that moves the selection back. |
-| `moveToTargetIcon` | string | `cil-chevron-right-alt` | Icon of the button that moves the selection across. |
+| `moveAllToSourceIcon` | string | double chevron SVG | Icon of the button that moves everything back. Inline SVG, put in the button only when the markup left it empty. |
+| `moveAllToTargetIcon` | string | double chevron SVG | Icon of the button that moves everything across. |
+| `moveToSourceIcon` | string | chevron SVG | Icon of the button that moves the selection back. |
+| `moveToTargetIcon` | string | chevron SVG | Icon of the button that moves the selection across. |
 | `oneWay` | boolean | `false` | Hides and disables both buttons that move back, and makes `moveToSource()` and `moveAllToSource()` no-ops. |
 | `sanitize` | boolean | `true` | Run the icon strings through the sanitizer. |
 | `sanitizeFn` | null, function | `null` | Your own sanitizer, used instead of the built-in one. |

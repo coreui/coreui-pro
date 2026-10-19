@@ -245,6 +245,8 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `clearSelection()` | Deselects all chips without removing them. |
 | `dispose()` | Destroys the component instance and the chip instances it created, and removes the fields it built. The chips stay in the document. |
 | `focus()` | Focuses the ghost input. |
+| `getInstance(element)` | Static method that returns the instance associated with a DOM element, or `null`. |
+| `getOrCreateInstance(element, config)` | Static method that returns the instance associated with a DOM element, creating it when there is none. |
 | `getSelectedValues()` | Returns an array of selected chip values. |
 | `getValues()` | Returns an array of all chip values. |
 | `remove(chipOrValue)` | Removes a chip by element reference or value string. Focus moves to the text field only when the chip had it. Returns `true` if removed. |
@@ -318,6 +320,9 @@ chipInputElement.addEventListener('change.coreui.chip-input', event => {
 | `→` | Move to next chip |
 | `Home` | Move to first chip |
 | `End` | Move to last chip |
+| `Shift` + `←` / `→` | Move focus and add the chip it lands on to the selection (selectable chips, `selectionMode: 'multiple'`) |
+| `Shift` + `Home` / `End` | Extend the selection to the first or last chip (selectable chips, `selectionMode: 'multiple'`) |
+| `Ctrl` / `Cmd` + `A` | Select every chip (selectable chips, `selectionMode: 'multiple'`) |
 
 ## Accessibility
 
