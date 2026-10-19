@@ -193,14 +193,14 @@ describe('DateInput', () => {
       expect(events).toEqual(['input:TEXTAREA', 'change:TEXTAREA'])
     })
 
-    it('should not report a change while it is built or rebuilt with the same date', () => {
+    it('should not report a change while it is built or set to the same date as the user would', () => {
       const events = []
       const listener = event => events.push(event.type)
       fixtureEl.addEventListener('input', listener)
       fixtureEl.addEventListener('change', listener)
 
       const { dateInput } = mountForm({ date: new Date(2026, 0, 15) })
-      dateInput.setDate(new Date(2026, 0, 15))
+      dateInput.setDate(new Date(2026, 0, 15), true)
 
       fixtureEl.removeEventListener('input', listener)
       fixtureEl.removeEventListener('change', listener)
@@ -2380,7 +2380,7 @@ describe('DateInput', () => {
       expect(spy).toHaveBeenCalledTimes(3)
     })
 
-    it('should report the date before the error it changes, from the keyboard and from setDate', () => {
+    it('should report the date before the error it changes from the keyboard, and only the error from setDate', () => {
       const max = new Date(2026, 6, 14)
       const dateInput = createDateInput({ date: max, maxDate: max })
       const [day] = getSections(dateInput._element)
@@ -2393,7 +2393,7 @@ describe('DateInput', () => {
       pressKey(day, 'ArrowDown')
       dateInput.setDate(new Date(2026, 6, 20))
 
-      expect(log).toEqual(['date:null', 'error:maxDate', 'date:14', 'error:null', 'date:null', 'error:maxDate'])
+      expect(log).toEqual(['date:null', 'error:maxDate', 'date:14', 'error:null', 'error:maxDate'])
     })
 
     it('should keep a date an errorChange listener sets', () => {
@@ -2536,7 +2536,7 @@ describe('DateInput', () => {
       expect(changeSpy).not.toHaveBeenCalled()
     })
 
-    it('should clear the invalid state when update() sets a date back in range', () => {
+    it('should clear the invalid state when setDate sets a date back in range, without dateChange', () => {
       const dateInput = createDateInput({
         date: new Date(2026, 6, 20),
         maxDate: new Date(2026, 6, 14)
@@ -2548,7 +2548,7 @@ describe('DateInput', () => {
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 10))
-      expect(changeSpy.calls.mostRecent().args[0].date).toEqual(new Date(2026, 6, 10))
+      expect(changeSpy).not.toHaveBeenCalled()
     })
 
     it('should report disabled dates through errorChange', () => {
@@ -2876,6 +2876,306 @@ describe('DateInput', () => {
   })
 
   describe('setters', () => {
+    it('should keep the focused section and the same elements through setDate, and fire no change', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const sections = [...getSections(dateInput._element)]
+      const events = []
+      for (const type of ['input', 'change', 'dateChange.coreui.date-input']) {
+        dateInput._element.addEventListener(type, () => events.push(type))
+      }
+
+      sections[1].focus()
+
+      dateInput.setDate(new Date(2026, 8, 3))
+
+      expect([...getSections(dateInput._element)]).toEqual(sections)
+      for (const [index, section] of getSections(dateInput._element).entries()) {
+        expect(section).toBe(sections[index])
+      }
+
+      expect(document.activeElement).toBe(sections[1])
+      expect(sections.map(section => section.textContent)).toEqual(['03', '09', '2026'])
+      expect(dateInput._element.querySelector('textarea').value).toEqual('03.09.2026')
+      expect(events).toEqual([])
+    })
+
+    it('should report a change the user makes against the date setDate gave', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const dates = []
+      dateInput._element.addEventListener('dateChange.coreui.date-input', event => dates.push(event.date.getDate()))
+
+      dateInput.setDate(new Date(2026, 6, 20))
+      dateInput.setDate(new Date(2026, 6, 20), true)
+
+      expect(dates).toEqual([])
+
+      dateInput.setDate(new Date(2026, 6, 14), true)
+
+      expect(dates).toEqual([14])
+    })
+
+    it('should report a change the user makes against a date a dateChange listener gave', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+      const dates = []
+      dateInput._element.addEventListener('dateChange.coreui.date-input', event => {
+        dates.push(event.date.getDate())
+
+        if (event.date.getDate() === 15) {
+          dateInput.setDate(new Date(2026, 6, 20))
+        }
+      })
+
+      day.focus()
+      pressKey(day, 'ArrowUp')
+      dateInput.setDate(new Date(2026, 6, 15), true)
+
+      expect(dates).toEqual([15, 15])
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 20))
+    })
+
+    it('should report the error of a refused setDate, but not the date', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14), maxDate: new Date(2026, 6, 14) })
+      const log = []
+      dateInput._element.addEventListener('dateChange.coreui.date-input', () => log.push('date'))
+      dateInput._element.addEventListener('errorChange.coreui.date-input', event => log.push(event.error))
+
+      dateInput.setDate(new Date(2026, 6, 20))
+
+      expect(dateInput.getDate()).toBeNull()
+      expect(log).toEqual(['maxDate'])
+    })
+
+    it('should write and take back the disabled state on the same sections', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const sections = [...getSections(dateInput._element)]
+      const textarea = dateInput._element.querySelector('textarea')
+
+      dateInput.disable()
+
+      expect(dateInput._element).toHaveClass('disabled')
+      expect(textarea.disabled).toBeTrue()
+      for (const [index, section] of getSections(dateInput._element).entries()) {
+        expect(section).toBe(sections[index])
+        expect(section.getAttribute('aria-disabled')).toEqual('true')
+        expect(section.hasAttribute('contenteditable')).toBeFalse()
+        expect(section.tabIndex).toEqual(-1)
+      }
+
+      dateInput.enable()
+
+      for (const [index, section] of getSections(dateInput._element).entries()) {
+        expect(section).toBe(sections[index])
+      }
+
+      expect(dateInput._element).not.toHaveClass('disabled')
+      expect(textarea.disabled).toBeFalse()
+      expect(sections.map(section => section.getAttribute('contenteditable'))).toEqual(['true', 'true', 'true'])
+      expect(sections.some(section => section.hasAttribute('aria-disabled'))).toBeFalse()
+      expect(sections.map(section => section.tabIndex)).toEqual([0, -1, -1])
+    })
+
+    it('should ignore a click and a key on the sections once disable() runs', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+
+      dateInput.disable()
+      dateInput._element.click()
+      pressKey(day, 'ArrowUp')
+      const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+      day.dispatchEvent(mousedown)
+
+      expect(document.activeElement).not.toBe(day)
+      expect(mousedown.defaultPrevented).toBeFalse()
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should take the focus off a section on disable(), and start a new entry after enable()', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+      const events = []
+      for (const type of ['input', 'change', 'dateChange.coreui.date-input']) {
+        dateInput._element.addEventListener(type, () => events.push(type))
+      }
+
+      day.focus()
+      pressKey(day, '1')
+      dateInput.disable()
+
+      expect(dateInput._element.contains(document.activeElement)).toBeFalse()
+
+      dateInput.enable()
+      day.focus()
+      pressKey(day, '5')
+
+      expect(day.textContent).toEqual('05')
+      expect(events.at(-1)).toEqual('dateChange.coreui.date-input')
+    })
+
+    it('should fire no change event from disable() over a draft the field would normalize', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, '0')
+
+      const events = []
+      for (const type of ['input', 'change', 'dateChange.coreui.date-input']) {
+        dateInput._element.addEventListener(type, () => events.push(type))
+      }
+
+      dateInput.disable()
+
+      expect(dateInput._element.contains(document.activeElement)).toBeFalse()
+      expect(events).toEqual([])
+    })
+
+    it('should fire the native input and change of the value field from setDate(date, true)', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const textarea = dateInput._element.querySelector('textarea')
+      const events = []
+      textarea.addEventListener('input', () => events.push(`input:${textarea.value}`))
+      textarea.addEventListener('change', () => events.push(`change:${textarea.value}`))
+
+      dateInput.setDate(new Date(2026, 6, 20), true)
+
+      expect(events).toEqual(['input:20.07.2026', 'change:20.07.2026'])
+    })
+
+    it('should fire change once when an input listener corrects the date through setDate(date, true)', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+      const textarea = dateInput._element.querySelector('textarea')
+      const changes = []
+
+      textarea.addEventListener('input', () => {
+        if (dateInput.getDate().getDate() === 15) {
+          dateInput.setDate(new Date(2026, 6, 20), true)
+        }
+      })
+      textarea.addEventListener('change', () => changes.push(textarea.value))
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(changes).toEqual(['20.07.2026'])
+    })
+
+    it('should keep the user\'s change when an input listener commits the same value again', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+      const textarea = dateInput._element.querySelector('textarea')
+      const changes = []
+
+      textarea.addEventListener('input', () => {
+        dateInput.setDate(dateInput.getDate(), true)
+      }, { once: true })
+      textarea.addEventListener('change', () => changes.push(textarea.value))
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(changes).toEqual(['15.07.2026'])
+    })
+
+    it('should keep the tab stop on the section that holds the focus when enable() runs', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const sections = [...getSections(dateInput._element)]
+
+      dateInput.disable()
+      sections[2].focus()
+      dateInput.enable()
+
+      expect(document.activeElement).toBe(sections[2])
+      expect(sections.map(section => section.tabIndex)).toEqual([-1, -1, 0])
+    })
+
+    it('should drop a draft when setDate writes the field', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, '1')
+      dateInput.setDate(new Date(2026, 6, 20))
+      pressKey(day, '5')
+
+      expect(day.textContent).toEqual('05')
+    })
+
+    it('should fire change once with the date an input listener sets through setDate during the user\'s change', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+      const textarea = dateInput._element.querySelector('textarea')
+      const log = []
+
+      textarea.addEventListener('input', () => {
+        if (dateInput.getDate().getDate() === 15) {
+          dateInput.setDate(new Date(2026, 6, 20))
+        }
+      })
+      textarea.addEventListener('change', () => log.push(`change:${textarea.value}`))
+      dateInput._element.addEventListener('dateChange.coreui.date-input', event => log.push(`date:${event.date.getDate()}`))
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(log).toEqual(['change:20.07.2026', 'date:20'])
+    })
+
+    it('should report the date before the error an input listener causes through setDate during the user\'s change', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14), maxDate: new Date(2026, 6, 15) })
+      const [day] = getSections(dateInput._element)
+      const log = []
+
+      dateInput._element.querySelector('textarea').addEventListener('input', () => {
+        if (dateInput.getDate()?.getDate() === 15) {
+          dateInput.setDate(new Date(2026, 6, 20))
+        }
+      })
+      dateInput._element.addEventListener('dateChange.coreui.date-input', event => log.push(`date:${event.date}`))
+      dateInput._element.addEventListener('errorChange.coreui.date-input', event => log.push(`error:${event.error}`))
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(log).toEqual(['date:null', 'error:maxDate'])
+    })
+
+    it('should block the submit once enable() runs on a field built disabled and invalid, and stop again on disable()', () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const dateInput = new DateInput(form.querySelector('div'), { disabled: true, validationState: 'invalid' })
+
+      expect(form.checkValidity()).toBeTrue()
+
+      dateInput.enable()
+
+      expect(form.checkValidity()).toBeFalse()
+
+      dateInput.disable()
+
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should go back to the start date on a form reset after setDate, and report it', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const dateInput = new DateInput(form.querySelector('div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
+      const dates = []
+      dateInput._element.addEventListener('dateChange.coreui.date-input', event => dates.push(event.date.getDate()))
+
+      dateInput.setDate(new Date(2026, 6, 20))
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+      expect(dates).toEqual([14])
+    })
+
+    it('should reject a date of the wrong type with the option error', () => {
+      const dateInput = createDateInput()
+
+      expect(() => dateInput.setDate(true)).toThrow('DATE-INPUT: Option "date" provided type "boolean" but expected type "(date|number|string|null)".')
+    })
+
     it('should show a date given to setDate in the format the field was built with', () => {
       const dateInput = createDateInput({ format: 'yyyy-MM-dd' })
 

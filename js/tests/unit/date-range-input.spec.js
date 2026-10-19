@@ -356,7 +356,7 @@ describe('DateRangeInput', () => {
       const seen = []
       root().addEventListener('endDateChange.coreui.date-range-input', event => seen.push(event))
 
-      range._endInput.setDate(new Date(2026, 6, 20))
+      range._endInput.setDate(new Date(2026, 6, 20), true)
 
       expect(range.getEndDate()).toEqual(new Date(2026, 6, 20))
       expect(range.getStartDate()).toEqual(new Date(2026, 6, 14))
@@ -383,7 +383,7 @@ describe('DateRangeInput', () => {
       expect(() => range.setRange(undefined, null)).toThrowError(TypeError)
 
       range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
-      range._endInput.setDate(new Date(2026, 6, 21))
+      range._endInput.setDate(new Date(2026, 6, 21), true)
 
       expect(seen).toEqual([
         ['startDateChange', new Date(2026, 6, 14)],
@@ -416,7 +416,7 @@ describe('DateRangeInput', () => {
       expect(() => range.setRange(new Date(2026, 6, 14))).toThrowError(TypeError)
       expect(hiddenInputs().map(input => input.value)).toEqual(['', ''])
 
-      range._endInput.setDate(new Date(2026, 6, 20))
+      range._endInput.setDate(new Date(2026, 6, 20), true)
 
       expect(range.getStartDate()).toBeNull()
       expect(seen).toEqual([['endDateChange', new Date(2026, 6, 20)]])

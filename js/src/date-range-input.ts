@@ -501,11 +501,11 @@ class DateRangeInput extends BaseComponent {
 
     try {
       if (startDate !== undefined) {
-        this._startInput.setDate(startDate)
+        this._startInput.setDate(startDate, true)
       }
 
       if (generation === this._generation && endDate !== undefined) {
-        this._endInput.setDate(endDate)
+        this._endInput.setDate(endDate, true)
       }
 
       if (this._element) {

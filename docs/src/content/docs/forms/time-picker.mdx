@@ -280,7 +280,7 @@ picker itself.
 | `now` | Sets the current time. |
 | `reset` | Restores the initial value. |
 | `setValidationState(state)` | Gives the picker a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
-| `setTime` | Sets the value. Emits `timeChange` when the value changes. |
+| `setTime` | Sets the value without firing `timeChange`. The open panel follows it. |
 | `show` / `hide` / `toggle` | Popup control. |
 
 #### Slot context
@@ -302,7 +302,7 @@ context.disabled         // disabled state
 | Event | Description |
 | --- | --- |
 | `show/shown/hide/hidden.coreui.time-picker` | Popup lifecycle. `shown` and `hidden` fire once the popup's transition has ended; `shown` is skipped when the popup closes first, `hidden` when it reopens first. |
-| `timeChange.coreui.time-picker` | Fired once when the value changes, whether from the field, the panel or a method. `event.time` is the value the field accepted, the same as `getTime()`, or `null` when it refused the time. |
+| `timeChange.coreui.time-picker` | Fired once when the value changes, whether from the field, the panel or an action such as `now()`; `setTime()` does not fire it. `event.time` is the value the field accepted, the same as `getTime()`, or `null` when it refused the time. |
 
 `timeChange.coreui.time-picker` fires before the field's `errorChange.coreui.time-input` for the same change, so a time an `errorChange` listener sets replaces the one just reported.
 

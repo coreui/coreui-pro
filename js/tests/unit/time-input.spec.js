@@ -78,6 +78,21 @@ describe('TimeInput', () => {
     })
   })
 
+  describe('setters', () => {
+    it('should take a time from setDate without timeChange', () => {
+      const timeInput = createTimeInput({ date: '10:30' })
+      const events = []
+      for (const type of ['input', 'change', 'timeChange.coreui.time-input']) {
+        timeInput._element.addEventListener(type, () => events.push(type))
+      }
+
+      timeInput.setDate('14:45')
+
+      expect([...getSections(timeInput._element)].map(section => section.textContent)).toEqual(['14', '45'])
+      expect(events).toEqual([])
+    })
+  })
+
   describe('DATA_KEY', () => {
     it('should return plugin data key', () => {
       expect(TimeInput.DATA_KEY).toEqual('coreui.time-input')

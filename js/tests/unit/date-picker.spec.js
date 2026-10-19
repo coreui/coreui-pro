@@ -74,7 +74,7 @@ describe('DatePicker', () => {
       picker.hide()
 
       // the same path a typed value takes: the field validates and emits
-      picker._input.setDate('2026-08-20')
+      picker._input.setDate('2026-08-20', true)
 
       picker.show()
 
@@ -784,13 +784,13 @@ describe('DatePicker', () => {
       expect(picker.getDate()).toEqual(new Date(2026, 6, 20))
       expect(picker._calendar._startDate).toEqual(new Date(2026, 6, 20))
 
-      picker.setDate(new Date(2026, 6, 20))
+      picker.getContext().setDate(new Date(2026, 6, 20))
       expect(emitted.length).toBe(1)
 
       picker.setDate(new Date(2026, 6, 21))
       expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('07/21/2026')
       expect(picker._calendar._startDate).toEqual(new Date(2026, 6, 21))
-      expect(emitted.length).toBe(2)
+      expect(emitted.length).toBe(1)
     })
   })
 
@@ -820,7 +820,56 @@ describe('DatePicker', () => {
   })
 
   describe('dateChange payload', () => {
-    it('should report the date before the field error, from the keyboard and from setDate', () => {
+    it('should report reset() and today() as changes', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14) })
+      const emitted = []
+      fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.date))
+
+      picker.setDate(new Date(2026, 6, 20))
+      picker.reset()
+      picker.today()
+
+      expect(emitted.length).toBe(2)
+      expect(emitted[0]).toEqual(new Date(2026, 6, 14))
+      expect(emitted[1]).toEqual(picker.getDate())
+    })
+
+    it('should report the date before the field error on a write of its own', () => {
+      const max = new Date(2026, 6, 14)
+      const picker = buildPicker({ date: max, format: 'dd.MM.yyyy', maxDate: max })
+      const el = fixtureEl.querySelector('#picker')
+      const log = []
+
+      el.addEventListener('dateChange.coreui.date-picker', event => log.push(`date:${event.date}`))
+      el.addEventListener('errorChange.coreui.date-input', event => log.push(`error:${event.error}`))
+      picker.getContext().setDate(new Date(2026, 6, 20))
+
+      expect(log).toEqual(['date:null', 'error:maxDate'])
+    })
+
+    it('should reject a date of the wrong type with its own option error', () => {
+      const picker = buildPicker()
+
+      expect(() => picker.setDate(0)).toThrow('DATE-PICKER: Option "date" provided type "number" but expected type "(date|string|null)".')
+    })
+
+    it('should show a date setDate gives in the open calendar and the toggle name, without an event', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' })
+      const el = fixtureEl.querySelector('#picker')
+      const events = []
+      for (const type of ['input', 'change', 'dateChange.coreui.date-input', 'dateChange.coreui.date-picker']) {
+        el.addEventListener(type, () => events.push(type))
+      }
+
+      picker.show()
+      picker.setDate(new Date(2026, 8, 3))
+
+      expect(fixtureEl.querySelector('.date-picker-popup .calendar-cell.selected').textContent.trim()).toEqual('3')
+      expect(fixtureEl.querySelector('[aria-haspopup]').getAttribute('aria-label')).toEqual('Toggle calendar, Thursday, September 3, 2026')
+      expect(events).toEqual([])
+    })
+
+    it('should report the date before the field error from the keyboard, and only the error from setDate', () => {
       const max = new Date(2026, 6, 14)
       const picker = buildPicker({ date: max, format: 'dd.MM.yyyy', maxDate: max })
       const el = fixtureEl.querySelector('#picker')
@@ -834,7 +883,7 @@ describe('DatePicker', () => {
       picker.setDate(max)
       picker.setDate(new Date(2026, 6, 20))
 
-      expect(log).toEqual(['date:null', 'error:maxDate', 'date:14', 'error:null', 'date:null', 'error:maxDate'])
+      expect(log).toEqual(['date:null', 'error:maxDate', 'error:null', 'error:maxDate'])
     })
 
     it('should show in the time panel a date a dateChange listener sets during a panel pick', () => {
@@ -852,12 +901,27 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('select.date-picker-time-select.minutes').value).toEqual('15')
     })
 
-    it('should show in the calendar a date the field takes from a listener during a calendar pick', () => {
+    it('should show in the time panel a time the field takes from a listener during a panel pick', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14, 10, 0), locale: 'en-GB', timepicker: true })
+
+      fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-input', event => {
+        if (event.date?.getMinutes() === 30) {
+          DateInput.getInstance(event.target).setDate(new Date(2026, 6, 14, 8, 15))
+        }
+      })
+      picker.show()
+      pickMinutes(30)
+
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 14, 8, 15))
+      expect(fixtureEl.querySelector('select.date-picker-time-select.minutes').value).toEqual('15')
+    })
+
+    it('should show in the calendar a date a listener sets through setDate during a calendar pick', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US', timepicker: true })
 
       fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-input', event => {
         if (event.date && event.date.getDate() !== 3) {
-          DateInput.getInstance(event.target).setDate(new Date(2026, 6, 3, event.date.getHours()))
+          picker.setDate(new Date(2026, 6, 3, event.date.getHours()))
         }
       })
       picker.show();
@@ -892,12 +956,12 @@ describe('DatePicker', () => {
         selected.push(fixtureEl.querySelector('.date-picker-popup .calendar-cell.selected').textContent.trim())
       })
       picker.show()
-      picker.setDate(new Date(2026, 6, 20))
+      picker.getContext().setDate(new Date(2026, 6, 20))
 
       expect(selected).toEqual(['20'])
     })
 
-    it('should keep a date an errorChange listener sets while setDate runs', () => {
+    it('should keep a date an errorChange listener sets while setDate runs, without an event', () => {
       const max = new Date(2026, 6, 14)
       const picker = buildPicker({ date: max, format: 'dd.MM.yyyy', maxDate: max })
       const el = fixtureEl.querySelector('#picker')
@@ -913,7 +977,7 @@ describe('DatePicker', () => {
 
       expect(picker.getDate()).toEqual(max)
       expect([...el.querySelectorAll('.form-date-time-section')].map(section => section.textContent)).toEqual(['14', '07', '2026'])
-      expect(emitted).toEqual([null, max])
+      expect(emitted).toEqual([])
     })
 
     it('should carry the same shape whether the day comes from the calendar or the field', () => {
@@ -924,7 +988,7 @@ describe('DatePicker', () => {
 
       picker.show()
       fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-selectable]').click()
-      picker.setDate(new Date(2026, 6, 20))
+      picker._input.setDate(new Date(2026, 6, 20), true)
 
       expect(emitted.length).toBe(2)
       for (const event of emitted) {
@@ -960,8 +1024,8 @@ describe('DatePicker', () => {
 
       expect(() => picker.setDate(undefined)).toThrowError(TypeError)
 
-      picker.setDate(new Date(2026, 6, 20))
-      picker._input.setDate(new Date(2026, 6, 21))
+      picker.getContext().setDate(new Date(2026, 6, 20))
+      picker._input.setDate(new Date(2026, 6, 21), true)
 
       expect(emitted).toEqual([new Date(2026, 6, 20), new Date(2026, 6, 21)])
       expect(picker.getDate()).toEqual(new Date(2026, 6, 21))
@@ -973,7 +1037,7 @@ describe('DatePicker', () => {
       const emitted = []
       el.addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.date))
 
-      picker.setDate(new Date(2026, 6, 14, 10, 30))
+      picker.getContext().setDate(new Date(2026, 6, 14, 10, 30))
 
       expect(emitted).toEqual([new Date(2026, 6, 14, 10, 30)])
     })
@@ -1575,9 +1639,8 @@ describe('DatePicker', () => {
 
       picker.setDate(new Date())
 
-      // the emitted value follows the validation outcome, not the argument
       expect(picker.getDate()).toBeNull()
-      expect(emitted).toBeNull()
+      expect(emitted).toEqual('not-fired')
       expect(el.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
     })
 
@@ -1592,7 +1655,7 @@ describe('DatePicker', () => {
       })
 
       // empty picker, argument validates to null — null to null is no change
-      picker.setDate(new Date())
+      picker.getContext().setDate(new Date())
 
       expect(picker.getDate()).toBeNull()
       expect(emitted).toEqual('not-fired')
@@ -1606,7 +1669,7 @@ describe('DatePicker', () => {
         emitted = event.date
       })
 
-      picker._input.setDate('2026-08-20')
+      picker._input.setDate('2026-08-20', true)
 
       expect(new Date(emitted).getDate()).toEqual(20)
     })
@@ -1673,7 +1736,7 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('.date-picker-popup [data-coreui-picker-action="today"]').disabled).toBeTrue()
     })
 
-    it('should emit and select a programmatic date within range', () => {
+    it('should select a programmatic date within range without an event', () => {
       const picker = buildPicker({ maxDate: new Date(2026, 6, 31) })
       const el = fixtureEl.querySelector('#picker')
       let emitted = null
@@ -1684,7 +1747,7 @@ describe('DatePicker', () => {
       picker.setDate(new Date(2026, 6, 14))
 
       expect(picker.getDate()).toEqual(new Date(2026, 6, 14))
-      expect(emitted).toEqual(new Date(2026, 6, 14))
+      expect(emitted).toBeNull()
       expect(el.querySelector('.form-date-time').classList.contains('is-invalid')).toBeFalse()
     })
   })
@@ -1755,6 +1818,19 @@ describe('DatePicker', () => {
       expect(date.getFullYear()).toEqual(today.getFullYear())
       expect(date.getMonth()).toEqual(today.getMonth())
       expect(date.getDate()).toEqual(today.getDate())
+    })
+
+    it('should keep the month the calendar shows when typing changes only the time', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14, 10, 0), locale: 'en-US', timepicker: true })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      const hour = fixtureEl.querySelector('#picker .form-date-time-section[data-coreui-section="hour"]')
+      hour.focus()
+      hour.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
+
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 14, 11, 0))
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('August 2026')
     })
 
     it('should show the date in the calendar when the context sets it again after browsing', () => {

@@ -365,6 +365,14 @@ after the option it changes:
 - **A setter takes the type of its option.** A wrong type throws the
   `TypeError` the constructor throws, and the component is left as it was;
   Autocomplete and MultiSelect skipped that check on `update()`.
+- **The date and time setters fire no change event**, since the code that
+  calls them already holds the value. `setDate()` of Date Input, Time Input and
+  Date Picker and `setTime()` of Time Picker change the value without
+  `dateChange`, `timeChange` or the native `input` and `change` of the value field;
+  `errorChange` still reports a date the field refuses. The verbs (`clear()`,
+  `reset()`, `today()`, `now()`) and what the user does fire as before.
+  `setDate(date, true)` of Date Input and Time Input fires what typing the date
+  would, for a date the user gives through another control.
 - **Other options are fixed.** A new format, size, label, icon, `name`,
   `required` or `readonly` means disposing the instance and creating a new one.
   `update()` applied some of them, such as `format` on Date Input or `size` on
@@ -1112,8 +1120,7 @@ check, radio, carousel and toggler icons already work:
   reset brings Rating and Range Slider back to the value they were created
   with, not one a later `setValue()` gave, and OTP Input's `reset()` puts back
   the code it started with, as a native reset does. A stepper keeps the
-  validation marks of a form reset a listener cancels. Date Input and Time Input
-  still fire from `setDate()`.
+  validation marks of a form reset a listener cancels.
 - **Multi Select keeps its selection through `setOptions()`**; it used to fall
   back to the options marked `selected`. A selected option that is disabled, also inside a
   disabled group, shows as a disabled chip and stays through the clear button,
@@ -1635,9 +1642,9 @@ behaviour, v5 is the reference. Mapping:
   `isDateSelectable(date)` (`isTimeSelectable` on the time picker) for
   computing it. Programmatic dates (`setDate`, actions, the initial `date`
   config) run through the same min/max validation as typed ones: out of
-  range, the field turns `is-invalid`, `errorChange` fires, and
-  `getDate()`/`dateChange` report `null`. `dateChange` on the shells always
-  carries the validated value.
+  range, the field turns `is-invalid`, `errorChange` fires, and `getDate()`
+  reports `null`. `dateChange` on the shells always carries the validated
+  value, and `setDate()` does not fire it.
 - **The calendar is built on first open, not at construction.** It accounts for
   ~83% of a date picker's DOM (and ~89% of a range picker's), and it is not
   observable before the popup opens, so the shells create it in `show()` and
@@ -1734,8 +1741,8 @@ validation and the arrow between them. Two consequences:
   pick of the value already selected, and `clear()` or `reset()` when the
   picker already holds that value, no longer fire `dateChange`,
   `startDateChange`, `endDateChange` or `timeChange`; v5 fired them on every
-  pick and on every `clear()` and `reset()`. The new `setDate()`,
-  `setRange()` and `setTime()` follow the same rule.
+  pick and on every `clear()` and `reset()`. The new `setDate()` and
+  `setTime()` fire no change event at all.
 
 - **`shown` and `hidden` on the pickers wait for the popup's transition**, like
   the modal, dialog, toast and collapse events: `shown` fires once the panel

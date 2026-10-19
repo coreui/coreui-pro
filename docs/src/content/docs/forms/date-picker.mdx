@@ -59,8 +59,9 @@ mask checks the calendar day, so `new Date()` passes with a `maxDate` of
 today, and a month, quarter or year mask checks the whole period) — and every
 programmatic date still runs through the field's
 validation: out of range, the field turns `is-invalid`, `errorChange` reports
-the reason, and `getDate()`/`dateChange` report `null`, the same outcome as
-typing that date.
+the reason, and `getDate()` reports `null`, the same outcome as typing that
+date. `setDate()` fires no `dateChange`; an action such as `today` fires it
+with `null`.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
@@ -493,7 +494,7 @@ by the picker itself.
 | `hide` | Closes the popup. |
 | `reset` | Restores the initial value. |
 | `setValidationState(state)` | Gives the picker a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
-| `setDate` | Sets the value. Emits `dateChange` when the value changes. |
+| `setDate` | Sets the value without firing `dateChange`. The open calendar, the time selection and the name of the toggle follow it. |
 | `show` | Opens the popup. |
 | `today` | Sets today's date. |
 | `toggle` | Toggles the popup. |
@@ -530,7 +531,7 @@ The field's own events (`dateChange.coreui.date-input`,
 `errorChange.coreui.date-input`) still bubble from the inner element — the shell
 does not duplicate them. `dateChange.coreui.date-picker` fires before the
 field's `errorChange` for the same change, whether it comes from the calendar,
-the field or a method, so a date an `errorChange` listener sets replaces the one
+the field or an action, so a date an `errorChange` listener sets replaces the one
 just reported.
 
 ```js
