@@ -1,4 +1,4 @@
-
+import { vi } from 'vitest'
 import PasswordInput from '../../src/password-input.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
@@ -345,27 +345,34 @@ describe('PasswordInput', () => {
       expect(fixtureEl.querySelector('.form-control-action').disabled).toBe(true)
     })
 
-    it('should not reveal a control the page disabled after init, and keep focus on its button', () => {
+    it('should disable its button once the page disables the control and the pointer comes back', () => {
       initialized('<input type="password" class="form-control" data-coreui-password-input>')
       const input = fixtureEl.querySelector('input')
       const button = fixtureEl.querySelector('.form-control-action')
 
-      button.focus()
       input.disabled = true
-      button.click()
+      input.parentElement.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
 
-      expect(input.type).toBe('password')
-      expect(document.activeElement).toBe(button)
+      expect(button.disabled).toBe(true)
     })
 
-    it('should still hide a password revealed before the page disabled the control', () => {
+    it('should disable its button when a press reaches a control the page disabled', () => {
       initialized('<input type="password" class="form-control" data-coreui-password-input>')
       const input = fixtureEl.querySelector('input')
       const button = fixtureEl.querySelector('.form-control-action')
 
-      button.click()
       input.disabled = true
-      button.click()
+      button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))
+
+      expect(button.disabled).toBe(true)
+    })
+
+    it('should not reveal a control the page disabled after init through toggle()', () => {
+      initialized('<input type="password" class="form-control" data-coreui-password-input>')
+      const input = fixtureEl.querySelector('input')
+
+      input.disabled = true
+      PasswordInput.getInstance(input).toggle()
 
       expect(input.type).toBe('password')
     })
@@ -392,6 +399,32 @@ describe('PasswordInput', () => {
       button.click()
 
       expect(input.type).toBe('text')
+    })
+
+    it('should enable its button when the pointer reaches a control the page enabled after init', () => {
+      initialized('<input type="password" class="form-control" disabled data-coreui-password-input>')
+      const input = fixtureEl.querySelector('input')
+      const button = fixtureEl.querySelector('.form-control-action')
+
+      input.disabled = false
+      input.parentElement.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+
+      expect(button.disabled).toBe(false)
+    })
+
+    it('should drop the frame listeners of an authored frame on dispose', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group"><input type="password" class="form-control" data-coreui-password-input></div>'
+      const spy = vi.spyOn(PasswordInput.prototype, '_updateDisabledState')
+      PasswordInput._initializeDataApi()
+      const group = fixtureEl.querySelector('.form-control-group')
+      const input = fixtureEl.querySelector('input')
+
+      PasswordInput.getInstance(input).dispose()
+      spy.mockClear()
+      group.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+
+      expect(spy).not.toHaveBeenCalled()
+      spy.mockRestore()
     })
 
     it('should drop the focus listener of the control on dispose', () => {
