@@ -144,11 +144,11 @@ numberInput.decrement()
 
 | Method | Description |
 | --- | --- |
-| `decrement()` | Steps the value down by one, exactly as the decrement button does. |
+| `decrement()` | Steps the value down by `step` (or by one, on a field without a numeric `step`), exactly as the decrement button does. |
 | `dispose()` | Destroys the component instance, removes the increment/decrement buttons it created, and releases the field. |
 | `getInstance(element)` | Static method that returns the instance associated with a DOM element, or `null`. |
 | `getOrCreateInstance(element, config)` | Static method that returns the instance associated with a DOM element, creating it when there is none. |
-| `increment()` | Steps the value up by one, exactly as the increment button does. |
+| `increment()` | Steps the value up by `step` (or by one, on a field without a numeric `step`), exactly as the increment button does. |
 
 ### Events
 
