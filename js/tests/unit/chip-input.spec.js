@@ -39,6 +39,15 @@ describe('ChipInput', () => {
       expect(label.hasAttribute('for')).toBeFalse()
     })
 
+    it('should keep the for a label had on dispose', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"><label class="chip-input-label" for="skills">Skills</label></div>'
+      const label = fixtureEl.querySelector('.chip-input-label')
+
+      new ChipInput(fixtureEl.querySelector('.chip-input')).dispose()
+
+      expect(label.getAttribute('for')).toEqual('skills')
+    })
+
     it('should keep a field the page wrote', () => {
       fixtureEl.innerHTML = '<div class="chip-input"><input type="text" class="chip-input-field"></div>'
       const chipInputEl = fixtureEl.querySelector('.chip-input')
@@ -78,16 +87,6 @@ describe('ChipInput', () => {
       const chipInput = new ChipInput(element) // eslint-disable-line no-unused-vars
 
       expect(element.classList.contains('form-control-group')).toBe(true)
-    })
-
-    it('should give the class back on dispose', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
-      const element = fixtureEl.querySelector('.chip-input')
-      const chipInput = new ChipInput(element)
-
-      chipInput.dispose()
-
-      expect(element.classList.contains('form-control-group')).toBe(false)
     })
 
     it('should leave a class the author wrote', () => {
@@ -454,18 +453,16 @@ describe('ChipInput', () => {
       expect(element.classList.contains('is-invalid')).toBeTrue()
     })
 
-    it('should take back on dispose the state class and an aria-required it added, and leave the chips to a later reset', async () => {
+    it('should take back on dispose the state class it added, and leave the chips to a later reset', async () => {
       fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip">one</span><input type="text" class="chip-input-field"></div></form>'
       const form = fixtureEl.querySelector('form')
       const element = fixtureEl.querySelector('.chip-input')
-      const input = element.querySelector('.chip-input-field')
       const chipInput = new ChipInput(element, { required: true, validationState: 'invalid' })
 
       chipInput.remove('one')
       chipInput.dispose()
 
       expect(element.classList.contains('is-invalid')).toBeFalse()
-      expect(input.hasAttribute('aria-required')).toBeFalse()
 
       form.reset()
       await tick()
@@ -632,21 +629,42 @@ describe('ChipInput', () => {
       disabledInput.dispose()
     })
 
-    it('should give a text field from the markup back its disabled and readonly state on dispose', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"><input type="text" class="chip-input-field" disabled readonly></div>'
+    it('should leave its state to the next instance, which writes it from its own options', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"><input type="text" class="chip-input-field"></div>'
       const el = fixtureEl.querySelector('.chip-input')
       const input = el.querySelector('input')
-      const chipInput = new ChipInput(el)
+
+      new ChipInput(el, { disabled: true, readonly: true, required: true }).dispose()
+      // eslint-disable-next-line no-new
+      new ChipInput(el)
 
       expect(input.disabled).toBeFalse()
       expect(input.readOnly).toBeFalse()
+      expect(input.hasAttribute('aria-required')).toBeFalse()
+      expect(el.classList.contains('disabled')).toBeFalse()
 
-      chipInput.dispose()
+      ChipInput.getInstance(el).dispose()
+      new ChipInput(el, { required: true }).dispose()
+      // eslint-disable-next-line no-new
+      new ChipInput(el, { create: false, required: true })
 
-      expect(input.disabled).toBeTrue()
-      expect(input.readOnly).toBeTrue()
+      expect(input.hasAttribute('aria-required')).toBeFalse()
     })
 
+    it('should make its selectable chips toggle buttons with a named remove button', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"><span class="chip">Design</span><span class="chip" data-coreui-selected="true">QA</span></div>'
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el, { selectable: true })
+      const [design, qa] = el.querySelectorAll('.chip')
+
+      expect(el.hasAttribute('role')).toBeFalse()
+      expect(design.getAttribute('role')).toEqual('button')
+      expect(design.getAttribute('aria-pressed')).toEqual('false')
+      expect(design.hasAttribute('aria-selected')).toBeFalse()
+      expect(design.querySelector('button.chip-remove').getAttribute('aria-label')).toContain('Design')
+      expect(qa.getAttribute('aria-pressed')).toEqual('true')
+      expect(chipInput.getSelectedValues()).toEqual(['QA'])
+    })
     it('should leave the disabled state to the option, not a class in the markup', () => {
       fixtureEl.innerHTML = '<div class="chip-input disabled"></div>'
 
@@ -655,10 +673,6 @@ describe('ChipInput', () => {
 
       expect(chipInput._disabled).toBeFalse()
       expect(el.classList.contains('disabled')).toBeFalse()
-
-      chipInput.dispose()
-
-      expect(el.classList.contains('disabled')).toBeTrue()
     })
 
     it('should initialize as readonly via config', () => {
@@ -1653,19 +1667,6 @@ describe('ChipInput', () => {
   })
 
   describe('dispose', () => {
-    it('should leave no class attribute on an element that had none, and keep a disabled class the page wrote', () => {
-      fixtureEl.innerHTML = '<div id="bare"></div><div id="marked" class="disabled"></div>'
-      const bare = fixtureEl.querySelector('#bare')
-      const marked = fixtureEl.querySelector('#marked')
-
-      for (const element of [bare, marked]) {
-        new ChipInput(element, { disabled: true, validationState: 'invalid' }).dispose()
-      }
-
-      expect(bare.hasAttribute('class')).toBeFalse()
-      expect(marked.getAttribute('class')).toEqual('disabled')
-    })
-
     it('should dispose a chip-input instance', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 

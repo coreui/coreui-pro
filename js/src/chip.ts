@@ -10,9 +10,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
-import {
-  captureHostClasses, defineJQueryPlugin, type HostClasses, jQueryDispatch, restoreHostClasses
-} from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch, writeAttribute } from './util/index.js'
 
 /**
  * Constants
@@ -41,9 +39,6 @@ const CLASS_NAME_CHIP_CLICKABLE = 'chip-clickable'
 const CLASS_NAME_CHIP_REMOVE = 'chip-remove'
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_DISABLED = 'disabled'
-
-const HOST_ATTRIBUTES = ['aria-disabled', 'aria-pressed', 'aria-selected', 'role', 'tabindex']
-const HOST_CLASS_NAMES = [CLASS_NAME_CHIP_CLICKABLE, CLASS_NAME_DISABLED]
 
 type ChipConfig = {
   allowList: SanitizerAllowList
@@ -94,28 +89,21 @@ const DefaultType = {
 class Chip extends BaseComponent {
   protected declare _checkIcon: HTMLElement | null
   protected declare _disabled: any
-  protected declare _hostAttributes: Map<string, string | null>
-  protected declare _hostClasses: HostClasses
   protected declare _removeControl: HTMLElement | null
   protected declare _selected: any
 
   constructor(element?: string | Element | null, config?: Partial<ChipConfig> | null) {
     super(element, config)
 
-    this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
-    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._checkIcon = null
     this._disabled = this._config.disabled
     this._removeControl = null
-    this._selected = this._config.selected || this._element.classList.contains(CLASS_NAME_ACTIVE)
+    this._selected = this._config.selected
 
     this._applyRole()
     this._ensureRemoveControl()
     this._applyState()
-
-    if (this._config.selectable || this._config.removable) {
-      this._makeFocusable()
-    }
+    this._makeFocusable()
 
     this._addEventListeners()
   }
@@ -205,16 +193,6 @@ class Chip extends BaseComponent {
     this._checkIcon?.remove()
     this._removeControl?.remove()
 
-    for (const [name, value] of this._hostAttributes) {
-      if (value === null) {
-        this._element.removeAttribute(name)
-      } else {
-        this._element.setAttribute(name, value)
-      }
-    }
-
-    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
-
     super.dispose()
   }
 
@@ -260,60 +238,37 @@ class Chip extends BaseComponent {
   // selectable chip set the set stamps role="option" (listbox pattern) before
   // initializing the chip; a standalone selectable chip is a toggle button.
   _applyRole(): void {
-    if (this._config.selectable && !this._element.hasAttribute('role')) {
-      this._element.setAttribute('role', 'button')
-    }
-  }
+    const option = this._element.getAttribute('role') === 'option'
 
-  // aria-selected is only valid on role="option"; a toggle button reflects its
-  // state via aria-pressed instead.
-  _selectionStateAttribute(): string {
-    return this._element.getAttribute('role') === 'option' ? 'aria-selected' : 'aria-pressed'
+    writeAttribute(this._element, 'role', option ? 'option' : (this._config.selectable ? 'button' : null))
   }
 
   _applyState(): void {
-    if (!this._disabled && (this._config.clickable || this._config.selectable)) {
-      this._element.classList.add(CLASS_NAME_CHIP_CLICKABLE)
-    }
+    this._element.classList.toggle(CLASS_NAME_CHIP_CLICKABLE, !this._disabled && (this._config.clickable || this._config.selectable))
 
     this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
 
     // aria-disabled is not allowed on a generic element — only stamp it when
     // the chip carries a role; a role-less chip conveys the state through the
     // disabled class and the removed interactivity.
-    const hasRole = this._element.hasAttribute('role')
-
-    if (this._disabled) {
-      if (hasRole) {
-        this._element.setAttribute('aria-disabled', 'true')
-      } else {
-        this._element.removeAttribute('aria-disabled')
-      }
-    } else if (this._element.hasAttribute('aria-disabled')) {
-      if (hasRole) {
-        this._element.setAttribute('aria-disabled', 'false')
-      } else {
-        this._element.removeAttribute('aria-disabled')
-      }
+    if (this._disabled && this._element.hasAttribute('role')) {
+      this._element.setAttribute('aria-disabled', 'true')
+    } else {
+      this._element.removeAttribute('aria-disabled')
     }
 
-    if (this._config.selectable) {
-      this._element.classList.toggle(CLASS_NAME_ACTIVE, this._selected)
-      this._element.setAttribute(this._selectionStateAttribute(), this._selected ? 'true' : 'false')
+    const selected = this._config.selectable && this._selected
+    const option = this._element.getAttribute('role') === 'option'
 
-      if (this._config.filter) {
-        if (this._selected) {
-          this._ensureCheckIcon()
-        } else {
-          SelectorEngine.findOne(SELECTOR_CHIP_CHECK, this._element)?.remove()
-        }
-      }
-    } else {
-      this._element.classList.remove(CLASS_NAME_ACTIVE)
-      if (this._element.getAttribute('role') === 'option') {
-        this._element.setAttribute('aria-selected', 'false')
+    this._element.classList.toggle(CLASS_NAME_ACTIVE, selected)
+    writeAttribute(this._element, 'aria-selected', option ? String(selected) : null)
+    writeAttribute(this._element, 'aria-pressed', !option && this._config.selectable ? String(selected) : null)
+
+    if (this._config.filter) {
+      if (selected) {
+        this._ensureCheckIcon()
       } else {
-        this._element.removeAttribute('aria-selected')
+        SelectorEngine.findOne(SELECTOR_CHIP_CHECK, this._element)?.remove()
       }
     }
   }
@@ -364,11 +319,7 @@ class Chip extends BaseComponent {
   }
 
   _makeFocusable(): void {
-    if (this._element.hasAttribute('tabindex') || this._disabled) {
-      return
-    }
-
-    this._element.setAttribute('tabindex', '0')
+    writeAttribute(this._element, 'tabindex', !this._disabled && (this._config.selectable || this._config.removable) ? '0' : null)
   }
 
   _handleKeydown(event: any): void {

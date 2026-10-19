@@ -247,7 +247,9 @@ const DefaultType: Record<string, string> = {
 // no role (the ChipInput precedent), and MultiSelect keeps managing the chips
 // itself: Chip.getOrCreateInstance makes both sides meet on one instance.
 class MultiSelectChipSet extends ChipSet {
-  override _applyAccessibilityRoles(): void {}
+  override _containerRole(): null {
+    return null
+  }
 }
 
 class MultiSelect extends ComboboxBase {

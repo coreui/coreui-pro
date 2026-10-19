@@ -2738,6 +2738,16 @@ field behind that kept submitting.
 
 #### Chip / Chip set / Chip input
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span> **A chip starts selected only
+  from the `selected` option.** An `active` class in the markup no longer selects
+  it; write `data-coreui-selected="true"` on the chip instead. The role,
+  `tabindex` and `aria-*` a chip or a chip set writes come from its options too,
+  so a role or `tabindex` in the markup is replaced rather than kept, and
+  `dispose()` leaves them in place for the next instance to rewrite.
+- **A chip set is one tab stop.** The set keeps `tabindex="0"` on one chip and
+  `-1` on the others and moves it with the focus, so <kbd>Tab</kbd> enters and
+  leaves the set once and the arrow keys move between the chips. Every
+  interactive chip used to be a tab stop of its own.
 - **Chips expose real roles now.** A selectable chip set is a horizontal
   `role="listbox"` (with `aria-multiselectable` in multiple mode) whose chips
   are `role="option"` elements carrying `aria-selected`; a standalone

@@ -12,13 +12,13 @@ import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
 import { type ChipAnnouncement, getChipAnnouncement, resolveChipClassName } from './util/chip-values.js'
-import { containsFocus } from './util/focus.js'
+import { containsFocus, focusWithTemporaryTabindex } from './util/focus.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
   createTypeaheadBuffer, findTypeaheadMatch, getRemovalNeighbor, rangeBetween, type TypeaheadBuffer
 } from './util/list-navigation.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
+  defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
 } from './util/index.js'
 
 /**
@@ -34,8 +34,8 @@ const EVENT_ADD = 'add'
 const EVENT_REMOVE = 'remove'
 const EVENT_CHANGE = 'change'
 const EVENT_SELECT = 'select'
-const EVENT_BLUR = 'blur'
 const EVENT_CLICK = 'click'
+const EVENT_FOCUSIN = 'focusin'
 const EVENT_KEYDOWN = 'keydown'
 
 const A_KEY = 'a'
@@ -57,8 +57,6 @@ const SELECTOR_FOCUSABLE_ITEMS = '.chip:not(.disabled)'
 
 const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_DISABLED = 'disabled'
-
-const HOST_ATTRIBUTES = ['aria-multiselectable', 'aria-orientation', 'role']
 
 const SELECTION_MODE_SINGLE = 'single'
 
@@ -118,11 +116,9 @@ const DefaultType: Record<string, string> = {
  */
 
 class ChipSet extends BaseComponent {
-  protected declare _addedAttributes: string[]
   protected declare _disabled: boolean
   protected declare _pendingFocus: HTMLElement | null
   protected declare _chips: string[]
-  protected declare _optionChips: Set<HTMLElement>
   protected declare _ownedChips: Map<HTMLElement, Chip>
   protected declare _input: HTMLElement | null
   protected declare _anchor: HTMLElement | null
@@ -134,11 +130,9 @@ class ChipSet extends BaseComponent {
   constructor(element?: string | Element | null, config?: Partial<ChipSetConfig> | null) {
     super(element, config)
 
-    this._addedAttributes = HOST_ATTRIBUTES.filter(name => !this._element.hasAttribute(name))
     this._disabled = this._config.disabled
     this._pendingFocus = null
     this._chips = []
-    this._optionChips = new Set()
     this._ownedChips = new Map()
     this._anchor = null
     this._typeaheadBuffer = createTypeaheadBuffer()
@@ -148,6 +142,7 @@ class ChipSet extends BaseComponent {
 
     this._applyAccessibilityRoles()
     this._initChips()
+    this._moveTabStop()
     this._addEventListeners()
     queueMicrotask(() => {
       this._settled = true
@@ -200,6 +195,7 @@ class ChipSet extends BaseComponent {
     const element = isElement ? chip : this._createChip(value)
     this._appendChip(element)
     this._setupChip(element)
+    this._moveTabStop()
     this._noteChange()
     this._chips.push(value)
 
@@ -313,14 +309,10 @@ class ChipSet extends BaseComponent {
       }
     }
 
-    for (const chip of this._optionChips) {
-      if (this._element.contains(chip)) {
+    if (this._containerRole() === 'listbox') {
+      for (const chip of this._getChipElements()) {
         chip.removeAttribute('role')
       }
-    }
-
-    for (const name of this._addedAttributes) {
-      this._element.removeAttribute(name)
     }
 
     this._typeaheadBuffer.clear()
@@ -392,17 +384,30 @@ class ChipSet extends BaseComponent {
   // listbox role and each chip becomes an option, so the chips' selection and
   // disabled states are expressed on roles that allow them. A non-selectable
   // set is a plain group (which also legitimizes the documented aria-label).
+  _containerRole(): string | null {
+    return this._config.selectable ? 'listbox' : 'group'
+  }
+
   _applyAccessibilityRoles(): void {
-    if (!this._element.hasAttribute('role')) {
-      this._element.setAttribute('role', this._config.selectable ? 'listbox' : 'group')
+    const role = this._containerRole()
+
+    if (!role) {
+      return
     }
 
-    if (this._config.selectable && this._element.getAttribute('role') === 'listbox') {
-      this._element.setAttribute('aria-orientation', 'horizontal')
+    const listbox = role === 'listbox'
 
-      if (this._config.selectionMode === 'multiple') {
-        this._element.setAttribute('aria-multiselectable', 'true')
-      }
+    this._element.setAttribute('role', role)
+    writeAttribute(this._element, 'aria-orientation', listbox ? 'horizontal' : null)
+    writeAttribute(this._element, 'aria-multiselectable', listbox && this._config.selectionMode === 'multiple' ? 'true' : null)
+  }
+
+  _moveTabStop(stop: HTMLElement | null = null): void {
+    const chips = this._getFocusableChips().filter(chip => chip.hasAttribute('tabindex'))
+    const current = stop ?? chips.find(chip => chip.tabIndex === 0) ?? chips[0]
+
+    for (const chip of chips) {
+      chip.tabIndex = chip === current ? 0 : -1
     }
   }
 
@@ -437,12 +442,11 @@ class ChipSet extends BaseComponent {
   }
 
   _setupChip(chip: HTMLElement): void {
-    if (this._element.getAttribute('role') === 'listbox' && !chip.hasAttribute('role')) {
-      chip.setAttribute('role', 'option')
-      this._optionChips.add(chip)
-    }
-
     if (!Chip.getInstance(chip)) {
+      if (this._containerRole() === 'listbox') {
+        chip.setAttribute('role', 'option')
+      }
+
       this._ownedChips.set(chip, new Chip(chip, this._getChipConfig(chip)))
     }
   }
@@ -482,6 +486,7 @@ class ChipSet extends BaseComponent {
   _addEventListeners(): void {
     EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN), SELECTOR_CHIP, event => this._handleKeydown(event))
     EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), SELECTOR_CHIP, event => this._handleClick(event))
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN), SELECTOR_CHIP, event => this._moveTabStop(event.delegateTarget))
 
     EventHandler.on(this._element, EVENT_CHIP_SELECTED, SELECTOR_CHIP, event => this._handleSelectionChange(event))
     EventHandler.on(this._element, EVENT_CHIP_DESELECTED, SELECTOR_CHIP, event => this._handleSelectionChange(event))
@@ -648,7 +653,7 @@ class ChipSet extends BaseComponent {
 
     if (target && containsFocus(chip)) {
       if (target === this._element) {
-        this._focusSet()
+        focusWithTemporaryTabindex(this._element)
       } else {
         target.focus()
       }
@@ -657,32 +662,9 @@ class ChipSet extends BaseComponent {
     this._handleChipRemoval(chip as HTMLElement, this._getChipValue(chip as HTMLElement))
   }
 
-  _focusSet(): void {
-    if (this._element.hasAttribute('tabindex')) {
-      this._element.focus()
-      return
-    }
-
-    this._element.setAttribute('tabindex', '-1')
-    this._addedAttributes.push('tabindex')
-    EventHandler.on(this._element, this.constructor.eventName(EVENT_BLUR), () => this._releaseSetTabindex())
-    this._element.focus()
-    this._releaseSetTabindex()
-  }
-
-  _releaseSetTabindex(): void {
-    if ((this._element.getRootNode() as Document | ShadowRoot).activeElement === this._element) {
-      return
-    }
-
-    EventHandler.off(this._element, this.constructor.eventName(EVENT_BLUR))
-    this._element.removeAttribute('tabindex')
-    this._addedAttributes = this._addedAttributes.filter(name => name !== 'tabindex')
-  }
-
   _handleChipRemoval(chip: HTMLElement, value: string): void {
-    this._optionChips.delete(chip)
     this._ownedChips.delete(chip)
+    this._moveTabStop()
 
     const index = this._chips.indexOf(value)
     if (index !== -1) {

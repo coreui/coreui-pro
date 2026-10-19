@@ -68,19 +68,18 @@ describe('Chip', () => {
 
       expect(chip._disabled).toBeFalse()
       expect(chipEl.classList.contains('disabled')).toBeFalse()
-
-      chip.dispose()
-
-      expect(chipEl.classList.contains('disabled')).toBeTrue()
     })
 
-    it('should initialize with active class on element as selected', () => {
-      fixtureEl.innerHTML = '<span class="chip active">Tag</span>'
+    it('should take the initial selection from the selected option, not an active class in the markup', () => {
+      fixtureEl.innerHTML = '<span class="chip active">Tag</span><span class="chip" data-coreui-selected="true">Tag</span>'
 
-      const chipEl = fixtureEl.querySelector('.chip')
-      const chip = new Chip(chipEl, { selectable: true })
+      const [fromClass, fromOption] = fixtureEl.querySelectorAll('.chip')
+      const classChip = new Chip(fromClass, { selectable: true })
+      const optionChip = new Chip(fromOption, { selectable: true })
 
-      expect(chip._selected).toBeTrue()
+      expect(classChip._selected).toBeFalse()
+      expect(fromClass.classList.contains('active')).toBeFalse()
+      expect(optionChip._selected).toBeTrue()
     })
 
     it('should initialize as disabled via data-coreui-config', () => {
@@ -130,14 +129,27 @@ describe('Chip', () => {
       expect(chipEl.getAttribute('tabindex')).toEqual('0')
     })
 
-    it('should not override existing tabindex', () => {
-      fixtureEl.innerHTML = '<span class="chip" tabindex="2">Tag</span>'
+    it('should write the button role of a selectable chip over a role in the markup', () => {
+      fixtureEl.innerHTML = '<span class="chip" role="link">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
       new Chip(chipEl, { selectable: true })
 
-      expect(chipEl.getAttribute('tabindex')).toEqual('2')
+      expect(chipEl.getAttribute('role')).toEqual('button')
+    })
+
+    it('should write its tabindex from its options over one in the markup', () => {
+      fixtureEl.innerHTML = '<span class="chip" tabindex="2">Tag</span><span class="chip" tabindex="0">Tag</span>'
+
+      const [focusable, disabled] = fixtureEl.querySelectorAll('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(focusable, { selectable: true })
+      // eslint-disable-next-line no-new
+      new Chip(disabled, { selectable: true, disabled: true })
+
+      expect(focusable.getAttribute('tabindex')).toEqual('0')
+      expect(disabled.hasAttribute('tabindex')).toBeFalse()
     })
 
     it('should not set tabindex when disabled', () => {
@@ -333,10 +345,10 @@ describe('Chip', () => {
     })
 
     it('should remove the check icon when a filter chip is deselected', () => {
-      fixtureEl.innerHTML = '<span class="chip active">Tag</span>'
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
-      const chip = new Chip(chipEl, { selectable: true, filter: true })
+      const chip = new Chip(chipEl, { selected: true, selectable: true, filter: true })
 
       expect(chipEl.querySelector('.chip-check')).not.toBeNull()
 
@@ -369,11 +381,13 @@ describe('Chip', () => {
     })
 
     it('should use a custom selectedIcon', () => {
-      fixtureEl.innerHTML = '<span class="chip active">Tag</span>'
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
-      new Chip(chipEl, { selectable: true, filter: true, selectedIcon: '<svg class="my-check"></svg>' })
+      new Chip(chipEl, {
+        selected: true, selectable: true, filter: true, selectedIcon: '<svg class="my-check"></svg>'
+      })
 
       expect(chipEl.querySelector('.chip-check .my-check')).not.toBeNull()
     })
@@ -393,11 +407,13 @@ describe('Chip', () => {
     })
 
     it('should strip disallowed markup from a custom selectedIcon', () => {
-      fixtureEl.innerHTML = '<span class="chip active">Tag</span>'
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
-      new Chip(chipEl, { selectable: true, filter: true, selectedIcon: '<svg><script>window.xss = true</script></svg>' })
+      new Chip(chipEl, {
+        selected: true, selectable: true, filter: true, selectedIcon: '<svg><script>window.xss = true</script></svg>'
+      })
 
       const check = chipEl.querySelector('.chip-check')
       expect(check.querySelector('script')).toBeNull()
@@ -414,11 +430,13 @@ describe('Chip', () => {
     })
 
     it('should render the default icons after sanitization', () => {
-      fixtureEl.innerHTML = '<span class="chip active">Tag</span>'
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
-      new Chip(chipEl, { removable: true, selectable: true, filter: true })
+      new Chip(chipEl, {
+        selected: true, removable: true, selectable: true, filter: true
+      })
 
       expect(chipEl.querySelector('.chip-remove svg line')).not.toBeNull()
       expect(chipEl.querySelector('.chip-check svg path')).not.toBeNull()
@@ -899,37 +917,33 @@ describe('Chip', () => {
       expect(Chip.getInstance(chipEl)).toBeNull()
     })
 
-    it('should give back the aria-disabled the markup had on dispose', () => {
-      fixtureEl.innerHTML = '<span class="chip disabled" role="button" aria-disabled="true">A</span>'
-      const chipEl = fixtureEl.querySelector('span')
-      const chip = new Chip(chipEl)
+    it('should leave its state to the next instance, which writes it from its own options', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+      const chipEl = fixtureEl.querySelector('.chip')
+      const first = new Chip(chipEl, { selectable: true })
 
-      expect(chipEl.getAttribute('aria-disabled')).toEqual('false')
+      first.select()
+      first.dispose()
 
-      chip.dispose()
+      const second = new Chip(chipEl, { selectable: true, disabled: true })
 
+      expect(second._selected).toBeFalse()
+      expect(chipEl.classList.contains('active')).toBeFalse()
+      expect(chipEl.getAttribute('aria-pressed')).toEqual('false')
       expect(chipEl.getAttribute('aria-disabled')).toEqual('true')
-      expect(chipEl.getAttribute('class')).toEqual('chip disabled')
+      expect(chipEl.hasAttribute('tabindex')).toBeFalse()
+
+      second.dispose()
+      // eslint-disable-next-line no-new
+      new Chip(chipEl)
+
+      expect(chipEl.classList.contains('disabled')).toBeFalse()
+      expect(chipEl.classList.contains('chip-clickable')).toBeFalse()
+      expect(chipEl.hasAttribute('aria-disabled')).toBeFalse()
+      expect(chipEl.hasAttribute('aria-pressed')).toBeFalse()
+      expect(chipEl.hasAttribute('role')).toBeFalse()
+      expect(chipEl.hasAttribute('tabindex')).toBeFalse()
     })
-
-    it('should take back the disabled class it added', () => {
-      fixtureEl.innerHTML = '<span>Tag</span>'
-      const chipEl = fixtureEl.querySelector('span')
-
-      new Chip(chipEl, { disabled: true }).dispose()
-
-      expect(chipEl.hasAttribute('class')).toBeFalse()
-    })
-
-    it('should leave no class attribute on an element that had none', () => {
-      fixtureEl.innerHTML = '<span>Tag</span>'
-      const chipEl = fixtureEl.querySelector('span')
-
-      new Chip(chipEl, { selectable: true }).dispose()
-
-      expect(chipEl.hasAttribute('class')).toBeFalse()
-    })
-
     it('should remove its listeners on dispose', () => {
       fixtureEl.innerHTML = '<span class="chip">Tag<button type="button" class="chip-remove"></button></span>'
 
@@ -984,34 +998,6 @@ describe('Chip', () => {
       chip.dispose()
 
       expect(chipEl.querySelector('.chip-check')).toBeNull()
-    })
-
-    it('should give back the attributes and classes it added on dispose', () => {
-      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
-
-      const chipEl = fixtureEl.querySelector('.chip')
-      new Chip(chipEl, { selectable: true }).dispose()
-
-      expect(chipEl.hasAttribute('role')).toBeFalse()
-      expect(chipEl.hasAttribute('tabindex')).toBeFalse()
-      expect(chipEl.hasAttribute('aria-pressed')).toBeFalse()
-      expect(chipEl.classList.contains('chip-clickable')).toBeFalse()
-
-      new Chip(chipEl, { disabled: true }).dispose()
-
-      expect(chipEl.classList.contains('disabled')).toBeFalse()
-    })
-
-    it('should keep the attributes and classes from the markup on dispose', () => {
-      fixtureEl.innerHTML = '<span class="chip chip-clickable" role="button" tabindex="-1" aria-pressed="false">Tag</span>'
-
-      const chipEl = fixtureEl.querySelector('.chip')
-      new Chip(chipEl, { selectable: true }).dispose()
-
-      expect(chipEl.getAttribute('role')).toEqual('button')
-      expect(chipEl.getAttribute('tabindex')).toEqual('-1')
-      expect(chipEl.getAttribute('aria-pressed')).toEqual('false')
-      expect(chipEl.classList.contains('chip-clickable')).toBeTrue()
     })
 
     it('should do nothing on a second dispose', () => {
