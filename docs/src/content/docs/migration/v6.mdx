@@ -1737,8 +1737,7 @@ validation and the arrow between them. Two consequences:
 #### Date Input / Time Input
 
 - **The `disabled` option is the only switch.** A `.disabled` class written on
-  the field does not disable it: the field sets the class from the option and
-  `dispose()` gives the markup back.
+  the field does not disable it: the field sets the class from the option.
 - **`reset()` restores the date the field was created with**, not the last one
   passed to `update()`, and emits `dateChange` when the value moves. A native
   form reset (`form.reset()`, a reset button) now resets the field too.
@@ -2135,7 +2134,7 @@ field. See [Validation](/forms/chip-input/#validation).
 
 A chip input has no control to wrap — the element *is* the frame — so it adds
 `.form-control-group` to itself rather than asking you to write both. Writing
-both still works; the component only removes on `dispose()` a class it added.
+both still works.
 
 #### Chip Input reads the group's tokens
 
@@ -2166,10 +2165,10 @@ Combobox, Autocomplete, Multi Select, Chip Input, Chip Set, Chip, Rating, Date
 Input and Time Input take their disabled state only from the `disabled` option
 (`data-coreui-disabled="true"`). A `.disabled` class in the markup, or a
 `disabled` attribute on the select a multi select enhances or on a combobox
-toggle button, does not disable them. While they live, all but Chip Set set the
-class from the option, Combobox and Multi Select also that attribute, and
-`dispose()` gives the element back the markup it had; Chip Set passes the
-option to its chips. In v5 a `.disabled` class disabled a chip, a chip set and
+toggle button, does not disable them. All but Chip Set set the class from the
+option, Combobox and Multi Select also that attribute; Chip Set passes the
+option to its chips. `dispose()` leaves the class and the attribute for the
+next instance to write again from its options. In v5 a `.disabled` class disabled a chip, a chip set and
 a chip input, and the autocomplete data API skipped an element with the class;
 write `data-coreui-disabled="true"` instead, on a single chip too. A
 `disabled` class returned by `chipClassName` no longer disables a chip.
@@ -2308,11 +2307,10 @@ permission to submit, naming their hidden input `<component>-<id>` when no
 inherit the rule through the field they embed, and with `floatingLabel` that
 field is given a generated id, so they posted a key that changed on every load
 (`date-input-date-picker-190423`). The value field is named from `name` alone
-now, and a field without one stays out of the form. `dispose()` gives the host
-back the way the page wrote it: the sections, the separators and the value
-field are gone, the classes the component added go with them while the ones the
-markup carried stay, the `role` and `aria-label` come back, and the author's own
-child nodes are the same nodes, not copies. It used to leave a live-looking
+now, and a field without one stays out of the form. `dispose()` removes the
+sections, the separators and the value field, takes back the `aria-label` it
+generated, and gives the host the author's own child nodes, the same nodes,
+not copies. It used to leave a live-looking
 field behind that kept submitting.
 
 #### Range / Range Slider
@@ -2382,9 +2380,7 @@ field behind that kept submitting.
   the slider. With several handles, each handle carries only its own name
   ("Minimum value"); a single handle takes the name of the group, followed by
   its `ariaLabel` when it has one. `aria-describedby` moves onto every handle.
-  An element with a `role` of its own keeps it, with its label and
-  description; a single handle still takes its name, and several handles keep
-  only their own names.
+  A `role` written on the element is replaced with `group`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The range slider takes a validation state.** The new `validationState`
   option, or `.is-invalid`/`.is-valid` on the slider element read once when it
@@ -2668,14 +2664,13 @@ field behind that kept submitting.
   props stay `readOnly` — that is how those frameworks spell the native
   attribute.
 - **`dispose()` takes back what the component rendered.** The stars and their
-  radios go away, so the form no longer submits the value, and so do the
-  classes and the `role` the component wrote. Classes, a role and content
-  written in the markup come back as they were. A rating left in the page after
-  `dispose()` used to keep working as a plain radio group.
-- **While the rating lives, its options decide `.disabled`, `.readonly` and the
-  size class.** A `.disabled` or `.readonly` written in the markup without the
-  matching option is removed at init, and `size` replaces a `rating-sm` or
-  `rating-lg` the markup wrote. `setConfig({ disabled: false })` used to leave
+  radios go away, so the form no longer submits the value; content written in
+  the markup stays. A rating left in the page after `dispose()` used to keep
+  working as a plain radio group.
+- **Its options decide `.disabled`, `.readonly`, the size class, the
+  `radiogroup` role and `aria-readonly`, `aria-required` and `aria-invalid`.**
+  The same classes and attributes written in the markup are replaced at init,
+  and a `rating-sm` or `rating-lg` without `size` is removed. `setConfig({ disabled: false })` used to leave
   `.disabled` behind.
 - **A read-only rating submits its value under the `name` you give it.**
   `readonly` used to disable the radios, so the form left the value out; now

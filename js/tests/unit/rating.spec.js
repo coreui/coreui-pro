@@ -680,13 +680,22 @@ describe('Rating', () => {
       expect(div).not.toHaveClass('rating-lg')
     })
 
-    it('should leave a size class the page wrote alone while the size option is empty', () => {
+    it('should take off a size class the page wrote while the size option is empty', () => {
       fixtureEl.innerHTML = '<div class="rating-lg"></div>'
       const div = fixtureEl.querySelector('div')
-      const rating = new Rating(div)
+      // eslint-disable-next-line no-new
+      new Rating(div)
 
-      div.classList.remove('rating-lg')
-      rating.dispose()
+      expect(div).not.toHaveClass('rating-lg')
+    })
+
+    it('should take the size of a new instance from its options after dispose', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+
+      new Rating(div, { size: 'lg' }).dispose()
+      // eslint-disable-next-line no-new
+      new Rating(div)
 
       expect(div).not.toHaveClass('rating-lg')
     })
@@ -2314,6 +2323,21 @@ describe('Rating', () => {
   })
 
   describe('dispose', () => {
+    it('should leave the role and the aria state it wrote for the next instance to rewrite', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+
+      new Rating(div, { readonly: true }).dispose()
+
+      expect(div.getAttribute('role')).toEqual('radiogroup')
+      expect(div.getAttribute('aria-readonly')).toEqual('true')
+
+      new Rating(div, { required: true }).dispose()
+
+      expect(div.hasAttribute('aria-readonly')).toBeFalse()
+      expect(div.getAttribute('aria-required')).toEqual('true')
+    })
+
     it('should take back the items and radios it rendered', () => {
       fixtureEl.innerHTML = '<form><div data-coreui-rating></div></form>'
       const form = fixtureEl.querySelector('form')

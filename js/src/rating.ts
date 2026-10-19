@@ -452,14 +452,16 @@ class Rating extends BaseComponent {
     this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
     this._element.classList.toggle(CLASS_NAME_READONLY, Boolean(this._config.readonly))
 
+    this._element.classList.remove(...SIZE_CLASS_NAMES)
+
     if (this._sizeClassName) {
       this._element.classList.remove(this._sizeClassName)
-      this._sizeClassName = null
     }
+
+    this._sizeClassName = null
 
     if (this._config.size) {
       const sizeClassName = `rating-${this._config.size}`
-      this._element.classList.remove(...SIZE_CLASS_NAMES)
       this._element.classList.add(sizeClassName)
       this._sizeClassName = sizeClassName
     }

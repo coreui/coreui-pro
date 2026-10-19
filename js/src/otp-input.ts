@@ -167,6 +167,11 @@ class OTPInput extends BaseComponent {
     this._validation.dispose()
     this._inputElement?.remove()
     this._inputElement = null
+
+    for (const input of this._placeholders.keys()) {
+      this._restorePlaceholder(input)
+    }
+
     super.dispose()
   }
 

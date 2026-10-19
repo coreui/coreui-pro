@@ -1234,6 +1234,15 @@ describe('RangeSlider', () => {
   })
 
   describe('dispose', () => {
+    it('should leave the group role it wrote for the next instance to rewrite', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+
+      new RangeSlider(element, { value: 40 }).dispose()
+
+      expect(element.getAttribute('role')).toEqual('group')
+    })
+
     it('should remove what it built, take off the state class it drew and keep the page content', () => {
       fixtureEl.innerHTML = '<div id="slider"><p class="note">Page content</p></div>'
       const element = fixtureEl.querySelector('#slider')

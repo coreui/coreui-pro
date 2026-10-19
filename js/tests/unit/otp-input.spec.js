@@ -859,6 +859,22 @@ describe('OTPInput', () => {
       </div>
     `
 
+    it('should take off the placeholder the option wrote, so a new instance does not take it for the page\'s', () => {
+      fixtureEl.innerHTML = MARKUP_FOR_DISPOSE
+      const otpElement = fixtureEl.querySelector('.form-otp')
+
+      new OTPInput(otpElement, { placeholder: '0' }).dispose()
+
+      for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
+        expect(input.hasAttribute('placeholder')).toBeFalse()
+      }
+
+      const otpInput = new OTPInput(otpElement, { placeholder: 'X' })
+      otpInput.setConfig({ placeholder: null })
+
+      expect(fixtureEl.querySelector('.form-otp-control').hasAttribute('placeholder')).toBeFalse()
+    })
+
     it('should take off the state class it drew', () => {
       fixtureEl.innerHTML = '<div><input type="text"><input type="text"></div>'
       const otpElement = fixtureEl.querySelector('div')
