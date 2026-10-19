@@ -358,9 +358,9 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `search` | Performs a search with the provided text parameter. |
 | `disable()` | Disables the field. |
 | `enable()` | Enables the field. |
-| `setOptions(options)` | Replaces the options. |
+| `setOptions(options)` | Replaces the options, as an array or a comma-separated string. The value stays unless the new options mark another option `selected`, and a value `setValue()` gave that the earlier options lacked is picked without an event; a start value a form reset waits for is reported with `change` when the options bring it. |
 | `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
-| `setValue(value)` | Sets the value without firing a change event. |
+| `setValue(value)` | Sets the value without firing a change event, also after a form reset; a value the options lack waits for `setOptions()`. |
 | `show` | Shows the Bootstrap autocomplete dropdown options. |
 | `toggle` | Toggles the visibility of the dropdown options. |
 

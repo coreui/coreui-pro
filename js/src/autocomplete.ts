@@ -185,6 +185,8 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputHintElement: any
   protected declare _hostAria: Array<[string, string]>
   protected declare _keySerial: number | null
+  protected declare _disabled: boolean
+  protected declare _givenValue: any
   protected declare _known: Map<string, any>
   protected declare _initialValue: any
   protected declare _reportSeed: boolean
@@ -206,6 +208,7 @@ class Autocomplete extends ComboboxBase {
     this._shownText = ''
     this._validation = new FieldValidation(this._element, {
       aliases: true,
+      canBlock: () => !this._disabled,
       config: () => this._config,
       fields: () => [this._inputElement],
       frames: () => [this._element],
@@ -217,7 +220,9 @@ class Autocomplete extends ComboboxBase {
     this._menu = null
     this._known = new Map()
     this._store = createSelectionStore(next => next.slice(-1))
-    this._options = this._getOptionsFromConfig()
+    this._disabled = this._config.disabled
+    this._givenValue = this._config.value
+    this._options = this._getOptionsFromConfig(this._config.options)
     this._floatingCleanup = null
     this._anchoredPosition = null
     this._search = ''
@@ -328,27 +333,37 @@ class Autocomplete extends ComboboxBase {
   }
 
   disable(): void {
-    if (!this._config.disabled) {
-      this._setConfig({ disabled: true })
-    }
+    this._setDisabled(true)
   }
 
   enable(): void {
-    if (this._config.disabled) {
-      this._setConfig({ disabled: false })
-    }
+    this._setDisabled(false)
   }
 
   setOptions(options: AutocompleteConfig['options']): void {
-    this._setConfig({ options })
+    const normalized = this._normalizeOptions(options)
+    this._typeCheckConfig({ options: normalized }, { options: DefaultType.options })
+    this._options = this._getOptionsFromConfig(normalized)
+    this._setListBoxItems()
+    this._seedSelection()
+    this._validation.update()
   }
 
   setValidationState(validationState: ValidationState | null): void {
-    this._setConfig({ invalid: false, valid: false, validationState })
+    const state = { invalid: false, valid: false, validationState }
+    this._config = this._getConfig({ ...this._config, ...state })
+    this._validation.configure(state)
   }
 
   setValue(value: AutocompleteConfig['value']): void {
-    this._setConfig({ value })
+    this._typeCheckConfig({ value }, { value: DefaultType.value })
+    this._givenValue = value
+    this._valueApplied = false
+    this._reportSeed = false
+    this.deselectAll()
+    this._setText('')
+    this._seedSelection()
+    this._validation.update()
   }
 
   deselectAll(options: any[] = this._selectedOptions()): void {
@@ -384,35 +399,28 @@ class Autocomplete extends ComboboxBase {
   }
 
   // Private
-  _setConfig(config: Partial<AutocompleteConfig> | null): void {
-    this._config = this._getConfig({ ...this._config, ...config })
+  override _isDisabled(): boolean {
+    return this._disabled
+  }
 
-    if (this._validation.configure(config)) {
+  _setDisabled(disabled: boolean): void {
+    if (disabled === this._disabled) {
       return
     }
 
-    this._options = this._getOptionsFromConfig()
-    this._setListBoxItems()
+    this._disabled = disabled
 
-    if (config?.value !== undefined) {
-      this._valueApplied = false
-      this.deselectAll()
-      this._setText('')
-    }
-
-    this._seedSelection()
-    this._applyState()
-
-    if (this._config.disabled) {
+    if (disabled) {
       this.hide()
     }
 
+    this._applyState()
     this._validation.update()
   }
 
   _addEventListeners(): void {
     EventHandler.on(this._element, EVENT_CLICK, (event: any) => {
-      if (!this._config.disabled && !event.target.closest(SELECTOR_INDICATOR)) {
+      if (!this._disabled && !event.target.closest(SELECTOR_INDICATOR)) {
         this.show()
         this._inputElement.focus()
       }
@@ -470,7 +478,7 @@ class Autocomplete extends ComboboxBase {
     EventHandler.on(this._inputElement, EVENT_BLUR, () => {
       const inputValue = this._inputElement.value
 
-      if (this._config.disabled || inputValue.length === 0) {
+      if (this._disabled || inputValue.length === 0) {
         return
       }
 
@@ -557,7 +565,7 @@ class Autocomplete extends ComboboxBase {
     })
 
     EventHandler.on(this._cleanerElement, EVENT_CLICK, (event: any) => {
-      if (!this._config.disabled) {
+      if (!this._disabled) {
         event.preventDefault()
         event.stopPropagation()
         this._clearByUser()
@@ -565,7 +573,7 @@ class Autocomplete extends ComboboxBase {
     })
 
     EventHandler.on(this._cleanerElement, EVENT_KEYDOWN, (event: any) => {
-      if (!this._config.disabled && event.key === ENTER_KEY) {
+      if (!this._disabled && event.key === ENTER_KEY) {
         event.preventDefault()
         event.stopPropagation()
         this._clearByUser()
@@ -627,7 +635,7 @@ class Autocomplete extends ComboboxBase {
     this._inputElement.removeAttribute('name')
   }
 
-  _getOptionsFromConfig(options: any = this._config.options, disabled = false): any[] {
+  _getOptionsFromConfig(options: any, disabled = false): any[] {
     if (!options || !Array.isArray(options)) {
       return []
     }
@@ -651,7 +659,6 @@ class Autocomplete extends ComboboxBase {
 
       const label = typeof option === 'string' ? option : option.label
       const value = option.value ?? (typeof option === 'string' ? option : option.label)
-      const isSelected = option.selected || (this._config.value && this._config.value === value)
 
       const customProperties = typeof option === 'object' ? { ...option } : {}
 
@@ -664,7 +671,7 @@ class Autocomplete extends ComboboxBase {
         ...customProperties,
         label,
         value: String(value),
-        ...isSelected && { selected: true },
+        ...option.selected && { selected: true },
         ...(disabled || option.disabled) && { disabled: true }
       })
     }
@@ -683,7 +690,8 @@ class Autocomplete extends ComboboxBase {
   }
 
   _applyState(): void {
-    const { disabled, required } = this._config
+    const { required } = this._config
+    const disabled = this._disabled
 
     this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
     this._inputElement.disabled = disabled
@@ -792,7 +800,7 @@ class Autocomplete extends ComboboxBase {
   override _onOptionSelected(value: string): void {
     const foundOption = this._findOptionByValue(value)
 
-    if (foundOption && !this._config.disabled) {
+    if (foundOption && !this._disabled) {
       this._selectOption(foundOption)
       this._inputElement.focus()
     }
@@ -872,7 +880,7 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
-    if (this._store.size() > 0 && !this._config.disabled) {
+    if (this._store.size() > 0 && !this._disabled) {
       this._cleanerElement.style.removeProperty('display')
       return
     }
@@ -900,7 +908,7 @@ class Autocomplete extends ComboboxBase {
       this.search('')
     }
 
-    this._config.value = this._initialValue
+    this._givenValue = this._initialValue
     this._valueApplied = false
     this._seenOptionValues.clear()
     this._seedSelection()
@@ -917,7 +925,7 @@ class Autocomplete extends ComboboxBase {
 
   _seedSelection(): void {
     const options = flattenOptions(this._options)
-    const { value } = this._config
+    const value = this._givenValue
     let seed
 
     if (value !== null && value !== undefined && value !== '') {
@@ -960,12 +968,14 @@ class Autocomplete extends ComboboxBase {
     }
   }
 
+  _normalizeOptions(options: any): any {
+    return typeof options === 'string' ? options.split(/,\s*/).map(String) : options
+  }
+
   override _configAfterMerge(config: any): any {
     config = this._normalizeContainerConfig(config)
 
-    if (typeof config.options === 'string') {
-      config.options = config.options.split(/,\s*/).map(String)
-    }
+    config.options = this._normalizeOptions(config.options)
 
     if (config.searchNoResultsLabel === true) {
       config.searchNoResultsLabel = 'No results found'
