@@ -325,7 +325,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `ariaPickerLabel` | string | `'Toggle options list'` | Accessible label for the picker button, read by screen readers. |
 | `cleaner` | boolean | `false` | Enables the selection cleaner button. |
 | `clearSearchOnSelect` | boolean | `true` | Clears the search input when an option is selected. |
-| `container` | string, element, boolean | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
+| `container` | string, element, boolean | `false` | Where the panel is mounted while open. `true` means `<body>`; leave it alone and the panel goes next to the toggle unless an ancestor would clip it. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `disabled` | boolean | `false` | Disables the component when set to `true`. |
 | `globalSearch` | boolean | `true` | Routes typing to the field from anywhere in the component, so a keystroke never depends on where the focus sits. Set to `false` to keep it local: a keystroke then counts only while the field has the focus. |
 | `highlightOptionsOnSearch` | boolean | `false` | Highlights matching text in options during search. |
@@ -352,6 +352,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 
 | Method | Description |
 | --- | --- |
+| `clear` | Deselects the option and empties the typed text. |
 | `deselectAll` | Deselects all currently selected options. |
 | `dispose` | Destroys the instance and removes the input, buttons and panel it created, along with the classes it put on the host. |
 | `getInstance` | Static method to get the Bootstrap autocomplete instance associated with a DOM element. |
@@ -412,9 +413,9 @@ The Autocomplete component includes several accessibility features:
 | <kbd>Arrow Down</kbd> | Highlight the next option or open dropdown |
 | <kbd>Arrow Up</kbd> | Highlight the previous option |
 | <kbd>Enter</kbd> | Select the highlighted option, or commit the typed text; with the list closed, also submit the form |
-| <kbd>Escape</kbd> | Close the dropdown and clear focus |
+| <kbd>Escape</kbd> | Close the dropdown; the input keeps focus and the highlighted option clears |
 | <kbd>Tab</kbd> | Accept hint completion (when hints are enabled) |
-| <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Clear input and trigger search |
+| <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Delete one character and search with what's left; a held selection is deselected first |
 | Any character, <kbd>Backspace</kbd>, <kbd>Delete</kbd> on the picker or clear button | Move the focus to the field and type there, unless `globalSearch` is `false` |
 
 ## Customizing
