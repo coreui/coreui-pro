@@ -627,7 +627,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `hide` | Hides the multi select's options. |
 | `selectAll` | Select all options. |
 | `selectFiltered` | Select only the currently filtered (search-matched) options. |
-| `setLoading` | Dims the list and marks it busy while you wait for options, for example with `search: 'external'`; <kbd>Enter</kbd> in the search box picks nothing meanwhile. |
+| `setLoading` | Dims the list and marks it busy while you wait for options, for example with `search: 'external'`; a click, a key in the list or <kbd>Enter</kbd> in the search box picks nothing meanwhile, while the select all button and the chips keep working. |
 | `setOptions` | Replaces the options without rebuilding the control: the selection, an open panel and the search box keep their state, and the focus stays where it was unless the element holding it goes. A selected option the new list lacks stays selected and is still sent with the form unless it is disabled; `selected` flags in the new options are ignored unless `resetSelectionOnOptionsChange` empties the selection first. |
 | `setConfig` | Merges the given options over the current configuration and rebuilds the interface. Options you leave out keep their current value. A call that only changes `validationState`, `invalid` or `valid` updates the state without rebuilding. |
 | `show` | Shows the multi select's options. |

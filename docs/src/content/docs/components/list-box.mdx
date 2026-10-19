@@ -133,7 +133,7 @@ Leave an empty `.list-box-options` in the markup so you can name it; the plugin 
 
 A list that depends on another field, such as the cities of the chosen country, sets `resetSelectionOnItemsChange: true`. Whenever the values of the new items differ from the ones before, `setItems` then starts from an empty selection and takes the items marked `selected`, so the city of the previous country never travels on with the next one. The same values again, in any order, keep the selection. Leave it off with `search: 'external'`, where every answer brings different values and would drop the pick.
 
-`loading` covers the wait: it writes `aria-busy="true"` on the options element, puts `.loading` on the container — which dims the options and stops them responding — and holds the empty state back, so "No results" never flashes before the answer arrives. `setLoading(value)` turns it on and off around the request.
+`loading` covers the wait: it writes `aria-busy="true"` on the options element, puts `.loading` on the container — which dims the options while they stay usable, so a choice from the shown results still counts — and holds the empty state back, so "No results" never flashes before the answer arrives. `setLoading(value)` turns it on and off around the request.
 
 <Example code={`<div class="list-box" id="listBoxRemote" style="max-width: 22rem">
     <div class="list-box-header">
@@ -401,7 +401,7 @@ Add `data-coreui-list-box` to a `.list-box` and the plugin initializes it on pag
 | `data-coreui-indicator="checkbox"` | Renders the checkbox indicator in front of every option. |
 | `data-coreui-list-box-counter` | Marks the element that holds the `{selected}/{available}` counter. Created in the header when `counter` is on and the markup has none. |
 | `data-coreui-list-box-search` | Marks an input as the search field of the list. Built for you when `search` is on and the markup has none. |
-| `data-coreui-loading="true"` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. |
+| `data-coreui-loading="true"` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. The options stay usable. |
 
 ```html
 <div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple">
@@ -436,7 +436,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and marks the container with `data-coreui-indicator="checkbox"`, which is what lays the options out in two columns. |
 | `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever `.list-box-options` already holds. |
-| `loading` | boolean | `false` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. |
+| `loading` | boolean | `false` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. The options stay usable. |
 | `resetSelectionOnItemsChange` | boolean | `false` | Empties the selection when `setItems()` brings items with different values, then takes the items marked `selected`. For a list that depends on another field. |
 | `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`. |
 | `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |

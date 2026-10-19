@@ -2330,6 +2330,18 @@ describe('ListBox', () => {
       expect(listBox.getSelectedValues()).toEqual([])
     })
 
+    it('should keep its options usable by click and keyboard while loading', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple"', null, selectAllMarkup)
+      const listBox = new ListBox(el, { loading: true })
+
+      click(item(el, 'lettuce'))
+      listBox.setActive('tomato')
+      keydown(list(el), ' ')
+      el.querySelector('[data-coreui-select-all]').click()
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato', 'onion', 'cheese'])
+    })
+
     it('should drop the loading class on dispose', () => {
       const el = setLoadingMarkup(' data-coreui-loading="true"')
       const listBox = new ListBox(el)

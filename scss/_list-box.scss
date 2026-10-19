@@ -71,7 +71,6 @@ $list-box-tokens: defaults(
   }
 
   .list-box.loading .list-box-options {
-    pointer-events: none;
     opacity: var(--#{$prefix}list-box-loading-opacity);
   }
 
