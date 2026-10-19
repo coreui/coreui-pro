@@ -809,14 +809,22 @@ describe('TimePicker', () => {
     })
 
     it('should keep the hour cycle of its field over selectionOptions', () => {
-      const picker = buildPicker({ selectionOptions: { hourCycle: 'h23', minutes: [0, 30] }, time: '15:30' })
+      const picker = buildPicker({ format: 'HH:mm', selectionOptions: { hourCycle: 'h12', minutes: [0, 30] }, time: '15:30' })
 
       picker.show()
 
       const columns = [...picker._menu.querySelectorAll('.time-picker-col')]
-      expect(columns.map(column => column.getAttribute('aria-label'))).toContain('Select AM/PM')
-      expect(columns[0].querySelectorAll('.time-picker-cell').length).toEqual(12)
+      expect(columns.map(column => column.getAttribute('aria-label'))).not.toContain('Select AM/PM')
+      expect(columns[0].querySelectorAll('.time-picker-cell').length).toEqual(24)
       expect(columns[1].querySelectorAll('.time-picker-cell').length).toEqual(2)
+    })
+
+    it('should keep the time of its field over selectionOptions', () => {
+      const picker = buildPicker({ selectionOptions: { time: new Date(2026, 0, 1, 8, 0) }, time: '15:30' })
+
+      picker.show()
+
+      expect(picker._menu.querySelector('.time-picker-col .selected').textContent.trim()).toEqual('3')
     })
 
     it('should keep its own onChange over selectionOptions', () => {
