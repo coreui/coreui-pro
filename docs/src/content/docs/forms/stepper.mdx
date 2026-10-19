@@ -305,7 +305,7 @@ This ensures data integrity and improves the user experience by keeping the flow
 
 ## Non-linear Stepper (Optional Steps)
 
-You can configure the Stepper Component to behave as non-linear, allowing users to jump freely between steps without validation restrictions. Add `data-coreui-linear="false"` or set `linear: false` to allow non-sequential navigation.
+You can configure the Stepper Component to behave as non-linear, allowing users to open any step directly instead of one at a time. Add `data-coreui-linear="false"` or set `linear: false` to allow non-sequential navigation. Moving forward still validates the step being left, as in linear mode; set `skipValidation: true` to let users move on with an invalid step.
 
 Use a Non-linear Bootstrap Stepper when users should have full control over navigation, for example:
 
@@ -603,7 +603,7 @@ const stepperList = stepperElementList.map(stepperEl => {
 
 | Method | Description |
 | --- | --- |
-| `finish()` | On the last enabled step, complete the form wizard and mark all steps as finished. Called from an earlier step, it just advances to the next one, like `next()`. |
+| `finish()` | On the last enabled step, complete the form wizard and mark all steps as finished. Called from an earlier step, it does nothing. |
 | `getInstance(element)` | Retrieve the Stepper instance from a DOM element. |
 | `getOrCreateInstance(element)` | Get or create the Stepper instance associated with a DOM element. |
 | `next()` | Go to the next step. On the last enabled step, finish the wizard as `finish()` does. |

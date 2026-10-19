@@ -214,11 +214,6 @@ class Stepper extends BaseComponent {
     const index = steps.indexOf(active)
 
     if (index !== steps.length - 1) {
-      const next = steps[index + 1]
-      if (next) {
-        this.showStep(next)
-      }
-
       return
     }
 
