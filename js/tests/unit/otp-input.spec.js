@@ -257,23 +257,6 @@ describe('OTPInput', () => {
       expect(otpInput._inputElement.disabled).toBe(true)
     })
 
-    it('should set readonly attribute when readonly option is true', () => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control">
-          <input type="text" class="form-otp-control">
-        </div>
-      `
-
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer, { readonly: true }) // eslint-disable-line no-new
-
-      const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      for (const input of inputs) {
-        expect(input.readOnly).toBe(true)
-      }
-    })
-
     it('should set id attributes when provided and leave the slots unnamed', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
@@ -764,17 +747,6 @@ describe('OTPInput', () => {
       expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').disabled).toBeFalse()
     })
 
-    it('should make the slots editable again when readonly is turned off', () => {
-      fixtureEl.innerHTML = MARKUP
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { readonly: true })
-
-      otpInput.setConfig({ readonly: false })
-
-      for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
-        expect(input.readOnly).toBeFalse()
-      }
-    })
-
     it('should drop the placeholder when it is turned off', () => {
       fixtureEl.innerHTML = MARKUP
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { placeholder: '•' })
@@ -786,28 +758,25 @@ describe('OTPInput', () => {
       }
     })
 
-    it('should let the options decide disabled and readonly over the slot markup, and give back its placeholder when the option turns off', () => {
+    it('should let the disabled option decide over the slot markup, and give back its placeholder when the option turns off', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
-          <input type="text" class="form-otp-control" disabled readonly placeholder="a">
+          <input type="text" class="form-otp-control" disabled placeholder="a">
           <input type="text" class="form-otp-control">
         </div>
       `
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), {
         disabled: true,
-        placeholder: '•',
-        readonly: true
+        placeholder: '•'
       })
 
-      otpInput.setConfig({ disabled: false, placeholder: null, readonly: false })
+      otpInput.setConfig({ disabled: false, placeholder: null })
 
       const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
 
       expect(first.disabled).toBeFalse()
-      expect(first.readOnly).toBeFalse()
       expect(first.getAttribute('placeholder')).toEqual('a')
       expect(second.disabled).toBeFalse()
-      expect(second.readOnly).toBeFalse()
       expect(second.hasAttribute('placeholder')).toBeFalse()
     })
 
@@ -832,7 +801,7 @@ describe('OTPInput', () => {
       expect(second.getAttribute('placeholder')).toEqual('x')
     })
 
-    it('should keep the placeholder of a slot added after init and give it the readonly state of the options', () => {
+    it('should keep the placeholder of a slot added after init', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control">
@@ -841,13 +810,12 @@ describe('OTPInput', () => {
       const otpElement = fixtureEl.querySelector('.form-otp')
       const otpInput = new OTPInput(otpElement)
 
-      otpElement.insertAdjacentHTML('afterbegin', '<input type="text" class="form-otp-control" placeholder="0" readonly>')
+      otpElement.insertAdjacentHTML('afterbegin', '<input type="text" class="form-otp-control" placeholder="0">')
       otpInput.setConfig({})
 
       const added = otpElement.querySelector('.form-otp-control')
 
       expect(added.getAttribute('placeholder')).toEqual('0')
-      expect(added.readOnly).toBeFalse()
     })
   })
 
@@ -890,18 +858,17 @@ describe('OTPInput', () => {
     it('should give a new instance the slot state of its own options, whatever the slots carried before', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
-          <input type="text" class="form-otp-control" disabled readonly aria-required="true">
+          <input type="text" class="form-otp-control" disabled aria-required="true">
           <input type="text" class="form-otp-control">
         </div>
       `
       const otpElement = fixtureEl.querySelector('.form-otp')
 
-      new OTPInput(otpElement, { disabled: true, readonly: true, required: true }).dispose()
+      new OTPInput(otpElement, { disabled: true, required: true }).dispose()
       OTPInput.getOrCreateInstance(otpElement)
 
       for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
         expect(input.disabled).toBeFalse()
-        expect(input.readOnly).toBeFalse()
         expect(input.hasAttribute('aria-required')).toBeFalse()
       }
     })
@@ -1603,12 +1570,10 @@ describe('OTPInput', () => {
       expect(form.checkValidity()).toBeFalse()
     })
 
-    it('should leave a read-only or disabled code out of the form validation', () => {
-      for (const config of [{ readonly: true }, { disabled: true }]) {
-        const { form } = mountForm({ required: true, ...config })
+    it('should leave a disabled code out of the form validation', () => {
+      const { form } = mountForm({ disabled: true, required: true })
 
-        expect(form.checkValidity()).toBeTrue()
-      }
+      expect(form.checkValidity()).toBeTrue()
     })
 
     it('should hand the focus the browser gives the value field to the first empty slot', () => {
@@ -1793,13 +1758,11 @@ describe('OTPInput', () => {
       expect(otpInput._inputElement.validationMessage).toBe('Invalid value.')
     })
 
-    it('should show a given state while disabled or read-only without blocking the submit', () => {
-      for (const config of [{ disabled: true }, { readonly: true }]) {
-        const { form } = mountForm({ ...config, validationState: 'invalid' })
+    it('should show a given state while disabled without blocking the submit', () => {
+      const { form } = mountForm({ disabled: true, validationState: 'invalid' })
 
-        expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
-        expect(form.checkValidity()).toBeTrue()
-      }
+      expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeTrue()
     })
 
     it('should show a state of its own without aria-invalid and without blocking the submit', () => {
@@ -1932,18 +1895,6 @@ describe('OTPInput', () => {
 
       expect(ariaLabel).not.toHaveBeenCalled()
       expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
-    })
-
-    it('should ignore a paste into a read-only code', () => {
-      const { form, slots, valueField } = mountForm({ readonly: true, validationState: 'invalid', value: '1' })
-      const clipboardData = new DataTransfer()
-      clipboardData.setData('text', '12')
-
-      slots[0].dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData }))
-
-      expect(valueField.value).toBe('1')
-      expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeTrue()
     })
 
     it.each([

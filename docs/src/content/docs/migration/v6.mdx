@@ -2651,6 +2651,10 @@ field behind that kept submitting.
   validationState })` sets it again, and a native form reset puts back the
   code the field started with. A change of the code sends `input` and `change`
   from the input that holds the value.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The `readonly` option is removed.** A code the user cannot type has no use
+  in a form, so `data-coreui-readonly` and `{ readonly: true }` no longer do
+  anything; use `disabled` to show a code the user cannot change.
 
 #### Rating
 

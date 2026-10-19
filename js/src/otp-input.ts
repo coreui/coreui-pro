@@ -55,7 +55,6 @@ type OtpInputConfig = {
   masked: boolean
   name: string | null
   placeholder: number | string | null
-  readonly: boolean
   required: boolean
   type: string
   validationState: ValidationState | null
@@ -71,7 +70,6 @@ const Default: OtpInputConfig = {
   masked: false,
   name: null,
   placeholder: null,
-  readonly: false,
   required: false,
   type: 'number',
   validationState: null,
@@ -87,7 +85,6 @@ const DefaultType = {
   masked: 'boolean',
   name: '(string|null)',
   placeholder: '(number|string|null)',
-  readonly: 'boolean',
   required: 'boolean',
   type: 'string',
   validationState: '(string|null|undefined)',
@@ -318,10 +315,6 @@ class OTPInput extends BaseComponent {
     EventHandler.on(this._element, EVENT_PASTE, SELECTOR_FORM_OTP_CONTROL, event => {
       event.preventDefault()
 
-      if (this._config.readonly) {
-        return
-      }
-
       const pastedData = event.clipboardData.getData('text')
       const validChars = this._extractValidChars(pastedData)
 
@@ -422,7 +415,6 @@ class OTPInput extends BaseComponent {
     configureValueField(field, {
       disabled: this._config.disabled,
       name: this._config.name,
-      readOnly: this._config.readonly,
       required: this._config.required
     })
     field.pattern = `${this._config.type === 'number' ? '[0-9]' : '.'}{${this._getInputs().length}}`
@@ -564,8 +556,6 @@ class OTPInput extends BaseComponent {
       if (this._config.id && !input.id) {
         input.id = `${this._config.id}-${index}`
       }
-
-      input.readOnly = this._config.readonly
 
       if (typeof this._config.ariaLabel === 'function') {
         const ariaLabel = this._config.ariaLabel(index, inputs.length)
