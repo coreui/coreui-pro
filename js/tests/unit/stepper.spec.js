@@ -858,16 +858,20 @@ describe('Stepper', () => {
       })
     })
 
-    it('should move to next step if not on last step', () => {
+    it('should do nothing before the last step', () => {
       fixtureEl.innerHTML = getThreeStepFixture()
       const stepperElement = fixtureEl.querySelector('.stepper')
       const stepper = new Stepper(stepperElement)
+      const listener = vi.fn()
+      stepperElement.addEventListener('stepChange.coreui.stepper', listener)
 
       stepper.finish()
 
       const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
-      expect(buttons[1]).toHaveClass('active')
+      expect(buttons[0]).toHaveClass('active')
+      expect(buttons[1]).not.toHaveClass('active')
       expect(stepper._isFinished).toBeFalse()
+      expect(listener).not.toHaveBeenCalled()
     })
 
     it('should do nothing if already finished', () => {
@@ -1585,6 +1589,25 @@ describe('Stepper', () => {
       expect(fixtureEl.querySelector('#filled')).not.toHaveClass('is-valid')
     })
 
+    it('should validate the step being left when a later step is clicked in non-linear mode', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement, { linear: false })
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      buttons[1].click()
+
+      expect(buttons[0]).toHaveClass('active')
+      expect(fixtureEl.querySelector('#empty')).toHaveClass('is-invalid')
+
+      fixtureEl.querySelector('#empty').value = 'filled'
+      buttons[1].click()
+
+      expect(buttons[1]).toHaveClass('active')
+    })
+
     it('should set aria-invalid on the invalid controls of noValidate forms on failure', () => {
       fixtureEl.innerHTML = validationFixture('novalidate')
 
@@ -2094,12 +2117,29 @@ describe('Stepper', () => {
       expect(events).toEqual([true])
       expect(fixtureEl.querySelector('#step2')).toHaveClass('active')
 
-      stepper.prev()
+      fixtureEl.innerHTML = `
+        <div class="stepper" data-coreui-stepper>
+          <ol class="stepper-steps">
+            <li class="stepper-step">
+              <button type="button" class="stepper-step-button active" data-coreui-target="#last">
+                <span class="stepper-step-indicator">1</span>
+              </button>
+            </li>
+          </ol>
+          <div id="last" class="stepper-pane active show">
+            <form novalidate><input type="text" required value="filled"></form>
+          </div>
+        </div>
+      `
+      const lastElement = fixtureEl.querySelector('.stepper')
+      const last = new Stepper(lastElement)
       events.length = 0
-      stepper.finish()
+      lastElement.addEventListener('stepValidationComplete.coreui.stepper', event => events.push(event.isValid))
+
+      last.finish()
 
       expect(events).toEqual([true])
-      expect(fixtureEl.querySelector('#step2')).toHaveClass('active')
+      expect(last._isFinished).toBeTrue()
     })
 
     it('should fire stepValidationComplete before the invalid events, whether the browser validates the form or not', () => {
@@ -3371,19 +3411,6 @@ describe('Stepper', () => {
       expect(stepper._isFinished).toBeTrue()
       expect(button).toHaveClass('complete')
       expect(button).not.toHaveClass('active')
-    })
-
-    it('should handle finish() when on non-last step (advances to next)', () => {
-      fixtureEl.innerHTML = getThreeStepFixture()
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement)
-
-      // On step 1 (not the last step), finish should advance to next
-      stepper.finish()
-
-      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
-      expect(buttons[1]).toHaveClass('active')
-      expect(stepper._isFinished).toBeFalse()
     })
 
     it('should handle indicator with only whitespace text', () => {

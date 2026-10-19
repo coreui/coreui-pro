@@ -2027,6 +2027,12 @@ the step and, when it passes, finishes the stepper and fires
 driven by a single Next control never finished. A step button with
 `.disabled` does not count, so `next()` finishes on the step before it.
 
+#### Stepper: `finish()` before the last step does nothing
+
+`finish()` called on an earlier step used to move to the next step, the same
+as `next()`. It now does nothing until the last enabled step is active, the
+same as in React and Vue. Call `next()` to move forward.
+
 #### Stepper: the active indicator's background follows the theme
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
