@@ -136,7 +136,7 @@ describe('FieldValidation', () => {
       expect(targets.map(describedBy)).toEqual([null, null])
     })
 
-    it('should give back the aria-invalid it overwrote, when a target leaves the list and on dispose', () => {
+    it('should take off the aria-invalid it wrote over the one the page set, when a target leaves the list and on dispose', () => {
       fixtureEl.innerHTML = '<form><div id="host"><textarea></textarea><input id="first" aria-invalid="false"><input id="second" aria-invalid="grammar"></div></form>'
       const host = fixtureEl.querySelector('#host')
       const [first, second] = host.querySelectorAll('input')
@@ -153,11 +153,12 @@ describe('FieldValidation', () => {
       targets = [first]
       validation.update()
 
-      expect(second.getAttribute('aria-invalid')).toBe('grammar')
+      expect(first.getAttribute('aria-invalid')).toBe('true')
+      expect(second.hasAttribute('aria-invalid')).toBe(false)
 
       validation.dispose()
 
-      expect(first.getAttribute('aria-invalid')).toBe('false')
+      expect(first.hasAttribute('aria-invalid')).toBe(false)
     })
 
     it('should describe the targets it is given apart from the ones it marks invalid', () => {

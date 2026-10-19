@@ -14,8 +14,7 @@ import {
   configureValueField, createValueField, dispatchValueChange, writeValueField, type ValidationState
 } from './util/form-validation.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getNextActiveElement, type HostClasses, isRTL, jQueryDispatch,
-  restoreHostClasses
+  defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
 } from './util/index.js'
 
 /**
@@ -100,13 +99,9 @@ const DefaultType = {
  */
 
 class OTPInput extends BaseComponent {
-  protected declare _disabledSlots: Set<HTMLInputElement>
-  protected declare _hostClasses: HostClasses
   protected declare _inputElement: HTMLInputElement | null
   protected declare _placeholders: Map<HTMLInputElement, string | null>
-  protected declare _readOnlySlots: Set<HTMLInputElement>
   protected declare _removeLabelClick: () => void
-  protected declare _requiredSlots: Set<HTMLInputElement>
   protected declare _resetCode: string | null
   protected declare _validation: FieldValidation
   protected declare _value: string
@@ -115,12 +110,8 @@ class OTPInput extends BaseComponent {
     super(element, config)
 
     this._config = this._getConfig(config)
-    this._disabledSlots = new Set()
-    this._hostClasses = captureHostClasses(this._element, [])
     this._inputElement = null
     this._placeholders = new Map()
-    this._readOnlySlots = new Set()
-    this._requiredSlots = new Set()
     this._resetCode = null
     this._value = ''
     this._validation = new FieldValidation(this._element, {
@@ -176,24 +167,6 @@ class OTPInput extends BaseComponent {
     this._validation.dispose()
     this._inputElement?.remove()
     this._inputElement = null
-    restoreHostClasses(this._element, [], this._hostClasses)
-
-    for (const input of this._requiredSlots) {
-      input.removeAttribute('aria-required')
-    }
-
-    for (const input of this._disabledSlots) {
-      input.disabled = false
-    }
-
-    for (const input of this._readOnlySlots) {
-      input.readOnly = false
-    }
-
-    for (const input of this._placeholders.keys()) {
-      this._restorePlaceholder(input)
-    }
-
     super.dispose()
   }
 
@@ -566,12 +539,7 @@ class OTPInput extends BaseComponent {
         this._restorePlaceholder(input)
       }
 
-      if (this._config.required && !input.hasAttribute('aria-required')) {
-        input.setAttribute('aria-required', 'true')
-        this._requiredSlots.add(input)
-      } else if (!this._config.required && this._requiredSlots.delete(input)) {
-        input.removeAttribute('aria-required')
-      }
+      writeAttribute(input, 'aria-required', this._config.required ? 'true' : null)
 
       switch (this._config.type) {
         case 'number': {
@@ -586,13 +554,13 @@ class OTPInput extends BaseComponent {
         }
       }
 
-      this._setSlotFlag(input, 'disabled', this._config.disabled, this._disabledSlots)
+      input.disabled = this._config.disabled
 
       if (this._config.id && !input.id) {
         input.id = `${this._config.id}-${index}`
       }
 
-      this._setSlotFlag(input, 'readOnly', this._config.readonly, this._readOnlySlots)
+      input.readOnly = this._config.readonly
 
       if (typeof this._config.ariaLabel === 'function') {
         const ariaLabel = this._config.ariaLabel(index, inputs.length)
@@ -601,15 +569,6 @@ class OTPInput extends BaseComponent {
     }
 
     this._syncFirstInputMaxLength()
-  }
-
-  _setSlotFlag(input: HTMLInputElement, flag: 'disabled' | 'readOnly', on: boolean, slots: Set<HTMLInputElement>): void {
-    if (on && !input[flag]) {
-      input[flag] = true
-      slots.add(input)
-    } else if (!on && slots.delete(input)) {
-      input[flag] = false
-    }
   }
 
   _restorePlaceholder(input: HTMLInputElement): void {

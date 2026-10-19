@@ -786,7 +786,7 @@ describe('OTPInput', () => {
       }
     })
 
-    it('should keep what a slot carried in its markup when the options are turned off', () => {
+    it('should let the options decide disabled and readonly over the slot markup, and give back its placeholder when the option turns off', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control" disabled readonly placeholder="a">
@@ -803,15 +803,15 @@ describe('OTPInput', () => {
 
       const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
 
-      expect(first.disabled).toBeTrue()
-      expect(first.readOnly).toBeTrue()
+      expect(first.disabled).toBeFalse()
+      expect(first.readOnly).toBeFalse()
       expect(first.getAttribute('placeholder')).toEqual('a')
       expect(second.disabled).toBeFalse()
       expect(second.readOnly).toBeFalse()
       expect(second.hasAttribute('placeholder')).toBeFalse()
     })
 
-    it('should leave what the page changed on a slot after init alone on an unrelated call', () => {
+    it('should let the options decide disabled on every slot at init and on an unrelated call, and keep a placeholder the page wrote', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control" disabled>
@@ -821,17 +821,18 @@ describe('OTPInput', () => {
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
       const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
 
-      first.disabled = false
+      expect(first.disabled).toBeFalse()
+
       second.disabled = true
       second.placeholder = 'x'
       otpInput.setConfig({ masked: true })
 
       expect(first.disabled).toBeFalse()
-      expect(second.disabled).toBeTrue()
+      expect(second.disabled).toBeFalse()
       expect(second.getAttribute('placeholder')).toEqual('x')
     })
 
-    it('should keep the markup of a slot added after init', () => {
+    it('should keep the placeholder of a slot added after init and give it the readonly state of the options', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control">
@@ -846,7 +847,7 @@ describe('OTPInput', () => {
       const added = otpElement.querySelector('.form-otp-control')
 
       expect(added.getAttribute('placeholder')).toEqual('0')
-      expect(added.readOnly).toBeTrue()
+      expect(added.readOnly).toBeFalse()
     })
   })
 
@@ -858,32 +859,35 @@ describe('OTPInput', () => {
       </div>
     `
 
-    it('should leave no class attribute on an element that had none', () => {
+    it('should take off the state class it drew', () => {
       fixtureEl.innerHTML = '<div><input type="text"><input type="text"></div>'
       const otpElement = fixtureEl.querySelector('div')
+      const otpInput = new OTPInput(otpElement, { validationState: 'invalid' })
 
-      new OTPInput(otpElement, { validationState: 'invalid' }).dispose()
+      expect(otpElement).toHaveClass('is-invalid')
 
-      expect(otpElement.hasAttribute('class')).toBeFalse()
+      otpInput.dispose()
+
+      expect(otpElement).not.toHaveClass('is-invalid')
     })
 
-    it('should give back what the options set on the slots', () => {
+    it('should give a new instance the slot state of its own options, whatever the slots carried before', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
-          <input type="text" class="form-otp-control" placeholder="a">
+          <input type="text" class="form-otp-control" disabled readonly aria-required="true">
           <input type="text" class="form-otp-control">
         </div>
       `
       const otpElement = fixtureEl.querySelector('.form-otp')
 
-      new OTPInput(otpElement, { disabled: true, placeholder: '•', readonly: true }).dispose()
+      new OTPInput(otpElement, { disabled: true, readonly: true, required: true }).dispose()
+      OTPInput.getOrCreateInstance(otpElement)
 
-      const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
-
-      expect(first.disabled).toBeFalse()
-      expect(first.readOnly).toBeFalse()
-      expect(first.getAttribute('placeholder')).toEqual('a')
-      expect(second.hasAttribute('placeholder')).toBeFalse()
+      for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
+        expect(input.disabled).toBeFalse()
+        expect(input.readOnly).toBeFalse()
+        expect(input.hasAttribute('aria-required')).toBeFalse()
+      }
     })
 
     it('should let a new instance turn the options off after the previous one', () => {
@@ -1870,7 +1874,7 @@ describe('OTPInput', () => {
       expect(group).not.toHaveClass('is-invalid')
     })
 
-    it('should not take a class or aria-invalid the page writes after start, or aria-invalid on the group or a slot', async () => {
+    it('should not take a class or aria-invalid the page writes after start, and let the state decide aria-invalid on a slot over its markup', async () => {
       const { form, otpInput, slots } = mountForm({}, '', '<input class="form-otp-control" aria-invalid="true"><input class="form-otp-control">')
       const group = fixtureEl.querySelector('.form-otp')
 
@@ -1887,7 +1891,7 @@ describe('OTPInput', () => {
       slots[1].classList.remove('is-invalid')
       otpInput.dispose()
 
-      expect(slotStates(slots)).toEqual([['true', null], [null, null]])
+      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
     })
 
     it('should give a slot added after start the state and keep it from the form plugin', () => {
@@ -2122,16 +2126,18 @@ describe('OTPInput', () => {
       expect(slots[0]).toHaveClass('is-valid')
     })
 
-    it('should keep an aria-required the page wrote on a slot', () => {
+    it('should let the required option decide aria-required on every slot over the markup', () => {
       const { otpInput, slots } = mountForm({}, '', '<input class="form-otp-control" aria-required="true"><input class="form-otp-control">')
 
-      expect(slots.map(slot => slot.getAttribute('aria-required'))).toEqual(['true', null])
+      expect(slots.map(slot => slot.getAttribute('aria-required'))).toEqual([null, null])
 
       otpInput.setConfig({ required: true })
-      otpInput.setConfig({ required: false })
-      otpInput.dispose()
 
-      expect(slots.map(slot => slot.getAttribute('aria-required'))).toEqual(['true', null])
+      expect(slots.map(slot => slot.getAttribute('aria-required'))).toEqual(['true', 'true'])
+
+      otpInput.setConfig({ required: false })
+
+      expect(slots.map(slot => slot.getAttribute('aria-required'))).toEqual([null, null])
     })
 
     it('should give the slots back their attributes on dispose', () => {
@@ -2165,7 +2171,7 @@ describe('OTPInput', () => {
       expect(host.getAttribute('aria-describedby')).toBe('hint')
     })
 
-    it('should give a slot added later its own aria-invalid back on dispose', () => {
+    it('should take the aria-invalid it wrote off a slot added later on dispose', () => {
       const { otpInput, slots } = mountForm({ validationState: 'invalid' }, '', '<input class="form-otp-control">')
       const added = document.createElement('input')
 
@@ -2178,7 +2184,7 @@ describe('OTPInput', () => {
 
       otpInput.dispose()
 
-      expect(added.getAttribute('aria-invalid')).toBe('false')
+      expect(added.hasAttribute('aria-invalid')).toBe(false)
     })
 
     it('should still answer a native reset when a capturing reset listener reconfigures it', async () => {

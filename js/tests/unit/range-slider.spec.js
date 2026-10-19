@@ -776,16 +776,19 @@ describe('RangeSlider', () => {
       expect(inputsOf(named)[0].getAttribute('aria-label')).toEqual('Volume Master')
     })
 
-    it('should leave the label and description on an element with a role of its own', () => {
-      const { element } = mount({ value: [20, 80] }, 'role="group" aria-labelledby="budgetLabel" aria-describedby="budgetHelp"')
+    it('should make an element with a role of its own a group and move its description to the handles', () => {
+      const { element } = mount({ value: [20, 80] }, 'role="region" aria-labelledby="budgetLabel" aria-describedby="budgetHelp"')
 
+      expect(element.getAttribute('role')).toEqual('group')
       expect(element.getAttribute('aria-labelledby')).toEqual('budgetLabel')
-      expect(element.getAttribute('aria-describedby')).toEqual('budgetHelp')
+      expect(element.hasAttribute('aria-describedby')).toBeFalse()
       expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Minimum value', 'Maximum value'])
-      expect(inputsOf(element).some(input => input.hasAttribute('aria-labelledby') || input.hasAttribute('aria-describedby'))).toBeFalse()
+      expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp'])
+      expect(inputsOf(element).some(input => input.hasAttribute('aria-labelledby'))).toBeFalse()
 
       const { element: single } = mount({ value: 40 }, 'role="presentation" aria-label="Volume"')
 
+      expect(single.getAttribute('role')).toEqual('group')
       expect(inputsOf(single)[0].getAttribute('aria-label')).toEqual('Volume')
     })
 
@@ -815,14 +818,16 @@ describe('RangeSlider', () => {
       expect(inputsOf(element)[0].getAttribute('aria-label')).toEqual('Cost')
     })
 
-    it('should make the element a group and take the role back on dispose', () => {
+    it('should make the element a group on every init and leave a role the page set later on dispose', () => {
       const { element, rangeSlider } = mount({ value: 40 })
 
       expect(element.getAttribute('role')).toEqual('group')
 
       rangeSlider.dispose()
+      element.setAttribute('role', 'region')
+      RangeSlider.getOrCreateInstance(element, { value: 40 })
 
-      expect(element.hasAttribute('role')).toBeFalse()
+      expect(element.getAttribute('role')).toEqual('group')
 
       const { element: region, rangeSlider: regionSlider } = mount({ value: 40 })
 
@@ -1229,7 +1234,7 @@ describe('RangeSlider', () => {
   })
 
   describe('dispose', () => {
-    it('should remove what it built and keep the page content', () => {
+    it('should remove what it built, take off the state class it drew and keep the page content', () => {
       fixtureEl.innerHTML = '<div id="slider"><p class="note">Page content</p></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { ticks: ['Low', 'High'], value: [20, 80], vertical: true })
@@ -1239,18 +1244,17 @@ describe('RangeSlider', () => {
 
       expect(RangeSlider.getInstance(element)).toBeNull()
       expect(Range.getInstance(wrapper)).toBeNull()
-      expect(element.hasAttribute('class')).toBeFalse()
       expect([...element.children].map(child => child.className)).toEqual(['note'])
 
-      fixtureEl.innerHTML = '<div id="styled"></div><div id="kept" class=""></div>'
+      fixtureEl.innerHTML = '<div id="styled"></div>'
+      const styled = fixtureEl.querySelector('#styled')
+      const invalid = new RangeSlider(styled, { validationState: 'invalid', value: 40 })
 
-      for (const id of ['styled', 'kept']) {
-        const styled = fixtureEl.querySelector(`#${id}`)
-        new RangeSlider(styled, { validationState: 'invalid', value: 40 }).dispose()
-      }
+      expect(styled).toHaveClass('is-invalid')
 
-      expect(fixtureEl.querySelector('#styled').hasAttribute('class')).toBeFalse()
-      expect(fixtureEl.querySelector('#kept').getAttribute('class')).toEqual('')
+      invalid.dispose()
+
+      expect(styled).not.toHaveClass('is-invalid')
     })
 
     it('should give the element back its label and description', () => {

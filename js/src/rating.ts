@@ -12,7 +12,7 @@ import FieldValidation from './util/field-validation.js'
 import { type ValidationState } from './util/form-validation.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
+  defineJQueryPlugin, getUID, jQueryDispatch, writeAttribute
 } from './util/index.js'
 import Tooltip from './tooltip.js'
 
@@ -123,15 +123,9 @@ const DefaultType = {
 
 class Rating extends BaseComponent {
   protected declare _currentValue: number | string | null
-  protected declare _hostAriaInvalid: string | null
-  protected declare _hostAriaReadonly: string | null
-  protected declare _hostAriaRequired: string | null
-  protected declare _hostClasses: HostClasses
-  protected declare _hostRole: string | null
   protected declare _items: HTMLElement[]
   protected declare _name: string
   protected declare _sizeClassName: string | null
-  protected declare _sizeClassNames: Set<string>
   protected declare _startValue: number | string | null
   protected declare _tooltip: any
   protected declare _validation: FieldValidation
@@ -139,16 +133,6 @@ class Rating extends BaseComponent {
   constructor(element?: string | Element | null, config?: Partial<RatingConfig> | null) {
     super(element)
 
-    this._hostClasses = captureHostClasses(this._element, [
-      CLASS_NAME_RATING,
-      CLASS_NAME_DISABLED,
-      CLASS_NAME_READONLY,
-      ...[...this._element.classList].filter(className => className.startsWith(`${CLASS_NAME_RATING}-`))
-    ])
-    this._hostAriaInvalid = this._element.getAttribute('aria-invalid')
-    this._hostAriaReadonly = this._element.getAttribute('aria-readonly')
-    this._hostAriaRequired = this._element.getAttribute('aria-required')
-    this._hostRole = this._element.getAttribute('role')
     this._items = []
     this._validation = new FieldValidation(this._element, {
       blockers: () => {
@@ -161,13 +145,12 @@ class Rating extends BaseComponent {
       describedTargets: () => this._radios(),
       fields: () => this._radios(),
       frames: () => [this._element],
-      invalidTargets: () => (this._hostAriaInvalid === null ? [this._element] : []),
+      invalidTargets: () => [this._element],
       pageDescribed: () => [this._element],
       restore: () => this._restoreValue()
     })
 
     this._sizeClassName = null
-    this._sizeClassNames = new Set()
     this._config = this._getConfig(config)
     this._currentValue = this._config.value
     this._startValue = this._config.value
@@ -228,27 +211,10 @@ class Rating extends BaseComponent {
 
     this._validation.dispose()
     this._removeRating()
-    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
-
-    if (this._hostAriaRequired === null) {
-      this._element.removeAttribute('aria-required')
-    }
-
-    if (this._hostRole === null && this._element.getAttribute('role') === 'radiogroup') {
-      this._element.removeAttribute('role')
-    }
-
-    if (this._hostAriaReadonly === null) {
-      this._element.removeAttribute('aria-readonly')
-    }
-
     super.dispose()
   }
 
   // Private
-  _managedClassNames(): string[] {
-    return [CLASS_NAME_RATING, CLASS_NAME_DISABLED, CLASS_NAME_READONLY, ...this._sizeClassNames]
-  }
 
   _radios(): HTMLInputElement[] {
     return SelectorEngine.find<HTMLInputElement>(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)
@@ -496,31 +462,11 @@ class Rating extends BaseComponent {
       this._element.classList.remove(...SIZE_CLASS_NAMES)
       this._element.classList.add(sizeClassName)
       this._sizeClassName = sizeClassName
-
-      for (const className of [...SIZE_CLASS_NAMES, sizeClassName]) {
-        this._sizeClassNames.add(className)
-      }
     }
 
-    if (!this._element.hasAttribute('role')) {
-      this._element.setAttribute('role', 'radiogroup')
-    }
-
-    if (this._hostAriaReadonly === null) {
-      if (this._config.readonly) {
-        this._element.setAttribute('aria-readonly', 'true')
-      } else {
-        this._element.removeAttribute('aria-readonly')
-      }
-    }
-
-    if (this._hostAriaRequired === null) {
-      if (this._isRequired()) {
-        this._element.setAttribute('aria-required', 'true')
-      } else {
-        this._element.removeAttribute('aria-required')
-      }
-    }
+    this._element.setAttribute('role', 'radiogroup')
+    writeAttribute(this._element, 'aria-readonly', this._config.readonly ? 'true' : null)
+    writeAttribute(this._element, 'aria-required', this._isRequired() ? 'true' : null)
 
     this._items = Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index))
 
