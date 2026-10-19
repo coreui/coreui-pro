@@ -20,10 +20,10 @@ From this one map the library generates:
 | --- | --- | --- |
 | `primary` | `oklch(52.945% 0.19103 278.34)` | Main brand color for primary actions |
 | `secondary` | `var(--cui-gray-200)` | Less prominent actions and states |
-| `success` | `oklch(61.237% 0.17298 146.95)` | Positive actions and successful states |
-| `info` | `oklch(67.55% 0.17646 252.26)` | Informational messages and neutral states |
-| `warning` | `oklch(80.791% 0.16473 78.5)` | Cautionary messages and states |
-| `danger` | `oklch(63.864% 0.18175 23.81)` | Destructive actions and error states |
+| `success` | `oklch(55.1% 0.173 145)` | Positive actions and successful states |
+| `info` | `oklch(57.4% 0.196 256)` | Informational messages and neutral states |
+| `warning` | `oklch(84% 0.172 85)` | Cautionary messages and states |
+| `danger` | `oklch(58.7% 0.237 23.81)` | Destructive actions and error states |
 | `inverse` | `var(--cui-gray-900)` | Surfaces that flip against the page, e.g. a dark bar on a light page |
 
 The five chromatic colors are entries of the [palette](/customize/color/#all-colors) under the same name: `base` and `bg` read `--cui-primary-500`, and the rest of the slots read that scale. Override `$primary`, or the `--cui-primary-500` token at run time, and the whole family retints. `secondary` and `inverse` read gray stops: their `base` is one stop, and their `bg` flips between the schemes.
