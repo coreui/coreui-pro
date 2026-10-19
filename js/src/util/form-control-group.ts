@@ -23,11 +23,6 @@ export const applyControlGroupSize = (element: HTMLElement, size: string | null)
   element.classList.add(`${CLASS_NAME_FORM_CONTROL}-${size}`)
 }
 
-export const managedSizeClassNames = (size: string | null): string[] =>
-  size ? [...new Set([...SIZE_CLASS_NAMES, `${CLASS_NAME_FORM_CONTROL}-${size}`])] : []
-
-export { captureHostClasses, type HostClasses, restoreHostClasses } from './index.js'
-
 export const applyControlGroupClasses = (element: HTMLElement, ...classNames: string[]): void => {
   if (element.classList.contains(CLASS_NAME_GROUP)) {
     element.classList.add(...classNames)

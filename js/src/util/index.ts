@@ -432,41 +432,7 @@ const getNextActiveElement = <T>(list: T[], activeElement: T, shouldGetNext: boo
   return list[Math.max(0, Math.min(index, listLength - 1))]
 }
 
-export type HostClasses = { classNames: string[], hadAttribute: boolean }
-
-/**
- * Records which of the classes a component manages the element already had,
- * and whether it had a `class` attribute at all.
- *
- * @param element - The element the component decorates
- * @param managed - The class names the component may add or remove
- * @returns The snapshot to hand to `restoreHostClasses`
- */
-const captureHostClasses = (element: HTMLElement, managed: string[]): HostClasses => ({
-  classNames: managed.filter(className => element.classList.contains(className)),
-  hadAttribute: element.hasAttribute('class')
-})
-
-/**
- * Sets every managed class back to the snapshot and drops a `class`
- * attribute that the element did not have and that is now empty.
- *
- * @param element - The element the component decorates
- * @param managed - The class names the component added or removed
- * @param host - The snapshot `captureHostClasses` took
- */
-const restoreHostClasses = (element: HTMLElement, managed: string[], host: HostClasses): void => {
-  for (const className of managed) {
-    element.classList.toggle(className, host.classNames.includes(className))
-  }
-
-  if (!host.hadAttribute && element.classList.length === 0) {
-    element.removeAttribute('class')
-  }
-}
-
 export {
-  captureHostClasses,
   defineJQueryPlugin,
   execute,
   executeAfterTransition,
@@ -486,7 +452,6 @@ export {
   onDOMContentLoaded,
   parseSelector,
   reflow,
-  restoreHostClasses,
   setAriaAttribute,
   triggerTransitionEnd,
   toType,
