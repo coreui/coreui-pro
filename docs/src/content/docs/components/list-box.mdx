@@ -133,7 +133,7 @@ Leave an empty `.list-box-options` in the markup so you can name it; the plugin 
 
 A list that depends on another field, such as the cities of the chosen country, sets `resetSelectionOnItemsChange: true`. Whenever the values of the new items differ from the ones before, `setItems` then starts from an empty selection and takes the items marked `selected`, so the city of the previous country never travels on with the next one. The same values again, in any order, keep the selection. Leave it off with `search: 'external'`, where every answer brings different values and would drop the pick.
 
-`loading` covers the wait: it writes `aria-busy="true"` on the options element, puts `.loading` on the container — which dims the options while they stay usable, so a choice from the shown results still counts — and holds the empty state back, so "No results" never flashes before the answer arrives. `setLoading(value)` turns it on and off around the request.
+`loading` covers the wait: it writes `aria-busy="true"` on the options element, shows a row with a spinner and the `loadingLabel` text below the options, announces that text to screen readers when the wait starts or the list shows up waiting, and holds the empty state back, so "No results" never flashes before the answer arrives. The options stay as they are and can still be picked, so a choice from the shown results counts. `setLoading(value)` turns it on and off around the request.
 
 <Example code={`<div class="list-box" id="listBoxRemote" style="max-width: 22rem">
     <div class="list-box-header">
@@ -169,7 +169,7 @@ The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-se
 
 ### External search
 
-`search: 'external'` builds the same field and filters nothing. Every keystroke fires `search.coreui.list-box` with the `query`, and you answer with `setItems()` — the list shows what you hand it, so the query is yours to interpret. What the user picked stays picked while the results change, also when the next answer does not carry it. Debounce the request and put `setLoading()` around it, and the list dims instead of flickering between two answers.
+`search: 'external'` builds the same field and filters nothing. Every keystroke fires `search.coreui.list-box` with the `query`, and you answer with `setItems()` — the list shows what you hand it, so the query is yours to interpret. What the user picked stays picked while the results change, also when the next answer does not carry it. Debounce the request and put `setLoading()` around it, so the loading row shows while the answer is on its way and the options already shown can still be picked.
 
 <Example code={`<div class="list-box" id="listBoxExternalSearch" style="max-width: 22rem">
     <div class="list-box-options" role="listbox" aria-label="Users" style="max-height: 14rem; overflow-y: auto">
@@ -401,7 +401,8 @@ Add `data-coreui-list-box` to a `.list-box` and the plugin initializes it on pag
 | `data-coreui-indicator="checkbox"` | Renders the checkbox indicator in front of every option. |
 | `data-coreui-list-box-counter` | Marks the element that holds the `{selected}/{available}` counter. Created in the header when `counter` is on and the markup has none. |
 | `data-coreui-list-box-search` | Marks an input as the search field of the list. Built for you when `search` is on and the markup has none. |
-| `data-coreui-loading="true"` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. The options stay usable. |
+| `data-coreui-loading="true"` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, the loading row below the options, empty state held back. The options stay usable. |
+| `data-coreui-loading-label` | Text of the loading row and of its announcement. |
 
 ```html
 <div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple">
@@ -436,7 +437,8 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and marks the container with `data-coreui-indicator="checkbox"`, which is what lays the options out in two columns. |
 | `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever `.list-box-options` already holds. |
-| `loading` | boolean | `false` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. The options stay usable. |
+| `loading` | boolean | `false` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, the loading row below the options, empty state held back. The options stay usable. |
+| `loadingLabel` | string | `'Loading…'` | Text of the loading row, announced to screen readers when the list starts loading on the page or shows up loading. |
 | `resetSelectionOnItemsChange` | boolean | `false` | Empties the selection when `setItems()` brings items with different values, then takes the items marked `selected`. For a list that depends on another field. |
 | `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`. |
 | `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |
@@ -470,7 +472,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
 | `setActive(value)` | Moves the highlight without taking the focus. |
 | `setItems(items)` | Rebuilds the list from an `items` array. The selection stays as it is, values the new items no longer carry included; items marked `selected` join a multiple selection, or a single one that holds nothing, and `change` fires only when they do. With `resetSelectionOnItemsChange` new values empty the selection first. |
-| `setLoading(loading)` | Turns the loading state on or off. |
+| `setLoading(loading)` | Turns the loading state on or off; turning it on announces `loadingLabel` while the list is on the page. |
 | `toggle(value)` | Selects the value, or deselects it when it is already selected. |
 | `update` | Re-reads the DOM: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, the empty state and the select-all button are re-evaluated. The selection survives all of it. |
 

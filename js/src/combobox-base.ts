@@ -185,6 +185,7 @@ class ComboboxBase extends BaseComponent {
 
   _syncPanelReferences(): void {
     this._listBox?._updateActiveDescendant()
+    this._listBox?._syncLoadingAnnouncement()
 
     const open = this._menu.isConnected && this._isShown()
     const field = this._getActiveDescendantField()

@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import ListBox from '../../src/list-box.js'
 import { DefaultAllowlist } from '../../src/util/sanitizer.js'
 import { createSelectionStore } from '../../src/util/selection-state.js'
@@ -97,6 +98,7 @@ describe('ListBox', () => {
         indicator: 'none',
         items: [],
         loading: false,
+        loadingLabel: 'Loading…',
         resetSelectionOnItemsChange: false,
         sanitize: true,
         sanitizeFn: null,
@@ -2340,6 +2342,137 @@ describe('ListBox', () => {
       el.querySelector('[data-coreui-select-all]').click()
 
       expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato', 'onion', 'cheese'])
+    })
+
+    it('should keep a hidden loading row next to the options and show it while loading', () => {
+      const el = setLoadingMarkup()
+      const listBox = new ListBox(el)
+      const region = el.querySelector('.list-box-loading')
+
+      expect(region.hasAttribute('role')).toBeFalse()
+      expect(region.previousElementSibling).toBe(list(el))
+      expect(region.textContent).toEqual('Loading…')
+      expect(region.querySelector('.spinner-border').getAttribute('aria-hidden')).toEqual('true')
+      expect(region.hidden).toBeTrue()
+
+      listBox.setLoading(true)
+
+      expect(region.hidden).toBeFalse()
+
+      listBox.setItems([{ value: 'ham', label: 'Ham' }])
+
+      expect(el.querySelector('.list-box-loading')).toBe(region)
+      expect(region.hidden).toBeFalse()
+
+      listBox.setLoading(false)
+
+      expect(region.hidden).toBeTrue()
+    })
+
+    it('should announce the loading label while it loads in the page, once per wait', async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      const el = setLoadingMarkup(' data-coreui-loading-label="Fetching users"')
+      const listBox = new ListBox(el)
+      const announced = text => [...document.querySelectorAll('[data-coreui-live-announcer] [aria-live="polite"] > *')].filter(node => node.textContent === text).length
+      const settle = async () => {
+        await Promise.resolve()
+        vi.advanceTimersByTime(100)
+      }
+
+      try {
+        listBox.setLoading(true)
+        listBox.setLoading(true)
+        await settle()
+
+        expect(announced('Fetching users')).toEqual(1)
+
+        listBox.setLoading(false)
+
+        expect(announced('Fetching users')).toEqual(0)
+
+        listBox.setLoading(true)
+        await settle()
+
+        expect(announced('Fetching users')).toEqual(1)
+
+        listBox.setLoading(false)
+        listBox.setLoading(true)
+        listBox.setLoading(false)
+        await settle()
+
+        expect(announced('Fetching users')).toEqual(0)
+      } finally {
+        vi.useRealTimers()
+
+        for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+          announcer.remove()
+        }
+      }
+    })
+
+    it('should announce a list that starts loading in the page, and stay quiet while it is out of it', async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      const announced = text => [...document.querySelectorAll('[data-coreui-live-announcer] [aria-live="polite"] > *')].filter(node => node.textContent === text).length
+      const settle = async () => {
+        await Promise.resolve()
+        vi.advanceTimersByTime(100)
+      }
+
+      try {
+        // eslint-disable-next-line no-new
+        new ListBox(setLoadingMarkup(' data-coreui-loading="true" data-coreui-loading-label="Fetching users"'))
+        await settle()
+
+        expect(announced('Fetching users')).toEqual(1)
+
+        const detached = document.createElement('div')
+        detached.innerHTML = '<div class="list-box-options" aria-label="Results"><div class="list-box-option" data-coreui-value="ham">Ham</div></div>'
+        const listBox = new ListBox(detached, { loadingLabel: 'Fetching ham' })
+        listBox.setLoading(true)
+        await settle()
+
+        expect(announced('Fetching ham')).toEqual(0)
+
+        fixtureEl.append(detached)
+        listBox.update()
+        await settle()
+
+        expect(announced('Fetching ham')).toEqual(1)
+      } finally {
+        vi.useRealTimers()
+
+        for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+          announcer.remove()
+        }
+      }
+    })
+
+    it('should put no loading row outside a host that is the list itself', () => {
+      fixtureEl.innerHTML = '<div class="list-box" aria-label="Results"><div class="list-box-option" data-coreui-value="a">A</div></div>'
+      const listBox = new ListBox(fixtureEl.firstElementChild)
+
+      listBox.setLoading(true)
+
+      expect(fixtureEl.querySelector('.list-box-loading')).toBeNull()
+    })
+
+    it('should say the loading label it is given', () => {
+      const el = setLoadingMarkup(' data-coreui-loading="true" data-coreui-loading-label="Fetching users"')
+      // eslint-disable-next-line no-new
+      new ListBox(el)
+
+      expect(el.querySelector('.list-box-loading').textContent).toEqual('Fetching users')
+    })
+
+    it('should remove its loading row on dispose', () => {
+      const el = setLoadingMarkup(' data-coreui-loading="true"')
+      const listBox = new ListBox(el)
+
+      listBox.dispose()
+
+      expect(el.querySelector('.list-box-loading')).toBeNull()
     })
 
     it('should drop the loading class on dispose', () => {

@@ -123,7 +123,7 @@ The search belongs to the list box — `search` and `searchPlaceholder` are pass
 
 `search: 'external'` hands the searching over to you — the [list box's external mode](/components/list-box/#external-search) on both lists at once. The transfer re-emits what they report as `search.coreui.transfer`, adding the `side` that was typed in, and you answer with `setItems()` — one method for both lists, so pass the whole set you want shown and leave out what the query rules out. Values already in the target stay there as long as your set still carries them, which is why the example below keeps the chosen users in what it sends back.
 
-`loading` covers the wait: `setLoading(true, 'source')` writes `aria-busy="true"` on that list's options element and dims it until the answer arrives. The second argument is what scopes it — `setLoading(true)` and the `loading` option both cover *both* lists, so a list you never fetch for stays dimmed until something releases it. Fetch one list, mark one list.
+`loading` covers the wait: `setLoading(true, 'source')` writes `aria-busy="true"` on that list's options element and shows a loading row with `loadingLabel` below its options until the answer arrives. The second argument is what scopes it — `setLoading(true)` and the `loading` option both cover *both* lists, so a list you never fetch for keeps its loading row until something releases it. Fetch one list, mark one list.
 
 Rebuilding is a fresh start for the selection: after `setItems()` neither list has anything checked, and `selected` on an item applies to the first render only, so a re-fetch never brings the checkboxes back. Moving options across clears the destination's selection too — what arrives is ready to be picked, not already picked.
 
@@ -361,7 +361,8 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `html` | boolean | `false` | Parse the labels and descriptions of `items` as markup instead of text. Passed to both list boxes. |
 | `indicator` | string | `'checkbox'` | Passed to both list boxes. `'none'` drops the checkbox in front of every option. |
 | `items` | array | `[]` | The options of both lists, rendered instead of the markup: `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` keeps every item in it on its side. `value` decides which of them start in the target list, `selected` which start checked — on the first render only, and never a disabled item. |
-| `loading` | boolean | `false` | Marks both lists as busy: `aria-busy="true"` on the options element and `.loading` on the list, which dims it while it stays usable. Release it with `setLoading(false)`, or scope it per list with `setLoading(value, list)`. |
+| `loading` | boolean | `false` | Marks both lists as busy: `aria-busy="true"` on the options element and a loading row below the options, while the lists stay usable. Release it with `setLoading(false)`, or scope it per list with `setLoading(value, list)`. |
+| `loadingLabel` | string | `'Loading…'` | Text of the loading row of a busy list, announced to screen readers when it starts loading. |
 | `moveAllToSourceIcon` | string | `cil-chevron-double-left-alt` | Icon of the button that moves everything back. Inline SVG, put in the button only when the markup left it empty. |
 | `moveAllToTargetIcon` | string | `cil-chevron-double-right-alt` | Icon of the button that moves everything across. |
 | `moveToSourceIcon` | string | `cil-chevron-left-alt` | Icon of the button that moves the selection back. |
@@ -393,7 +394,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `moveToSource(values?)` | The same in the other direction. Does nothing with `oneWay`. |
 | `moveToTarget(values?)` | Moves the source list's selection to the target list. Pass an array of values to move exactly those, selected or not. |
 | `setItems(items)` | Rebuilds both lists from a new `items` array. The values the target holds keep their place as long as the new items still carry them; everything else goes to the source in the items order. Both selections come back empty. |
-| `setLoading(loading, list?)` | Marks a list busy while you fetch: pass `'source'` or `'target'` for one of them, nothing for both. A list left busy stays dimmed, so release every list you marked. |
+| `setLoading(loading, list?)` | Marks a list busy while you fetch: pass `'source'` or `'target'` for one of them, nothing for both. A list left busy keeps its loading row, so release every list you marked. |
 | `update` | Re-reads the DOM: options added or removed reach both list boxes, which re-apply their search and counter, and the move buttons are re-evaluated. |
 
 ### Events

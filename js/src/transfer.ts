@@ -77,6 +77,7 @@ type TransferConfig = {
   indicator: string
   items: ListBoxEntry[]
   loading: boolean
+  loadingLabel: string
   moveAllToSourceIcon: string
   moveAllToTargetIcon: string
   moveToSourceIcon: string
@@ -105,6 +106,7 @@ const Default: TransferConfig = {
   indicator: 'checkbox',
   items: [],
   loading: false,
+  loadingLabel: 'Loading…',
   moveAllToSourceIcon: CHEVRON_DOUBLE_LEFT_ICON,
   moveAllToTargetIcon: CHEVRON_DOUBLE_RIGHT_ICON,
   moveToSourceIcon: CHEVRON_LEFT_ICON,
@@ -133,6 +135,7 @@ const DefaultType: Record<string, string> = {
   indicator: 'string',
   items: 'array',
   loading: 'boolean',
+  loadingLabel: 'string',
   moveAllToSourceIcon: 'string',
   moveAllToTargetIcon: 'string',
   moveToSourceIcon: 'string',
@@ -299,6 +302,7 @@ class Transfer extends BaseComponent {
         html: this._config.html,
         indicator: this._config.indicator,
         loading: this._config.loading,
+        loadingLabel: this._config.loadingLabel,
         resetSelectionOnItemsChange: true,
         sanitize: this._config.sanitize,
         sanitizeFn: this._config.sanitizeFn,

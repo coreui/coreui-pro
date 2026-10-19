@@ -6736,17 +6736,6 @@ describe('MultiSelect', () => {
       expect(() => new MultiSelect(fixtureEl.querySelector('select'), { search: 'global' })).toThrowError(TypeError)
     })
 
-    it('should not pick with Enter while the list loads', async () => {
-      const multiSelect = mountExternal()
-
-      multiSelect.show()
-      multiSelect.setLoading(true)
-      multiSelect._searchElement.focus()
-      await userEvent.keyboard('{Enter}')
-
-      expect(multiSelect.getValue()).toEqual([])
-    })
-
     it('should give the focus to the search field when the option holding it comes back disabled', () => {
       const multiSelect = mountExternal()
 
@@ -6901,20 +6890,23 @@ describe('MultiSelect', () => {
       expect(() => multiSelect.setOptions([])).not.toThrow()
     })
 
-    it('should not pick an option from the keyboard while the list loads', async () => {
-      const multiSelect = mountExternal()
+    it('should show its loading label below the list while it loads', () => {
+      fixtureEl.innerHTML = '<form><select multiple name="tech"><option value="a">Angular</option></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { loadingLabel: 'Fetching', search: 'external' })
 
       multiSelect.show()
       multiSelect.setLoading(true)
-      multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
-      await userEvent.keyboard(' ')
 
-      expect(multiSelect.getValue()).toEqual([])
-      expect(multiSelect._menu.querySelector('[data-coreui-value="a"]').getAttribute('aria-selected')).toBe('false')
+      expect(multiSelect._menu.querySelector('.list-box-loading').textContent).toEqual('Fetching')
+      expect(multiSelect._menu.querySelector('.list-box-loading').hidden).toBeFalse()
+
+      multiSelect.setLoading(false)
+
+      expect(multiSelect._menu.querySelector('.list-box-loading').hidden).toBeTrue()
     })
 
-    it('should not drop a selected option from the keyboard while the list loads', async () => {
-      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option><option value="r">React</option></select>')
+    it('should pick an option from the keyboard while the list loads', async () => {
+      const multiSelect = mountExternal()
 
       multiSelect.show()
       multiSelect.setLoading(true)
@@ -6925,16 +6917,58 @@ describe('MultiSelect', () => {
       expect(multiSelect._menu.querySelector('[data-coreui-value="a"]').getAttribute('aria-selected')).toBe('true')
     })
 
-    it('should keep refusing a pick while the list loads after setConfig rebuilds it', async () => {
+    it('should announce its loading label when the panel opens on a wait, not while it is closed', async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      const announced = () => [...document.querySelectorAll('[data-coreui-live-announcer] [aria-live="polite"] > *')].filter(node => node.textContent === 'Fetching tech').length
+      const settle = async () => {
+        await Promise.resolve()
+        vi.advanceTimersByTime(100)
+      }
+
+      try {
+        fixtureEl.innerHTML = '<form><select multiple name="tech"><option value="a">Angular</option></select></form>'
+        const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { loadingLabel: 'Fetching tech', search: 'external' })
+
+        multiSelect.setLoading(true)
+        await settle()
+
+        expect(announced()).toEqual(0)
+
+        multiSelect.show()
+        await settle()
+
+        expect(announced()).toEqual(1)
+      } finally {
+        vi.useRealTimers()
+
+        for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+          announcer.remove()
+        }
+      }
+    })
+
+    it('should pick the option in reach with Enter in the search box while the list loads', async () => {
       const multiSelect = mountExternal()
 
-      multiSelect.setLoading(true)
-      multiSelect.setConfig({ placeholder: 'Search' })
       multiSelect.show()
+      multiSelect.setLoading(true)
+      multiSelect._searchElement.focus()
+      await userEvent.keyboard('{Enter}')
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should drop a selected option from the keyboard while the list loads', async () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option><option value="r">React</option></select>')
+
+      multiSelect.show()
+      multiSelect.setLoading(true)
       multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
       await userEvent.keyboard(' ')
 
       expect(multiSelect.getValue()).toEqual([])
+      expect(multiSelect._menu.querySelector('[data-coreui-value="a"]').getAttribute('aria-selected')).toBe('false')
     })
 
     it('should report the search text as typed, once per change', () => {

@@ -109,6 +109,7 @@ describe('Transfer', () => {
         indicator: 'checkbox',
         items: [],
         loading: false,
+        loadingLabel: 'Loading…',
         moveAllToSourceIcon: jasmine.any(String),
         moveAllToTargetIcon: jasmine.any(String),
         moveToSourceIcon: jasmine.any(String),
@@ -195,6 +196,15 @@ describe('Transfer', () => {
       new Transfer(el)
 
       expect(moveButton(el, 'target').textContent).toEqual('Add')
+    })
+
+    it('should show its loading label only in the list that loads', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el, { loadingLabel: 'Fetching' })
+
+      transfer.setLoading(true, 'source')
+
+      expect([...el.querySelectorAll('.list-box-loading')].map(row => [row.textContent, row.hidden])).toEqual([['Fetching', false], ['Fetching', true]])
     })
 
     it('should add no live region of its own', () => {
