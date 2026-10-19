@@ -368,6 +368,7 @@ describe('PasswordInput', () => {
       passwordInput.toggle()
 
       expect(input.type).toBe('text')
+      expect(fixtureEl.querySelector('.form-control-action').disabled).toBe(true)
     })
 
     it('should leave the button of a control disabled by its fieldset to the fieldset', () => {
