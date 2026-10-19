@@ -338,6 +338,21 @@ describe('Stepper', () => {
       expect(buttons[2].disabled).toBeFalse()
     })
 
+    it('should skip a step button with the disabled class in non-linear mode', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+      buttons[1].classList.add('disabled')
+
+      const stepper = new Stepper(stepperElement)
+
+      buttons[1].click()
+      expect(buttons[0]).toHaveClass('active')
+
+      stepper.next()
+      expect(buttons[2]).toHaveClass('active')
+    })
+
     it('should register keydown event handler', () => {
       fixtureEl.innerHTML = getThreeStepFixture()
       const stepperElement = fixtureEl.querySelector('.stepper')
@@ -1587,6 +1602,25 @@ describe('Stepper', () => {
 
       expect(fixtureEl.querySelector('#empty')).toHaveClass('is-invalid')
       expect(fixtureEl.querySelector('#filled')).not.toHaveClass('is-valid')
+    })
+
+    it('should validate the step being left when a later step is clicked in non-linear mode', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement, { linear: false })
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      buttons[1].click()
+
+      expect(buttons[0]).toHaveClass('active')
+      expect(fixtureEl.querySelector('#empty')).toHaveClass('is-invalid')
+
+      fixtureEl.querySelector('#empty').value = 'filled'
+      buttons[1].click()
+
+      expect(buttons[1]).toHaveClass('active')
     })
 
     it('should set aria-invalid on the invalid controls of noValidate forms on failure', () => {
