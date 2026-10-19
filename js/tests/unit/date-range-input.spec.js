@@ -642,6 +642,10 @@ describe('DateRangeInput', () => {
       expect(root().classList.contains('is-invalid')).toBeFalse()
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(DateRangeInput.LIVE_OPTIONS).toEqual(['validationState'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range"></div></form>')
       const [day] = root().querySelectorAll('.form-date-time-section')

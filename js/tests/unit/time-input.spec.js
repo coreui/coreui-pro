@@ -341,6 +341,10 @@ describe('TimeInput', () => {
       expect(onChange).not.toHaveBeenCalled()
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(TimeInput.LIVE_OPTIONS).toEqual(['date', 'disabled', 'readonly', 'required', 'validationState'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       const timeInput = createTimeInput({ date: new Date(2026, 6, 14, 14, 30) })
 

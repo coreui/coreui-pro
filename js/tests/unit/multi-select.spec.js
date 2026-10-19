@@ -5820,6 +5820,10 @@ describe('MultiSelect', () => {
       expect(changes).toEqual([])
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(MultiSelect.LIVE_OPTIONS).toEqual(['disabled', 'invalid', 'options', 'required', 'total', 'valid', 'validationState', 'value'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       fixtureEl.innerHTML = '<form id="form"><select><option value="1" selected>One</option><option value="2">Two</option></select></form>'
       const selectEl = fixtureEl.querySelector('select')

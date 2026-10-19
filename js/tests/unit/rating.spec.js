@@ -622,6 +622,10 @@ describe('Rating', () => {
       expect(div).not.toHaveClass('readonly')
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(Rating.LIVE_OPTIONS).toEqual(['disabled', 'readonly', 'required', 'validationState', 'value'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

@@ -1633,6 +1633,10 @@ describe('Calendar', () => {
       expect(div.querySelectorAll('.calendar-nav')).toHaveSize(2)
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(Calendar.LIVE_OPTIONS).toEqual(['calendarDate', 'endDate', 'selectEndDate', 'startDate'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       fixtureEl.innerHTML = '<div></div>'
 

@@ -662,6 +662,10 @@ describe('OTPInput', () => {
       expect(slots()).toEqual(['5', '5', ''])
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(OTPInput.LIVE_OPTIONS).toEqual(['disabled', 'required', 'validationState', 'value'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       fixtureEl.innerHTML = MARKUP
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { masked: false, value: '12' })

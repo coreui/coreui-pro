@@ -206,6 +206,10 @@ describe('ChipInput', () => {
       expect(element.classList.contains('is-invalid')).toBeFalse()
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(ChipInput.LIVE_OPTIONS).toEqual(['validationState'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
       const element = fixtureEl.querySelector('.chip-input')

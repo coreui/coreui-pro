@@ -2960,6 +2960,10 @@ describe('DateInput', () => {
       expect(dateInput.getDate()).toEqual(new Date(2026, 7, 20))
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(DateInput.LIVE_OPTIONS).toEqual(['date', 'disabled', 'readonly', 'required', 'validationState'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
       const sections = [...getSections(dateInput._element)]

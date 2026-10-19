@@ -1222,6 +1222,10 @@ describe('RangeSlider', () => {
       expect(wrapperOf(element)).not.toEqual(wrapper)
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(RangeSlider.LIVE_OPTIONS).toEqual(['disabled', 'validationState', 'value'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       const { element, rangeSlider } = mount({ value: [20, 80], vertical: true })
       const wrapper = wrapperOf(element)

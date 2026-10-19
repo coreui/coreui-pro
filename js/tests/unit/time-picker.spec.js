@@ -27,6 +27,20 @@ describe('TimePicker', () => {
     return picker
   }
 
+  describe('setConfig', () => {
+    it('should list the options setConfig changes', () => {
+      expect(TimePicker.LIVE_OPTIONS).toEqual(['invalid', 'valid', 'validationState'])
+    })
+
+    it('should throw for an option setConfig does not change', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const picker = new TimePicker(fixtureEl.querySelector('div'))
+
+      expect(() => picker.setConfig({ locale: 'pl-PL' })).toThrowError(TypeError, 'TIME-PICKER: setConfig() does not change "locale". Dispose the instance and create a new one with it.')
+      picker.dispose()
+    })
+  })
+
   describe('constructor', () => {
     it('should read an empty time from an errorChange listener while the field is built', () => {
       const read = []

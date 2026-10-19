@@ -57,6 +57,20 @@ describe('DateRangePicker', () => {
     })
   })
 
+  describe('setConfig', () => {
+    it('should list the options setConfig changes', () => {
+      expect(DateRangePicker.LIVE_OPTIONS).toEqual(['invalid', 'valid', 'validationState'])
+    })
+
+    it('should throw for an option setConfig does not change', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const picker = new DateRangePicker(fixtureEl.querySelector('div'))
+
+      expect(() => picker.setConfig({ locale: 'pl-PL' })).toThrowError(TypeError, 'DATE-RANGE-PICKER: setConfig() does not change "locale". Dispose the instance and create a new one with it.')
+      picker.dispose()
+    })
+  })
+
   describe('constructor', () => {
     it('should read empty ends from an errorChange listener while the fields are built', () => {
       const read = []

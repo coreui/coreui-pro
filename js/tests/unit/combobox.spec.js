@@ -770,6 +770,10 @@ describe('Combobox', () => {
       expect(toggle.classList.contains('is-invalid')).toBeFalse()
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(Combobox.LIVE_OPTIONS).toEqual(['validationState'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       const toggle = setMarkupInForm()
       const combobox = new Combobox(toggle, { validationState: 'invalid' })

@@ -1528,6 +1528,10 @@ describe('Autocomplete', () => {
   })
 
   describe('setConfig', () => {
+    it('should list the options setConfig changes', () => {
+      expect(Autocomplete.LIVE_OPTIONS).toEqual(['disabled', 'invalid', 'options', 'required', 'valid', 'validationState', 'value'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       fixtureEl.innerHTML = '<form id="form"><div class="autocomplete"></div></form>'
       const element = fixtureEl.querySelector('.autocomplete')

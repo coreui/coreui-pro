@@ -1359,6 +1359,10 @@ describe('DatePicker', () => {
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
     })
 
+    it('should list the options setConfig changes', () => {
+      expect(DatePicker.LIVE_OPTIONS).toEqual(['invalid', 'valid', 'validationState'])
+    })
+
     it('should throw for an option setConfig does not change, and leave the instance as it was', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div></form>')
 
