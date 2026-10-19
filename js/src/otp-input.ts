@@ -96,6 +96,7 @@ const DefaultType = {
  */
 
 class OTPInput extends BaseComponent {
+  protected declare _disabled: boolean
   protected declare _inputElement: HTMLInputElement | null
   protected declare _placeholders: Map<HTMLInputElement, string | null>
   protected declare _removeLabelClick: () => void
@@ -107,11 +108,13 @@ class OTPInput extends BaseComponent {
     super(element, config)
 
     this._config = this._getConfig(config)
+    this._disabled = this._config.disabled
     this._inputElement = null
     this._placeholders = new Map()
     this._resetCode = null
     this._value = ''
     this._validation = new FieldValidation(this._element, {
+      canBlock: () => !this._disabled,
       config: () => this._config,
       fields: () => (this._inputElement ? [this._inputElement] : []),
       frames: () => [this._element],
@@ -123,7 +126,7 @@ class OTPInput extends BaseComponent {
 
     this._setRoleAttribute()
     this._setInputsAttributes()
-    this._seedSlots()
+    this._seedSlots(this._config.value)
     this._createValueField()
     this._setInputsTabIndexes()
     this._addEventListeners()
@@ -177,48 +180,41 @@ class OTPInput extends BaseComponent {
   }
 
   disable(): void {
-    if (!this._config.disabled) {
-      this._setConfig({ disabled: true })
-    }
+    this._setDisabled(true)
   }
 
   enable(): void {
-    if (this._config.disabled) {
-      this._setConfig({ disabled: false })
-    }
+    this._setDisabled(false)
   }
 
   setValidationState(validationState: ValidationState | null): void {
-    this._setConfig({ validationState })
+    this._config = this._getConfig({ ...this._config, validationState })
+    this._validation.configure({ validationState })
   }
 
   setValue(value: OtpInputConfig['value']): void {
-    this._setConfig({ value })
+    this._typeCheckConfig({ value }, { value: DefaultType.value })
+    this._seedSlots(value, true)
+    this._setInputsTabIndexes()
+    this._value = this._readSlots()
+    writeValueField(this._inputElement!, this._value)
+    this._validation.update()
   }
 
   // Private
-  _setConfig(config: Partial<OtpInputConfig>): void {
-    this._config = this._getConfig({ ...this._config, ...config })
-    const repaint = 'value' in config
-
-    if (this._validation.configure(config)) {
+  _setDisabled(disabled: boolean): void {
+    if (disabled === this._disabled) {
       return
     }
 
-    this._setInputsAttributes()
+    this._disabled = disabled
 
-    if (repaint) {
-      this._seedSlots({ clearWhenEmpty: true })
+    for (const input of this._getInputs()) {
+      input.disabled = disabled
     }
 
-    this._setInputsTabIndexes()
-    this._syncValueField()
-
-    if (repaint) {
-      this._value = this._readSlots()
-      writeValueField(this._inputElement!, this._value)
-      this._validation.update()
-    }
+    this._inputElement!.disabled = disabled
+    this._validation.update()
   }
 
   _addEventListeners(): void {
@@ -428,7 +424,7 @@ class OTPInput extends BaseComponent {
     const field = this._inputElement!
 
     configureValueField(field, {
-      disabled: this._config.disabled,
+      disabled: this._disabled,
       name: this._config.name,
       required: this._config.required
     })
@@ -512,8 +508,8 @@ class OTPInput extends BaseComponent {
     this._setInputsTabIndexes()
   }
 
-  _seedSlots({ clearWhenEmpty = false }: { clearWhenEmpty?: boolean } = {}): void {
-    const value = this._extractValidChars(String(this._config.value ?? ''))
+  _seedSlots(code: OtpInputConfig['value'], clearWhenEmpty = false): void {
+    const value = this._extractValidChars(String(code ?? ''))
 
     if (!value && !clearWhenEmpty) {
       return
@@ -564,7 +560,7 @@ class OTPInput extends BaseComponent {
         }
       }
 
-      input.disabled = this._config.disabled
+      input.disabled = this._disabled
       input.readOnly = false
 
       if (this._config.id && !input.id) {

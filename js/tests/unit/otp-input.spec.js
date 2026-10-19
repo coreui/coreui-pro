@@ -736,25 +736,180 @@ describe('OTPInput', () => {
       expect(second.hasAttribute('placeholder')).toBeFalse()
     })
 
-    it('should let the options decide disabled on every slot at init and on setValue, and keep a placeholder the page wrote', () => {
+    it('should let the options decide disabled on every slot at init and on enable(), and keep a placeholder the page wrote', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control" disabled>
           <input type="text" class="form-otp-control">
         </div>
       `
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { ariaLabel: index => `Digit ${index + 1}` })
       const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
 
       expect(first.disabled).toBeFalse()
 
       second.disabled = true
       second.placeholder = 'x'
-      otpInput.setValue('1')
+      second.setAttribute('aria-label', 'Second')
+      otpInput.disable()
+      otpInput.enable()
 
+      expect([...fixtureEl.querySelectorAll('.form-otp-control')]).toEqual([first, second])
+      expect(fixtureEl.querySelectorAll('.form-otp-control')[1]).toBe(second)
       expect(first.disabled).toBeFalse()
       expect(second.disabled).toBeFalse()
       expect(second.getAttribute('placeholder')).toEqual('x')
+      expect(second.getAttribute('aria-label')).toEqual('Second')
+    })
+
+    it('should write only the code on setValue, keeping the focused slot and firing no change', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { ariaLabel: index => `Digit ${index + 1}`, linear: false })
+      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+      const events = []
+      for (const type of ['input', 'change', 'change.coreui.otp-input', 'complete.coreui.otp-input']) {
+        fixtureEl.querySelector('.form-otp').addEventListener(type, () => events.push(type))
+      }
+
+      slots[1].setAttribute('aria-label', 'Second')
+      slots[1].focus()
+      otpInput.setValue('1234')
+
+      expect([...fixtureEl.querySelectorAll('.form-otp-control')]).toEqual(slots)
+      expect(document.activeElement).toBe(slots[1])
+      expect(slots.map(slot => slot.value)).toEqual(['1', '2', '3', '4'])
+      expect(slots[1].getAttribute('aria-label')).toEqual('Second')
+      expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('1234')
+      expect(events).toEqual([])
+
+      otpInput.setValue('')
+
+      expect(slots.map(slot => slot.value)).toEqual(['', '', '', ''])
+      expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('')
+    })
+
+    it('should move the tab stop to the first empty slot after setValue', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+
+      otpInput.setValue('12')
+
+      expect(slots.map(slot => slot.getAttribute('tabindex'))).toEqual([null, null, null, '-1'])
+    })
+
+    it('should drop a reported invalid state once setValue fills the code', () => {
+      fixtureEl.innerHTML = '<form novalidate><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const otpInput = new OTPInput(form.querySelector('.form-otp'), { required: true })
+
+      form.reportValidity()
+
+      expect(form.querySelector('.form-otp')).toHaveClass('is-invalid')
+
+      otpInput.setValue('12')
+
+      expect(form.querySelector('.form-otp')).not.toHaveClass('is-invalid')
+    })
+
+    it('should write and take back disabled on the slots and the value field', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+      const field = fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)')
+
+      otpInput.disable()
+
+      expect(slots.every(slot => slot.disabled)).toBeTrue()
+      expect(field.disabled).toBeTrue()
+
+      otpInput.enable()
+
+      expect(slots.some(slot => slot.disabled)).toBeFalse()
+      expect(field.disabled).toBeFalse()
+    })
+
+    it('should block the submit once enable() runs on a field built disabled and invalid, and stop again on disable()', () => {
+      fixtureEl.innerHTML = '<form><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const otpInput = new OTPInput(form.querySelector('.form-otp'), { disabled: true, validationState: 'invalid' })
+      const field = form.querySelector('.form-otp > input:not(.form-otp-control)')
+
+      expect(form.checkValidity()).toBeTrue()
+
+      otpInput.enable()
+
+      expect(form.checkValidity()).toBeFalse()
+
+      otpInput.disable()
+
+      expect(form.checkValidity()).toBeTrue()
+      expect(field.validity.customError).toBeFalse()
+    })
+
+    it('should go back to the start code on a form reset after setValue', async () => {
+      fixtureEl.innerHTML = '<form><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      new OTPInput(form.querySelector('.form-otp'), { value: '12' }).setValue('99')
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect([...fixtureEl.querySelectorAll('.form-otp-control')].map(slot => slot.value)).toEqual(['1', '2'])
+    })
+
+    it('should reject a code of the wrong type with the option error', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"></div>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+
+      expect(() => otpInput.setValue(true)).toThrow('OTP-INPUT: Option "value" provided type "boolean" but expected type "(number|string|null)".')
+      expect(() => otpInput.setValue(true)).toThrowError(TypeError)
+    })
+
+    it('should leave the code as it was when setValue throws', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '12' })
+
+      expect(() => otpInput.setValue({})).toThrowError(TypeError)
+      expect([...fixtureEl.querySelectorAll('.form-otp-control')].map(slot => slot.value)).toEqual(['1', '2'])
+      expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('12')
+    })
+
+    it('should drop the characters the type does not take from setValue', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { type: 'number' })
+
+      otpInput.setValue('1a2')
+
+      expect([...fixtureEl.querySelectorAll('.form-otp-control')].map(slot => slot.value)).toEqual(['1', '2', ''])
+      expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('12')
+    })
+
+    it('should give the first slot the full length again after setValue empties the code', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+      const [first] = fixtureEl.querySelectorAll('.form-otp-control')
+
+      otpInput.setValue('12')
+
+      expect(first.maxLength).toBe(1)
+
+      otpInput.setValue('')
+
+      expect(first.maxLength).toBe(2)
+    })
+
+    it('should leave the slots alone when enable() finds the field enabled', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+      const [first] = fixtureEl.querySelectorAll('.form-otp-control')
+
+      first.disabled = true
+      otpInput.enable()
+
+      expect(first.disabled).toBeTrue()
     })
   })
 
