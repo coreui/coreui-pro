@@ -26,8 +26,6 @@ const DATA_API_KEY = '.data-api'
 
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
-const EVENT_MOUSEOVER = `mouseover${EVENT_KEY}`
-const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
 
 const CLASS_NAME_ACTION = 'form-control-action'
 const CLASS_NAME_PASSWORD_INPUT = 'password-input'
@@ -97,7 +95,8 @@ class PasswordInput extends BaseComponent {
 
   // Public
   toggle(): any {
-    if (this._element.type === 'password' && this._element.matches(':disabled')) {
+    if (this._element.matches(':disabled')) {
+      this._updateDisabledState()
       return
     }
 
@@ -116,7 +115,6 @@ class PasswordInput extends BaseComponent {
     }
 
     if (this._group) {
-      EventHandler.off(this._group.element, EVENT_KEY)
       this._group.element.classList.remove(CLASS_NAME_PASSWORD_INPUT)
       releaseControlGroup(this._element, this._group)
     }
@@ -145,15 +143,13 @@ class PasswordInput extends BaseComponent {
     })
 
     EventHandler.on(this._toggleElement, EVENT_CLICK, () => this.toggle())
-    EventHandler.on(this._group.element, EVENT_MOUSEOVER, () => this._updateDisabledState())
-    EventHandler.on(this._group.element, EVENT_POINTERDOWN, () => this._updateDisabledState())
     EventHandler.on(this._element, EVENT_FOCUS, () => this._updateDisabledState())
     this._group.element.append(this._toggleElement)
   }
 
   _updateDisabledState(): void {
     if (this._toggleElement) {
-      this._toggleElement.disabled = this._element.matches(':disabled')
+      this._toggleElement.disabled = this._element.disabled
     }
   }
 

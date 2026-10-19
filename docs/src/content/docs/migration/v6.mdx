@@ -2273,10 +2273,11 @@ adornment in the library — so the button needs no icon markup at all:
 #### Password Input: the toggle is disabled with the field
 
 The toggle button used to stay enabled on a disabled field and ignore the
-click. It is now disabled whenever the field is, `<fieldset disabled>`
-included, like the steppers of Number Input, so it leaves the tab order too.
-A password revealed before the field is disabled stays visible until the field
-is enabled again.
+click, while `toggle()` flipped a disabled field anyway. The button is now
+disabled with the field and leaves the tab order, like the other action
+buttons, and neither the button nor `toggle()` changes what a disabled field
+shows: a password revealed before the field is disabled stays visible until
+the field is enabled again.
 
 #### Icons rendered by JavaScript
 
