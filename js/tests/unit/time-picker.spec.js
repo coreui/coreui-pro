@@ -808,6 +808,38 @@ describe('TimePicker', () => {
       expect(picker._popup.isShown).toBeFalse()
     })
 
+    it('should keep the hour cycle of its field over selectionOptions', () => {
+      const picker = buildPicker({ format: 'HH:mm', selectionOptions: { hourCycle: 'h12', minutes: [0, 30] }, time: '15:30' })
+
+      picker.show()
+
+      const columns = [...picker._menu.querySelectorAll('.time-picker-col')]
+      expect(columns.map(column => column.getAttribute('aria-label'))).not.toContain('Select AM/PM')
+      expect(columns[0].querySelectorAll('.time-picker-cell').length).toEqual(24)
+      expect(columns[1].querySelectorAll('.time-picker-cell').length).toEqual(2)
+    })
+
+    it('should keep the time of its field over selectionOptions', () => {
+      const picker = buildPicker({ selectionOptions: { time: new Date(2026, 0, 1, 8, 0) }, time: '15:30' })
+
+      picker.show()
+
+      expect(picker._menu.querySelector('.time-picker-col .selected').textContent.trim()).toEqual('3')
+    })
+
+    it('should keep its own onChange over selectionOptions', () => {
+      const onChange = vi.fn()
+      const picker = buildPicker({ selectionOptions: { onChange }, time: '15:30' })
+
+      picker.show()
+      const hour = [...picker._menu.querySelector('.time-picker-col').querySelectorAll('.time-picker-cell')]
+        .find(cell => cell.textContent.trim() === '5')
+      hour.click()
+
+      expect(picker.getTime().getHours()).toEqual(17)
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
     it('should apply the size class', () => {
       buildPicker({ size: 'lg' })
 

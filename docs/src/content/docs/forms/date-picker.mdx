@@ -473,7 +473,7 @@ by the picker itself.
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
 | `seconds` | array, boolean, function | `true` | Seconds offered by the time half. Ignored without `timepicker`. |
-| `selectionOptions` | object | `{}` | Programmatic escape hatch for the time half. |
+| `selectionOptions` | object | `{}` | Programmatic escape hatch for the time half, except `onChange`, `time` and, when the field shows hours, `hourCycle`, which the picker owns. |
 | `selectionType` | string | `'day'` | What the picker selects: `'day'`, `'week'`, `'month'`, `'quarter'` or `'year'`. The calendar and the field mask follow it. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
 | `timepicker` | boolean | `false` | Add a time half to the panel and switch the field to a date and time mask. |

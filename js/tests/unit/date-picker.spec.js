@@ -1117,6 +1117,45 @@ describe('DatePicker', () => {
       expect(meridiem.value).toEqual('')
     })
 
+    it('should keep the hour cycle of its field over selectionOptions', () => {
+      const picker = buildPicker({
+        format: 'MM/dd/yyyy HH:mm', locale: 'en-US', selectionOptions: { hourCycle: 'h12' }, timepicker: true
+      })
+      picker.show()
+
+      expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).toBeNull()
+      expect(fixtureEl.querySelector('select.date-picker-time-select.hours option[value="13"]')).not.toBeNull()
+    })
+
+    it('should let selectionOptions set the hour cycle when the field has no hours', () => {
+      const picker = buildPicker({
+        format: 'dd.MM.yyyy', locale: 'en-US', selectionOptions: { hourCycle: 'h23' }, timepicker: true
+      })
+      picker.show()
+
+      expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).toBeNull()
+    })
+
+    it('should keep its own time and onChange over selectionOptions', () => {
+      const onChange = vi.fn()
+      const picker = buildPicker({
+        date: new Date(2026, 6, 14, 10, 15),
+        locale: 'en-GB',
+        selectionOptions: { onChange, time: new Date(2026, 0, 1, 8, 0) },
+        timepicker: true
+      })
+      picker.show()
+      const hours = fixtureEl.querySelector('select.date-picker-time-select.hours')
+
+      expect(hours.value).toEqual('10')
+
+      hours.value = '11'
+      hours.dispatchEvent(new Event('change', { bubbles: true }))
+
+      expect(picker.getDate().getHours()).toEqual(11)
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
     it('should check the limits against the hour a listed entry stands for', () => {
       const picker = buildPicker({
         date: new Date(2026, 9, 15, 9),

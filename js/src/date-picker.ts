@@ -388,12 +388,16 @@ class DatePicker extends PickerBase {
       return
     }
 
+    const hourCycle = getHourCycle(this._input._sections)
+
     this._selection = new TimeSelects(this._selectionElement, this._forwardConfig(TimeSelects, {
-      hourCycle: getHourCycle(this._input._sections) ?? null,
-      locale: this._config.locale,
+      locale: this._config.locale
+    }, {
+      ...this._config.selectionOptions,
+      ...(hourCycle && { hourCycle }),
       onChange: (time: Date | null) => this._runAsUser(() => this._applyTime(time)),
       time: this.getDate()
-    }, this._config.selectionOptions))
+    }))
   }
 
   _withinTimeLimits(date: Date): Date {
