@@ -21,7 +21,6 @@ import {
   getCalendarKeyAction,
   getClosestSelectable,
   getDateBySelectionType,
-  getDateTimeFieldName,
   getDateOfISOWeek,
   getISOWeekNumberAndYear,
   getKeptDay,
@@ -1352,18 +1351,6 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('End'), null, context())).toEqual({ type: 'stay' })
       expect(getCalendarKeyAction(press('Enter'), null, context())).toBeNull()
       expect(getCalendarKeyAction(press(' '), null, context())).toBeNull()
-    })
-  })
-
-  describe('getDateTimeFieldName', () => {
-    it('should name a date-time field in the locale', () => {
-      expect(getDateTimeFieldName('en-US', 'hour')).toBe('hour')
-      expect(getDateTimeFieldName('pl-PL', 'minute')).toBe('minuta')
-      expect(getDateTimeFieldName('en-US', 'dayPeriod')).toBe('AM/PM')
-    })
-
-    it('should give an empty name where Intl.DisplayNames throws', () => {
-      expect(getDateTimeFieldName('en-US', 'century')).toBe('')
     })
   })
 

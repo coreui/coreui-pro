@@ -6,7 +6,6 @@
  */
 
 import SelectorEngine from '../dom/selector-engine.js'
-import { getDateTimeFieldName } from '../util/calendar.js'
 import { CLOCK_ICON } from '../util/icons.js'
 import { isRTL } from '../util/index.js'
 import TimeSelection from './base.js'
@@ -43,12 +42,20 @@ class TimeSelects extends TimeSelection {
   }
 
   override _markPart(part: string, value: string): void {
-    const select = SelectorEngine.findOne(`select.${part}`, this._element as ParentNode)
+    const select = SelectorEngine.findOne(`select.${part}`, this._element as ParentNode) as HTMLSelectElement | null
 
-    if (select) {
-      (select as HTMLSelectElement).value = value;
-      (select as HTMLSelectElement).options[0].hidden = value !== ''
+    if (!select) {
+      return
     }
+
+    const shown = [...select.options].some(option => option.value === String(value)) ? String(value) : ''
+
+    for (const option of select.options) {
+      option.defaultSelected = option.value === shown
+    }
+
+    select.value = shown
+    select.options[0].hidden = shown !== ''
   }
 
   override _markDisabled(): void {
@@ -99,15 +106,9 @@ class TimeSelects extends TimeSelection {
       })
 
       const placeholder = document.createElement('option')
-      const fieldName = getDateTimeFieldName(this._config.locale, part.name === 'meridiem' ? 'dayPeriod' : part.name.slice(0, -1))
       placeholder.value = ''
       placeholder.disabled = true
       placeholder.textContent = '--'
-
-      if (fieldName) {
-        placeholder.setAttribute('aria-label', fieldName)
-      }
-
       select.append(placeholder)
 
       for (const option of part.options) {

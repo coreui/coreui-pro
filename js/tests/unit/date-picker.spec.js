@@ -2344,30 +2344,64 @@ describe('DatePicker', () => {
       expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 12))
     })
 
-    it('should leave the selects on a named placeholder while no date is picked', () => {
+    it('should leave every select on its placeholder while no date is picked', () => {
       vi.useFakeTimers({ toFake: ['Date'] })
       vi.setSystemTime(new Date(2026, 9, 1, 9))
       onTestFinished(() => vi.useRealTimers())
       const picker = buildPicker({ timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30) })
       picker.show()
-      const [hours, minutes] = fixtureEl.querySelectorAll('select.date-picker-time-select')
+      const selects = () => [...fixtureEl.querySelectorAll('select.date-picker-time-select')]
 
-      expect([hours.value, minutes.value]).toEqual(['', ''])
-      expect(hours.options[0].getAttribute('aria-label')).toEqual('godzina')
-      expect(hours.options[0].disabled).toBeTrue()
+      expect(selects().map(select => select.value)).toEqual(['', '', ''])
+      expect(selects().map(select => select.options[0].textContent)).toEqual(['--', '--', '--'])
+      expect(selects()[0].options[0].disabled).toBeTrue()
 
-      minutes.value = '45'
-      minutes.dispatchEvent(new Event('change'))
+      selects()[0].value = '10'
+      selects()[0].dispatchEvent(new Event('change'))
 
-      expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 10, 45))
-      expect(hours.value).toEqual('10')
-      expect(hours.options[0].hidden).toBeTrue()
+      expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 10, 30))
+      expect(selects().map(select => select.value)).toEqual(['10', '30', '0'])
+      expect(selects().map(select => select.options[0].hidden)).toEqual([true, true, true])
 
       picker.clear()
-      const [clearedHours, clearedMinutes] = fixtureEl.querySelectorAll('select.date-picker-time-select')
 
-      expect([clearedHours.value, clearedMinutes.value]).toEqual(['', ''])
-      expect(clearedHours.options[0].hidden).toBeFalse()
+      expect(selects().map(select => select.value)).toEqual(['', '', ''])
+      expect(selects()[0].options[0].hidden).toBeFalse()
+    })
+
+    it('should build a first pick on the start time of a 12-hour list', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 9, 1, 9))
+      onTestFinished(() => vi.useRealTimers())
+      const picker = buildPicker({ timepicker: true, locale: 'en-US', minDate: new Date(2026, 9, 15, 13) })
+      picker.show()
+      const select = part => fixtureEl.querySelector(`select.date-picker-time-select.${part}`)
+
+      expect(select('meridiem').value).toEqual('')
+
+      select('minutes').value = '30'
+      select('minutes').dispatchEvent(new Event('change'))
+
+      expect([picker.getDate().getHours(), picker.getDate().getMinutes()]).toEqual([13, 30])
+      expect([select('hours').value, select('meridiem').value]).toEqual(['1', 'pm'])
+    })
+
+    it('should keep the placeholder through a form reset while no date is picked', () => {
+      buildPicker({ timepicker: true, locale: 'en-GB' }, '<form><div id="picker"></div></form>').show()
+
+      fixtureEl.querySelector('form').reset()
+
+      expect(fixtureEl.querySelector('select.date-picker-time-select.hours').value).toEqual('')
+    })
+
+    it('should stand a select on its placeholder for a time its list does not offer', () => {
+      buildPicker({
+        timepicker: true, locale: 'en-GB', date: new Date(2026, 9, 15, 10, 7), selectionOptions: { minutes: [0, 15, 30, 45] }
+      }).show()
+      const minutes = fixtureEl.querySelector('select.date-picker-time-select.minutes')
+
+      expect(minutes.value).toEqual('')
+      expect(minutes.options[0].hidden).toBeFalse()
     })
 
     it('should judge no minute by the limits while no date is picked', () => {

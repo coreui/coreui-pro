@@ -104,22 +104,6 @@ export const parseToDateString = (value: string) : Date => {
 }
 
 /**
- * Gives a locale's name for a date-time field ("hour", "godzina", "Stunde"),
- * or an empty string where `Intl.DisplayNames` has no data.
- *
- * @param locale - The locale to use
- * @param field - The field as `Intl.DisplayNames` names it: `hour`, `minute`, `second`, `dayPeriod`, `weekOfYear`, …
- * @returns The name
- */
-export const getDateTimeFieldName = (locale: string, field: string): string => {
-  try {
-    return new Intl.DisplayNames(locale, { type: 'dateTimeField' }).of(field) ?? ''
-  } catch {
-    return ''
-  }
-}
-
-/**
  * Gives a locale's week-of-year label, capitalized the way the native week
  * input shows it ("Week", "Tydzień", "Woche"), or "Week" where
  * `Intl.DisplayNames` has no data.
@@ -128,8 +112,12 @@ export const getDateTimeFieldName = (locale: string, field: string): string => {
  * @returns The label
  */
 export const getWeekLabel = (locale: string): string => {
-  const label = getDateTimeFieldName(locale, 'weekOfYear')
-  return label ? label.charAt(0).toLocaleUpperCase(locale) + label.slice(1) : 'Week'
+  try {
+    const label = new Intl.DisplayNames(locale, { type: 'dateTimeField' }).of('weekOfYear')
+    return label ? label.charAt(0).toLocaleUpperCase(locale) + label.slice(1) : 'Week'
+  } catch {
+    return 'Week'
+  }
 }
 
 /**

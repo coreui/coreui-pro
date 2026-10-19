@@ -146,9 +146,9 @@ Set `timepicker` to add the time half. The field switches to a date and time
 mask, the panel grows a row of time selects under the calendar, and picking a
 day no longer closes the panel — the two halves own different parts of one
 value, so the interaction is not over until the user says so. While no time is
-picked, each select stands on a `--` placeholder that names its part to screen
-readers ("hour", "minute"), so every real option, the first allowed one
-included, sets the time.
+picked, or the field holds a time a list does not offer, each select stands on a
+`--` placeholder, so every enabled option, the first allowed one included, sets
+the time.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
