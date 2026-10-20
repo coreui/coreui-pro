@@ -55,7 +55,7 @@ const SELECTOR_DATA_CHIP_SET = '[data-coreui-chip-set]'
 const SELECTOR_CHIP = '.chip'
 const SELECTOR_CHIP_ACTIVE = `${SELECTOR_CHIP}.active`
 const SELECTOR_CHIP_REMOVE = '.chip-remove'
-const SELECTOR_FOCUSABLE_ITEMS = '.chip:not(.disabled)'
+const SELECTOR_FOCUSABLE_ITEMS = '.chip[data-coreui-chip-focusable]'
 
 const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_DISABLED = 'disabled'
@@ -405,7 +405,7 @@ class ChipSet extends BaseComponent {
   }
 
   _moveTabStop(stop: HTMLElement | null = null): void {
-    const chips = this._getFocusableChips().filter(chip => chip.hasAttribute('tabindex'))
+    const chips = this._getFocusableChips()
     const current = stop ?? chips.find(chip => chip.tabIndex === 0) ?? chips[0]
 
     for (const chip of chips) {

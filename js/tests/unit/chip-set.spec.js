@@ -354,6 +354,20 @@ describe('ChipSet', () => {
       expect(el.querySelector('.chip-remove').getAttribute('aria-label')).toEqual(expected)
     })
 
+    it('should move focus past a chip that takes no focus after a removal', () => {
+      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span><span class="chip" data-coreui-removable="false">Fixed</span><span class="chip">Last</span></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+      const [first, fixed, last] = el.querySelectorAll('.chip')
+
+      first.focus()
+      first.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))
+
+      expect(fixed.hasAttribute('data-coreui-chip-focusable')).toBeFalse()
+      expect(document.activeElement).toEqual(last)
+    })
+
     it('should keep a real button when the set is not a listbox', () => {
       const el = setMarkup(['First', 'Second'])
       // eslint-disable-next-line no-new

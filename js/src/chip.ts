@@ -329,7 +329,9 @@ class Chip extends BaseComponent {
   }
 
   _makeFocusable(): void {
-    writeAttribute(this._element, 'tabindex', !this._disabled && (this._config.selectable || this._config.removable) ? '0' : null)
+    const focusable = !this._disabled && (this._config.selectable || this._config.removable)
+    writeAttribute(this._element, 'tabindex', focusable ? '0' : null)
+    writeAttribute(this._element, 'data-coreui-chip-focusable', focusable ? 'true' : null)
   }
 
   _handleKeydown(event: any): void {
