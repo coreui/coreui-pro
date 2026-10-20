@@ -3,7 +3,8 @@
 /*!
  * Script to check that the packed tarball carries, next to every plugin file
  * in js/dist, the ES module and both declarations the exports map points at,
- * and every js/ and dist/js/ file the exports map names directly.
+ * every js/ and dist/js/ file the exports map names directly, and that the
+ * package root resolves to the same js/dist modules as the plugin entries.
  * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  */
@@ -42,6 +43,14 @@ for (const target of Object.values(exports).flatMap(targets)) {
 
   if (!file.includes('*') && /^(js|dist\/js)\//.test(file) && !shipped.has(file)) {
     problems.push(`the exports map names ${file}, which the package does not ship`)
+  }
+}
+
+const { module: moduleEntry } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'))
+
+for (const entry of [...targets(exports['.']), moduleEntry]) {
+  if (!/^(\.\/)?js\/dist\/index\.(m?js|d\.m?ts)$/.test(entry)) {
+    problems.push(`the package root resolves to ${entry}, outside the js/dist modules the plugin entries load, so mixing the two imports duplicates them`)
   }
 }
 

@@ -90,11 +90,11 @@
     ".": {
       "import": {
         "types": "./js/dist/index.d.mts",
-        "default": "./dist/js/coreui.esm.js"
+        "default": "./js/dist/index.mjs"
       },
       "require": {
         "types": "./js/dist/index.d.ts",
-        "default": "./dist/js/coreui.js"
+        "default": "./js/dist/index.js"
       }
     },
     "./js/src/*.js": {
@@ -279,7 +279,7 @@
   "style": "dist/css/coreui.css",
   "sass": "scss/coreui.scss",
   "main": "dist/js/coreui.js",
-  "module": "dist/js/coreui.esm.js",
+  "module": "js/dist/index.mjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/coreui/coreui.git"
