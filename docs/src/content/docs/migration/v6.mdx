@@ -2829,6 +2829,11 @@ field behind that kept submitting.
   the text out, such as `data-coreui-aria-remove-label="Remove React"`, now repeats
   it, so drop it or use `{label}`. A `.chip-remove` button you write yourself keeps
   its `aria-label`, and gets one from `ariaRemoveLabel` when it has none.
+- **A selectable chip hides its remove affordance.** A chip with a role — a
+  selectable chip, which is a toggle button, or an option in a selectable set —
+  gets a `<span aria-hidden="true">` instead of a `<button>` inside it, so its name
+  is its text and a control is no longer nested in a button. <kbd>Backspace</kbd> /
+  <kbd>Delete</kbd> remove it from the keyboard, the affordance from the pointer.
 - **Chip input: `aria-disabled`/`aria-readonly` are no longer stamped on the
   container.** The container is a generic element, so those attributes were
   invalid on it (axe `aria-allowed-attr`); the native `disabled`/`readonly`

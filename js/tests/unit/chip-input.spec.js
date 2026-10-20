@@ -665,7 +665,7 @@ describe('ChipInput', () => {
       expect(input.hasAttribute('aria-required')).toBeFalse()
     })
 
-    it('should make its selectable chips toggle buttons with a named remove button', () => {
+    it('should make its selectable chips toggle buttons with a hidden remove affordance', () => {
       fixtureEl.innerHTML = '<div class="chip-input"><span class="chip">Design</span><span class="chip" data-coreui-selected="true">QA</span></div>'
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { selectable: true })
@@ -675,7 +675,8 @@ describe('ChipInput', () => {
       expect(design.getAttribute('role')).toEqual('button')
       expect(design.getAttribute('aria-pressed')).toEqual('false')
       expect(design.hasAttribute('aria-selected')).toBeFalse()
-      expect(design.querySelector('button.chip-remove').getAttribute('aria-label')).toContain('Design')
+      expect(design.querySelector('button.chip-remove')).toBeNull()
+      expect(design.querySelector('.chip-remove').getAttribute('aria-hidden')).toEqual('true')
       expect(qa.getAttribute('aria-pressed')).toEqual('true')
       expect(chipInput.getSelectedValues()).toEqual(['QA'])
     })

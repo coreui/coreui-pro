@@ -288,7 +288,7 @@ class Chip extends BaseComponent {
   }
 
   _createRemoveControl(): HTMLElement {
-    if (this._element.getAttribute('role') === 'option') {
+    if (this._element.hasAttribute('role')) {
       const indicator = document.createElement('span')
       indicator.className = CLASS_NAME_CHIP_REMOVE
       indicator.setAttribute('aria-hidden', 'true')

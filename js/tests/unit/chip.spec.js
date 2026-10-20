@@ -250,6 +250,24 @@ describe('Chip', () => {
       expect([...fixtureEl.querySelectorAll('.chip-remove')].map(button => button.getAttribute('aria-label'))).toEqual(['Remove Tag', 'Drop'])
     })
 
+    it('should hide the remove affordance of a chip with a role, which Backspace still removes', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      const chip = new Chip(chipEl, { removable: true, selectable: true })
+      const control = chipEl.querySelector('.chip-remove')
+      spyOn(chip, 'remove')
+
+      expect(chipEl.getAttribute('role')).toEqual('button')
+      expect(control.tagName).toEqual('SPAN')
+      expect(control.getAttribute('aria-hidden')).toEqual('true')
+      expect(control.hasAttribute('aria-label')).toBeFalse()
+
+      chipEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+
+      expect(chip.remove).toHaveBeenCalled()
+    })
+
     it('should name the remove button from a data attribute template', () => {
       fixtureEl.innerHTML = '<span class="chip" data-coreui-aria-remove-label="Usuń {label}">Tag</span>'
 

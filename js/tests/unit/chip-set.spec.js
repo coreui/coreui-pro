@@ -1138,7 +1138,7 @@ describe('ChipSet', () => {
 
       expect(chip.getAttribute('role')).toEqual('button')
       expect(chip.hasAttribute('aria-selected')).toBeFalse()
-      expect(chip.querySelector('button.chip-remove')).not.toBeNull()
+      expect(chip.querySelector('.chip-remove').getAttribute('aria-hidden')).toEqual('true')
     })
     it('should drop the tabindex it added to hold focus once the focus leaves, also after dispose', () => {
       fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span></div><button type="button">Next</button>'
