@@ -121,7 +121,7 @@ class LoadingButton extends BaseComponent {
 
       this._announcement = this._announce(
         [this._getName(), this._config.ariaLoadingLabel].filter(Boolean).join(', '),
-        'assertive'
+        'high'
       )
       EventHandler.trigger(this._element, EVENT_START)
     }, 1)
@@ -148,7 +148,7 @@ class LoadingButton extends BaseComponent {
       if (this._announcement) {
         this._announcement()
         this._announcement = null
-        this._announce(this._getName(), 'polite')
+        this._announce(this._getName(), 'normal')
       }
 
       EventHandler.trigger(this._element, EVENT_STOP)

@@ -212,3 +212,9 @@ afterEach(() => {
   vi.restoreAllMocks()
   vi.useRealTimers()
 })
+
+/**
+ * Specs read the live regions that browsers without `ariaNotify()` get; the announce spec stubs it.
+ */
+delete Document.prototype.ariaNotify
+delete Element.prototype.ariaNotify
