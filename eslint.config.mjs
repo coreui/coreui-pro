@@ -1,29 +1,48 @@
 import markdown from '@eslint/markdown'
-import xo from 'eslint-config-xo'
-import xoBrowser from 'eslint-config-xo/browser'
+import eslintConfigXo from 'eslint-config-xo'
 import html from 'eslint-plugin-html'
-import eslintPluginImport from 'eslint-plugin-import'
+import eslintPluginImportX from 'eslint-plugin-import-x'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
+const xoBase = eslintConfigXo({ browser: true, space: false }).find(config => config.name === 'xo/base')
+
+const plugins = {
+  import: eslintPluginImportX,
+  unicorn: eslintPluginUnicorn
+}
+
 export default [
   {
-    // The migration leaves the tree mixed: a `.js` module can import a sibling
-    // that is already `.ts`, written as the ESM-style `./x.js` specifier that
-    // tsc resolves. The default resolver takes that literally and reports
-    // no-unresolved, so hand resolution to the TypeScript-aware one.
+    plugins
+  },
+  {
+    ...xoBase,
     settings: {
-      'import/resolver': {
+      ...xoBase.settings,
+      // The migration leaves the tree mixed: a `.js` module can import a sibling
+      // that is already `.ts`, written as the ESM-style `./x.js` specifier that
+      // tsc resolves. The default resolver takes that literally and reports
+      // no-unresolved, so hand resolution to the TypeScript-aware one.
+      'import-x/resolver': {
         typescript: { project: './tsconfig.json' }
       }
+    },
+    plugins: {
+      ...xoBase.plugins,
+      ...plugins
+    },
+    rules: {
+      ...xoBase.rules,
+      ...eslintPluginUnicorn.configs.recommended.rules,
+      'import/default': 'error',
+      'import/export': 'error',
+      'import/named': 'error',
+      'import/namespace': 'error',
+      'import/no-unresolved': 'error'
     }
   },
-  eslintPluginImport.flatConfigs.errors,
-  eslintPluginImport.flatConfigs.warnings,
-  eslintPluginUnicorn.configs.recommended,
-  ...xo,
-  ...xoBrowser,
   {
     ignores: [
       '**/*.json',
@@ -32,6 +51,7 @@ export default [
       '**/vendor/',
       '.babelrc.js',
       '.cache/',
+      '**/*.md/*.vue',
       '_site/',
       'docs/.astro/',
       'docs/scripts/',
@@ -127,7 +147,93 @@ export default [
       'unicorn/prefer-string-raw': 'off',
       'unicorn/prefer-string-replace-all': 'off',
       'unicorn/prefer-structured-clone': 'off',
-      'unicorn/prevent-abbreviations': 'off'
+      'unicorn/prevent-abbreviations': 'off',
+      // Rules new/changed in ESLint 10 / updated plugins — disable to preserve old behavior
+      'xo/import-specifier-newline': 'off',
+      '@eslint-community/eslint-comments/require-description': 'off',
+      'import-x/no-anonymous-default-export': 'off',
+      'import-x/no-extraneous-dependencies': 'off',
+      'import-x/no-unassigned-import': 'off',
+      'n/file-extension-in-import': 'off',
+      'n/no-deprecated-api': 'off',
+      'n/no-extraneous-import': 'off',
+      'n/prefer-global/buffer': 'off',
+      'n/prefer-global/process': 'off',
+      'n/prefer-promises/fs': 'off',
+      'no-shadow': 'off',
+      'require-unicode-regexp': 'off',
+      'unicorn/better-dom-traversing': 'off',
+      'unicorn/class-reference-in-static-methods': 'off',
+      'unicorn/consistent-boolean-name': 'off',
+      'unicorn/consistent-class-member-order': 'off',
+      'unicorn/consistent-compound-words': 'off',
+      'unicorn/consistent-conditional-object-spread': 'off',
+      'unicorn/default-export-style': 'off',
+      'unicorn/dom-node-dataset': 'off',
+      'unicorn/explicit-timer-delay': 'off',
+      'unicorn/logical-assignment-operators': 'off',
+      'unicorn/max-nested-calls': 'off',
+      'unicorn/name-replacements': 'off',
+      'unicorn/no-break-in-nested-loop': 'off',
+      'unicorn/no-computed-property-existence-check': 'off',
+      'unicorn/no-declarations-before-early-exit': 'off',
+      'unicorn/no-duplicate-if-branches': 'off',
+      'unicorn/no-for-each': 'off',
+      'unicorn/no-global-object-property-assignment': 'off',
+      'unicorn/no-incorrect-query-selector': 'off',
+      'unicorn/no-return-array-push': 'off',
+      'unicorn/no-this-outside-of-class': 'off',
+      'unicorn/no-unnecessary-splice': 'off',
+      'unicorn/no-unused-array-method-return': 'off',
+      'unicorn/no-unreadable-for-of-expression': 'off',
+      'unicorn/no-subtraction-comparison': 'off',
+      'unicorn/prefer-add-event-listener-options': 'off',
+      'unicorn/prefer-array-from-map': 'off',
+      'unicorn/prefer-await': 'off',
+      'unicorn/prefer-classlist-toggle': 'off',
+      'unicorn/prefer-continue': 'off',
+      'unicorn/prefer-early-return': 'off',
+      'unicorn/prefer-global-number-constants': 'off',
+      'unicorn/prefer-includes-over-repeated-comparisons': 'off',
+      'unicorn/prefer-iterator-to-array': 'off',
+      'unicorn/prefer-minimal-ternary': 'off',
+      'unicorn/prefer-number-coercion': 'off',
+      'unicorn/prefer-object-define-properties': 'off',
+      'unicorn/prefer-object-iterable-methods': 'off',
+      'unicorn/prefer-private-class-fields': 'off',
+      'unicorn/prefer-scoped-selector': 'off',
+      'unicorn/prefer-split-limit': 'off',
+      'unicorn/prefer-string-repeat': 'off',
+      'unicorn/prefer-ternary': 'off',
+      'unicorn/prefer-unicode-code-point-escapes': 'off',
+      'unicorn/no-array-sort': 'off',
+      'unicorn/no-top-level-assignment-in-function': 'off',
+      'unicorn/no-top-level-side-effects': 'off',
+      'unicorn/no-useless-coercion': 'off',
+      'unicorn/no-useless-template-literals': 'off',
+      'unicorn/no-unsafe-string-replacement': 'off',
+      'unicorn/require-array-sort-compare': 'off',
+      'unicorn/require-css-escape': 'off',
+      'unicorn/no-array-from-fill': 'off',
+      'unicorn/no-chained-comparison': 'off',
+      'unicorn/no-duplicate-loops': 'off',
+      'unicorn/no-exports-in-scripts': 'off',
+      'unicorn/no-invalid-argument-count': 'off',
+      'unicorn/no-negated-array-predicate': 'off',
+      'unicorn/no-unnecessary-boolean-comparison': 'off',
+      'unicorn/no-unreadable-object-destructuring': 'off',
+      'unicorn/no-useless-boolean-cast': 'off',
+      'unicorn/prefer-array-flat-map': 'off',
+      'unicorn/prefer-array-iterable-methods': 'off',
+      'unicorn/prefer-boolean-return': 'off',
+      'unicorn/prefer-direct-iteration': 'off',
+      'unicorn/prefer-else-if': 'off',
+      'unicorn/prefer-hoisting-branch-code': 'off',
+      'unicorn/prefer-math-constants': 'off',
+      'unicorn/prefer-promise-with-resolvers': 'off',
+      'unicorn/prefer-unary-minus': 'off',
+      'import-x/no-duplicates': 'off',
+      'import-x/order': 'off'
     }
   },
   {
@@ -143,7 +249,8 @@ export default [
     // specifier instead. Upstream disables the same rule for the same reason.
     files: ['js/**'],
     rules: {
-      'import/extensions': 'off'
+      'import/extensions': 'off',
+      'import-x/extensions': 'off'
     }
   },
   {
@@ -251,6 +358,7 @@ export default [
     },
     rules: {
       'max-lines': 'off', // added to avoid the error: 'File must not contain more than 1500 lines of code'
+      'max-nested-callbacks': 'off',
       'no-console': 'off',
       'unicorn/consistent-function-scoping': 'off',
       'unicorn/no-useless-undefined': 'off',

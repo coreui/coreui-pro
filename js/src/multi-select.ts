@@ -1878,8 +1878,8 @@ class MultiSelect extends ComboboxBase {
 
     const selects = SelectorEngine.find(SELECTOR_SELECT)
 
-    for (let i = 0, len = selects.length; i < len; i++) {
-      const context = Data.get(selects[i], DATA_KEY)
+    for (const select of selects) {
+      const context = Data.get(select, DATA_KEY)
 
       if (!context) {
         continue

@@ -584,6 +584,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   _handleEnterKey(event: KeyboardEvent): void {
+    // eslint-disable-next-line unicorn/prefer-keyboard-event-key -- Safari reports an IME composition only as keyCode 229
     if (event.isComposing || event.keyCode === 229) {
       return
     }
