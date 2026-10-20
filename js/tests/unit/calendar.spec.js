@@ -6218,10 +6218,7 @@ describe('Calendar', () => {
 
       calendar._modifyCalendarDate(0, 1, callback)
 
-      // Callback is called via setTimeout
-      setTimeout(() => {
-        expect(callback).toHaveBeenCalled()
-      }, 10)
+      expect(callback).toHaveBeenCalled()
     })
   })
 

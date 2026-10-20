@@ -1,5 +1,5 @@
 
-import { userEvent } from '@vitest/browser/context'
+import { userEvent } from 'vitest/browser'
 import Form from '../../src/form.js'
 import OTPInput from '../../src/otp-input.js'
 import { getFieldHandler } from '../../src/util/field-label.js'

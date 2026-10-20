@@ -1,4 +1,4 @@
-import { userEvent } from '@vitest/browser/context'
+import { userEvent } from 'vitest/browser'
 import { onTestFinished, vi } from 'vitest'
 import Calendar from '../../src/calendar.js'
 import DateInput from '../../src/date-input.js'

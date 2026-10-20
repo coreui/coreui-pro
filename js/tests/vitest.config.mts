@@ -85,14 +85,14 @@ export default defineConfig({
         lines: 90
       }
     },
+    // `js-test` runs the unit and jQuery projects in parallel; without a
+    // distinct port the two Vitest servers collide on the default one.
+    api: { port: JQUERY_TEST ? 63320 : 63315 },
     browser: {
       enabled: true,
       provider: playwright(),
       headless: !DEBUG,
       screenshotFailures: false,
-      // `js-test` runs the unit and jQuery projects in parallel; without a
-      // distinct port the two Vitest servers collide on the default one.
-      api: { port: JQUERY_TEST ? 63320 : 63315 },
       instances: [
         { browser: 'chromium' }
       ]

@@ -39,7 +39,7 @@ Thumbs.db
 *.komodoproject
 
 # Folders to ignore
-/.vitest-attachments/
+/.vitest/
 /dist-sass/
 /js/coverage/
 node_modules/

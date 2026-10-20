@@ -1,4 +1,4 @@
-import { userEvent } from '@vitest/browser/context'
+import { userEvent } from 'vitest/browser'
 import { vi } from 'vitest'
 import FieldValidation from '../../../src/util/field-validation.js'
 import { nextStateSerial, updateValidationState } from '../../../src/util/form-validation.js'

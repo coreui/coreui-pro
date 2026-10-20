@@ -24,7 +24,7 @@ package's CSS and follow its behaviour, so this repository is the reference for 
 - One spec file: `npx vitest run --config js/tests/vitest.config.mts js/tests/unit/<name>.spec.js`.
 
 The Vitest browser server uses a fixed port. Two runs at once attach to the same server and the
-second one reports zero tests. Pass `--browser.api.port <free port>` when you run suites in parallel.
+second one reports zero tests. Pass `--api.port <free port>` when you run suites in parallel.
 
 ## Writing
 
