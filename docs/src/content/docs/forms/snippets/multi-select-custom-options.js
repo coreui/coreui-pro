@@ -89,7 +89,7 @@ new coreui.MultiSelect(myMultiSelectCountries, {
   search: true,
   selectAllLabel: 'Select all countries',
   deselectAllLabel: 'Deselect all countries',
-  selectionType: 'tags'
+  selectionType: 'chips'
 })
 
 new coreui.MultiSelect(myMultiSelectCountriesAndCities, {
@@ -103,5 +103,5 @@ new coreui.MultiSelect(myMultiSelectCountriesAndCities, {
   search: true,
   selectAllLabel: 'Select all cities',
   deselectAllLabel: 'Deselect all cities',
-  selectionType: 'tags'
+  selectionType: 'chips'
 })

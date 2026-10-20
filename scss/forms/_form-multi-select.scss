@@ -10,8 +10,8 @@ $form-multi-select-tokens: () !default;
 // scss-docs-start form-multi-select-tokens
 $form-multi-select-tokens: defaults(
   (
-    --#{$prefix}form-multi-select-selection-tags-gap: .25rem,
-    --#{$prefix}form-multi-select-selection-tags-padding-y: .25rem,
+    --#{$prefix}form-multi-select-selection-chips-gap: .25rem,
+    --#{$prefix}form-multi-select-selection-chips-padding-y: .25rem,
   ),
   $form-multi-select-tokens
 );
@@ -62,10 +62,10 @@ $form-multi-select-tokens: defaults(
     min-width: 0;
   }
 
-  .form-multi-select-selection-tags {
-    gap: var(--#{$prefix}form-multi-select-selection-tags-gap);
+  .form-multi-select-selection-chips {
+    gap: var(--#{$prefix}form-multi-select-selection-chips-gap);
     align-content: center;
-    margin: calc(var(--#{$prefix}form-multi-select-selection-tags-padding-y) * -1) 0;
+    margin: calc(var(--#{$prefix}form-multi-select-selection-chips-padding-y) * -1) 0;
   }
 
   .form-multi-select-search {
@@ -90,7 +90,7 @@ $form-multi-select-tokens: defaults(
       flex: 1 1 auto;
     }
 
-    .form-multi-select-selection-tags & {
+    .form-multi-select-selection-chips & {
       padding-inline-start: calc(var(--#{$prefix}control-padding-x) - .25rem);
     }
   }
@@ -98,7 +98,7 @@ $form-multi-select-tokens: defaults(
   .form-multi-select-placeholder {
     color: var(--#{$prefix}control-placeholder-color);
 
-    .form-multi-select-selection-tags & {
+    .form-multi-select-selection-chips & {
       padding: calc(var(--#{$prefix}control-padding-y) - .25rem) calc(var(--#{$prefix}control-padding-x) - .25rem);
     }
   }

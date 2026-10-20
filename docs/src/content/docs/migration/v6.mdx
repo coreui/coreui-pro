@@ -5965,6 +5965,12 @@ markup.
   are still accepted and now produce the same markup, so a selection is a chip
   everywhere in the library — style it through the `--cui-chip-*`
   properties. The `$form-multi-select-tag-*` variables are gone with it.
+  `'chips'` is the name and the default now; `'tags'` renders the same and is
+  deprecated until v7. The selection container `.form-multi-select-selection-tags`
+  and its `--cui-form-multi-select-selection-tags-gap` and `-padding-y` tokens
+  are renamed `-selection-chips`, and `ariaTagDeleteLabel` becomes
+  `ariaChipRemoveLabel` (the old option still works and takes precedence while
+  it is set).
 
 - **The per-family frame variables are gone.** `$autocomplete-font-size`,
   `$date-picker-border-color`, `$time-picker-focus-bg`,

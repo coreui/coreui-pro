@@ -397,7 +397,7 @@ describe('MultiSelect', () => {
     })
 
     it.each([
-      ['a removed chip', { selectionType: 'tags' }, multiSelect => multiSelect._selectionElement.querySelector('.chip-remove').click()],
+      ['a removed chip', { selectionType: 'chips' }, multiSelect => multiSelect._selectionElement.querySelector('.chip-remove').click()],
       ['the cleaner', {}, multiSelect => multiSelect._selectionCleanerElement.click()],
       ['select all', { selectAll: true }, multiSelect => multiSelect._selectAllElement.click()],
       ['Backspace in the search box', { search: true }, multiSelect => multiSelect._searchElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true }))]
@@ -1785,7 +1785,7 @@ describe('MultiSelect', () => {
       expect(selection.textContent).toContain('Opt 2')
     })
 
-    it('should handle selectionType tags', () => {
+    it('should handle selectionType chips', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -1793,21 +1793,21 @@ describe('MultiSelect', () => {
           { value: '1', text: 'Opt 1', selected: true },
           { value: '2', text: 'Opt 2', selected: true }
         ],
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       const tags = multiSelect._wrapperElement.querySelectorAll('.chip')
       expect(tags.length).toBe(2)
     })
 
-    it('should create tags with delete buttons', () => {
+    it('should create chips with remove buttons', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [
           { value: '1', text: 'Opt 1', selected: true }
         ],
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       const tag = multiSelect._wrapperElement.querySelector('.chip')
@@ -1821,7 +1821,7 @@ describe('MultiSelect', () => {
         options: [
           { value: '1', text: 'Opt 1', selected: true }
         ],
-        selectionType: 'tags',
+        selectionType: 'chips',
         disabled: true
       })
 
@@ -4022,7 +4022,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._searchElement.placeholder).toBe('Choose items...')
     })
 
-    it('should remove search placeholder when items selected in multiple mode with tags', () => {
+    it('should remove search placeholder when items selected in multiple mode with chips', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -4031,7 +4031,7 @@ describe('MultiSelect', () => {
         ],
         search: true,
         multiple: true,
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       expect(multiSelect._searchElement.placeholder).toBe('')
@@ -4365,8 +4365,36 @@ describe('MultiSelect', () => {
     })
   })
 
-  describe('tags', () => {
-    it('should remove tag on tag delete button click', () => {
+  describe('chips', () => {
+    it.each([
+      ['by default', {}],
+      ['for the deprecated tags value', { selectionType: 'tags' }]
+    ])('should render the selection as chips in a chips container %s', (_, config) => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1', selected: true }],
+        ...config
+      })
+
+      expect(multiSelect._selectionElement.classList.contains('form-multi-select-selection-chips')).toBeTrue()
+      expect(multiSelect._selectionElement.querySelectorAll('.chip')).toHaveSize(1)
+    })
+
+    it.each([
+      ['the default label', {}, 'Remove Opt 1'],
+      ['ariaChipRemoveLabel', { ariaChipRemoveLabel: 'Usuń' }, 'Usuń Opt 1'],
+      ['the deprecated ariaTagDeleteLabel, which wins while it is set', { ariaChipRemoveLabel: 'Usuń', ariaTagDeleteLabel: 'Delete' }, 'Delete Opt 1']
+    ])('should name the chip remove button with %s', (_, config, label) => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1', selected: true }],
+        ...config
+      })
+
+      expect(multiSelect._selectionElement.querySelector('.chip-remove').getAttribute('aria-label')).toBe(label)
+    })
+
+    it('should remove a chip on its remove button click', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -4374,7 +4402,7 @@ describe('MultiSelect', () => {
           { value: '1', text: 'Opt 1', selected: true },
           { value: '2', text: 'Opt 2', selected: true }
         ],
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       expect(multiSelect.getValue().length).toBe(2)
@@ -4385,12 +4413,12 @@ describe('MultiSelect', () => {
       expect(multiSelect.getValue().length).toBe(1)
     })
 
-    it('should not open the dropdown when clicking a tag delete button', () => {
+    it('should not open the dropdown when clicking a chip remove button', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Opt 1', selected: true }],
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
@@ -4401,7 +4429,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
-    it('should remove a tag created after initialization via delegation', () => {
+    it('should remove a chip created after initialization via delegation', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -4409,7 +4437,7 @@ describe('MultiSelect', () => {
           { value: '1', text: 'Opt 1', selected: true },
           { value: '2', text: 'Opt 2' }
         ],
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       // This tag node did not exist when listeners were bound.
@@ -4430,7 +4458,7 @@ describe('MultiSelect', () => {
         options: [
           { value: '1', text: 'Opt 1' }
         ],
-        selectionType: 'tags',
+        selectionType: 'chips',
         search: true,
         multiple: true
       })
@@ -4443,7 +4471,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._searchElement.size).toBe(2)
     })
 
-    it('should handle tags with disabled options', () => {
+    it('should handle chips with disabled options', () => {
       // Pre-select via native element with disabled option
       fixtureEl.innerHTML = [
         '<select>',
@@ -4454,7 +4482,7 @@ describe('MultiSelect', () => {
 
       const selectEl2 = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl2, {
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       // The disabled option's tag should not have a delete button
@@ -4472,7 +4500,7 @@ describe('MultiSelect', () => {
         options: [
           { value: '1', text: 'Angular', selected: true }
         ],
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       let tagDelete = multiSelect._wrapperElement.querySelector('.chip-remove')
@@ -4483,7 +4511,7 @@ describe('MultiSelect', () => {
         options: [
           { value: '1', text: 'Angular', selected: true }
         ],
-        selectionType: 'tags',
+        selectionType: 'chips',
         ariaTagDeleteLabel: 'Usuń'
       })
 
@@ -4500,7 +4528,7 @@ describe('MultiSelect', () => {
           { value: '2', text: 'Opt 2' },
           { value: '3', text: 'Opt 3' }
         ],
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       const firstTag = multiSelect._wrapperElement.querySelector('.chip[data-value="1"]')
@@ -4519,7 +4547,7 @@ describe('MultiSelect', () => {
         options: [
           { value: '1', text: 'Opt 1' }
         ],
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       expect(multiSelect._wrapperElement.querySelector('.form-multi-select-placeholder')).not.toBeNull()
@@ -4530,7 +4558,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._wrapperElement.querySelectorAll('.chip').length).toBe(1)
     })
 
-    it('should keep tags ordered and before the search input', () => {
+    it('should keep chips ordered and before the search input', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -4539,7 +4567,7 @@ describe('MultiSelect', () => {
           { value: '2', text: 'Opt 2' },
           { value: '3', text: 'Opt 3' }
         ],
-        selectionType: 'tags',
+        selectionType: 'chips',
         search: true,
         multiple: true
       })
@@ -5928,7 +5956,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Option 1', selected: true }],
         search: true,
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
       const selection = multiSelect._selectionElement
       const menu = multiSelect._menu
@@ -7238,7 +7266,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Option 1', selected: true }],
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       const selectionEl = multiSelect._selectionElement
@@ -7807,14 +7835,14 @@ describe('MultiSelect', () => {
       expect(multiSelect._searchElement.size).toBe(2)
     })
 
-    it('should remove size attribute when nothing selected and selectionType is tags', () => {
+    it('should remove size attribute when nothing selected and selectionType is chips', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Opt 1' }],
         search: true,
         multiple: true,
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       expect(multiSelect._searchElement.getAttribute('size')).toBeNull()
@@ -7829,7 +7857,7 @@ describe('MultiSelect', () => {
         ],
         search: true,
         multiple: true,
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       multiSelect._updateSearchSize(10)
@@ -8001,21 +8029,21 @@ describe('MultiSelect', () => {
     })
   })
 
-  describe('selection tags selection-type', () => {
-    it('should add selection-tags class when multiple and selectionType is tags', () => {
+  describe('selection chips selection-type', () => {
+    it('should add the selection-chips class when multiple and selectionType is chips', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Opt 1' }],
         multiple: true,
-        selectionType: 'tags'
+        selectionType: 'chips'
       })
 
       const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
-      expect(selection.classList.contains('form-multi-select-selection-tags')).toBe(true)
+      expect(selection.classList.contains('form-multi-select-selection-chips')).toBe(true)
     })
 
-    it('should not add selection-tags class when selectionType is not tags', () => {
+    it('should not add the selection-chips class when selectionType is not chips', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -8025,7 +8053,7 @@ describe('MultiSelect', () => {
       })
 
       const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
-      expect(selection.classList.contains('form-multi-select-selection-tags')).toBe(false)
+      expect(selection.classList.contains('form-multi-select-selection-chips')).toBe(false)
     })
   })
 
