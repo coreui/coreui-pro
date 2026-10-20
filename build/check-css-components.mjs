@@ -129,7 +129,7 @@ const plugins = {
   'date-range-input': 'forms/form-date-time',
   'date-range-picker': 'date-picker',
   form: 'forms/validation',
-  'multi-select': 'forms/form-multi-select',
+  'multi-select': 'forms/multi-select',
   navigation: 'sidebar',
   'number-input': 'forms/number-input',
   'otp-input': 'forms/otp-input',

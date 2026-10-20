@@ -53,14 +53,12 @@ const SELECTOR_CHIP_REMOVE = '.chip-remove'
 const SELECTOR_CHIP = '.chip'
 const SELECTOR_CLEANER = '.form-control-cleaner'
 const SELECTOR_OPTION = '.list-box-option'
-const SELECTOR_SEARCH = '.form-multi-select-search'
+const SELECTOR_SEARCH = '.multi-select-search'
 const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
 const SELECTOR_TEXT_ENTRY = 'input, textarea, select, [contenteditable=""], [contenteditable="true"]'
 const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
-// The class-based selector stays alongside the data attribute: pages relying
-// on class-only auto-init keep working (the v6 bet).
-const SELECTOR_SELECT = 'select.form-multi-select'
-const SELECTOR_SELECTION = '.form-multi-select-selection'
+const SELECTOR_SELECT = 'select.multi-select'
+const SELECTOR_SELECTION = '.multi-select-selection'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -82,15 +80,15 @@ const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
-const CLASS_NAME_SELECT = 'form-multi-select'
+const CLASS_NAME_SELECT = 'multi-select'
 const HOST_ATTRIBUTES = ['id', 'name']
-const CLASS_NAME_SELECT_FILLED = 'form-multi-select-filled'
+const CLASS_NAME_SELECT_FILLED = 'multi-select-filled'
 const CLASS_NAME_SELECT_ALL = 'list-box-select-all'
-const CLASS_NAME_SEARCH = 'form-multi-select-search'
+const CLASS_NAME_SEARCH = 'multi-select-search'
 const CLASS_NAME_SELECTED = 'selected'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
-const CLASS_NAME_SELECTION = 'form-multi-select-selection'
-const CLASS_NAME_SELECTION_CHIPS = 'form-multi-select-selection-chips'
+const CLASS_NAME_SELECTION = 'multi-select-selection'
+const CLASS_NAME_SELECTION_CHIPS = 'multi-select-selection-chips'
 const CLASS_NAME_SHOW = 'show'
 
 type MultiSelectConfig = {
@@ -1240,7 +1238,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   _updateChips(selection: HTMLElement, search: HTMLElement | null): void {
-    const placeholder = SelectorEngine.findOne('.form-multi-select-placeholder', selection)
+    const placeholder = SelectorEngine.findOne('.multi-select-placeholder', selection)
     if (placeholder) {
       placeholder.remove()
     }
@@ -1531,7 +1529,7 @@ class MultiSelect extends ComboboxBase {
 
   _renderEmptySelection(selection: HTMLElement): void {
     const placeholder = document.createElement('span')
-    placeholder.classList.add('form-multi-select-placeholder')
+    placeholder.classList.add('multi-select-placeholder')
     placeholder.textContent = this._config.placeholder
 
     for (const chip of SelectorEngine.find(SELECTOR_CHIP, selection)) {
@@ -1837,13 +1835,8 @@ class MultiSelect extends ComboboxBase {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  const elements = new Set([
-    ...SelectorEngine.find(SELECTOR_DATA_MULTI_SELECT),
-    ...SelectorEngine.find(SELECTOR_SELECT)
-  ])
-
-  for (const ms of elements) {
-    MultiSelect.multiSelectInterface(ms)
+  for (const multiSelect of SelectorEngine.find(SELECTOR_DATA_MULTI_SELECT)) {
+    MultiSelect.multiSelectInterface(multiSelect)
   }
 })
 EventHandler.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus)

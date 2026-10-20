@@ -210,7 +210,8 @@ The field components (Autocomplete, Multi Select, Chip Input, Password Input, th
 | `.autocomplete-options-empty`, `.form-multi-select-options-empty` | `.list-box-empty` |
 | `.form-multi-select-all` | `.list-box-select-all` |
 | `.form-multi-select-tag`, `.form-multi-select-tag-delete` | `.chip`, `.chip-remove` |
-| `.form-multi-select-selection-tags` | `.form-multi-select-selection-chips` |
+| `.form-multi-select`, `.form-multi-select-selection`, `.form-multi-select-search`, `.form-multi-select-placeholder` | `.multi-select`, `.multi-select-selection`, `.multi-select-search`, `.multi-select-placeholder` |
+| `.form-multi-select-selection-tags` | `.multi-select-selection-chips` |
 | `.autocomplete-buttons`, `.form-multi-select-buttons`, `.date-picker-input-wrapper`, `.date-picker-input-preview` | removed, no replacement |
 | `.range-slider` (inner), `.range-slider-input`, `.range-slider-vertical`, `.range-slider-tooltip` | `.form-range`, `.form-range-input`, `.form-range-vertical`, `.form-range-tooltip` |
 | `.range-slider-labels-container`, `.range-slider-label` | `.form-range-ticks`, `.form-range-tick` (text in `.form-range-tick-label`) |
@@ -233,6 +234,7 @@ A plugin that builds a component inside an element is enabled with a bare `data-
 | `data-coreui-toggle="stepper"` | `data-coreui-stepper` |
 | `data-coreui-toggle="password"` (on the button) | `data-coreui-password-input` (on the input, see Step 3) |
 | `data-coreui="navigation"` | `data-coreui-navigation` |
+| `<select class="form-multi-select">` started on load | `<select data-coreui-multi-select>`; the class no longer starts the component |
 | `data-coreui-ride="carousel"` | `data-coreui-autoplay="true"` |
 | `data-coreui-wrap="true"` / `"false"` | `data-coreui-ends="wrap"` / `"stop"` (default is `"loop"`) |
 | `data-coreui-touch` | remove, touch is native |
@@ -659,7 +661,7 @@ Hard-coded media queries at `992px`, `1200px` or `1400px` no longer match `lg`, 
 | `--cui-form-valid-color`, `--cui-form-valid-border-color`, `--cui-form-invalid-color` | removed; retint the `success` and `danger` theme colours |
 | `--cui-form-select-bg-img` | `--cui-control-select-bg-img` |
 | `--cui-input-placeholder-color` | `--cui-control-placeholder-color` |
-| `--cui-form-multi-select-selection-tags-gap`, `-padding-y` | `--cui-form-multi-select-selection-chips-gap`, `-padding-y` |
+| `--cui-form-multi-select-selection-tags-gap`, `-padding-y` | `--cui-multi-select-selection-chips-gap`, `-padding-y` |
 | `--cui-autocomplete-*`, `--cui-date-picker-*`, `--cui-time-picker-*`, `--cui-form-multi-select-*`, `--cui-chip-input-*` frame tokens (padding, font, colour, border) | `--cui-control-*` on the same element (`--cui-control-padding-y`, `--cui-control-bg`, …) |
 | `--cui-accordion-btn-*` | `--cui-accordion-header-*` |
 | `--cui-accordion-inner-border-radius` | removed; the header follows `--cui-accordion-border-radius` |
@@ -732,7 +734,7 @@ All library CSS is in cascade layers and utilities no longer carry `!important`.
    grep -rnE 'modal-dialog|modal-content|modal-backdrop|offcanvas-backdrop|accordion-button|accordion-collapse|was-validated|needs-validation|has-validation|form-check|form-switch|form-password|btn-close-white' .
    grep -rnE '\b(btn|btn-outline|btn-ghost|alert|callout|chip|list-group-item)-(primary|secondary|success|danger|warning|info|light|dark)\b' .
    grep -rnE '\b[a-z-]+-(xxl)\b|\b[a-z-]+-xxl-[a-z0-9-]+' .
-   grep -rnE '\b(mw|mh)-100\b|link-(offset|underline|primary|secondary|success|danger|warning|info|light|dark|body-emphasis)|text-(muted|black-50|white-50|high-emphasis|medium-emphasis|disabled)\b|display-[1-6]|\blead\b|elevation-|-gradient\b|spinner-(border|grow)-sm|progress-(group|thin)|card-link|card-header-pills|(header|footer)-sticky|\bfooter\b|carousel-dark|\bcollapsed\b|chip-dismiss|form-select|selection-tags' .
+   grep -rnE '\b(mw|mh)-100\b|link-(offset|underline|primary|secondary|success|danger|warning|info|light|dark|body-emphasis)|text-(muted|black-50|white-50|high-emphasis|medium-emphasis|disabled)\b|display-[1-6]|\blead\b|elevation-|-gradient\b|spinner-(border|grow)-sm|progress-(group|thin)|card-link|card-header-pills|(header|footer)-sticky|\bfooter\b|carousel-dark|\bcollapsed\b|chip-dismiss|form-select|form-multi-select' .
    grep -rnE '\b(bg|text|border|text-bg|table|focus-ring|shadow)-(light|dark)\b' .
    grep -rnE '\.update\(\{|changed\.coreui\.(autocomplete|multi-select)|getSelected\(\)|cellHover|selectAdjacement|showAdjacement|optionsStyle|selectAllStyle|optionsGroupsStyle|selectionTypeCounterText|ariaIndicatorLabel|ariaTagDeleteLabel|inputDateFormat|todayButton|cancelButton|confirmButton|previewDateOnHover|clickableLabels|ariaLabels|readOnly|dateObject' --include=*.js --include=*.ts --include=*.html .
    grep -rnE "\b(ride|wrap|touch|toggle|focus|animation|offset|variant|indicator|labels|placeholder|search)\s*:" --include=*.js --include=*.ts .

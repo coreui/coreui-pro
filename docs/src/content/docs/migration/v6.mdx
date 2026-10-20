@@ -5971,8 +5971,30 @@ markup.
   properties. The `$form-multi-select-tag-*` variables are gone with it.
   `'chips'` is the name and the default now; `'tags'` renders the same and is
   deprecated until v7. The selection container `.form-multi-select-selection-tags`
-  and its `--cui-form-multi-select-selection-tags-gap` and `-padding-y` tokens
-  are renamed `-selection-chips`, with no alias.
+  is `.multi-select-selection-chips`, with no alias.
+- **Multi Select's classes drop the `form-` prefix**, so they carry the
+  component's name like `.autocomplete`, `.chip-input` and `.date-picker`.
+  There is no alias for styling:
+
+  | v5 | v6 |
+  | --- | --- |
+  | `.form-multi-select` | `.multi-select` |
+  | `.form-multi-select-selection`, `.form-multi-select-selection-tags` | `.multi-select-selection`, `.multi-select-selection-chips` |
+  | `.form-multi-select-search`, `.form-multi-select-placeholder` | `.multi-select-search`, `.multi-select-placeholder` |
+  | `--cui-form-multi-select-selection-tags-gap`, `-padding-y` | `--cui-multi-select-selection-chips-gap`, `-padding-y` |
+
+  The filled state is `.multi-select-filled`, the Sass partial is
+  `scss/forms/_multi-select.scss` with `$multi-select-tokens`, and the component
+  stylesheet is `css/components/forms/multi-select.css`.
+- **Multi Select starts from `data-coreui-multi-select` only.** A v5
+  `<select class="form-multi-select">` was initialized on page load by its
+  class; in v6 it stays a plain native select. Replace the class with the
+  attribute, as every other field component is started:
+
+  ```diff
+  - <select class="form-multi-select" multiple>
+  + <select data-coreui-multi-select multiple>
+  ```
 
 - **The per-family frame variables are gone.** `$autocomplete-font-size`,
   `$date-picker-border-color`, `$time-picker-focus-bg`,
