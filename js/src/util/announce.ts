@@ -20,7 +20,6 @@ const ATTRIBUTE = 'data-coreui-live-announcer'
 const CLASS_NAME_HIDING = 'hiding'
 const CLOSE_DELAY = 500
 const FIRST_MESSAGE_DELAY = 100
-const LIVE = ['assertive', 'polite']
 
 const VISUALLY_HIDDEN: Partial<CSSStyleDeclaration> = {
   border: '0',
@@ -35,19 +34,9 @@ const VISUALLY_HIDDEN: Partial<CSSStyleDeclaration> = {
   width: '1px'
 }
 
-type Notifier = Document & { ariaNotify?: (message: string, options: { priority: AnnouncePriority }) => void }
-
 const holds = new WeakMap<Element, Moment>()
 const readyAt = new WeakMap<Element, Moment>()
 const pending: Message[] = []
-
-/**
- * Tells whether the browser reads messages itself through `document.ariaNotify()`. Chrome on
- * ChromeOS and on Android has the method, but sends nothing to ChromeVox or TalkBack.
- *
- * @returns `true` when `document.ariaNotify()` exists and reaches the screen reader
- */
-const canNotify = (): boolean => 'ariaNotify' in document && !/CrOS|Android/.test(navigator.userAgent)
 
 /**
  * Tells whether an element is an open modal dialog: a native dialog opened with `showModal()`, or
@@ -113,8 +102,8 @@ const getModal = (context: Element | null): HTMLElement | null => {
  * @param element - The element the time belongs to
  * @returns The time on the `performance.now()` clock, `0` when there is none
  */
-const readTime = (times: WeakMap<Element, Moment>, element: Element | null): number => {
-  const [time, clock] = (element && times.get(element)) || [0, null]
+const readTime = (times: WeakMap<Element, Moment>, element: Element): number => {
+  const [time, clock] = times.get(element) ?? [0, null]
 
   return clock === performance.now ? time : 0
 }
@@ -149,7 +138,7 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
   announcer.setAttribute(ATTRIBUTE, '')
   Object.assign(announcer.style, VISUALLY_HIDDEN)
 
-  for (const live of LIVE) {
+  for (const live of ['assertive', 'polite']) {
     const region = document.createElement('div')
     region.setAttribute('role', 'log')
     region.setAttribute('aria-live', live)
@@ -187,13 +176,16 @@ export const holdAnnouncements = (): void => {
   }
 
   holds.set(getModal(null) ?? document.body, getMoment(CLOSE_DELAY))
+
+  if (pending.length > 0) {
+    setTimeout(flush, CLOSE_DELAY)
+  }
 }
 
 /**
- * Sends the waiting messages in the order they came in, all at the highest priority among them: as
- * one `document.ariaNotify()` call, or each to the region of that priority on the page or in the
- * modal dialog open at that moment, since a screen reader reads only one of two regions changed
- * together. The queue holds while that dialog, or the dialog holding focus, plays its closing
+ * Adds the waiting messages to their regions in the order they came in, all to the region of the
+ * highest priority among them, since VoiceOver reads only one of two regions changed together. Each
+ * goes to the page or to the modal dialog open at that moment. The queue holds while that dialog, or the dialog holding focus, plays its closing
  * transition, for 500 ms after a dialog component closes its dialog, and while a region is younger
  * than 100 ms. A message that waited for page regions removed since is dropped with them, and the
  * whole queue once there is no document, as when a test environment tears down.
@@ -204,8 +196,7 @@ const flush = (): void => {
     return
   }
 
-  const native = canNotify()
-  const sent: [Message, HTMLElement | null][] = []
+  const sent: [Message, HTMLElement][] = []
 
   while (pending.length > 0) {
     const [{ context, page }] = pending
@@ -223,7 +214,7 @@ const flush = (): void => {
     }
 
     const host = modal ?? document.body
-    const announcer = native ? null : getAnnouncer(host)
+    const announcer = getAnnouncer(host)
     const wait = Math.max(readTime(holds, host), readTime(readyAt, announcer)) - performance.now()
 
     if (wait > 0) {
@@ -234,14 +225,10 @@ const flush = (): void => {
     sent.push([pending.shift()!, announcer])
   }
 
-  const high = sent.some(([{ priority }]) => priority === 'high')
-
-  if (native && sent.length > 0) {
-    (document as Notifier).ariaNotify!(sent.map(([{ node }]) => node.textContent).join('\n'), { priority: high ? 'high' : 'normal' })
-  }
+  const live = sent.some(([{ priority }]) => priority === 'high') ? 'assertive' : 'polite'
 
   for (const [{ node, timeout }, announcer] of sent) {
-    announcer?.querySelector(`[aria-live="${LIVE[high ? 0 : 1]}"]`)!.append(node)
+    announcer.querySelector(`[aria-live="${live}"]`)!.append(node)
 
     if (timeout > 0 && Number.isFinite(timeout)) {
       setTimeout(() => node.remove(), timeout)
@@ -250,19 +237,20 @@ const flush = (): void => {
 }
 
 /**
- * Reads a message to screen reader users, through `document.ariaNotify()` where the browser speaks
- * it, and otherwise through a visually hidden live region at the start of the page or, while a
- * modal dialog leaves the rest of the page inert, inside that dialog, native or marked with
- * `aria-modal="true"`. A message is sent one task after the call, once a new region is 100 ms old,
- * and 500 ms after a dialog component has closed its dialog. Messages go out in the order of the
- * calls, those sent together at the highest priority among them and through `ariaNotify()` as one,
- * and the same text is read again.
+ * Reads a message to screen reader users. The message goes to a visually hidden live region at
+ * the start of the page or, while a modal dialog leaves the rest of the page inert, to one inside
+ * that dialog, native or marked with `aria-modal="true"`. The region is picked when the message is
+ * added: one task after the call, once a new region is 100 ms old, and 500 ms after a dialog
+ * component has closed its dialog. Messages are added in the order of the calls, those added
+ * together to the region of the highest priority among them, and each call adds a new one, so the
+ * same text is read again.
  *
  * @param message - The text to read
- * @param options - `priority` is `'normal'` (default) or `'high'`, which interrupts, as in
- *   `ariaNotify()`; `timeout` how long (ms) a message stays in its region, 7000 by default and `0`
- *   to keep it; `context` the element the message comes from, which tells a modal dialog it sits in
- * @returns A function that removes the message from its region, or cancels it before it is sent
+ * @param options - `priority` is `'normal'` (default, the polite region) or `'high'` (the
+ *   assertive one), as in `ariaNotify()`; `timeout` how long (ms) the message stays once added,
+ *   7000 by default and `0` to keep it; `context` the element the message comes from, which tells
+ *   a modal dialog it sits in
+ * @returns A function that removes the message, or cancels it before it is added
  */
 export const announce = (message: string, { context = null, priority = 'normal', timeout = 7000 }: AnnounceOptions = {}): (() => void) => {
   if (typeof document === 'undefined' || !document.body || !message) {
@@ -273,12 +261,12 @@ export const announce = (message: string, { context = null, priority = 'normal',
   node.textContent = message
   const modal = getModal(context)
   const host = modal && !modal.classList.contains(CLASS_NAME_HIDING) ? modal : document.body
-  const announcer = canNotify() ? null : getAnnouncer(host)
+  const announcer = getAnnouncer(host)
 
   pending.push({
     context, node, page: host === document.body ? announcer : null, priority, timeout
   })
-  setTimeout(flush, readTime(readyAt, announcer) - performance.now())
+  setTimeout(flush, Math.max(0, readTime(readyAt, announcer) - performance.now()))
 
   return () => {
     const index = pending.findIndex(message => message.node === node)

@@ -131,6 +131,21 @@ describe('announce', () => {
     expect(messages(document.body, 'assertive')).toEqual(['Saved', 'Failed'])
   })
 
+  it('should send the messages a hold releases together to the assertive region when one of them is high', () => {
+    announce('Before')
+    vi.advanceTimersByTime(100)
+    holdAnnouncements()
+    announce('Saved')
+    vi.advanceTimersByTime(200)
+    announce('Failed', { priority: 'high' })
+    vi.advanceTimersByTime(299)
+    expect(messages(document.body, 'assertive')).toEqual([])
+
+    vi.advanceTimersByTime(1)
+    expect(messages(document.body, 'polite')).toEqual(['Before'])
+    expect(messages(document.body, 'assertive')).toEqual(['Saved', 'Failed'])
+  })
+
   it('should add the same text again as a new message', () => {
     announce('Saved')
     announce('Saved')
@@ -190,6 +205,19 @@ describe('announce', () => {
     vi.advanceTimersByTime(100)
 
     expect(messages(document.body)).toEqual(['First', 'Second'])
+  })
+
+  it('should add the waiting messages after a hold, when their timer was lost', () => {
+    announce('First')
+    vi.useRealTimers()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance', 'Date'] })
+
+    holdAnnouncements()
+    vi.advanceTimersByTime(499)
+    expect(messages(document.body)).toEqual([])
+
+    vi.advanceTimersByTime(1)
+    expect(messages(document.body)).toEqual(['First'])
   })
 
   it('should drop the messages waiting for page regions that were removed', () => {
@@ -491,109 +519,5 @@ describe('announce', () => {
 
     expect(messages(document.body)).toEqual(['Saved'])
     expect(dialog.querySelector('[data-coreui-live-announcer]')).toBeNull()
-  })
-
-  describe('with ariaNotify', () => {
-    let notify
-
-    beforeEach(() => {
-      notify = vi.fn()
-      document.ariaNotify = notify
-    })
-
-    afterEach(() => {
-      delete document.ariaNotify
-    })
-
-    it('should send a message through document.ariaNotify one task later, without a region', () => {
-      announce('Saved')
-      expect(notify).not.toHaveBeenCalled()
-
-      vi.advanceTimersByTime(0)
-      expect(notify).toHaveBeenCalledExactlyOnceWith('Saved', { priority: 'normal' })
-      expect(announcers()).toHaveSize(0)
-    })
-
-    it('should send the messages of one task as one, in order, at the highest priority', () => {
-      announce('First')
-      announce('Failed', { priority: 'high' })
-      announce('Last')
-      vi.advanceTimersByTime(0)
-
-      expect(notify).toHaveBeenCalledExactlyOnceWith('First\nFailed\nLast', { priority: 'high' })
-    })
-
-    it('should send the same text again as a new message', () => {
-      announce('Saved')
-      vi.advanceTimersByTime(0)
-      announce('Saved')
-      vi.advanceTimersByTime(0)
-
-      expect(notify).toHaveBeenCalledTimes(2)
-    })
-
-    it('should send nothing for a message cancelled before it is sent', () => {
-      const cancel = announce('Saved')
-      cancel()
-      vi.advanceTimersByTime(0)
-
-      expect(notify).not.toHaveBeenCalled()
-    })
-
-    it('should send through document.ariaNotify while a modal dialog is open', () => {
-      fixtureEl.innerHTML = '<dialog><button type="button">Close</button></dialog>'
-      const dialog = fixtureEl.querySelector('dialog')
-      dialog.showModal()
-      dialog.querySelector('button').focus()
-
-      announce('Saved', { context: dialog })
-      vi.advanceTimersByTime(0)
-
-      expect(notify).toHaveBeenCalledExactlyOnceWith('Saved', { priority: 'normal' })
-      expect(dialog.querySelector('[data-coreui-live-announcer]')).toBeNull()
-    })
-
-    it('should hold a message for 500 ms after a dialog component closes its dialog', () => {
-      fixtureEl.innerHTML = '<dialog><button type="button">Close</button></dialog>'
-      const dialog = fixtureEl.querySelector('dialog')
-      dialog.showModal()
-
-      dialog.close()
-      holdAnnouncements()
-      announce('Saved')
-      vi.advanceTimersByTime(499)
-      expect(notify).not.toHaveBeenCalled()
-
-      vi.advanceTimersByTime(1)
-      expect(notify).toHaveBeenCalledExactlyOnceWith('Saved', { priority: 'normal' })
-    })
-
-    it('should hold a message while the modal dialog plays its closing transition', () => {
-      fixtureEl.innerHTML = '<dialog class="hiding"><button type="button">Close</button></dialog>'
-      const dialog = fixtureEl.querySelector('dialog')
-      dialog.showModal()
-
-      announce('Saved', { context: dialog })
-      vi.advanceTimersByTime(0)
-      expect(notify).not.toHaveBeenCalled()
-
-      dialog.classList.remove('hiding')
-      dialog.close()
-      vi.advanceTimersByTime(500)
-      expect(notify).toHaveBeenCalledExactlyOnceWith('Saved', { priority: 'normal' })
-    })
-
-    it('should use the regions on ChromeOS and Android, where ariaNotify reaches no screen reader', () => {
-      const userAgent = vi.spyOn(navigator, 'userAgent', 'get')
-
-      for (const platform of ['X11; CrOS x86_64 14541.0.0', 'Linux; Android 10; K']) {
-        userAgent.mockReturnValue(`Mozilla/5.0 (${platform}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36`)
-        announce(platform)
-        vi.advanceTimersByTime(100)
-      }
-
-      expect(notify).not.toHaveBeenCalled()
-      expect(messages(document.body)).toEqual(['X11; CrOS x86_64 14541.0.0', 'Linux; Android 10; K'])
-    })
   })
 })

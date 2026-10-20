@@ -29,6 +29,7 @@ Dropdown.getOrCreateInstance(element).toggle()
 Tooltip.getOrCreateInstance(element).show()
 const rootTooltip: RootTooltip = Tooltip.getOrCreateInstance(element)
 announce('Saved', { priority: 'high' })()
+announce('Saved', { priority: 'normal' })()
 rootAnnounce('Saved', { context: element, timeout: 1000 })()
 // @ts-expect-error — 'assertive' is not a priority
 announce('Saved', { priority: 'assertive' })
