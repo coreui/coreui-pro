@@ -2819,6 +2819,12 @@ field behind that kept submitting.
 - **Adding and removing chips is announced.** Chip set and Chip input announce
   each change through `announce()`; the wording is configurable via
   `ariaAddedAnnouncement`/`ariaRemovedAnnouncement`.
+- **Every remove button names its chip.** Chip and Chip set named each remove
+  button `Remove`, so a set read the same name for every chip; the button is
+  `Remove <text>` now, as Chip input and Multi Select already did. `ariaRemoveLabel`
+  (and Multi Select's `ariaChipRemoveLabel`) takes a string, where `{label}` stands
+  for the chip's text and is appended when missing, or a function of the text for
+  a different word order. A label written for v5 keeps working and gains the text.
 - **Chip input: `aria-disabled`/`aria-readonly` are no longer stamped on the
   container.** The container is a generic element, so those attributes were
   invalid on it (axe `aria-allowed-attr`); the native `disabled`/`readonly`

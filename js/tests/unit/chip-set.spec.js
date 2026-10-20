@@ -353,7 +353,7 @@ describe('ChipSet', () => {
 
       expect(chip.getAttribute('role')).toBeNull()
       expect(control.tagName).toEqual('BUTTON')
-      expect(control.getAttribute('aria-label')).toEqual('Remove')
+      expect(control.getAttribute('aria-label')).toEqual('Remove First')
     })
 
     it('should remove the chip when the aria-hidden control is clicked', () => {

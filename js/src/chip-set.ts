@@ -11,7 +11,9 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
-import { type ChipAnnouncement, getChipAnnouncement, resolveChipClassName } from './util/chip-values.js'
+import {
+  type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement, resolveChipClassName
+} from './util/chip-values.js'
 import { containsFocus, focusWithTemporaryTabindex } from './util/focus.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
@@ -62,7 +64,7 @@ const SELECTION_MODE_SINGLE = 'single'
 
 export type ChipSetConfig = {
   ariaAddedAnnouncement: ChipAnnouncement
-  ariaRemoveLabel: string
+  ariaRemoveLabel: ChipRemoveLabel
   ariaRemovedAnnouncement: ChipAnnouncement
   chipClassName: string | ((value: string) => string) | null
   disabled: boolean
@@ -96,7 +98,7 @@ const Default: ChipSetConfig = {
 
 const DefaultType: Record<string, string> = {
   ariaAddedAnnouncement: '(string|function)',
-  ariaRemoveLabel: 'string',
+  ariaRemoveLabel: '(string|function)',
   ariaRemovedAnnouncement: '(string|function)',
   chipClassName: '(string|function|null)',
   disabled: 'boolean',

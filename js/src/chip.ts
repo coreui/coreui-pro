@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { type ChipRemoveLabel, getChipRemoveLabel } from './util/chip-values.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch, writeAttribute } from './util/index.js'
 
@@ -42,7 +43,7 @@ const CLASS_NAME_DISABLED = 'disabled'
 
 type ChipConfig = {
   allowList: SanitizerAllowList
-  ariaRemoveLabel: string
+  ariaRemoveLabel: ChipRemoveLabel
   disabled: boolean
   filter: boolean
   removable: boolean
@@ -70,7 +71,7 @@ const Default: ChipConfig = {
 
 const DefaultType = {
   allowList: 'object',
-  ariaRemoveLabel: 'string',
+  ariaRemoveLabel: '(string|function)',
   disabled: 'boolean',
   filter: 'boolean',
   removable: 'boolean',
@@ -298,7 +299,7 @@ class Chip extends BaseComponent {
     const button = document.createElement('button')
     button.type = 'button'
     button.className = CLASS_NAME_CHIP_REMOVE
-    button.setAttribute('aria-label', this._config.ariaRemoveLabel)
+    button.setAttribute('aria-label', getChipRemoveLabel(this._config.ariaRemoveLabel, this._element.textContent.trim()))
     button.setAttribute('tabindex', '-1')
     button.innerHTML = sanitizeByConfig(this._config.removeIcon, this._config)
     return button

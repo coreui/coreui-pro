@@ -4389,6 +4389,7 @@ describe('MultiSelect', () => {
     it.each([
       ['the default label', {}, 'Remove Opt 1'],
       ['ariaChipRemoveLabel', { ariaChipRemoveLabel: 'Usuń' }, 'Usuń Opt 1'],
+      ['an ariaChipRemoveLabel function', { ariaChipRemoveLabel: label => `${label} entfernen` }, 'Opt 1 entfernen'],
       ['the deprecated ariaTagDeleteLabel, which wins while it is set', { ariaChipRemoveLabel: 'Usuń', ariaTagDeleteLabel: 'Delete' }, 'Delete Opt 1']
     ])('should name the chip remove button with %s', (_, config, label) => {
       fixtureEl.innerHTML = '<select></select>'

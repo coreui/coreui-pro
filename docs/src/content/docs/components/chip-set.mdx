@@ -116,7 +116,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | --- | --- | --- | --- |
 | `ariaAddedAnnouncement` | string, function | `'added'` | Wording appended to the values of the added chips when their addition is announced. A function receives the added values and returns the whole message. |
 | `ariaRemovedAnnouncement` | string, function | `'removed'` | Wording appended to the values of the removed chips when their removal is announced. A function receives the removed values and returns the whole message. |
-| `ariaRemoveLabel` | string | `'Remove'` | Accessible label applied to each chip's remove button. A selectable set has no such button — see [Accessibility](#accessibility). |
+| `ariaRemoveLabel` | string \| function | `'Remove'` | Names each chip's remove button with the chip's label: a string has `{label}` replaced by it, or gets it appended when there is no `{label}` (`Remove React`); a function receives the label and returns the whole name. A selectable set has no such button — see [Accessibility](#accessibility). |
 | `chipClassName` | string, function, null | `null` | CSS class(es) added to chips created through `add`. A function receives the chip value and returns the class string. |
 | `disabled` | boolean | `false` | Disables interactions and focus for the chips in the set. |
 | `filter` | boolean | `false` | Turns the chips into filter chips — a check icon is shown on the selected ones. Implies `selectable`. |
