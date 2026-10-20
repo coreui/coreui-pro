@@ -557,6 +557,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `ariaChipRemoveLabel` | string \| function | `'Remove'` | Names a chip's remove button with the selected option's text: a string has `{label}` replaced by it, or gets it appended when there is no `{label}` ("Remove Angular"); a function receives the text and returns the whole name. |
 | `ariaCleanerLabel`| string | `Clear all selections` | A string that provides an accessible label for the cleaner button. This label is read by screen readers to describe the action associated with the button. |
 | `ariaPickerLabel` | string | `'Toggle options list'` | Accessible label of the picker button. |
+| `ariaRemovedAnnouncement` | string \| function | `'removed'` | Announced after a value is removed through its chip, <kbd>Backspace</kbd> or the cleaner. A string follows the removed labels (`Angular removed`); a function receives them and returns the whole message. A pick in the list is not announced, since the option says it is selected. |
 | `ariaSearchLabel`| string | `Search` | Accessible label for the search input (when `search` is enabled). |
 | `ariaTagDeleteLabel` | string \| null | `null` | Deprecated, use `ariaChipRemoveLabel`. While it is set, it takes precedence over `ariaChipRemoveLabel`. |
 | `cleaner`| boolean | `true` | Enables selection cleaner element. |
@@ -661,7 +662,8 @@ The select stays in the page as an invisible overlay for form validation and is 
 | <kbd>Home</kbd>/<kbd>End</kbd> | Focus the first/last option (not while typing in the search box) |
 | <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>A</kbd> | Select every option the list shows, from the options list (multiple selection) |
 | <kbd>Escape</kbd> | Close the panel and return the focus to the control |
-| <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Remove the last selected item (when the search box is empty) |
+| <kbd>Backspace</kbd>/<kbd>Delete</kbd> | In the empty search box, focus the last chip; on a chip, remove it and move the focus to the next chip, else the previous one, else the search box. With `selectionType` other than `chips`, remove the last selected item |
+| <kbd>Arrow Left</kbd>/<kbd>Arrow Right</kbd> | From the start of the search box, focus the last chip; between the chips, move the focus; past the last chip, return to the search box (mirrored in right-to-left) |
 
 ## Customizing
 

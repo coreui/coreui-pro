@@ -11,13 +11,14 @@ import ComboboxBase from './combobox-base.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { type ChipRemoveLabel } from './util/chip-values.js'
+import { announce } from './util/announce.js'
+import { type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement } from './util/chip-values.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import FocusTrap from './util/focustrap.js'
 import { type ValidationState } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
-import { isTypingKey } from './util/list-navigation.js'
+import { getRemovalNeighbor, isTypingKey } from './util/list-navigation.js'
 import { flattenOptions, isOptionGroup } from './util/option-tree.js'
 import {
   type CountLabel, createSelectionStore, fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit,
@@ -27,7 +28,7 @@ import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import {
-  defineJQueryPlugin, getUID, isVisible, jQueryDispatch, writeAttribute
+  defineJQueryPlugin, getUID, isRTL, isVisible, jQueryDispatch, writeAttribute
 } from './util/index.js'
 
 /**
@@ -42,6 +43,8 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const ARROW_DOWN_KEY = 'ArrowDown'
+const ARROW_LEFT_KEY = 'ArrowLeft'
+const ARROW_RIGHT_KEY = 'ArrowRight'
 const ARROW_UP_KEY = 'ArrowUp'
 const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
@@ -97,6 +100,7 @@ type MultiSelectConfig = {
   ariaChipRemoveLabel: ChipRemoveLabel
   ariaCleanerLabel: string
   ariaPickerLabel: string
+  ariaRemovedAnnouncement: ChipAnnouncement
   ariaSearchLabel: string
   ariaTagDeleteLabel: string | null
   cleaner: boolean
@@ -145,6 +149,7 @@ const Default: MultiSelectConfig = {
   ariaChipRemoveLabel: 'Remove',
   ariaCleanerLabel: 'Clear all selections',
   ariaPickerLabel: 'Toggle options list',
+  ariaRemovedAnnouncement: 'removed',
   ariaSearchLabel: 'Search',
   ariaTagDeleteLabel: null,
   cleaner: true,
@@ -193,6 +198,7 @@ const DefaultType: Record<string, string> = {
   ariaChipRemoveLabel: '(string|function)',
   ariaCleanerLabel: 'string',
   ariaPickerLabel: 'string',
+  ariaRemovedAnnouncement: '(string|function)',
   ariaSearchLabel: 'string',
   ariaTagDeleteLabel: '(string|null)',
   cleaner: 'boolean',
@@ -684,8 +690,24 @@ class MultiSelect extends ComboboxBase {
       event.preventDefault()
 
       const chip = event.target.closest(SELECTOR_CHIP)
-      if (chip) {
-        this._validation.runAsUser(() => this._deselectOption(String(chip.dataset.value)))
+      if (!chip) {
+        return
+      }
+
+      const target = containsFocus(chip) ?
+        getRemovalNeighbor(this._getChips(), chip) ?? this._getChipsFallback() :
+        null
+
+      this._removeAsUser(() => this._deselectOption(String(chip.dataset.value)))
+      target?.focus()
+    })
+
+    EventHandler.on(this._selectionElement, EVENT_KEYDOWN, SELECTOR_CHIP, (event: any) => {
+      const towardField = isRTL(this._wrapperElement) ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY
+
+      if (this._config.search && event.key === towardField && event.delegateTarget === this._getChips().at(-1)) {
+        event.preventDefault()
+        this._searchElement.focus()
       }
     })
 
@@ -693,7 +715,7 @@ class MultiSelect extends ComboboxBase {
       if (!this._disabled) {
         event.preventDefault()
         event.stopPropagation()
-        this._validation.runAsUser(() => this.deselectAll())
+        this._removeAsUser(() => this.deselectAll())
       }
     })
 
@@ -741,7 +763,8 @@ class MultiSelect extends ComboboxBase {
 
       if (
         this._routesTypingToSearch() &&
-        isTypingKey(event)
+        isTypingKey(event) &&
+        !event.defaultPrevented
       ) {
         this._searchElement.focus()
       }
@@ -817,6 +840,10 @@ class MultiSelect extends ComboboxBase {
     EventHandler.on(this._searchElement, EVENT_KEYDOWN, (event: any) => {
       if ((!this._isShown() && event.key?.length === 1 && !event.ctrlKey && !event.metaKey) || event.key === ARROW_DOWN_KEY) {
         this.show()
+      }
+
+      if (this._handleSearchToChips(event)) {
+        return
       }
 
       if ((event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && event.target.value.length === 0) {
@@ -1283,6 +1310,8 @@ class MultiSelect extends ComboboxBase {
 
       next = chip
     }
+
+    this._selectionChipSet?._moveTabStop()
   }
 
   override _onSelectionChange(): void {
@@ -1375,7 +1404,44 @@ class MultiSelect extends ComboboxBase {
     const last = this._selectedOptions().findLast((option: any) => option.disabled !== true)
 
     if (last) {
-      this._validation.runAsUser(() => this._deselectOption(last.value))
+      this._removeAsUser(() => this._deselectOption(last.value))
+    }
+  }
+
+  _getChips(): HTMLElement[] {
+    return this._selectionChipSet?._getFocusableChips() ?? []
+  }
+
+  _getChipsFallback(): HTMLElement {
+    return this._config.search ? this._searchElement : this._togglerElement
+  }
+
+  _handleSearchToChips(event: any): boolean {
+    const chips = this._getChips()
+    const field = event.target as HTMLInputElement
+    const atStart = field.selectionStart === 0 && field.selectionEnd === 0
+    const towardChips = isRTL(this._wrapperElement) ? ARROW_RIGHT_KEY : ARROW_LEFT_KEY
+
+    if (
+      chips.length === 0 ||
+      !(((event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && field.value.length === 0) || (event.key === towardChips && atStart))
+    ) {
+      return false
+    }
+
+    event.preventDefault()
+    chips.at(-1)?.focus()
+    return true
+  }
+
+  _removeAsUser(remove: () => void): void {
+    const before = this._selectedOptions().map((option: any) => option.text)
+
+    this._validation.runAsUser(remove)
+
+    const message = getChipAnnouncement(before, this._selectedOptions().map((option: any) => option.text), this._config.ariaRemovedAnnouncement, this._config.ariaRemovedAnnouncement)
+    if (message) {
+      announce(message, { context: this._wrapperElement })
     }
   }
 
