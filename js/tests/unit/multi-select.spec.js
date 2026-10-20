@@ -1,4 +1,4 @@
-import { userEvent } from '@vitest/browser/context'
+import { userEvent } from 'vitest/browser'
 import { vi } from 'vitest'
 
 import Chip from '../../src/chip.js'

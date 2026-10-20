@@ -297,9 +297,9 @@
     "@coreui/astro-docs": "^0.1.16",
     "@eslint/markdown": "^7.5.1",
     "@floating-ui/dom": "^1.8.0",
-    "@vitest/browser": "^4.1.12",
-    "@vitest/browser-playwright": "^4.1.12",
-    "@vitest/coverage-istanbul": "^4.1.12",
+    "@vitest/browser": "^5.0.5",
+    "@vitest/browser-playwright": "^5.0.5",
+    "@vitest/coverage-istanbul": "^5.0.5",
     "astro": "^7.4.1",
     "autoprefixer": "^10.6.1",
     "axe-core": "^4.14.0",
@@ -336,7 +336,7 @@
     "terser": "5.49.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1",
-    "vitest": "^4.1.12",
+    "vitest": "^5.0.5",
     "vnu-jar": "25.11.25"
   },
   "files": [

@@ -1,4 +1,4 @@
-import { userEvent } from '@vitest/browser/context'
+import { userEvent } from 'vitest/browser'
 import Autocomplete from '../../src/autocomplete.js'
 import Dialog from '../../src/dialog.js'
 import Form from '../../src/form.js'

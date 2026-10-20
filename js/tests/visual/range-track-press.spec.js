@@ -7,7 +7,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 
-import { userEvent } from '@vitest/browser/context'
+import { userEvent } from 'vitest/browser'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
 import RangeSlider from '../../src/range-slider.js'

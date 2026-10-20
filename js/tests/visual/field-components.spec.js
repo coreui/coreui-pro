@@ -11,8 +11,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 
-import { page } from 'vitest/browser'
-import { userEvent } from '@vitest/browser/context'
+import { page, userEvent } from 'vitest/browser'
 // The whole point of the suite is what the CSS does, so it loads the Sass
 // source rather than a built file: no dist step to remember, and a regression
 // in scss/ shows up on the next run.

@@ -1,4 +1,4 @@
-import { userEvent } from '@vitest/browser/context'
+import { userEvent } from 'vitest/browser'
 
 import Rating from '../../src/rating.js'
 import EventHandler from '../../src/dom/event-handler.js'
