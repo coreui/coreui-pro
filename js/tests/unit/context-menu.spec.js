@@ -208,6 +208,14 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should name the component when the reference object has no getBoundingClientRect', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+
+      expect(() => new ContextMenu(area, { reference: {} })).toThrowError(TypeError, 'CONTEXT-MENU: Option "reference" provided type "object" without a required "getBoundingClientRect" method.')
+    })
+
     it('should not show if the element is disabled', () => {
       fixtureEl.innerHTML = markup('class="area disabled"').replace('class="area" ', '')
 

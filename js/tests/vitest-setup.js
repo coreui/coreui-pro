@@ -143,6 +143,30 @@ globalThis.jasmine = {
  */
 const result = (pass, message) => ({ pass, message: () => message })
 
+const checkThrowErrorArguments = (expected, message) => {
+  if (expected !== undefined && typeof expected !== 'function' && typeof expected !== 'string' && !(expected instanceof RegExp)) {
+    throw new TypeError('toThrowError takes an error class, a message or a RegExp')
+  }
+
+  if (typeof expected !== 'function' && message !== undefined) {
+    throw new TypeError('toThrowError takes a message after an error class only')
+  }
+}
+
+const callForThrow = received => {
+  if (typeof received !== 'function') {
+    throw new TypeError('toThrowError expects a function, or a promise with rejects')
+  }
+
+  try {
+    received()
+  } catch (error) {
+    return { threw: true, thrown: error }
+  }
+
+  return { threw: false, thrown: undefined }
+}
+
 expect.extend({
   toHaveClass(received, className) {
     const pass = Boolean(received?.classList?.contains(className))
@@ -160,6 +184,23 @@ expect.extend({
   },
   nothing() {
     return result(true, '')
+  },
+  toThrowError(received, expected, message) {
+    checkThrowErrorArguments(expected, message)
+
+    const { threw, thrown } = this.promise === 'rejects' ? { threw: true, thrown: received } : callForThrow(received)
+    const type = typeof expected === 'function' ? expected : null
+    const text = type ? message : expected
+    const wanted = `${this.isNot ? 'not ' : ''}to throw ${type?.name ?? 'an Error'}${text === undefined ? '' : ` with message ${text}`}`
+
+    if (!threw || !(thrown instanceof Error)) {
+      return result(false, `expected the function ${wanted}, but it ${threw ? `threw ${String(thrown)}` : 'did not throw'}`)
+    }
+
+    const typeOk = !type || thrown instanceof type
+    const textOk = text === undefined || (text instanceof RegExp ? text.test(thrown.message) : thrown.message === text)
+
+    return result(typeOk && textOk, `expected the function ${wanted}, but it threw ${thrown.name}: ${thrown.message}`)
   }
 })
 
