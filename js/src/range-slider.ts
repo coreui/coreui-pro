@@ -611,7 +611,7 @@ class RangeSlider extends BaseComponent {
     EventHandler.on(document, EVENT_POINTERUP, this._onPointerUp)
     EventHandler.on(document, EVENT_POINTERCANCEL, this._onPointerUp)
     input.focus({ preventScroll: true })
-    this._setValue(input, value ?? this._config.min + (at * (this._config.max - this._config.min)))
+    this._setValue(input, value ?? (this._config.min + (at * (this._config.max - this._config.min))))
   }
 
   _pointerMove(event: PointerEvent): void {

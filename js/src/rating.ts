@@ -688,8 +688,8 @@ class Rating extends BaseComponent {
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   const ratings = SelectorEngine.find(SELECTOR_DATA_RATING)
-  for (let i = 0, len = ratings.length; i < len; i++) {
-    Rating.ratingInterface(ratings[i])
+  for (const rating of ratings) {
+    Rating.ratingInterface(rating)
   }
 })
 
