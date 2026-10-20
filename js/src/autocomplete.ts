@@ -310,6 +310,7 @@ class Autocomplete extends ComboboxBase {
   clear(): void {
     const isChanged = this._store.size() > 0 || this._shownText !== ''
 
+    this._valueApplied = true
     this.deselectAll()
     this.search('')
     this._filterOptionsList()
@@ -360,9 +361,10 @@ class Autocomplete extends ComboboxBase {
     this._givenValue = value
     this._valueApplied = false
     this._reportSeed = false
-    this.deselectAll()
+    this._commitSelection([])
     this._setText('')
     this._seedSelection()
+    this._updateCleaner()
     this._validation.update()
   }
 
@@ -540,6 +542,7 @@ class Autocomplete extends ComboboxBase {
       }
 
       this._shownText = value
+      this._valueApplied = true
       this._validation.update()
 
       if (this._store.size() > 0) {
@@ -811,6 +814,8 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
+    this._valueApplied = true
+
     if (this._inputElement.value !== option.label) {
       this._validation.dismiss()
     }
@@ -897,7 +902,7 @@ class Autocomplete extends ComboboxBase {
     const text = this._shownText
 
     this._reportSeed = false
-    this.deselectAll()
+    this._commitSelection([])
     this._setText('')
 
     if (this._inputHintElement) {
@@ -912,6 +917,7 @@ class Autocomplete extends ComboboxBase {
     this._valueApplied = false
     this._seenOptionValues.clear()
     this._seedSelection()
+    this._updateCleaner()
     this._validation.update()
 
     const current = this._selectedOptions()[0]
