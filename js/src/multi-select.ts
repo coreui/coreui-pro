@@ -1085,7 +1085,7 @@ class MultiSelect extends ComboboxBase {
     this._selectionElement = selectionEl
 
     if (this._config.multiple && ['chips', 'tags'].includes(this._config.selectionType)) {
-      this._selectionChipSet = new MultiSelectChipSet(selectionEl, { removable: !this._disabled })
+      this._selectionChipSet = new MultiSelectChipSet(selectionEl, { removable: !this._disabled, typeahead: false })
     }
   }
 
@@ -1274,6 +1274,7 @@ class MultiSelect extends ComboboxBase {
     const chips = new Map<string, HTMLElement>()
     let focused: string | undefined
     const selected = this._selectedOptions()
+    const stop = this._getChipTabStop()
 
     for (const chip of SelectorEngine.children(selection, SELECTOR_CHIP) as HTMLElement[]) {
       const option = selected.find((option: any) => option.value === chip.dataset.value)
@@ -1311,7 +1312,7 @@ class MultiSelect extends ComboboxBase {
       next = chip
     }
 
-    this._selectionChipSet?._moveTabStop()
+    this._moveChipTabStop(stop)
   }
 
   override _onSelectionChange(): void {
@@ -1412,34 +1413,49 @@ class MultiSelect extends ComboboxBase {
     return this._selectionChipSet?._getFocusableChips() ?? []
   }
 
+  _getChipTabStop(): string | undefined {
+    return this._getChips().find(chip => chip.tabIndex === 0)?.dataset.value
+  }
+
+  _moveChipTabStop(value: string | undefined): void {
+    this._selectionChipSet?._moveTabStop(this._getChips().find(chip => chip.dataset.value === value) ?? null)
+  }
+
   _getChipsFallback(): HTMLElement {
     return this._config.search ? this._searchElement : this._togglerElement
   }
 
   _handleSearchToChips(event: any): boolean {
-    const chips = this._getChips()
-    const field = event.target as HTMLInputElement
-    const atStart = field.selectionStart === 0 && field.selectionEnd === 0
-    const towardChips = isRTL(this._wrapperElement) ? ARROW_RIGHT_KEY : ARROW_LEFT_KEY
+    const removing = event.key === BACKSPACE_KEY || event.key === DELETE_KEY
+    const arrow = event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY
 
-    if (
-      chips.length === 0 ||
-      !(((event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && field.value.length === 0) || (event.key === towardChips && atStart))
-    ) {
+    if ((!removing && !arrow) || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+      return false
+    }
+
+    const field = event.target as HTMLInputElement
+    const towardChips = isRTL(this._wrapperElement) ? ARROW_RIGHT_KEY : ARROW_LEFT_KEY
+    const entering = removing ? field.value.length === 0 : event.key === towardChips && field.selectionStart === 0 && field.selectionEnd === 0
+    const last = entering ? this._getChips().at(-1) : undefined
+
+    if (!last) {
       return false
     }
 
     event.preventDefault()
-    chips.at(-1)?.focus()
+    this.hide()
+    last.focus()
     return true
   }
 
   _removeAsUser(remove: () => void): void {
-    const before = this._selectedOptions().map((option: any) => option.text)
+    const before = this._selectedOptions()
 
     this._validation.runAsUser(remove)
 
-    const message = getChipAnnouncement(before, this._selectedOptions().map((option: any) => option.text), this._config.ariaRemovedAnnouncement, this._config.ariaRemovedAnnouncement)
+    const after = new Set(this._store.values())
+    const removed = before.filter((option: any) => !after.has(String(option.value))).map((option: any) => option.text)
+    const message = getChipAnnouncement(removed, [], this._config.ariaRemovedAnnouncement, this._config.ariaRemovedAnnouncement)
     if (message) {
       announce(message, { context: this._wrapperElement })
     }

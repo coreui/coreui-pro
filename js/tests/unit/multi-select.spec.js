@@ -5227,6 +5227,112 @@ describe('MultiSelect', () => {
         expect(document.activeElement).toEqual(target)
       })
 
+      it('should keep one tab stop when a chip is added and keep it on the focused chip when an earlier one is rebuilt', () => {
+        const multiSelect = create({ options: [...chipOptions.slice(0, 2), { value: '4', text: 'Opt 4' }] })
+
+        multiSelect._optionsElement.querySelector('[data-coreui-value="4"]').click()
+
+        expect(['1', '2', '4'].map(value => chip(multiSelect, value).tabIndex)).toEqual([0, -1, -1])
+
+        chip(multiSelect, '4').focus()
+        multiSelect.setOptions([{ value: '1', text: 'Opt 1 (LTS)' }, { value: '2', text: 'Opt 2' }, { value: '4', text: 'Opt 4' }])
+
+        expect(['1', '2', '4'].map(value => chip(multiSelect, value).tabIndex)).toEqual([-1, -1, 0])
+        expect(document.activeElement).toEqual(chip(multiSelect, '4'))
+      })
+
+      it.each([
+        ['an IME composition', { isComposing: true }],
+        ['a modifier', { ctrlKey: true }]
+      ])('should stay in the search for an arrow during %s', (_, init) => {
+        const multiSelect = create()
+        multiSelect._searchElement.focus()
+
+        multiSelect._searchElement.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'ArrowLeft', bubbles: true, cancelable: true, ...init
+        }))
+
+        expect(document.activeElement).toEqual(multiSelect._searchElement)
+      })
+
+      it('should close the open panel when the focus moves to the chips', () => {
+        const multiSelect = create()
+        multiSelect.show()
+        multiSelect._searchElement.focus()
+
+        key(multiSelect._searchElement, 'Backspace')
+
+        expect(multiSelect._isShown()).toBeFalse()
+        expect(document.activeElement).toEqual(chip(multiSelect, '3'))
+      })
+
+      it('should focus the last removable chip when the last one is locked', () => {
+        const multiSelect = create({
+          options: [...chipOptions.slice(0, 2), {
+            value: '3', text: 'Opt 3', selected: true, disabled: true
+          }]
+        })
+        multiSelect._searchElement.focus()
+
+        key(multiSelect._searchElement, 'Backspace')
+
+        expect(document.activeElement).toEqual(chip(multiSelect, '2'))
+      })
+
+      it('should take the two-step model for the deprecated tags value', () => {
+        const multiSelect = create({ selectionType: 'tags' })
+        multiSelect._searchElement.focus()
+
+        key(multiSelect._searchElement, 'Backspace')
+
+        expect(multiSelect.getValue()).toHaveSize(3)
+        expect(document.activeElement).toEqual(chip(multiSelect, '3'))
+      })
+
+      it.each([
+        ['a single select', { multiple: false, options: [{ value: '1', text: 'Opt 1', selected: true }] }, []],
+        ['the text selection', { selectionType: 'text' }, ['1', '2']]
+      ])('should remove the last value at once in %s', (_, config, expected) => {
+        const multiSelect = create(config)
+
+        key(multiSelect._searchElement, 'Backspace')
+
+        expect(multiSelect.getValue().map(option => option.value)).toEqual(expected)
+      })
+
+      it('should move to the first and last chip with Home and End', () => {
+        const multiSelect = create()
+        chip(multiSelect, '2').focus()
+
+        key(chip(multiSelect, '2'), 'End')
+        expect(document.activeElement).toEqual(chip(multiSelect, '3'))
+
+        key(chip(multiSelect, '3'), 'Home')
+        expect(document.activeElement).toEqual(chip(multiSelect, '1'))
+      })
+
+      it('should stay on the last chip with the arrow away from the chips when there is no search', () => {
+        const multiSelect = create({ search: false })
+        chip(multiSelect, '3').focus()
+
+        key(chip(multiSelect, '3'), 'ArrowRight')
+
+        expect(document.activeElement).toEqual(chip(multiSelect, '3'))
+      })
+
+      it.each([
+        ['to the search with globalSearch', { globalSearch: true }, 'search'],
+        ['nowhere without globalSearch', { globalSearch: false }, 'chip']
+      ])('should send a letter typed on a chip %s, with no typeahead among the chips', (_, config, expected) => {
+        const multiSelect = create({ ...config, options: [{ value: '1', text: 'Angular', selected: true }, { value: '2', text: 'Vue', selected: true }] })
+        chip(multiSelect, '2').focus()
+
+        key(chip(multiSelect, '2'), 'a')
+
+        expect(document.activeElement).toEqual(expected === 'search' ? multiSelect._searchElement : chip(multiSelect, '2'))
+        expect(chip(multiSelect, '1').tabIndex).toEqual(-1)
+      })
+
       it('should leave focus where it is when a chip without focus is removed', () => {
         const multiSelect = create()
         multiSelect._searchElement.focus()
@@ -5272,6 +5378,15 @@ describe('MultiSelect', () => {
           await settle()
 
           expect(messages()).toEqual(['Opt 1 removed', 'Opt 3 removed', 'Opt 2 removed'])
+        })
+
+        it('should announce one of two selected values that share a label', async () => {
+          const multiSelect = create({ options: [{ value: '1', text: 'John', selected: true }, { value: '2', text: 'John', selected: true }] })
+
+          chip(multiSelect, '1').querySelector('.chip-remove').click()
+          await settle()
+
+          expect(messages()).toEqual(['John removed'])
         })
 
         it('should word the announcement with ariaRemovedAnnouncement and stay quiet for a pick from the list', async () => {
