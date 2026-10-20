@@ -311,7 +311,7 @@ class Autocomplete extends ComboboxBase {
     const isChanged = this._store.size() > 0 || this._shownText !== ''
 
     this._valueApplied = true
-    this.deselectAll()
+    this._clearSelection()
     this.search('')
     this._filterOptionsList()
     this._setText('')
@@ -361,10 +361,9 @@ class Autocomplete extends ComboboxBase {
     this._givenValue = value
     this._valueApplied = false
     this._reportSeed = false
-    this._commitSelection([])
+    this._clearSelection()
     this._setText('')
     this._seedSelection()
-    this._updateCleaner()
     this._validation.update()
   }
 
@@ -454,7 +453,7 @@ class Autocomplete extends ComboboxBase {
 
       if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._store.size() > 0) {
         this._validation.dismiss(this._keySerial)
-        this.deselectAll()
+        this._clearSelection()
         this._validation.update()
         this._triggerChangeEvent(null)
       }
@@ -546,7 +545,7 @@ class Autocomplete extends ComboboxBase {
       this._validation.update()
 
       if (this._store.size() > 0) {
-        this.deselectAll()
+        this._clearSelection()
         this._triggerChangeEvent(null)
       }
 
@@ -842,6 +841,11 @@ class Autocomplete extends ComboboxBase {
     this._updateCleaner()
   }
 
+  _clearSelection(): void {
+    this._commitSelection([])
+    this._updateCleaner()
+  }
+
   _deselectOption(value: any): void {
     this._commitSelection(this._store.values().filter(selected => selected !== String(value)))
   }
@@ -902,7 +906,7 @@ class Autocomplete extends ComboboxBase {
     const text = this._shownText
 
     this._reportSeed = false
-    this._commitSelection([])
+    this._clearSelection()
     this._setText('')
 
     if (this._inputHintElement) {
@@ -917,7 +921,6 @@ class Autocomplete extends ComboboxBase {
     this._valueApplied = false
     this._seenOptionValues.clear()
     this._seedSelection()
-    this._updateCleaner()
     this._validation.update()
 
     const current = this._selectedOptions()[0]
