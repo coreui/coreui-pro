@@ -67,7 +67,9 @@ Work through the steps in order. After each step, search the project for the pat
    // Bootstrap
    import * as bootstrap from 'bootstrap'
    import { Tooltip, Toast } from 'bootstrap'
+   ```
 
+   ```js
    // CoreUI PRO
    import * as coreui from '@coreui/coreui-pro'
    import { Tooltip, Toast } from '@coreui/coreui-pro'

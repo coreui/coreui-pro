@@ -43,7 +43,12 @@ The CSS is the same in all three editions. Packages: `@coreui/coreui-pro`, `@cor
 4. In React and Vue, components import their own compiled stylesheets. When you compile the Sass yourself, import components from the unstyled entry point so the default CSS does not load twice.
 
    ```js
+   // React
    import { CButton } from '@coreui/react-pro/unstyled'
+   ```
+
+   ```js
+   // Vue
    import { CButton } from '@coreui/vue-pro/unstyled'
    ```
 
@@ -127,9 +132,11 @@ Every entry of `$theme-colors` defines the same nine slots. The built-in entries
 5. In React and Vue, set the `theme` prop. It renders the same `theme-{color}` class. The `color` prop is deprecated since 6.0.0 and loses to `theme` when both are set.
 
    ```jsx
-   <CButton theme="primary" variant="outline">Save</CButton>
-   <CAlert theme="danger">Error</CAlert>
-   <CBadge theme="success" variant="subtle">Done</CBadge>
+   <>
+     <CButton theme="primary" variant="outline">Save</CButton>
+     <CAlert theme="danger">Error</CAlert>
+     <CBadge theme="success" variant="subtle">Done</CBadge>
+   </>
    ```
 
    ```vue

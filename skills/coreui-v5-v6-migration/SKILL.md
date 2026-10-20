@@ -40,8 +40,11 @@ Modal, Offcanvas and Dropdown keep their names in v6: `.modal`, `.offcanvas`, `.
 
    ```js
    // v5
-   import Alert from '@coreui/coreui-pro/js/src/alert.js'
    import { Tooltip } from '@coreui/coreui-pro/js/index.esm.js'
+   import Alert from '@coreui/coreui-pro/js/src/alert.js'
+   ```
+
+   ```js
    // v6
    import Alert from '@coreui/coreui-pro/js/dist/alert.js'
    import { Tooltip } from '@coreui/coreui-pro'
