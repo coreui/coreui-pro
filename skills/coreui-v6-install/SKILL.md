@@ -146,13 +146,14 @@ From npm in a bundler: `import '@coreui/coreui-pro/css/base.css'` and `import '@
 
 ## Step 5: Choose how to load the JavaScript
 
-1. Pick exactly one source per page. The bundle, the ESM entry and the per-plugin files each carry their own copy of the shared internals. Two of them on one page register the data-attribute handlers twice, so a toggle opens and closes on the same click.
+1. Pick exactly one source per page. The UMD files and `dist/js/coreui.esm.js` each carry their own copy of the shared internals, and the package root and the `js/dist` files share a third. Two copies on one page register the data-attribute handlers twice, so a toggle opens and closes on the same click. In a bundler, the package root and `js/dist` imports mix safely.
 
    | Source | Floating UI | How |
    | --- | --- | --- |
    | `dist/js/coreui.bundle(.min).js` | included | `<script>`, global `coreui` |
    | `dist/js/coreui(.min).js` | external | `<script>` after the Floating UI UMD files, global `coreui` |
-   | `dist/js/coreui.esm(.min).js` | external | `<script type="module">` with an import map, or a bundler |
+   | `dist/js/coreui.esm(.min).js` | external | `<script type="module">` with an import map |
+   | `@coreui/coreui-pro` (resolves to `js/dist/index.mjs`) | external | bundler, every plugin |
    | `js/dist/<plugin>.mjs` | external | bundler, one import per plugin |
 
 2. In a bundler, import everything:

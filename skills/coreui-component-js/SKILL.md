@@ -40,7 +40,7 @@ The package must come from npm and go through a bundler (Vite, Webpack, Parcel, 
    | `@coreui/coreui-pro/js/dist/<plugin>` | one CoreUI plugin, for example `js/dist/modal` |
    | `@coreui/coreui-pro/utils/announce`, `@coreui/coreui-pro/utils/focus` | `announce()`, `containsFocus()`, `focusWithTemporaryTabindex()` |
 
-2. Import the CoreUI plugins of the same page from `js/dist` too. Every `js/dist/*.mjs` file shares one copy of `base-component`, `dom/data` and `dom/event-handler`. The package root is a separate build with its own copy: `import { Modal } from '@coreui/coreui-pro'` next to a `js/dist` import puts both copies and the whole library in the bundle.
+2. Import the CoreUI plugins of the same page from `js/dist` too. Every `js/dist/*.mjs` file shares one copy of `base-component`, `dom/data` and `dom/event-handler`. The package root resolves to `js/dist/index.mjs`, so it loads the same copy, but `import { Modal } from '@coreui/coreui-pro'` still puts the whole library in the bundle. Import from `js/dist` to keep the bundle small.
 
    ```js
    import BaseComponent from '@coreui/coreui-pro/js/dist/base-component'
