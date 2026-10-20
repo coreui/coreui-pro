@@ -320,15 +320,23 @@ class Calendar extends BaseComponent {
 
   // Public
   setCalendarDate(calendarDate: CalendarConfig['calendarDate']): void {
-    this._setConfig({ calendarDate })
+    this._setDates({ calendarDate })
   }
 
   setEndDate(endDate: CalendarConfig['endDate']): void {
-    this._setConfig({ endDate })
+    this._setDates({ endDate })
+  }
+
+  setRange(startDate: CalendarConfig['startDate'], endDate: CalendarConfig['endDate']): void {
+    this._setDates({ endDate, startDate })
+  }
+
+  setSelectEndDate(selectEndDate: CalendarConfig['selectEndDate']): void {
+    this._setDates({ selectEndDate })
   }
 
   setStartDate(startDate: CalendarConfig['startDate']): void {
-    this._setConfig({ startDate })
+    this._setDates({ startDate })
   }
 
   refresh(): void {
@@ -346,14 +354,9 @@ class Calendar extends BaseComponent {
   }
 
   // Private
-  _setConfig(config?: Partial<CalendarConfig> | null): void {
-    this._config = this._getConfig({ ...this._config, ...config })
-    this._initializeDates(Object.keys(config ?? {}))
-
-    if (!config) {
-      this._initializeView()
-    }
-
+  _setDates(values: Partial<Pick<CalendarConfig, 'calendarDate' | 'endDate' | 'selectEndDate' | 'startDate'>>): void {
+    this._typeCheckConfig(values, Object.fromEntries(Object.keys(values).map(name => [name, DefaultType[name as keyof typeof DefaultType]])))
+    this._initializeDates(values)
     this._updateCalendar()
   }
 
@@ -1021,20 +1024,21 @@ class Calendar extends BaseComponent {
     this._element.classList.add(CLASS_NAME_CALENDARS)
   }
 
-  _initializeDates(keys?: string[]): void {
-    const changed = (...names: string[]) => !keys || names.some(name => keys.includes(name))
+  _initializeDates(values?: Partial<CalendarConfig>): void {
+    const given: Partial<CalendarConfig> = values ?? this._config
+    const changed = (...names: string[]) => !values || names.some(name => name in values)
 
-    if (!keys) {
+    if (!values) {
       this._minDate = convertToLimitDate(this._config.minDate, this._config.selectionType)
       this._maxDate = convertToLimitDate(this._config.maxDate, this._config.selectionType)
     }
 
     if (changed('calendarDate', 'startDate', 'endDate')) {
-      const source = keys ?
-        ['calendarDate', 'startDate', 'endDate'].filter(name => keys.includes(name)).map(name => this._config[name]).find(Boolean) ?? null :
-        this._config.calendarDate || this._config.startDate || this._config.endDate
+      const source: any = values ?
+        (['calendarDate', 'startDate', 'endDate'] as const).filter(name => name in values).map(name => values[name]).find(Boolean) ?? null :
+        given.calendarDate || given.startDate || given.endDate
 
-      const date = source === this._config.calendarDate ?
+      const date = source === given.calendarDate ?
         convertToDateObject(source, this._config.selectionType) :
         convertToShownDate(source, this._config.selectionType, this._config.firstDayOfWeek)
 
@@ -1042,15 +1046,15 @@ class Calendar extends BaseComponent {
     }
 
     if (changed('startDate')) {
-      this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
+      this._startDate = convertToDateObject(given.startDate, this._config.selectionType)
     }
 
     if (changed('endDate')) {
-      this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
+      this._endDate = convertToDateObject(given.endDate, this._config.selectionType)
     }
 
     if (changed('selectEndDate')) {
-      this._selectEndDate = this._config.selectEndDate
+      this._selectEndDate = Boolean(given.selectEndDate)
     }
 
     this._hoverDate = null

@@ -260,7 +260,11 @@ class MultiSelect extends ComboboxBase {
   protected declare _loading: boolean
   protected declare _offListOptions: HTMLOptionElement[]
   protected declare _seenValues: Set<string>
-  protected declare _startValues: Set<string> | null
+  protected declare _disabled: boolean
+  protected declare _givenApplies: boolean
+  protected declare _givenValues: Set<string> | null
+  protected declare _sourceOptions: any[] | false
+  protected declare _total: number | null | undefined
   protected declare _validation: FieldValidation
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
@@ -286,6 +290,7 @@ class MultiSelect extends ComboboxBase {
     this._validation = new FieldValidation(this._element, {
       aliases: true,
       config: () => this._config,
+      canBlock: () => !this._disabled,
       fields: () => [this._element as HTMLSelectElement],
       frames: () => [this._wrapperElement],
       invalidTargets: () => [this._getFocusTarget()],
@@ -309,7 +314,11 @@ class MultiSelect extends ComboboxBase {
     this._initialSelection = []
     this._known = new Map()
     this._seenValues = new Set()
-    this._startValues = null
+    this._disabled = this._config.disabled
+    this._givenApplies = Boolean(this._config.value)
+    this._givenValues = this._config.value ? new Set(this._config.value as string[]) : null
+    this._sourceOptions = this._config.options || this._getOptionsFromElement()
+    this._total = this._config.total
     this._store = createSelectionStore(next => this._fit(next))
     this._options = this._getOptions()
     this._store.commit(this._markedValues())
@@ -442,7 +451,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   override _onHideEnd(): void {
-    if (this._refocusOnHide && !this._config.disabled) {
+    if (this._refocusOnHide && !this._disabled) {
       const refocusTarget = this._config.search ? this._searchElement : this._togglerElement
       if (refocusTarget) {
         refocusTarget.focus()
@@ -493,14 +502,14 @@ class MultiSelect extends ComboboxBase {
     const previous = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
     const seen = new Set(this._seenValues)
 
-    this._config.options = options
-    this._config.value = null
+    this._sourceOptions = options
+    this._givenApplies = false
     this._options = this._getOptionsFromConfig(options)
 
     const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
     const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || [...values].some(value => !previous.has(value)))
     const marked = this._markedValues()
-    const seeded = this._startValues ? marked.filter(value => !seen.has(value)) : []
+    const seeded = this._givenValues ? marked.filter(value => !seen.has(value)) : []
     const selected = this._store.values()
     const next = reset ? marked : [...selected, ...(this._config.multiple || selected.length === 0 ? seeded : [])]
     const listed = this._listedOptions()
@@ -535,27 +544,38 @@ class MultiSelect extends ComboboxBase {
   }
 
   disable(): void {
-    if (!this._config.disabled) {
-      this._setConfig({ disabled: true })
-    }
+    this._setDisabled(true)
   }
 
   enable(): void {
-    if (this._config.disabled) {
-      this._setConfig({ disabled: false })
-    }
+    this._setDisabled(false)
   }
 
   setTotal(total: MultiSelectConfig['total']): void {
-    this._setConfig({ total })
+    this._typeCheckConfig({ total }, { total: DefaultType.total })
+    this._total = total
+    this._render()
   }
 
   setValidationState(validationState: ValidationState | null): void {
-    this._setConfig({ invalid: false, valid: false, validationState })
+    const state = { invalid: false, valid: false, validationState }
+
+    this._config = this._getConfig({ ...this._config, ...state })
+    this._validation.configure(state)
   }
 
   setValue(value: MultiSelectConfig['value']): void {
-    this._setConfig({ value })
+    this._typeCheckConfig({ value }, { value: DefaultType.value })
+
+    const select = this._element as HTMLSelectElement
+
+    const values = this._normalizeValue(value)
+
+    this._givenValues = values ? new Set(values) : new Set()
+    this._givenApplies = true
+    this._options = this._getOptions()
+    select.selectedIndex = -1
+    this._commit(this._markedValues(), false)
   }
 
   selectAll(options: any[] = this._options): void {
@@ -587,35 +607,40 @@ class MultiSelect extends ComboboxBase {
   }
 
   // Private
-  _setConfig(config: Partial<MultiSelectConfig> | null): void {
-    this._config = this._getConfig({ ...this._config, value: null, ...config })
+  override _isDisabled(): boolean {
+    return this._disabled
+  }
 
-    if (this._validation.configure(config)) {
+  _setDisabled(disabled: boolean): void {
+    if (disabled === this._disabled) {
       return
     }
 
-    if (config && Object.keys(config).every(key => key === 'total')) {
-      this._render()
-      return
+    this._disabled = disabled
+
+    if (disabled) {
+      this.hide()
     }
 
-    const keep = !config || !('value' in config)
+    this._element.toggleAttribute('disabled', disabled)
+    this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
+    this._wrapperElement.classList.toggle(CLASS_NAME_DISABLED, disabled)
+    this._togglerElement.classList.toggle(CLASS_NAME_DISABLED, disabled)
+    writeAttribute(this._togglerElement, 'aria-disabled', disabled ? 'true' : null)
 
-    if (!keep) {
-      (this._element as HTMLSelectElement).selectedIndex = -1
+    if (!this._config.search) {
+      writeAttribute(this._togglerElement, 'tabindex', disabled ? null : '0')
     }
 
-    this._options = this._getOptions()
+    if (this._indicatorElement) {
+      this._indicatorElement.disabled = disabled
+    }
 
-    const next = keep ? this._store.values() : this._markedValues()
+    if (this._searchElement) {
+      this._searchElement.disabled = disabled
+    }
 
-    this._destroySelect()
-    this._element.innerHTML = ''
-    this._configureNativeSelect()
-    this._createNativeOptions(this._element, this._options)
-    this._createSelect()
-    this._addEventListeners()
-    this._commit(next, false)
+    this._render()
   }
 
   _destroySelect(): void {
@@ -663,7 +688,7 @@ class MultiSelect extends ComboboxBase {
     })
 
     EventHandler.on(this._togglerElement, EVENT_CLICK, SELECTOR_CLEANER, (event: any) => {
-      if (!this._config.disabled) {
+      if (!this._disabled) {
         event.preventDefault()
         event.stopPropagation()
         this._validation.runAsUser(() => this.deselectAll())
@@ -671,7 +696,7 @@ class MultiSelect extends ComboboxBase {
     })
 
     EventHandler.on(this._wrapperElement, EVENT_CLICK, () => {
-      if (!this._config.disabled) {
+      if (!this._disabled) {
         this.show()
       }
     })
@@ -806,7 +831,7 @@ class MultiSelect extends ComboboxBase {
         event.preventDefault()
         event.stopPropagation()
 
-        if (!this._config.disabled) {
+        if (!this._disabled) {
           this._validation.runAsUser(() => this._toggleSelectAll())
         }
       })
@@ -814,14 +839,10 @@ class MultiSelect extends ComboboxBase {
   }
 
   _getOptions(): any[] {
-    return this._getOptionsFromConfig(this._config.options || this._getOptionsFromElement())
+    return this._getOptionsFromConfig(this._sourceOptions)
   }
 
-  _getOptionsFromConfig(options: any = this._config.options, disabled = false): any[] {
-    if (this._config.value) {
-      this._startValues = new Set(this._config.value)
-    }
-
+  _getOptionsFromConfig(options: any = this._sourceOptions, disabled = false): any[] {
     const _options = []
     for (const option of options) {
       if (isOptionGroup(option)) {
@@ -840,7 +861,7 @@ class MultiSelect extends ComboboxBase {
       }
 
       const value = String(option.value)
-      const values = this._config.value || !this._seenValues.has(value) ? this._startValues : null
+      const values = this._givenApplies || !this._seenValues.has(value) ? this._givenValues : null
       const isSelected = values ? values.has(value) : option.selected
 
       this._seenValues.add(value)
@@ -891,7 +912,7 @@ class MultiSelect extends ComboboxBase {
       this._element.removeAttribute('required')
     }
 
-    this._element.toggleAttribute('disabled', this._config.disabled)
+    this._element.toggleAttribute('disabled', this._disabled)
   }
 
   _createNativeOptions(parentElement: HTMLElement, options: any[]): void {
@@ -962,7 +983,7 @@ class MultiSelect extends ComboboxBase {
     const wrapper = document.createElement('div')
     wrapper.classList.add(CLASS_NAME_SELECT)
 
-    this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
+    this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
 
     for (const className of this._element.classList) {
       if (className !== CLASS_NAME_IS_INVALID && className !== CLASS_NAME_IS_VALID) {
@@ -1013,12 +1034,12 @@ class MultiSelect extends ComboboxBase {
     togglerEl.setAttribute('aria-haspopup', 'dialog')
     this._togglerElement = togglerEl
 
-    if (this._config.disabled) {
+    if (this._disabled) {
       togglerEl.classList.add(CLASS_NAME_DISABLED)
       togglerEl.setAttribute('aria-disabled', 'true')
     }
 
-    if (!this._config.search && !this._config.disabled) {
+    if (!this._config.search && !this._disabled) {
       togglerEl.tabIndex = 0
     }
 
@@ -1035,7 +1056,7 @@ class MultiSelect extends ComboboxBase {
     this._selectionElement = selectionEl
 
     if (this._config.multiple && ['chips', 'tags'].includes(this._config.selectionType)) {
-      this._selectionChipSet = new MultiSelectChipSet(selectionEl, { removable: !this._config.disabled })
+      this._selectionChipSet = new MultiSelectChipSet(selectionEl, { removable: !this._disabled })
     }
   }
 
@@ -1048,7 +1069,7 @@ class MultiSelect extends ComboboxBase {
       const indicator = document.createElement('button')
       indicator.type = 'button'
       indicator.classList.add('form-control-action')
-      indicator.disabled = this._config.disabled
+      indicator.disabled = this._disabled
       indicator.setAttribute('aria-label', this._config.ariaPickerLabel)
       indicator.innerHTML = sanitizeByConfig(
         this._config.pickerIcon === true ? PICKER_ICON : this._config.pickerIcon,
@@ -1077,7 +1098,7 @@ class MultiSelect extends ComboboxBase {
     const input = document.createElement('input')
     input.classList.add(CLASS_NAME_SEARCH)
 
-    if (this._config.disabled) {
+    if (this._disabled) {
       input.disabled = true
     }
 
@@ -1209,7 +1230,7 @@ class MultiSelect extends ComboboxBase {
     new Chip(chip, {
       ariaRemoveLabel: `${this._config.ariaTagDeleteLabel} ${text}`.trim(),
       disabled: disabled === true,
-      removable: !this._config.disabled && disabled !== true
+      removable: !this._disabled && disabled !== true
     })
 
     return chip
@@ -1228,7 +1249,7 @@ class MultiSelect extends ComboboxBase {
     for (const chip of SelectorEngine.children(selection, SELECTOR_CHIP) as HTMLElement[]) {
       const option = selected.find((option: any) => option.value === chip.dataset.value)
 
-      if (option && chip.firstChild?.textContent === option.text && Boolean(SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip)) === (!this._config.disabled && option.disabled !== true)) {
+      if (option && chip.firstChild?.textContent === option.text && Boolean(SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip)) === (!this._disabled && option.disabled !== true)) {
         chips.set(option.value, chip)
         continue
       }
@@ -1335,8 +1356,8 @@ class MultiSelect extends ComboboxBase {
   }
 
   _getTotalCount(): number {
-    if (typeof this._config.total === 'number') {
-      return this._config.total
+    if (typeof this._total === 'number') {
+      return this._total
     }
 
     const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
@@ -1533,11 +1554,11 @@ class MultiSelect extends ComboboxBase {
   }
 
   _updateSelectionCleaner(): void {
-    if (!this._config.cleaner || this._config.disabled) {
+    if (!this._config.cleaner) {
       return
     }
 
-    if (this._store.size() > 0 && this._selectionCleanerElement === null) {
+    if (this._store.size() > 0 && !this._disabled && this._selectionCleanerElement === null) {
       const selectionCleaner = this._createSelectionCleaner()
 
       if (this._indicatorElement) {
@@ -1550,7 +1571,7 @@ class MultiSelect extends ComboboxBase {
       return
     }
 
-    if (this._store.size() === 0 && this._selectionCleanerElement !== null) {
+    if ((this._store.size() === 0 || this._disabled) && this._selectionCleanerElement !== null) {
       this._selectionCleanerElement.remove()
       this._selectionCleanerElement = null
     }
@@ -1745,15 +1766,17 @@ class MultiSelect extends ComboboxBase {
       throw new TypeError(`${NAME.toUpperCase()}: Option "search" takes true, false or "external".`)
     }
 
-    if (typeof config.value === 'number' || typeof config.value === 'string') {
-      config.value = config.value === '' ? null : String(config.value).split(/,\s*/)
-    }
-
-    if (Array.isArray(config.value)) {
-      config.value = config.value.map(String)
-    }
+    config.value = this._normalizeValue(config.value)
 
     return config
+  }
+
+  _normalizeValue(value: MultiSelectConfig['value']): string[] | null {
+    if (typeof value === 'number' || typeof value === 'string') {
+      return value === '' ? null : String(value).split(/,\s*/)
+    }
+
+    return Array.isArray(value) ? value.map(String) : value
   }
 
   // Static

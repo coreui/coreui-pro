@@ -269,7 +269,7 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | `disable()` | Disables the slider. |
 | `enable()` | Enables the slider. |
 | `setValidationState(state)` | Gives the slider a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
-| `setValue(value)` | Sets the value of each handle without firing a change event. |
+| `setValue(value)` | Sets the value of each handle without firing a change event. The handles, their tooltips and the focus stay; a value with another number of entries builds the handles again. |
 
 ### Events
 

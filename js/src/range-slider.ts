@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import FieldValidation from './util/field-validation.js'
+import { containsFocus } from './util/focus.js'
 import { type ValidationState } from './util/form-validation.js'
 import {
   defineJQueryPlugin, getUID, isRTL, jQueryDispatch
@@ -51,7 +52,7 @@ const EVENT_POINTERUP = `pointerup${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const ATTRIBUTE_INVALID_FEEDBACK = 'data-coreui-invalid-feedback'
-const HOST_ATTRIBUTES = ['aria-label', 'aria-labelledby']
+const HOST_ATTRIBUTES = ['aria-label', 'aria-labelledby', ATTRIBUTE_INVALID_FEEDBACK]
 
 const CLASS_NAME_FORM_RANGE = 'form-range'
 const CLASS_NAME_FORM_RANGE_INPUT = 'form-range-input'
@@ -151,6 +152,7 @@ const DefaultType: Record<string, string> = {
 
 class RangeSlider extends BaseComponent {
   protected declare _config: RangeSliderConfig
+  protected declare _disabled: boolean
   protected declare _hostAttributes: Map<string, string>
   protected declare _inputs: HTMLInputElement[]
   protected declare _press: RangeSliderPress | null
@@ -175,6 +177,7 @@ class RangeSlider extends BaseComponent {
       return
     }
 
+    this._disabled = this._config.disabled
     this._inputs = []
     this._press = null
     this._shownValues = []
@@ -184,6 +187,7 @@ class RangeSlider extends BaseComponent {
     this._tooltips = []
     this._validation = new FieldValidation(this._element, {
       blockers: () => this._inputs.slice(0, 1),
+      canBlock: () => !this._disabled,
       config: () => this._config,
       fields: () => this._inputs,
       frames: () => [this._element, ...this._inputs],
@@ -193,6 +197,7 @@ class RangeSlider extends BaseComponent {
     })
     this._wrapper = null
     this._hostAttributes = new Map()
+    this._readHostAttributes()
 
     this._element.setAttribute('role', 'group')
 
@@ -222,7 +227,7 @@ class RangeSlider extends BaseComponent {
     this._onPointerDown = event => this._pointerDown(event as PointerEvent)
     this._onPointerMove = event => this._pointerMove(event as PointerEvent)
     this._onPointerUp = event => this._pointerUp(event as PointerEvent)
-    this._build()
+    this._build(this._config.value as number[])
   }
 
   // Getters
@@ -240,23 +245,41 @@ class RangeSlider extends BaseComponent {
 
   // Public
   disable(): void {
-    if (!this._config.disabled) {
-      this._setConfig({ disabled: true })
-    }
+    this._setDisabled(true)
   }
 
   enable(): void {
-    if (this._config.disabled) {
-      this._setConfig({ disabled: false })
-    }
+    this._setDisabled(false)
   }
 
   setValidationState(validationState: ValidationState | null): void {
-    this._setConfig({ validationState })
+    this._config = this._getConfig({ ...this._config, validationState }) as RangeSliderConfig
+    this._validation.configure({ validationState })
   }
 
   setValue(value: RangeSliderConfig['value']): void {
-    this._setConfig({ value })
+    const values: number[] = this._normalizeValue(value)
+    this._typeCheckConfig({ value: values }, { value: DefaultType.value })
+
+    if (values.length !== this._inputs.length) {
+      const focused = this._inputs.findIndex(input => containsFocus(input))
+
+      this._startValues = values.map((value, index) => this._startValues[index] ?? value)
+      this._teardown()
+      this._build(values)
+      this._inputs[Math.min(focused, this._inputs.length - 1)]?.focus()
+      return
+    }
+
+    for (const [index, input] of this._inputs.entries()) {
+      input.value = `${values[index]}`
+    }
+
+    if (this._press) {
+      this._press.start = this._press.input.value
+    }
+
+    this._update()
   }
 
   override dispose(): void {
@@ -270,27 +293,37 @@ class RangeSlider extends BaseComponent {
   }
 
   // Private
-  _setConfig(config: Partial<RangeSliderConfig>): void {
-    const current = config && 'value' in config ? null : this._values()
-    this._config = this._getConfig({ ...this._config, ...config }) as RangeSliderConfig
-    this._startValues = (this._config.value as number[]).map((value, index) => this._startValues[index] ?? value)
-
-    if (this._validation.configure(config)) {
+  _setDisabled(disabled: boolean): void {
+    if (disabled === this._disabled) {
       return
     }
 
-    this._teardown()
-    this._build(current)
+    this._disabled = disabled
+
+    if (disabled) {
+      this._releasePress()
+    }
+
+    for (const input of this._inputs) {
+      input.disabled = disabled
+    }
+
+    this._updateClickableTicks()
+    this._validation.update()
   }
 
-  _build(current: number[] | null = null): void {
+  _build(values: number[]): void {
     const { tooltipClass, tooltips, vertical } = this._config
 
-    this._readHostAttributes()
     this._wrapper = document.createElement('div')
     this._wrapper.className = CLASS_NAME_FORM_RANGE
     this._wrapper.classList.toggle(CLASS_NAME_FORM_RANGE_VERTICAL, vertical)
-    this._inputs = (this._config.value as number[]).map((value, index) => this._createInput(index, value, current?.[index]))
+    this._inputs = values.map((value, index) => this._createInput(index, value))
+
+    for (const [index, input] of this._inputs.entries()) {
+      this._nameInput(input, index)
+    }
+
     this._wrapper.append(...this._inputs)
     this._element.append(this._wrapper)
 
@@ -310,7 +343,7 @@ class RangeSlider extends BaseComponent {
 
     if (this._tickPoints.length > 0) {
       this._ticks = createTicks(this._tickPoints, vertical)
-      this._ticks.classList.toggle(CLASS_NAME_TICKS_CLICKABLE, this._config.clickableTicks && this._inputs.some(input => !input.matches(':disabled')))
+      this._updateClickableTicks()
       this._wrapper.append(this._ticks)
     }
 
@@ -347,8 +380,8 @@ class RangeSlider extends BaseComponent {
     EventHandler.on(wrapper, EVENT_POINTERDOWN, this._onPointerDown)
   }
 
-  _createInput(index: number, value: number, current?: number): HTMLInputElement {
-    const { disabled, max, min, step, vertical } = this._config
+  _createInput(index: number, value: number): HTMLInputElement {
+    const { max, min, step, vertical } = this._config
     const input = document.createElement('input')
     input.type = 'range'
     input.className = CLASS_NAME_FORM_RANGE_INPUT
@@ -356,8 +389,8 @@ class RangeSlider extends BaseComponent {
     input.max = `${max}`
     input.step = `${step}`
     input.defaultValue = `${this._startValues[index] ?? value}`
-    input.value = `${current ?? value}`
-    input.disabled = disabled
+    input.value = `${value}`
+    input.disabled = this._disabled
 
     const name = Array.isArray(this._config.name) ?
       this._config.name[index] :
@@ -371,13 +404,11 @@ class RangeSlider extends BaseComponent {
       input.setAttribute('aria-orientation', 'vertical')
     }
 
-    const invalidFeedback = this._element.getAttribute(ATTRIBUTE_INVALID_FEEDBACK)
+    const invalidFeedback = this._hostAttributes.get(ATTRIBUTE_INVALID_FEEDBACK)
 
     if (invalidFeedback) {
       input.setAttribute(ATTRIBUTE_INVALID_FEEDBACK, invalidFeedback)
     }
-
-    this._nameInput(input, index)
 
     return input
   }
@@ -386,9 +417,7 @@ class RangeSlider extends BaseComponent {
     for (const name of HOST_ATTRIBUTES) {
       const value = this._element.getAttribute(name)
 
-      if (value === null) {
-        this._hostAttributes.delete(name)
-      } else {
+      if (value !== null) {
         this._hostAttributes.set(name, value)
       }
     }
@@ -399,7 +428,7 @@ class RangeSlider extends BaseComponent {
     const label = this._hostAttributes.get('aria-label')
     const labelledBy = this._hostAttributes.get('aria-labelledby')
 
-    if ((this._config.value as number[]).length > 1) {
+    if (this._inputs.length > 1) {
       if (handleLabel) {
         input.setAttribute('aria-label', handleLabel)
       }
@@ -426,7 +455,7 @@ class RangeSlider extends BaseComponent {
   }
 
   _ariaLabel(index: number): string | null {
-    const total = (this._config.value as number[]).length
+    const total = this._inputs.length
     const { ariaLabel } = this._config
     const given = typeof ariaLabel === 'function' ? ariaLabel(index, total) : (ariaLabel as string[] | null)?.[index]
 
@@ -443,6 +472,10 @@ class RangeSlider extends BaseComponent {
     }
 
     return `Value ${index + 1}`
+  }
+
+  _updateClickableTicks(): void {
+    this._ticks?.classList.toggle(CLASS_NAME_TICKS_CLICKABLE, this._config.clickableTicks && this._inputs.some(input => !input.matches(':disabled')))
   }
 
   _values(): number[] {
@@ -519,7 +552,7 @@ class RangeSlider extends BaseComponent {
   _keydown(event: KeyboardEvent): void {
     const input = event.target as HTMLInputElement
 
-    if (!this._config.vertical || !this._inputs.includes(input) || !['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+    if (!this._config.vertical || this._disabled || !this._inputs.includes(input) || !['ArrowLeft', 'ArrowRight'].includes(event.key)) {
       return
     }
 
@@ -632,17 +665,21 @@ class RangeSlider extends BaseComponent {
       config.name = config.name.split(/,\s*/)
     }
 
-    if (typeof config.value === 'number') {
-      config.value = [config.value]
-    }
-
-    if (typeof config.value === 'string') {
-      config.value = config.value.split(/,\s*/).map(Number)
-    } else if (Array.isArray(config.value)) {
-      config.value = [...config.value]
-    }
+    config.value = this._normalizeValue(config.value)
 
     return config
+  }
+
+  _normalizeValue(value: any): any {
+    if (typeof value === 'number') {
+      return [value]
+    }
+
+    if (typeof value === 'string') {
+      return value.split(/,\s*/).map(Number)
+    }
+
+    return Array.isArray(value) ? [...value] : value
   }
 
   // Static

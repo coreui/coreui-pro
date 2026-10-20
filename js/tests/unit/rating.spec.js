@@ -508,6 +508,22 @@ describe('Rating', () => {
   })
 
   describe('setters', () => {
+    it('should block the submit once enable() runs on a rating built disabled and invalid, and stop again on disable()', () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const rating = new Rating(fixtureEl.querySelector('div'), { disabled: true, validationState: 'invalid' })
+
+      expect(form.checkValidity()).toBeTrue()
+
+      rating.enable()
+
+      expect(form.checkValidity()).toBeFalse()
+
+      rating.disable()
+
+      expect(form.checkValidity()).toBeTrue()
+    })
+
     it('should keep the focused star when enable() finds the rating enabled', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -520,16 +536,16 @@ describe('Rating', () => {
       expect(document.activeElement).toBe(star)
     })
 
-    it('should update config and re-render the rating UI', () => {
+    it('should highlight the stars up to the value setValue gives, on the same items', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 5, value: 1 })
+      const items = [...div.querySelectorAll('.rating-item')]
 
-      const previousHTML = div.innerHTML
       rating.setValue(3)
 
-      expect(div.innerHTML).not.toEqual(previousHTML)
-      expect(div.querySelectorAll('.rating-item')).toHaveSize(5)
+      expect([...div.querySelectorAll('.rating-item')]).toEqual(items)
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(3)
       const checkedInput = div.querySelector('.rating-item-input:checked')
       expect(checkedInput.value).toEqual('3')
     })
@@ -577,7 +593,7 @@ describe('Rating', () => {
       expect(rating._config.value).toBeNull()
     })
 
-    it('should keep one set of listeners across updates', () => {
+    it('should keep one set of listeners through disable() and enable()', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 3 })
@@ -594,7 +610,42 @@ describe('Rating', () => {
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
-    it('should dispose the tooltips of the items it replaces', () => {
+    it('should keep the focused star and the same elements through setValue, disable() and enable()', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { value: 2 })
+      const radios = [...div.querySelectorAll('input')]
+
+      radios[1].focus()
+      rating.setValue(4)
+
+      expect(document.activeElement).toBe(radios[1])
+      expect(radios[3].checked).toBeTrue()
+
+      rating.disable()
+
+      expect(div).toHaveClass('disabled')
+      expect(radios.every(radio => radio.disabled)).toBeTrue()
+
+      rating.enable()
+
+      expect([...div.querySelectorAll('input')]).toEqual(radios)
+      expect(radios.some(radio => radio.disabled)).toBeFalse()
+    })
+
+    it('should drop a value setValue gives that no star has', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 5, value: 2 })
+
+      rating.setValue(9)
+
+      expect(rating._currentValue).toBeNull()
+      expect(div.querySelector('input:checked')).toBeNull()
+      expect(div.querySelector('.rating-item-label.active')).toBeNull()
+    })
+
+    it('should keep the items and their tooltip through setValue', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 3, tooltips: true })
@@ -606,8 +657,8 @@ describe('Rating', () => {
 
       rating.setValue(2)
 
-      expect(Tooltip.getInstance(item)).toBeNull()
-      expect(rating._tooltip).toBeNull()
+      expect(div.querySelectorAll('.rating-item')[1]).toBe(item)
+      expect(Tooltip.getInstance(item)).not.toBeNull()
     })
 
     it('should update disabled state', () => {
@@ -639,21 +690,6 @@ describe('Rating', () => {
       const rating = new Rating(fixtureEl.querySelector('div'))
 
       expect(typeof rating.setConfig).toEqual('undefined')
-    })
-
-    it('should keep content the page put in the element, where the page put it', () => {
-      fixtureEl.innerHTML = '<div><span class="rating-note">Before</span></div>'
-      const div = fixtureEl.querySelector('div')
-      const rating = new Rating(div, { itemCount: 3 })
-      const after = document.createElement('span')
-      div.append(after)
-
-      rating.disable()
-      rating.enable()
-
-      expect(div.firstElementChild).toHaveClass('rating-note')
-      expect(div.lastElementChild).toBe(after)
-      expect(div.querySelectorAll('.rating-item')).toHaveSize(3)
     })
 
     it('should drop a state class the page wrote once the option turns it off', () => {
@@ -719,21 +755,7 @@ describe('Rating', () => {
       expect(div.querySelectorAll('.rating-item')).toHaveSize(5)
     })
 
-    it('should keep the generated name when other options change', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-      const rating = new Rating(div)
-      const { name } = div.querySelector('.rating-item-input')
-
-      rating.disable()
-      rating.enable()
-
-      for (const input of div.querySelectorAll('.rating-item-input')) {
-        expect(input.name).toEqual(name)
-      }
-    })
-
-    it('should keep the value the user picked when other options change', () => {
+    it('should keep the value the user picked through disable() and enable()', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { value: 2 })
@@ -763,23 +785,23 @@ describe('Rating', () => {
       expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
     })
 
-    it('should re-attach event listeners after update', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        const rating = new Rating(div, { itemCount: 5 })
+    it('should drop the tooltip and the hover highlight when disable() runs over a hovered star', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { value: 2, tooltips: true })
+      const label = div.querySelectorAll('.rating-item-label')[4]
+      const item = label.parentElement
 
-        rating.disable()
-        rating.enable()
+      label.dispatchEvent(createEvent('mouseover'))
 
-        div.addEventListener('change.coreui.rating', event => {
-          expect(event.value).toBeDefined()
-          resolve()
-        })
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(5)
+      expect(Tooltip.getInstance(item)).not.toBeNull()
 
-        const label = div.querySelectorAll('.rating-item-label')[1]
-        label.click()
-      })
+      rating.disable()
+      label.dispatchEvent(createEvent('mouseout'))
+
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+      expect(Tooltip.getInstance(item)).toBeNull()
     })
   })
 
@@ -2100,7 +2122,7 @@ describe('Rating', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should drop a state given before a native reset, also when the page rebuilds the rating in the reset', async () => {
+    it('should drop a state given before a native reset, also when a reset listener disables and enables the rating', async () => {
       const { element, form, rating } = mountInForm({ validationState: 'invalid' })
 
       form.addEventListener('reset', () => {
@@ -2159,7 +2181,7 @@ describe('Rating', () => {
       expect(radiosOf(element)).toHaveSize(0)
     })
 
-    it('should keep a report when a reset listener rebuilds the rating and a later one cancels the reset', async () => {
+    it('should keep a report when a reset listener disables and enables the rating and a later one cancels the reset', async () => {
       const { element, form, rating } = mountInForm({ required: true })
 
       form.checkValidity()
@@ -2224,7 +2246,7 @@ describe('Rating', () => {
       expect(element.hasAttribute('aria-invalid')).toBeFalse()
     })
 
-    it('should keep the state a validation reported when disable() and enable() render the stars again', () => {
+    it('should keep the state a validation reported through disable() and enable()', () => {
       const { element, form, rating } = mountInForm({ required: true })
 
       form.checkValidity()
@@ -2233,6 +2255,31 @@ describe('Rating', () => {
 
       expect(element).toHaveClass('is-invalid')
       expect(element.getAttribute('aria-invalid')).toEqual('true')
+    })
+
+    it('should block a required rating again once setValue(null) empties it', () => {
+      const { form, rating } = mountInForm({ required: true, value: 2, name: 'r' })
+
+      expect(form.checkValidity()).toBeTrue()
+
+      rating.setValue(null)
+
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should stop blocking the submit on disable() and block it again on enable()', () => {
+      const { element, form, rating } = mountInForm({ validationState: 'invalid' })
+
+      expect(form.checkValidity()).toBeFalse()
+
+      rating.disable()
+
+      expect(form.checkValidity()).toBeTrue()
+      expect(element).toHaveClass('is-invalid')
+
+      rating.enable()
+
+      expect(form.checkValidity()).toBeFalse()
     })
 
     it('should keep a given valid state over what the form plugin reports', () => {

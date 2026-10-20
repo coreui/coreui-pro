@@ -1529,6 +1529,149 @@ describe('Autocomplete', () => {
   })
 
   describe('setters', () => {
+    const OPTIONS_AB = [{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }]
+    const mount = (config = {}) => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const element = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(element, { options: OPTIONS_AB, ...config })
+      const events = []
+      for (const type of ['input', 'change', 'change.coreui.autocomplete']) {
+        element.addEventListener(type, () => events.push(type))
+      }
+
+      return {
+        autocomplete, element, events, form: fixtureEl.querySelector('form')
+      }
+    }
+
+    it('should not fire change from setValue after a form reset that found no value', async () => {
+      const { autocomplete, events, form } = mount()
+
+      autocomplete._applySelection(OPTIONS_AB[0])
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      events.length = 0
+      autocomplete.setValue('b')
+
+      expect(autocomplete._selectedOptions()[0]?.value).toEqual('b')
+      expect(events).toEqual([])
+    })
+
+    it('should take a value setValue gives before the options carry it once setOptions brings them, without an event', () => {
+      const { autocomplete, events } = mount({ options: [{ label: 'A', value: 'a' }] })
+
+      autocomplete.setValue('c')
+      autocomplete.setOptions([{ label: 'A', value: 'a' }, { label: 'C', value: 'c' }])
+
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['c'])
+      expect(events).toEqual([])
+    })
+
+    it('should keep the value through setOptions', () => {
+      const { autocomplete } = mount({ value: 'a' })
+
+      autocomplete.setOptions([{ label: 'A', value: 'a' }, { label: 'D', value: 'd' }])
+
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should keep the list elements through disable(), enable() and setValue', () => {
+      const { autocomplete } = mount()
+
+      autocomplete.show()
+      const options = [...autocomplete._optionsElement.querySelectorAll('.list-box-option')]
+      autocomplete.disable()
+      autocomplete.enable()
+      autocomplete.setValue('b')
+
+      const now = [...autocomplete._optionsElement.querySelectorAll('.list-box-option')]
+      for (const [index, option] of now.entries()) {
+        expect(option).toBe(options[index])
+      }
+    })
+
+    it('should close the panel on disable() and write the disabled state', () => {
+      const { autocomplete, element } = mount({ pickerIcon: true })
+
+      autocomplete.show()
+      autocomplete.disable()
+
+      expect(autocomplete._isShown()).toBeFalse()
+      expect(element).toHaveClass('disabled')
+      expect(autocomplete._inputElement.disabled).toBeTrue()
+      expect(autocomplete._indicatorElement.disabled).toBeTrue()
+
+      autocomplete.enable()
+
+      expect(element).not.toHaveClass('disabled')
+      expect(autocomplete._inputElement.disabled).toBeFalse()
+      expect(autocomplete._indicatorElement.disabled).toBeFalse()
+      autocomplete._togglerElement.click()
+
+      expect(autocomplete._isShown()).toBeTrue()
+    })
+
+    it('should block the submit once enable() runs on a field built disabled and invalid, and stop again on disable()', () => {
+      const { autocomplete, form } = mount({ disabled: true, validationState: 'invalid' })
+
+      expect(form.checkValidity()).toBeTrue()
+
+      autocomplete.enable()
+
+      expect(form.checkValidity()).toBeFalse()
+
+      autocomplete.disable()
+
+      expect(form.checkValidity()).toBeTrue()
+      expect(autocomplete._inputElement.validity.customError).toBeFalse()
+    })
+
+    it('should not take a gesture in an open list once disable() runs', () => {
+      const { autocomplete, element, events } = mount()
+
+      autocomplete.show()
+      element.addEventListener('hide.coreui.autocomplete', event => event.preventDefault())
+      autocomplete.disable()
+      autocomplete._optionsElement.querySelector('[data-coreui-value="b"]').click()
+
+      expect(autocomplete._selectedOptions()).toEqual([])
+      expect(events).toEqual([])
+    })
+
+    it('should reject a value or options of the wrong type with the option error', () => {
+      const { autocomplete } = mount()
+
+      expect(() => autocomplete.setValue(true)).toThrow('AUTOCOMPLETE: Option "value" provided type "boolean" but expected type "(number|string|null)".')
+      expect(() => autocomplete.setOptions(1)).toThrow('AUTOCOMPLETE: Option "options" provided type "number" but expected type "(array|null)".')
+    })
+
+    it('should take options as a comma-separated string, as the option does', () => {
+      const { autocomplete } = mount()
+
+      autocomplete.setOptions('Angular, React')
+
+      expect(autocomplete._options.map(option => option.value)).toEqual(['Angular', 'React'])
+    })
+
+    it('should restore the empty start value on a form reset after setValue, setOptions and setValue(null)', async () => {
+      const { autocomplete, events, form } = mount()
+
+      autocomplete.setValue('b')
+      autocomplete.setOptions(OPTIONS_AB)
+      autocomplete.setValue(null)
+      events.length = 0
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(autocomplete._selectedOptions()).toEqual([])
+      expect(autocomplete._inputElement.value).toEqual('')
+      expect(events.filter(type => type === 'change.coreui.autocomplete')).toEqual([])
+    })
+
     it('should drop a state given with the invalid alias in setValidationState(null)', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const element = fixtureEl.querySelector('.autocomplete')
@@ -3102,7 +3245,7 @@ describe('Autocomplete', () => {
       })
 
       // Manually make it disabled after creation to test the event handler guard
-      autocomplete._config.disabled = true
+      autocomplete._disabled = true
       autocomplete._inputElement.value = 'test'
       holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 
@@ -3139,7 +3282,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      autocomplete._config.disabled = true
+      autocomplete._disabled = true
       autocomplete._inputElement.value = 'test'
       holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 

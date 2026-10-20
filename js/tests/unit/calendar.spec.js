@@ -1615,7 +1615,80 @@ describe('Calendar', () => {
   })
 
   describe('setters', () => {
-    it('should merge the previous configuration on a partial update', () => {
+    const EVENTS = ['startDateChange', 'endDateChange', 'calendarDateChange', 'selectEndChange']
+    const listen = div => {
+      const events = []
+      for (const name of EVENTS) {
+        div.addEventListener(`${name}.coreui.calendar`, () => events.push(name))
+      }
+
+      return events
+    }
+
+    it('should show both ends setRange gives in one redraw, without an event', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), range: true })
+      const events = listen(div)
+      const config = calendar._config
+      const update = spyOn(calendar, '_updateCalendar').and.callThrough()
+
+      calendar.setRange(new Date(2026, 8, 3), new Date(2026, 8, 24))
+
+      expect(update).toHaveBeenCalledTimes(1)
+      expect([...div.querySelectorAll('.calendar-cell.selected')].map(cell => cell.textContent.trim())).toEqual(['3', '24'])
+      expect(calendar._config).toBe(config)
+      expect(events).toEqual([])
+    })
+
+    it('should let a click set the end after setSelectEndDate(true), without an event from the setter', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), range: true, startDate: new Date(2026, 8, 3) })
+      const events = listen(div)
+
+      calendar.setSelectEndDate(true)
+
+      expect(events).toEqual([])
+
+      div.querySelector(`.calendar-cell[data-coreui-date="${new Date(2026, 8, 20).toDateString()}"]`).click()
+
+      expect(calendar._startDate).toEqual(new Date(2026, 8, 3))
+      expect(calendar._endDate).toEqual(new Date(2026, 8, 20))
+    })
+
+    it('should take dates from setStartDate, setEndDate and setCalendarDate without an event', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { range: true })
+      const events = listen(div)
+      const config = calendar._config
+
+      calendar.setStartDate(new Date(2026, 8, 3))
+      calendar.setEndDate(new Date(2026, 8, 24))
+      calendar.setCalendarDate(new Date(2026, 10, 1))
+      calendar.setSelectEndDate(true)
+
+      expect(calendar._config).toBe(config)
+
+      expect([calendar._startDate, calendar._endDate]).toEqual([new Date(2026, 8, 3), new Date(2026, 8, 24)])
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('November 2026')
+      expect(events).toEqual([])
+    })
+
+    it('should reject a value of the wrong type with the option error', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const calendar = new Calendar(fixtureEl.querySelector('div'), { range: true })
+
+      expect(() => calendar.setStartDate(true)).toThrow('CALENDAR: Option "startDate" provided type "boolean" but expected type "(date|number|string|null)".')
+      expect(() => calendar.setRange(new Date(), true)).toThrow('CALENDAR: Option "endDate" provided type "boolean" but expected type "(date|number|string|null)".')
+      expect(() => calendar.setSelectEndDate('yes')).toThrow('CALENDAR: Option "selectEndDate" provided type "string" but expected type "boolean".')
+      expect(() => calendar.setSelectEndDate('yes')).toThrowError(TypeError)
+      expect(calendar._selectEndDate).toBeFalse()
+      expect(calendar._startDate).toBeNull()
+    })
+
+    it('should keep the configuration through setSelectEndDate', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -1626,7 +1699,7 @@ describe('Calendar', () => {
 
       expect(div.querySelectorAll('.calendar-nav')).toHaveSize(2)
 
-      calendar._setConfig({ selectEndDate: true })
+      calendar.setSelectEndDate(true)
 
       expect(calendar._config.range).toBeTrue()
       expect(calendar._config.calendars).toEqual(2)
@@ -1693,7 +1766,7 @@ describe('Calendar', () => {
       }
 
       calendar.refresh()
-      calendar._setConfig({ selectEndDate: true })
+      calendar.setSelectEndDate(true)
 
       expect(observer.takeRecords()).toHaveSize(0)
       observer.disconnect()
@@ -2974,7 +3047,7 @@ describe('Calendar', () => {
 
         clickWithFocus(first.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`))
         Calendar.getInstance(div).refresh()
-        Calendar.getInstance(div)._setConfig({ selectEndDate: false })
+        Calendar.getInstance(div).setSelectEndDate(false)
         vi.advanceTimersByTime(110)
 
         expect(messages()).toEqual(['Selected date: Wednesday, August 12, 2026'])
@@ -4734,7 +4807,7 @@ describe('Calendar', () => {
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('May 2026')
     })
 
-    it('should keep a picked range when _setConfig changes only selectEndDate', () => {
+    it('should keep a picked range when setSelectEndDate changes the end it picks', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -4745,7 +4818,7 @@ describe('Calendar', () => {
 
       pick(11)
       pick(16)
-      calendar._setConfig({ selectEndDate: true })
+      calendar.setSelectEndDate(true)
 
       expect(calendar._startDate).toEqual(new Date(2026, 8, 11))
       expect(calendar._endDate).toEqual(new Date(2026, 8, 16))
@@ -4753,7 +4826,7 @@ describe('Calendar', () => {
       expect(div.querySelectorAll('.calendar-cell.selected').length).toEqual(2)
     })
 
-    it('should keep the month and the view when _setConfig changes only selectEndDate', () => {
+    it('should keep the month and the view when setSelectEndDate changes the end it picks', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -4761,11 +4834,11 @@ describe('Calendar', () => {
 
       div.querySelector('.btn-next').click()
       div.querySelector('.btn-next').click()
-      calendar._setConfig({ selectEndDate: true })
+      calendar.setSelectEndDate(true)
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('November 2026')
 
       div.querySelector('.btn-month').click()
-      calendar._setConfig({ selectEndDate: false })
+      calendar.setSelectEndDate(false)
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('2026')
     })
 

@@ -1066,8 +1066,7 @@ describe('RangeSlider', () => {
       const { element, form, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] })
 
       form.addEventListener('reset', () => {
-        rangeSlider.disable()
-        rangeSlider.enable()
+        rangeSlider.setValue([20, 50, 80])
       })
       form.reset()
       await new Promise(resolve => {
@@ -1124,12 +1123,14 @@ describe('RangeSlider', () => {
     it('should keep the report a validation made on a handle for the handle that replaces it', () => {
       const { element, form, rangeSlider } = mountInForm({ value: [20, 80] })
 
-      inputsOf(element)[1].setCustomValidity('Too wide.')
+      const replaced = inputsOf(element)[1]
+      replaced.setCustomValidity('Too wide.')
       form.checkValidity()
-      rangeSlider.disable()
-      rangeSlider.enable()
+      rangeSlider.setValue([20, 50, 80])
 
       const [, second] = inputsOf(element)
+
+      expect(second).not.toBe(replaced)
 
       second.setCustomValidity('Too wide.')
       second.dispatchEvent(new Event('focusout'))
@@ -1142,8 +1143,7 @@ describe('RangeSlider', () => {
 
       fixtureEl.querySelector('form').before(fixtureEl.querySelector('#budgetError'))
 
-      rangeSlider.disable()
-      rangeSlider.enable()
+      rangeSlider.setValue([40, 60])
 
       expect(inputsOf(element)[0].validationMessage).toEqual('Pick a budget.')
     })
@@ -1179,7 +1179,233 @@ describe('RangeSlider', () => {
   })
 
   describe('setters', () => {
-    it('should rebuild from the merged config and keep the page content of the element', () => {
+    it('should keep the focused handle through setValue and the same elements through disable() and enable()', () => {
+      const { element, rangeSlider } = mount({ ticks: 3, value: [20, 80] })
+      const wrapper = wrapperOf(element)
+      const inputs = inputsOf(element)
+      const tooltips = [...element.querySelectorAll('.form-range-tooltip')]
+      const ticks = element.querySelector('.form-range-ticks')
+      const events = []
+      for (const type of ['input', 'change', 'input.coreui.range-slider', 'change.coreui.range-slider']) {
+        element.addEventListener(type, () => events.push(type))
+      }
+
+      inputs[1].focus()
+
+      rangeSlider.setValue([10, 60])
+
+      expect(document.activeElement).toBe(inputs[1])
+
+      rangeSlider.disable()
+      rangeSlider.enable()
+
+      const now = [...element.querySelectorAll('.form-range-tooltip')]
+
+      expect(wrapperOf(element)).toBe(wrapper)
+      for (const [index, input] of inputsOf(element).entries()) {
+        expect(input).toBe(inputs[index])
+        expect(now[index]).toBe(tooltips[index])
+      }
+
+      expect(element.querySelector('.form-range-ticks')).toBe(ticks)
+      expect(inputs.map(input => input.value)).toEqual(['10', '60'])
+      expect(events).toEqual([])
+    })
+
+    it('should show the value setValue gives in the tooltip and the fill', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] })
+
+      rangeSlider.setValue([10, 60])
+
+      expect([...element.querySelectorAll('.tooltip-inner')].map(tooltip => tooltip.textContent)).toEqual(['10', '60'])
+      expect(wrapperOf(element).style.getPropertyValue('--cui-range-fill')).toBe('0.6')
+    })
+
+    it('should clamp a value setValue gives outside the limits', () => {
+      const { element, rangeSlider } = mount({ max: 100, value: 40 })
+
+      rangeSlider.setValue([200])
+
+      expect(inputsOf(element)[0].value).toBe('100')
+    })
+
+    it('should take a value with another count as new handles with their names', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] })
+
+      rangeSlider.setValue([10, 60, 90])
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Value 1', 'Value 2', 'Value 3'])
+
+      rangeSlider.setValue(40)
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['40'])
+      expect(inputsOf(element)[0].hasAttribute('aria-label')).toBeFalse()
+    })
+
+    it('should write and take back the disabled state of the handles and the clickable ticks', () => {
+      const { element, rangeSlider } = mount({ ticks: 3, value: [20, 80] })
+      const ticks = element.querySelector('.form-range-ticks')
+
+      rangeSlider.disable()
+
+      expect(inputsOf(element).every(input => input.disabled)).toBeTrue()
+      expect(ticks.classList.contains('form-range-ticks-clickable')).toBeFalse()
+
+      rangeSlider.enable()
+
+      expect(inputsOf(element).some(input => input.disabled)).toBeFalse()
+      expect(ticks.classList.contains('form-range-ticks-clickable')).toBeTrue()
+    })
+
+    it('should ignore a press on the track once disable() runs and take one after enable()', () => {
+      const { element, rangeSlider } = mount({ value: [25, 75] })
+
+      rangeSlider.disable()
+      pressAt(wrapperOf(element), 60)
+      pressAt(wrapperOf(element), 60, 'pointerup')
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['25', '75'])
+
+      rangeSlider.enable()
+      pressAt(wrapperOf(element), 60)
+      pressAt(wrapperOf(element), 60, 'pointerup')
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['25', '60'])
+    })
+
+    it('should stop a drag in progress on disable()', () => {
+      const { element, rangeSlider } = mount({ value: [25, 75] })
+      const wrapper = wrapperOf(element)
+
+      pressAt(wrapper, 60)
+      rangeSlider.disable()
+      pressAt(wrapper, 90, 'pointermove')
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['25', '60'])
+      expect(rangeSlider._press).toBeNull()
+    })
+
+    it('should block the submit once enable() runs on a slider built disabled and invalid, and stop again on disable()', () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const rangeSlider = new RangeSlider(fixtureEl.querySelector('div'), { disabled: true, validationState: 'invalid', value: 40 })
+
+      expect(form.checkValidity()).toBeTrue()
+
+      rangeSlider.enable()
+
+      expect(form.checkValidity()).toBeFalse()
+
+      rangeSlider.disable()
+
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should go back to the start value on a form reset after setValue', () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = form.querySelector('div')
+      const rangeSlider = new RangeSlider(element, { value: 40 })
+
+      rangeSlider.setValue(30)
+      form.reset()
+
+      expect(inputsOf(element)[0].value).toBe('40')
+    })
+
+    it('should reset each handle to the value it was added with, through every change in the count', () => {
+      fixtureEl.innerHTML = '<form><div></div><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const [growing, shrinking] = form.querySelectorAll('div')
+      const grown = new RangeSlider(growing, { value: [20, 80] })
+      const shrunk = new RangeSlider(shrinking, { value: [20, 80] })
+
+      grown.setValue([10, 50, 90])
+      grown.setValue([1, 2, 3, 4])
+      shrunk.setValue([10])
+      shrunk.setValue([10, 50])
+      form.reset()
+
+      expect(inputsOf(growing).map(input => input.value)).toEqual(['20', '80', '90', '4'])
+      expect(inputsOf(shrinking).map(input => input.value)).toEqual(['20', '50'])
+    })
+
+    it('should go on with a drag through setValue and fire no change for the value the code set', () => {
+      const { element, rangeSlider } = mount({ value: [25, 75] })
+      const wrapper = wrapperOf(element)
+      const changes = []
+      wrapper.addEventListener('change', event => changes.push(event.target.value))
+
+      pressAt(wrapper, 60)
+      rangeSlider.setValue([25, 50])
+      pressAt(wrapper, 50, 'pointerup')
+
+      expect(changes).toEqual([])
+
+      pressAt(wrapper, 60)
+      rangeSlider.setValue([25, 50])
+      pressAt(wrapper, 90, 'pointermove')
+      pressAt(wrapper, 90, 'pointerup')
+
+      expect(inputsOf(element)[1].value).toBe('90')
+      expect(changes).toEqual(['90'])
+    })
+
+    it('should not move a vertical handle by an arrow key once disable() runs', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80], vertical: true })
+      const [first] = inputsOf(element)
+
+      rangeSlider.disable()
+      first.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' }))
+
+      expect(first.value).toBe('20')
+    })
+
+    it('should name the handles from what the element carried at start, whatever the count setValue gives', () => {
+      const { element, rangeSlider } = mount({ value: 40 }, 'aria-label="Budget" data-coreui-invalid-feedback="Pick a budget."')
+
+      element.setAttribute('aria-label', 'Price')
+      element.setAttribute('data-coreui-invalid-feedback', 'Pick a price.')
+      rangeSlider.setValue(30)
+
+      expect(inputsOf(element)[0].getAttribute('aria-label')).toBe('Budget')
+
+      rangeSlider.setValue([30, 60])
+      rangeSlider.setValue(30)
+
+      expect(inputsOf(element)[0].getAttribute('aria-label')).toBe('Budget')
+      expect(inputsOf(element)[0].getAttribute('data-coreui-invalid-feedback')).toBe('Pick a budget.')
+    })
+
+    it('should keep the focus on the handle at the same place when setValue changes the count', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] })
+
+      inputsOf(element)[1].focus()
+      rangeSlider.setValue([10, 60, 90])
+
+      expect(document.activeElement).toBe(inputsOf(element)[1])
+
+      inputsOf(element)[2].focus()
+      rangeSlider.setValue([10, 60])
+
+      expect(document.activeElement).toBe(inputsOf(element)[1])
+
+      document.activeElement.blur()
+      rangeSlider.setValue([10, 60, 90])
+
+      expect(element.contains(document.activeElement)).toBeFalse()
+    })
+
+    it('should take a value in every form the option takes and reject another type', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] })
+
+      rangeSlider.setValue('10, 60')
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['10', '60'])
+      expect(() => rangeSlider.setValue(true)).toThrow('RANGE-SLIDER: Option "value" provided type "boolean" but expected type "(array|number)".')
+    })
+
+    it('should build the handles again for a value with another count and keep the page content of the element', () => {
       fixtureEl.innerHTML = '<div id="slider"><p class="note">Page content</p></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { tooltips: false, value: [20, 80] })
@@ -1221,7 +1447,7 @@ describe('RangeSlider', () => {
       const wrapper = wrapperOf(element)
       const off = spyOn(EventHandler, 'off').and.callThrough()
 
-      rangeSlider.setValue([10, 90])
+      rangeSlider.setValue([10, 50, 90])
 
       const removed = off.calls.allArgs().filter(([target]) => target === wrapper).map(([, type]) => type)
       expect(removed).toEqual(['input.coreui.range-slider', 'change.coreui.range-slider', 'keydown.coreui.range-slider', 'pointerdown.coreui.range-slider'])
@@ -1283,10 +1509,9 @@ describe('RangeSlider', () => {
       const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-describedby="budgetHelp"')
 
       element.setAttribute('aria-describedby', 'budgetNote')
-      rangeSlider.disable()
-      rangeSlider.enable()
+      rangeSlider.setValue([20, 50, 80])
 
-      expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp'])
+      expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp', 'budgetHelp'])
       expect(element.getAttribute('aria-describedby')).toEqual('budgetNote')
 
       rangeSlider.dispose()

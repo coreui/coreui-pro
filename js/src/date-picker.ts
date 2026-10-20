@@ -17,7 +17,6 @@ import {
   formatSelectionName,
   getDateBySelectionType,
   isSameDateAs,
-  isSameInstantAs,
   type SelectionTypes
 } from './util/calendar.js'
 import {
@@ -177,7 +176,7 @@ class DatePicker extends PickerBase {
   protected declare _calendarElement: any
   protected declare _selection: any
   protected declare _selectionElement: any
-  protected declare _source: 'calendar' | 'selection' | null
+  protected declare _source: 'calendar' | 'code' | 'selection' | null
   protected declare _toggleLabel: string | null
 
   constructor(element?: string | Element | null, config?: DatePickerOptions | null) {
@@ -217,7 +216,8 @@ class DatePicker extends PickerBase {
   }
 
   setDate(date: Date | null): void {
-    this._writeField(date)
+    this._typeCheckConfig({ date }, { date: DefaultType.date })
+    this._writeField(date, 'code', false)
   }
 
   clear(): void {
@@ -237,7 +237,7 @@ class DatePicker extends PickerBase {
       ...this._baseContext(),
       date: this.getDate(),
       isDateSelectable: (date: Date | null) => this._input.isDateSelectable(date),
-      setDate: (date: Date | null) => this._runAsUser(() => this.setDate(date)),
+      setDate: (date: Date | null) => this._runAsUser(() => this._writeField(date)),
       today: () => this._runAsUser(() => this.today())
     }
   }
@@ -437,32 +437,33 @@ class DatePicker extends PickerBase {
     }
   }
 
-  _writeField(date: Date | null, source: 'calendar' | 'selection' | null = null): void {
-    const before = this.getDate()
+  _writeField(date: Date | null, source: 'calendar' | 'code' | 'selection' = 'code', triggerChange = true): void {
     const previous = this._source
     this._source = source
 
     try {
-      this._input.setDate(date)
+      this._input.setDate(date, triggerChange)
+
+      if (this._element && this._source === source) {
+        this._syncParts()
+      }
     } finally {
       this._source = previous
-    }
-
-    if (!this._element) {
-      return
-    }
-
-    if (!source && isSameInstantAs(before, this.getDate())) {
-      this._calendar?.setStartDate(before)
-      this._selection?.setConfig({ time: before })
     }
   }
 
   _onFieldChange(date: Date | null): void {
+    this._syncParts()
+
+    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, formattedDate: getDateBySelectionType(date, this._config.selectionType) })
+  }
+
+  _syncParts(): void {
     const source = this._source
+    const date = this.getDate()
     this._source = null
 
-    if (this._calendar && !isSameDateAs(this._calendar._startDate, date)) {
+    if (this._calendar && (source === 'code' || !isSameDateAs(this._calendar._startDate, date))) {
       this._calendar.setStartDate(date)
     }
 
@@ -471,8 +472,6 @@ class DatePicker extends PickerBase {
     }
 
     this._nameToggle()
-
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, formattedDate: getDateBySelectionType(date, this._config.selectionType) })
   }
 
   _nameToggle(): void {

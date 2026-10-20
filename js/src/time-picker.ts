@@ -137,7 +137,7 @@ class TimePicker extends PickerBase {
   protected declare _input: any
   protected declare _selection: any
   protected declare _selectionElement: any
-  protected declare _source: 'selection' | null
+  protected declare _source: 'code' | 'selection' | null
 
   constructor(element?: string | Element | null, config?: TimePickerOptions | null) {
     super(element, config)
@@ -172,19 +172,20 @@ class TimePicker extends PickerBase {
   }
 
   setTime(time: Date | null): void {
-    this._write(() => this._input.setDate(time))
+    this._typeCheckConfig({ time }, { time: DefaultType.time })
+    this._write(time, 'code', false)
   }
 
   now(): void {
-    this.setTime(new Date())
+    this._write(new Date())
   }
 
   clear(): void {
-    this._write(() => this._input.clear())
+    this._write(null)
   }
 
   reset(): void {
-    this.setTime(this._initialTime)
+    this._write(this._initialTime)
   }
 
   override getContext(): Record<string, any> {
@@ -192,7 +193,7 @@ class TimePicker extends PickerBase {
       ...this._baseContext(),
       isTimeSelectable: (time: Date | null) => this._input.isDateSelectable(time),
       now: () => this._runAsUser(() => this.now()),
-      setTime: (time: Date | null) => this._runAsUser(() => this.setTime(time)),
+      setTime: (time: Date | null) => this._runAsUser(() => this._write(time)),
       time: this.getTime()
     }
   }
@@ -283,37 +284,40 @@ class TimePicker extends PickerBase {
   }
 
   _applyTime(time: Date | null, picked: Date | null): void {
-    this._write(() => this._input.setDate(time), 'selection')
+    this._write(time, 'selection')
 
-    if (time !== picked) {
+    if (this._element && time !== picked) {
       this._selection.setTime(time)
     }
   }
 
-  _write(action: () => void, source: 'selection' | null = null): void {
+  _write(time: Date | null, source: 'code' | 'selection' = 'code', triggerChange = true): void {
     const previous = this._source
     this._source = source
 
     try {
-      action()
+      this._input.setDate(time, triggerChange)
+
+      if (this._element && this._source === source) {
+        this._syncParts()
+      }
     } finally {
       this._source = previous
-    }
-
-    if (this._element && !source) {
-      this._showTime(this.getTime())
     }
   }
 
   _onFieldChange(time: Date | null): void {
+    this._syncParts()
+    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
+  }
+
+  _syncParts(): void {
     const source = this._source
     this._source = null
 
     if (source !== 'selection') {
-      this._showTime(time)
+      this._showTime(this.getTime())
     }
-
-    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
   }
 
   _showTime(time: Date | null): void {
