@@ -416,11 +416,11 @@ Relying on color to convey meaning creates a visual cue that assistive technolog
 
 ### Border
 
-Use [border utilities](/utilities/border/) to change just the `border-color` of a card. Note that you can put `.text-{color}` classes on the parent `.card` or a subset of the card's contents as shown below.
+Use [border utilities](/utilities/border/) to change just the `border-color` of a card. Note that you can put `.fg-{color}` classes on the parent `.card` or a subset of the card's contents as shown below.
 
 <Example code={getData('theme-colors').map((c) => `<div class="card border-${c.name} mb-4" style="max-width: 18rem;">
     <div class="card-header">Header</div>
-    <div class="card-body text-${c.name}">
+    <div class="card-body fg-${c.name}">
       <h5 class="card-title">${c.title} card title</h5>
       <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
     </div>
@@ -428,11 +428,11 @@ Use [border utilities](/utilities/border/) to change just the `border-color` of 
 
 ### Top border
 
-Use [border utilities](/utilities/border/) to change just the `border-top-color` of a card. Note that you can put `.text-{color}` classes on the parent `.card` or a subset of the card's contents as shown below.
+Use [border utilities](/utilities/border/) to change just the `border-top-color` of a card. Note that you can put `.fg-{color}` classes on the parent `.card` or a subset of the card's contents as shown below.
 
 <Example code={getData('theme-colors').map((c) => `<div class="card border-top-${c.name} border-top-3 mb-4" style="max-width: 18rem;">
     <div class="card-header">Header</div>
-    <div class="card-body text-${c.name}">
+    <div class="card-body fg-${c.name}">
       <h5 class="card-title">${c.title} card title</h5>
       <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
     </div>

@@ -29,7 +29,7 @@ Learn more by reading the new [color modes documentation](/customize/color-modes
 
 - **Global support for light (default) and dark color modes.** Set color mode globally on the `:root` element, on groups of elements and components with a wrapper class, or directly on components, with `data-coreui-theme="light|dark"`. Also included is a new `color-mode()` mixin that can output a ruleset with the `data-coreui-theme` selector or a media query, depending on your preference.
 
-  <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Color modes replace dark variants for components, so  `.btn-close-white`, `.carousel-dark`, `.dropdown-menu-dark`, and `.navbar-dark` are deprecated.
+  <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> Color modes replace dark variants for components, so  `.btn-close-white`, `.carousel-dark`, `.dropdown-menu-dark`, and `.navbar-dark` are deprecated.
 
 - **New extended color system.** We've added new theme colors (but not in `$theme-colors`) for a more nuanced, system-wide color palette with new secondary, tertiary, and emphasis colors for `color` and `background-color`. These new colors are available as Sass variables, CSS variables, and utilities.
 
@@ -73,7 +73,7 @@ Learn more by reading the new [color modes documentation](/customize/color-modes
 
 - Alert variants are now styled via CSS variables.
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> The `.alert-variant()` mixin is now deprecated. We now [use a Sass loop](/components/alerts/#sass-loops) directly to modify the component's default CSS variables for each variant.
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> The `.alert-variant()` mixin is now deprecated. We now [use a Sass loop](/components/alerts/#sass-loops) directly to modify the component's default CSS variables for each variant.
 
 #### Card
 
@@ -81,7 +81,7 @@ Learn more by reading the new [color modes documentation](/customize/color-modes
 
 #### Close button
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> The `.btn-close-white` class has been deprecated and replaced with `data-coreui-theme="dark"` on the close button or any parent element. [See the docs for an example.](/components/close-button/#on-a-dark-surface)
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> The `.btn-close-white` class has been deprecated and replaced with `data-coreui-theme="dark"` on the close button or any parent element. [See the docs for an example.](/components/close-button/#on-a-dark-surface)
 
 #### Date Picker
 
@@ -95,17 +95,17 @@ Learn more by reading the new [color modes documentation](/customize/color-modes
 
 #### Dropdowns
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> The `.dropdown-menu-dark` class has been deprecated and replaced with `data-coreui-theme="dark"` on the dropdown or any parent element. [See the docs for an example.](/components/dropdowns/#dark-dropdowns)
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> The `.dropdown-menu-dark` class has been deprecated and replaced with `data-coreui-theme="dark"` on the dropdown or any parent element. [See the docs for an example.](/components/dropdowns/#dark-dropdowns)
 
 #### List group
 
 - List group item variants are now styled via CSS variables.
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> The `.list-group-variant()` mixin is now deprecated. We now [use a Sass loop](/components/list-group/#sass-loops) directly to modify the component's default CSS variables for each variant.
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> The `.list-group-variant()` mixin is now deprecated. We now [use a Sass loop](/components/list-group/#sass-loops) directly to modify the component's default CSS variables for each variant.
 
 #### Navbar
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> The `.navbar-dark` class has been deprecated and replaced with `data-coreui-theme="dark"` on the navbar or any parent element. [See the docs for updated examples.](/components/navbar/#color-schemes)
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> The `.navbar-dark` class has been deprecated and replaced with `data-coreui-theme="dark"` on the navbar or any parent element. [See the docs for updated examples.](/components/navbar/#color-schemes)
 
 #### Navs
 
@@ -183,7 +183,7 @@ Subheader component has been removed.
 
 ### Utilities
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> `.text-muted` will be replaced by `.text-body-secondary` in v6.
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> `.text-muted` will be replaced by `.text-body-secondary` in v6.
 
   With the addition of the expanded theme colors and variables, the `.text-muted` variables and utility have been deprecated with v5.0.0. Its default value has also been reassigned to the new `--cui-secondary-color` CSS variable to better support color modes. It will be removed in v6.0.0.
 
@@ -205,18 +205,18 @@ Subheader component has been removed.
 
 - Added new `.border-black` utility to match our `.text-black` and `.bg-black` utilities.
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-muted` utility and `$text-muted` Sass variable. It's been replaced by `.text-body-secondary` and `$body-secondary-color`.
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> Deprecated the `.text-muted` utility and `$text-muted` Sass variable. It's been replaced by `.text-body-secondary` and `$body-secondary-color`.
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-high-emphasis` utility and `$high-emphasis` Sass variable.
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> Deprecated the `.text-high-emphasis` utility and `$high-emphasis` Sass variable.
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-medium-emphasis` utility and `$medium-emphasis` Sass variable.
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> Deprecated the `.text-medium-emphasis` utility and `$medium-emphasis` Sass variable.
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-disabled` utility and `$disabled` Sass variable.
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> Deprecated the `.text-disabled` utility and `$disabled` Sass variable.
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-high-emphasis-inverse` utility and `$high-emphasis-inverse` Sass variable.
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> Deprecated the `.text-high-emphasis-inverse` utility and `$high-emphasis-inverse` Sass variable.
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-medium-emphasis-inverse` utility and `$medium-emphasis-inverse` Sass variable.
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> Deprecated the `.text-medium-emphasis-inverse` utility and `$medium-emphasis-inverse` Sass variable.
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-disabled-inverse` utility and `$disabled-inverse` Sass variable.
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> Deprecated the `.text-disabled-inverse` utility and `$disabled-inverse` Sass variable.
 
 - Added new `.d-inline-grid` [display utility](/utilities/display/).

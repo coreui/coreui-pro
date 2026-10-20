@@ -38,11 +38,11 @@ If you don't fancy a border spinner, switch to the grow spinner. While it doesn'
 
 Both spinners use `currentColor` for their appearance, so any [text color utility][color] recolors them.
 
-<Example code={getData('theme-colors').map((c) => `<div class="spinner-border text-${c.name}" role="status">
+<Example code={getData('theme-colors').map((c) => `<div class="spinner-border fg-${c.name}" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>`)} />
 
-<Example code={getData('theme-colors').map((c) => `<div class="spinner-grow text-${c.name}" role="status">
+<Example code={getData('theme-colors').map((c) => `<div class="spinner-grow fg-${c.name}" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>`)} />
 
