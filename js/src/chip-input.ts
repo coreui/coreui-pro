@@ -243,8 +243,8 @@ class ChipInput extends ChipSet {
     }
   }
 
-  override _getRemovalFocusTarget(chip: HTMLElement): HTMLElement {
-    return this._input ?? super._getRemovalFocusTarget(chip)
+  override _getRemovalFallback(): HTMLElement {
+    return this._input ?? super._getRemovalFallback()
   }
 
   override _handleChipRemoved(event: any): void {

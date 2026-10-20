@@ -1024,7 +1024,10 @@ describe('ChipInput', () => {
       expect(chipInput.getValues()).toEqual([])
     })
 
-    it('should move focus to the text input after removing a focused chip', () => {
+    it.each([
+      ['the next chip after removing a middle chip', 1, 'Rust'],
+      ['the previous chip after removing the last chip', 2, 'TypeScript']
+    ])('should move focus to %s', (_, index, expected) => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
@@ -1032,11 +1035,12 @@ describe('ChipInput', () => {
 
       chipInput.add('JavaScript')
       chipInput.add('TypeScript')
-      const chip = el.querySelector('.chip')
+      chipInput.add('Rust')
+      const chip = el.querySelectorAll('.chip')[index]
       chip.focus()
       chip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
 
-      expect(document.activeElement).toEqual(chipInput._input)
+      expect(document.activeElement.dataset.coreuiChipValue).toEqual(expected)
     })
 
     it('should move focus to the text input after removing its only chip', () => {

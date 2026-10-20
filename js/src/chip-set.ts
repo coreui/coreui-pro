@@ -612,7 +612,11 @@ class ChipSet extends BaseComponent {
   }
 
   _getRemovalFocusTarget(chip: HTMLElement): HTMLElement {
-    return getRemovalNeighbor(this._getFocusableChips(), chip) ?? this._element
+    return getRemovalNeighbor(this._getFocusableChips(), chip) ?? this._getRemovalFallback()
+  }
+
+  _getRemovalFallback(): HTMLElement {
+    return this._element
   }
 
   _navigateToEdge(targetIndex: number): HTMLElement | null {

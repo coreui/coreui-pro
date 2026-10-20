@@ -2135,6 +2135,13 @@ own stylesheet re-squared those corners as a workaround, the override is no
 longer needed. A rule of yours that relied on the group losing to a component
 now loses to the group instead; give it a layer of its own if you need it back.
 
+#### Chip Input keeps focus among the chips after a removal
+
+Removing the focused chip used to send focus back to the text field. It now
+moves to the next chip, else the previous one, and only reaches the text field
+once no chip is left, the same rule Chip Set follows, so several chips can be
+removed in a row from the keyboard.
+
 #### Chip Input is submitted only once you name it
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
