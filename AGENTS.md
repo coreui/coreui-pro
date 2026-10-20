@@ -8,6 +8,8 @@ package's CSS and follow its behaviour, so this repository is the reference for 
 
 - Sass source in `scss/`, TypeScript source in `js/src/`, unit specs in `js/tests/unit/`.
 - Docs site in `docs/` (Astro, shared `@coreui/astro-docs` engine), pages in `docs/src/content/docs/`.
+- Agent skills for CoreUI users in `skills/<name>/SKILL.md`, shipped in the package and listed on
+  `ai-tools/skills.mdx`. `npm run js-test-skills` checks both.
 - Built output in `dist/` and `js/dist/` is generated. Do not edit it and do not commit it in a feature change.
 
 ## Commands
