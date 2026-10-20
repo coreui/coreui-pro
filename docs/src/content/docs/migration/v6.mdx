@@ -5971,8 +5971,21 @@ markup.
   properties. The `$form-multi-select-tag-*` variables are gone with it.
   `'chips'` is the name and the default now; `'tags'` renders the same and is
   deprecated until v7. The selection container `.form-multi-select-selection-tags`
-  and its `--cui-form-multi-select-selection-tags-gap` and `-padding-y` tokens
-  are renamed `-selection-chips`, with no alias.
+  is `.multi-select-selection-chips`, with no alias.
+- **Multi Select's classes drop the `form-` prefix**, so they carry the
+  component's name like every other field component (`.autocomplete`,
+  `.chip-input`, `.date-picker`). There is no alias:
+
+  | v5 | v6 |
+  | --- | --- |
+  | `.form-multi-select` | `.multi-select` |
+  | `.form-multi-select-selection`, `.form-multi-select-selection-tags` | `.multi-select-selection`, `.multi-select-selection-chips` |
+  | `.form-multi-select-search`, `.form-multi-select-placeholder` | `.multi-select-search`, `.multi-select-placeholder` |
+  | `--cui-form-multi-select-selection-tags-gap`, `-padding-y` | `--cui-multi-select-selection-chips-gap`, `-padding-y` |
+  | `$form-multi-select-tokens`, `scss/forms/_form-multi-select.scss` | `$multi-select-tokens`, `scss/forms/_multi-select.scss` |
+  | `css/components/forms/form-multi-select.css` | `css/components/forms/multi-select.css` |
+
+  The filled state is `.multi-select-filled`.
 
 - **The per-family frame variables are gone.** `$autocomplete-font-size`,
   `$date-picker-border-color`, `$time-picker-focus-bg`,

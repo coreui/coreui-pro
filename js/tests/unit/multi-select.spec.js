@@ -105,9 +105,10 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(multiSelect._wrapperElement.classList.contains('form-multi-select')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('multi-select')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('form-multi-select')).toBe(false)
       expect(multiSelect._wrapperElement.classList.contains('form-control-group')).toBe(true)
-      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-selection')).toBeTruthy()
+      expect(multiSelect._wrapperElement.querySelector('.multi-select-selection')).toBeTruthy()
     })
 
     it('should handle disabled state', () => {
@@ -1344,7 +1345,7 @@ describe('MultiSelect', () => {
       })
 
       expect(multiSelect._searchElement).not.toBeNull()
-      expect(multiSelect._searchElement.classList.contains('form-multi-select-search')).toBe(true)
+      expect(multiSelect._searchElement.classList.contains('multi-select-search')).toBe(true)
     })
 
     it('should create search input when search is "global"', () => {
@@ -1412,7 +1413,7 @@ describe('MultiSelect', () => {
         placeholder: 'Choose...'
       })
 
-      const placeholder = multiSelect._wrapperElement.querySelector('.form-multi-select-placeholder')
+      const placeholder = multiSelect._wrapperElement.querySelector('.multi-select-placeholder')
       expect(placeholder).not.toBeNull()
       expect(placeholder.textContent).toBe('Choose...')
     })
@@ -1695,7 +1696,7 @@ describe('MultiSelect', () => {
         selectedLabel: count => `${count} items selected`
       })
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
       expect(selection.textContent).toContain('2')
       expect(selection.textContent).toContain('items selected')
     })
@@ -1721,7 +1722,7 @@ describe('MultiSelect', () => {
         selectedLabel: '{count} of {total}'
       })
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
       expect(selection.textContent).toBe('1 of 5')
       expect(multiSelect._headerElement.textContent).toBe('4')
     })
@@ -1780,7 +1781,7 @@ describe('MultiSelect', () => {
         selectionType: 'text'
       })
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
       expect(selection.textContent).toContain('Opt 1')
       expect(selection.textContent).toContain('Opt 2')
     })
@@ -1840,7 +1841,7 @@ describe('MultiSelect', () => {
         multiple: false
       })
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
       expect(selection.textContent).toContain('Opt 1')
     })
 
@@ -2153,7 +2154,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const searchInput = multiSelect._wrapperElement.querySelector('.form-multi-select-search')
+      const searchInput = multiSelect._wrapperElement.querySelector('.multi-select-search')
       expect(searchInput).not.toBeNull()
     })
 
@@ -4380,7 +4381,7 @@ describe('MultiSelect', () => {
         ...config
       })
 
-      expect(multiSelect._selectionElement.classList.contains('form-multi-select-selection-chips')).toBeTrue()
+      expect(multiSelect._selectionElement.classList.contains('multi-select-selection-chips')).toBeTrue()
       expect(multiSelect._selectionElement.classList.contains('form-multi-select-selection-tags')).toBeFalse()
       expect(multiSelect._selectionElement.querySelectorAll('.chip')).toHaveSize(1)
     })
@@ -4555,11 +4556,11 @@ describe('MultiSelect', () => {
         selectionType: 'chips'
       })
 
-      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-placeholder')).not.toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.multi-select-placeholder')).not.toBeNull()
 
       multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
 
-      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-placeholder')).toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.multi-select-placeholder')).toBeNull()
       expect(multiSelect._wrapperElement.querySelectorAll('.chip').length).toBe(1)
     })
 
@@ -4580,7 +4581,7 @@ describe('MultiSelect', () => {
       multiSelect.selectAll([{ value: '2', text: 'Opt 2' }])
       multiSelect.selectAll([{ value: '1', text: 'Opt 1' }])
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
       const order = Array.from(selection.children).map(child => child.dataset.value || 'search')
 
       expect(order).toEqual(['2', '1', 'search'])
@@ -7153,7 +7154,7 @@ describe('MultiSelect', () => {
       expect(select.disabled).toBeFalse()
       expect(select.required).toBeFalse()
       expect(fixtureEl.querySelector('[role="combobox"]').hasAttribute('aria-disabled')).toBeFalse()
-      expect(fixtureEl.querySelectorAll('.form-multi-select:not(select)')).toHaveSize(1)
+      expect(fixtureEl.querySelectorAll('.multi-select:not(select)')).toHaveSize(1)
     })
 
     it('should leave the native select hidden after dispose', () => {
@@ -7185,7 +7186,7 @@ describe('MultiSelect', () => {
       multiSelect.disable()
 
       expect(select.disabled).toBeTrue()
-      expect(fixtureEl.querySelector('.form-multi-select').classList.contains('disabled')).toBeTrue()
+      expect(fixtureEl.querySelector('.multi-select').classList.contains('disabled')).toBeTrue()
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
 
       multiSelect.dispose()
@@ -7202,7 +7203,7 @@ describe('MultiSelect', () => {
 
       expect(select.disabled).toBeFalse()
       expect(select.classList.contains('disabled')).toBeFalse()
-      expect(fixtureEl.querySelector('.form-multi-select').classList.contains('disabled')).toBeFalse()
+      expect(fixtureEl.querySelector('.multi-select').classList.contains('disabled')).toBeFalse()
 
       multiSelect.dispose()
     })
@@ -7324,7 +7325,7 @@ describe('MultiSelect', () => {
       const wrapper = multiSelect._wrapperElement
       const menu = multiSelect._menu
 
-      expect(fixtureEl.querySelector('.form-multi-select')).not.toBeNull()
+      expect(fixtureEl.querySelector('.multi-select')).not.toBeNull()
       expect(selectEl.parentNode).toBe(wrapper)
 
       multiSelect.dispose()
@@ -7749,7 +7750,7 @@ describe('MultiSelect', () => {
     })
 
     it('should initialize on load a select whose earlier instance was disposed', () => {
-      fixtureEl.innerHTML = '<select class="form-multi-select"><option value="1">One</option></select>'
+      fixtureEl.innerHTML = '<select class="multi-select"><option value="1">One</option></select>'
       const selectEl = fixtureEl.querySelector('select')
 
       MultiSelect.getOrCreateInstance(selectEl).dispose()
@@ -7758,8 +7759,8 @@ describe('MultiSelect', () => {
       expect(MultiSelect.getInstance(selectEl)).toBeInstanceOf(MultiSelect)
     })
 
-    it('should still auto-initialize on load via the form-multi-select class (backward compat)', () => {
-      fixtureEl.innerHTML = '<select class="form-multi-select"><option value="1">One</option></select>'
+    it('should still auto-initialize on load via the multi-select class (backward compat)', () => {
+      fixtureEl.innerHTML = '<select class="multi-select"><option value="1">One</option></select>'
       const selectEl = fixtureEl.querySelector('select')
 
       window.dispatchEvent(new Event('load'))
@@ -7952,7 +7953,7 @@ describe('MultiSelect', () => {
         search: false
       })
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
       expect(selection.innerHTML).toContain('Select something')
     })
 
@@ -7967,7 +7968,7 @@ describe('MultiSelect', () => {
         search: false
       })
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
       expect(selection.textContent).toContain('Opt 1')
     })
 
@@ -7985,7 +7986,7 @@ describe('MultiSelect', () => {
         search: false
       })
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
       expect(selection.textContent).toContain('2')
       expect(selection.textContent).toContain('item(s) selected')
     })
@@ -8003,7 +8004,7 @@ describe('MultiSelect', () => {
         selectionType: 'text'
       })
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
       expect(selection.textContent).toContain('Apple')
       expect(selection.textContent).toContain('Banana')
     })
@@ -8044,8 +8045,8 @@ describe('MultiSelect', () => {
         selectionType: 'chips'
       })
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
-      expect(selection.classList.contains('form-multi-select-selection-chips')).toBe(true)
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
+      expect(selection.classList.contains('multi-select-selection-chips')).toBe(true)
     })
 
     it('should not add the selection-chips class when selectionType is not chips', () => {
@@ -8057,8 +8058,8 @@ describe('MultiSelect', () => {
         selectionType: 'counter'
       })
 
-      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
-      expect(selection.classList.contains('form-multi-select-selection-chips')).toBe(false)
+      const selection = multiSelect._wrapperElement.querySelector('.multi-select-selection')
+      expect(selection.classList.contains('multi-select-selection-chips')).toBe(false)
     })
   })
 

@@ -268,8 +268,8 @@ describe('floating labels', () => {
     const empty = build(HOST_DIV, MultiSelect, { options: OPTIONS })
     floatingClass = 'form-floating'
 
-    expect(blockPadding(empty.querySelector('.form-multi-select-selection')))
-      .toBe(blockPadding(filled.querySelector('.form-multi-select-selection')))
+    expect(blockPadding(empty.querySelector('.multi-select-selection')))
+      .toBe(blockPadding(filled.querySelector('.multi-select-selection')))
   })
 
   // The masks (and the range picker's arrow) hide at rest so the label has the
@@ -296,7 +296,7 @@ describe('floating labels', () => {
   it('rests the label over an empty searchable Multi Select and hides its placeholder', () => {
     const root = build(HOST_DIV, MultiSelect, { options: OPTIONS, search: true })
     expect(labelFloats(root)).toBeFalse()
-    const search = root.querySelector('.form-multi-select-search')
+    const search = root.querySelector('.multi-select-search')
     expect(getComputedStyle(search, '::placeholder').color).toBe('rgba(0, 0, 0, 0)')
   })
 

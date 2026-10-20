@@ -667,9 +667,9 @@ The select stays in the page as an invisible overlay for form validation and is 
 
 ### CSS variables
 
-The field is a [`.form-control-group`](/forms/form-control-group/#css-variables), so its frame, the cleaner and the toggle read the `--cui-control-*` and `--cui-control-group-*` tokens. The plugin renders that frame as a `.form-multi-select` element around your `<select>`: set the tokens with a rule on `.form-multi-select`, because a `style` attribute on the `<select>` does not reach the frame. The selected chips add two of their own:
+The field is a [`.form-control-group`](/forms/form-control-group/#css-variables), so its frame, the cleaner and the toggle read the `--cui-control-*` and `--cui-control-group-*` tokens. The plugin renders that frame as a `.multi-select` element around your `<select>`: set the tokens with a rule on `.multi-select`, because a `style` attribute on the `<select>` does not reach the frame. The selected chips add two of their own:
 
-<ScssDocs file="scss/forms/_form-multi-select.scss" capture="form-multi-select-tokens" />
+<ScssDocs file="scss/forms/_multi-select.scss" capture="multi-select-tokens" />
 
 The options panel is the shared combobox surface, which only sizes itself:
 

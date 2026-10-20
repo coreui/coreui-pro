@@ -100,6 +100,7 @@ Rewrite project CSS that targets the v4 internals straight to the v6 frame, not 
 | `.picker-input-group` | `.form-control-group` |
 | `.picker-input-group-indicator`, `.date-picker-input-icon`, `.time-picker-input-icon` | `.form-control-action` |
 | `.picker-input-group-cleaner`, `.date-picker-cleaner-icon`, `.time-picker-cleaner-icon`, `.form-multi-select-selection-cleaner` | `.form-control-cleaner` |
+| `.form-multi-select`, `.form-multi-select-selection`, `.form-multi-select-search`, `.form-multi-select-placeholder` | `.multi-select`, `.multi-select-selection`, `.multi-select-search`, `.multi-select-placeholder` |
 | `.date-picker-arrow-icon` | `.form-control-icon` |
 | `.picker-footer` | `.date-picker-footer`, `.time-picker-footer` |
 

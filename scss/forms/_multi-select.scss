@@ -3,25 +3,25 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-$form-multi-select-tokens: () !default;
+$multi-select-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start form-multi-select-tokens
-$form-multi-select-tokens: defaults(
+// scss-docs-start multi-select-tokens
+$multi-select-tokens: defaults(
   (
-    --#{$prefix}form-multi-select-selection-chips-gap: .25rem,
-    --#{$prefix}form-multi-select-selection-chips-padding-y: .25rem,
+    --#{$prefix}multi-select-selection-chips-gap: .25rem,
+    --#{$prefix}multi-select-selection-chips-padding-y: .25rem,
   ),
-  $form-multi-select-tokens
+  $multi-select-tokens
 );
-// scss-docs-end form-multi-select-tokens
+// scss-docs-end multi-select-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
 @layer forms {
-  .form-multi-select {
-    @include tokens($form-multi-select-tokens);
+  .multi-select {
+    @include tokens($multi-select-tokens);
 
     position: relative;
 
@@ -41,7 +41,7 @@ $form-multi-select-tokens: defaults(
   // An invisible overlay so native `required` validation focuses and anchors
   // over the field.
   // stylelint-disable-next-line selector-no-qualifying-type
-  select.form-multi-select,
+  select.multi-select,
   [data-coreui-multi-select] {
     position: absolute;
     inset: 0;
@@ -55,20 +55,20 @@ $form-multi-select-tokens: defaults(
     opacity: 0;
   }
 
-  .form-multi-select-selection {
+  .multi-select-selection {
     display: flex;
     flex: 1 1 auto;
     flex-wrap: wrap;
     min-width: 0;
   }
 
-  .form-multi-select-selection-chips {
-    gap: var(--#{$prefix}form-multi-select-selection-chips-gap);
+  .multi-select-selection-chips {
+    gap: var(--#{$prefix}multi-select-selection-chips-gap);
     align-content: center;
-    margin: calc(var(--#{$prefix}form-multi-select-selection-chips-padding-y) * -1) 0;
+    margin: calc(var(--#{$prefix}multi-select-selection-chips-padding-y) * -1) 0;
   }
 
-  .form-multi-select-search {
+  .multi-select-search {
     display: flex;
     flex: 0 1 0px;
     max-width: 100%;
@@ -85,50 +85,50 @@ $form-multi-select-tokens: defaults(
       opacity: 1;
     }
 
-    .form-multi-select.show &,
+    .multi-select.show &,
     &:placeholder-shown {
       flex: 1 1 auto;
     }
 
-    .form-multi-select-selection-chips & {
+    .multi-select-selection-chips & {
       padding-inline-start: calc(var(--#{$prefix}control-padding-x) - .25rem);
     }
   }
 
-  .form-multi-select-placeholder {
+  .multi-select-placeholder {
     color: var(--#{$prefix}control-placeholder-color);
 
-    .form-multi-select-selection-chips & {
+    .multi-select-selection-chips & {
       padding: calc(var(--#{$prefix}control-padding-y) - .25rem) calc(var(--#{$prefix}control-padding-x) - .25rem);
     }
   }
 
-  .form-floating > .form-multi-select {
+  .form-floating > .multi-select {
     &:focus-within,
-    &.form-multi-select-filled {
-      .form-multi-select-selection {
+    &.multi-select-filled {
+      .multi-select-selection {
         padding-top: var(--#{$prefix}form-floating-input-padding-t);
         padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
       }
     }
 
     &:focus-within ~ label,
-    &.form-multi-select-filled ~ label {
+    &.multi-select-filled ~ label {
       transform: var(--#{$prefix}form-floating-label-transform);
     }
   }
 
-  .form-floating:is(.form-floating-always, .form-floating-always *) > .form-multi-select .form-multi-select-selection {
+  .form-floating:is(.form-floating-always, .form-floating-always *) > .multi-select .multi-select-selection {
     padding-top: var(--#{$prefix}form-floating-input-padding-t);
     padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
   }
 
-  .form-floating:not(.form-floating-always, .form-floating-always *) > .form-multi-select:not(:focus-within, .form-multi-select-filled) {
-    .form-multi-select-placeholder {
+  .form-floating:not(.form-floating-always, .form-floating-always *) > .multi-select:not(:focus-within, .multi-select-filled) {
+    .multi-select-placeholder {
       color: transparent;
     }
 
-    .form-multi-select-search::placeholder {
+    .multi-select-search::placeholder {
       color: transparent;
     }
 
@@ -137,8 +137,8 @@ $form-multi-select-tokens: defaults(
     }
   }
 
-  .form-floating > label:has(~ .form-multi-select:focus-within),
-  .form-floating > label:has(~ .form-multi-select.form-multi-select-filled) {
+  .form-floating > label:has(~ .multi-select:focus-within),
+  .form-floating > label:has(~ .multi-select.multi-select-filled) {
     transform: var(--#{$prefix}form-floating-label-transform);
   }
 
