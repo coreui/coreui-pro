@@ -63,6 +63,7 @@ Write the v6 class directly instead of the v5 one:
 | `.elevation-0` to `.elevation-24` | `.elevation-0` to `.elevation-5` | `.shadow-none`, `.shadow-sm`, `.shadow`, `.shadow-lg`, picked by depth |
 | `.calendar` started on load | `data-coreui-toggle="calendar"` | `data-coreui-calendar` (remove `.calendar` from the host, as in the first hop) |
 | `data-coreui="navigation"` | either form | `data-coreui-navigation` |
+| `<select class="form-multi-select">` started on load | the same | `<select data-coreui-multi-select>`; the class no longer starts the component |
 
 ### Dark variants
 
@@ -137,7 +138,7 @@ Two results of the first hop change again in the second:
 2. Search for the names this skill told you to skip. Each hit is a v5 name written during the first hop that v6 deprecates or removes:
 
    ```sh
-   grep -rnE 'text-body-(secondary|tertiary)|elevation-[0-9]|btn-close-white|\bdark:|data-coreui-toggle="calendar"|data-coreui="navigation"' .
+   grep -rnE 'text-body-(secondary|tertiary)|elevation-[0-9]|btn-close-white|\bdark:|data-coreui-toggle="calendar"|data-coreui="navigation"|form-multi-select' .
    grep -rnE 'inputDateFormat|inputDateParse|formattedDate|formatedDate' --include=*.js --include=*.ts --include=*.html .
    grep -rnE '@import .*coreui|variables-dark|\$[a-z0-9-]+-(dt|dark)\b|\$(input|form-select)-' --include=*.scss .
    grep -rnE '\.picker\b|date-picker-(input-group|indicator|cleaner|separator|dropdown)|time-picker-(input-group|indicator|cleaner|dropdown)' --include=*.css --include=*.scss .

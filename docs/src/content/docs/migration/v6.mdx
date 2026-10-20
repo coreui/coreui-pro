@@ -5985,9 +5985,16 @@ markup.
 
   The filled state is `.multi-select-filled`, the Sass partial is
   `scss/forms/_multi-select.scss` with `$multi-select-tokens`, and the component
-  stylesheet is `css/components/forms/multi-select.css`. A v5
-  `<select class="form-multi-select">` still initializes the component on page
-  load; `data-coreui-multi-select` is the v6 way.
+  stylesheet is `css/components/forms/multi-select.css`.
+- **Multi Select starts from `data-coreui-multi-select` only.** A v5
+  `<select class="form-multi-select">` was initialized on page load by its
+  class; in v6 it stays a plain native select. Replace the class with the
+  attribute, as every other field component is started:
+
+  ```diff
+  - <select class="form-multi-select" multiple>
+  + <select data-coreui-multi-select multiple>
+  ```
 
 - **The per-family frame variables are gone.** `$autocomplete-font-size`,
   `$date-picker-border-color`, `$time-picker-focus-bg`,

@@ -234,6 +234,7 @@ A plugin that builds a component inside an element is enabled with a bare `data-
 | `data-coreui-toggle="stepper"` | `data-coreui-stepper` |
 | `data-coreui-toggle="password"` (on the button) | `data-coreui-password-input` (on the input, see Step 3) |
 | `data-coreui="navigation"` | `data-coreui-navigation` |
+| `<select class="form-multi-select">` started on load | `<select data-coreui-multi-select>`; the class no longer starts the component |
 | `data-coreui-ride="carousel"` | `data-coreui-autoplay="true"` |
 | `data-coreui-wrap="true"` / `"false"` | `data-coreui-ends="wrap"` / `"stop"` (default is `"loop"`) |
 | `data-coreui-touch` | remove, touch is native |
