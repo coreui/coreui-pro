@@ -1115,13 +1115,14 @@ check, radio, carousel and toggler icons already work:
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Form controls fire their change event once per change of the value, on a
   form reset as well, and never from a value the page gives.** OTP Input's
-  `change.coreui.otp-input`, Combobox's `setValue()` and `clear()`, Rating's
+  `change.coreui.otp-input`, Combobox's `clear()`, Rating's
   `reset()`, Autocomplete's `clear()` and Range's `changed.coreui.range` used
   to fire even when the value stayed; they fire only when it changes now, and
   Range no longer fires while it starts or on the `change` after an `input`.
   OTP Input and Range Slider now fire on a native form reset that changes the
   value, and Date Input sends the native `input` and `change` of its value
-  field there too. `setValue()` of OTP Input does not fire. A form
+  field there too. `setValue()` of OTP Input and Combobox does not fire,
+  native events included. A form
   reset brings Rating and Range Slider back to the value they were created
   with, not one a later `setValue()` gave, and OTP Input's `reset()` puts back
   the code it started with, as a native reset does. A stepper keeps the

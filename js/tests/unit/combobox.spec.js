@@ -891,7 +891,7 @@ describe('Combobox', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
     })
 
-    it('should send input and change from the value field when the value changes', () => {
+    it('should send input and change from the value field when clear changes the value, and not from setValue', () => {
       const toggle = setMarkupInForm()
       const combobox = new Combobox(toggle, { name: 'country' })
       const events = []
@@ -899,10 +899,12 @@ describe('Combobox', () => {
       fixtureEl.querySelector('form').addEventListener('input', event => events.push(['input', event.target.value]))
       fixtureEl.querySelector('form').addEventListener('change', event => events.push(['change', event.target.value]))
       combobox.setValue('ca')
-      combobox.setValue('ca')
       combobox.update()
+      combobox.clear()
+      combobox.clear()
 
-      expect(events).toEqual([['input', 'ca'], ['change', 'ca']])
+      expect(events).toEqual([['input', ''], ['change', '']])
+      expect(fixtureEl.querySelector('form').elements.country.value).toBe('')
     })
 
     it('should show what a validation reports until the value is valid, and link the message', () => {
@@ -1365,7 +1367,7 @@ describe('Combobox', () => {
       expect(fired).toEqual(['show', 'shown', 'hide', 'hidden'])
     })
 
-    it('should fire change once for a setValue or clear that changes the value, and never for one that does not', () => {
+    it('should fire change once for a clear that changes the value, and never for setValue or a clear that does not', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle)
       const reported = []
@@ -1373,11 +1375,22 @@ describe('Combobox', () => {
       toggle.addEventListener('change.coreui.combobox', event => reported.push(event.value))
       combobox.clear()
       combobox.setValue('us')
-      combobox.setValue('us')
+      combobox.setValue('ca')
       combobox.clear()
       combobox.clear()
 
-      expect(reported).toEqual(['us', null])
+      expect(reported).toEqual([null])
+    })
+
+    it('should take a number in setValue as the constructor takes it, and throw the constructor error for another type', () => {
+      const toggle = setMarkup('', ['<div class="list-box-option" data-coreui-value="5">Five</div>'])
+      const combobox = new Combobox(toggle)
+
+      combobox.setValue(5)
+
+      expect(combobox.getValue()).toBe('5')
+      expect(() => combobox.setValue({})).toThrowError(TypeError, 'COMBOBOX: Option "value" provided type "object" but expected type "(string|array|null)".')
+      expect(combobox.getValue()).toBe('5')
     })
 
     it('should fire selectionLimit with the limit and the value that did not fit', () => {

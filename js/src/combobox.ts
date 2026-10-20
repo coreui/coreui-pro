@@ -223,7 +223,10 @@ class Combobox extends ComboboxBase {
   }
 
   setValue(value: string | string[] | null): void {
-    this._applySelection(toSelectionValues(value, 'multiple').map(String))
+    const given = typeof value === 'number' ? String(value) : value
+
+    this._typeCheckConfig({ value: given }, { value: DefaultType.value })
+    this._applySelection(toSelectionValues(given, 'multiple').map(String), false)
   }
 
   clear(): void {
@@ -492,7 +495,7 @@ class Combobox extends ComboboxBase {
     return option.dataset.coreuiValue ?? option.textContent?.trim() ?? ''
   }
 
-  _applySelection(values: string[]): void {
+  _applySelection(values: string[], notify = true): void {
     if (!this._listBox) {
       return
     }
@@ -501,7 +504,12 @@ class Combobox extends ComboboxBase {
     const next = [...new Set(values)].filter(value => listed.has(value) || this._store.has(value))
 
     this._commitSelection(next.slice(0, getSelectionLimit(this._config.multiple, this._config.selectionLimit) ?? next.length))
-    this._commitValue()
+
+    if (notify) {
+      this._commitValue()
+    } else {
+      this._updateValue()
+    }
   }
 
   _commitValue(): void {
