@@ -4366,6 +4366,10 @@ describe('MultiSelect', () => {
   })
 
   describe('chips', () => {
+    it('should default selectionType to chips', () => {
+      expect(MultiSelect.Default.selectionType).toEqual('chips')
+    })
+
     it.each([
       ['by default', {}],
       ['for the deprecated tags value', { selectionType: 'tags' }]
@@ -4377,6 +4381,7 @@ describe('MultiSelect', () => {
       })
 
       expect(multiSelect._selectionElement.classList.contains('form-multi-select-selection-chips')).toBeTrue()
+      expect(multiSelect._selectionElement.classList.contains('form-multi-select-selection-tags')).toBeFalse()
       expect(multiSelect._selectionElement.querySelectorAll('.chip')).toHaveSize(1)
     })
 

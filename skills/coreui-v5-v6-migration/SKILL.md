@@ -210,6 +210,7 @@ The field components (Autocomplete, Multi Select, Chip Input, Password Input, th
 | `.autocomplete-options-empty`, `.form-multi-select-options-empty` | `.list-box-empty` |
 | `.form-multi-select-all` | `.list-box-select-all` |
 | `.form-multi-select-tag`, `.form-multi-select-tag-delete` | `.chip`, `.chip-remove` |
+| `.form-multi-select-selection-tags` | `.form-multi-select-selection-chips` |
 | `.autocomplete-buttons`, `.form-multi-select-buttons`, `.date-picker-input-wrapper`, `.date-picker-input-preview` | removed, no replacement |
 | `.range-slider` (inner), `.range-slider-input`, `.range-slider-vertical`, `.range-slider-tooltip` | `.form-range`, `.form-range-input`, `.form-range-vertical`, `.form-range-tooltip` |
 | `.range-slider-labels-container`, `.range-slider-label` | `.form-range-ticks`, `.form-range-tick` (text in `.form-range-tick-label`) |
@@ -526,6 +527,8 @@ Change events now fire only when the value changes. Code that relied on an event
 | Multi Select | `optionsStyle: 'text'` | `indicator: 'none'` |
 | Multi Select | `selectAllStyle`, `optionsGroupsStyle` | removed; `indicator` sets the marker for the whole list |
 | Multi Select | `ariaIndicatorLabel` | `ariaPickerLabel` |
+| Multi Select | `ariaTagDeleteLabel` | `ariaChipRemoveLabel` (the old option is deprecated and wins while it is set) |
+| Multi Select | `selectionType: 'tags'` | `selectionType: 'chips'`, the default (`'tags'` is deprecated and renders the same) |
 | Multi Select | `selectionTypeCounterText: 'item(s) selected'` | `selectedLabel: (count) => \`${count} item(s) selected\`` or the string `'{count} item(s) selected'` |
 | Multi Select | `search: 'global'` or `['global']` | `search: true` |
 | Calendar, pickers | `selectAdjacementDays`, `showAdjacementDays` | `selectAdjacentDays`, `showAdjacentDays` |
@@ -656,6 +659,7 @@ Hard-coded media queries at `992px`, `1200px` or `1400px` no longer match `lg`, 
 | `--cui-form-valid-color`, `--cui-form-valid-border-color`, `--cui-form-invalid-color` | removed; retint the `success` and `danger` theme colours |
 | `--cui-form-select-bg-img` | `--cui-control-select-bg-img` |
 | `--cui-input-placeholder-color` | `--cui-control-placeholder-color` |
+| `--cui-form-multi-select-selection-tags-gap`, `-padding-y` | `--cui-form-multi-select-selection-chips-gap`, `-padding-y` |
 | `--cui-autocomplete-*`, `--cui-date-picker-*`, `--cui-time-picker-*`, `--cui-form-multi-select-*`, `--cui-chip-input-*` frame tokens (padding, font, colour, border) | `--cui-control-*` on the same element (`--cui-control-padding-y`, `--cui-control-bg`, …) |
 | `--cui-accordion-btn-*` | `--cui-accordion-header-*` |
 | `--cui-accordion-inner-border-radius` | removed; the header follows `--cui-accordion-border-radius` |
@@ -728,9 +732,9 @@ All library CSS is in cascade layers and utilities no longer carry `!important`.
    grep -rnE 'modal-dialog|modal-content|modal-backdrop|offcanvas-backdrop|accordion-button|accordion-collapse|was-validated|needs-validation|has-validation|form-check|form-switch|form-password|btn-close-white' .
    grep -rnE '\b(btn|btn-outline|btn-ghost|alert|callout|chip|list-group-item)-(primary|secondary|success|danger|warning|info|light|dark)\b' .
    grep -rnE '\b[a-z-]+-(xxl)\b|\b[a-z-]+-xxl-[a-z0-9-]+' .
-   grep -rnE '\b(mw|mh)-100\b|link-(offset|underline|primary|secondary|success|danger|warning|info|light|dark|body-emphasis)|text-(muted|black-50|white-50|high-emphasis|medium-emphasis|disabled)\b|display-[1-6]|\blead\b|elevation-|-gradient\b|spinner-(border|grow)-sm|progress-(group|thin)|card-link|card-header-pills|(header|footer)-sticky|\bfooter\b|carousel-dark|\bcollapsed\b|chip-dismiss|form-select' .
+   grep -rnE '\b(mw|mh)-100\b|link-(offset|underline|primary|secondary|success|danger|warning|info|light|dark|body-emphasis)|text-(muted|black-50|white-50|high-emphasis|medium-emphasis|disabled)\b|display-[1-6]|\blead\b|elevation-|-gradient\b|spinner-(border|grow)-sm|progress-(group|thin)|card-link|card-header-pills|(header|footer)-sticky|\bfooter\b|carousel-dark|\bcollapsed\b|chip-dismiss|form-select|selection-tags' .
    grep -rnE '\b(bg|text|border|text-bg|table|focus-ring|shadow)-(light|dark)\b' .
-   grep -rnE '\.update\(\{|changed\.coreui\.(autocomplete|multi-select)|getSelected\(\)|cellHover|selectAdjacement|showAdjacement|optionsStyle|selectAllStyle|optionsGroupsStyle|selectionTypeCounterText|ariaIndicatorLabel|inputDateFormat|todayButton|cancelButton|confirmButton|previewDateOnHover|clickableLabels|ariaLabels|readOnly|dateObject' --include=*.js --include=*.ts --include=*.html .
+   grep -rnE '\.update\(\{|changed\.coreui\.(autocomplete|multi-select)|getSelected\(\)|cellHover|selectAdjacement|showAdjacement|optionsStyle|selectAllStyle|optionsGroupsStyle|selectionTypeCounterText|ariaIndicatorLabel|ariaTagDeleteLabel|inputDateFormat|todayButton|cancelButton|confirmButton|previewDateOnHover|clickableLabels|ariaLabels|readOnly|dateObject' --include=*.js --include=*.ts --include=*.html .
    grep -rnE "\b(ride|wrap|touch|toggle|focus|animation|offset|variant|indicator|labels|placeholder|search)\s*:" --include=*.js --include=*.ts .
    grep -rnE 'var\(--cui-[a-z0-9-]+-rgb\)|--cui-(primary|secondary|success|danger|warning|info|light|dark)\)|-text-emphasis\)|-border-subtle\)|--cui-border-radius|--cui-font-monospace|--cui-highlight-|--cui-(text|bg|border|link)-opacity|focus-box-shadow|--cui-accordion-btn-|--cui-avatar-(width|height)|--cui-btn-close-(bg|filter)|--cui-range-slider-|--cui-(autocomplete|date-picker|time-picker|form-multi-select|chip-input)-' .
    ```
