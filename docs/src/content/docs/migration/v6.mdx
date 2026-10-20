@@ -9,7 +9,7 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   is final until a v6 release ships. The **class API keeps its meaning** —
   `.btn-primary`, `.alert-success` and friends render as before. Where the Sass
   or CSS-variable surface does change, the entry below carries a
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span> badge.
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span> badge.
 </Callout>
 
 ## v6.0.0 (unreleased)
@@ -17,7 +17,7 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 ### Dependencies
 
 - **Popper is gone; `@floating-ui/dom` replaces it.**
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   Every positioned component — tooltips, popovers, dropdowns, autocomplete,
   multi-select, and the pickers — now positions with
   [Floating UI](https://floating-ui.com). `@popperjs/core` is no longer a peer
@@ -41,7 +41,7 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 ### Distributed files
 
 - **The `*.rtl.css` builds are gone.**
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   One stylesheet now serves both directions, so `dist/css` no longer carries
   `coreui.rtl.css`, `coreui-grid.rtl.css`, `coreui-reboot.rtl.css`,
   `coreui-utilities.rtl.css`, their minified twins, source maps or SRI hashes —
@@ -60,7 +60,7 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   before stops being possible.
 
 - **The Bootstrap theme and the Bootstrap-compatible JavaScript are gone.**
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   `dist/css/themes/bootstrap/bootstrap.css`, `dist/js/bootstrap.js`,
   `bootstrap.bundle.js` and `bootstrap.esm.js` no longer ship, with their
   minified twins, source maps and SRI hashes, and neither does
@@ -83,7 +83,7 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 
 - **`dist/css` gained `coreui-legacy.css`, and `coreui.css` lost the v5
   spellings it carries.**
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   `coreui.css` is the v6 class API only. The deprecated v5 spellings — the
   colour modifiers (`.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
   `.btn-subtle-{color}`, `.btn-ghost-{color}`, `.callout-{color}`,
@@ -108,14 +108,14 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   [v5 compatibility CSS](/getting-started/install/#v5-compatibility-css).
 
 - **`$enable-deprecated-classes` and `$enable-deprecated-form-check` are gone.**
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   A separate stylesheet answers the question both flags existed for, without a
   recompile: `false` is now "do not load `coreui-legacy.css`". Sass builds that
   set either flag fail with an unknown-variable error — delete the line.
 
 ### Browser support
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 **The minimum supported browsers are now Chrome 123, Edge 123, Firefox 129,
 Safari 18 and iOS 18.** Safari 18 is set by `color-mix()`: a mix in `oklch` with
@@ -173,7 +173,7 @@ the **emitted** declarations, so the shipped types cannot drift from the code.
 
 #### The `js/src` sources ship as TypeScript
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The package used to ship `js/src/**/*.js`; it now ships `js/src/**/*.ts`. The
 documented per-plugin path is unaffected — **`js/dist/*.js` still ships,
@@ -203,7 +203,7 @@ next to `js/dist/alert.d.mts`.
 
 #### `js/index.esm.js` and `js/index.umd.js` are no longer published
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 These two files are the bundler's entry points, and they import the sources —
 which are now TypeScript, so the files could not resolve for a consumer anyway.
@@ -219,7 +219,7 @@ or, if you are already resolving the package by name, `import { Tooltip } from
 
 #### Unused date helpers are gone from `js/dist/util`
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The `util` modules are internal, but the package exports every file under `js/dist`, so a deep import could reach them. These helpers are no longer exported: `js/dist/util/date-range-picker.js` as a whole, `getFirstAvailableDateInRange`, `getSelectableDates`, `createDateFromMonth`, `createDateFromWeek` and `createDateFromYear` from `util/calendar.js`, `getDateSections` from `util/date-sections.js` (now `getSectionLayout`), and `convertTimeToDate`, `formatTimePartials`, `getAmPm`, `isValidTime` and `shouldUseTwoDigitHour` from `util/time.js`. Most had no reader in the library and are gone; `createDateFromYear`, `formatTimePartials` and `shouldUseTwoDigitHour` stay as module internals. Pass dates to the components in the formats their options take (`startDate: '2026W03'` with `selectionType: 'week'`), or keep a copy of the helper in your code. The nine per-unit comparisons of `util/calendar.js`, `isMonthDisabled`, `isMonthInRange`, `isMonthSelected` and their `isQuarter…` and `isYear…` counterparts, are three functions that take the calendar view as the second argument: `isPeriodDisabled(date, 'months', min, max, disabledDates)`, `isPeriodInRange(date, 'quarters', start, end)` and `isPeriodSelected(date, 'years', start, end)`.
 
@@ -327,7 +327,7 @@ finished, not whether the state changed.
 
 #### Live changes go through setters, not `update(config)`
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `update()` meant two different things. On Combobox, List box, Transfer, Menu,
 Progress, Range, Tooltip and Popup it takes no argument and recomputes from what
@@ -396,7 +396,7 @@ rather than reconfiguring the component.
 
 #### A getter says what it returns
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `getSelected()` returned three different things. List box gave the selected
 values, Chip Set gave the selected **elements** while `getSelectedValues()` sat
@@ -433,7 +433,7 @@ Transfer still takes `'source'` or `'target'`, the argument its
 
 #### The button that opens a panel is `pickerIcon`
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `indicator` named two unrelated things. On Autocomplete it was a boolean that
 showed the button opening the options menu; on List box, Combobox and Transfer
@@ -478,7 +478,7 @@ which eight components use for three different jobs.
 
 #### The "N selected" text is one option, and it can be a function
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 Four components rendered the same sentence under three option names and two
 shapes: Combobox substituted `{count}` into `selectedText`, List box and
@@ -518,7 +518,7 @@ ignores it, so one function can serve all four.
 
 #### One selection event, one payload key
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 Seven components told you the selection had changed, under two event names and
 four payload keys. Autocomplete and Multi Select fired `changed`, everyone else
@@ -600,17 +600,17 @@ announces its toasts through it. See
 
 #### Accordion on the native `<details>`
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The accordion renders on the native `<details>`/`<summary>` elements now.**
   `.accordion-item` goes on a `<details>` element and `.accordion-header` on its
   `<summary>`; the browser opens and closes the panel, so the component needs no
   initialization and works on markup added after load.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.accordion-button`, `.accordion-collapse` and `.collapsed` are gone.** The
   trigger is the `<summary>` itself and the panel is the element's own content,
   revealed through `::details-content`. Style the open state with
   `.accordion-item[open] > .accordion-header` instead of `:not(.collapsed)`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Grouping moves from `data-coreui-parent` to the `name` attribute.** Give the
   `<details>` elements of one accordion the same `name` to keep a single item
   open at a time; omit it for an always-open accordion. The `id` plumbing
@@ -627,14 +627,14 @@ announces its toasts through it. See
   the same animation in Firefox and Safari; that part of it goes away, without a
   breaking change, once they ship `calc-size()`. The component's events and
   methods do not depend on it and stay either way.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The accordion's events replace Collapse's.** `shown`/`hidden.coreui.accordion`
   fire on the `.accordion-item` whenever its open state changes, mirroring the
   native `toggle` event but bubbling, so they can be delegated. There is no
   `show`/`hide` counterpart: `<details>` has no cancelable event before the
   state change, so an item is kept shut by cancelling the click on its
   `<summary>` instead of by preventing an event.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The plugin replaces Collapse's, and it is instantiated on the `.accordion`
   container, not on a panel.** Where v5 called
   `Collapse.getOrCreateInstance(panel).show()`, v6 calls
@@ -660,7 +660,7 @@ announces its toasts through it. See
   `.accordion-icon-active` does the same in markup — that is what a plus/minus
   accordion needs, where the icon is swapped rather than rotated. The default
   chevron and its rotation are unchanged when neither is used.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The open item is neutral, and `.theme-{color}` is what tints it.**
   `--cui-accordion-active-bg` and `--cui-accordion-active-color` were fixed to
   `--cui-primary-bg-subtle` / `--cui-primary-fg-emphasis`, so every accordion
@@ -669,7 +669,7 @@ announces its toasts through it. See
   through `--cui-theme-fg` / `-bg-subtle` / `-border` first — so the colour is a
   decision you make per accordion instead of one baked into the component. To
   keep the old look, put `.theme-primary` on the `.accordion`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-accordion-inner-border-radius` is gone; the header's corners follow
   `--cui-accordion-border-radius`.** The token was computed from the global
   `--cui-border-radius` when the stylesheet was built, so setting
@@ -679,7 +679,7 @@ announces its toasts through it. See
   — so one token now shapes the whole item. Defaults render as before; drop any
   override of the removed variable.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The header tokens are named after the header.** The summary is not a
   button any more, so `--cui-accordion-btn-*` is `--cui-accordion-header-*`
   (`-color`, `-bg`, `-icon`, `-active-icon`, `-icon-width`, `-icon-color`,
@@ -698,7 +698,7 @@ announces its toasts through it. See
 
 #### Breadcrumb
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The breadcrumb has no bottom margin.** `.breadcrumb` sat on
   `margin-bottom: 1rem` through `$breadcrumb-margin-bottom` and
   `--cui-breadcrumb-margin-bottom`; both are gone and the list ends where its
@@ -755,7 +755,7 @@ announces its toasts through it. See
   an avatar; they just no longer have to.
 - **New: `.avatar-subtle`**, a tinted avatar that keeps the theme colour in the
   letters rather than behind them.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **One size token replaces the width/height pair.** `--cui-avatar-width` and
   `--cui-avatar-height` always carried the same value, in the base and in all
   four size classes, so setting a size meant writing it twice. They become
@@ -772,15 +772,15 @@ announces its toasts through it. See
   `$avatar-size` / `$avatar-status-size` plus `$avatar-font-size-ratio`, and
   `$avatar-sizes` keys drop to `size` and an optional `status-size`. The
   `$avatar-widths` map, deprecated since 5.1.0, is gone.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.avatar-img` fills the avatar and crops instead of stretching.** It was
   `height: auto`, which deformed every image that was not square; it is now
   `height: 100%` with `object-fit: cover`. Square images look the same.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The status indicator's ring follows the theme.** It was `1px solid $white`,
   a hardcoded white that read as a mistake in dark mode. It now comes from
   `--cui-avatar-status-border-color`, defaulting to the body background.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A stacked avatar lifts on hover instead of pushing its neighbours.** The
   hover changed `margin-inline-end`, which moved every avatar after it; it now
   uses `transform`, so nothing else shifts. `$avatar-transition` changes from
@@ -800,13 +800,13 @@ announces its toasts through it. See
 
 #### Alert
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **An alert without a theme class carries its own surface.** `--cui-alert-bg`
   falls back to `var(--cui-bg-1)` instead of `transparent`, so a plain
   `.alert` no longer takes the color of whatever it sits on. Set
   `--cui-alert-bg: transparent` on the alert to restore the old rendering.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The alert lays its children out in a row.** It is `display: flex` with
   `align-items: start` and `--cui-alert-gap` between children, so an icon next
   to a label needs no `d-flex` and no spacing utility. Text mixed with inline
@@ -823,7 +823,7 @@ announces its toasts through it. See
   </div>
   ```
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A solid alert is `.alert-solid`, not a pile of utilities.** The docs used to
   say to drop the contextual class and reach for `bg-{color}` plus a `text-*`
   class picked by hand — and the examples hard-coded `text-white`, which fails
@@ -858,12 +858,12 @@ announces its toasts through it. See
   border you recoloured follows it. A variant such as `.alert-solid` paints its
   border with the surface colour, so there the separator takes the theme's
   border colour, or the text colour without one.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-alert-border` is gone.** The border is written in the rule from
   `--cui-alert-border-width` and the border colour, so that a `.theme-*` class
   can colour it. Set `--cui-alert-border-width` and `--cui-alert-border-color`
   instead, and `border-style` on the alert for a dashed or dotted line.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$alert-dismissible-padding-r` is gone; the space for the close button
   follows `--cui-alert-padding-x`.** The variable was multiplied out in Sass
   when the stylesheet was built, so raising `--cui-alert-padding-x` widened
@@ -877,7 +877,7 @@ announces its toasts through it. See
 
 #### The close button is masked, not filtered
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `.btn-close` used to paint a black glyph baked into its SVG and recolour it for
 dark mode with a filter. The colour now comes from the element, the way the
@@ -896,7 +896,7 @@ check, radio, carousel and toggler icons already work:
 - **`$btn-close-color` defaults to `inherit`**, so the glyph follows the surface
   it sits on. A close button inside a themed alert or a dark toast no longer
   needs a rule of its own to stay legible.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.btn-close-white` is gone**, deprecated since v5.0.0, and so is the
   dark-mode rule that forced the glyph white. Both restated what the inherited
   colour already produces on a surface that paints its own text — a
@@ -905,13 +905,13 @@ check, radio, carousel and toggler icons already work:
   renders identically without it. The rule additionally got the mirror case
   wrong: a `data-coreui-theme="light"` section inside a dark page inherited the
   forced white and drew a white icon on white.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-btn-close-width` and `-height` become `--cui-btn-close-icon-size`.**
   The glyph is square, so one variable sizes it; the padding keeps both axes
   (`--cui-btn-close-padding-y`, `-padding-x`). Nothing changes on screen: the
   glyph is still `1em` inside `.25em` of padding, so the pointer target stays
   24px at the default font size — the WCAG 2.2 minimum.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-btn-close-bg` is `--cui-btn-close-icon`** (`$btn-close-bg` →
   `$btn-close-icon`). It stopped being a background when the glyph moved to a
   mask; the name had been describing the old implementation.
@@ -920,7 +920,7 @@ check, radio, carousel and toggler icons already work:
 
 #### Badge
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Colour comes from `.theme-*`, and `.badge-*` now names the variant.** A bare
   `.badge` used to be white text with no background of its own, so it was
   invisible until a `.text-bg-*` utility supplied both. It renders neutral on
@@ -960,7 +960,7 @@ check, radio, carousel and toggler icons already work:
 
 #### Carousel slides by scrolling
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The engine is native CSS scroll snapping, not transforms.** The track
   (`.carousel-inner`) is a scroll container: dragging, swiping and momentum
   come from the browser, and programmatic jumps animate the scroll position
@@ -972,7 +972,7 @@ check, radio, carousel and toggler icons already work:
   it any more. The markup skeleton (indicators + inner with items +
   controls) is unchanged, and the controls, indicators and captions keep
   their overlaid layout.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`ride` is `autoplay`, `wrap` is `ends`, and `touch` is gone.**
   `data-coreui-autoplay="true"` (boolean — the `"carousel"` spelling is gone)
   cycles from page load; `ends` takes `"loop"` (default — continues
@@ -989,7 +989,7 @@ check, radio, carousel and toggler icons already work:
   and `.carousel-control-play-icon`) toggles autoplay and swaps its
   `aria-label` between `data-coreui-pause-label` and
   `data-coreui-play-label`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.carousel-dark`, the `carousel-dark()` mixin and `$carousel-dark-*` are
   gone.** The chrome colours are `light-dark()` pairs resolved on the
   carousel itself, so the standard `data-coreui-theme="dark"` attribute is
@@ -1006,7 +1006,7 @@ check, radio, carousel and toggler icons already work:
 
 #### Autocomplete and Multi Select share one options menu
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The generated options dropdown now uses unified `combobox-*` classes** in
   both components: `combobox-popup`, `combobox-options`, `combobox-option`
   (+`-with-checkbox`), `combobox-optgroup(-label)`, `combobox-options-empty`,
@@ -1020,7 +1020,7 @@ check, radio, carousel and toggler icons already work:
   markup is generated by the plugins (authors don't write it), so only custom
   CSS targeting the dropdown internals needs updating. The field/selection
   markup of both components is unchanged.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The options list is now a [List box](/components/list-box/) instance, so
   the `combobox-*` option classes are gone.** `.combobox-popup` stays as the
   panel; everything inside it is List box markup:
@@ -1045,19 +1045,19 @@ check, radio, carousel and toggler icons already work:
   `--cui-combobox-popup-min-width` is left on `.combobox-popup`. Option
   padding follows the List box (`.5rem .75rem`, indicator in its own grid
   column) rather than the wider `1.25rem` the combobox surface used.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Multi Select's `selectAllStyle` and `optionsGroupsStyle` are removed.**
   A list has one marker, and `indicator` decides it for the options, the
   selectable group labels and the select all button alike. Replace
   `selectAllStyle: 'text'` / `optionsGroupsStyle: 'text'` with
   `indicator: 'none'` when you want the whole list without checkboxes.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Autocomplete keeps the focus in its input while the options list is
   open.** Options take no `tabindex` and are never focused; the input carries
   `aria-activedescendant`, and the arrows, <kbd>Enter</kbd> and
   <kbd>Space</kbd> are handled there, so <kbd>Home</kbd>, <kbd>End</kbd> and
   the space bar keep working as text keys.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Multi Select opens a dialog instead.** The panel is
   `role="dialog"` named by the control, and the focus moves into it: onto the
   search box when `search` is on, otherwise onto the option the list points
@@ -1069,7 +1069,7 @@ check, radio, carousel and toggler icons already work:
   header, reachable with <kbd>Tab</kbd>, and carries `aria-pressed`
   (`true`/`false`/`mixed`); selectable group labels are in the arrow order in
   its place.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Multi Select's `search` takes `true`, `false` or `'external'`, and `search: 'global'` is gone.**
   Typing reaches the search box from anywhere in the component by default,
   which is what `'global'` used to turn on, so `data-coreui-search="global"`
@@ -1077,7 +1077,7 @@ check, radio, carousel and toggler icons already work:
   typing local: the search box then filters only while it has the focus, and
   a keystroke over the options list jumps to the first option starting with
   it. Any other string throws a `TypeError`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Multi Select's `value` wins over options marked `selected`.** It used to
   add to them, in the markup and in `options`, and later options applied the
   start value again; now a given `value` is the
@@ -1100,7 +1100,7 @@ check, radio, carousel and toggler icons already work:
   or one whose options `setOptions()` replaced, used to keep
   the generated options; an empty `<select>` given `options` is empty again
   after `dispose()`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Multi Select sends one `change.coreui.multi-select` per change of the
   selection.** The clear button, `deselectAll()`, `selectAll()` and a pick
   that replaces the value of a single select used to send one event for every
@@ -1112,7 +1112,7 @@ check, radio, carousel and toggler icons already work:
   `value` that options from `setOptions()` bring later, and a native reset of
   the form that changes the selection sends one, as Autocomplete, Chip Input
   and Combobox do.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Form controls fire their change event once per change of the value, on a
   form reset as well, and never from a value the page gives.** OTP Input's
   `change.coreui.otp-input`, Rating's
@@ -1135,7 +1135,7 @@ check, radio, carousel and toggler icons already work:
   selection is empty holds its `value=""` placeholder option, or none, instead
   of letting the browser fall back to the first option, so the form gets no
   option the control does not show.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Autocomplete's `search` takes only `'external'`, and global typing is
   `globalSearch`, on by default.** The array and the comma list are gone, so
   `search: ['external', 'global']` and `data-coreui-search="external, global"`
@@ -1154,7 +1154,7 @@ check, radio, carousel and toggler icons already work:
   rather than only opening the panel. With
   `search: 'external'` the panel opens for the options you set even when they
   do not contain the typed text.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Autocomplete's typeahead hint no longer reaches the server.** With
   `showHints` on, the hint input behind the field carried a `name` and, being
   readonly rather than disabled, was serialized with the form: the configured
@@ -1164,7 +1164,7 @@ check, radio, carousel and toggler icons already work:
   `new FormData(form).getAll(name)` returns one entry and `form.elements[name]`
   is an input rather than a `RadioNodeList`. Code written around the old shape,
   such as reading `getAll(name)[1]`, needs the plain value.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Multi Select's search field no longer reaches the server.** The input that
   filters the options carried a `name` and is a plain text input, so every form
   holding a Multi Select submitted whatever the user had typed to narrow the
@@ -1172,17 +1172,17 @@ check, radio, carousel and toggler icons already work:
   not. It carries no `name` now, the `search-…` key is gone from the payload,
   and the input sets `autocomplete="off"` so the browser stops offering to fill
   it.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **An unnamed Multi Select stays out of the form.** A `<select>` the page had
   not named was given `name="<uid>"`, so its value was submitted under a key
   nobody chose. The attribute is written only when there is a name, from the
   option or from the element. `dispose()` also takes back the `id` and the
   `name` the component added, where it used to leave both behind.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **An unnamed Autocomplete stays out of the form too.** Its input took a
   generated `name` when the option was not set, so a form carried a key nobody
   chose. It does not now. The generated `id` is unaffected.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Validation state comes from `validationState`.** `invalid` and `valid` are
   deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
   `validationState` also takes a state from `$form-validation-states`. A given
@@ -1214,7 +1214,7 @@ check, radio, carousel and toggler icons already work:
   Menu's engine underneath. Where their options overlap, Dropdown also
   understands Menu's additions (for example `container`). **Deprecation
   notice: Dropdown may be removed in v7** — prefer Menu for new work.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The responsive alignment classes `.dropdown-menu{-sm|-md|-lg|-xl|-2xl}{-start|-end}`
   moved to `coreui-legacy.css`, and `.dropup`/`.dropend`/`.dropstart` no longer
   carry the menu's static position.** Alignment that changes with the viewport
@@ -1267,13 +1267,13 @@ check, radio, carousel and toggler icons already work:
 
 #### Modal and Offcanvas on the native `<dialog>`
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Both components render on the native `<dialog>` element now**, opened with
   `showModal()`/`show()` and closed with `close()`. The browser provides the
   top layer (no `z-index` management), the `::backdrop`, focus trapping,
   background inertness and the dialog ARIA semantics — the markup drops
   `role`, `aria-modal`, `aria-hidden` and `tabindex="-1"`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The modal wrapper layers are gone.** `.modal > .modal-dialog >
   .modal-content` flattens to a single `<dialog class="modal">` holding
   `.modal-header`/`.modal-body`/`.modal-footer` directly. Size
@@ -1290,19 +1290,19 @@ check, radio, carousel and toggler icons already work:
   working (our events bubble through it). Selectors and custom CSS targeting
   `.modal-dialog`/`.modal-content` are the one thing that cannot be preserved.
   **This transitional layer will be removed in v7.**
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.modal-backdrop` and `.offcanvas-backdrop` are gone** — the backdrop is
   the native `::backdrop` pseudo-element. Style it through the new
   `--cui-modal-backdrop-bg`/`--cui-modal-backdrop-opacity` and
   `--cui-offcanvas-backdrop-*` tokens. `$zindex-modal-backdrop` and
   `$zindex-offcanvas-backdrop` are removed.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Animation opt-in is inverted.** Modals animate by default; `.fade` is gone
   and `.modal-instant` / `.offcanvas-instant` disable animation instead. The
   auto-upgrade maps a missing `.fade` to `.modal-instant`. The offcanvas
   `.showing` state class is replaced by the native `[open]` attribute
   (`.hiding` remains for the exit transition).
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The Modal `focus` option is removed** — the native dialog always traps
   focus. `handleUpdate()` remains as a no-op for API compatibility; the
   scrollbar-compensation logic it triggered no longer exists (scroll lock is
@@ -1397,7 +1397,7 @@ removed in favour of `$translucent-opacity` and
   `minDate` later than the first day of its row disabled that row, and with
   Tuesday to Thursday first a `maxDate` of `2026W36` disabled the row of week
   36.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`cellHover` is gone.** It reported the date under the pointer or the focus
   for the hover preview in the date picker's field, which v6 no longer draws.
   To follow the pointer or the focus over a calendar, listen for `mouseover`
@@ -1406,18 +1406,18 @@ removed in favour of `$translucent-opacity` and
   `toDateString()` form, and a week row carries it on the day cells it shows.
   Unlike the event, the listeners also see cells that cannot be picked, and
   only `mouseout` or `focusout` tells that the pointer or the focus left.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`selectAdjacementDays` and `showAdjacementDays` are spelled `selectAdjacentDays`
   and `showAdjacentDays`** — the option keys, the `data-coreui-select-adjacent-days`
   / `data-coreui-show-adjacent-days` attributes and the picker passthrough alike. The
   typo is fixed in the React and Vue libraries in the same release.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`update(config)` is gone; the dates change through `setStartDate()`,
   `setEndDate()` and `setCalendarDate()`**, and the other options are fixed once
   the calendar starts. A call like `update({ startDate })` used to reset every
   other option (`range`, `calendars`, `locale`, …). See
   [Live changes go through setters, not `update(config)`](#live-changes-go-through-setters-not-updateconfig).
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Each grid is one tab stop, and `tabindex` no longer marks a selectable cell.**
   The arrows, `Home`, `End` and the page keys move within a calendar and Tab
   leaves it, which is what `role="grid"` promises. Every cell inside `minDate` /
@@ -1429,12 +1429,12 @@ removed in favour of `$translucent-opacity` and
   `tabindex="0"` sits on one cell per grid, so a two-month range picker keeps a
   stop in each month that reaches into the limits. Custom CSS or scripts that reached for
   `.calendar-cell[tabindex="0"]` need `.calendar-cell[data-coreui-selectable]`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Day cells write `data-coreui-date` in the `toDateString()` form**
   (`"Thu Sep 17 2026"`), like the month, quarter and year cells, instead of the
   full `Date#toString()` value. A script that selected a day cell with
   `[data-coreui-date="${date}"]` needs `[data-coreui-date="${date.toDateString()}"]`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Picking a date no longer fires `calendarDateChange` and keeps the month on
   screen.** A picked day of an adjacent month (`selectAdjacentDays`) used to
   become the calendar date while the grid stayed put, so the next-month button
@@ -1464,7 +1464,7 @@ removed in favour of `$translucent-opacity` and
   header was empty. Each week number is named the same way with its number
   (`Week 36`), and the new `ariaWeekNumberLabel` option takes a function of
   the week number to name it yourself.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The years view names its double arrows with new `ariaNavNextYearsLabel` /
   `ariaNavPrevYearsLabel` options** (`'Next 12 years'` / `'Previous 12 years'`)
   instead of the year labels, which stay on the days, months and quarters
@@ -1497,7 +1497,7 @@ removed in favour of `$translucent-opacity` and
   that share the Gregorian months, such as Thai Buddhist or Japanese, keep
   their year numbering in the calendar. The date field lays out and reads
   Gregorian numbers for every locale, without the locale's era.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A cell drawn by `renderDayCell` no longer gets an `aria-label`**, so its
   content is what a screen reader reads. Every render function receives the
   cell's full name as `meta.label` (`Wednesday, August 12, 2026`,
@@ -1553,7 +1553,7 @@ removed in favour of `$translucent-opacity` and
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
   a string for week (`"2026W27"`), month (`"2026-01"`), quarter (`"2026Q1"`) and
   year (`"2026"`). Existing listeners are unaffected.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`startDateChange` and `endDateChange` no longer report a date that stays
   empty.** Picking a day before the start of a range, or an end across a
   disabled day, used to fire `endDateChange` with `null` although no end had
@@ -1571,7 +1571,7 @@ removed in favour of `$translucent-opacity` and
 
 #### Date Picker / Date Range Picker
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 **The pickers are rewritten.** `DatePicker`, `DateRangePicker` and `TimePicker`
 are now a composition of the section-based input fields
@@ -1668,7 +1668,7 @@ behaviour, v5 is the reference. Mapping:
 
 #### The pickers take their validation state from `validationState`
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `invalid` and `valid` on `DatePicker`, `DateRangePicker` and `TimePicker` are
 deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
@@ -1694,7 +1694,7 @@ inside the picker element and it uses them instead of generating its own —
 a trigger can be a regular button with text, the icons can be plain `<svg>`
 in the HTML. Nothing changes for the bare `<div data-coreui-date-picker>`.
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 `aria-expanded` moved from the picker's root element to the toggle button,
 where it describes the control that opens the calendar; the toggle also
 carries `aria-controls` and `aria-haspopup="dialog"`. Styles keyed to the
@@ -1702,7 +1702,7 @@ root's `.show` class are unaffected.
 
 #### The date range picker is built on the date range input
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The range picker no longer builds its two fields itself: it composes the new
 [date range input](/forms/date-range-input/), which owns both dates, their
@@ -1727,7 +1727,7 @@ validation and the arrow between them. Two consequences:
 
 #### Picker events can be cancelled, and `dateChange` has one shape
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`dateChange` / `startDateChange` / `endDateChange` on the Date Picker and
   Date Range Picker carry the same payload whichever way the date arrived.**
   `event.date` is the validated `Date` (or `null`) the field holds, and
@@ -1741,7 +1741,7 @@ validation and the arrow between them. Two consequences:
   + const date = event.date
   ```
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The pickers emit their change events only when the value changes.** A
   pick of the value already selected, and `clear()` or `reset()` when the
   picker already holds that value, no longer fire `dateChange`,
@@ -1775,7 +1775,7 @@ validation and the arrow between them. Two consequences:
   right-to-left; the direction is read from the element's computed style
   instead of `document.documentElement.dir`, so a `dir="rtl"` ancestor works
   and not only a document-level direction.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A required field blocks the form.** The value moved from an
   `<input type="hidden">`, which the browser leaves out of validation, to a
   `<textarea>` laid invisibly over the field, with `tabindex="-1"` and
@@ -1791,7 +1791,7 @@ validation and the arrow between them. Two consequences:
 
 #### Time Picker
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The `roll` infix is gone from the class and token names.** It marked which
   of two renderings a body used, and the time picker has one now, so
   `.time-picker-roll-col` and `.time-picker-roll-cell` are `.time-picker-col`
@@ -1809,7 +1809,7 @@ validation and the arrow between them. Two consequences:
   the value is complete only once the seconds are typed, the same as every other
   section of the field.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`hours` is 0 to 23 in every locale.** v5 read the list and the filter in the
   column's cycle, so on a locale whose v5 columns were 12-hour (the ones that
   write AM and PM in Latin letters, such as `en-US`) `hours: [1, 3, 5, 7]` meant
@@ -1839,7 +1839,7 @@ validation and the arrow between them. Two consequences:
   the v5 areas once more, so `.date-picker-timepickers` spans the calendars it
   belongs to, with its clock icon back as an inline SVG that takes its colour
   from `--cui-date-picker-time-icon-color`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The date picker's time controls carry its own name.** `.time-picker-inline-icon`
   and `.time-picker-inline-select` are `.date-picker-time-icon` and
   `.date-picker-time-select`, with `--cui-date-picker-time-icon-*` and
@@ -1874,7 +1874,7 @@ validation and the arrow between them. Two consequences:
 
 #### The v1 picker shell classes are gone
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The rewritten pickers style the field through
 `forms/_form-date-time.scss` and render their icons as inline SVG, so the v1
@@ -1888,7 +1888,7 @@ the new structure; everything else (`.date-picker`, `.date-picker-popup`,
 
 #### The picker panel is `.date-picker-popup` / `.time-picker-popup`
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `-dropdown` was the vocabulary of the per-family panels, and every other family
 lost it when the options menu became `.combobox-popup`. The pickers were the
@@ -1932,7 +1932,7 @@ declaration.
   + <select class="form-control form-control-lg">
   ```
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The `$form-select-*` Sass variables are gone**, along with
   `scss/forms/_form-select.scss`. Most were pass-throughs to `$input-*` /
   `--cui-btn-input-*` and their `.form-control` equivalents apply
@@ -1941,7 +1941,7 @@ declaration.
   `--cui-control-select-bg-img`, `-bg-position`, `-bg-size`,
   `-indicator-padding` → `--cui-control-select-padding-end`, and the
   `-feedback-icon-*` pair.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The chevron is translucent, and its color is no longer a Sass variable.**
   `$form-control-select-indicator-color` and its dark counterpart are gone; the
   SVG carries `#00000080` and `#ffffff80`, and the control declares both images
@@ -1963,7 +1963,7 @@ declaration.
 
 #### Form labels carry their own weight
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.form-label` and `.col-form-label` render medium and full-contrast by
   default.** `$form-label-font-weight` is `var(--cui-font-weight-medium)`
   (was `null` — labels inherited the surrounding weight) and
@@ -1974,7 +1974,7 @@ declaration.
 
 #### Validation: `data-coreui-validate` replaces `.was-validated`
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 Client-side validation no longer uses `.was-validated` or the bare `:valid` /
 `:invalid` pseudo-classes. Add `data-coreui-validate` to the `<form>` instead:
 the styles ride the `:user-invalid` pseudo-class, so feedback appears only
@@ -2028,7 +2028,7 @@ per step instead of twice.
 
 #### Form components share one validation state
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 The multi select, the chip input, the combobox, the OTP input, the date and
 time fields, the pickers and the autocomplete take and show their validation
 state the same way, described under
@@ -2064,7 +2064,7 @@ same as in React and Vue. Call `next()` to move forward.
 
 #### Stepper: the active indicator's background follows the theme
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `--cui-stepper-step-indicator-active-bg` is removed. The active step's
 indicator background is a 5% tint mixed on the step from the theme colour, or
@@ -2075,7 +2075,7 @@ and border. To give the active indicator another background, set
 
 #### Input group: `.has-validation` removed
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 `.has-validation` is gone. It existed so a group could keep its corner logic
 with a `-feedback` element sitting inside it as the last child — in v6 the
 feedback lives **outside** the group: wrap the group in a
@@ -2101,7 +2101,7 @@ should move it out.
 
 #### Input group: one frame class instead of five
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `.input-group` squared off the frame of a field component by naming each
 family's wrapper — `.autocomplete-input-group`, `.date-picker-input-group`,
@@ -2137,7 +2137,7 @@ now loses to the group instead; give it a layer of its own if you need it back.
 
 #### Chip Input is submitted only once you name it
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The hidden input that carries the chips took a generated `name` when the option
 was not set, so a form carried a key nobody chose. It is named only when you
@@ -2146,7 +2146,7 @@ ask for one, and the option table no longer lists the name as auto-generated.
 
 #### Chip Input carries its chips in a `<textarea>`
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The chips travel in a hidden `<textarea>` instead of an `<input type="hidden">`,
 because the browser leaves a hidden input out of validation. The submitted value
@@ -2160,7 +2160,7 @@ field. See [Validation](/forms/chip-input/#validation).
 
 #### Chip Input takes the frame class itself
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 ```diff
 - <div class="form-control-group chip-input" data-coreui-chip-input>
@@ -2238,7 +2238,7 @@ submit.
 
 #### Password Input and Number Input build their own frame
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 Both components supply their own buttons, so they supply the frame that lays
 them out. The markup is a plain form control carrying the toggle:
@@ -2269,7 +2269,7 @@ them out. The markup is a plain form control carrying the toggle:
 
 #### Password Input: the toggle icon comes from JavaScript
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The toggle button carried `<span class="form-password-action-icon"></span>`,
 and CSS painted it as a mask that swapped through a sibling selector. The
@@ -2341,7 +2341,7 @@ can be hidden once the field is enabled again.
 
 #### Date and time fields are submitted only once you name them
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 Date Input and Time Input took an `id` written on the host as
 permission to submit, naming their hidden input `<component>-<id>` when no
@@ -2362,7 +2362,7 @@ field behind that kept submitting.
 - **Changed.** **A pressed thumb takes `--cui-primary-bg-muted`**, the theme's
   `bg-muted` under a `.theme-*` class, instead of a 30% tint of the primary
   colour (`$form-range-thumb-active-bg`).
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A Range Slider handle with no name of its own is no longer submitted.** An
   array of names shorter than the handle count gave the leftover handles the
   literal name `undefined`, so a form carried an `undefined=` key. Those handles
@@ -2389,7 +2389,7 @@ field behind that kept submitting.
 - **Validation reaches the range.** `.is-invalid`/`.is-valid` on the input
   (either form) colour the thumb and its focus ring with the state, and a
   feedback element after the wrapper toggles through `:has()`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The range slider renders the markup of the range.** It builds
   `<div class="form-range">` inside its element, with one native
   `.form-range-input` per handle, so it looks like a range and reads its
@@ -2413,7 +2413,7 @@ field behind that kept submitting.
   declared on that inner `.form-range`, so a `--cui-range-*` token set on the
   slider element itself (inline, or by a class on it) no longer reaches the
   handles: target its `.form-range` (`.my-slider .form-range { … }`).
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The range slider's `ariaLabels` option is `ariaLabel`.** It takes an
   array with one name per handle, as before, a comma-separated string, or a
   function `(index, total) => string`, the shape the OTP input uses for its
@@ -2425,7 +2425,7 @@ field behind that kept submitting.
   ("Minimum value"); a single handle takes the name of the group, followed by
   its `ariaLabel` when it has one. `aria-describedby` moves onto every handle.
   A `role` written on the element is replaced with `group`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The range slider takes a validation state.** The new `validationState`
   option, or `.is-invalid`/`.is-valid` on the slider element read once when it
   starts, shows on the element and on the handles, and a given `'invalid'`
@@ -2440,7 +2440,7 @@ field behind that kept submitting.
   numbers; a form reset restores the configured values instead of the middle of
   the range; `setValue()` and `dispose()` touch only what the slider built, so
   content of the element stays.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The range slider's handles and track read the range's tokens.** The
   `--cui-range-slider-thumb-*` and `--cui-range-slider-track-*` families are
   gone; the slider's `.form-range` declares the `--cui-range-*` family
@@ -2462,7 +2462,7 @@ field behind that kept submitting.
   the tick label padding has no counterpart. The filled band keeps its half-strength mix of the theme colour, now
   shared with the range's fill, and a disabled slider greys the band through
   the theme slot on the track.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The range slider's `labels` option is `ticks`.** Every entry draws a tick
   mark, with or without text, so the option and everything around it carry the
   name the `Range` plugin uses: `labels` → `ticks`, `clickableLabels` →
@@ -2485,7 +2485,7 @@ field behind that kept submitting.
 - **A theme beats `--cui-range-thumb-bg`, as everywhere else.** The token carried
   the `--cui-theme-*` slot inside its own default, so setting it inside a themed
   container dropped the theme. The slot sits on the property now.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The value bubble is a tooltip.** The plugin renders
   `<div class="form-range-tooltip tooltip bs-tooltip-top">` (vertical:
   `bs-tooltip-start`, or `bs-tooltip-end` in a right-to-left page) with
@@ -2501,7 +2501,7 @@ field behind that kept submitting.
   `--cui-tooltip-bg: var(--cui-bg-4)` and `--cui-tooltip-color: var(--cui-fg-body)`
   on `.light-tip`.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The pressed thumb adapts to the color mode.** Its color was 70% white
   mixed into the theme color at build time, so in dark mode the pressed
   thumb flashed a near-white pastel. It now mixes toward `--cui-body-bg` at
@@ -2523,14 +2523,14 @@ field behind that kept submitting.
   `color-mix(in srgb, var(--cui-fg-body) 10%, transparent)` now — a tint that
   works on any surface and can be retuned in the browser. Slightly stronger
   than before on a light sidebar, slightly weaker on a dark one.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-tertiary-bg-translucent` is gone from `:root`.** The sidebar was
   its only reader. Set `--cui-sidebar-nav-link-hover-bg` /
   `-active-bg` on `.sidebar-nav` for a different tint.
 - **Theme variants.** `.sidebar.theme-{color}` paints the surface, text,
   icons and the hover/active links from that colour's slots. `.sidebar-light`
   joins `.sidebar-dark` as the scheme switch.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.sidebar-body` and `.sidebar-form` are removed.** Neither carried
   styles beyond the sidebar's own padding. `.sidebar-self-hiding-*` had already
   gone in v6 — a sidebar that hides itself below a breakpoint is `hide()` from
@@ -2548,7 +2548,7 @@ field behind that kept submitting.
 
 #### ScrollSpy
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The active link is chosen by an activation line, not by scroll
   direction.** The plugin used to compare each section's offset with the
   previous scroll position, so the same scroll offset could highlight a
@@ -2562,7 +2562,7 @@ field behind that kept submitting.
 - **New option `topMargin`** (default `12%`) places the activation line; it
   takes a percentage of the container's height or a pixel value (`96px`).
   A pixel line is recomputed on resize.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`rootMargin` defaults to `null` and is now the raw override.** Set it and
   it is handed to the `IntersectionObserver` unchanged, taking precedence over
   `topMargin`; a v5 configuration such as `rootMargin: '0px 0px -25%'` keeps
@@ -2571,14 +2571,14 @@ field behind that kept submitting.
   whether it crosses it.
 - **`smoothScroll` finishes the navigation.** Once the scroll settles, the
   URL hash is replaced with the link's target and focus moves to the section.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The deprecated `offset` option is removed** — it has been a thin alias
   since the IntersectionObserver rewrite. Use `topMargin` instead:
   `offset: 100` &rarr; `topMargin: '100px'`.
 
 #### Tab
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Constructing a Tab outside a tab-panel parent now throws a `TypeError`**
   instead of silently returning a half-initialized instance, matching upstream.
   The silent variant hid real markup mistakes: the instance existed but never
@@ -2591,7 +2591,7 @@ field behind that kept submitting.
   while `.tab-pane` in the same file already read the three-token form, so half
   the file could be retimed in the browser and half could not. Setting
   `--cui-nav-link-transition-duration` now takes effect; before it was ignored.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.nav-link` is a flex row, and it fills on hover and when active.** The link
   lays its children out with `--cui-nav-link-gap`, `--cui-nav-link-align` and
   `--cui-nav-link-justify`, so an icon and its label line up without a wrapper.
@@ -2605,7 +2605,7 @@ field behind that kept submitting.
   and the two underline variants take neither fill, hover or active: they mark
   their state with a line, and a radius curves that line's ends while a fill says
   the same thing twice.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.nav-tabs` draws its line with an inset `box-shadow`, not a border.** The
   links no longer pull themselves over the container's border with a negative
   `margin-bottom`; each link carries its own bottom border (the line colour at
@@ -2629,7 +2629,7 @@ field behind that kept submitting.
   3.5&#8758;1). The surface and arrow keep the same translucent look; the text
   renders at full opacity. The token still works — override it and only the
   background alpha changes.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$tooltip-margin` and `--cui-tooltip-margin` are removed.** The variable
   had been `null` and deprecated since v4; the token compiled to an empty
   value and the `margin` declaration reading it never took effect. Position
@@ -2657,7 +2657,7 @@ field behind that kept submitting.
   the field, as a paste already was. Previously such a value stayed in one slot
   and the submitted value was empty. The slots also gained `enterkeyhint`,
   `autocorrect="off"` and `spellcheck="false"`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Only the hidden input carries the field's `name`.** Each visible slot was
   given `<name>-<index>` on top of it, so a six-slot field submitted seven
   keys where the option is documented as the name of the hidden input. The
@@ -2671,7 +2671,7 @@ field behind that kept submitting.
   and `ArrowRight` walks back freely. Previously the guard was attached to the
   key name, which let the caret jump ahead over empty slots in RTL and refused
   to walk back.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The code is validated as one value.** It moved from an
   `<input type="hidden">`, which the browser leaves out of validation, to a
   text input laid invisibly over the group, with `tabindex="-1"` and
@@ -2695,7 +2695,7 @@ field behind that kept submitting.
   again, and a native form reset puts back the
   code the field started with. A change of the code sends `input` and `change`
   from the input that holds the value.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The `readonly` option is removed, and every slot is editable.** A code the
   user cannot type has no use in a form, so `data-coreui-readonly`,
   `{ readonly: true }` and a `readonly` written on a slot no longer make it
@@ -2731,7 +2731,7 @@ field behind that kept submitting.
   `disable()` and `enable()` change their part in place; any option change
   through `update()` used to render the stars again and reset the rating to its
   initial value.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The rating takes a validation state.** The new `validationState` option,
   or `.is-invalid`/`.is-valid` on the rating element read once when it starts,
   colours the focus ring, and a given `'invalid'` sets
@@ -2748,7 +2748,7 @@ field behind that kept submitting.
 
 #### Search Button
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The shortcut handlers no longer create search button instances.** Every
   keydown, keyup and window blur anywhere on the page used to initialise each
   `[data-coreui-search-button]`, so `dispose()` lasted until the next key press.
@@ -2763,7 +2763,7 @@ field behind that kept submitting.
 
 #### Alert
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Every alert fades out when dismissed, and `.fade` no longer decides that.**
   The alert carries its own transition and
   `--cui-alert-transition-property` / `-duration` / `-timing`; the JavaScript
@@ -2782,7 +2782,7 @@ field behind that kept submitting.
 
 #### Chip / Chip set / Chip input
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span> **A chip starts selected only
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span> **A chip starts selected only
   from the `selected` option.** An `active` class in the markup no longer selects
   it; write `data-coreui-selected="true"` on the chip instead. The role,
   `tabindex` and `aria-*` a chip or a chip set writes come from its options too,
@@ -2831,7 +2831,7 @@ field behind that kept submitting.
   icon at 24px and its image at 20px — the reverse of the base sizes, where the
   image is the larger of the two. Large is now 24px image / 20px icon and small
   16px / 14px.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The selected chip's text follows the palette.** `$chip-active-color` was
   white at 87% opacity, computed at build time — repaint the selected
   background and the text stayed near-white. It defaults to
@@ -2844,7 +2844,7 @@ field behind that kept submitting.
 
 #### Collapse
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The `toggle` option is gone.** It made the constructor change the state the
   markup declares, which surprised people — so nearly every caller passed
   `toggle: false`. The constructor now always keeps the declared state; add
@@ -2859,7 +2859,7 @@ field behind that kept submitting.
   `new coreui.Collapse(el).toggle()`. `data-coreui-toggle` on a *trigger* is
   unrelated and unchanged.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Triggers no longer get the `.collapsed` class.** Their state was written
   twice, as the class and as `aria-expanded`, and only the second is required.
   Nothing in the stylesheet had matched the class since the accordion stopped
@@ -2878,7 +2878,7 @@ field behind that kept submitting.
   state follows what the reader sees. Off by default, and below Chrome 102 /
   Firefox 148 / Safari 26.2 it hides the content the way `hidden` always did.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The transition is set through CSS variables, and the Sass variables split
   in two.** `$transition-collapse` and `$transition-collapse-width` were
   shorthands carrying the property, the duration and the easing at once, which
@@ -2889,7 +2889,7 @@ field behind that kept submitting.
   also be changed per instance at runtime. `$transition-fade` splits the same
   way into `$transition-fade-duration` / `$transition-fade-timing`.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **CSS owns the collapse animation, and the class choreography follows.**
   Where `interpolate-size: allow-keywords` is supported the stylesheet
   interpolates the size to the `auto` of the open state on its own; elsewhere
@@ -2918,7 +2918,7 @@ field behind that kept submitting.
   missing attribute on `DOMContentLoaded`, reading the `.active` class to pick
   the value; an attribute you wrote yourself is left alone. Write it in your
   markup anyway, so the state is correct before our JavaScript runs.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.btn` is a flex container.** It lays its content out in a row, centres it
   on both axes and separates the parts with `--cui-btn-gap`, so an icon next to
   a label no longer depends on a whitespace text node in your markup — and no
@@ -2927,7 +2927,7 @@ field behind that kept submitting.
   CSS that positioned button content with `display`, `line-height` or margins
   needs a second look; the caret of a `.dropdown-toggle` now takes its distance
   from the gap instead of its own margin.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A button label no longer wraps.** `--cui-btn-white-space` is `nowrap`. In v5
   `$btn-white-space` was `null`, so no declaration was emitted at all and a long
   label broke onto a second line, leaving the button taller than the ones beside
@@ -2969,7 +2969,7 @@ field behind that kept submitting.
   `.btn-outline.theme-primary`, and `.btn-subtle-*` completes the set. What
   changes is that one rule per variant now serves every colour, so a theme
   colour of your own gets the whole set for free.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A bare `.btn` is a neutral button, not an invisible one.** It renders in the
   surface colours (`--cui-bg-2`, one step darker on hover) instead of
   being transparent and unstyled. Buttons that carry a variant or a colour class
@@ -2986,7 +2986,7 @@ field behind that kept submitting.
 
 #### Loading button
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`disabledOnLoading` no longer sets the `disabled` attribute.** A disabled
   button drops focus, so a keyboard or screen reader user who pressed it landed
   on the page body. While loading, the button now gets `aria-disabled="true"`
@@ -3000,7 +3000,7 @@ field behind that kept submitting.
 
 #### Navbar
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.navbar-expand-*` reads the navbar's own width, not the viewport's.** Every
   `.navbar` is a [query container](/utilities/container-queries/) now, so a
   navbar in a sidebar or a narrow dashboard column collapses there while a
@@ -3025,7 +3025,7 @@ field behind that kept submitting.
   only, so a `.drawer` inside a `.navbar-expand-*` stayed a fixed side panel over
   the page at every width — measured at 400×868 next to the offcanvas's 1176×24.
   Both are handled now.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Three navbar defaults move.** `.navbar` takes
   `--cui-navbar-min-height: 3.5rem`, so a navbar with short content no longer
   collapses below the height of one with a brand in it. `.navbar-brand` takes
@@ -3044,7 +3044,7 @@ field behind that kept submitting.
 
 #### Checkbox, radio and switch: the class moved onto the input
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `.check`, `.radio` and `.switch` go on the `<input>` itself. There is no wrapper
 and no second element: `appearance: none` lets the control render a
@@ -3092,7 +3092,7 @@ toggle button's move to the buttons — it duplicated `$btn-disabled-opacity`,
 which is now what the disabled toggle reads, through
 `--cui-btn-disabled-opacity`.
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Removed</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Removed</span>
 **`.form-check-reverse` is gone.** It right-flushed the label and the control as
 a pair — which `order` utilities express directly — and it was never the settings
 row (label on the left, control on the right) that people actually reach for;
@@ -3128,7 +3128,7 @@ resolved to something invalid and every switch transition was dropped. It is two
 tokens now — `--cui-switch-transition-duration` and
 `-timing` — and the thumb slides rather than the background position.
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 **The switch is redrawn.** The track is 1.25rem tall with a 1.75 aspect ratio
 (was a 2:1, font-relative `em` track), pill-radiused, on the tertiary surface
 with an inset shadow; the thumb is white with a drop shadow and turns
@@ -3211,7 +3211,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Figures
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.figure` is an inline flex column and spaces its parts with
   `--cui-figure-gap`.** `$figure-img-margin-bottom` and
   `--cui-figure-img-margin-bottom` are gone — the gap (knob: `$figure-gap`,
@@ -3272,7 +3272,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 - **A textarea's label stays at the top.** The label is a flex box centred on the
   control, and `label:has(~ textarea)` anchors it to the start instead, so it
   floats correctly however tall the textarea is.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The placeholder shows once the field has focus.** It used to stay
   transparent in every state; it now appears under the floated label while the
   field, or the control inside a field component, has focus, and stays hidden
@@ -3314,7 +3314,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   the padding on every cell. Anything that raised specificity to beat
   `.table-sm > :not(caption) > * > *` can set `--cui-table-cell-padding-y`/`-x`
   instead.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The contrast factors are percentages.** `$table-striped-bg-factor`,
   `$table-active-bg-factor` and `$table-hover-bg-factor` changed from unit-less
   fractions (`.05`) to percentages (`5%`), because they now ship as the
@@ -3327,7 +3327,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Blockquote
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The source line reads `--cui-secondary-color`.** `.blockquote-footer` was
   painted with `--cui-gray-600`, a fixed value that never flipped with the
   colour mode: 4.15:1 on the light background and 3.65:1 on the dark one, both
@@ -3357,7 +3357,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   container to the viewport in place of the `position-fixed top-0 end-0`
   utility stacks. New classes: `.toast-title`, `.toast-description`,
   `.toast-action`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The fade moved to CSS.** Toast was the last component driving its animation
   from JavaScript — it toggled `.fade`, forced a reflow, then juggled `.show`,
   `.showing` and a deprecated `.hide` class to fake an exit. Menu and the picker
@@ -3371,7 +3371,7 @@ Multi Select's option indicators moved with it — they render as a decorative
     `--cui-toast-transition-timing`.
   - `isShown()` returns `false` as soon as `hide()` is called, rather than when
     the fade-out ends.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Toasts are opaque by default.** `--cui-toast-bg` and `--cui-toast-header-bg`
   resolved to `color-mix(in srgb, var(--cui-body-bg) 85%, transparent)`, so every
   toast let 15% of whatever sat behind it through — with no blur to settle it,
@@ -3390,7 +3390,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Card
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A card is roomier and framed in the solid border colour.**
   `--cui-card-spacer-y` / `-x` go from `1rem` to `--cui-spacer-6` (`1.25rem`),
   and the image-overlay padding follows them. The header, the footer and a
@@ -3402,7 +3402,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   `.text-bg-*` keeps that neutral frame; add the matching `.border-{color}` to
   frame it in the fill colour. To keep the v5 spacing, set
   `--cui-card-spacer-y` and `-x` to `var(--cui-spacer-5)` on `.card`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.card-header-pills` is gone.** It only pulled the pill row out to the
   header's padding edge, which is wrong for pills — they carry their own
   background, so flush against the header's inner edge they touch the border.
@@ -3432,7 +3432,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   `--cui-theme-base` was set one level below it, on the header. The theme
   indirection moved to the point of use, so each section reads the theme in its
   own scope. A theme class on the `.card` itself behaves exactly as before.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.card-body` is a flex column.** It spaces its children with
   `--cui-card-body-gap` and zeroes their block margins, so nothing in a card
   needs `.mb-*` to sit correctly any more. Two consequences for existing markup:
@@ -3451,7 +3451,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   direction.** The rules named the physical corners, so a right-to-left group
   squared its outer corners and rounded the ones that meet. A list group at the
   edge of a grouped card is squared like the other sections.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.card-link` is gone**, along with `--cui-card-title-spacer-y`. Both existed
   to space children the gap now handles; the class's inline margin only ever
   worked because the links were inline. Wrap them yourself:
@@ -3467,7 +3467,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   `--cui-translucent-*` tokens; the caps read
   `--cui-card-translucent-cap-bg-opacity` (Sass default
   `$card-translucent-cap-bg-opacity`).
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.card-group` attaches its cards from a container query, not a media
   query.** The `sm` breakpoint is now the width of the nearest query container,
   which is what a group inside a column actually has to fit — the viewport
@@ -3477,7 +3477,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### List group
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.list-group-horizontal-{sm|md|lg|xl|2xl}` turns horizontal from a
   container query.** Same change and same fix as `.card-group`: put
   [`.contains-inline`](/utilities/container-queries/) on an ancestor, or the
@@ -3493,7 +3493,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Tab
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A tab pane fades on its own — `.fade` on a `.tab-pane` does nothing for
   it.** `.tab-pane` carries the transition and
   `--cui-tab-pane-transition-property` / `-duration` / `-timing`, and
@@ -3510,7 +3510,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Modal
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A size modifier applies at every viewport.** `.modal-lg` and `.modal-xl`
   were withheld until the `lg` and `xl` breakpoints, so on a tablet a large
   modal was **500 px** — the same as one with no modifier at all — and an
@@ -3520,7 +3520,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   At 768 px `.modal-lg` goes 500 → 712 px, and at 1100 px `.modal-xl` goes
   800 → 1044 px.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.modal-sm` is narrow on phones too.** It used to fall back to the default
   width below the `sm` breakpoint, so on a 360 px screen it filled the width;
   it is 300 px there now. Drop the modifier for markup that should fill a small
@@ -3532,7 +3532,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Pagination
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A page link is sized from the shared control scale.** Pagination kept its
   own padding values, so `.pagination-lg` did not match `.btn-lg` or
   `.form-control-lg` — it measured **56 px** against their 48. The tokens read
@@ -3541,7 +3541,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   sizes are unchanged; the large one loses 8 px of height and some horizontal
   padding.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`pagination-size()` is removed**, together with
   `$pagination-padding-{x|y}-{sm|lg}` and
   `$pagination-border-radius-{sm|lg}`. Sizes are generated by a loop over
@@ -3586,7 +3586,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Popover and Tooltip
 
-- <span className="badge bg-warning text-dark">Deprecated</span> **`placement`
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span> **`placement`
   takes the logical `start` and `end`; `left` and `right` are deprecated.**
   The physical names never meant a physical side — both components have always
   mirrored them in RTL, which their own pages documented — so `right` was
@@ -3615,7 +3615,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Progress
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$progress-bar-animation-timing` is replaced by `$progress-bar-animation`,
   which carries the keyframes name too.** The stripe animation is a CSS variable
   now — `--cui-progress-bar-animation` — so its speed, easing and keyframes can
@@ -3628,14 +3628,14 @@ Multi Select's option indicators moved with it — they render as a decorative
   size now, which makes it one step larger. Set `--cui-progress-font-size` to go
   back.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.progress-group`, `.progress-group-prepend`, `.progress-group-header` and
   `.progress-group-bars` are removed.** Four classes carried a flex row, a
   100 px label column, a header row and a 2 px gap between bars — all of which
   utilities already do. Use `.hstack` / `.vstack` with a `gap-*` and put the
   label column's width in a style, as the Grouping bars examples now show.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.progress-thin` is removed.** It did nothing an inline height does not. Use
   `style="height: 4px"` on the `.progress`, as the Height section shows, or set
   `--cui-progress-height` if you want the stripe geometry to follow the height
@@ -3677,7 +3677,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Spinner
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Spinners are sized in `em`, not `rem`.** `.spinner-border` and
   `.spinner-grow` are now `1em` square with a `.125em` border, so a spinner
   takes the font size of whatever it sits in instead of being a fixed 32 px
@@ -3686,12 +3686,12 @@ Multi Select's option indicators moved with it — they render as a decorative
   `--cui-spinner-width` / `-height`, or the `$spinner-width` /
   `$spinner-height` Sass variables, to go back to a fixed size.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.spinner-border-sm` and `.spinner-grow-sm` are replaced by one
   `.spinner-sm`.** The small variant no longer has to correct the border width,
   so a single class serves both spinners.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-spinner-vertical-align` is gone.** Spinners are
   `inline-flex` and assume a flex parent; the `-.125em` baseline nudge it used
   to need no longer applies.
@@ -3710,7 +3710,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Footer
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.footer` is gone.** Every declaration it carried is reachable with
   utilities, so `<footer class="footer">` becomes `<footer class="d-flex
   flex-wrap align-items-center justify-content-between bg-3 border-top px-5
@@ -3718,19 +3718,19 @@ Multi Select's option indicators moved with it — they render as a decorative
   floor matters, set it yourself or pad with `py-4`. The
   `--cui-footer-*` variables and the `$footer-*` Sass variables go with it.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.footer-sticky` is replaced by `.sticky-bottom`.** It pins to the bottom
   the same way but sits on `--cui-z-sticky` rather than `--cui-z-fixed`, so a
   footer that has to stack above fixed chrome needs its own `z-index`.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.footer-fixed` is replaced by `.fixed-bottom`.** It pins to the bottom of
   the viewport the same way and, unlike the footer class, is available in both
   editions.
 
 #### Header
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.header-sticky` is replaced by `.sticky-top`.** The two rules were
   identical — `position: sticky`, `top: 0`, `--cui-z-sticky` — so the utility
   pins the header exactly as the component class did, and it composes with the
@@ -3750,11 +3750,11 @@ Multi Select's option indicators moved with it — they render as a decorative
   any element above it, like the alert does. The class colours the leading edge
   and tints the border, and because it exposes every slot, `.theme-subtle` next
   to it fills the callout without naming the colour twice.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Deprecated</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Deprecated</span>
   **`.callout-{color}` still works and is removed in v7.** Each modifier is
   generated from `$theme-colors` through the same `theme-tokens()` mixin as the
   theme class, so `.callout-primary` *is* `.callout.theme-primary`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$callout-variants` is gone.** The modifier classes are generated from
   `$theme-colors`, so adding a theme colour adds its callout class — there is no
   separate map to keep in step.
@@ -3848,7 +3848,7 @@ map — several things below are breaking and are called out as such.
 
 #### A theme class wins over a component's own colour token
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Under a `.theme-*` class the theme wins over a component colour token.** A
   component reads the `--cui-theme-*` slot on the property and its own token
   only as the fallback. In v5 the colour came from the component's tokens,
@@ -3869,7 +3869,7 @@ map — several things below are breaking and are called out as such.
 
 #### A numeric radius scale replaces the one global radius
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Components read stops of a radius scale, and most got rounder.** `:root`
   emits `--cui-radius` (`$radius`, `.5rem` by default) and the stops
   `--cui-radius-0` through `--cui-radius-9` as `calc()` multiples of it, plus
@@ -3898,7 +3898,7 @@ map — several things below are breaking and are called out as such.
 
 #### Interaction surfaces sit two rungs lighter on the ladder
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Hover, active and disabled surfaces read lighter ladder rungs.** Hover
   states read `--cui-bg-1` (was `--cui-bg-3`), active and disabled states
   `--cui-bg-2` (was `--cui-bg-4`), across list groups, menus, navs,
@@ -3908,7 +3908,7 @@ map — several things below are breaking and are called out as such.
   step down the same way. Interaction feedback is a tint rather than a
   block of gray — the same relationships, two rungs closer to the page.
   Set the component's own token to keep a darker surface.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The neutral button steps down the ladder with everything else.** A `.btn`
   without a theme colour rests on `--cui-bg-2` (was `--cui-bg-4`) and hovers
   on `--cui-bg-3` (was a hard-coded `gray-300`/`gray-700` pair outside the
@@ -3919,7 +3919,7 @@ map — several things below are breaking and are called out as such.
   so buttons match the fields they sit next to in input groups; `.btn-group`
   clips to the same stop. Set `$btn-bg`/`$btn-hover-bg` or the `--cui-btn-*`
   tokens to keep the old look.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The rest of the library steps down the same two rungs.** The first pass
   left a group of components on the old surfaces; they now read the rungs
   their neighbours read. Hover surfaces on `--cui-bg-1`: the dropdown link,
@@ -3943,7 +3943,7 @@ map — several things below are breaking and are called out as such.
   `--cui-fg-3` like every other caption and placeholder, and the active
   breadcrumb reads `--cui-fg-1`, one rung above the hovered link instead of
   the same one.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Border tokens move one rung towards the page.** `--cui-border-color` is
   `light-dark(gray-200, gray-700)` (was `gray-300` / `gray-800`): lighter
   in the light scheme, and in the dark scheme one rung further from the
@@ -3958,7 +3958,7 @@ map — several things below are breaking and are called out as such.
 
 #### The neutral ladder is three maps
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$theme-bgs`, `$theme-fgs` and `$theme-borders` replace the neutral
   scalars.** `$fg-body`, `$fg-1` … `$fg-4`, `$bg-body`, `$bg-1` … `$bg-4`,
   `$border-subtle`, `$border-muted` and `$border-emphasized` are gone; each
@@ -3996,7 +3996,7 @@ map — several things below are breaking and are called out as such.
 
 #### Theme colours have no bare token
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-primary`, `--cui-secondary`, `--cui-success`, `--cui-info`,
   `--cui-warning`, `--cui-danger` and `--cui-inverse` are gone.** A theme
   colour is its set of slots — `-base`, `-bg`, `-fg`, `-fg-emphasis`,
@@ -4019,7 +4019,7 @@ map — several things below are breaking and are called out as such.
 
 #### Breakpoints: `lg` 1024, `xl` 1280, `2xl` 1536
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The three largest breakpoints move and the largest is renamed.** `lg` is
   `1024px` (was 992), `xl` `1280px` (was 1200) and the top tier is `2xl` at
   `1536px` (was `xxl` at 1400); `sm` and `md` stay. Every responsive class
@@ -4040,7 +4040,7 @@ map — several things below are breaking and are called out as such.
 
 - **New: `.w-1` … `.w-12`**, one `$spacer` per step from the `$sizes` map,
   merged into the width utility next to the percentages.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$grid-gutter-width` is `$grid-gutter-x`, and `$grid-gutter-y` joins it.**
   `make-row()` takes both (`make-row($gutter-x, $gutter-y)`) and writes them to
   `--cui-gutter-x` / `--cui-gutter-y`; the row gutter defaults to `0` as
@@ -4058,7 +4058,7 @@ map — several things below are breaking and are called out as such.
 
 #### Every type stop carries its own line height
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$font-sizes` sets a line height per stop instead of one value for all
   headings.** `xs` is 1.25, `sm` … `lg` the body leading (`--cui-body-line-height`, 1.5), `xl` 2.5⁄1.75, `2xl` 3⁄2.25,
   `3xl` 1.2, `4xl` and `5xl` 1.1, `6xl` 1 — the larger the type, the tighter
@@ -4070,7 +4070,7 @@ map — several things below are breaking and are called out as such.
 
 #### Layered shadows
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Every shadow is a stack of two to four layers with a negative spread**
   instead of one wide blur: a tight layer for contact, wider ones for
   ambient light, each at 4–9 % alpha, so a card reads as lifted rather than
@@ -4083,7 +4083,7 @@ map — several things below are breaking and are called out as such.
 
 #### A denser spacing scale
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$spacers` has thirteen steps, `0`–`12`.** From `1` the scale runs
   `.25 / .375 / .5 / .75 / 1 / 1.25 / 1.5 / 1.75 / 2 / 2.25 / 2.5 / 3 rem`
   (v5: `.25 / .5 / 1 / 1.5 / 3`), so every spacing, gap,
@@ -4108,7 +4108,7 @@ map — several things below are breaking and are called out as such.
 
 #### Padding tokens carry both axes
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A token that sets `padding` names an axis.** The six that v5 also had as
   custom properties are `-padding-y` and `-padding-x` now:
   `--cui-modal-padding`, `--cui-modal-header-padding`,
@@ -4132,7 +4132,7 @@ map — several things below are breaking and are called out as such.
   directly, so a vertical half would be a knob with nothing to set.
   `--cui-list-inline-padding` is the space between `.list-inline-item`s and
   sets a margin.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-modal-header-padding` is gone.** It only restated
   `--cui-modal-header-padding-y --cui-modal-header-padding-x`, and setting it
   had no effect on the close button, which reads the two axes. The footer no
@@ -4150,7 +4150,7 @@ map — several things below are breaking and are called out as such.
 
 #### Link decoration is a token, not a Sass knob
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$link-decoration`, `$link-underline-offset` and `$link-hover-decoration`
   are gone.** The underline lives on `:root` as `--cui-link-decoration`
   (`underline`) and `--cui-link-underline-offset` (`.2em`); set the token
@@ -4192,7 +4192,7 @@ assembles maps of CSS expressions and the browser resolves them.
   be a Sass colour for the contrast pass to run over it. Upstream keeps a
   `"contrast"` key per colour and never calls the function either.
 - **Table variants read the theme tokens.**
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   `.table-primary` and friends still exist, but they are generated the way
   `.btn-primary` is: the class sets `--cui-theme-*` and the base `.table`
   rules read it. `$table-variants` is now a **list of colour names**, not a map
@@ -4208,7 +4208,7 @@ assembles maps of CSS expressions and the browser resolves them.
 
 #### The theme colours are retuned so white text reads on them
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 **Four of the five base colours moved, and `success`, `info` and `danger` now
 carry white contrast text instead of black.** The bases were picked at the
 brightest point where white text still clears both contrast gates: WCAG 4.5:1
@@ -4244,7 +4244,7 @@ background is too dark for any text to clear 75 against it.
 
 #### RGB channel tokens and the elevation system removed
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 - **Every `--cui-{name}-rgb` custom property is gone**, along with the
   `$theme-colors-rgb` and `$theme-colors-rgb-dark` maps, the `to-rgb()`
@@ -4279,7 +4279,7 @@ background is too dark for any text to clear 75 against it.
 
 #### Focus rings are keyboard-only on activation controls
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 Controls you click to act — checkboxes, radios, switches, both range sliders,
 pagination links, stepper buttons, the search, close, sidebar and navbar
@@ -4295,7 +4295,7 @@ invisible on both.
 
 #### A validation state is a theme colour, not a palette of its own
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `$form-validation-states` carried a colour, a border colour, a focus ring and a
 pair of tooltip colours per state, and `_root.scss` emitted four tokens to feed
@@ -4338,7 +4338,7 @@ them. A state names a theme colour now, and every value is a slot of it.
   read it — `$btn-close-focus-shadow` and `$sidebar-toggler-focus-shadow` —
   are gone with it; the close button and the sidebar toggler draw their ring
   with the shared `focus-ring()` mixin.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-sidebar-toggler-focus-shadow` is removed.** It fed a `box-shadow`
   on `.sidebar-toggler:focus-visible` next to an `outline: 0`, and its value
   was the `--cui-focus-ring` shorthand — `<width> solid <color>`, which
@@ -4346,14 +4346,14 @@ them. A state names a theme colour now, and every value is a slot of it.
   the toggler had no focus indicator at all. The ring is an `outline` now,
   like everywhere else; restyle it through `--cui-focus-ring-width`,
   `--cui-focus-ring-color` and `--cui-focus-ring-offset`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`add()` and `subtract()` are removed.** They wrapped `calc()` to keep a
   unitless `0` from making the expression invalid. v6 computes derived values
   in the browser, so the stylesheet reaches for `calc()` directly — 243 times,
   and not once for these two. Write the `calc()` yourself; guard a possible
   `0` with `if($value == 0, …)` where it can actually occur. `divide()` stays,
   the grid still uses it.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The theme colour tokens finish the rename to the slot names.**
   `--cui-{color}-text-emphasis` is `--cui-{color}-fg-emphasis` and
   `--cui-{color}-border-subtle` is `--cui-{color}-border`. The theme slots
@@ -4381,7 +4381,7 @@ them. A state names a theme colour now, and every value is a slot of it.
 
 #### `$component-active-color` and `$component-active-bg` are removed
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 One shared pair in `_config.scss` fed every active state in the library — the
 list group, pagination, the menu, nav pills, the dropdown, both range sliders
@@ -4412,7 +4412,7 @@ it at the colour's slots, so nothing is defined in a file that never renders it.
 
 #### A theme colour is one nested map entry
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `$theme-colors` carried one value per colour and three further families carried
 the rest, so a theme colour was defined in four places and adding one meant
@@ -4491,7 +4491,7 @@ The `$input-*` knobs keep working — they read the tokens now — so a `with()`
 override reaches the whole family as before, and a runtime override of one
 root token restyles every text control at once.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$input-focus-border-color` is a `var()` reference, not a Sass colour.**
   It was `tint-color($primary, 50%)`, frozen at build time — retint the
   palette and the focus border stayed on the old primary. It reads
@@ -4499,7 +4499,7 @@ root token restyles every text control at once.
   in the browser). Sass colour functions on it no longer compile; override
   the token or the variable with a colour of your own instead.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$time-picker-roll-cell-selected-hover-bg` is computed in the browser.**
   It was a `light-dark()` pair of `color.scale($primary, …)`, frozen at build
   time, so a retinted palette moved the selected cell but left its hover state
@@ -4510,7 +4510,7 @@ root token restyles every text control at once.
 
 #### The field transition is three tokens, not one shorthand
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `--cui-control-transition` held a whole shorthand
 (`border-color .15s ease-in-out, box-shadow .15s ease-in-out`), so retiming a
@@ -4548,7 +4548,7 @@ have left it at `0s`. The rendered animation is unchanged.
 
 #### `$form-check-*` is now named for what it configures
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The checkbox, the radio and the switch shared their defaults through variables
 named after `.form-check` — the v5 wrapper they no longer use. The names said
@@ -4586,7 +4586,7 @@ The class names are unchanged. `.form-check`, `.form-check-input` and
 
 #### The `$input-*` variables are gone; configure the frame once
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `$input-padding-y`, `$input-color`, `$input-bg`, `$input-border-radius` and the
 30 others were aliases: each one held nothing but `var(--cui-btn-input-…)`, the
@@ -4619,7 +4619,7 @@ so they follow the validation mixin they serve into
 
 #### The control variables moved out of the shared config
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `$input-*` described one thing — the frame every field component draws — but sat
 in `_config.scss` next to the breakpoints and the spacing scale. It lives in
@@ -4640,7 +4640,7 @@ in `_config.scss` next to the breakpoints and the spacing scale. It lives in
 
 #### Shadows are computed at runtime
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 A shadow's alpha is now `base * strength * opacity`, computed on the element
 rather than resolved when the stylesheet is built. That is what makes a shadow
@@ -4674,7 +4674,7 @@ tintable and lets dark mode deepen every shadow at once.
 
 #### Theme gradients removed
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 - **`.bg-{color}-gradient` and `.text-bg-{color}-gradient` are gone**, along
   with the `$theme-gradients` / `$theme-gradients-dark` maps that generated
@@ -4702,7 +4702,7 @@ tintable and lets dark mode deepen every shadow at once.
   action needed — selectors that worked before keep working, and low-specificity
   overrides that used to lose on specificity now win.
 - **Utilities no longer carry `!important`.**
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   The `$enable-important-utilities` switch is gone with the suffix, because the
   layer order above already puts every utility past every component — the
   suffix was doing nothing our own stylesheet needed. That takes 556 bytes gzip (19 kB
@@ -4733,7 +4733,7 @@ tintable and lets dark mode deepen every shadow at once.
   );
   ```
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **941 Sass variables are gone, across 64 partials.** Every scalar whose only
   job was carrying a value into a token map now sits in the map, so a value has
   one home instead of two. Set the token instead of the variable —
@@ -4743,7 +4743,7 @@ tintable and lets dark mode deepen every shadow at once.
   if your build set one of the removed variables, and Sass then names it: `This variable was not declared with
   !default in the @used module.` Each component page says which variables it
   still has: 31 lost their `### Sass variables` section entirely.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`scss/_root.scss` declares no variables of its own any more** — 62 went,
   leaving only `$root-tokens` for overriding the map. The page-wide knobs that
   lived there are now the tokens they always emitted: `$input-btn-*` →
@@ -4761,7 +4761,7 @@ tintable and lets dark mode deepen every shadow at once.
     )
   );
   ```
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Sixteen more page-wide knobs are gone.** `scss/_theme.scss` declares no
   variables at all now: the four that set how far a hover or active shade
   travels are the tokens they fed, `--cui-theme-hover-lightness`,
@@ -4780,7 +4780,7 @@ tintable and lets dark mode deepen every shadow at once.
   same way, to `--cui-border-width` and `--cui-border-color`; the width scale and the `.border-{key}` classes
   read the token, not the variable. `$blue` and `$pink` are finally gone from
   the source, which is what the palette entry above already said.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The reboot declares no variables of its own**, and 89 more scalars go with
   the same rule across the content partials, the legacy layer, the form label,
   text and file blocks, the callout, card, list group, dropdown and navbar dark
@@ -4794,13 +4794,13 @@ tintable and lets dark mode deepen every shadow at once.
   They sit on `mark, .mark` now, in a `$reboot-mark-tokens` map you can override
   like any other component surface. Setting them on `:root` no longer reaches
   the element; set them on the element, or on the map when you compile.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **76 more component scalars are gone**, the ones whose value reached exactly
   one custom property and nothing else: the chip and chip input size variants,
   the nav enclosed set, the OTP input sizes, the badge and rating sizes, the
   modal widths and margins, the toast surface, the form control group icon
   sizes and the colour picker width. Each is the token it fed.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The artwork variables are gone too.** The accordion chevron, the breadcrumb
   divider, the four carousel controls, the close button glyph, the check and
   radio marks, the rating star, the select indicator and the navbar, header and
@@ -4810,7 +4810,7 @@ tintable and lets dark mode deepen every shadow at once.
   `--cui-check-mark-checked`, `--cui-radio-mark`, `--cui-rating-item-icon`,
   `--cui-control-select-bg-img`, `--cui-navbar-toggler-icon-bg`,
   `--cui-header-toggler-icon-bg`, `--cui-sidebar-toggler-icon`.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The validation icon inside the field is gone**, and with it
   `$enable-validation-icons`, the two glyphs and their colours, the geometry
   that made room for them and the select's second background layer. A valid or
@@ -4819,7 +4819,7 @@ tintable and lets dark mode deepen every shadow at once.
   colour baked into the SVG, so it could never follow a token: an input renders
   no pseudo-element to hang a mask on, and masking the input erases its own
   background. It comes back when the field has a wrapper to draw it in.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$radius` and `$chip-gap` are gone**, to `--cui-radius` and
   `--cui-chip-gap`. The radius scale still multiplies one value, but that value
   is the token: set `--cui-radius` and every stop follows at runtime.
@@ -4882,7 +4882,7 @@ tintable and lets dark mode deepen every shadow at once.
 
 #### `--cui-mobile-breakpoint` removed
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The token carried the **name** of the sidebar's breakpoint (`lg`), not a length,
 so it could not be used in a media query or in `calc()`, and nothing in the
@@ -4901,7 +4901,7 @@ queries are built on it.
 
 #### Colour scales, and `_variables-dark.scss` removed
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 Dark mode no longer has a second set of Sass variables. Every colour is declared
 once, as a native
@@ -4927,7 +4927,7 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   each key of `$colors`. Knobs: `$color-tints`, `$color-shades`,
   `$color-mix-space` (`oklch`), `$tint-color`, `$shade-color`. Override
   `--cui-primary-500` at runtime and the whole scale retints.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The palette is the theme colours.** `$colors` holds `primary`, `success`,
   `info`, `warning`, `danger` and `gray`; `$blue`, `$indigo`, `$purple`,
   `$pink`, `$red`, `$orange`, `$yellow`, `$green`, `$teal`, `$cyan` and every
@@ -4951,21 +4951,21 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
 
   A new theme colour is a colour in `$colors` plus an entry in `$theme-colors`
   that points at it; see [adding a theme colour](/customize/theme/#adding-a-theme-color).
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The seven `$theme-colors-{slot}` maps are removed** (`$theme-colors-fg`,
   `$theme-colors-fg-emphasis`, `$theme-colors-bg-subtle`, `$theme-colors-bg-muted`,
   `$theme-colors-border`, `$theme-colors-contrast`, `$theme-colors-focus-ring`).
   They were flat copies of one slot each; `theme-color-refs("bg-subtle")`
   returns the same shape as token references, which is what every utility
   reads.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The palette is written in `oklch()` and mixes in `oklch`.** The base colours
   are unchanged — every hex converts to the same sRGB pixel — but the 100–900
   steps mixed from them shift, because `oklch` holds chroma where `lab` drained
   it (measured: 5.9 per RGB channel on average, 28 at most). `$black` is `#000`
   now rather than a near-black with a blue cast: `oklch` interpolates hue, so
   mixing a scale towards a tinted black rotated every shade towards blue.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The gray ramp is generated like every other colour.** `$gray-025` …
   `$gray-975` were thirteen hand-picked values; they are now one `$gray` base
   run through the same generator, and `gray` is an entry of `$colors`. The Sass
@@ -5055,7 +5055,7 @@ two in v5 and still is.
 
 Two consequences for the tokens:
 
-- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span>
+- <span class="badge fg-emphasis-warning bg-subtle-warning">Deprecated</span>
   **The surface tokens move out of the theme-color namespace.**
   `--cui-bg-body`, `--cui-bg-1` … `--cui-bg-4` and `--cui-fg-body`,
   `--cui-fg-1` … `--cui-fg-4` are canonical; `--cui-body-bg`, `--cui-body-color`,
@@ -5064,14 +5064,14 @@ Two consequences for the tokens:
   with identical values, and go away in v7 — at which point
   the `--cui-secondary-*` prefix belongs to the `secondary` theme color alone.
   One alias is already gone:
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-secondary-bg` is the `secondary` theme color's action-background
   slot now** (see the entry below), not a surface alias. Markup that read it
   for the surface gets a similar but lighter gray — read `--cui-bg-4`
   instead. This name is exactly why the ladder moved out of the theme-color
   namespace: a page surface sat next to `--cui-secondary-bg-subtle` (a
   theme-color slot) with no way to tell which system a token belonged to.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The dark side of the ladder is palette stops, and the page got darker.**
   The grays gain `--cui-gray-950` (`#15181f`) and `--cui-gray-975` (`#0e1115`),
   and every dark rung is a stop instead of a `color-mix()` between `gray-800`
@@ -5083,7 +5083,7 @@ Two consequences for the tokens:
   instead of two `rgba()` values computed in Sass; the `color-translucent()`
   function is gone. Override the `$bg-*` knobs or the `--cui-bg-*` tokens to
   keep the previous palette.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The text ladder is solid grays, and components use all of its rungs.**
   `--cui-fg-body` through `--cui-fg-4` were alpha blends of one color
   (`rgba(…, .95)` down to `.25`), which made the two deepest rungs
@@ -5103,7 +5103,7 @@ Two consequences for the tokens:
   previous rendering.
 - **`.text-body` and `.text-body-emphasis` are unaffected** — they are not
   ordinal, any more than `.text-primary` is.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The Sass knobs follow the ladder.** The `$theme-fgs` and `$theme-bgs`
   maps (`"body"`, `"1"` … `"4"`) replace `$body-color`, `$body-bg`,
   `$body-secondary-color`, `$body-secondary-bg`, `$body-tertiary-color` and
@@ -5113,7 +5113,7 @@ Two consequences for the tokens:
 
 #### `light` and `dark` are replaced by `inverse`
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `light` and `dark` were theme colours whose names described a colour scheme, and
 they behaved like it: `.theme-dark` sat next to `data-coreui-theme="dark"`
@@ -5164,7 +5164,7 @@ now, and the two neutrals swap ends of the gray scale between schemes.
 
 #### Component icons render through CSS masks
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The accordion chevron and the carousel arrows were `background-image` SVGs with
 the colour written inside the markup, which is why each needed a dark-mode rule —
@@ -5212,7 +5212,7 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
 
 #### Buttons
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`button-variant()` takes a variant name, not a colour pair**, and reads it
   from `$button-variants`. Each entry of that map names, per state, the theme
   token a button variable reads and the neutral value behind it; `disabled`
@@ -5229,7 +5229,7 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   `$btn-hover-bg-shade-amount`, `$btn-hover-bg-tint-amount`,
   `$btn-hover-border-shade-amount`, `$btn-hover-border-tint-amount` and the four
   `$btn-active-*` counterparts. They fed the Sass mixes that no longer happen.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The interaction shade belongs to the theme, not to the button.** Every
   `.theme-*` class emits `--cui-theme-hover` and `--cui-theme-active` — its own
   colour, shifted in lightness — and the button variants read them, so a
@@ -5248,7 +5248,7 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   button no longer fades as it darkens; the lightness steps are unchanged.
 - **The dark-mode button block is gone** (~160 lines of CSS) — variants follow
   the root color tokens, which already switch in dark mode.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The `$btn-*` variables that only forwarded a shared value are removed**:
   `$btn-color`, `$btn-padding-y`, `$btn-padding-x`, `$btn-font-family`,
   `$btn-font-size`, `$btn-line-height`, `$btn-border-width`,
@@ -5256,7 +5256,7 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   `-sm`/`-lg` pairs. They pointed at `--cui-btn-input-*`, so a value assigned to
   them was overwritten by the token anyway. Configure the frame once on `:root`
   with the `$input-btn-*` variables, or set `--cui-btn-*` on the button.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$btn-font-weight` is removed, and buttons take their weight from the
   shared frame.** `--cui-btn-font-weight` reads `--cui-btn-input-font-weight`,
   the weight fields and input group addons use, which defaults to
@@ -5264,7 +5264,7 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   gets lighter buttons with it; `.btn-link` keeps the normal weight. Set
   `--cui-btn-font-weight` on `.btn` to change buttons alone, or
   `--cui-btn-input-font-weight` on `:root` to change buttons and fields together.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`button-size()` is removed.** Sizes are a loop over `$button-sizes`, which
   points the button's tokens at the matching `--cui-btn-input-{size}-*` set. Add
   a size by adding its tokens on `:root` and its name to the map.
@@ -5272,7 +5272,7 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   `--cui-btn-white-space` and `--cui-btn-transition-property` /
   `-duration` / `-timing`. The transition was read straight from the shared
   `--cui-btn-input-*` tokens before, so it could not be retuned per button.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.btn-close` draws its focus ring as an `outline`,** like every other
   control; `$btn-close-focus-shadow` and `--cui-btn-close-focus-shadow` are
   removed. A box-shadow ring was clipped by the `overflow: hidden` of the modal,
@@ -5302,7 +5302,7 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
 
 #### Utilities API: one `property` map replaces `css-var`, `css-variable-name` and `local-vars`
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 Three keys said one thing between them — *a utility may write custom
 properties, real properties, or both* — and `property` now says it alone. Give
@@ -5378,7 +5378,7 @@ Nothing existing changes; these are additions. See
 
 #### Utilities API: theme variants and the `rtl` key removed
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 - **The `dark:` theme-variant utilities are gone** (40 classes:
   `.dark\:bg-*`, `.dark\:text-*`). They were generated for the colour
@@ -5400,7 +5400,7 @@ Nothing existing changes; these are additions. See
 
 #### RFS removed
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 - **The RFS engine is gone** — no `vendor/rfs`, no `font-size()` / `rfs()`
   mixins, no `$enable-rfs`, no `rfs` option in the utilities API, and none of
@@ -5430,7 +5430,7 @@ Nothing existing changes; these are additions. See
   (padding, font, colors, border, radius, shadows, focus and disabled sets)
   that default to those knobs. Override a single control on its element;
   override everything at `:root`.
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   The component-namespace custom properties that duplicated this frame are
   **renamed**: `--cui-autocomplete-padding-y`, `--cui-date-picker-font-size`,
   `--cui-time-picker-bg`, `--cui-form-multi-select-border-color`,
@@ -5453,7 +5453,7 @@ Nothing existing changes; these are additions. See
   are now `calc()` expressions over `var(--cui-control-padding-x)` instead of
   Sass products, and `$form-select-bg-position` carries the `var()` inside it
   (the mirrored keyword comes from the `:dir(rtl)` rule in the same sheet).
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   Sass arithmetic on these variables in your own stylesheets no longer works —
   they are CSS calc strings now, not numbers. Override them with your own
   `calc()` or a plain length instead.
@@ -5462,7 +5462,7 @@ Nothing existing changes; these are additions. See
   follows tooltip theming — `--cui-tooltip-padding-*`, `-font-size`,
   `-border-radius` — the upstream v6 contract. Bare `.invalid-tooltip` markup
   keeps rendering exactly as before through built-in fallbacks.
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   The Sass-level derivation is gone: `$form-feedback-tooltip-*` no longer
   default to `$tooltip-*`, so overriding `$tooltip-padding-y` alone no longer
   moves feedback tooltips at compile time — use the runtime link (add the
@@ -5476,7 +5476,7 @@ Nothing existing changes; these are additions. See
 
 #### The spacing scale is computed from `--cui-spacer` in the browser
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-spacer-1` … `-12` are `calc()` multiples of `--cui-spacer`, and the
   spacing utilities read the stops.** `$spacers` used to multiply `$spacer`
   when the stylesheet was built and every `.m-*`, `.p-*`, `.gap-*`,
@@ -5494,7 +5494,7 @@ Nothing existing changes; these are additions. See
 
 #### The border-width scale is computed from `--cui-border-width` in the browser
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-border-width-1` … `-5` and `-keyline` are `calc()` multiples of
   `--cui-border-width`, and the `.border-*` width classes read them.**
   `$border-widths` shipped literal pixel values and every `.border-2`,
@@ -5519,7 +5519,7 @@ longhands after ours — a shorthand still yields to a later longhand.
 
 #### Opacity utilities no longer cascade to descendants
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The opacity utilities compose through custom properties — `.text-opacity-50` sets
 `--cui-text-opacity` and the colour utilities read it. Custom properties
@@ -5552,7 +5552,7 @@ Five names are now registered with
 
 #### The CSS Grid ships, and its responsive classes are container queries
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `$enable-cssgrid` is `true` by default, so `.grid` and the `.g-col-*` /
 `.g-start-*` classes are in the compiled CSS instead of waiting behind a Sass
@@ -5570,7 +5570,7 @@ through a portal and are unaffected; your own fixed markup has to live outside.
 
 #### The CSS Grid declares its variables, and nested grids no longer inherit
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `.grid` read `--cui-rows`, `--cui-columns` and `--cui-gap` through a `var()`
 fallback and declared none of them. Two consequences: the variables did not
@@ -5594,7 +5594,7 @@ If you relied on a nested grid inheriting, set the variable on that grid too:
 
 #### The `cq-*` grid is gone
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 v5.3.0 shipped a second, experimental grid — `.cq-container`, `.cq-row`,
 `.cq-col-*`, `.cq-offset-*`, `.cq-g-*` — behind `$enable-container-queries`,
@@ -5613,7 +5613,7 @@ behaviour on markup of your own, mark the element with
 
 #### Breakpoint mixins emit range queries
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `media-breakpoint-*` now emits `(width >= 768px)` / `(width < 768px)` instead of
 `(min-width: 768px)` / `(max-width: 767.98px)`. The `.02px` subtraction existed
@@ -5643,7 +5643,7 @@ element a query container from markup. See
 
 #### Sass file layout follows Bootstrap v6
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 Upstream's directories mirror the cascade layers, so partials now live in the
 directory named after the layer they emit into. **The old paths no longer
@@ -5671,7 +5671,7 @@ The three aggregators are unaffected: Sass resolves `@use "mixins"` to
 
 #### `@import` is no longer supported
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The 87 `*.import.scss` files that let `@import` reach our modules are gone, so an
 `@import` of anything under `scss/` no longer resolves. Load the library with
@@ -5714,7 +5714,7 @@ names and their classes here.
 
 #### The colour system has its own modules
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `_config.scss` no longer defines a single colour. The palette — the base
 colours, the grays and their maps — lives in `scss/_colors.scss`; the theme
@@ -5752,7 +5752,7 @@ $font-sizes: (
   with a nested map per stop. The two top stops sit above the headings — display
   sizes (`$font-size-5xl`/`-6xl`, up to `3rem` and `3.5rem`) continuing the same
   fluid progression, numerically level with the former `.display-5` and `.display-4`.
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   If you overrode `$font-sizes`, move your values into the new shape. The numeric
   keys live on in `$font-sizes-legacy`, which is derived from the named scale.
 - **`:root` gets `--cui-font-size-*` and `--cui-line-height-*` per
@@ -5767,7 +5767,7 @@ $font-sizes: (
   identically — `.fs-1` is `.fs-4xl`, down to `.fs-6`, which is `.fs-md`.
 - **New: `.text-{stop}`**, which sets `font-size` and `line-height` together.
 
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.display-1` … `.display-6` and `.lead` are removed**, with
   `$display-font-sizes`, `$display-font-family`, `$display-font-style`,
   `$display-font-weight`, `$display-line-height`, `$lead-font-size` and
@@ -5785,7 +5785,7 @@ sizes.
 
 #### The focus ring is an outline
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 Focus rings were drawn with `box-shadow` and are now drawn with `outline`,
 following upstream v6. The practical win is that an outline is **not clipped by an
@@ -5854,7 +5854,7 @@ the property drawing it, which also means the ring no longer participates in a
 
 #### Everything deprecated before v6 is removed
 
-<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 Some of these carried a "to be removed in v6" note since v4.2. This is v6.
 
@@ -6052,7 +6052,7 @@ markup.
   `.underline-offset-*`, the class sets a `text-decoration-*` property on any
   element rather than only on a link, and it now sits beside
   `.underline-thickness-*`, which already carried that name.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The colour utilities take upstream's names, and opacity is a step of the
   same family.** Text colour is `.fg-{color}` (`.fg-emphasis-{color}`,
   `.fg-contrast-{color}`, `.fg-reset`, plus the `.fg-body` / `.fg-1` … `.fg-4`
@@ -6084,7 +6084,7 @@ markup.
   set `--cui-bg` to a translucent colour. Reboot's `a` reads
   `var(--cui-theme-fg, var(--cui-link-color))` directly instead of mixing the
   link colour through `--cui-link-opacity` on every link.
-- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.rounded-*` counts the stops of the radius scale.** The numbers are the
   keys of `$radii` (`--cui-radius-0` … `-9`) instead of the five v5 sizes, so
   every numbered class changes value and four new ones appear:

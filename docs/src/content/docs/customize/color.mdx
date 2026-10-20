@@ -463,14 +463,14 @@ generate those with the [utility API](/utilities/api/).
 3. Merge that map into the `values` of any utility group.
 
 Here's an example that generates text color utilities for two stops of every
-palette color and for one brand color (e.g., `.text-primary-300`, `.text-brand`).
+palette color and for one brand color (e.g., `.fg-primary-300`, `.fg-brand`).
 
 ```scss
 // _my-colors.scss
 @use "sass:map";
-@use "@coreui/coreui/scss/functions/maps" as *;
-@use "@coreui/coreui/scss/colors" as *;
-@use "@coreui/coreui/scss/utilities" as *;
+@use "@coreui/coreui-pro/scss/functions/maps" as *;
+@use "@coreui/coreui-pro/scss/colors" as *;
+@use "@coreui/coreui-pro/scss/utilities" as *;
 
 $scale-colors: ();
 
@@ -485,11 +485,11 @@ $all-colors: map-merge-multiple($scale-colors, ("brand": #6f42c1));
 $utilities: map.merge(
   $utilities,
   (
-    "color": map.merge(
-      map.get($utilities, "color"),
+    "fg": map.merge(
+      map.get($utilities, "fg"),
       (
         values: map.merge(
-          map.get(map.get($utilities, "color"), "values"),
+          map.get(map.get($utilities, "fg"), "values"),
           $all-colors,
         ),
       ),
@@ -504,7 +504,7 @@ utilities API runs:
 ```scss
 // my-coreui.scss
 @use "my-colors";
-@use "@coreui/coreui/scss/coreui";
+@use "@coreui/coreui-pro/scss/coreui";
 ```
 
-This will generate new `.text-{color}-{level}` utilities for every color and level. You can do the same for any other utility and property as well.
+This will generate new `.fg-{color}-{level}` utilities for every color and level. You can do the same for any other utility and property as well.
