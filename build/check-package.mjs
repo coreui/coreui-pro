@@ -3,8 +3,9 @@
 /*!
  * Script to check that the packed tarball carries, next to every plugin file
  * in js/dist, the ES module and both declarations the exports map points at,
- * every js/ and dist/js/ file the exports map names directly, and that the
- * package root resolves to the same js/dist modules as the plugin entries.
+ * every js/ and dist/js/ file the exports map names directly, that the
+ * package root resolves to the same js/dist modules as the plugin entries,
+ * and every agent skill in skills/.
  * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  */
@@ -51,6 +52,12 @@ const { module: moduleEntry } = JSON.parse(fs.readFileSync(path.join(root, 'pack
 for (const entry of [...targets(exports['.']), moduleEntry]) {
   if (!/^(\.\/)?js\/dist\/index\.(m?js|d\.m?ts)$/.test(entry)) {
     problems.push(`the package root resolves to ${entry}, outside the js/dist modules the plugin entries load, so mixing the two imports duplicates them`)
+  }
+}
+
+for (const skill of fs.readdirSync(path.join(root, 'skills'))) {
+  if (!shipped.has(`skills/${skill}/SKILL.md`)) {
+    problems.push(`skills/${skill}/SKILL.md is not in the package`)
   }
 }
 

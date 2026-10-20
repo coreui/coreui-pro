@@ -318,5 +318,12 @@ export default [
     rules: {
       'unicorn/prefer-node-protocol': 'off'
     }
+  },
+  {
+    files: ['skills/**/*.md/*.js', 'skills/**/*.md/*.jsx', 'skills/**/*.md/*.mjs'],
+    rules: {
+      'import/no-unassigned-import': 'off',
+      'import/no-unresolved': 'off'
+    }
   }
 ]

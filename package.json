@@ -57,8 +57,9 @@
     "js-test-integration-modularity": "rolldown --config js/tests/integration/rolldown.bundle-modularity.mjs",
     "js-test-integration-modularity-esm": "rolldown --config js/tests/integration/rolldown.bundle-modularity-esm.mjs",
     "js-test-package": "node build/check-package.mjs",
+    "js-test-skills": "node build/check-skills.mjs",
     "js-test-jquery": "cross-env JQUERY=true vitest run --config js/tests/vitest.config.mts",
-    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel js-lint js-typecheck js-test-config-types js-test-default-type js-test-docs-options css-lint css-components-test lockfile-lint",
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel js-lint js-typecheck js-test-config-types js-test-default-type js-test-docs-options js-test-skills css-lint css-components-test lockfile-lint",
     "docs": "npm-run-all docs-build docs-lint",
     "docs-build": "npm run css-compile && astro build --root docs",
     "docs-compile": "npm run docs-build",
@@ -347,6 +348,7 @@
     "js/src/**/*.ts",
     "scss/**/*.scss",
     "!scss/tests/**",
+    "skills/*/SKILL.md",
     ".browserslistrc"
   ],
   "jspm": {
