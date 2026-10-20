@@ -90,15 +90,16 @@ const CLASS_NAME_SEARCH = 'form-multi-select-search'
 const CLASS_NAME_SELECTED = 'selected'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
-const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
+const CLASS_NAME_SELECTION_CHIPS = 'form-multi-select-selection-chips'
 const CLASS_NAME_SHOW = 'show'
 
 type MultiSelectConfig = {
   allowList: SanitizerAllowList
+  ariaChipRemoveLabel: string
   ariaCleanerLabel: string
   ariaPickerLabel: string
   ariaSearchLabel: string
-  ariaTagDeleteLabel: string
+  ariaTagDeleteLabel: string | null
   cleaner: boolean
   clearSearchOnSelect: boolean
   container: Element | boolean | string
@@ -142,10 +143,11 @@ type MultiSelectConfig = {
 
 const Default: MultiSelectConfig = {
   allowList: DefaultAllowlist as SanitizerAllowList,
+  ariaChipRemoveLabel: 'Remove',
   ariaCleanerLabel: 'Clear all selections',
   ariaPickerLabel: 'Toggle options list',
   ariaSearchLabel: 'Search',
-  ariaTagDeleteLabel: 'Remove',
+  ariaTagDeleteLabel: null,
   cleaner: true,
   clearSearchOnSelect: false,
   container: false,
@@ -180,7 +182,7 @@ const Default: MultiSelectConfig = {
   selectedLabel: (count: number) => `${count} item(s) selected`,
   selectFilteredLabel: 'Select filtered',
   selectionLimit: null,
-  selectionType: 'tags',
+  selectionType: 'chips',
   total: null,
   valid: false,
   validationState: null,
@@ -189,10 +191,11 @@ const Default: MultiSelectConfig = {
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
+  ariaChipRemoveLabel: 'string',
   ariaCleanerLabel: 'string',
   ariaPickerLabel: 'string',
   ariaSearchLabel: 'string',
-  ariaTagDeleteLabel: 'string',
+  ariaTagDeleteLabel: '(string|null)',
   cleaner: 'boolean',
   clearSearchOnSelect: 'boolean',
   container: '(string|element|boolean)',
@@ -1047,7 +1050,7 @@ class MultiSelect extends ComboboxBase {
     selectionEl.classList.add(CLASS_NAME_SELECTION)
 
     if (this._config.multiple && ['chips', 'tags'].includes(this._config.selectionType)) {
-      selectionEl.classList.add(CLASS_NAME_SELECTION_TAGS)
+      selectionEl.classList.add(CLASS_NAME_SELECTION_CHIPS)
     }
 
     togglerEl.append(selectionEl)
@@ -1228,7 +1231,7 @@ class MultiSelect extends ComboboxBase {
 
     // eslint-disable-next-line no-new
     new Chip(chip, {
-      ariaRemoveLabel: `${this._config.ariaTagDeleteLabel} ${text}`.trim(),
+      ariaRemoveLabel: `${this._config.ariaTagDeleteLabel ?? this._config.ariaChipRemoveLabel} ${text}`.trim(),
       disabled: disabled === true,
       removable: !this._disabled && disabled !== true
     })

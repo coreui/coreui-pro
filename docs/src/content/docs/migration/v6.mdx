@@ -2235,6 +2235,10 @@ submit.
   read, so set the state with `setValidationState()`. A native form
   reset restores the selection the control started with. See
   [Validation](/forms/multi-select/#validation).
+- **`selectionType: 'chips'` is the default, and `'tags'` is deprecated.** The
+  two render the same chips; `'tags'` keeps working until v7.
+  `ariaTagDeleteLabel` is deprecated in favour of `ariaChipRemoveLabel`; the old
+  option still names the remove button and takes precedence while it is set.
 
 #### Password Input and Number Input build their own frame
 
@@ -5437,7 +5441,7 @@ Nothing existing changes; these are additions. See
   `--cui-chip-input-padding-x` and the rest of their frame sets are now
   `--cui-control-*` on the same elements. Runtime overrides written against
   the old names must be updated. Component-specific tokens (indicators,
-  dropdowns, tags, cells, cleaner buttons) keep their names. Three v5 names
+  dropdowns, cells, cleaner buttons) keep their names. Three v5 names
   that survived as undeclared fallbacks are gone too:
   `--cui-input-placeholder-color` (set `--cui-control-placeholder-color`),
   `--cui-input-focus-border-color` in the combobox (set
@@ -5965,6 +5969,10 @@ markup.
   are still accepted and now produce the same markup, so a selection is a chip
   everywhere in the library — style it through the `--cui-chip-*`
   properties. The `$form-multi-select-tag-*` variables are gone with it.
+  `'chips'` is the name and the default now; `'tags'` renders the same and is
+  deprecated until v7. The selection container `.form-multi-select-selection-tags`
+  and its `--cui-form-multi-select-selection-tags-gap` and `-padding-y` tokens
+  are renamed `-selection-chips`, with no alias.
 
 - **The per-family frame variables are gone.** `$autocomplete-font-size`,
   `$date-picker-border-color`, `$time-picker-focus-bg`,
@@ -5974,7 +5982,7 @@ markup.
   through them never reached it. Theme the frame once through the `$input-*`
   variables, or per instance through `--cui-control-*` on
   `.form-control-group`. Each family keeps only the variables for what is
-  genuinely its own (placeholder colours, the pickers' footers, the tag row).
+  genuinely its own (placeholder colours, the pickers' footers, the chip row).
 
   Markup you write by hand has to be updated: the password input wrapper
   (`<div class="form-control-group">` with a `.form-control-action` button) and

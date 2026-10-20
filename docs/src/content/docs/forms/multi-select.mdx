@@ -179,27 +179,9 @@ If you want to enable users to select multiple options as text entries, add the 
     </optgroup>
   </select>`} />
 
-### Tag
-
-If you want to display selected options as tags, add the `data-coreui-selection-type="tags"`. This mode is useful for visually grouping selected items. The search functionality is also enabled for better user experience.
-
-<Example pro code={`<select id="multiple-select-tag" data-coreui-multi-select multiple data-coreui-selection-type="tags" data-coreui-search="true">
-    <option value="0">Angular</option>
-    <option value="1">Bootstrap</option>
-    <option value="2">React.js</option>
-    <option value="3">Vue.js</option>
-    <optgroup label="backend">
-      <option value="4">Django</option>
-      <option value="5">Laravel</option>
-      <option value="6">Node.js</option>
-    </optgroup>
-  </select>`} />
-
 ### Chips
 
-<AddedIn version="6.0.0" />
-
-Add `data-coreui-selection-type="chips"` to render selected options as [Chip](/components/chip/) components — each selection becomes a real chip with the standard chip styling and a labelled remove button.
+Selected options render as [Chip](/components/chip/) components by default (`data-coreui-selection-type="chips"`). Each selection is a real chip with the standard chip styling and a remove button named by `ariaChipRemoveLabel`, which keeps the selected items grouped and easy to drop. `tags`, the v5 name of this mode, renders the same and is deprecated.
 
 <Example pro code={`<select id="multiple-select-chips" data-coreui-multi-select multiple data-coreui-selection-type="chips" data-coreui-search="true">
     <option value="0">Angular</option>
@@ -501,7 +483,7 @@ The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the 
       </select>
     </div>
     <div class="col-md-6">
-      <select id="multiple-select-tags-lg" class="form-control-lg mb-4" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
+      <select id="multiple-select-chips-lg" class="form-control-lg mb-4" data-coreui-multi-select data-coreui-selection-type="chips" data-coreui-search="true">
         <option value="0">Angular</option>
         <option value="1">Bootstrap</option>
         <option value="2">React.js</option>
@@ -512,7 +494,7 @@ The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the 
           <option value="6">Node.js</option>
         </optgroup>
       </select>
-      <select id="multiple-select-tags-sm" class="form-control-sm" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
+      <select id="multiple-select-chips-sm" class="form-control-sm" data-coreui-multi-select data-coreui-selection-type="chips" data-coreui-search="true">
         <option value="0">Angular</option>
         <option value="1">Bootstrap</option>
         <option value="2">React.js</option>
@@ -572,10 +554,11 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | `DefaultAllowlist` | Object containing allowed tags and attributes for HTML sanitization when using custom templates. |
+| `ariaChipRemoveLabel` | string | `'Remove'` | Accessible label prefix for a chip's remove button. The selected option's text is appended, so screen readers announce e.g. "Remove Angular". |
 | `ariaCleanerLabel`| string | `Clear all selections` | A string that provides an accessible label for the cleaner button. This label is read by screen readers to describe the action associated with the button. |
 | `ariaPickerLabel` | string | `'Toggle options list'` | Accessible label of the picker button. |
 | `ariaSearchLabel`| string | `Search` | Accessible label for the search input (when `search` is enabled). |
-| `ariaTagDeleteLabel`| string | `Remove` | Accessible label prefix for a tag's delete button (selection type `tags`). The selected option's text is appended, so screen readers announce e.g. "Remove Angular". |
+| `ariaTagDeleteLabel` | string \| null | `null` | Deprecated, use `ariaChipRemoveLabel`. While it is set, it takes precedence over `ariaChipRemoveLabel`. |
 | `cleaner`| boolean | `true` | Enables selection cleaner element. |
 | `clearSearchOnSelect`| boolean | `false` | Clear current search on selecting an item. |
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
@@ -610,7 +593,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `selectedLabel` | string, function | `` (count) => `${count} item(s) selected` `` | The counter selection label. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced; `total` is the number of options in the list, disabled ones and the ones inside a group included, so a disabled option shows that not everything is selected, plus any selected value the current options lack, so it never falls below `count`, unless the `total` option gives a number of its own. |
 | `selectFilteredLabel` | string | `'Select filtered'` | Label shown instead of `selectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list, so the button reads as acting on the filtered options rather than the whole list. |
 | `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. The select all button stays enabled and selects up to the limit (firing the `selectionLimit` event), then toggles to deselect all once the limit is reached. |
-| `selectionType` | string | `'tags'` | Sets the selection style: `'chips'`, `'counter'`, `'tags'` or `'text'`. Selections render as [Chip](/components/chip/) components — `'tags'` and `'chips'` are the same thing, kept as synonyms. |
+| `selectionType` | string | `'chips'` | Sets the selection style: `'chips'`, `'counter'` or `'text'`. `'chips'` renders the selection as [Chip](/components/chip/) components. `'tags'` is a deprecated name for `'chips'`. |
 | `total` | number, null | `null` | The `{total}` of `selectedLabel`. Leave it `null` to count the options in the list; with `search: 'external'` give the number of records your data source holds, which the component cannot see. |
 | `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
 | `validationState` | string, null | `null` | The validation state the control shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change of the selection by the user clears it, see [Validation](#validation). |
@@ -684,7 +667,7 @@ The select stays in the page as an invisible overlay for form validation and is 
 
 ### CSS variables
 
-The field is a [`.form-control-group`](/forms/form-control-group/#css-variables), so its frame, the cleaner and the toggle read the `--cui-control-*` and `--cui-control-group-*` tokens. The plugin renders that frame as a `.form-multi-select` element around your `<select>`: set the tokens with a rule on `.form-multi-select`, because a `style` attribute on the `<select>` does not reach the frame. The selected tags add two of their own:
+The field is a [`.form-control-group`](/forms/form-control-group/#css-variables), so its frame, the cleaner and the toggle read the `--cui-control-*` and `--cui-control-group-*` tokens. The plugin renders that frame as a `.form-multi-select` element around your `<select>`: set the tokens with a rule on `.form-multi-select`, because a `style` attribute on the `<select>` does not reach the frame. The selected chips add two of their own:
 
 <ScssDocs file="scss/forms/_form-multi-select.scss" capture="form-multi-select-tokens" />
 

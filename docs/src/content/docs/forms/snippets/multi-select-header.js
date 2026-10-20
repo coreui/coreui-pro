@@ -13,7 +13,7 @@ new coreui.MultiSelect(myMultiSelectHeader, {
   ],
   placeholder: 'Select frameworks',
   search: true,
-  selectionType: 'tags',
+  selectionType: 'chips',
   headerTemplate(state, actions) {
     const wrapper = document.createElement('div')
     wrapper.className = 'd-flex flex-wrap gap-3'
