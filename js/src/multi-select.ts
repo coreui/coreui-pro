@@ -12,6 +12,7 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
+import { hasShortcutModifier } from './util/calendar.js'
 import { type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement } from './util/chip-values.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
@@ -695,7 +696,7 @@ class MultiSelect extends ComboboxBase {
       }
 
       const target = containsFocus(chip) ?
-        getRemovalNeighbor(this._getChips(), chip) ?? this._getChipsFallback() :
+        getRemovalNeighbor(this._getChips(), chip) ?? (this._config.search ? this._searchElement : this._togglerElement) :
         null
 
       this._removeAsUser(() => this._deselectOption(String(chip.dataset.value)))
@@ -1274,7 +1275,6 @@ class MultiSelect extends ComboboxBase {
     const chips = new Map<string, HTMLElement>()
     let focused: string | undefined
     const selected = this._selectedOptions()
-    const stop = this._getChipTabStop()
 
     for (const chip of SelectorEngine.children(selection, SELECTOR_CHIP) as HTMLElement[]) {
       const option = selected.find((option: any) => option.value === chip.dataset.value)
@@ -1292,6 +1292,7 @@ class MultiSelect extends ComboboxBase {
       chip.remove()
     }
 
+    const stop = [...chips.values()].find(chip => chip.tabIndex === 0)
     let next: HTMLElement | null = search?.parentElement === selection ? search : null
 
     for (const option of selected.toReversed()) {
@@ -1312,7 +1313,7 @@ class MultiSelect extends ComboboxBase {
       next = chip
     }
 
-    this._moveChipTabStop(stop)
+    this._selectionChipSet?._moveTabStop(stop)
   }
 
   override _onSelectionChange(): void {
@@ -1413,23 +1414,11 @@ class MultiSelect extends ComboboxBase {
     return this._selectionChipSet?._getFocusableChips() ?? []
   }
 
-  _getChipTabStop(): string | undefined {
-    return this._getChips().find(chip => chip.tabIndex === 0)?.dataset.value
-  }
-
-  _moveChipTabStop(value: string | undefined): void {
-    this._selectionChipSet?._moveTabStop(this._getChips().find(chip => chip.dataset.value === value) ?? null)
-  }
-
-  _getChipsFallback(): HTMLElement {
-    return this._config.search ? this._searchElement : this._togglerElement
-  }
-
   _handleSearchToChips(event: any): boolean {
     const removing = event.key === BACKSPACE_KEY || event.key === DELETE_KEY
     const arrow = event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY
 
-    if ((!removing && !arrow) || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+    if ((!removing && !arrow) || event.isComposing || event.shiftKey || hasShortcutModifier(event)) {
       return false
     }
 
