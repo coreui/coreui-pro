@@ -226,6 +226,30 @@ describe('Chip', () => {
       expect(btn.getAttribute('aria-label')).toEqual(expected)
     })
 
+    it('should name the remove button with the chip text, its whitespace collapsed', () => {
+      fixtureEl.innerHTML = '<span class="chip">\n  <span class="avatar">L</span>\n  Leah\n</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl, { removable: true })
+
+      expect(chipEl.querySelector('.chip-remove').getAttribute('aria-label')).toEqual('Remove L Leah')
+    })
+
+    it('should name a remove button from the markup only when it has no name', () => {
+      fixtureEl.innerHTML = [
+        '<span class="chip">Tag <button type="button" class="chip-remove"></button></span>',
+        '<span class="chip">Tag <button type="button" class="chip-remove" aria-label="Drop"></button></span>'
+      ].join('')
+
+      for (const chipEl of fixtureEl.querySelectorAll('.chip')) {
+        // eslint-disable-next-line no-new
+        new Chip(chipEl, { removable: true })
+      }
+
+      expect([...fixtureEl.querySelectorAll('.chip-remove')].map(button => button.getAttribute('aria-label'))).toEqual(['Remove Tag', 'Drop'])
+    })
+
     it('should name the remove button from a data attribute template', () => {
       fixtureEl.innerHTML = '<span class="chip" data-coreui-aria-remove-label="Usuń {label}">Tag</span>'
 

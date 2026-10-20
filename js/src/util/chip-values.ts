@@ -103,5 +103,5 @@ export const getChipRemoveLabel = (removeLabel: ChipRemoveLabel, label: string):
     return removeLabel(label)
   }
 
-  return removeLabel.includes('{label}') ? removeLabel.replaceAll('{label}', label) : `${removeLabel} ${label}`.trim()
+  return removeLabel.includes('{label}') ? removeLabel.replaceAll('{label}', () => label) : `${removeLabel} ${label}`.trim()
 }

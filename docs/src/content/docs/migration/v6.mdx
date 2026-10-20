@@ -2821,10 +2821,14 @@ field behind that kept submitting.
   `ariaAddedAnnouncement`/`ariaRemovedAnnouncement`.
 - **Every remove button names its chip.** Chip and Chip set named each remove
   button `Remove`, so a set read the same name for every chip; the button is
-  `Remove <text>` now, as Chip input and Multi Select already did. `ariaRemoveLabel`
-  (and Multi Select's `ariaChipRemoveLabel`) takes a string, where `{label}` stands
-  for the chip's text and is appended when missing, or a function of the text for
-  a different word order. A label written for v5 keeps working and gains the text.
+  `Remove <text>` now, as Multi Select already did; Chip input names it after the
+  chip's text instead of its value. `ariaRemoveLabel` (and Multi Select's
+  `ariaChipRemoveLabel`) takes a string, where `{label}` stands for the chip's text
+  and is appended when missing, or a function of the text for a different word
+  order. A one-word label such as `Usuń` gains the text; a label that already spelled
+  the text out, such as `data-coreui-aria-remove-label="Remove React"`, now repeats
+  it, so drop it or use `{label}`. A `.chip-remove` button you write yourself keeps
+  its `aria-label`, and gets one from `ariaRemoveLabel` when it has none.
 - **Chip input: `aria-disabled`/`aria-readonly` are no longer stamped on the
   container.** The container is a generic element, so those attributes were
   invalid on it (axe `aria-allowed-attr`); the native `disabled`/`readonly`

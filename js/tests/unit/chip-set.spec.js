@@ -343,6 +343,17 @@ describe('ChipSet', () => {
       expect(control.getAttribute('aria-label')).toBeNull()
     })
 
+    it.each([
+      ['a {label} template', 'Usuń {label}', 'Usuń First'],
+      ['a function', label => `${label} entfernen`, 'First entfernen']
+    ])('should name the remove buttons with %s', (_, ariaRemoveLabel, expected) => {
+      const el = setMarkup(['First', 'Second'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true, ariaRemoveLabel })
+
+      expect(el.querySelector('.chip-remove').getAttribute('aria-label')).toEqual(expected)
+    })
+
     it('should keep a real button when the set is not a listbox', () => {
       const el = setMarkup(['First', 'Second'])
       // eslint-disable-next-line no-new

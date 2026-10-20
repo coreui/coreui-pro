@@ -150,7 +150,7 @@ Use `.chip-sm` or `.chip-lg` for different sizes. Chips placed in a `.form-contr
     </span>
     <span class="chip chip-sm">
       Small removable
-      <button type="button" class="chip-remove" aria-label="Remove">
+      <button type="button" class="chip-remove" aria-label="Remove Small removable">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="4" y1="4" x2="12" y2="12"/>
           <line x1="12" y1="4" x2="4" y2="12"/>
@@ -179,7 +179,7 @@ Use `.chip-sm` or `.chip-lg` for different sizes. Chips placed in a `.form-contr
     </span>
     <span class="chip">
       Default removable
-      <button type="button" class="chip-remove" aria-label="Remove">
+      <button type="button" class="chip-remove" aria-label="Remove Default removable">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="4" y1="4" x2="12" y2="12"/>
           <line x1="12" y1="4" x2="4" y2="12"/>
@@ -208,7 +208,7 @@ Use `.chip-sm` or `.chip-lg` for different sizes. Chips placed in a `.form-contr
     </span>
     <span class="chip chip-lg">
       Large removable
-      <button type="button" class="chip-remove" aria-label="Remove">
+      <button type="button" class="chip-remove" aria-label="Remove Large removable">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="4" y1="4" x2="12" y2="12"/>
           <line x1="12" y1="4" x2="4" y2="12"/>
@@ -248,12 +248,12 @@ coreui.Chip.getOrCreateInstance(chip, {
 
 ### Remove button
 
-If `removable` is enabled, the plugin will add the remove button automatically. You can also provide your own markup:
+If `removable` is enabled, the plugin will add the remove button automatically. You can also provide your own markup; a button without an `aria-label` gets its name from `ariaRemoveLabel`:
 
 ```html
 <span class="chip" data-coreui-chip data-coreui-removable="true">
   Removable chip
-  <button type="button" class="chip-remove" aria-label="Remove">
+  <button type="button" class="chip-remove">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
       <line x1="4" y1="4" x2="12" y2="12"/>
       <line x1="12" y1="4" x2="4" y2="12"/>

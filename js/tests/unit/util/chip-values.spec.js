@@ -125,6 +125,10 @@ describe('Chip value utilities', () => {
       expect(getChipRemoveLabel(removeLabel, 'React')).toBe(expected)
     })
 
+    it('keeps replacement patterns in the label as they are', () => {
+      expect(getChipRemoveLabel('Remove {label}', 'Q$&A $$')).toBe('Remove Q$&A $$')
+    })
+
     it('trims the name when the label is empty', () => {
       expect(getChipRemoveLabel('Remove', '')).toBe('Remove')
     })

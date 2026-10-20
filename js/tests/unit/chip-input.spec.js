@@ -804,7 +804,26 @@ describe('ChipInput', () => {
       expect(chip.classList.contains('chip')).toBeTrue()
     })
 
-    it('should name the remove button with ariaRemoveLabel followed by the chip value', () => {
+    it('should name the remove button after the chip text, not its value', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"><span class="chip" data-coreui-chip-value="pl">Poland</span></div>'
+
+      // eslint-disable-next-line no-new
+      new ChipInput(fixtureEl.querySelector('.chip-input'))
+
+      expect(fixtureEl.querySelector('.chip-remove').getAttribute('aria-label')).toBe('Remove Poland')
+    })
+
+    it.each([
+      ['a {label} template', 'Usuń „{label}”', 'Usuń „JavaScript”'],
+      ['a function', label => `${label} entfernen`, 'JavaScript entfernen']
+    ])('should name the remove button with %s', (_, ariaRemoveLabel, expected) => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { ariaRemoveLabel })
+
+      expect(chipInput.add('JavaScript').querySelector('.chip-remove').getAttribute('aria-label')).toBe(expected)
+    })
+
+    it('should name the remove button with ariaRemoveLabel followed by the chip text', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input" id="plain"></div>' +
         '<div class="form-control-group chip-input" id="custom" data-coreui-aria-remove-label="Usuń"></div>'
 

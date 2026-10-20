@@ -299,10 +299,14 @@ class Chip extends BaseComponent {
     const button = document.createElement('button')
     button.type = 'button'
     button.className = CLASS_NAME_CHIP_REMOVE
-    button.setAttribute('aria-label', getChipRemoveLabel(this._config.ariaRemoveLabel, this._element.textContent.trim()))
+    button.setAttribute('aria-label', this._getRemoveLabel())
     button.setAttribute('tabindex', '-1')
     button.innerHTML = sanitizeByConfig(this._config.removeIcon, this._config)
     return button
+  }
+
+  _getRemoveLabel(): string {
+    return getChipRemoveLabel(this._config.ariaRemoveLabel, this._element.textContent.replaceAll(/\s+/g, ' ').trim())
   }
 
   _ensureRemoveControl(): void {
@@ -311,7 +315,12 @@ class Chip extends BaseComponent {
       return
     }
 
-    if (SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, this._element)) {
+    const existing = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, this._element)
+    if (existing) {
+      if (existing.tagName === 'BUTTON' && !existing.hasAttribute('aria-label')) {
+        existing.setAttribute('aria-label', this._getRemoveLabel())
+      }
+
       return
     }
 
