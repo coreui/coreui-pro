@@ -1,4 +1,5 @@
 import { onTestFinished, vi } from 'vitest'
+import TimeInput from '../../src/time-input.js'
 import TimePicker from '../../src/time-picker.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
@@ -450,6 +451,24 @@ describe('TimePicker', () => {
       expect(cell('minutes', '15').classList.contains('selected')).toBeFalse()
     })
 
+    it.each([
+      ['clears the field', null, null],
+      ['writes another time', new Date(1970, 0, 1, 15), '15']
+    ])('should show what a timeChange listener writes after a pick moved into the limits, when it %s', (_, written, hour) => {
+      const picker = buildPicker({
+        locale: 'en-GB', maxDate: '17:00', minDate: '09:30', seconds: false, time: '10:15'
+      })
+      fixtureEl.querySelector('#picker').addEventListener('timeChange.coreui.time-picker', () => picker.setTime(written), { once: true })
+      picker.show()
+
+      cell('hours', '9').click()
+
+      expect(picker.getTime()).toEqual(written)
+      expect(picker._selection.getTime()).toEqual(written)
+      expect(cell('hours', '9').classList.contains('selected')).toBeFalse()
+      expect(hour ? cell('hours', hour).classList.contains('selected') : true).toBeTrue()
+    })
+
     it('should judge no minute by the limits while the field is empty, and start on the first allowed hour', () => {
       const picker = buildPicker({
         locale: 'en-GB', maxDate: '17:00', minDate: '09:30', seconds: false
@@ -711,6 +730,9 @@ describe('TimePicker', () => {
     })
 
     it('should emit timeChange once per change, carrying what getTime returns', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 9, 15, 9, 40))
+      onTestFinished(() => vi.useRealTimers())
       const picker = buildPicker({ time: '09:15', seconds: false })
       const emitted = listen()
 
@@ -728,6 +750,7 @@ describe('TimePicker', () => {
       expect(emitted.length).toEqual(2)
       expect(emitted[1]).toEqual(picker.getTime())
 
+      vi.setSystemTime(new Date(2026, 9, 15, 18, 5, 30))
       picker.getContext().now()
       expect(emitted.length).toEqual(3)
       expect(emitted[2]).toEqual(picker.getTime())
@@ -758,6 +781,21 @@ describe('TimePicker', () => {
       cell('meridiem', 'am').click()
 
       expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 9, 15))
+    })
+
+    it('should show in the panel a time a listener writes straight into the field during a panel pick', () => {
+      const picker = buildPicker({ locale: 'en-GB', seconds: false, time: '09:15' })
+
+      fixtureEl.querySelector('#picker').addEventListener('timeChange.coreui.time-input', event => {
+        if (event.date?.getHours() === 10) {
+          TimeInput.getInstance(event.target).setDate(new Date(1970, 0, 1, 8, 15))
+        }
+      })
+      picker.show()
+      cell('hours', '10').click()
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 8, 15))
+      expect(fixtureEl.querySelector('.time-picker-popup [data-coreui-hours].selected').getAttribute('data-coreui-hours')).toEqual('8')
     })
 
     it('should show in the panel a time a listener sets through setTime during a panel pick', () => {

@@ -17,6 +17,7 @@ import {
   formatSelectionName,
   getDateBySelectionType,
   isSameDateAs,
+  isSameInstantAs,
   type SelectionTypes
 } from './util/calendar.js'
 import {
@@ -432,8 +433,8 @@ class DatePicker extends PickerBase {
 
     this._writeField(limited, 'selection')
 
-    if (this._element) {
-      this._selection?.setTime(this.getDate() ?? limited)
+    if (this._element && isSameInstantAs(this._selection?.getTime(), time)) {
+      this._selection.setTime(this.getDate() ?? limited)
     }
   }
 

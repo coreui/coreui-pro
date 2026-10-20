@@ -901,6 +901,21 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('select.date-picker-time-select.minutes').value).toEqual('15')
     })
 
+    it('should keep a time the field refuses in the time panel, so the next pick builds on it', () => {
+      const picker = buildPicker({
+        date: new Date(2026, 6, 14, 10, 15), disabledDates: date => date.getHours() >= 12, locale: 'en-GB', timepicker: true
+      })
+      const select = part => fixtureEl.querySelector(`.date-picker-popup select.date-picker-time-select.${part}`)
+
+      picker.show()
+      select('hours').value = '14'
+      select('hours').dispatchEvent(new Event('change'))
+
+      expect(picker.getDate()).toBeNull()
+      expect(select('hours').value).toEqual('14')
+      expect(select('minutes').value).toEqual('15')
+    })
+
     it('should show in the time panel a time the field takes from a listener during a panel pick', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14, 10, 0), locale: 'en-GB', timepicker: true })
 
@@ -2337,6 +2352,25 @@ describe('DatePicker', () => {
       hours.dispatchEvent(new Event('change'))
 
       expect(disabled('minutes')).toEqual(Array.from({ length: 30 }, (_, minute) => minute))
+    })
+
+    it.each([
+      ['clears the field', null, ''],
+      ['writes another time', new Date(2026, 9, 15, 14), '14']
+    ])('should show what a dateChange listener writes after a time picked into the limits, when it %s', (_, written, hour) => {
+      const picker = buildPicker({
+        timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30), date: new Date(2026, 9, 15, 12)
+      })
+      fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-picker', () => picker.setDate(written), { once: true })
+      picker.show()
+      const hours = fixtureEl.querySelector('.date-picker-popup select.date-picker-time-select.hours')
+
+      hours.value = '10'
+      hours.dispatchEvent(new Event('change'))
+
+      expect(picker.getDate()).toEqual(written)
+      expect(picker._selection.getTime()).toEqual(written)
+      expect(fixtureEl.querySelector('.date-picker-popup select.date-picker-time-select.hours').value).toEqual(hour)
     })
 
     it('should read limits given as strings with a time', () => {
