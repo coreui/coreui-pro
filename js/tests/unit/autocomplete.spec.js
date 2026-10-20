@@ -1569,6 +1569,94 @@ describe('Autocomplete', () => {
       expect(events).toEqual([])
     })
 
+    it.each([
+      ['a pick', autocomplete => autocomplete._onOptionSelected('a'), ['a'], 'A'],
+      ['typing', autocomplete => {
+        autocomplete._inputElement.value = 'x'
+        autocomplete._inputElement.dispatchEvent(new Event('input', { bubbles: true }))
+      }, [], 'x'],
+      ['clear()', autocomplete => autocomplete.clear(), [], '']
+    ])('should end the wait of a setValue value on %s, so options that bring it later do not replace what the user did', (_, act, selected, text) => {
+      const { autocomplete } = mount({ options: [{ label: 'A', value: 'a' }] })
+
+      autocomplete.setValue('c')
+      act(autocomplete)
+      autocomplete.setOptions([{ label: 'A', value: 'a' }, { label: 'C', value: 'c' }])
+
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(selected)
+      expect(autocomplete._inputElement.value).toBe(text)
+    })
+
+    it.each([
+      ['the start value', async () => {}],
+      ['the value a form reset waits for', async (autocomplete, form) => {
+        autocomplete._onOptionSelected('a')
+        form.reset()
+        await new Promise(resolve => {
+          setTimeout(resolve)
+        })
+      }]
+    ])('should end the wait of %s on a pick, so options that bring it later do not replace it', async (_, prepare) => {
+      const { autocomplete, form } = mount({ options: [{ label: 'A', value: 'a' }], value: 'c' })
+
+      await prepare(autocomplete, form)
+
+      expect(autocomplete._selectedOptions()).toEqual([])
+
+      autocomplete._onOptionSelected('a')
+      autocomplete.setOptions([{ label: 'A', value: 'a' }, { label: 'C', value: 'c' }])
+
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should drop a selected disabled option on setValue, as a native select takes a value from a script', () => {
+      const { autocomplete } = mount({ cleaner: true, options: [{ label: 'A', value: 'a', disabled: true }, { label: 'B', value: 'b' }], value: 'a' })
+
+      expect(autocomplete._selectedOptions().map(option => option.value)).toEqual(['a'])
+      expect(autocomplete._cleanerElement.style.display).toBe('')
+
+      autocomplete.setValue(null)
+
+      expect(autocomplete._selectedOptions()).toEqual([])
+      expect(autocomplete._inputElement.value).toBe('')
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
+    })
+
+    it.each([
+      ['clear()', autocomplete => autocomplete.clear()],
+      ['the cleaner', autocomplete => autocomplete._cleanerElement.click()],
+      ['typing', autocomplete => {
+        autocomplete._inputElement.value = 'x'
+        autocomplete._inputElement.dispatchEvent(new Event('input', { bubbles: true }))
+      }],
+      ['Backspace', autocomplete => autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))]
+    ])('should drop a selected disabled option on %s and report it once', (_, act) => {
+      const { autocomplete, element } = mount({ cleaner: true, options: [{ label: 'A', value: 'a', disabled: true }, { label: 'B', value: 'b' }], value: 'a' })
+      const reported = []
+
+      element.addEventListener('change.coreui.autocomplete', event => reported.push(event.value))
+      act(autocomplete)
+
+      expect(autocomplete._selectedOptions()).toEqual([])
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
+      expect(reported).toEqual([null])
+    })
+
+    it('should drop a selected disabled option on a form reset that goes back to no value', async () => {
+      const { autocomplete, form } = mount({ cleaner: true, options: [{ label: 'A', value: 'a', disabled: true }, { label: 'B', value: 'b' }] })
+
+      autocomplete.setValue('a')
+      expect(autocomplete._cleanerElement.style.display).toBe('')
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(autocomplete._selectedOptions()).toEqual([])
+      expect(autocomplete._inputElement.value).toBe('')
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
+    })
+
     it('should keep the value through setOptions', () => {
       const { autocomplete } = mount({ value: 'a' })
 

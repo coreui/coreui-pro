@@ -310,7 +310,8 @@ class Autocomplete extends ComboboxBase {
   clear(): void {
     const isChanged = this._store.size() > 0 || this._shownText !== ''
 
-    this.deselectAll()
+    this._valueApplied = true
+    this._clearSelection()
     this.search('')
     this._filterOptionsList()
     this._setText('')
@@ -360,7 +361,7 @@ class Autocomplete extends ComboboxBase {
     this._givenValue = value
     this._valueApplied = false
     this._reportSeed = false
-    this.deselectAll()
+    this._clearSelection()
     this._setText('')
     this._seedSelection()
     this._validation.update()
@@ -452,7 +453,7 @@ class Autocomplete extends ComboboxBase {
 
       if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._store.size() > 0) {
         this._validation.dismiss(this._keySerial)
-        this.deselectAll()
+        this._clearSelection()
         this._validation.update()
         this._triggerChangeEvent(null)
       }
@@ -540,10 +541,11 @@ class Autocomplete extends ComboboxBase {
       }
 
       this._shownText = value
+      this._valueApplied = true
       this._validation.update()
 
       if (this._store.size() > 0) {
-        this.deselectAll()
+        this._clearSelection()
         this._triggerChangeEvent(null)
       }
 
@@ -811,6 +813,8 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
+    this._valueApplied = true
+
     if (this._inputElement.value !== option.label) {
       this._validation.dismiss()
     }
@@ -834,6 +838,11 @@ class Autocomplete extends ComboboxBase {
     this._known.set(String(option.value), option)
     this._commitSelection([String(option.value)])
     this._setText(option.label)
+    this._updateCleaner()
+  }
+
+  _clearSelection(): void {
+    this._commitSelection([])
     this._updateCleaner()
   }
 
@@ -897,7 +906,7 @@ class Autocomplete extends ComboboxBase {
     const text = this._shownText
 
     this._reportSeed = false
-    this.deselectAll()
+    this._clearSelection()
     this._setText('')
 
     if (this._inputHintElement) {

@@ -344,13 +344,13 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `showHints` | boolean | `false` | Shows completion hints as users type. |
 | `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
 | `validationState` | string, null | `null` | The state the autocomplete shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's next change of the value drops it. See [Validation](#validation). |
-| `value` | number, string, null | `null` | Sets the initial value of the component: the option whose value, compared as text, equals it, so `1` and `'1'` select the same option. It is applied once, as soon as the options contain it; pass it to `setValue()` to select another option, or `null` to clear the field. |
+| `value` | number, string, null | `null` | Sets the initial value of the component: the option whose value, compared as text, equals it, so `1` and `'1'` select the same option. It is applied once, as soon as the options contain it, unless the user picks, types or clears the field first; pass it to `setValue()` to select another option, or `null` to clear the field. |
 
 ### Methods
 
 | Method | Description |
 | --- | --- |
-| `clear` | Deselects the option and empties the typed text. |
+| `clear` | Deselects the option, a disabled one included, and empties the typed text. The cleaner, typing over the selection, <kbd>Backspace</kbd> or <kbd>Delete</kbd> on it and a native form reset back to no value drop a disabled option the same way. |
 | `deselectAll` | Deselects all currently selected options. |
 | `dispose` | Destroys the instance and removes the input, buttons and panel it created. An autocomplete disposed while open is closed first; the other classes it wrote on the host stay, and a new instance writes them again from its options. |
 | `getInstance` | Static method to get the Bootstrap autocomplete instance associated with a DOM element. |
@@ -358,9 +358,9 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `search` | Performs a search with the provided text parameter. |
 | `disable()` | Disables the field. |
 | `enable()` | Enables the field. |
-| `setOptions(options)` | Replaces the options, as an array or a comma-separated string. The value stays unless the new options mark another option `selected`, and a value `setValue()` gave that the earlier options lacked is picked without an event; a start value a form reset waits for is reported with `change` when the options bring it. |
+| `setOptions(options)` | Replaces the options, as an array or a comma-separated string. The value stays unless the new options mark another option `selected`, and a value `setValue()` gave that the earlier options lacked is picked without an event; a start value a form reset waits for is reported with `change` when the options bring it. A pick, typing or clearing ends the wait of either value. |
 | `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
-| `setValue(value)` | Sets the value without firing a change event, also after a form reset; a value the options lack waits for `setOptions()`. |
+| `setValue(value)` | Sets the value without firing a change event, also after a form reset; a value the options lack waits for `setOptions()` until the user picks, types or the field is cleared. It replaces the whole selection, a disabled option included, as a native select takes a value from a script. |
 | `show` | Shows the Bootstrap autocomplete dropdown options. |
 | `toggle` | Toggles the visibility of the dropdown options. |
 
