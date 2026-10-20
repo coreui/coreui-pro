@@ -2242,6 +2242,14 @@ submit.
   read, so set the state with `setValidationState()`. A native form
   reset restores the selection the control started with. See
   [Validation](/forms/multi-select/#validation).
+- **<kbd>Backspace</kbd> in the empty search box focuses the last chip.** It
+  removed the last value at once; the first press now moves the focus to the
+  last chip and the second removes it, as in Chip Input. The arrow keys move
+  between the search box and the chips, the selection is one tab stop, removing
+  a focused chip moves the focus to its neighbour, and a value removed through a
+  chip, <kbd>Backspace</kbd> or the cleaner is announced (`ariaRemovedAnnouncement`).
+  A single select and the `counter` and `text` selections still remove the last
+  value at once.
 - **`selectionType: 'chips'` is the default, and `'tags'` is deprecated.** The
   two render the same chips; `'tags'` keeps working until v7.
   `ariaTagDeleteLabel` is deprecated in favour of `ariaChipRemoveLabel`; the old
