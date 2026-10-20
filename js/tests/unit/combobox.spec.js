@@ -907,6 +907,37 @@ describe('Combobox', () => {
       expect(fixtureEl.querySelector('form').elements.country.value).toBe('')
     })
 
+    it('should send input and change from the value field on a native reset that changes the value', async () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { name: 'country', value: 'us' })
+      const form = fixtureEl.querySelector('form')
+      const events = []
+
+      pick(combobox, 'ca')
+      form.addEventListener('input', event => events.push(['input', event.target.value]))
+      form.addEventListener('change', event => events.push(['change', event.target.value]))
+      form.reset()
+      await tick()
+
+      expect(events).toEqual([['input', 'us'], ['change', 'us']])
+    })
+
+    it('should send the native change of a pick after a change.coreui.combobox listener, with the value a setValue there wrote', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { name: 'country', value: 'us' })
+      const seen = []
+
+      toggle.addEventListener('change.coreui.combobox', event => {
+        seen.push(['custom', event.value])
+        combobox.setValue('us')
+      })
+      fixtureEl.querySelector('form').addEventListener('change', event => seen.push(['change', event.target.value]))
+      pick(combobox, 'ca')
+
+      expect(seen).toEqual([['custom', 'ca'], ['change', 'us']])
+      expect(combobox.getValue()).toBe('us')
+    })
+
     it('should show what a validation reports until the value is valid, and link the message', () => {
       const toggle = setMarkupInForm('', null, '<div class="invalid-feedback">Pick a country.</div>')
       const combobox = new Combobox(toggle, { required: true })
