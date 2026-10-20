@@ -59,6 +59,7 @@ const SELECTOR_TEXT_ENTRY = 'input, textarea, select, [contenteditable=""], [con
 const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
 // The class-based selector stays alongside the data attribute: pages relying
 // on class-only auto-init keep working (the v6 bet).
+const SELECTOR_LEGACY_SELECT = 'select.form-multi-select'
 const SELECTOR_SELECT = 'select.multi-select'
 const SELECTOR_SELECTION = '.multi-select-selection'
 
@@ -1839,7 +1840,7 @@ class MultiSelect extends ComboboxBase {
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   const elements = new Set([
     ...SelectorEngine.find(SELECTOR_DATA_MULTI_SELECT),
-    ...SelectorEngine.find(SELECTOR_SELECT)
+    ...SelectorEngine.find(SELECTOR_LEGACY_SELECT)
   ])
 
   for (const ms of elements) {

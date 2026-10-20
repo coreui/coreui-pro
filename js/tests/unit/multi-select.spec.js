@@ -7750,7 +7750,7 @@ describe('MultiSelect', () => {
     })
 
     it('should initialize on load a select whose earlier instance was disposed', () => {
-      fixtureEl.innerHTML = '<select class="multi-select"><option value="1">One</option></select>'
+      fixtureEl.innerHTML = '<select class="form-multi-select"><option value="1">One</option></select>'
       const selectEl = fixtureEl.querySelector('select')
 
       MultiSelect.getOrCreateInstance(selectEl).dispose()
@@ -7759,13 +7759,23 @@ describe('MultiSelect', () => {
       expect(MultiSelect.getInstance(selectEl)).toBeInstanceOf(MultiSelect)
     })
 
-    it('should still auto-initialize on load via the multi-select class (backward compat)', () => {
-      fixtureEl.innerHTML = '<select class="multi-select"><option value="1">One</option></select>'
+    it('should still auto-initialize on load via the v5 form-multi-select class (backward compat)', () => {
+      fixtureEl.innerHTML = '<select class="form-multi-select"><option value="1">One</option></select>'
       const selectEl = fixtureEl.querySelector('select')
 
       window.dispatchEvent(new Event('load'))
 
       expect(MultiSelect.getInstance(selectEl)).toBeInstanceOf(MultiSelect)
+      expect(selectEl.classList.contains('multi-select')).toBeTrue()
+    })
+
+    it('should not auto-initialize a select that only carries the multi-select class', () => {
+      fixtureEl.innerHTML = '<select class="multi-select"><option value="1">One</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+
+      window.dispatchEvent(new Event('load'))
+
+      expect(MultiSelect.getInstance(selectEl)).toBeNull()
     })
   })
 
