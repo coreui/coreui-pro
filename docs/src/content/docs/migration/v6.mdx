@@ -2135,6 +2135,13 @@ own stylesheet re-squared those corners as a workaround, the override is no
 longer needed. A rule of yours that relied on the group losing to a component
 now loses to the group instead; give it a layer of its own if you need it back.
 
+#### Chip Input keeps focus among the chips after a removal
+
+Removing the focused chip used to send focus back to the text field. It now
+moves to the next chip, else the previous one, and only reaches the text field
+once no chip is left, the same rule Chip Set follows, so several chips can be
+removed in a row from the keyboard.
+
 #### Chip Input is submitted only once you name it
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
@@ -2812,6 +2819,21 @@ field behind that kept submitting.
 - **Adding and removing chips is announced.** Chip set and Chip input announce
   each change through `announce()`; the wording is configurable via
   `ariaAddedAnnouncement`/`ariaRemovedAnnouncement`.
+- **Every remove button names its chip.** Chip and Chip set named each remove
+  button `Remove`, so a set read the same name for every chip; the button is
+  `Remove <text>` now, as Multi Select already did; Chip input names it after the
+  chip's text instead of its value. `ariaRemoveLabel` (and Multi Select's
+  `ariaChipRemoveLabel`) takes a string, where `{label}` stands for the chip's text
+  and is appended when missing, or a function of the text for a different word
+  order. A one-word label such as `Usuń` gains the text; a label that already spelled
+  the text out, such as `data-coreui-aria-remove-label="Remove React"`, now repeats
+  it, so drop it or use `{label}`. A `.chip-remove` button you write yourself keeps
+  its `aria-label`, and gets one from `ariaRemoveLabel` when it has none.
+- **A selectable chip hides its remove affordance.** A chip with a role — a
+  selectable chip, which is a toggle button, or an option in a selectable set —
+  gets a `<span aria-hidden="true">` instead of a `<button>` inside it, so its name
+  is its text and a control is no longer nested in a button. <kbd>Backspace</kbd> /
+  <kbd>Delete</kbd> remove it from the keyboard, the affordance from the pointer.
 - **Chip input: `aria-disabled`/`aria-readonly` are no longer stamped on the
   container.** The container is a generic element, so those attributes were
   invalid on it (axe `aria-allowed-attr`); the native `disabled`/`readonly`

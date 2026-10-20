@@ -11,6 +11,7 @@ import ComboboxBase from './combobox-base.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { type ChipRemoveLabel } from './util/chip-values.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import FocusTrap from './util/focustrap.js'
@@ -93,7 +94,7 @@ const CLASS_NAME_SHOW = 'show'
 
 type MultiSelectConfig = {
   allowList: SanitizerAllowList
-  ariaChipRemoveLabel: string
+  ariaChipRemoveLabel: ChipRemoveLabel
   ariaCleanerLabel: string
   ariaPickerLabel: string
   ariaSearchLabel: string
@@ -189,7 +190,7 @@ const Default: MultiSelectConfig = {
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
-  ariaChipRemoveLabel: 'string',
+  ariaChipRemoveLabel: '(string|function)',
   ariaCleanerLabel: 'string',
   ariaPickerLabel: 'string',
   ariaSearchLabel: 'string',
@@ -1229,7 +1230,7 @@ class MultiSelect extends ComboboxBase {
 
     // eslint-disable-next-line no-new
     new Chip(chip, {
-      ariaRemoveLabel: `${this._config.ariaTagDeleteLabel ?? this._config.ariaChipRemoveLabel} ${text}`.trim(),
+      ariaRemoveLabel: this._config.ariaTagDeleteLabel ?? this._config.ariaChipRemoveLabel,
       disabled: disabled === true,
       removable: !this._disabled && disabled !== true
     })

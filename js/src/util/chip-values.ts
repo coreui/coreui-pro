@@ -1,4 +1,5 @@
 export type ChipAnnouncement = string | ((values: string[]) => string)
+export type ChipRemoveLabel = string | ((label: string) => string)
 
 export type ChipClassName = string | ((value: string) => unknown) | null | undefined
 
@@ -86,4 +87,21 @@ export const getChipAnnouncement = (before: readonly string[], after: readonly s
   }
 
   return (changed.length > 0 && (typeof label === 'function' ? label(changed) : `${changed.join(', ')} ${label}`)) || null
+}
+
+/**
+ * Names a chip's remove button. A string label has `{label}` replaced by the chip's label, or the
+ * chip's label appended after a space when it holds no `{label}`; a function label receives the
+ * chip's label and returns the whole name.
+ *
+ * @param removeLabel - The text of the name, or a function that words it
+ * @param label - The chip's label
+ * @returns The name of the remove button
+ */
+export const getChipRemoveLabel = (removeLabel: ChipRemoveLabel, label: string): string => {
+  if (typeof removeLabel === 'function') {
+    return removeLabel(label)
+  }
+
+  return removeLabel.includes('{label}') ? removeLabel.replaceAll('{label}', () => label) : `${removeLabel} ${label}`.trim()
 }

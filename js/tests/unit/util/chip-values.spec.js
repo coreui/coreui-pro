@@ -1,5 +1,5 @@
 import {
-  appendChipValues, getChipAnnouncement, getChipValues, resolveChipClassName, splitChipText
+  appendChipValues, getChipAnnouncement, getChipRemoveLabel, getChipValues, resolveChipClassName, splitChipText
 } from '../../../src/util/chip-values.js'
 
 describe('Chip value utilities', () => {
@@ -113,6 +113,24 @@ describe('Chip value utilities', () => {
     it('should give null when nothing was added or removed', () => {
       expect(getChipAnnouncement(['a', 'b'], ['b', 'a'], 'added', 'removed')).toBeNull()
       expect(getChipAnnouncement([], [], 'added', 'removed')).toBeNull()
+    })
+  })
+
+  describe('getChipRemoveLabel', () => {
+    it.each([
+      ['appends the label to a string without a placeholder', 'Remove', 'Remove React'],
+      ['replaces every {label} in a string', 'Usuń {label} ({label})', 'Usuń React (React)'],
+      ['passes the label to a function', label => `${label} entfernen`, 'React entfernen']
+    ])('%s', (_, removeLabel, expected) => {
+      expect(getChipRemoveLabel(removeLabel, 'React')).toBe(expected)
+    })
+
+    it('keeps replacement patterns in the label as they are', () => {
+      expect(getChipRemoveLabel('Remove {label}', 'Q$&A $$')).toBe('Remove Q$&A $$')
+    })
+
+    it('trims the name when the label is empty', () => {
+      expect(getChipRemoveLabel('Remove', '')).toBe('Remove')
     })
   })
 })

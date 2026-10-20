@@ -50,7 +50,7 @@ describe('Chip', () => {
   describe('DefaultType', () => {
     it('should return default type configuration', () => {
       expect(Chip.DefaultType).toEqual(jasmine.objectContaining({
-        ariaRemoveLabel: 'string',
+        ariaRemoveLabel: '(string|function)',
         disabled: 'boolean',
         removable: 'boolean',
         selectable: 'boolean',
@@ -173,7 +173,7 @@ describe('Chip', () => {
 
       const btn = chipEl.querySelector('.chip-remove')
       expect(btn).not.toBeNull()
-      expect(btn.getAttribute('aria-label')).toEqual('Remove')
+      expect(btn.getAttribute('aria-label')).toEqual('Remove Tag')
     })
 
     it('should not append a remove button when removable is false', () => {
@@ -211,15 +211,71 @@ describe('Chip', () => {
       expect(chipEl.querySelectorAll('.chip-remove')).toHaveSize(1)
     })
 
-    it('should use custom ariaRemoveLabel on the remove button', () => {
+    it.each([
+      ['a string without {label}, followed by the label', 'Close', 'Close Tag'],
+      ['a string with {label} in place', 'Usuń „{label}”', 'Usuń „Tag”'],
+      ['a function of the label', label => `${label} entfernen`, 'Tag entfernen']
+    ])('should name the remove button with %s', (_, ariaRemoveLabel, expected) => {
       fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
-      new Chip(chipEl, { removable: true, ariaRemoveLabel: 'Close chip' })
+      new Chip(chipEl, { removable: true, ariaRemoveLabel })
 
       const btn = chipEl.querySelector('.chip-remove')
-      expect(btn.getAttribute('aria-label')).toEqual('Close chip')
+      expect(btn.getAttribute('aria-label')).toEqual(expected)
+    })
+
+    it('should name the remove button with the chip text, its whitespace collapsed', () => {
+      fixtureEl.innerHTML = '<span class="chip">\n  <span class="avatar">L</span>\n  Leah\n</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl, { removable: true })
+
+      expect(chipEl.querySelector('.chip-remove').getAttribute('aria-label')).toEqual('Remove L Leah')
+    })
+
+    it('should name a remove button from the markup only when it has no name', () => {
+      fixtureEl.innerHTML = [
+        '<span class="chip">Tag <button type="button" class="chip-remove"></button></span>',
+        '<span class="chip">Tag <button type="button" class="chip-remove" aria-label="Drop"></button></span>'
+      ].join('')
+
+      for (const chipEl of fixtureEl.querySelectorAll('.chip')) {
+        // eslint-disable-next-line no-new
+        new Chip(chipEl, { removable: true })
+      }
+
+      expect([...fixtureEl.querySelectorAll('.chip-remove')].map(button => button.getAttribute('aria-label'))).toEqual(['Remove Tag', 'Drop'])
+    })
+
+    it('should hide the remove affordance of a chip with a role, which Backspace still removes', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      const chip = new Chip(chipEl, { removable: true, selectable: true })
+      const control = chipEl.querySelector('.chip-remove')
+      spyOn(chip, 'remove')
+
+      expect(chipEl.getAttribute('role')).toEqual('button')
+      expect(control.tagName).toEqual('SPAN')
+      expect(control.getAttribute('aria-hidden')).toEqual('true')
+      expect(control.hasAttribute('aria-label')).toBeFalse()
+
+      chipEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+
+      expect(chip.remove).toHaveBeenCalled()
+    })
+
+    it('should name the remove button from a data attribute template', () => {
+      fixtureEl.innerHTML = '<span class="chip" data-coreui-aria-remove-label="Usuń {label}">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl, { removable: true })
+
+      expect(chipEl.querySelector('.chip-remove').getAttribute('aria-label')).toEqual('Usuń Tag')
     })
   })
 

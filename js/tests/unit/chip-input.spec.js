@@ -665,7 +665,7 @@ describe('ChipInput', () => {
       expect(input.hasAttribute('aria-required')).toBeFalse()
     })
 
-    it('should make its selectable chips toggle buttons with a named remove button', () => {
+    it('should make its selectable chips toggle buttons with a hidden remove affordance', () => {
       fixtureEl.innerHTML = '<div class="chip-input"><span class="chip">Design</span><span class="chip" data-coreui-selected="true">QA</span></div>'
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { selectable: true })
@@ -675,7 +675,8 @@ describe('ChipInput', () => {
       expect(design.getAttribute('role')).toEqual('button')
       expect(design.getAttribute('aria-pressed')).toEqual('false')
       expect(design.hasAttribute('aria-selected')).toBeFalse()
-      expect(design.querySelector('button.chip-remove').getAttribute('aria-label')).toContain('Design')
+      expect(design.querySelector('button.chip-remove')).toBeNull()
+      expect(design.querySelector('.chip-remove').getAttribute('aria-hidden')).toEqual('true')
       expect(qa.getAttribute('aria-pressed')).toEqual('true')
       expect(chipInput.getSelectedValues()).toEqual(['QA'])
     })
@@ -804,7 +805,26 @@ describe('ChipInput', () => {
       expect(chip.classList.contains('chip')).toBeTrue()
     })
 
-    it('should name the remove button with ariaRemoveLabel followed by the chip value', () => {
+    it('should name the remove button after the chip text, not its value', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"><span class="chip" data-coreui-chip-value="pl">Poland</span></div>'
+
+      // eslint-disable-next-line no-new
+      new ChipInput(fixtureEl.querySelector('.chip-input'))
+
+      expect(fixtureEl.querySelector('.chip-remove').getAttribute('aria-label')).toBe('Remove Poland')
+    })
+
+    it.each([
+      ['a {label} template', 'Usuń „{label}”', 'Usuń „JavaScript”'],
+      ['a function', label => `${label} entfernen`, 'JavaScript entfernen']
+    ])('should name the remove button with %s', (_, ariaRemoveLabel, expected) => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { ariaRemoveLabel })
+
+      expect(chipInput.add('JavaScript').querySelector('.chip-remove').getAttribute('aria-label')).toBe(expected)
+    })
+
+    it('should name the remove button with ariaRemoveLabel followed by the chip text', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input" id="plain"></div>' +
         '<div class="form-control-group chip-input" id="custom" data-coreui-aria-remove-label="Usuń"></div>'
 
@@ -1024,7 +1044,10 @@ describe('ChipInput', () => {
       expect(chipInput.getValues()).toEqual([])
     })
 
-    it('should move focus to the text input after removing a focused chip', () => {
+    it.each([
+      ['the next chip after removing a middle chip', 1, 'Rust'],
+      ['the previous chip after removing the last chip', 2, 'TypeScript']
+    ])('should move focus to %s', (_, index, expected) => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
@@ -1032,11 +1055,12 @@ describe('ChipInput', () => {
 
       chipInput.add('JavaScript')
       chipInput.add('TypeScript')
-      const chip = el.querySelector('.chip')
+      chipInput.add('Rust')
+      const chip = el.querySelectorAll('.chip')[index]
       chip.focus()
       chip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
 
-      expect(document.activeElement).toEqual(chipInput._input)
+      expect(document.activeElement.dataset.coreuiChipValue).toEqual(expected)
     })
 
     it('should move focus to the text input after removing its only chip', () => {

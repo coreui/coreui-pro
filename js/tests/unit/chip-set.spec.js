@@ -343,6 +343,31 @@ describe('ChipSet', () => {
       expect(control.getAttribute('aria-label')).toBeNull()
     })
 
+    it.each([
+      ['a {label} template', 'Usuń {label}', 'Usuń First'],
+      ['a function', label => `${label} entfernen`, 'First entfernen']
+    ])('should name the remove buttons with %s', (_, ariaRemoveLabel, expected) => {
+      const el = setMarkup(['First', 'Second'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true, ariaRemoveLabel })
+
+      expect(el.querySelector('.chip-remove').getAttribute('aria-label')).toEqual(expected)
+    })
+
+    it('should move focus past a chip that takes no focus after a removal', () => {
+      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span><span class="chip" data-coreui-removable="false">Fixed</span><span class="chip">Last</span></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+      const [first, fixed, last] = el.querySelectorAll('.chip')
+
+      first.focus()
+      first.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))
+
+      expect(fixed.hasAttribute('data-coreui-chip-focusable')).toBeFalse()
+      expect(document.activeElement).toEqual(last)
+    })
+
     it('should keep a real button when the set is not a listbox', () => {
       const el = setMarkup(['First', 'Second'])
       // eslint-disable-next-line no-new
@@ -353,7 +378,7 @@ describe('ChipSet', () => {
 
       expect(chip.getAttribute('role')).toBeNull()
       expect(control.tagName).toEqual('BUTTON')
-      expect(control.getAttribute('aria-label')).toEqual('Remove')
+      expect(control.getAttribute('aria-label')).toEqual('Remove First')
     })
 
     it('should remove the chip when the aria-hidden control is clicked', () => {
@@ -1127,7 +1152,7 @@ describe('ChipSet', () => {
 
       expect(chip.getAttribute('role')).toEqual('button')
       expect(chip.hasAttribute('aria-selected')).toBeFalse()
-      expect(chip.querySelector('button.chip-remove')).not.toBeNull()
+      expect(chip.querySelector('.chip-remove').getAttribute('aria-hidden')).toEqual('true')
     })
     it('should drop the tabindex it added to hold focus once the focus leaves, also after dispose', () => {
       fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span></div><button type="button">Next</button>'

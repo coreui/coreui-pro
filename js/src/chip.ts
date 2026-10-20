@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { type ChipRemoveLabel, getChipRemoveLabel } from './util/chip-values.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch, writeAttribute } from './util/index.js'
 
@@ -42,7 +43,7 @@ const CLASS_NAME_DISABLED = 'disabled'
 
 type ChipConfig = {
   allowList: SanitizerAllowList
-  ariaRemoveLabel: string
+  ariaRemoveLabel: ChipRemoveLabel
   disabled: boolean
   filter: boolean
   removable: boolean
@@ -70,7 +71,7 @@ const Default: ChipConfig = {
 
 const DefaultType = {
   allowList: 'object',
-  ariaRemoveLabel: 'string',
+  ariaRemoveLabel: '(string|function)',
   disabled: 'boolean',
   filter: 'boolean',
   removable: 'boolean',
@@ -287,7 +288,7 @@ class Chip extends BaseComponent {
   }
 
   _createRemoveControl(): HTMLElement {
-    if (this._element.getAttribute('role') === 'option') {
+    if (this._element.hasAttribute('role')) {
       const indicator = document.createElement('span')
       indicator.className = CLASS_NAME_CHIP_REMOVE
       indicator.setAttribute('aria-hidden', 'true')
@@ -298,10 +299,14 @@ class Chip extends BaseComponent {
     const button = document.createElement('button')
     button.type = 'button'
     button.className = CLASS_NAME_CHIP_REMOVE
-    button.setAttribute('aria-label', this._config.ariaRemoveLabel)
+    button.setAttribute('aria-label', this._getRemoveLabel())
     button.setAttribute('tabindex', '-1')
     button.innerHTML = sanitizeByConfig(this._config.removeIcon, this._config)
     return button
+  }
+
+  _getRemoveLabel(): string {
+    return getChipRemoveLabel(this._config.ariaRemoveLabel, this._element.textContent.replaceAll(/\s+/g, ' ').trim())
   }
 
   _ensureRemoveControl(): void {
@@ -310,7 +315,12 @@ class Chip extends BaseComponent {
       return
     }
 
-    if (SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, this._element)) {
+    const existing = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, this._element)
+    if (existing) {
+      if (existing.tagName === 'BUTTON' && !existing.hasAttribute('aria-label')) {
+        existing.setAttribute('aria-label', this._getRemoveLabel())
+      }
+
       return
     }
 
@@ -319,7 +329,9 @@ class Chip extends BaseComponent {
   }
 
   _makeFocusable(): void {
-    writeAttribute(this._element, 'tabindex', !this._disabled && (this._config.selectable || this._config.removable) ? '0' : null)
+    const focusable = !this._disabled && (this._config.selectable || this._config.removable)
+    writeAttribute(this._element, 'tabindex', focusable ? '0' : null)
+    writeAttribute(this._element, 'data-coreui-chip-focusable', focusable ? 'true' : null)
   }
 
   _handleKeydown(event: any): void {

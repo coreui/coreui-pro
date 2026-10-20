@@ -11,7 +11,9 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
-import { type ChipAnnouncement, getChipAnnouncement, resolveChipClassName } from './util/chip-values.js'
+import {
+  type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement, resolveChipClassName
+} from './util/chip-values.js'
 import { containsFocus, focusWithTemporaryTabindex } from './util/focus.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
@@ -53,7 +55,7 @@ const SELECTOR_DATA_CHIP_SET = '[data-coreui-chip-set]'
 const SELECTOR_CHIP = '.chip'
 const SELECTOR_CHIP_ACTIVE = `${SELECTOR_CHIP}.active`
 const SELECTOR_CHIP_REMOVE = '.chip-remove'
-const SELECTOR_FOCUSABLE_ITEMS = '.chip:not(.disabled)'
+const SELECTOR_FOCUSABLE_ITEMS = '.chip[data-coreui-chip-focusable]'
 
 const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_DISABLED = 'disabled'
@@ -62,7 +64,7 @@ const SELECTION_MODE_SINGLE = 'single'
 
 export type ChipSetConfig = {
   ariaAddedAnnouncement: ChipAnnouncement
-  ariaRemoveLabel: string
+  ariaRemoveLabel: ChipRemoveLabel
   ariaRemovedAnnouncement: ChipAnnouncement
   chipClassName: string | ((value: string) => string) | null
   disabled: boolean
@@ -96,7 +98,7 @@ const Default: ChipSetConfig = {
 
 const DefaultType: Record<string, string> = {
   ariaAddedAnnouncement: '(string|function)',
-  ariaRemoveLabel: 'string',
+  ariaRemoveLabel: '(string|function)',
   ariaRemovedAnnouncement: '(string|function)',
   chipClassName: '(string|function|null)',
   disabled: 'boolean',
@@ -403,7 +405,7 @@ class ChipSet extends BaseComponent {
   }
 
   _moveTabStop(stop: HTMLElement | null = null): void {
-    const chips = this._getFocusableChips().filter(chip => chip.hasAttribute('tabindex'))
+    const chips = this._getFocusableChips()
     const current = stop ?? chips.find(chip => chip.tabIndex === 0) ?? chips[0]
 
     for (const chip of chips) {
@@ -612,7 +614,11 @@ class ChipSet extends BaseComponent {
   }
 
   _getRemovalFocusTarget(chip: HTMLElement): HTMLElement {
-    return getRemovalNeighbor(this._getFocusableChips(), chip) ?? this._element
+    return getRemovalNeighbor(this._getFocusableChips(), chip) ?? this._getRemovalFallback()
+  }
+
+  _getRemovalFallback(): HTMLElement {
+    return this._element
   }
 
   _navigateToEdge(targetIndex: number): HTMLElement | null {

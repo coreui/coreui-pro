@@ -530,6 +530,7 @@ Change events now fire only when the value changes. Code that relied on an event
 | Multi Select | `selectAllStyle`, `optionsGroupsStyle` | removed; `indicator` sets the marker for the whole list |
 | Multi Select | `ariaIndicatorLabel` | `ariaPickerLabel` |
 | Multi Select | `ariaTagDeleteLabel` | `ariaChipRemoveLabel` (the old option is deprecated and wins while it is set) |
+| Chip, Chip Set, Chip Input | `ariaRemoveLabel: 'Remove React'` (the whole name) | `ariaRemoveLabel: 'Remove'` or `'Remove {label}'`; the chip text is appended or put at `{label}`, a function `(label) => string` words it freely |
 | Multi Select | `selectionType: 'tags'` | `selectionType: 'chips'`, the default (`'tags'` is deprecated and renders the same) |
 | Multi Select | `selectionTypeCounterText: 'item(s) selected'` | `selectedLabel: (count) => \`${count} item(s) selected\`` or the string `'{count} item(s) selected'` |
 | Multi Select | `search: 'global'` or `['global']` | `search: true` |
