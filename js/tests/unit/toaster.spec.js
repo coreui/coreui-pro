@@ -169,6 +169,7 @@ describe('Toaster', () => {
       toaster = new Toaster(null, { container: fixtureEl })
 
       toaster.add({ title: 'Saved', description: 'Done', instant: true })
+      await announced()
       toaster.add({ description: 'Failed', priority: 'high', instant: true })
       await announced()
 

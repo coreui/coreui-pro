@@ -112,12 +112,23 @@ describe('announce', () => {
 
   it('should send each message to the region of its priority', () => {
     announce('Saved')
-    announce('Failed', { priority: 'high' })
-    announce('Unknown', { priority: 'assertive' })
     vi.advanceTimersByTime(100)
+    announce('Failed', { priority: 'high' })
+    vi.advanceTimersByTime(0)
+    announce('Unknown', { priority: 'assertive' })
+    vi.advanceTimersByTime(0)
 
     expect(messages(document.body, 'polite')).toEqual(['Saved', 'Unknown'])
     expect(messages(document.body, 'assertive')).toEqual(['Failed'])
+  })
+
+  it('should send the messages added together to the assertive region when one of them is high', () => {
+    announce('Saved')
+    announce('Failed', { priority: 'high' })
+    vi.advanceTimersByTime(100)
+
+    expect(messages(document.body, 'polite')).toEqual([])
+    expect(messages(document.body, 'assertive')).toEqual(['Saved', 'Failed'])
   })
 
   it('should add the same text again as a new message', () => {

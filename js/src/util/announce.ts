@@ -190,9 +190,10 @@ export const holdAnnouncements = (): void => {
 }
 
 /**
- * Sends the waiting messages in the order they came in: as one `document.ariaNotify()` call at the
- * highest priority among them, or each to the regions of the page or of the modal dialog open at
- * that moment. The queue holds while that dialog, or the dialog holding focus, plays its closing
+ * Sends the waiting messages in the order they came in, all at the highest priority among them: as
+ * one `document.ariaNotify()` call, or each to the region of that priority on the page or in the
+ * modal dialog open at that moment, since a screen reader reads only one of two regions changed
+ * together. The queue holds while that dialog, or the dialog holding focus, plays its closing
  * transition, for 500 ms after a dialog component closes its dialog, and while a region is younger
  * than 100 ms. A message that waited for page regions removed since is dropped with them, and the
  * whole queue once there is no document, as when a test environment tears down.
@@ -204,10 +205,10 @@ const flush = (): void => {
   }
 
   const native = canNotify()
-  const notified: Message[] = []
+  const sent: [Message, HTMLElement | null][] = []
 
   while (pending.length > 0) {
-    const [{ context, node, page, priority, timeout }] = pending
+    const [{ context, page }] = pending
 
     if (page && !page.isConnected) {
       pending.shift()
@@ -230,18 +231,21 @@ const flush = (): void => {
       break
     }
 
-    notified.push(pending.shift()!)
-    announcer?.querySelector(`[aria-live="${LIVE[priority === 'high' ? 0 : 1]}"]`)!.append(node)
+    sent.push([pending.shift()!, announcer])
+  }
+
+  const high = sent.some(([{ priority }]) => priority === 'high')
+
+  if (native && sent.length > 0) {
+    (document as Notifier).ariaNotify!(sent.map(([{ node }]) => node.textContent).join('\n'), { priority: high ? 'high' : 'normal' })
+  }
+
+  for (const [{ node, timeout }, announcer] of sent) {
+    announcer?.querySelector(`[aria-live="${LIVE[high ? 0 : 1]}"]`)!.append(node)
 
     if (timeout > 0 && Number.isFinite(timeout)) {
       setTimeout(() => node.remove(), timeout)
     }
-  }
-
-  if (native && notified.length > 0) {
-    (document as Notifier).ariaNotify!(notified.map(({ node }) => node.textContent).join('\n'), {
-      priority: notified.some(({ priority }) => priority === 'high') ? 'high' : 'normal'
-    })
   }
 }
 
@@ -251,7 +255,8 @@ const flush = (): void => {
  * modal dialog leaves the rest of the page inert, inside that dialog, native or marked with
  * `aria-modal="true"`. A message is sent one task after the call, once a new region is 100 ms old,
  * and 500 ms after a dialog component has closed its dialog. Messages go out in the order of the
- * calls, those sent together through `ariaNotify()` as one, and the same text is read again.
+ * calls, those sent together at the highest priority among them and through `ariaNotify()` as one,
+ * and the same text is read again.
  *
  * @param message - The text to read
  * @param options - `priority` is `'normal'` (default) or `'high'`, which interrupts, as in
