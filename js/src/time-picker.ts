@@ -286,8 +286,8 @@ class TimePicker extends PickerBase {
   _applyTime(time: Date | null, picked: Date | null): void {
     this._write(time, 'selection')
 
-    if (this._element && time !== picked) {
-      this._selection.setTime(time)
+    if (this._element && isSameInstantAs(this._selection.getTime(), picked)) {
+      this._selection.setTime(this.getTime() ?? time)
     }
   }
 
