@@ -123,7 +123,7 @@ Colour the active items with a [`.theme-*` class](/customize/components/#theme-v
 
 Customize the Rating component with your choice of SVG icons by assigning new values to the `activeIcon` and `icon` properties in the JavaScript options. This allows for a unique look tailored to the design language of your site or application.
 
-The Rating component can be customized with either SVG or font icons, allowing for visual alignment with your application's design. You can specify different icons for each rating value to enhance user interaction.
+The Rating component can be customized with either SVG or font icons, allowing for visual alignment with your application's design. A font icon needs its icon font's stylesheet on the page; without it the item has nothing to draw. You can specify different icons for each rating value to enhance user interaction.
 
 In the example below, we demonstrate how to set custom icons using SVG, allowing for detailed customization of the visual elements within the Rating component.
 
@@ -131,7 +131,7 @@ In the example below, we demonstrate how to set custom icons using SVG, allowing
 
 <Code code={ratingCustomIcons1} lang="js" />
 
-In the example below, we use font icons from the CoreUI Icons set. In the `activeIcon` configuration, we also apply the utility class `fg-danger` to change the icon's color to red when it is active.
+In the example below, we use the heart from the [CoreUI Icons](https://coreui.io/icons/) set as SVG. In the `activeIcon` configuration, we also apply the utility class `fg-danger` to the `<svg>` to change the icon's color to red when it is active.
 
 <Example pro code={`<div id="myRatingCustomIcons2"></div>`} sandboxJs={ratingCustomIcons2} />
 
