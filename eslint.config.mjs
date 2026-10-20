@@ -19,22 +19,12 @@ export default [
   },
   {
     ...xoBase,
-    settings: {
-      ...xoBase.settings,
-      // The migration leaves the tree mixed: a `.js` module can import a sibling
-      // that is already `.ts`, written as the ESM-style `./x.js` specifier that
-      // tsc resolves. The default resolver takes that literally and reports
-      // no-unresolved, so hand resolution to the TypeScript-aware one.
-      'import-x/resolver': {
-        typescript: { project: './tsconfig.json' }
-      }
-    },
     plugins: {
       ...xoBase.plugins,
       ...plugins
     },
     rules: {
-      ...xoBase.rules,
+      ...Object.fromEntries(Object.entries(xoBase.rules).filter(([name]) => !name.startsWith('import-x/'))),
       ...eslintPluginUnicorn.configs.recommended.rules,
       'import/default': 'error',
       'import/export': 'error',
@@ -178,7 +168,6 @@ export default [
       'unicorn/no-computed-property-existence-check': 'off',
       'unicorn/no-declarations-before-early-exit': 'off',
       'unicorn/no-duplicate-if-branches': 'off',
-      'unicorn/no-for-each': 'off',
       'unicorn/no-global-object-property-assignment': 'off',
       'unicorn/no-incorrect-query-selector': 'off',
       'unicorn/no-return-array-push': 'off',
@@ -190,7 +179,6 @@ export default [
       'unicorn/prefer-add-event-listener-options': 'off',
       'unicorn/prefer-array-from-map': 'off',
       'unicorn/prefer-await': 'off',
-      'unicorn/prefer-classlist-toggle': 'off',
       'unicorn/prefer-continue': 'off',
       'unicorn/prefer-early-return': 'off',
       'unicorn/prefer-global-number-constants': 'off',
@@ -206,7 +194,6 @@ export default [
       'unicorn/prefer-string-repeat': 'off',
       'unicorn/prefer-ternary': 'off',
       'unicorn/prefer-unicode-code-point-escapes': 'off',
-      'unicorn/no-array-sort': 'off',
       'unicorn/no-top-level-assignment-in-function': 'off',
       'unicorn/no-top-level-side-effects': 'off',
       'unicorn/no-useless-coercion': 'off',
@@ -231,9 +218,7 @@ export default [
       'unicorn/prefer-hoisting-branch-code': 'off',
       'unicorn/prefer-math-constants': 'off',
       'unicorn/prefer-promise-with-resolvers': 'off',
-      'unicorn/prefer-unary-minus': 'off',
-      'import-x/no-duplicates': 'off',
-      'import-x/order': 'off'
+      'unicorn/prefer-unary-minus': 'off'
     }
   },
   {
@@ -249,8 +234,7 @@ export default [
     // specifier instead. Upstream disables the same rule for the same reason.
     files: ['js/**'],
     rules: {
-      'import/extensions': 'off',
-      'import-x/extensions': 'off'
+      'import/extensions': 'off'
     }
   },
   {
@@ -376,7 +360,7 @@ export default [
     rules: {
       'no-console': 'off',
       'no-new': 'off',
-      'unicorn/no-array-for-each': 'off'
+      'unicorn/no-for-each': 'off'
     }
   },
   {
@@ -406,7 +390,7 @@ export default [
       'no-console': 'off',
       'no-new': 'off',
       'no-unused-vars': 'off',
-      'unicorn/no-array-for-each': 'off',
+      'unicorn/no-for-each': 'off',
       'unicorn/prefer-top-level-await': 'off'
     }
   },
