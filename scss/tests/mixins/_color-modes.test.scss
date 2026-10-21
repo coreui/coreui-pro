@@ -31,7 +31,7 @@
   }
 }
 
-@include describe("global $color-mode-type: media-query") {
+@include describe("global $color-mode-type: media-query, set in the test") {
   @include it("generates media queries for dark mode") {
     $color-mode-type: media-query !global;
 
