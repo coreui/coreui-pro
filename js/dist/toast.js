@@ -36,18 +36,6 @@
 	js_src_base_component_js = __toESM(js_src_base_component_js);
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	//#region js/src/toast.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI toast.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's toast.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "toast";
 	const EVENT_KEY = `.coreui.toast`;
 	const EVENT_MOUSEOVER = `mouseover${EVENT_KEY}`;
@@ -68,9 +56,6 @@
 		autohide: true,
 		delay: 5e3
 	};
-	/**
-	* Class definition
-	*/
 	var Toast = class Toast extends js_src_base_component_js.default {
 		constructor(element, config) {
 			super(element, config);
@@ -156,13 +141,7 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Toast, config, (element) => [element]);
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	(0, js_src_util_component_functions_js.enableDismissTrigger)(Toast);
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Toast);
 	//#endregion
 	return Toast;

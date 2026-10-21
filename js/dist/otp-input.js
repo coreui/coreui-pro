@@ -4,13 +4,16 @@
 * License (https://coreui.io/pro/license/)
 */
 (function(global, factory) {
-	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./base-component.js"), require("./dom/event-handler.js"), require("./dom/selector-engine.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
+	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./base-component.js"), require("./dom/event-handler.js"), require("./dom/selector-engine.js"), require("./util/field-label.js"), require("./util/field-validation.js"), require("./util/form-validation.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
 		"./base-component.js",
 		"./dom/event-handler.js",
 		"./dom/selector-engine.js",
+		"./util/field-label.js",
+		"./util/field-validation.js",
+		"./util/form-validation.js",
 		"./util/index.js"
-	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.OtpInput = factory(global.BaseComponent, global.EventHandler, global.SelectorEngine, global.Index));
-})(this, function(js_src_base_component_js, js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_util_index_js) {
+	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.OtpInput = factory(global.BaseComponent, global.EventHandler, global.SelectorEngine, global.FieldLabel, global.FieldValidation, global.FormValidation, global.Index));
+})(this, function(js_src_base_component_js, js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_util_field_label_js, js_src_util_field_validation_js, js_src_util_form_validation_js, js_src_util_index_js) {
 	//#region \0rolldown/runtime.js
 	var __create = Object.create;
 	var __defProp = Object.defineProperty;
@@ -36,16 +39,8 @@
 	js_src_base_component_js = __toESM(js_src_base_component_js);
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
+	js_src_util_field_validation_js = __toESM(js_src_util_field_validation_js);
 	//#region js/src/otp-input.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI otp-input.js
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "otp-input";
 	const EVENT_KEY = `.coreui.otp-input`;
 	const DATA_API_KEY = ".data-api";
@@ -71,9 +66,9 @@
 		masked: false,
 		name: null,
 		placeholder: null,
-		readonly: false,
 		required: false,
 		type: "number",
+		validationState: null,
 		value: null
 	};
 	const DefaultType = {
@@ -85,25 +80,37 @@
 		masked: "boolean",
 		name: "(string|null)",
 		placeholder: "(number|string|null)",
-		readonly: "boolean",
 		required: "boolean",
 		type: "string",
+		validationState: "(string|null|undefined)",
 		value: "(number|string|null)"
 	};
-	/**
-	* Class definition
-	*/
 	var OTPInput = class OTPInput extends js_src_base_component_js.default {
 		constructor(element, config) {
 			super(element, config);
 			this._config = this._getConfig(config);
+			this._disabled = this._config.disabled;
 			this._inputElement = null;
+			this._placeholders = /* @__PURE__ */ new Map();
+			this._resetCode = null;
+			this._value = "";
+			this._validation = new js_src_util_field_validation_js.default(this._element, {
+				canBlock: () => !this._disabled,
+				config: () => this._config,
+				fields: () => this._inputElement ? [this._inputElement] : [],
+				frames: () => [this._element],
+				invalidTargets: () => this._getInputs(),
+				owned: () => [this._inputElement, ...this._getInputs()],
+				restore: () => this._restoreValue(),
+				serverClassSources: () => [this._element, ...this._getInputs()]
+			});
 			this._setRoleAttribute();
 			this._setInputsAttributes();
-			this._seedSlots();
-			this._createHiddenInput();
+			this._seedSlots(this._config.value);
+			this._createValueField();
 			this._setInputsTabIndexes();
 			this._addEventListeners();
+			this._removeLabelClick = (0, js_src_util_field_label_js.onLabelClick)(this._element, () => this._getFirstEmptySlot()?.focus());
 		}
 		static get Default() {
 			return Default;
@@ -117,33 +124,49 @@
 		clear() {
 			const inputs = this._getInputs();
 			for (const input of inputs) input.value = "";
-			this._setHiddenInputValue(null);
+			this._setValue(null);
 			this._syncFirstInputMaxLength();
 			this._setInputsTabIndexes();
 		}
 		dispose() {
+			if (!this._element) return;
+			this._removeLabelClick();
+			this._validation.dispose();
 			this._inputElement?.remove();
+			this._inputElement = null;
+			for (const input of this._placeholders.keys()) this._restorePlaceholder(input);
 			super.dispose();
 		}
 		reset() {
-			this._seedSlots({ clearWhenEmpty: true });
-			this._setHiddenInputValue(this._readSlots() || null);
-			this._setInputsTabIndexes();
+			this._restoreValue();
 		}
-		setConfig(config) {
-			if (typeof config !== "object" || config === null) return;
-			const previousValue = this._config.value;
+		disable() {
+			this._setDisabled(true);
+		}
+		enable() {
+			this._setDisabled(false);
+		}
+		setValidationState(validationState) {
 			this._config = this._getConfig({
 				...this._config,
-				...config
+				validationState
 			});
-			const repaint = this._config.value !== previousValue;
-			this._setInputsAttributes();
-			if (repaint) this._seedSlots({ clearWhenEmpty: true });
+			this._validation.configure({ validationState });
+		}
+		setValue(value) {
+			this._typeCheckConfig({ value }, { value: DefaultType.value });
+			this._seedSlots(value, true);
 			this._setInputsTabIndexes();
-			this._inputElement.remove();
-			this._createHiddenInput();
-			if (repaint) this._setHiddenInputValue(this._readSlots() || null);
+			this._value = this._readSlots();
+			(0, js_src_util_form_validation_js.writeValueField)(this._inputElement, this._value);
+			this._validation.update();
+		}
+		_setDisabled(disabled) {
+			if (disabled === this._disabled) return;
+			this._disabled = disabled;
+			for (const input of this._getInputs()) input.disabled = disabled;
+			this._inputElement.disabled = disabled;
+			this._validation.update();
 		}
 		_addEventListeners() {
 			js_src_dom_event_handler_js.default.on(this._element, EVENT_BEFORE_INPUT, SELECTOR_FORM_OTP_CONTROL, (event) => {
@@ -177,7 +200,7 @@
 				const inputs = this._getInputs();
 				if (!inputs.length) return;
 				const value = inputs.map((input) => input.value).join("");
-				if (value !== (this._inputElement ? this._inputElement.value : "")) this._setHiddenInputValue(value);
+				if (value !== (this._inputElement ? this._inputElement.value : "")) this._setValue(value, true);
 				if (target.value.length === 1) {
 					const nextInput = (0, js_src_util_index_js.getNextActiveElement)(inputs, target, true);
 					if (nextInput) nextInput.focus();
@@ -218,7 +241,7 @@
 			for (let i = 0; i < chars.length && startIndex + i < inputs.length; i++) inputs[startIndex + i].value = chars[i];
 			const nextEmptyIndex = startIndex + chars.length;
 			inputs[nextEmptyIndex < inputs.length ? nextEmptyIndex : inputs.length - 1].focus();
-			this._setHiddenInputValue(inputs.map((input) => input.value).join(""));
+			this._setValue(inputs.map((input) => input.value).join(""), true);
 			this._syncFirstInputMaxLength();
 			this._setInputsTabIndexes();
 			this._checkAutoSubmit(inputs);
@@ -235,21 +258,37 @@
 				if (form && typeof form.requestSubmit === "function") form.requestSubmit();
 			}
 		}
+		_getFirstEmptySlot() {
+			const inputs = this._getInputs();
+			return inputs.find((input) => !input.value) ?? inputs[0];
+		}
 		_getInputs() {
 			return js_src_dom_selector_engine_js.default.find(SELECTOR_FORM_OTP_CONTROL, this._element);
 		}
 		_readSlots() {
 			return this._getInputs().map((input) => input.value).join("");
 		}
-		_createHiddenInput() {
-			const hiddenInput = document.createElement("input");
-			hiddenInput.type = "hidden";
-			if (this._config.disabled) hiddenInput.disabled = true;
-			if (this._config.id) hiddenInput.id = this._config.id;
-			if (this._config.name) hiddenInput.name = this._config.name;
-			hiddenInput.value = this._readSlots();
-			this._element.append(hiddenInput);
-			this._inputElement = hiddenInput;
+		_createValueField() {
+			const field = (0, js_src_util_form_validation_js.createValueField)("input", () => this._getFirstEmptySlot());
+			this._resetCode = this._extractValidChars(String(this._config.value ?? "")) ? this._readSlots() : null;
+			field.defaultValue = this._resetCode ?? this._getInputs().map((input) => input.defaultValue).join("");
+			this._value = this._readSlots();
+			field.value = this._value;
+			this._element.append(field);
+			this._inputElement = field;
+			this._syncValueField();
+		}
+		_syncValueField() {
+			const field = this._inputElement;
+			(0, js_src_util_form_validation_js.configureValueField)(field, {
+				disabled: this._disabled,
+				name: this._config.name,
+				required: this._config.required
+			});
+			field.pattern = `${this._config.type === "number" ? "[0-9]" : "."}{${this._getInputs().length}}`;
+			if (this._config.id) field.id = this._config.id;
+			else field.removeAttribute("id");
+			this._validation.refresh();
 		}
 		_extractValidChars(text) {
 			switch (this._config.type) {
@@ -264,13 +303,28 @@
 				default: return /^.$/s.test(value);
 			}
 		}
-		_setHiddenInputValue(value) {
-			if (this._inputElement) this._inputElement.value = value || "";
+		_setValue(value, byUser = false) {
+			if (!this._inputElement) return;
+			const code = value || "";
+			const isChanged = code !== this._value;
+			this._value = code;
+			(0, js_src_util_form_validation_js.writeValueField)(this._inputElement, code);
+			if (isChanged && byUser) this._validation.dismiss();
+			this._validation.update();
+			if (!isChanged) return;
+			(0, js_src_util_form_validation_js.dispatchValueChange)(this._inputElement);
 			js_src_dom_event_handler_js.default.trigger(this._element, EVENT_CHANGE, { value });
 			if (value && value.length === this._getInputs().length) js_src_dom_event_handler_js.default.trigger(this._element, EVENT_COMPLETE, { value });
 		}
-		_seedSlots({ clearWhenEmpty = false } = {}) {
-			const value = this._extractValidChars(String(this._config.value ?? ""));
+		_restoreValue() {
+			const code = this._resetCode;
+			for (const [index, input] of this._getInputs().entries()) input.value = code === null ? input.defaultValue : code[index] ?? "";
+			this._setValue(this._readSlots() || null);
+			this._syncFirstInputMaxLength();
+			this._setInputsTabIndexes();
+		}
+		_seedSlots(code, clearWhenEmpty = false) {
+			const value = this._extractValidChars(String(code ?? ""));
 			if (!value && !clearWhenEmpty) return;
 			for (const [index, input] of this._getInputs().entries()) input.value = value[index] ?? "";
 			this._syncFirstInputMaxLength();
@@ -286,10 +340,11 @@
 				input.spellcheck = false;
 				input.enterKeyHint = index === inputs.length - 1 ? "done" : "next";
 				if (this._config.placeholder !== null) {
+					if (!this._placeholders.has(input)) this._placeholders.set(input, input.getAttribute("placeholder"));
 					const placeholder = String(this._config.placeholder);
 					input.placeholder = placeholder.length > 1 ? placeholder[index] || "" : placeholder;
 				}
-				input.required = this._config.required;
+				(0, js_src_util_index_js.writeAttribute)(input, "aria-required", this._config.required ? "true" : null);
 				switch (this._config.type) {
 					case "number":
 						input.inputMode = "numeric";
@@ -299,15 +354,21 @@
 						input.inputMode = "text";
 						input.pattern = ".*";
 				}
-				if (this._config.disabled) input.disabled = true;
+				input.disabled = this._disabled;
+				input.readOnly = false;
 				if (this._config.id && !input.id) input.id = `${this._config.id}-${index}`;
-				if (this._config.readonly) input.readOnly = true;
 				if (typeof this._config.ariaLabel === "function") {
 					const ariaLabel = this._config.ariaLabel(index, inputs.length);
 					input.setAttribute("aria-label", ariaLabel);
 				}
 			}
 			this._syncFirstInputMaxLength();
+		}
+		_restorePlaceholder(input) {
+			const placeholder = this._placeholders.get(input);
+			if (typeof placeholder === "string") input.placeholder = placeholder;
+			else input.removeAttribute("placeholder");
+			this._placeholders.delete(input);
 		}
 		_setInputsTabIndexes() {
 			const inputs = this._getInputs();
@@ -337,15 +398,9 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, OTPInput, config, args);
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(window, EVENT_LOAD_DATA_API, () => {
 		for (const otp of js_src_dom_selector_engine_js.default.find(SELECTOR_DATA_OTP)) OTPInput.otpInputInterface(otp);
 	});
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(OTPInput);
 	//#endregion
 	return OTPInput;

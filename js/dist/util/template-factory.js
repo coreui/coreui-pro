@@ -36,18 +36,6 @@
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	js_src_util_config_js = __toESM(js_src_util_config_js);
 	//#region js/src/util/template-factory.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI util/template-factory.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's util/template-factory.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "TemplateFactory";
 	const Default = {
 		allowList: js_src_util_sanitizer_js.DefaultAllowlist,
@@ -71,9 +59,6 @@
 		entry: "(string|element|function|null)",
 		selector: "(string|element)"
 	};
-	/**
-	* Class definition
-	*/
 	var TemplateFactory = class extends js_src_util_config_js.default {
 		constructor(config) {
 			super();
@@ -147,8 +132,7 @@
 		}
 		_putElementInTemplate(element, templateElement) {
 			if (this._config.html) {
-				templateElement.innerHTML = "";
-				templateElement.append(element);
+				templateElement.replaceChildren(element);
 				return;
 			}
 			templateElement.textContent = element.textContent;

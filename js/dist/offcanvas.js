@@ -39,18 +39,6 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/offcanvas.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI offcanvas.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's drawer.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "offcanvas";
 	const EVENT_KEY = `.coreui.offcanvas`;
 	const DATA_API_KEY = ".data-api";
@@ -58,7 +46,8 @@
 	const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
 	const EVENT_RESIZE = `resize${EVENT_KEY}`;
 	const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
-	const OPEN_SELECTOR = "dialog[open][class*=\"offcanvas\"]";
+	const OPEN_SELECTOR = "dialog[open]:is(.offcanvas, [class^=\"offcanvas-\"], [class*=\" offcanvas-\"])";
+	const SELECTOR_OPEN_RESPONSIVE = "dialog[open]:not(.offcanvas):is([class^=\"offcanvas-\"], [class*=\" offcanvas-\"])";
 	const SELECTOR_DATA_TOGGLE = "[data-coreui-toggle=\"offcanvas\"]";
 	const SELECTOR_DISMISS_SCOPE = ".offcanvas, .offcanvas-sm, .offcanvas-md, .offcanvas-lg, .offcanvas-xl, .offcanvas-2xl";
 	const Default = {
@@ -71,12 +60,10 @@
 		keyboard: "boolean",
 		scroll: "boolean"
 	};
-	/**
-	* Class definition
-	*/
 	var Offcanvas = class Offcanvas extends js_src_dialog_base_js.default {
 		constructor(element, config) {
 			super((0, js_src_util_legacy_markup_js.resolveDialogElement)(element, NAME), config);
+			this._initResizeObserver();
 		}
 		static get Default() {
 			return Default;
@@ -100,9 +87,6 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Offcanvas, config, (element) => [element]);
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function(event) {
 		const target = (0, js_src_util_legacy_markup_js.resolveDialogElement)(js_src_dom_selector_engine_js.default.getElementFromSelector(this), NAME);
 		if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
@@ -118,12 +102,9 @@
 		for (const selector of js_src_dom_selector_engine_js.default.find(OPEN_SELECTOR)) Offcanvas.getOrCreateInstance(selector).show();
 	});
 	js_src_dom_event_handler_js.default.on(window, EVENT_RESIZE, () => {
-		for (const element of js_src_dom_selector_engine_js.default.find(OPEN_SELECTOR)) if (getComputedStyle(element).position !== "fixed") Offcanvas.getOrCreateInstance(element).hide();
+		for (const element of js_src_dom_selector_engine_js.default.find(SELECTOR_OPEN_RESPONSIVE)) if (getComputedStyle(element).position !== "fixed") Offcanvas.getOrCreateInstance(element).hide();
 	});
 	(0, js_src_util_component_functions_js.enableDismissTrigger)(Offcanvas, "hide", SELECTOR_DISMISS_SCOPE);
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Offcanvas);
 	//#endregion
 	return Offcanvas;

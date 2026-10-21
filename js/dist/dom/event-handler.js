@@ -7,18 +7,6 @@
 	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("../util/index.js")) : typeof define === "function" && define.amd ? define(["../util/index.js"], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.EventHandler = factory(global.Index));
 })(this, function(js_src_util_index_js) {
 	//#region js/src/dom/event-handler.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI dom/event-handler.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's dom/event-handler.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const namespaceRegex = /[^.]*(?=\..*)\.|.*/;
 	const stripNameRegex = /\..*/;
 	const stripUidRegex = /::\d+$/;
@@ -65,6 +53,7 @@
 		"blur",
 		"change",
 		"input",
+		"invalid",
 		"reset",
 		"select",
 		"submit",
@@ -84,9 +73,6 @@
 		"toggle",
 		"beforematch"
 	]);
-	/**
-	* Private methods
-	*/
 	function makeEventUid(element, uid) {
 		return uid && `${uid}::${uidEvent++}` || element.uidEvent || uidEvent++;
 	}

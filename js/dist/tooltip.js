@@ -4,17 +4,18 @@
 * License (https://coreui.io/pro/license/)
 */
 (function(global, factory) {
-	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("@floating-ui/dom"), require("./base-component.js"), require("./dom/event-handler.js"), require("./dom/manipulator.js"), require("./util/index.js"), require("./util/sanitizer.js"), require("./util/template-factory.js"), require("./util/floating-ui.js")) : typeof define === "function" && define.amd ? define([
+	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("@floating-ui/dom"), require("./base-component.js"), require("./dom/event-handler.js"), require("./dom/manipulator.js"), require("./util/focus.js"), require("./util/index.js"), require("./util/sanitizer.js"), require("./util/template-factory.js"), require("./util/floating-ui.js")) : typeof define === "function" && define.amd ? define([
 		"@floating-ui/dom",
 		"./base-component.js",
 		"./dom/event-handler.js",
 		"./dom/manipulator.js",
+		"./util/focus.js",
 		"./util/index.js",
 		"./util/sanitizer.js",
 		"./util/template-factory.js",
 		"./util/floating-ui.js"
-	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Tooltip = factory(global.FloatingUIDOM, global.BaseComponent, global.EventHandler, global.Manipulator, global.Index, global.Sanitizer, global.TemplateFactory, global.FloatingUi));
-})(this, function(_floating_ui_dom, js_src_base_component_js, js_src_dom_event_handler_js, js_src_dom_manipulator_js, js_src_util_index_js, js_src_util_sanitizer_js, js_src_util_template_factory_js, js_src_util_floating_ui_js) {
+	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Tooltip = factory(global.FloatingUIDOM, global.BaseComponent, global.EventHandler, global.Manipulator, global.Focus, global.Index, global.Sanitizer, global.TemplateFactory, global.FloatingUi));
+})(this, function(_floating_ui_dom, js_src_base_component_js, js_src_dom_event_handler_js, js_src_dom_manipulator_js, js_src_util_focus_js, js_src_util_index_js, js_src_util_sanitizer_js, js_src_util_template_factory_js, js_src_util_floating_ui_js) {
 	//#region \0rolldown/runtime.js
 	var __create = Object.create;
 	var __defProp = Object.defineProperty;
@@ -42,18 +43,6 @@
 	js_src_dom_manipulator_js = __toESM(js_src_dom_manipulator_js);
 	js_src_util_template_factory_js = __toESM(js_src_util_template_factory_js);
 	//#region js/src/tooltip.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI tooltip.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's tooltip.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "tooltip";
 	const ESCAPE_KEY = "Escape";
 	const CLASS_NAME_MODAL = "modal";
@@ -77,6 +66,8 @@
 	const EVENT_MOUSEENTER = "mouseenter";
 	const EVENT_MOUSELEAVE = "mouseleave";
 	const EVENT_KEYDOWN = "keydown";
+	const EVENT_POINTERCANCEL = "pointercancel";
+	const EVENT_POINTERDOWN = "pointerdown";
 	const ATTACHMENTS = {
 		AUTO: ["auto", "auto"],
 		TOP: ["top", "top"],
@@ -129,9 +120,6 @@
 		title: "(string|element|function)",
 		trigger: "string"
 	};
-	/**
-	* Class definition
-	*/
 	var Tooltip = class Tooltip extends js_src_base_component_js.default {
 		constructor(element, config) {
 			if (typeof _floating_ui_dom.computePosition === "undefined") throw new TypeError("CoreUI's tooltips require Floating UI (https://floating-ui.com)");
@@ -143,6 +131,8 @@
 			this._activeTrigger = {};
 			this._floatingCleanup = null;
 			this._keydownHandler = null;
+			this._focusOutsideHandler = null;
+			this._pressedInside = false;
 			this._tipEventOut = null;
 			this._templateFactory = null;
 			this._newContent = null;
@@ -178,6 +168,7 @@
 		dispose() {
 			this._clearTimeout();
 			this._removeEscapeListener();
+			this._removeFocusOutsideListener();
 			js_src_dom_event_handler_js.default.off(this._element.closest(SELECTOR_MODAL), EVENT_MODAL_HIDE, this._hideModalHandler);
 			if (this._element.getAttribute("data-coreui-original-title")) this._element.setAttribute("title", this._element.getAttribute("data-coreui-original-title"));
 			this._disposeFloating();
@@ -208,6 +199,7 @@
 			await this._createFloating(tip);
 			tip.classList.add(CLASS_NAME_SHOW);
 			this._setEscapeListener();
+			this._setFocusOutsideListener();
 			if ("ontouchstart" in document.documentElement) for (const element of document.body.children) js_src_dom_event_handler_js.default.on(element, "mouseover", js_src_util_index_js.noop);
 			const complete = () => {
 				js_src_dom_event_handler_js.default.trigger(this._element, this.constructor.eventName(EVENT_SHOWN));
@@ -220,6 +212,7 @@
 			if (!this._isShown()) return;
 			if (js_src_dom_event_handler_js.default.trigger(this._element, this.constructor.eventName(EVENT_HIDE)).defaultPrevented) return;
 			this._removeEscapeListener();
+			this._removeFocusOutsideListener();
 			this._getTipElement().classList.remove(CLASS_NAME_SHOW);
 			if ("ontouchstart" in document.documentElement) for (const element of document.body.children) js_src_dom_event_handler_js.default.off(element, "mouseover", js_src_util_index_js.noop);
 			this._activeTrigger[TRIGGER_CLICK] = false;
@@ -354,7 +347,7 @@
 				const isVertical = finalPlacement.startsWith("top") || finalPlacement.startsWith("bottom");
 				Object.assign(arrowElement.style, {
 					left: isVertical && arrowX !== void 0 ? `${arrowX}px` : "",
-					top: !isVertical && arrowY !== void 0 ? `${arrowY}px` : "",
+					top: isVertical || arrowY === void 0 ? "" : `${arrowY}px`,
 					right: "",
 					bottom: ""
 				});
@@ -412,6 +405,7 @@
 				});
 				js_src_dom_event_handler_js.default.on(this._element, eventOut, this._config.selector, (event) => {
 					const context = this._initializeOnDelegatedTarget(event);
+					if (event.type === "focusout" && context._pressedInside) return;
 					context._activeTrigger[event.type === "focusout" ? TRIGGER_FOCUS : TRIGGER_HOVER] = context._isInside(event.relatedTarget);
 					context._leave();
 				});
@@ -425,6 +419,7 @@
 			const trigger = this._getTrigger();
 			if (trigger === TRIGGER_MANUAL || trigger.includes(TRIGGER_CLICK)) return;
 			this._tipEventOut = (event) => {
+				if (event.type === "focusout" && this._pressedInside) return;
 				this._activeTrigger[event.type === "focusout" ? TRIGGER_FOCUS : TRIGGER_HOVER] = this._isInside(event.relatedTarget);
 				this._leave();
 			};
@@ -468,6 +463,38 @@
 			if (!this._keydownHandler) return;
 			this._element.ownerDocument.removeEventListener(EVENT_KEYDOWN, this._keydownHandler, true);
 			this._keydownHandler = null;
+		}
+		_setFocusOutsideListener() {
+			if (this._focusOutsideHandler || !this._getTrigger().split(" ").includes(TRIGGER_FOCUS)) return;
+			this._focusOutsideHandler = (event) => {
+				const inside = event.composedPath().some((node) => node === this._element || node === this.tip || node.getAttribute?.("role") === "tooltip");
+				if (event.type === EVENT_POINTERDOWN) {
+					this._pressedInside = inside;
+					return;
+				}
+				const pressedInside = this._pressedInside;
+				this._pressedInside = false;
+				if (inside || event.type === EVENT_POINTERCANCEL || event.type === EVENT_CLICK && pressedInside || !this._activeTrigger[TRIGGER_FOCUS] || [this._element, this.tip].some((element) => (0, js_src_util_focus_js.containsFocus)(element))) return;
+				this._activeTrigger[TRIGGER_FOCUS] = false;
+				this._leave();
+			};
+			for (const type of [
+				EVENT_POINTERDOWN,
+				EVENT_POINTERCANCEL,
+				EVENT_CLICK,
+				EVENT_FOCUSIN
+			]) this._element.ownerDocument.addEventListener(type, this._focusOutsideHandler, true);
+		}
+		_removeFocusOutsideListener() {
+			if (!this._focusOutsideHandler) return;
+			for (const type of [
+				EVENT_POINTERDOWN,
+				EVENT_POINTERCANCEL,
+				EVENT_CLICK,
+				EVENT_FOCUSIN
+			]) this._element.ownerDocument.removeEventListener(type, this._focusOutsideHandler, true);
+			this._focusOutsideHandler = null;
+			this._pressedInside = false;
 		}
 		_fixTitle() {
 			const title = this._element.getAttribute("title");
@@ -542,9 +569,6 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Tooltip, config, args);
 		}
 	};
-	/**
-	* Data API implementation - auto-initialize tooltips
-	*/
 	const initTooltip = (event) => {
 		const target = event.target.closest(SELECTOR_DATA_TOGGLE);
 		if (!target) return;
@@ -552,9 +576,6 @@
 	};
 	js_src_dom_event_handler_js.default.on(document, EVENT_FOCUSIN, SELECTOR_DATA_TOGGLE, initTooltip);
 	js_src_dom_event_handler_js.default.on(document, EVENT_MOUSEENTER, SELECTOR_DATA_TOGGLE, initTooltip);
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Tooltip);
 	//#endregion
 	return Tooltip;

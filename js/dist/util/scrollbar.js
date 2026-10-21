@@ -35,25 +35,10 @@
 	js_src_dom_manipulator_js = __toESM(js_src_dom_manipulator_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/util/scrollbar.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI util/scrollBar.js
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's util/scrollBar.js
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const SELECTOR_FIXED_CONTENT = ".fixed-top, .fixed-bottom, .is-fixed, .sticky-top";
 	const SELECTOR_STICKY_CONTENT = ".sticky-top";
 	const PROPERTY_PADDING = "padding-right";
 	const PROPERTY_MARGIN = "margin-right";
-	/**
-	* Class definition
-	*/
 	var ScrollBarHelper = class {
 		constructor() {
 			this._element = document.body;

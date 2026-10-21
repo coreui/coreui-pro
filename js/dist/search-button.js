@@ -35,15 +35,6 @@
 	js_src_base_component_js = __toESM(js_src_base_component_js);
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	//#region js/src/search-button.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI search-button.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "search-button";
 	const EVENT_KEY = `.coreui.search-button`;
 	const DATA_API_KEY = ".data-api";
@@ -91,9 +82,6 @@
 		shift: "Shift",
 		space: "Space"
 	};
-	/**
-	* Class definition
-	*/
 	var SearchButton = class SearchButton extends js_src_base_component_js.default {
 		constructor(element, config) {
 			super(element, config);
@@ -113,6 +101,12 @@
 		}
 		trigger() {
 			this._triggerEvent("api");
+		}
+		dispose() {
+			if (!this._element) return;
+			if (this._shortcutKeysContent) this._shortcutKeys.replaceChildren(...this._shortcutKeysContent);
+			else this._shortcutKeys.remove();
+			super.dispose();
 		}
 		_triggerEvent(trigger) {
 			if (this._isDisabled()) return;
@@ -135,10 +129,16 @@
 		}
 		_ensureShortcutKeys() {
 			const existingShortcutKeys = this._element.querySelector(SELECTOR_SHORTCUT_KEYS);
-			if (existingShortcutKeys) return existingShortcutKeys;
+			if (existingShortcutKeys) {
+				this._shortcutKeys = existingShortcutKeys;
+				this._shortcutKeysContent = [...existingShortcutKeys.childNodes];
+				return existingShortcutKeys;
+			}
 			const shortcutKeys = document.createElement("span");
 			shortcutKeys.className = CLASS_NAME_SHORTCUT_KEYS;
 			shortcutKeys.setAttribute("aria-hidden", "true");
+			this._shortcutKeys = shortcutKeys;
+			this._shortcutKeysContent = null;
 			const placeholder = this._element.querySelector(SELECTOR_PLACEHOLDER);
 			if (placeholder) {
 				placeholder.after(shortcutKeys);
@@ -261,22 +261,22 @@
 			data._triggerEvent("click");
 		}
 		static _handleDataApiKeydown(event) {
+			if (!event.key) return;
 			for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
-				const data = SearchButton.getOrCreateInstance(button);
+				const data = SearchButton.getInstance(button);
+				if (!data) continue;
 				data._syncActiveKeys(event);
 				if (data._handleShortcut(event)) break;
 			}
 		}
 		static _handleDataApiKeyup(event) {
-			for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) SearchButton.getOrCreateInstance(button)._syncActiveKeys(event);
+			if (!event.key) return;
+			for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) SearchButton.getInstance(button)?._syncActiveKeys(event);
 		}
 		static _handleDataApiBlur() {
-			for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) SearchButton.getOrCreateInstance(button)._clearActiveKeys();
+			for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) SearchButton.getInstance(button)?._clearActiveKeys();
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
 		SearchButton._initializeDataApi();
 	});
@@ -292,9 +292,6 @@
 	js_src_dom_event_handler_js.default.on(window, EVENT_BLUR_DATA_API, () => {
 		SearchButton._handleDataApiBlur();
 	});
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(SearchButton);
 	//#endregion
 	return SearchButton;

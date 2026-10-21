@@ -7,15 +7,6 @@
 	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("../util/index.js")) : typeof define === "function" && define.amd ? define(["../util/index.js"], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.SelectorEngine = factory(global.Index));
 })(this, function(js_src_util_index_js) {
 	//#region js/src/dom/selector-engine.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI dom/selector-engine.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's dom/selector-engine.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
 	const getSelector = (element) => {
 		let selector = element.getAttribute("data-coreui-target");
 		if (!selector || selector === "#") {

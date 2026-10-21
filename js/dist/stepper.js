@@ -4,14 +4,15 @@
 * License (https://coreui.io/pro/license/)
 */
 (function(global, factory) {
-	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./base-component.js"), require("./dom/event-handler.js"), require("./dom/manipulator.js"), require("./dom/selector-engine.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
+	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./base-component.js"), require("./dom/event-handler.js"), require("./dom/manipulator.js"), require("./dom/selector-engine.js"), require("./util/form-validation.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
 		"./base-component.js",
 		"./dom/event-handler.js",
 		"./dom/manipulator.js",
 		"./dom/selector-engine.js",
+		"./util/form-validation.js",
 		"./util/index.js"
-	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Stepper = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index));
-})(this, function(js_src_base_component_js, js_src_dom_event_handler_js, js_src_dom_manipulator_js, js_src_dom_selector_engine_js, js_src_util_index_js) {
+	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Stepper = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.FormValidation, global.Index));
+})(this, function(js_src_base_component_js, js_src_dom_event_handler_js, js_src_dom_manipulator_js, js_src_dom_selector_engine_js, js_src_util_form_validation_js, js_src_util_index_js) {
 	//#region \0rolldown/runtime.js
 	var __create = Object.create;
 	var __defProp = Object.defineProperty;
@@ -39,15 +40,6 @@
 	js_src_dom_manipulator_js = __toESM(js_src_dom_manipulator_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/stepper.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI PRO stepper.js
-	* License (https://coreui.io/pro/license/)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "stepper";
 	const EVENT_KEY = `.coreui.stepper`;
 	const EVENT_FINISH = `finish${EVENT_KEY}`;
@@ -60,15 +52,12 @@
 	const EVENT_LOAD_DATA_API = `load${EVENT_KEY}`;
 	const CLASS_NAME_ACTIVE = "active";
 	const CLASS_NAME_COMPLETE = "complete";
-	const CLASS_NAME_IS_INVALID = "is-invalid";
-	const CLASS_NAME_IS_VALID = "is-valid";
 	const CLASS_NAME_SHOW = "show";
 	const CLASS_NAME_STEPPER_STEP_CONNECTOR = "stepper-step-connector";
 	const CLASS_NAME_STEPPER_STEP_INDICATOR_ICON = "stepper-step-indicator-icon";
 	const CLASS_NAME_STEPPER_STEP_INDICATOR_TEXT = "stepper-step-indicator-text";
 	const CLASS_NAME_STEPPER_VERTICAL = "stepper-vertical";
 	const SELECTOR_DATA_STEPPER = "[data-coreui-stepper]";
-	const SELECTOR_FORM_VALIDATE_VALID = "[data-coreui-validate~=\"valid\"]";
 	const SELECTOR_STEPPER = ".stepper";
 	const SELECTOR_STEPPER_ACTION = "[data-coreui-stepper-action]";
 	const SELECTOR_STEPPER_STEP = ".stepper-step";
@@ -92,9 +81,6 @@
 		linear: "boolean",
 		skipValidation: "boolean"
 	};
-	/**
-	* Class definition
-	*/
 	var Stepper = class Stepper extends js_src_base_component_js.default {
 		constructor(element, config) {
 			super(element, config);
@@ -103,6 +89,7 @@
 			this._activeStepButton = this._getActiveElem();
 			this._initialStepButton = this._activeStepButton;
 			this._isFinished = false;
+			this._validationMarks = /* @__PURE__ */ new WeakMap();
 			this._validatedForms = /* @__PURE__ */ new Set();
 			this._addStepperConnector();
 			this._resetPanes(this._getTargetPane(this._activeStepButton));
@@ -126,27 +113,33 @@
 			if (typeof buttonOrStepNumber === "number") button = this._stepButtons[buttonOrStepNumber - 1];
 			if (!button) return;
 			const active = this._getActiveElem();
-			if (active && !this._isCurrentStepValid(active)) return;
 			if (this._elemIsActive(button)) return;
+			const isForward = this._stepButtons.indexOf(button) > this._stepButtons.indexOf(active);
+			if (active && isForward && !this._isCurrentStepValid(active)) return;
 			if (this._config.linear) {
 				const steps = this._getEnabledStepButtons();
 				if (steps.indexOf(button) > steps.indexOf(active) + 1) return;
 			}
 			const index = this._stepButtons.indexOf(button) + 1;
 			js_src_dom_event_handler_js.default.trigger(this._element, EVENT_STEP_CHANGE, { index });
+			const holdsFocus = this._holdsFocus();
 			this._activeStepButton = button;
 			this._deactivate(active);
 			this._activate(button);
 			this._updateStepButtonsDisabledState();
 			this._complete(button);
+			if (holdsFocus) button.focus();
 		}
 		next() {
 			if (this._isFinished) return;
-			if (!this._isCurrentStepValid(this._getActiveElem())) return;
 			const steps = this._getEnabledStepButtons();
 			const active = this._getActiveElem();
 			const next = steps[steps.indexOf(active) + 1];
-			if (next) this.showStep(next);
+			if (next) {
+				this.showStep(next);
+				return;
+			}
+			this.finish();
 		}
 		prev() {
 			if (this._isFinished) return;
@@ -157,15 +150,11 @@
 		}
 		finish() {
 			if (this._isFinished) return;
-			if (!this._isCurrentStepValid(this._getActiveElem())) return;
 			const steps = this._getEnabledStepButtons();
 			const active = this._getActiveElem();
-			const index = steps.indexOf(active);
-			if (index !== steps.length - 1) {
-				const next = steps[index + 1];
-				if (next) this.showStep(next);
-				return;
-			}
+			if (steps.indexOf(active) !== steps.length - 1) return;
+			if (!this._isCurrentStepValid(active)) return;
+			this._isFinished = true;
 			const finishHandler = () => {
 				active.classList.remove(CLASS_NAME_ACTIVE);
 				this._markAsComplete(active);
@@ -183,6 +172,7 @@
 		}
 		reset() {
 			if (!this._stepButtons.length) return;
+			const holdsFocus = this._holdsFocus();
 			for (const pane of js_src_dom_selector_engine_js.default.find(SELECTOR_STEPPER_PANE, this._element)) {
 				pane.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW);
 				pane.setAttribute("aria-hidden", "true");
@@ -196,7 +186,7 @@
 				this._removeIndicatorIcon(btn);
 			}
 			for (const form of this._element.querySelectorAll(`${SELECTOR_STEPPER_PANE} form, ${SELECTOR_STEPPER_STEP_CONTENT} form`)) form.reset();
-			for (const form of this._validatedForms) for (const control of form.elements) control.classList.remove(CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID);
+			for (const form of this._validatedForms) this._untrackValidatedForm(form);
 			const firstStep = this._initialStepButton || this._stepButtons[0];
 			firstStep.classList.add(CLASS_NAME_ACTIVE);
 			const pane = this._getTargetPane(firstStep);
@@ -214,10 +204,12 @@
 			this._activeStepButton = firstStep;
 			this._isFinished = false;
 			this._updateStepButtonsDisabledState();
+			this._setupAccessibilityAttributes();
+			if (holdsFocus) firstStep.focus();
 			js_src_dom_event_handler_js.default.trigger(this._element, EVENT_RESET);
 		}
 		dispose() {
-			for (const form of this._validatedForms) js_src_dom_event_handler_js.default.off(form, EVENT_INPUT);
+			for (const form of this._validatedForms) this._untrackValidatedForm(form);
 			super.dispose();
 		}
 		_getStepButtons() {
@@ -235,39 +227,52 @@
 		_elemIsActive(elem) {
 			return elem.classList.contains(CLASS_NAME_ACTIVE);
 		}
+		_getFocusedElement() {
+			return this._element.getRootNode().activeElement;
+		}
+		_holdsFocus() {
+			return this._element.contains(this._getFocusedElement());
+		}
 		_isCurrentStepValid(element) {
 			if (this._config.skipValidation) return true;
 			const target = this._getTargetPane(element) ?? element.parentNode.querySelector(SELECTOR_STEPPER_STEP_CONTENT);
 			if (!target) return true;
 			const form = target.querySelector("form");
 			if (!form) return true;
-			const isValid = form.checkValidity();
-			js_src_dom_event_handler_js.default.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, {
-				stepIndex: this._stepButtons.indexOf(element) + 1,
-				isValid
-			});
-			if (!isValid) {
-				if (form.noValidate) this._showValidationState(form);
-				else form.reportValidity();
-				return false;
+			const stepIndex = this._stepButtons.indexOf(element) + 1;
+			if (!form.noValidate) {
+				js_src_dom_event_handler_js.default.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, {
+					stepIndex,
+					isValid: (0, js_src_util_form_validation_js.isFormValid)(form)
+				});
+				return form.reportValidity();
 			}
-			return true;
+			const { isValid } = (0, js_src_util_form_validation_js.validateForm)(form, this._validationMarks, (isValid) => {
+				js_src_dom_event_handler_js.default.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, {
+					stepIndex,
+					isValid
+				});
+				return false;
+			});
+			this._trackValidatedForm(form);
+			return isValid;
 		}
-		_showValidationState(form) {
-			for (const control of form.elements) this._updateControlValidationState(control, form);
+		_trackValidatedForm(form) {
 			if (!this._validatedForms.has(form)) {
 				this._validatedForms.add(form);
-				js_src_dom_event_handler_js.default.on(form, EVENT_INPUT, (event) => this._updateControlValidationState(event.target, form));
+				js_src_dom_event_handler_js.default.on(form, EVENT_INPUT, () => (0, js_src_util_form_validation_js.updateValidationState)(form, this._validationMarks));
+				js_src_dom_event_handler_js.default.on(form, EVENT_RESET, (event) => {
+					setTimeout(() => {
+						if (this._element && !event.defaultPrevented && this._validatedForms.has(form)) this._untrackValidatedForm(form);
+					});
+				});
 			}
 		}
-		_updateControlValidationState(control, form) {
-			if (!control.willValidate || [
-				"button",
-				"reset",
-				"submit"
-			].includes(control.type)) return;
-			control.classList.toggle(CLASS_NAME_IS_INVALID, !control.validity.valid);
-			control.classList.toggle(CLASS_NAME_IS_VALID, control.validity.valid && form.matches(SELECTOR_FORM_VALIDATE_VALID));
+		_untrackValidatedForm(form) {
+			js_src_dom_event_handler_js.default.off(form, EVENT_INPUT);
+			js_src_dom_event_handler_js.default.off(form, EVENT_RESET);
+			(0, js_src_util_form_validation_js.clearValidationState)(form, this._validationMarks);
+			this._validatedForms.delete(form);
 		}
 		_activate(element) {
 			if (!element) return;
@@ -411,7 +416,6 @@
 					stepButton.setAttribute("aria-controls", pane.id);
 					if (this._tabPattern) pane.setAttribute("role", "tabpanel");
 					pane.setAttribute("aria-labelledby", stepButton.id);
-					pane.setAttribute("aria-live", "polite");
 					pane.setAttribute("aria-hidden", !this._elemIsActive(stepButton));
 				}
 				if (this._elemIsActive(stepButton)) {
@@ -456,9 +460,6 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Stepper, config, args);
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(document, EVENT_CLICK_DATA_API, SELECTOR_STEPPER_STEP_BUTTON, function(event) {
 		if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
 		if ((0, js_src_util_index_js.isDisabled)(this)) return;
@@ -476,9 +477,6 @@
 	js_src_dom_event_handler_js.default.on(window, EVENT_LOAD_DATA_API, () => {
 		for (const element of js_src_dom_selector_engine_js.default.find(SELECTOR_DATA_STEPPER)) Stepper.getOrCreateInstance(element);
 	});
-	/**
-	* jQuery integration
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Stepper);
 	//#endregion
 	return Stepper;

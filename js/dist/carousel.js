@@ -39,18 +39,6 @@
 	js_src_dom_manipulator_js = __toESM(js_src_dom_manipulator_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/carousel.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI carousel.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's carousel.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "carousel";
 	const EVENT_KEY = `.coreui.carousel`;
 	const DATA_API_KEY = ".data-api";
@@ -109,9 +97,6 @@
 		pause: "(string|boolean)"
 	};
 	const easeInOutCubic = (progress) => progress < .5 ? 4 * progress * progress * progress : 1 - (-2 * progress + 2) ** 3 / 2;
-	/**
-	* Class definition
-	*/
 	var Carousel = class Carousel extends js_src_base_component_js.default {
 		constructor(element, config) {
 			super(element, config);
@@ -418,12 +403,20 @@
 				atStart = this._activeIndex <= 0;
 				atEnd = this._activeIndex >= last;
 			}
-			this._setControlsDisabled(this._prevControls, atStart);
-			this._setControlsDisabled(this._nextControls, atEnd);
+			if (atStart) {
+				this._setControlsDisabled(this._nextControls, atEnd);
+				this._setControlsDisabled(this._prevControls, atStart);
+			} else {
+				this._setControlsDisabled(this._prevControls, atStart);
+				this._setControlsDisabled(this._nextControls, atEnd);
+			}
 		}
 		_setControlsDisabled(controls, disabled) {
 			for (const control of controls) {
-				if (disabled && control === document.activeElement) ((controls === this._prevControls ? this._nextControls : this._prevControls)[0] ?? this._viewport).focus({ preventScroll: true });
+				if (disabled && control === document.activeElement) {
+					((controls === this._prevControls ? this._nextControls : this._prevControls)[0] ?? this._viewport).focus({ preventScroll: true });
+					if (document.activeElement === control) control.blur();
+				}
 				control.disabled = disabled;
 			}
 		}
@@ -521,9 +514,6 @@
 			}
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_SLIDE, function(event) {
 		const target = js_src_dom_selector_engine_js.default.getElementFromSelector(this);
 		if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) return;
@@ -551,9 +541,6 @@
 		const carousels = js_src_dom_selector_engine_js.default.find(SELECTOR_DATA_AUTOPLAY);
 		for (const carousel of carousels) Carousel.getOrCreateInstance(carousel);
 	});
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Carousel);
 	//#endregion
 	return Carousel;

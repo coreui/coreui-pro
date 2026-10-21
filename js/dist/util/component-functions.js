@@ -37,15 +37,6 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/util/component-functions.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI util/component-functions.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's util/component-functions.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
 	const enableDismissTrigger = (component, method = "hide", closestSelector) => {
 		const clickEvent = `click.dismiss${component.EVENT_KEY}`;
 		const name = component.NAME;

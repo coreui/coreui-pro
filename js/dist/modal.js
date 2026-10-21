@@ -39,18 +39,6 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/modal.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI modal.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's dialog.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "modal";
 	const EVENT_KEY = `.coreui.modal`;
 	const DATA_API_KEY = ".data-api";
@@ -73,9 +61,6 @@
 		keyboard: "boolean",
 		modal: "boolean"
 	};
-	/**
-	* Class definition
-	*/
 	var Modal = class Modal extends js_src_dialog_base_js.default {
 		constructor(element, config) {
 			super((0, js_src_util_legacy_markup_js.resolveDialogElement)(element, NAME), config);
@@ -90,6 +75,10 @@
 			return NAME;
 		}
 		handleUpdate() {}
+		dispose() {
+			this._element.classList.remove(CLASS_NAME_SWAP_IN);
+			super.dispose();
+		}
 		_getShowOptions() {
 			return {
 				modal: this._config.modal,
@@ -108,46 +97,49 @@
 		_onCancel() {
 			js_src_dom_event_handler_js.default.trigger(this._element, EVENT_CANCEL);
 		}
+		static {
+			js_src_dom_event_handler_js.default.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function(event) {
+				Modal._handleDataApiClick(this, event);
+			});
+		}
 		static jQueryInterface(config, relatedTarget) {
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Modal, config, [relatedTarget]);
 		}
-	};
-	/**
-	* Data API implementation
-	*/
-	js_src_dom_event_handler_js.default.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function(event) {
-		const target = (0, js_src_util_legacy_markup_js.resolveDialogElement)(js_src_dom_selector_engine_js.default.getElementFromSelector(this), NAME);
-		if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
-		js_src_dom_event_handler_js.default.one(target, EVENT_SHOW, (showEvent) => {
-			if (showEvent.defaultPrevented) return;
-			js_src_dom_event_handler_js.default.one(target, EVENT_HIDDEN, () => {
-				if ((0, js_src_util_index_js.isVisible)(this)) this.focus({ preventScroll: true });
-			});
-		});
-		const currentDialog = this.closest("dialog[open]");
-		if (currentDialog && currentDialog !== target && target) {
+		static _handleDataApiClick(trigger, event) {
+			const target = (0, js_src_util_legacy_markup_js.resolveDialogElement)(js_src_dom_selector_engine_js.default.getElementFromSelector(trigger), NAME);
+			if (!target) return;
+			if (["A", "AREA"].includes(trigger.tagName)) event.preventDefault();
+			const currentDialog = trigger.closest("dialog[open]");
+			const currentInstance = currentDialog && currentDialog !== target ? Modal.getInstance(currentDialog) : null;
+			if (!currentDialog || !currentInstance) {
+				js_src_dom_event_handler_js.default.one(target, EVENT_SHOW, (showEvent) => {
+					if (!showEvent.defaultPrevented) Modal._registerFocusRestoration(target, trigger);
+				});
+				Modal.getOrCreateInstance(target).toggle(trigger);
+				return;
+			}
+			if (currentDialog.classList.contains(CLASS_NAME_SWAP_IN)) return;
 			const newModal = Modal.getOrCreateInstance(target);
+			if (!newModal._canShow(trigger) || !currentInstance._canHide()) return;
+			Modal._registerFocusRestoration(target, trigger);
 			target.classList.add(CLASS_NAME_SWAP_IN);
-			newModal.show(this);
 			js_src_dom_event_handler_js.default.one(target, EVENT_SHOWN, () => {
 				target.classList.remove(CLASS_NAME_SWAP_IN);
 			});
-			const currentInstance = Modal.getInstance(currentDialog);
-			if (currentInstance) {
-				currentDialog.classList.add(CLASS_NAME_INSTANT);
-				js_src_dom_event_handler_js.default.one(currentDialog, EVENT_HIDDEN, () => {
-					currentDialog.classList.remove(CLASS_NAME_INSTANT);
-				});
-				currentInstance.hide();
-			}
-			return;
+			newModal._show(trigger);
+			currentDialog.classList.add(CLASS_NAME_INSTANT);
+			js_src_dom_event_handler_js.default.one(currentDialog, EVENT_HIDDEN, () => {
+				currentDialog.classList.remove(CLASS_NAME_INSTANT);
+			});
+			currentInstance._hide();
 		}
-		Modal.getOrCreateInstance(target).toggle(this);
-	});
+		static _registerFocusRestoration(target, trigger) {
+			js_src_dom_event_handler_js.default.one(target, EVENT_HIDDEN, () => {
+				if ((0, js_src_util_index_js.isVisible)(trigger)) trigger.focus({ preventScroll: true });
+			});
+		}
+	};
 	(0, js_src_util_component_functions_js.enableDismissTrigger)(Modal);
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Modal);
 	//#endregion
 	return Modal;

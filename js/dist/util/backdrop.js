@@ -35,18 +35,6 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_util_config_js = __toESM(js_src_util_config_js);
 	//#region js/src/util/backdrop.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI util/backdrop.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's util/backdrop.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "backdrop";
 	const CLASS_NAME_FADE = "fade";
 	const CLASS_NAME_SHOW = "show";
@@ -65,9 +53,6 @@
 		isVisible: "boolean",
 		rootElement: "(element|string)"
 	};
-	/**
-	* Class definition
-	*/
 	var Backdrop = class extends js_src_util_config_js.default {
 		constructor(config) {
 			super();

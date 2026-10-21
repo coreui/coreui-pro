@@ -24,10 +24,10 @@ cdn:
 
 cdn_pro:
   css_pro: "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@6.0.0-alpha.0/dist/css/coreui.min.css"
-  css_pro_hash: "sha384-F+g1XwaEoDdMLXEPnahfRloRsSoftl2vWK4JeoGKKifs3GH9R3Ng2lRb3pq55HTS"
+  css_pro_hash: "sha384-t6XvzdaSKwWiXlIt37TCu6mfRbZKMmw0dOV7/9md0KPAzPqAaIB9vEGG61vovfPd"
   js_pro: "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@6.0.0-alpha.0/dist/js/coreui.min.js"
-  js_pro_hash: "sha384-kUpSKa20uGjMrb8XIUCECbcTGyZ7WO4FUM9/Dad7olwxxV6JFZqNSNCwAb7OzSYc"
+  js_pro_hash: "sha384-BQStKoRKknw5iuD+FsEleDFrdJImta4fZsjRE0/MrkSBr4z2RskRs35SRXUP0BJ+"
   js_pro_bundle: "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@6.0.0-alpha.0/dist/js/coreui.bundle.min.js"
-  js_pro_bundle_hash: "sha384-5EIITWrYmdJ/lLrIJ/CAkKMbEDQmQ2tbtKex02fTpIPGDke4Gk/2ypdWo43vOvfj"
+  js_pro_bundle_hash: "sha384-Lfg2VpFc1rTjT2KnFUnfPVR7QsBPjRnTTQbSeGCIgEETQgxoBJTPipJFB3rQ+OqC"
   js_pro_esm: "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@6.0.0-alpha.0/dist/js/coreui.esm.min.js"
-  js_pro_esm_hash: "sha384-PsF+4u61iMi60YqmimN6qPBfr/4L1S96Yvb21YpB/JVqn6r7LboSAsIyANHzxmOi"
+  js_pro_esm_hash: "sha384-hbV6Ml0BQ0HSZ+kvTgl8IkNOSzlB0+23b2QAODrtZ3lhIUr7Hbaj9EnQYPeyD+hl"

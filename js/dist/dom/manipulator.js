@@ -7,15 +7,6 @@
 	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define([], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Manipulator = factory());
 })(this, function() {
 	//#region js/src/dom/manipulator.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI dom/manipulator.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's dom/manipulator.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
 	function normalizeData(value) {
 		if (value === "true") return true;
 		if (value === "false") return false;

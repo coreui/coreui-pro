@@ -37,18 +37,6 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/button.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI button.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's button.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "button";
 	const EVENT_KEY = `.coreui.button`;
 	const DATA_API_KEY = ".data-api";
@@ -56,9 +44,6 @@
 	const SELECTOR_DATA_TOGGLE = "[data-coreui-toggle=\"button\"]";
 	const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
 	const EVENT_DOM_CONTENT_LOADED = `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`;
-	/**
-	* Class definition
-	*/
 	var Button = class Button extends js_src_base_component_js.default {
 		static get NAME() {
 			return NAME;
@@ -70,9 +55,6 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Button, config);
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(document, EVENT_DOM_CONTENT_LOADED, () => {
 		for (const element of js_src_dom_selector_engine_js.default.find(SELECTOR_DATA_TOGGLE)) if (!element.hasAttribute("aria-pressed")) (0, js_src_util_index_js.setAriaAttribute)(element, "aria-pressed", element.classList.contains(CLASS_NAME_ACTIVE));
 	});
@@ -81,9 +63,6 @@
 		const button = event.target.closest(SELECTOR_DATA_TOGGLE);
 		Button.getOrCreateInstance(button).toggle();
 	});
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Button);
 	//#endregion
 	return Button;

@@ -37,22 +37,7 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_util_config_js = __toESM(js_src_util_config_js);
 	//#region js/src/base-component.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI base-component.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's base-component.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const VERSION = "6.0.0-alpha.0";
-	/**
-	* Class definition
-	*/
 	var BaseComponent = class extends js_src_util_config_js.default {
 		constructor(element, config) {
 			super();

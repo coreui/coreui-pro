@@ -40,19 +40,11 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/password-input.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI password-input.js
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "password-input";
 	const EVENT_KEY = `.coreui.password-input`;
 	const DATA_API_KEY = ".data-api";
 	const EVENT_CLICK = `click${EVENT_KEY}`;
+	const EVENT_FOCUS = `focus${EVENT_KEY}`;
 	const CLASS_NAME_ACTION = "form-control-action";
 	const CLASS_NAME_PASSWORD_INPUT = "password-input";
 	const SELECTOR_DATA_PASSWORD_INPUT = "[data-coreui-password-input]";
@@ -72,16 +64,16 @@
 		sanitizeFn: "(null|function)",
 		showIcon: "string"
 	};
-	/**
-	* Class definition
-	*/
 	var PasswordInput = class PasswordInput extends js_src_base_component_js.default {
 		constructor(element, config) {
 			super(element, config);
 			this._group = null;
+			this._hostType = null;
 			this._toggleElement = null;
+			this._hostType = this._element.getAttribute("type");
 			this._createToggle();
 			this._updateToggleState();
+			this._updateDisabledState();
 		}
 		static get Default() {
 			return Default;
@@ -93,10 +85,15 @@
 			return NAME;
 		}
 		toggle() {
+			if (this._element.matches(":disabled")) {
+				this._updateDisabledState();
+				return;
+			}
 			this._element.type = this._element.type === "password" ? "text" : "password";
 			this._updateToggleState();
 		}
 		dispose() {
+			if (!this._element) return;
 			if (this._toggleElement) {
 				js_src_dom_event_handler_js.default.off(this._toggleElement, EVENT_KEY);
 				this._toggleElement.remove();
@@ -105,6 +102,8 @@
 				this._group.element.classList.remove(CLASS_NAME_PASSWORD_INPUT);
 				(0, js_src_util_form_control_group_js.releaseControlGroup)(this._element, this._group);
 			}
+			if (this._hostType === null) this._element.removeAttribute("type");
+			else this._element.setAttribute("type", this._hostType);
 			super.dispose();
 		}
 		_createToggle() {
@@ -112,13 +111,16 @@
 			this._group.element.classList.add(CLASS_NAME_PASSWORD_INPUT);
 			this._toggleElement = (0, js_src_util_form_control_group_js.createControlGroupAction)({
 				className: CLASS_NAME_ACTION,
-				disabled: this._element.disabled,
 				icon: this._config.showIcon,
 				label: this._config.ariaToggleLabel,
 				sanitizeIcon: (icon) => (0, js_src_util_sanitizer_js.sanitizeByConfig)(icon, this._config)
 			});
 			js_src_dom_event_handler_js.default.on(this._toggleElement, EVENT_CLICK, () => this.toggle());
+			js_src_dom_event_handler_js.default.on(this._element, EVENT_FOCUS, () => this._updateDisabledState());
 			this._group.element.append(this._toggleElement);
+		}
+		_updateDisabledState() {
+			if (this._toggleElement) this._toggleElement.disabled = this._element.disabled;
 		}
 		_updateToggleState() {
 			if (!this._toggleElement) return;
@@ -133,15 +135,9 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, PasswordInput, config, (element) => [element]);
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
 		PasswordInput._initializeDataApi();
 	});
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(PasswordInput);
 	//#endregion
 	return PasswordInput;

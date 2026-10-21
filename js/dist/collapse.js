@@ -38,18 +38,6 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/collapse.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI collapse.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's collapse.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "collapse";
 	const EVENT_KEY = `.coreui.collapse`;
 	const DATA_API_KEY = ".data-api";
@@ -81,9 +69,6 @@
 		parent: "(null|element)"
 	};
 	const supportsUntilFound = () => typeof document !== "undefined" && "onbeforematch" in document.documentElement;
-	/**
-	* Class definition
-	*/
 	var Collapse = class Collapse extends js_src_base_component_js.default {
 		constructor(element, config) {
 			super(element, config);
@@ -215,9 +200,6 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Collapse, config);
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(document, EVENT_LOAD_DATA_API, () => {
 		Collapse._initializeDataApi();
 	});
@@ -225,9 +207,6 @@
 		if (event.target.tagName === "A" || event.delegateTarget && event.delegateTarget.tagName === "A") event.preventDefault();
 		for (const element of js_src_dom_selector_engine_js.default.getMultipleElementsFromSelector(this)) Collapse.getOrCreateInstance(element).toggle();
 	});
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Collapse);
 	//#endregion
 	return Collapse;

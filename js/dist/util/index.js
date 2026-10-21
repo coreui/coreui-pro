@@ -11,11 +11,6 @@
 	const MAX_UID = 1e6;
 	const MILLISECONDS_MULTIPLIER = 1e3;
 	const TRANSITION_END = "transitionend";
-	/**
-	* Properly escape IDs selectors to handle weird IDs
-	* @param {string} selector
-	* @returns {string}
-	*/
 	const parseSelector = (selector) => {
 		if (selector && window.CSS && window.CSS.escape) selector = selector.replace(/#([^\s"#']+)/g, (match, id) => `#${CSS.escape(id)}`);
 		return selector;
@@ -24,9 +19,6 @@
 		if (object === null || object === void 0) return `${object}`;
 		return Object.prototype.toString.call(object).match(/\s([a-z]+)/i)[1].toLowerCase();
 	};
-	/**
-	* Public Util API
-	*/
 	const getUID = (prefix) => {
 		do
 			prefix += Math.floor(Math.random() * MAX_UID);
@@ -75,6 +67,11 @@
 	const setAriaAttribute = (element, name, value) => {
 		element.setAttribute(name, String(value));
 	};
+	const writeAttribute = (element, name, value) => {
+		if (element.getAttribute(name) === value) return;
+		if (value === null) element.removeAttribute(name);
+		else element.setAttribute(name, value);
+	};
 	const findShadowRoot = (element) => {
 		if (!document.documentElement.attachShadow) return null;
 		if (typeof element.getRootNode === "function") {
@@ -86,14 +83,6 @@
 		return findShadowRoot(element.parentNode);
 	};
 	const noop = () => {};
-	/**
-	* Trick to restart an element's animation
-	*
-	* @param {HTMLElement} element
-	* @return void
-	*
-	* @see https://www.charistheo.io/blog/2021/02/restart-a-css-animation-with-javascript/#restarting-a-css-animation
-	*/
 	const reflow = (element) => {
 		element.offsetHeight;
 	};
@@ -143,35 +132,43 @@
 	const execute = (possibleCallback, args = [], defaultValue = possibleCallback) => {
 		return typeof possibleCallback === "function" ? possibleCallback.call(...args) : defaultValue;
 	};
+	const getCoveredTransitions = (element, duration, transitionProperty) => {
+		if (typeof element.getAnimations !== "function" || typeof CSSTransition === "undefined") return [];
+		return element.getAnimations().filter((animation) => animation instanceof CSSTransition && animation.playState !== "finished" && (transitionProperty ? animation.transitionProperty === transitionProperty : Number(animation.effect?.getComputedTiming().endTime) <= duration));
+	};
 	const executeAfterTransition = (callback, transitionElement, waitForTransition = true, transitionProperty) => {
 		if (!waitForTransition) {
 			execute(callback);
 			return;
 		}
 		const emulatedDuration = getTransitionDurationFromElement(transitionElement) + 5;
+		const start = Date.now();
+		const transitions = getCoveredTransitions(transitionElement, emulatedDuration, transitionProperty);
 		let called = false;
-		const handler = (event) => {
-			if (event.target !== transitionElement) return;
-			const { propertyName } = event;
-			if (transitionProperty && propertyName && propertyName !== transitionProperty) return;
+		const finish = () => {
+			if (called) return;
 			called = true;
 			transitionElement.removeEventListener(TRANSITION_END, handler);
 			execute(callback);
 		};
+		const handler = (event) => {
+			if (event.target !== transitionElement) return;
+			const { propertyName } = event;
+			if (transitionProperty && propertyName && propertyName !== transitionProperty) return;
+			finish();
+		};
 		transitionElement.addEventListener(TRANSITION_END, handler);
 		setTimeout(() => {
-			if (!called) triggerTransitionEnd(transitionElement);
+			const late = Date.now() - start > emulatedDuration + 16;
+			const running = called || document.hidden || !late ? [] : transitions.filter((transition) => transition.playState === "running");
+			if (running.length === 0) {
+				if (!called) triggerTransitionEnd(transitionElement);
+				return;
+			}
+			Promise.race(running.map((transition) => transition.finished)).then(finish, finish);
+			setTimeout(finish, emulatedDuration + 1e3);
 		}, emulatedDuration);
 	};
-	/**
-	* Return the previous/next element of a list.
-	*
-	* @param {array} list    The list of elements
-	* @param activeElement   The active element
-	* @param shouldGetNext   Choose to get next or previous element
-	* @param isCycleAllowed
-	* @return {Element|elem} The proper element
-	*/
 	const getNextActiveElement = (list, activeElement, shouldGetNext, isCycleAllowed) => {
 		const listLength = list.length;
 		let index = list.indexOf(activeElement);
@@ -180,12 +177,12 @@
 		if (isCycleAllowed) index = (index + listLength) % listLength;
 		return list[Math.max(0, Math.min(index, listLength - 1))];
 	};
-	const resolveCountLabel = (label, count, total) => typeof label === "function" ? label(count, total) : label.replace("{count}", String(count)).replace("{total}", String(total));
 	//#endregion
 	exports.defineJQueryPlugin = defineJQueryPlugin;
 	exports.execute = execute;
 	exports.executeAfterTransition = executeAfterTransition;
 	exports.findShadowRoot = findShadowRoot;
+	exports.getCoveredTransitions = getCoveredTransitions;
 	exports.getElement = getElement;
 	exports.getNextActiveElement = getNextActiveElement;
 	exports.getTransitionDurationFromElement = getTransitionDurationFromElement;
@@ -200,10 +197,10 @@
 	exports.onDOMContentLoaded = onDOMContentLoaded;
 	exports.parseSelector = parseSelector;
 	exports.reflow = reflow;
-	exports.resolveCountLabel = resolveCountLabel;
 	exports.setAriaAttribute = setAriaAttribute;
 	exports.toType = toType;
 	exports.triggerTransitionEnd = triggerTransitionEnd;
+	exports.writeAttribute = writeAttribute;
 });
 
 //# sourceMappingURL=index.js.map

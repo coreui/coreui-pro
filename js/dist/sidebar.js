@@ -41,17 +41,6 @@
 	js_src_util_backdrop_js = __toESM(js_src_util_backdrop_js);
 	js_src_util_scrollbar_js = __toESM(js_src_util_scrollbar_js);
 	//#region js/src/sidebar.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI sidebar.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* ------------------------------------------------------------------------
-	* Constants
-	* ------------------------------------------------------------------------
-	*/
 	const NAME = "sidebar";
 	const EVENT_KEY = `.coreui.sidebar`;
 	const DATA_API_KEY = ".data-api";
@@ -73,11 +62,6 @@
 	const SELECTOR_DATA_CLOSE = "[data-coreui-close=\"sidebar\"]";
 	const SELECTOR_DATA_TOGGLE = "[data-coreui-toggle=\"narrow\"], [data-coreui-toggle=\"unfoldable\"]";
 	const SELECTOR_SIDEBAR = ".sidebar";
-	/**
-	* ------------------------------------------------------------------------
-	* Class Definition
-	* ------------------------------------------------------------------------
-	*/
 	var Sidebar = class Sidebar extends js_src_base_component_js.default {
 		constructor(element, config) {
 			super(element);
@@ -253,19 +237,9 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Sidebar, config);
 		}
 	};
-	/**
-	* ------------------------------------------------------------------------
-	* Data Api implementation
-	* ------------------------------------------------------------------------
-	*/
 	js_src_dom_event_handler_js.default.on(window, EVENT_LOAD_DATA_API, () => {
 		for (const element of Array.from(document.querySelectorAll(SELECTOR_SIDEBAR))) Sidebar.sidebarInterface(element);
 	});
-	/**
-	* ------------------------------------------------------------------------
-	* jQuery
-	* ------------------------------------------------------------------------
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Sidebar);
 	//#endregion
 	return Sidebar;

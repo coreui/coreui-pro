@@ -4,17 +4,22 @@
 * License (https://coreui.io/pro/license/)
 */
 (function(global, factory) {
-	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./combobox-base.js"), require("./dom/data.js"), require("./dom/event-handler.js"), require("./dom/selector-engine.js"), require("./util/form-control-group.js"), require("./util/sanitizer.js"), require("./util/icons.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
+	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./combobox-base.js"), require("./dom/data.js"), require("./dom/event-handler.js"), require("./dom/selector-engine.js"), require("./util/field-validation.js"), require("./util/form-control-group.js"), require("./util/form-validation.js"), require("./util/sanitizer.js"), require("./util/icons.js"), require("./util/list-navigation.js"), require("./util/option-tree.js"), require("./util/selection-state.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
 		"./combobox-base.js",
 		"./dom/data.js",
 		"./dom/event-handler.js",
 		"./dom/selector-engine.js",
+		"./util/field-validation.js",
 		"./util/form-control-group.js",
+		"./util/form-validation.js",
 		"./util/sanitizer.js",
 		"./util/icons.js",
+		"./util/list-navigation.js",
+		"./util/option-tree.js",
+		"./util/selection-state.js",
 		"./util/index.js"
-	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Autocomplete = factory(global.ComboboxBase, global.Data, global.EventHandler, global.SelectorEngine, global.FormControlGroup, global.Sanitizer, global.Icons, global.Index));
-})(this, function(js_src_combobox_base_js, js_src_dom_data_js, js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_util_form_control_group_js, js_src_util_sanitizer_js, js_src_util_icons_js, js_src_util_index_js) {
+	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Autocomplete = factory(global.ComboboxBase, global.Data, global.EventHandler, global.SelectorEngine, global.FieldValidation, global.FormControlGroup, global.FormValidation, global.Sanitizer, global.Icons, global.ListNavigation, global.OptionTree, global.SelectionState, global.Index));
+})(this, function(js_src_combobox_base_js, js_src_dom_data_js, js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_util_field_validation_js, js_src_util_form_control_group_js, js_src_util_form_validation_js, js_src_util_sanitizer_js, js_src_util_icons_js, js_src_util_list_navigation_js, js_src_util_option_tree_js, js_src_util_selection_state_js, js_src_util_index_js) {
 	//#region \0rolldown/runtime.js
 	var __create = Object.create;
 	var __defProp = Object.defineProperty;
@@ -41,22 +46,13 @@
 	js_src_dom_data_js = __toESM(js_src_dom_data_js);
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
+	js_src_util_field_validation_js = __toESM(js_src_util_field_validation_js);
 	//#region js/src/autocomplete.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI PRO autocomplete.js
-	* License (https://coreui.io/pro/license/)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* ------------------------------------------------------------------------
-	* Constants
-	* ------------------------------------------------------------------------
-	*/
 	const NAME = "autocomplete";
 	const DATA_KEY = "coreui.autocomplete";
 	const EVENT_KEY = `.${DATA_KEY}`;
 	const DATA_API_KEY = ".data-api";
+	const ARROW_DOWN_KEY = "ArrowDown";
 	const BACKSPACE_KEY = "Backspace";
 	const DELETE_KEY = "Delete";
 	const ENTER_KEY = "Enter";
@@ -80,11 +76,19 @@
 	const CLASS_NAME_INPUT = "form-control";
 	const CLASS_NAME_INPUT_HINT = "autocomplete-input-hint";
 	const CLASS_NAME_INPUT_GROUP = "form-control-group";
-	const CLASS_NAME_IS_INVALID = "is-invalid";
-	const CLASS_NAME_IS_VALID = "is-valid";
 	const CLASS_NAME_SHOW = "show";
-	const SELECTOR_DATA_AUTOCOMPLETE = "[data-coreui-autocomplete]:not(.disabled)";
-	const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`;
+	const HOST_FIELD_ATTRIBUTES = /* @__PURE__ */ new Set([
+		"aria-description",
+		"aria-details",
+		"aria-errormessage",
+		"aria-label",
+		"aria-labelledby",
+		"aria-placeholder",
+		"aria-readonly",
+		"aria-required"
+	]);
+	const SELECTOR_DATA_AUTOCOMPLETE = "[data-coreui-autocomplete]";
+	const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete.${CLASS_NAME_SHOW}`;
 	const SELECTOR_INDICATOR = ".form-control-action";
 	const Default = {
 		allowList: js_src_util_sanitizer_js.DefaultAllowlist,
@@ -95,6 +99,7 @@
 		clearSearchOnSelect: true,
 		container: false,
 		disabled: false,
+		globalSearch: true,
 		highlightOptionsOnSearch: false,
 		id: null,
 		invalid: false,
@@ -112,6 +117,7 @@
 		searchNoResultsLabel: false,
 		showHints: false,
 		valid: false,
+		validationState: null,
 		value: null
 	};
 	const DefaultType = {
@@ -123,6 +129,7 @@
 		clearSearchOnSelect: "boolean",
 		container: "(string|element|boolean)",
 		disabled: "boolean",
+		globalSearch: "boolean",
 		highlightOptionsOnSearch: "boolean",
 		id: "(string|null)",
 		invalid: "boolean",
@@ -136,35 +143,49 @@
 		required: "boolean",
 		sanitize: "boolean",
 		sanitizeFn: "(null|function)",
-		search: "(array|string|null)",
+		search: "(string|null)",
 		searchNoResultsLabel: "boolean|string",
 		showHints: "boolean",
 		valid: "boolean",
+		validationState: "(string|null|undefined)",
 		value: "(number|string|null)"
 	};
-	/**
-	* ------------------------------------------------------------------------
-	* Class Definition
-	* ------------------------------------------------------------------------
-	*/
 	var Autocomplete = class Autocomplete extends js_src_combobox_base_js.default {
 		constructor(element, config) {
 			super(element, config);
 			this._uniqueId = this._config.id ?? (0, js_src_util_index_js.getUID)(`${this.constructor.NAME}`);
+			this._cleanerElement = null;
 			this._indicatorElement = null;
 			this._inputElement = null;
 			this._inputHintElement = null;
 			this._togglerElement = null;
-			this._addedClassNames = [];
-			this._previousTabIndex = null;
+			this._keySerial = null;
+			this._shownText = "";
+			this._validation = new js_src_util_field_validation_js.default(this._element, {
+				aliases: true,
+				canBlock: () => !this._disabled,
+				config: () => this._config,
+				fields: () => [this._inputElement],
+				frames: () => [this._element],
+				invalidTargets: () => [this._inputElement],
+				restore: () => this._restoreInitialSelection()
+			});
 			this._optionsElement = null;
 			this._menu = null;
-			this._selected = [];
-			this._options = this._getOptionsFromConfig();
+			this._known = /* @__PURE__ */ new Map();
+			this._store = (0, js_src_util_selection_state_js.createSelectionStore)((next) => next.slice(-1));
+			this._disabled = this._config.disabled;
+			this._givenValue = this._config.value;
+			this._options = this._getOptionsFromConfig(this._config.options);
 			this._floatingCleanup = null;
 			this._anchoredPosition = null;
 			this._search = "";
+			this._seenOptionValues = /* @__PURE__ */ new Set();
+			this._valueApplied = false;
+			this._initialValue = this._config.value;
+			this._reportSeed = false;
 			this._createAutocomplete();
+			this._validation.refresh();
 			this._addEventListeners();
 			js_src_dom_data_js.default.set(this._element, DATA_KEY, this);
 		}
@@ -178,7 +199,7 @@
 			return NAME;
 		}
 		_canShow() {
-			return Boolean(this._config.searchNoResultsLabel) || this._flattenOptions().some((option) => option.label.toLowerCase().includes(this._search.toLowerCase()));
+			return Boolean(this._config.searchNoResultsLabel) || (this._isExternalSearch() ? this._options : (0, js_src_util_option_tree_js.filterOptionTree)(this._options, this._search)).length > 0;
 		}
 		_getAriaExpandedTarget() {
 			return this._inputElement;
@@ -191,6 +212,7 @@
 		}
 		dispose() {
 			if (!this._element) return;
+			this._validation.dispose();
 			this._disposeFloating();
 			this._disposeListBox();
 			for (const element of [
@@ -204,38 +226,66 @@
 				js_src_dom_event_handler_js.default.off(element, EVENT_KEY);
 				element.remove();
 			}
-			this._element.classList.remove(CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID, CLASS_NAME_SHOW, ...this._addedClassNames);
-			if (this._previousTabIndex === null) this._element.removeAttribute("tabindex");
-			else this._element.setAttribute("tabindex", this._previousTabIndex);
+			this._element.classList.remove(CLASS_NAME_SHOW);
+			for (const [name, value] of this._hostAria) if (!this._element.hasAttribute(name)) this._element.setAttribute(name, value);
 			super.dispose();
 		}
 		clear() {
-			this.deselectAll();
+			const isChanged = this._store.size() > 0 || this._shownText !== "";
+			this._valueApplied = true;
+			this._clearSelection();
 			this.search("");
 			this._filterOptionsList();
-			this._inputElement.value = "";
-			this._triggerChangeEvent(null);
+			this._setText("");
+			this._validation.update();
+			if (isChanged) this._triggerChangeEvent(null);
 		}
 		search(label) {
 			this._search = label.length > 0 ? label.toLowerCase() : "";
 			if (!this._isExternalSearch()) this._filterOptionsList();
 			js_src_dom_event_handler_js.default.trigger(this._element, EVENT_INPUT, { value: label });
 		}
-		setConfig(config) {
-			if (config?.value) this.deselectAll();
+		disable() {
+			this._setDisabled(true);
+		}
+		enable() {
+			this._setDisabled(false);
+		}
+		setOptions(options) {
+			const normalized = this._normalizeOptions(options);
+			this._typeCheckConfig({ options: normalized }, { options: DefaultType.options });
+			this._options = this._getOptionsFromConfig(normalized);
+			this._setListBoxItems();
+			this._seedSelection();
+			this._validation.update();
+		}
+		setValidationState(validationState) {
+			const state = {
+				invalid: false,
+				valid: false,
+				validationState
+			};
 			this._config = this._getConfig({
 				...this._config,
-				...config
+				...state
 			});
-			this._options = this._getOptionsFromConfig();
-			this._setListBoxItems();
-			this._syncInputName();
+			this._validation.configure(state);
 		}
-		deselectAll(options = this._selected) {
-			if (this._selected.length === 0) return;
+		setValue(value) {
+			this._typeCheckConfig({ value }, { value: DefaultType.value });
+			this._givenValue = value;
+			this._valueApplied = false;
+			this._reportSeed = false;
+			this._clearSelection();
+			this._setText("");
+			this._seedSelection();
+			this._validation.update();
+		}
+		deselectAll(options = this._selectedOptions()) {
+			if (this._store.size() === 0) return;
 			for (const option of options) {
 				if (option.disabled) continue;
-				if (Array.isArray(option.options)) {
+				if ((0, js_src_util_option_tree_js.isOptionGroup)(option)) {
 					this.deselectAll(option.options);
 					continue;
 				}
@@ -246,39 +296,53 @@
 		_triggerChangeEvent(value) {
 			js_src_dom_event_handler_js.default.trigger(this._element, EVENT_CHANGE, { value });
 		}
-		_highlightOption(label) {
-			if (!this._search) return (0, js_src_util_sanitizer_js.escapeHtml)(label);
-			const escapedSearch = this._search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-			const regex = new RegExp(`(${escapedSearch})`, "gi");
-			return String(label).split(regex).map((part, index) => index % 2 === 0 ? (0, js_src_util_sanitizer_js.escapeHtml)(part) : `<strong>${(0, js_src_util_sanitizer_js.escapeHtml)(part)}</strong>`).join("");
-		}
 		_isExternalSearch() {
-			return Array.isArray(this._config.search) && this._config.search.includes("external");
+			return this._config.search === "external";
 		}
-		_isGlobalSearch() {
-			return Array.isArray(this._config.search) && this._config.search.includes("global");
+		_isDisabled() {
+			return this._disabled;
+		}
+		_setDisabled(disabled) {
+			if (disabled === this._disabled) return;
+			this._disabled = disabled;
+			if (disabled) this.hide();
+			this._applyState();
+			this._validation.update();
 		}
 		_addEventListeners() {
 			js_src_dom_event_handler_js.default.on(this._element, EVENT_CLICK, (event) => {
-				if (!this._config.disabled && !event.target.closest(SELECTOR_INDICATOR)) this.show();
+				if (!this._disabled && !event.target.closest(SELECTOR_INDICATOR)) {
+					this.show();
+					this._inputElement.focus();
+				}
 			});
 			js_src_dom_event_handler_js.default.on(this._element, EVENT_KEYDOWN, (event) => {
+				this._keySerial = (0, js_src_util_form_validation_js.nextStateSerial)();
 				if (event.key === ESCAPE_KEY) {
 					if (this._isShown()) {
 						event.preventDefault();
 						event.stopPropagation();
 					}
 					this.hide();
-					if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
+					if (this._config.allowOnlyDefinedOptions && this._store.size() === 0) {
+						this._emptyByUser();
 						this.search("");
-						this._inputElement.value = "";
 					}
 					return;
 				}
-				if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) this._inputElement.focus();
+				if (this._config.globalSearch && !event.defaultPrevented && (0, js_src_util_list_navigation_js.isTypingKey)(event)) this._inputElement.focus();
+				if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._store.size() > 0) {
+					this._validation.dismiss(this._keySerial);
+					this._clearSelection();
+					this._validation.update();
+					this._triggerChangeEvent(null);
+				}
+			});
+			js_src_dom_event_handler_js.default.on(this._element, EVENT_KEYUP, () => {
+				this._keySerial = null;
 			});
 			js_src_dom_event_handler_js.default.on(this._menu, EVENT_KEYDOWN, (event) => {
-				if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) this._inputElement.focus();
+				if (this._config.globalSearch && !event.defaultPrevented && (0, js_src_util_list_navigation_js.isTypingKey)(event)) this._inputElement.focus();
 			});
 			this._addTogglerKeydownListeners();
 			js_src_dom_event_handler_js.default.on(this._indicatorElement, EVENT_CLICK, (event) => {
@@ -287,75 +351,94 @@
 			});
 			js_src_dom_event_handler_js.default.on(this._inputElement, EVENT_BLUR, () => {
 				const inputValue = this._inputElement.value;
-				if (inputValue.length === 0) return;
-				const inputValueLower = inputValue.toLowerCase();
-				const exactMatches = this._flattenOptions().filter((option) => option.label.toLowerCase() === inputValueLower);
+				if (this._disabled || inputValue.length === 0) return;
+				if (this._namesSelection(inputValue)) {
+					this.hide();
+					return;
+				}
+				const inputValueLower = inputValue.trim().toLowerCase();
+				const exactMatches = (0, js_src_util_option_tree_js.getSelectableOptions)(this._options).filter((option) => option.label.trim().toLowerCase() === inputValueLower);
 				if (exactMatches.length === 1) {
 					this._selectOption(exactMatches[0]);
 					return;
 				}
 				if (this._config.allowOnlyDefinedOptions) {
-					this.clear();
+					this._clearByUser();
 					return;
 				}
 				this._triggerChangeEvent(inputValue);
 			});
 			js_src_dom_event_handler_js.default.on(this._inputElement, EVENT_KEYDOWN, (event) => {
 				const handledByList = event.key === ENTER_KEY && event.defaultPrevented;
-				if (!handledByList && !this._isShown() && event.key !== TAB_KEY && event.key !== ESCAPE_KEY) this.show();
+				if (!handledByList && !this._isShown() && event.key !== TAB_KEY && event.key !== ESCAPE_KEY && event.key !== ENTER_KEY) this.show();
 				if (handledByList) return;
-				if (event.key === TAB_KEY && this._config.showHints && this._inputElement.value.length > 0) {
-					if (this._inputHintElement.value) {
-						event.preventDefault();
-						event.stopPropagation();
-					}
-					const options = this._flattenOptions().filter((option) => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()));
-					if (options.length > 0) this._selectOption(options[0]);
-				}
-				if (event.key === ENTER_KEY) {
+				if (event.key === TAB_KEY && this._inputHintElement?.value) {
 					event.preventDefault();
 					event.stopPropagation();
-					if (this._inputElement.value.length === 0) return;
-					const options = this._flattenOptions().filter((option) => option.label.toLowerCase() === this._inputElement.value.toLowerCase());
-					if (options.length > 0) this._selectOption(options[0]);
-					if (options.length === 0 && !this._config.allowOnlyDefinedOptions) {
-						this._triggerChangeEvent(this._inputElement.value);
-						this.hide();
-						if (this._config.clearSearchOnSelect) this.search("");
-					}
+					const option = this._findHintOption(this._inputElement.value);
+					if (option) this._selectOption(option);
 				}
+				if (event.key === ENTER_KEY) this._handleEnterKey(event);
 			});
-			js_src_dom_event_handler_js.default.on(this._inputElement, EVENT_KEYUP, (event) => {
-				if (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY) {
-					const { value } = event.target;
-					this.search(value);
-					if (this._config.showHints) {
-						const options = value ? this._flattenOptions().filter((option) => option.label.toLowerCase().startsWith(value.toLowerCase())) : [];
-						this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : "";
-					}
-					if (this._selected.length > 0) {
-						this.deselectAll();
-						this._triggerChangeEvent(null);
-					}
+			js_src_dom_event_handler_js.default.on(this._inputElement, EVENT_INPUT, () => {
+				const { value } = this._inputElement;
+				if (value !== this._shownText) this._validation.dismiss(this._keySerial ?? Number.POSITIVE_INFINITY);
+				this._shownText = value;
+				this._valueApplied = true;
+				this._validation.update();
+				if (this._store.size() > 0) {
+					this._clearSelection();
+					this._triggerChangeEvent(null);
 				}
+				this.search(value);
+				if (this._inputHintElement) {
+					const option = value.trim() ? this._findHintOption(value) : void 0;
+					this._inputHintElement.value = option ? `${value}${option.label.slice(value.trimStart().length)}` : "";
+				}
+				if (value && !this._isShown()) this.show();
 			});
 			js_src_dom_event_handler_js.default.on(this._optionsElement, EVENT_MOUSEDOWN, (event) => {
 				event.preventDefault();
 			});
 			js_src_dom_event_handler_js.default.on(this._cleanerElement, EVENT_CLICK, (event) => {
-				if (!this._config.disabled) {
+				if (!this._disabled) {
 					event.preventDefault();
 					event.stopPropagation();
-					this.clear();
+					this._clearByUser();
 				}
 			});
 			js_src_dom_event_handler_js.default.on(this._cleanerElement, EVENT_KEYDOWN, (event) => {
-				if (!this._config.disabled && event.key === ENTER_KEY) {
+				if (!this._disabled && event.key === ENTER_KEY) {
 					event.preventDefault();
 					event.stopPropagation();
-					this.clear();
+					this._clearByUser();
 				}
 			});
+		}
+		_handleEnterKey(event) {
+			if (event.isComposing || event.keyCode === 229) return;
+			if (this._isShown()) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+			if (this._inputElement.value.length === 0) return;
+			if (this._namesSelection(this._inputElement.value)) {
+				this.hide();
+				return;
+			}
+			const options = (0, js_src_util_option_tree_js.getSelectableOptions)(this._options).filter((option) => option.label.trim().toLowerCase() === this._inputElement.value.trim().toLowerCase());
+			if (options.length > 0) {
+				if (this._store.has(String(options[0].value))) this.hide();
+				else this._selectOption(options[0]);
+				return;
+			}
+			if (this._config.allowOnlyDefinedOptions) {
+				event.preventDefault();
+				return;
+			}
+			this._triggerChangeEvent(this._inputElement.value);
+			this.hide();
+			if (this._config.clearSearchOnSelect) this.search("");
 		}
 		_syncInputName() {
 			if (this._config.name) {
@@ -364,24 +447,23 @@
 			}
 			this._inputElement.removeAttribute("name");
 		}
-		_getOptionsFromConfig(options = this._config.options) {
+		_getOptionsFromConfig(options, disabled = false) {
 			if (!options || !Array.isArray(options)) return [];
 			const _options = [];
 			for (const option of options) {
-				if (option.options && Array.isArray(option.options)) {
+				if ((0, js_src_util_option_tree_js.isOptionGroup)(option)) {
 					const customGroupProperties = { ...option };
 					delete customGroupProperties.label;
 					delete customGroupProperties.options;
 					_options.push({
 						...customGroupProperties,
 						label: option.label,
-						options: this._getOptionsFromConfig(option.options)
+						options: this._getOptionsFromConfig(option.options, disabled || option.disabled)
 					});
 					continue;
 				}
 				const label = typeof option === "string" ? option : option.label;
 				const value = option.value ?? (typeof option === "string" ? option : option.label);
-				const isSelected = option.selected || this._config.value && this._config.value === value;
 				const customProperties = typeof option === "object" ? { ...option } : {};
 				delete customProperties.label;
 				delete customProperties.value;
@@ -391,45 +473,44 @@
 					...customProperties,
 					label,
 					value: String(value),
-					...isSelected && { selected: true },
-					...option.disabled && { disabled: true }
-				});
-				if (isSelected) this._selected.push({
-					label: option.label,
-					value: String(value)
+					...option.selected && { selected: true },
+					...(disabled || option.disabled) && { disabled: true }
 				});
 			}
 			return _options;
 		}
-		_addClassName(className) {
-			if (this._element.classList.contains(className)) return;
-			this._element.classList.add(className);
-			this._addedClassNames.push(className);
-		}
 		_createAutocomplete() {
-			this._addClassName(CLASS_NAME_AUTOCOMPLETE);
-			this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid);
-			this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid);
-			if (this._config.disabled) this._addClassName(CLASS_NAME_DISABLED);
+			this._element.classList.add(CLASS_NAME_AUTOCOMPLETE);
 			this._createInputGroup();
 			this._createButtons();
 			this._createOptionsContainer();
-			this._updateOptionsList();
+			this._seedSelection();
+			this._applyState();
+		}
+		_applyState() {
+			const { required } = this._config;
+			const disabled = this._disabled;
+			this._element.classList.toggle(CLASS_NAME_DISABLED, disabled);
+			this._inputElement.disabled = disabled;
+			this._inputElement.required = required;
+			(0, js_src_util_index_js.writeAttribute)(this._inputElement, "tabindex", disabled ? "-1" : null);
+			if (this._indicatorElement) this._indicatorElement.disabled = disabled;
+			this._updateCleaner();
 		}
 		_createInputGroup() {
 			const togglerEl = this._element;
-			this._previousTabIndex = togglerEl.getAttribute("tabindex");
-			if (!togglerEl.classList.contains(CLASS_NAME_INPUT_GROUP)) this._addedClassNames.push(CLASS_NAME_INPUT_GROUP);
+			this._hostAria = [...togglerEl.attributes].filter(({ name }) => HOST_FIELD_ATTRIBUTES.has(name)).map(({ name, value }) => [name, value]);
+			togglerEl.removeAttribute("tabindex");
 			(0, js_src_util_form_control_group_js.applyControlGroupClasses)(togglerEl, CLASS_NAME_INPUT_GROUP);
 			this._togglerElement = togglerEl;
-			if (!this._config.search && !this._config.disabled) togglerEl.tabIndex = -1;
-			if (!this._config.disabled && this._config.showHints) {
+			if (this._config.showHints) {
 				const inputHintEl = document.createElement("input");
 				inputHintEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_HINT);
 				inputHintEl.autocomplete = "off";
 				inputHintEl.readOnly = true;
 				inputHintEl.tabIndex = -1;
 				inputHintEl.setAttribute("aria-hidden", true);
+				inputHintEl.setAttribute("form", "");
 				togglerEl.append(inputHintEl);
 				this._inputHintElement = inputHintEl;
 			}
@@ -439,15 +520,13 @@
 			inputEl.autocomplete = "off";
 			inputEl.placeholder = this._config.placeholder ?? "";
 			inputEl.role = "combobox";
+			for (const [name, value] of this._hostAria) {
+				inputEl.setAttribute(name, value);
+				togglerEl.removeAttribute(name);
+			}
 			inputEl.setAttribute("aria-autocomplete", "list");
 			inputEl.setAttribute("aria-expanded", "false");
 			inputEl.setAttribute("aria-haspopup", "listbox");
-			inputEl.setAttribute("aria-controls", `${this._uniqueId}-listbox`);
-			if (this._config.disabled) {
-				inputEl.setAttribute("disabled", true);
-				inputEl.tabIndex = -1;
-			}
-			if (this._config.required) inputEl.setAttribute("required", true);
 			togglerEl.append(inputEl);
 			this._inputElement = inputEl;
 			this._syncInputName();
@@ -455,7 +534,7 @@
 		_createButtons() {
 			if (!this._config.cleaner && !this._config.pickerIcon) return;
 			const buttons = this._togglerElement;
-			if (!this._config.disabled && this._config.cleaner) {
+			if (this._config.cleaner) {
 				const cleaner = document.createElement("button");
 				cleaner.type = "button";
 				cleaner.classList.add(CLASS_NAME_CLEANER);
@@ -469,7 +548,6 @@
 				const indicator = document.createElement("button");
 				indicator.type = "button";
 				indicator.classList.add(CLASS_NAME_INDICATOR);
-				indicator.disabled = this._config.disabled;
 				indicator.setAttribute("aria-label", this._config.ariaPickerLabel);
 				indicator.innerHTML = (0, js_src_util_sanitizer_js.sanitizeByConfig)(this._config.pickerIcon === true ? js_src_util_icons_js.PICKER_ICON : this._config.pickerIcon, {
 					...this._config,
@@ -483,62 +561,123 @@
 		_decorateListbox(optionsDiv) {
 			optionsDiv.setAttribute("aria-labelledby", this._uniqueId);
 		}
-		_afterMenuCreated() {
-			if (this._config.container) this._inputElement.setAttribute("aria-owns", `${this._uniqueId}-listbox`);
-		}
 		_getActiveDescendantField() {
 			return this._inputElement;
 		}
 		_onOptionSelected(value) {
 			const foundOption = this._findOptionByValue(value);
-			if (foundOption) {
+			if (foundOption && !this._disabled) {
 				this._selectOption(foundOption);
 				this._inputElement.focus();
 			}
 		}
 		_selectOption(option) {
-			this.deselectAll();
-			if (this._selected.filter((selectedOption) => selectedOption.value === option.value).length === 0) this._selected.push(option);
-			this._syncOptionElementState(option.value, true);
+			if (option.disabled) return;
+			this._valueApplied = true;
+			if (this._inputElement.value !== option.label) this._validation.dismiss();
+			this._applySelection(option);
+			this._validation.update();
 			this._triggerChangeEvent(option);
-			this._inputElement.value = option.label;
-			if (this._config.showHints) this._inputHintElement.value = "";
+			if (this._inputHintElement) this._inputHintElement.value = "";
 			this.hide();
 			if (this._config.clearSearchOnSelect) this.search("");
+		}
+		_applySelection(option) {
+			this._known.set(String(option.value), option);
+			this._commitSelection([String(option.value)]);
+			this._setText(option.label);
+			this._updateCleaner();
+		}
+		_clearSelection() {
+			this._commitSelection([]);
 			this._updateCleaner();
 		}
 		_deselectOption(value) {
-			this._selected = this._selected.filter((option) => option.value !== value);
-			this._syncOptionElementState(value, false);
+			this._commitSelection(this._store.values().filter((selected) => selected !== String(value)));
+		}
+		_selectedOptions() {
+			return this._store.values().map((value) => this._known.get(value) ?? this._findOptionByValue(value)).filter(Boolean);
+		}
+		_findHintOption(text) {
+			return (0, js_src_util_option_tree_js.getSelectableOptions)(this._options).find((option) => option.label.toLowerCase().startsWith(text.trimStart().toLowerCase()));
+		}
+		_namesSelection(text) {
+			return this._selectedOptions().some((option) => option.label.trim() === text.trim());
+		}
+		_clearByUser() {
+			if (this._store.size() > 0 || this._inputElement.value !== "") this._validation.dismiss();
+			this.clear();
+		}
+		_emptyByUser() {
+			if (this._inputElement.value !== "") this._validation.dismiss();
+			this._setText("");
+			this._validation.update();
+		}
+		_setText(text) {
+			this._inputElement.value = text;
+			this._shownText = text;
 		}
 		_updateCleaner() {
-			if (!this._config.cleaner || this._cleanerElement === null) return;
-			if (this._selected.length > 0) {
+			if (!this._cleanerElement) return;
+			if (this._store.size() > 0 && !this._disabled) {
 				this._cleanerElement.style.removeProperty("display");
 				return;
 			}
 			this._cleanerElement.style.display = "none";
 		}
-		_updateOptionsList(options = this._options) {
-			for (const option of options) {
-				if (Array.isArray(option.options)) {
-					this._updateOptionsList(option.options);
-					continue;
+		_isOpenKey(event) {
+			return event.key === ARROW_DOWN_KEY || event.key === ENTER_KEY && event.target === this._togglerElement;
+		}
+		_restoreInitialSelection() {
+			const previous = this._selectedOptions()[0]?.value;
+			const text = this._shownText;
+			this._reportSeed = false;
+			this._clearSelection();
+			this._setText("");
+			if (this._inputHintElement) this._inputHintElement.value = "";
+			if (this._search !== "") this.search("");
+			this._givenValue = this._initialValue;
+			this._valueApplied = false;
+			this._seenOptionValues.clear();
+			this._seedSelection();
+			this._validation.update();
+			const current = this._selectedOptions()[0];
+			if (current ? current.value !== previous : previous !== void 0 || text !== "") this._triggerChangeEvent(current ?? null);
+			this._reportSeed = !current;
+		}
+		_seedSelection() {
+			const options = (0, js_src_util_option_tree_js.flattenOptions)(this._options);
+			const value = this._givenValue;
+			let seed;
+			if (value === null || value === void 0 || value === "") seed = options.find((option) => option.selected && !this._seenOptionValues.has(option.value));
+			else if (!this._valueApplied) {
+				seed = (0, js_src_util_option_tree_js.findOptionByValue)(options, value);
+				this._valueApplied = Boolean(seed);
+			}
+			for (const option of options) this._seenOptionValues.add(option.value);
+			if (seed && !this._store.has(String(seed.value))) {
+				this._applySelection(seed);
+				if (this._reportSeed && this._store.has(String(seed.value))) {
+					this._reportSeed = false;
+					this._validation.update();
+					this._triggerChangeEvent(seed);
 				}
-				if (option.selected) this._selectOption(option);
 			}
 		}
 		_afterOptionsRendered() {
 			if (!this._config.highlightOptionsOnSearch || this._config.optionsTemplate) return;
-			for (const option of this._getDisplayedOptions()) option.innerHTML = this._highlightOption(option.textContent);
+			for (const option of this._getDisplayedOptions()) option.innerHTML = (0, js_src_util_option_tree_js.highlightMatches)(option.textContent, this._search);
 		}
 		_afterFilter(visibleOptions) {
 			if (visibleOptions === 0 && !this._config.searchNoResultsLabel) this.hide();
 		}
+		_normalizeOptions(options) {
+			return typeof options === "string" ? options.split(/,\s*/).map(String) : options;
+		}
 		_configAfterMerge(config) {
 			config = this._normalizeContainerConfig(config);
-			if (typeof config.options === "string") config.options = config.options.split(/,\s*/).map(String);
-			if (typeof config.search === "string") config.search = config.search.split(/,\s*/).map(String);
+			config.options = this._normalizeOptions(config.options);
+			if (config.searchNoResultsLabel === true) config.searchNoResultsLabel = "No results found";
 			return config;
 		}
 		static autocompleteInterface(element, config, ...args) {
@@ -559,25 +698,17 @@
 				if (!context) continue;
 				const composedPath = event.composedPath();
 				if (composedPath.includes(context._element) || composedPath.includes(context._menu)) continue;
-				const relatedTarget = { relatedTarget: context._element };
-				if (event.type === "click") relatedTarget.clickEvent = event;
 				context.hide();
+				if (context._config.allowOnlyDefinedOptions && context._store.size() === 0) context._emptyByUser();
 				context.search("");
-				if (context._config.allowOnlyDefinedOptions && context._selected.length === 0) context._inputElement.value = "";
 			}
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(window, EVENT_LOAD_DATA_API, () => {
 		for (const autocomplete of js_src_dom_selector_engine_js.default.find(SELECTOR_DATA_AUTOCOMPLETE)) Autocomplete.autocompleteInterface(autocomplete);
 	});
 	js_src_dom_event_handler_js.default.on(document, EVENT_CLICK_DATA_API, Autocomplete.clearMenus);
 	js_src_dom_event_handler_js.default.on(document, EVENT_KEYUP_DATA_API, Autocomplete.clearMenus);
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Autocomplete);
 	//#endregion
 	return Autocomplete;

@@ -35,18 +35,6 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_util_config_js = __toESM(js_src_util_config_js);
 	//#region js/src/util/swipe.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI util/swipe.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's util/swipe.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "swipe";
 	const EVENT_KEY = ".coreui.swipe";
 	const EVENT_TOUCHSTART = `touchstart${EVENT_KEY}`;

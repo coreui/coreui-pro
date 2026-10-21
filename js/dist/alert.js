@@ -36,27 +36,12 @@
 	js_src_base_component_js = __toESM(js_src_base_component_js);
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	//#region js/src/alert.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI alert.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's alert.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "alert";
 	const EVENT_KEY = `.coreui.alert`;
 	const EVENT_CLOSE = `close${EVENT_KEY}`;
 	const EVENT_CLOSED = `closed${EVENT_KEY}`;
 	const CLASS_NAME_HIDING = "hiding";
 	const CLASS_NAME_SHOW = "show";
-	/**
-	* Class definition
-	*/
 	var Alert = class Alert extends js_src_base_component_js.default {
 		static get NAME() {
 			return NAME;
@@ -77,13 +62,7 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Alert, config, (element) => [element]);
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	(0, js_src_util_component_functions_js.enableDismissTrigger)(Alert, "close");
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Alert);
 	//#endregion
 	return Alert;

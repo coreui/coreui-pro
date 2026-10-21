@@ -4,99 +4,109 @@
 * License (https://coreui.io/pro/license/)
 */
 (function(global, factory) {
-	typeof exports === "object" && typeof module !== "undefined" ? factory(exports) : typeof define === "function" && define.amd ? define(["exports"], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, factory(global.Calendar = {}));
+	typeof exports === "object" && typeof module !== "undefined" ? factory(exports) : typeof define === "function" && define.amd ? define(["exports"], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, factory(global.CalendarUtil = {}));
 })(this, function(exports) {
 	Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 	//#region js/src/util/calendar.ts
-	/**
-	* Converts an ISO week string to a Date object representing the Monday of that week.
-	* @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
-	* @returns The Date object for the Monday of the specified week, or null if invalid.
-	*/
-	/**
-	* Helper function to calculate Monday of ISO week 1 for a given year.
-	* @param year - The year to calculate for.
-	* @returns The Monday of ISO week 1.
-	*/
-	const getMondayOfISOWeek1 = (year) => {
-		const jan4 = new Date(year, 0, 4);
-		const jan4DayOfWeek = jan4.getDay();
-		const daysFromMonday = jan4DayOfWeek === 0 ? 6 : jan4DayOfWeek - 1;
-		const mondayOfWeek1 = new Date(jan4);
-		mondayOfWeek1.setDate(jan4.getDate() - daysFromMonday);
-		return mondayOfWeek1;
+	const createDate = (year, month = 0, day = 1) => {
+		const date = new Date(year, month, day);
+		date.setFullYear(year, month, day);
+		date.setHours(0, 0, 0, 0);
+		return date;
 	};
-	/**
-	* Helper function to calculate Monday of a specific ISO week.
-	* @param year - The year.
-	* @param week - The ISO week number.
-	* @returns The Monday of the specified ISO week.
-	*/
-	const getMondayOfISOWeek = (year, week) => {
-		const mondayOfWeek1 = getMondayOfISOWeek1(year);
-		const weekStart = new Date(mondayOfWeek1);
-		weekStart.setDate(mondayOfWeek1.getDate() + (week - 1) * 7);
-		return weekStart;
+	const parseToDateString = (value) => {
+		const [, month, day, year] = /^\w{3} (\w{3}) (\d{2}) (-?\d{4,})$/.exec(value) ?? [];
+		const monthIndex = [
+			"Jan",
+			"Feb",
+			"Mar",
+			"Apr",
+			"May",
+			"Jun",
+			"Jul",
+			"Aug",
+			"Sep",
+			"Oct",
+			"Nov",
+			"Dec"
+		].indexOf(month);
+		return monthIndex === -1 ? /* @__PURE__ */ new Date(NaN) : createDate(Number(year), monthIndex, Number(day));
 	};
-	/**
-	* Helper function to convert a date to a month number for comparison.
-	* @param date - The date to convert.
-	* @returns A number representing year*12 + month for easy comparison.
-	*/
-	const dateToMonthNumber = (date) => {
-		return date.getFullYear() * 12 + date.getMonth();
+	const getWeekLabel = (locale) => {
+		try {
+			const label = new Intl.DisplayNames(locale, { type: "dateTimeField" }).of("weekOfYear");
+			return label ? label.charAt(0).toLocaleUpperCase(locale) + label.slice(1) : "Week";
+		} catch {
+			return "Week";
+		}
 	};
-	/**
-	* Helper function to convert a date to a quarter number for comparison.
-	* @param date - The date to convert.
-	* @returns A number representing year*4 + quarter for easy comparison.
-	*/
-	const dateToQuarterNumber = (date) => {
-		const quarter = Math.floor(date.getMonth() / 3);
-		return date.getFullYear() * 4 + quarter;
+	const getWeekNumberName = (weekNumber, weekLabel, label) => label?.(weekNumber) || `${weekLabel} ${weekNumber}`;
+	const getDateOfISOWeek = (year, week) => {
+		const date = createDate(year, 0, 4);
+		date.setDate(date.getDate() - (date.getDay() + 6) % 7 + (week - 1) * 7);
+		return date;
 	};
-	/**
-	* Helper function to check if a value is within min/max range.
-	* @param value - The value to check.
-	* @param min - Minimum allowed value (null means no minimum).
-	* @param max - Maximum allowed value (null means no maximum).
-	* @returns True if the value is outside the range, false if within range.
-	*/
-	const isOutsideRange = (value, min, max) => {
-		if (min !== null && value < min) return true;
-		if (max !== null && value > max) return true;
-		return false;
+	const ARROW_KEYS = /* @__PURE__ */ new Set([
+		"ArrowDown",
+		"ArrowLeft",
+		"ArrowRight",
+		"ArrowUp"
+	]);
+	const MODIFIER_KEYS = /* @__PURE__ */ new Set([
+		"Alt",
+		"Control",
+		"Meta",
+		"Shift"
+	]);
+	const GREGORIAN_MONTH_CALENDARS = /* @__PURE__ */ new Set([
+		"buddhist",
+		"gregory",
+		"iso8601",
+		"japanese",
+		"roc"
+	]);
+	const yearBeforeMonth = /* @__PURE__ */ new Map();
+	const CELL_NAME_FORMATS = {
+		days: {
+			weekday: "long",
+			day: "numeric",
+			month: "long",
+			year: "numeric"
+		},
+		months: {
+			month: "long",
+			year: "numeric"
+		},
+		years: { year: "numeric" }
 	};
-	/**
-	* Helper function to check if every day of a period is disabled.
-	* @param start - First day of the period.
-	* @param end - Last day of the period.
-	* @param min - Minimum allowed date.
-	* @param max - Maximum allowed date.
-	* @param disabledDates - Criteria for disabled dates.
-	* @returns True if no day between start and end (clamped to min/max) is selectable.
-	*/
-	const isPeriodDisabled = (start, end, min, max, disabledDates) => {
-		const startTime = min ? Math.max(start.getTime(), min.getTime()) : start.getTime();
-		const endTime = max ? Math.min(end.getTime(), max.getTime()) : end.getTime();
-		for (const currentDate = new Date(startTime); currentDate.getTime() <= endTime; currentDate.setDate(currentDate.getDate() + 1)) if (!isDateDisabled(currentDate, min, max, disabledDates)) return false;
+	const VIEW_BY_SELECTION_TYPE = {
+		day: "days",
+		week: "days",
+		month: "months",
+		quarter: "quarters",
+		year: "years"
+	};
+	const MONTHS_IN_PERIOD = {
+		months: 1,
+		quarters: 3,
+		years: 12
+	};
+	const YEARS_PER_PAGE = 12;
+	const getPeriod = (date, view) => {
+		if (view === "weeks") return getMonday(date).getTime();
+		return Math.floor((date.getFullYear() * 12 + date.getMonth()) / MONTHS_IN_PERIOD[view]);
+	};
+	const isEveryDayDisabled = (start, end, min, max, disabledDates) => {
+		const first = min && min > start ? createDate(min.getFullYear(), min.getMonth(), min.getDate()) : start;
+		const last = max && max < end ? createDate(max.getFullYear(), max.getMonth(), max.getDate()) : end;
+		for (const currentDate = new Date(first); currentDate.getTime() <= last.getTime(); currentDate.setDate(currentDate.getDate() + 1)) if (!isDateDisabled(currentDate, null, null, disabledDates)) return false;
 		return true;
 	};
-	/**
-	* Converts an ISO week string to a Date object representing the Monday of that week.
-	* @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
-	* @returns The Date object for the Monday of the specified week.
-	*/
 	const convertIsoWeekToDate = (isoWeek) => {
 		const [year, week] = isoWeek.split(/[Ww]/);
 		const parsedYear = parseYearSmart(year);
-		return getMondayOfISOWeek(parsedYear, Number.parseInt(week, 10));
+		return getDateOfISOWeek(parsedYear, Number.parseInt(week, 10));
 	};
-	/**
-	* Parses a week string and returns a Date object for the Monday of that week.
-	* @param dateString - The week string to parse.
-	* @returns The Date object for the Monday of the week, or null if invalid.
-	*/
 	const parseWeekString = (dateString) => {
 		for (const pattern of [
 			/^(\d{4})-W(\d{1,2})$/,
@@ -107,16 +117,11 @@
 			if (match) {
 				const parsedYear = parseYearSmart(match[1]);
 				const parsedWeek = Number.parseInt(match[2], 10);
-				return getMondayOfISOWeek(parsedYear, parsedWeek);
+				return getDateOfISOWeek(parsedYear, parsedWeek);
 			}
 		}
 		return convertIsoWeekToDate(dateString);
 	};
-	/**
-	* Parses a quarter string and returns a Date object for the first day of that quarter.
-	* @param dateString - The quarter string to parse.
-	* @returns The Date object for the first day of the quarter, or null if invalid.
-	*/
 	const parseQuarterString = (dateString) => {
 		for (const pattern of [
 			/^(\d{4})-Q(\d{1})$/,
@@ -129,17 +134,12 @@
 				const parsedQuarter = Number.parseInt(match[2], 10);
 				if (parsedQuarter >= 1 && parsedQuarter <= 4) {
 					const monthIndex = (parsedQuarter - 1) * 3;
-					return new Date(parsedYear, monthIndex, 1);
+					return createDate(parsedYear, monthIndex, 1);
 				}
 			}
 		}
 		return null;
 	};
-	/**
-	* Parses a month string and returns a Date object for the first day of that month.
-	* @param dateString - The month string to parse.
-	* @returns The Date object for the first day of the month, or null if invalid.
-	*/
 	const parseMonthString = (dateString) => {
 		for (const pattern of [/^(\d{2,4})[-/.\s](\d{1,2})$/, /^(\d{1,2})[-/.\s](\d{2,4})$/]) {
 			const match = dateString.trim().match(pattern);
@@ -163,16 +163,11 @@
 					parsedYear = parseYearSmart(secondGroup);
 					parsedMonth = parsedFirst - 1;
 				}
-				if (parsedMonth >= 0 && parsedMonth <= 11) return new Date(parsedYear, parsedMonth, 1);
+				if (parsedMonth >= 0 && parsedMonth <= 11) return createDate(parsedYear, parsedMonth, 1);
 			}
 		}
 		return null;
 	};
-	/**
-	* Parses a year string or number and returns a Date object for January 1st of that year.
-	* @param dateString - The year string or number to parse.
-	* @returns The Date object for January 1st of the year, or null if invalid.
-	*/
 	const parseYearString = (dateString) => {
 		const yearString = String(dateString);
 		const match = yearString.trim().match(/^(\d{2,4})$/);
@@ -182,17 +177,11 @@
 		}
 		return parseLocalDateString(yearString);
 	};
-	/**
-	* Helper function to generate multiple date format patterns based on locale.
-	* @param locale - The locale to use for date format patterns.
-	* @param includeTime - Whether to include time in the patterns.
-	* @returns Array of date format patterns.
-	*/
 	const generateDatePatterns = (locale, includeTime) => {
 		const referenceDate = new Date(2013, 11, 31, 17, 19, 22);
 		const patterns = [];
 		try {
-			const standardFormat = includeTime ? referenceDate.toLocaleString(locale) : referenceDate.toLocaleDateString(locale);
+			const standardFormat = includeTime ? referenceDate.toLocaleString(locale, { calendar: "gregory" }) : referenceDate.toLocaleDateString(locale, { calendar: "gregory" });
 			patterns.push(standardFormat);
 		} catch {
 			const standardFormat = includeTime ? referenceDate.toLocaleString("en-US") : referenceDate.toLocaleDateString("en-US");
@@ -216,25 +205,12 @@
 		}
 		return patterns;
 	};
-	/**
-	* Helper function to build regex pattern for date parsing.
-	* @param formatString - The date format string.
-	* @param includeTime - Whether to include time patterns.
-	* @returns The regex pattern string.
-	*/
 	const buildDateRegexPattern = (formatString, includeTime) => {
 		let regexPattern = formatString.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
 		regexPattern = regexPattern.replace("2013", String.raw`(?<year>\d{2,4})`).replace("12", String.raw`(?<month>\d{1,2})`).replace("31", String.raw`(?<day>\d{1,2})`);
 		if (includeTime) regexPattern = regexPattern.replaceAll(/17|5/g, String.raw`(?<hour>\d{1,2})`).replace("19", String.raw`(?<minute>\d{1,2})`).replace("22", String.raw`(?<second>\d{1,2})`).replaceAll(/AM|PM/gi, "(?<ampm>[APap][Mm])");
 		return regexPattern;
 	};
-	/**
-	* Helper function to try parsing with multiple patterns.
-	* @param dateString - The date string to parse.
-	* @param patterns - Array of format patterns to try.
-	* @param includeTime - Whether time parsing is included.
-	* @returns Parsed groups or null if no match.
-	*/
 	const tryParseWithPatterns = (dateString, patterns, includeTime) => {
 		for (const pattern of patterns) {
 			const regexPattern = buildDateRegexPattern(pattern, includeTime);
@@ -244,12 +220,15 @@
 		}
 		return null;
 	};
-	/**
-	* Helper function to convert 12-hour to 24-hour format.
-	* @param hour - Hour string.
-	* @param ampm - AM/PM indicator.
-	* @returns Hour in 24-hour format.
-	*/
+	const readWrittenDay = (dateString, locale) => {
+		const iso = /^(?<year>\d{4,})-(?<month>\d{1,2})-(?<day>\d{1,2})(?!\d)/.exec(dateString);
+		if (iso?.groups) return iso.groups;
+		for (const pattern of generateDatePatterns(locale, false)) {
+			const match = new RegExp(`^${buildDateRegexPattern(pattern, false)}(?!\\d)`).exec(dateString);
+			if (match?.groups) return match.groups;
+		}
+		return null;
+	};
 	const convertTo24Hour = (hour, ampm) => {
 		const parsedHour = Number.parseInt(hour, 10);
 		if (!ampm) return parsedHour;
@@ -258,34 +237,17 @@
 		if (!isPM && parsedHour === 12) return 0;
 		return parsedHour;
 	};
-	/**
-	* Helper function to validate time components.
-	* @param hour - Hour value.
-	* @param minute - Minute value.
-	* @param second - Second value.
-	* @returns True if time components are valid.
-	*/
 	const validateTimeComponents = (hour, minute, second) => {
 		return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59;
 	};
-	/**
-	* Helper function to validate date components.
-	* @param month - Month string.
-	* @param day - Day string.
-	* @returns True if date components are valid.
-	*/
-	const validateDateComponents = (month, day) => {
-		const parsedMonth = Number.parseInt(month, 10) - 1;
+	const validateDateComponents = (year, month, day) => {
+		const parsedMonth = Number.parseInt(month, 10);
 		const parsedDay = Number.parseInt(day, 10);
-		return parsedMonth >= 0 && parsedMonth <= 11 && parsedDay >= 1 && parsedDay <= 31;
+		return parsedMonth >= 1 && parsedMonth <= 12 && parsedDay >= 1 && parsedDay <= createDate(parseYearSmart(year), parsedMonth, 0).getDate();
 	};
-	/**
-	* Helper function to create date with time.
-	* @param groups - Parsed date and time groups.
-	* @returns Date object or null if invalid.
-	*/
 	const createDateWithTime = (groups) => {
 		const { year, month, day, hour, minute, second, ampm } = groups;
+		if (ampm && Number.parseInt(hour, 10) > 12) return null;
 		const parsedYear = parseYearSmart(year);
 		const parsedMonth = Number.parseInt(month, 10) - 1;
 		const parsedDay = Number.parseInt(day, 10);
@@ -293,36 +255,21 @@
 		const parsedMinute = Number.parseInt(minute ?? "0", 10) || 0;
 		const parsedSecond = Number.parseInt(second ?? "0", 10) || 0;
 		if (!validateTimeComponents(parsedHour, parsedMinute, parsedSecond)) return null;
-		return new Date(parsedYear, parsedMonth, parsedDay, parsedHour, parsedMinute, parsedSecond);
+		const date = createDate(parsedYear, parsedMonth, parsedDay);
+		date.setHours(parsedHour, parsedMinute, parsedSecond);
+		return date;
 	};
-	/**
-	* Helper function to create date without time.
-	* @param groups - Parsed date groups.
-	* @returns Date object or null if invalid.
-	*/
 	const createDateOnly = (groups) => {
 		const { year, month, day } = groups;
-		if (!validateDateComponents(month, day)) return null;
+		if (!validateDateComponents(year, month, day)) return null;
 		const parsedYear = parseYearSmart(year);
 		const parsedMonth = Number.parseInt(month, 10) - 1;
-		return new Date(parsedYear, parsedMonth, Number.parseInt(day, 10));
+		return createDate(parsedYear, parsedMonth, Number.parseInt(day, 10));
 	};
-	/**
-	* Helper function to determine expected parts count from patterns.
-	* @param patterns - Array of date format patterns.
-	* @returns Expected number of parts for a complete date.
-	*/
 	const getExpectedPartsCount = (patterns) => {
 		if (patterns.length === 0) return 3;
 		return patterns[0].split(/[-/.\s:]+/).filter((part) => part.length > 0).length;
 	};
-	/**
-	* Enhanced day parsing with locale-aware patterns.
-	* @param dateString - The day string to parse.
-	* @param locale - The locale to use for parsing.
-	* @param includeTime - Whether to include time parsing.
-	* @returns Date object or null if invalid.
-	*/
 	const parseDayString = (dateString, locale, includeTime) => {
 		const patterns = generateDatePatterns(locale, includeTime);
 		const groups = tryParseWithPatterns(dateString, patterns, includeTime);
@@ -332,20 +279,18 @@
 			const parts = trimmed.split(/[-/.\s:]+/).filter((part) => part.length > 0);
 			const expectedPartsCount = getExpectedPartsCount(patterns);
 			const hasRequiredParts = parts.length >= expectedPartsCount;
-			if (hasDateSeparators && hasRequiredParts) return parseLocalDateString(dateString);
+			if (hasDateSeparators && hasRequiredParts) {
+				const written = readWrittenDay(trimmed, locale);
+				return written && !validateDateComponents(written.year, written.month, written.day) ? null : parseLocalDateString(dateString);
+			}
 			return null;
 		}
 		if ("year" in groups && "month" in groups && "day" in groups) {
-			const { month, day } = groups;
-			if (!validateDateComponents(month, day)) return null;
+			const { year, month, day } = groups;
+			if (!validateDateComponents(year, month, day)) return null;
 		} else return null;
 		return includeTime ? createDateWithTime(groups) : createDateOnly(groups);
 	};
-	/**
-	* Parses a date string into a local Date object.
-	* @param dateString - The date string to parse.
-	* @returns The Date object in local timezone, or null if invalid.
-	*/
 	const parseLocalDateString = (dateString) => {
 		const trimmed = dateString.trim();
 		const isoDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(trimmed);
@@ -353,194 +298,169 @@
 		if (!Number.isNaN(_date.getTime())) return _date;
 		return null;
 	};
-	/**
-	* Converts a date string or Date object to a Date object based on selection type.
-	* @param date - The date to convert.
-	* @param selectionType - The type of selection ('day', 'week', 'month', 'year').
-	* @param locale - The locale to use for date parsing (for day parsing).
-	* @param includeTime - Whether to include time parsing (for day parsing).
-	* @returns The corresponding Date object or null if invalid.
-	*/
 	const convertToDateObject = (date, selectionType, locale = "en-US", includeTime = false) => {
-		if (date === null) return null;
+		if (!date) return null;
 		if (date instanceof Date) return Number.isNaN(date.getTime()) ? null : date;
-		const dateString = date;
-		switch (selectionType) {
-			case "week": return parseWeekString(dateString);
-			case "month": return parseMonthString(dateString);
-			case "quarter": return parseQuarterString(dateString);
-			case "year": return parseYearString(dateString);
-			default: return parseDayString(dateString, locale, includeTime);
-		}
+		const parsers = {
+			week: parseWeekString,
+			month: parseMonthString,
+			quarter: parseQuarterString,
+			year: parseYearString
+		};
+		const value = typeof date === "number" ? String(date) : date;
+		const parse = selectionType ? parsers[selectionType] : void 0;
+		const parsed = parse ? parse(value) : parseDayString(value, locale, includeTime);
+		return parsed && !Number.isNaN(parsed.getTime()) ? parsed : null;
 	};
-	/**
-	* Enhanced locale-aware date parsing function (replaces getLocalDateFromString).
-	* @param dateString - The date string to parse.
-	* @param locale - The locale to use for date format patterns.
-	* @param includeTime - Whether to include time parsing.
-	* @param selectionType - The selection type ('day', 'week', 'month', 'quarter', 'year').
-	* @returns A Date object if parsing succeeds, null if parsing fails.
-	*/
+	const convertToSelectionDate = (date, selectionType) => {
+		const value = convertToDateObject(date, selectionType);
+		return value && selectionType === "week" ? getMonday(value) : value;
+	};
+	const convertToShownDate = (date, selectionType, firstDayOfWeek) => {
+		const value = convertToDateObject(date, selectionType);
+		if (!value || selectionType !== "week") return value;
+		const rowStart = getWeekRowStart(value, firstDayOfWeek);
+		const rowEnd = createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 6);
+		const monday = getMonday(value);
+		return [rowStart, rowEnd].some((day) => day.getFullYear() === value.getFullYear() && day.getMonth() === value.getMonth()) ? value : createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3);
+	};
+	const convertToLimitDate = (date, selectionType) => {
+		const value = convertToDateObject(date, selectionType);
+		if (!value || selectionType !== "week") return value;
+		const monday = getMonday(value);
+		return createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3);
+	};
 	const getLocalDateFromString = (dateString, locale = "en-US", includeTime = false, selectionType = "day") => {
 		if (!dateString || typeof dateString !== "string") return null;
 		return convertToDateObject(dateString, selectionType, locale, includeTime);
 	};
-	/**
-	* Creates groups from an array.
-	* @param arr - The array to group.
-	* @param numberOfGroups - Number of groups to create.
-	* @returns An array of grouped arrays.
-	*/
 	const createGroupsInArray = (arr, numberOfGroups) => {
 		const perGroup = Math.ceil(arr.length / numberOfGroups);
 		return Array.from({ length: numberOfGroups }).fill("").map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
 	};
-	/**
-	* Adjusts the calendar date based on order and view type.
-	* @param calendarDate - The current calendar date.
-	* @param order - The order to adjust by.
-	* @param view - The current view type.
-	* @returns The adjusted Date object.
-	*/
 	const getCalendarDate = (calendarDate, order, view) => {
-		if (order !== 0 && view === "days") return new Date(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1);
-		if (order !== 0 && (view === "months" || view === "quarters")) return new Date(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1);
-		if (order !== 0 && view === "years") return new Date(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1);
+		if (order !== 0 && view === "days") return createDate(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1);
+		if (order !== 0 && (view === "months" || view === "quarters")) return createDate(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1);
+		if (order !== 0 && view === "years") return createDate(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1);
 		return calendarDate;
 	};
-	/**
-	* Formats a date based on the selection type.
-	* @param date - The date to format.
-	* @param selectionType - The type of selection ('day', 'week', 'month', 'quarter', 'year').
-	* @returns A formatted date string or the original Date object.
-	*/
 	const getDateBySelectionType = (date, selectionType) => {
 		if (date === null) return null;
 		if (selectionType === "week") {
 			const { year, weekNumber } = getISOWeekNumberAndYear(date);
-			return `${year}W${weekNumber.toString().padStart(2, "0")}`;
+			return `${String(year).padStart(4, "0")}W${weekNumber.toString().padStart(2, "0")}`;
 		}
-		if (selectionType === "month") {
-			const monthNumber = `0${date.getMonth() + 1}`.slice(-2);
-			return `${date.getFullYear()}-${monthNumber}`;
-		}
-		if (selectionType === "quarter") {
-			const quarter = Math.floor(date.getMonth() / 3) + 1;
-			return `${date.getFullYear()}Q${quarter}`;
-		}
-		if (selectionType === "year") return `${date.getFullYear()}`;
+		const year = String(date.getFullYear()).padStart(4, "0");
+		if (selectionType === "month") return `${year}-${`0${date.getMonth() + 1}`.slice(-2)}`;
+		if (selectionType === "quarter") return `${year}Q${Math.floor(date.getMonth() / 3) + 1}`;
+		if (selectionType === "year") return year;
 		return date;
 	};
-	/**
-	* Retrieves the first available date within a range that is not disabled.
-	* @param startDate - Start date of the range.
-	* @param endDate - End date of the range.
-	* @param min - Minimum allowed date.
-	* @param max - Maximum allowed date.
-	* @param disabledDates - Criteria for disabled dates.
-	* @returns The first available Date object or null if none found.
-	*/
-	const getFirstAvailableDateInRange = (startDate, endDate, min, max, disabledDates) => {
-		const _min = min ? new Date(Math.max(startDate.getTime(), min.getTime())) : startDate;
-		const _max = max ? new Date(Math.min(endDate.getTime(), max.getTime())) : endDate;
-		if (disabledDates === void 0) return _min;
-		for (const currentDate = new Date(_min); currentDate <= _max; currentDate.setDate(currentDate.getDate() + 1)) if (!isDateDisabled(currentDate, min, max, disabledDates)) return currentDate;
-		return null;
-	};
-	/**
-	* Retrieves an array of month names based on locale and format.
-	* @param locale - The locale string (e.g., 'en-US').
-	* @param format - The format of the month names ('short' or 'long').
-	* @returns An array of month names.
-	*/
-	const getMonthsNames = (locale, format = "short") => {
-		return Array.from({ length: 12 }, (_, i) => {
-			return new Date(2e3, i, 1).toLocaleString(locale, { month: format });
+	const createDateTimeFormat = (locale, options) => {
+		const formatter = new Intl.DateTimeFormat(locale, options);
+		return options?.calendar || GREGORIAN_MONTH_CALENDARS.has(formatter.resolvedOptions().calendar) ? formatter : new Intl.DateTimeFormat(locale, {
+			...options,
+			calendar: "gregory"
 		});
 	};
-	/**
-	* Retrieves an array of selectable dates from the given element.
-	* @param element - The HTML element to search for selectable dates.
-	* @param selector - The CSS selector used to identify selectable dates. Defaults to 'tr[tabindex="0"], td[tabindex="0"]'.
-	* @returns An array of HTMLElements representing the selectable dates.
-	*/
-	const getSelectableDates = (element, selector = "tr[tabindex=\"0\"], td[tabindex=\"0\"]") => {
-		return [...Element.prototype.querySelectorAll.call(element, selector)];
+	const isYearBeforeMonth = (locale) => {
+		const key = locale ?? "";
+		if (!yearBeforeMonth.has(key)) {
+			const parts = createDateTimeFormat(locale, {
+				month: "long",
+				year: "numeric"
+			}).formatToParts(new Date(2e3, 0, 1));
+			yearBeforeMonth.set(key, parts.findIndex(({ type }) => type === "year") < parts.findIndex(({ type }) => type === "month"));
+		}
+		return yearBeforeMonth.get(key);
 	};
-	/**
-	* Generates an array of years centered around a given year.
-	* @param year - The central year.
-	* @param range - The number of years before and after the central year.
-	* @returns An array of years.
-	*/
+	const getMonthsNames = (locale, format = "short") => {
+		const formatter = createDateTimeFormat(locale, { month: format });
+		return Array.from({ length: 12 }, (_, i) => formatter.format(new Date(2e3, i, 1)));
+	};
+	const createDateFormatter = () => {
+		const formatters = /* @__PURE__ */ new Map();
+		return (date, locale, options) => {
+			if (Number.isNaN(date.getTime())) return date.toLocaleDateString(locale, options);
+			const key = `${locale}|${options ? JSON.stringify(options) : ""}`;
+			let formatter = formatters.get(key);
+			if (!formatter) {
+				formatter = createDateTimeFormat(locale, options);
+				formatters.set(key, formatter);
+			}
+			return formatter.format(date);
+		};
+	};
 	const getYears = (year, range = 6) => {
 		return Array.from({ length: range * 2 }, (_, i) => year - range + i);
 	};
-	/**
-	* Retrieves leading days (from the previous month) for a calendar view.
-	* @param year - The year.
-	* @param month - The month (0-11).
-	* @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
-	* @returns An array of leading day objects.
-	*/
+	const formatYearsRange = (year, locale) => {
+		const years = getYears(year);
+		const [start, end] = [years[0], years.at(-1)].map((value) => createDate(value));
+		const range = createDateTimeFormat(locale, { year: "numeric" }).formatRange(start, end);
+		return /(?!\p{Nd})[\u0590-\u08FF]/u.test(range) ? `\u2067${range}\u2069` : range;
+	};
+	const formatCellName = (date, view, format) => view === "quarters" ? `Q${Math.floor(date.getMonth() / 3) + 1} ${format(date, { year: "numeric" })}` : format(date, CELL_NAME_FORMATS[view]);
+	const formatWeekName = (days, locale) => createDateTimeFormat(locale, {
+		day: "numeric",
+		month: "long",
+		year: "numeric"
+	}).formatRange(days[0].date, days.at(-1).date);
+	const formatSelectionName = (date, { ariaWeekNumberLabel = null, firstDayOfWeek = 1, locale, selectionType = "day", showWeekNumber = false } = {}) => {
+		if (selectionType !== "week") return formatCellName(date, VIEW_BY_SELECTION_TYPE[selectionType], (value, options) => createDateTimeFormat(locale, options).format(value));
+		const first = getWeekRowStart(date, firstDayOfWeek);
+		const name = formatWeekName([{ date: first }, { date: createDate(first.getFullYear(), first.getMonth(), first.getDate() + 6) }], locale);
+		return showWeekNumber ? `${getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale ?? ""), ariaWeekNumberLabel)}, ${name}` : name;
+	};
+	const formatSelectionRangeName = (start, end, options = {}) => {
+		const { ariaWeekNumberLabel = null, firstDayOfWeek = 1, locale, selectionType = "day", showWeekNumber = false } = options;
+		const startName = formatSelectionName(start, options);
+		const endName = formatSelectionName(end, options);
+		if (startName === endName) return startName;
+		if (selectionType === "quarter" || end < start) return `${startName} – ${endName}`;
+		if (selectionType === "week") {
+			const last = getWeekRowStart(end, firstDayOfWeek);
+			const days = createDateTimeFormat(locale, {
+				day: "numeric",
+				month: "long",
+				year: "numeric"
+			}).formatRange(getWeekRowStart(start, firstDayOfWeek), createDate(last.getFullYear(), last.getMonth(), last.getDate() + 6));
+			const weekName = (date) => getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale ?? ""), ariaWeekNumberLabel);
+			return showWeekNumber ? `${weekName(start)} – ${weekName(end)}, ${days}` : days;
+		}
+		return createDateTimeFormat(locale, CELL_NAME_FORMATS[VIEW_BY_SELECTION_TYPE[selectionType]]).formatRange(start, end);
+	};
 	const getLeadingDays = (year, month, firstDayOfWeek) => {
 		const dates = [];
-		const d = new Date(year, month);
+		const d = createDate(year, month);
 		const y = d.getFullYear();
 		const m = d.getMonth();
-		let leadingDays = 6 - (6 - new Date(y, m, 1).getDay()) - firstDayOfWeek;
+		let leadingDays = 6 - (6 - createDate(y, m, 1).getDay()) - firstDayOfWeek;
 		if (firstDayOfWeek) leadingDays = leadingDays < 0 ? 7 + leadingDays : leadingDays;
 		for (let i = leadingDays * -1; i < 0; i++) dates.push({
-			date: new Date(y, m, i + 1),
+			date: createDate(y, m, i + 1),
 			month: "previous"
 		});
 		return dates;
 	};
-	/**
-	* Retrieves all days within a specific month.
-	* @param year - The year.
-	* @param month - The month (0-11).
-	* @returns An array of day objects.
-	*/
 	const getMonthDays = (year, month) => {
 		const dates = [];
-		const lastDay = new Date(year, month + 1, 0).getDate();
+		const lastDay = createDate(year, month + 1, 0).getDate();
 		for (let i = 1; i <= lastDay; i++) dates.push({
-			date: new Date(year, month, i),
+			date: createDate(year, month, i),
 			month: "current"
 		});
 		return dates;
 	};
-	/**
-	* Retrieves trailing days (from the next month) for a calendar view.
-	* @param year - The year.
-	* @param month - The month (0-11).
-	* @param leadingDays - Array of leading day objects.
-	* @param monthDays - Array of current month day objects.
-	* @returns An array of trailing day objects.
-	*/
 	const getTrailingDays = (year, month, leadingDays, monthDays) => {
 		const dates = [];
 		const days = 42 - (leadingDays.length + monthDays.length);
 		for (let i = 1; i <= days; i++) dates.push({
-			date: new Date(year, month + 1, i),
+			date: createDate(year, month + 1, i),
 			month: "next"
 		});
 		return dates;
 	};
-	/**
-	* Calculates the ISO 8601 week number and year for a given date.
-	*
-	* In the ISO 8601 standard:
-	* - Weeks start on Monday.
-	* - The first week of the year is the one that contains January 4th.
-	* - The year of the week may differ from the calendar year (e.g., Dec 29, 2025 is in ISO year 2026).
-	*
-	* @param {Date} date - The date for which to calculate the ISO week number and year.
-	* @returns {{ weekNumber: number, year: number }} An object containing:
-	*   - `weekNumber`: the ISO week number (1–53),
-	*   - `year`: the ISO year (may differ from the calendar year of the date).
-	*/
 	const getISOWeekNumberAndYear = (date) => {
 		const tempDate = new Date(date);
 		tempDate.setHours(0, 0, 0, 0);
@@ -552,13 +472,6 @@
 			year: tempDate.getFullYear()
 		};
 	};
-	/**
-	* Retrieves detailed information about each week in a month for calendar rendering.
-	* @param year - The year.
-	* @param month - The month (0-11).
-	* @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
-	* @returns An array of week objects containing week numbers and day details.
-	*/
 	const getMonthDetails = (year, month, firstDayOfWeek) => {
 		const daysPrevMonth = getLeadingDays(year, month, firstDayOfWeek);
 		const daysThisMonth = getMonthDays(year, month);
@@ -577,7 +490,7 @@
 				},
 				days: []
 			});
-			if ((index + 1) % 7 === 0) {
+			if (index % 7 === 3) {
 				const { weekNumber, year } = getISOWeekNumberAndYear(day.date);
 				const lastWeek = weeks[weeks.length - 1];
 				if (lastWeek) lastWeek.week = {
@@ -590,17 +503,263 @@
 		}
 		return weeks;
 	};
-	/**
-	* Checks if a date is disabled based on the 'date' period type.
-	* @param date - The date to check.
-	* @param min - Minimum allowed date.
-	* @param max - Maximum allowed date.
-	* @param disabledDates - Criteria for disabled dates.
-	* @returns True if the date is disabled, false otherwise.
-	*/
+	const getClosestTarget = (targets, anchor, rows) => {
+		let closest;
+		let closestGap = Number.POSITIVE_INFINITY;
+		for (const target of targets) {
+			if (!rows && target.adjacent) continue;
+			const time = anchor.getTime();
+			const gap = time < target.position.getTime() ? target.position.getTime() - time : Math.max(0, time - target.end.getTime());
+			if (gap < closestGap || gap === closestGap && closest?.adjacent && !target.adjacent) {
+				closest = target;
+				closestGap = gap;
+			}
+		}
+		return closest;
+	};
+	const getTabStop = (targets, anchor, rows) => (targets.find((target) => target.selected) ?? (anchor ? getClosestTarget(targets, anchor, rows) : void 0) ?? targets[0])?.date.getTime();
+	const getSelectableDates = (element, selector = "tr[tabindex], td[tabindex]") => [...Element.prototype.querySelectorAll.call(element, selector)];
+	const getClosestSelectable = (elements, anchor, rows) => {
+		const targets = [];
+		for (const element of elements) {
+			const cells = rows ? [...element.querySelectorAll("td[data-coreui-date]")] : [element];
+			const first = cells[0]?.dataset.coreuiDate;
+			const last = cells.at(-1)?.dataset.coreuiDate;
+			if (first && last) {
+				const position = parseToDateString(first);
+				targets.push({
+					adjacent: cells[0].matches(".previous, .next"),
+					date: position,
+					element,
+					end: parseToDateString(last),
+					position,
+					selected: element.classList.contains("selected")
+				});
+			}
+		}
+		return getClosestTarget(targets, anchor, rows)?.element;
+	};
+	const setRovingTabIndex = (element, selector, anchor, rows, preferred) => {
+		const empty = !element.querySelector(selector);
+		for (const panel of element.querySelectorAll(".calendar")) {
+			const targets = getSelectableDates(panel, selector);
+			const grid = panel.querySelector("table");
+			if (empty) grid?.setAttribute("tabindex", "0");
+			else grid?.removeAttribute("tabindex");
+			for (const stale of panel.querySelectorAll("td[tabindex=\"0\"], tr[tabindex=\"0\"]")) if (!targets.includes(stale)) stale.tabIndex = -1;
+			if (targets.length === 0) continue;
+			const active = (preferred && targets.includes(preferred) ? preferred : void 0) ?? targets.find((target) => target.classList.contains("selected")) ?? (anchor ? getClosestSelectable(targets, anchor, rows) : void 0) ?? targets[0];
+			for (const target of targets) {
+				const tabIndex = target === active ? 0 : -1;
+				if (target.tabIndex !== tabIndex) target.tabIndex = tabIndex;
+			}
+		}
+	};
+	const getStartOfView = (date, view) => {
+		const value = new Date(date);
+		value.setHours(0, 0, 0, 0);
+		if (view === "months") value.setDate(1);
+		if (view === "quarters") value.setMonth(Math.floor(value.getMonth() / 3) * 3, 1);
+		if (view === "years") value.setMonth(0, 1);
+		return value;
+	};
+	const getStartOfWeek = (date, firstDayOfWeek) => {
+		const value = new Date(date);
+		value.setDate(value.getDate() - (value.getDay() - firstDayOfWeek + 7) % 7);
+		return value;
+	};
+	const getWeekRowDate = (rowStart) => getMonday(createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 3));
+	const getMonday = (date) => {
+		const monday = getStartOfWeek(date, 1);
+		return createDate(monday.getFullYear(), monday.getMonth(), monday.getDate());
+	};
+	const getWeekRowStart = (date, firstDayOfWeek) => {
+		const monday = getMonday(date);
+		return getStartOfWeek(createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3), firstDayOfWeek);
+	};
+	const getViewEdge = (forward, { calendarDate, calendars, view }) => {
+		const year = calendarDate.getFullYear();
+		const month = calendarDate.getMonth();
+		const last = calendars - 1;
+		if (view === "days") return forward ? createDate(year, month + last + 1, 0) : createDate(year, month, 1);
+		if (view === "years") return createDate(forward ? year + 6 - 1 + 12 * last : year - 6, 0, 1);
+		return forward ? createDate(year + last, view === "quarters" ? 9 : 11, 1) : createDate(year, 0, 1);
+	};
+	const getPanelMonth = ({ calendarDate, panel }) => [createDate(calendarDate.getFullYear(), calendarDate.getMonth() + panel, 1), createDate(calendarDate.getFullYear(), calendarDate.getMonth() + panel + 1, 0)];
+	const isUnfocusable = (date, { maxDate, minDate, rows, view }) => isCellOutsideLimits(date, view, minDate, maxDate, rows);
+	const walkToFocusable = (start, date, context) => {
+		const { rows, view } = context;
+		const sign = start > date ? -1 : 1;
+		const isShort = (value) => sign * (date.getTime() - value.getTime()) > 0;
+		while (isUnfocusable(start, context) && isShort(start)) if (view === "days") start.setDate(start.getDate() + sign * (rows ? 7 : 1));
+		else start.setMonth(start.getMonth() + sign * MONTHS_IN_PERIOD[view]);
+		return start;
+	};
+	const getArrowTarget = (date, forward, vertical, context) => {
+		const { firstDayOfWeek, rows, view } = context;
+		const [days, months] = {
+			days: vertical || rows ? [7, 0] : [1, 0],
+			months: vertical ? [0, 3] : [0, 1],
+			quarters: vertical ? [0, 12] : [0, 3],
+			years: vertical ? [0, 36] : [0, 12]
+		}[view];
+		const sign = forward ? 1 : -1;
+		const target = rows ? getStartOfWeek(date, firstDayOfWeek) : new Date(date);
+		target.setMonth(target.getMonth() + sign * months, target.getDate() + sign * days);
+		return isUnfocusable(target, context) ? null : target;
+	};
+	const getGridArrowTarget = (forward, context) => {
+		const { firstDayOfWeek, maxDate, minDate, rows, view } = context;
+		const limit = forward ? minDate ?? createDate(1) : maxDate;
+		if (!limit) return null;
+		const target = getStartOfView(limit, view);
+		const edge = getViewEdge(forward, context);
+		if (forward ? edge >= target : edge <= target) return null;
+		return rows ? getStartOfWeek(target, firstDayOfWeek) : target;
+	};
+	const getRevealOffset = (date, { calendarDate, calendars, rows, view }) => {
+		if (view === "days") {
+			const end = new Date(date);
+			end.setDate(end.getDate() + (rows ? 6 : 0));
+			const monthsFrom = (value) => (value.getFullYear() - calendarDate.getFullYear()) * 12 + value.getMonth() - calendarDate.getMonth();
+			return {
+				months: monthsFrom(end) < 0 ? monthsFrom(end) : Math.max(0, monthsFrom(date) - calendars + 1),
+				years: 0
+			};
+		}
+		if (view === "years") {
+			const page = Math.floor((date.getFullYear() - calendarDate.getFullYear() + 6) / 12);
+			return {
+				months: 0,
+				years: 12 * (page < 0 ? page : Math.max(0, page - calendars + 1))
+			};
+		}
+		const delta = date.getFullYear() - calendarDate.getFullYear();
+		return {
+			months: 0,
+			years: delta < 0 ? delta : Math.max(0, delta - calendars + 1)
+		};
+	};
+	const getRowEdge = (date, last, context) => {
+		const { calendarDate, firstDayOfWeek, rows, view } = context;
+		const year = date.getFullYear();
+		const month = date.getMonth();
+		let edge;
+		if (view === "days" && rows) edge = getStartOfWeek(getPanelMonth(context)[last ? 1 : 0], firstDayOfWeek);
+		else switch (view) {
+			case "days":
+				edge = getStartOfWeek(createDate(year, month, date.getDate()), firstDayOfWeek);
+				edge.setDate(edge.getDate() + (last ? 6 : 0));
+				break;
+			case "months":
+				edge = createDate(year, month - month % 3 + (last ? 2 : 0), 1);
+				break;
+			case "quarters":
+				edge = createDate(year, last ? 9 : 0, 1);
+				break;
+			default: {
+				const offset = year - calendarDate.getFullYear() + 6;
+				edge = createDate(year - offset % 3 + (last ? 2 : 0), 0, 1);
+			}
+		}
+		if ((last ? -1 : 1) * (date.getTime() - edge.getTime()) < 0) return new Date(date);
+		return walkToFocusable(edge, date, context);
+	};
+	const moveTo = (target, context) => target ? {
+		date: target,
+		...getRevealOffset(target, context),
+		type: "move"
+	} : { type: "stay" };
+	const getPageOffset = (direction, shiftKey, view) => view === "days" && !shiftKey ? {
+		months: direction,
+		years: 0
+	} : {
+		months: 0,
+		years: direction * (view === "years" ? 12 : 1)
+	};
+	const getPageAction = (date, direction, shiftKey, context) => {
+		const { firstDayOfWeek, keptDay, maxDate, minDate, rows, view } = context;
+		const offset = getPageOffset(direction, shiftKey, view);
+		const kept = keptDay && isSameDateAs(keptDay.focused, date) ? keptDay : null;
+		const day = kept ? kept.day : date.getDate();
+		const from = kept ? kept.target : date;
+		const target = new Date(date);
+		target.setFullYear(from.getFullYear() + offset.years, from.getMonth() + offset.months, 1);
+		target.setDate(Math.min(day, createDate(target.getFullYear(), target.getMonth() + 1, 0).getDate()));
+		const bound = direction > 0 ? maxDate : minDate ?? createDate(1);
+		const [first, last] = getPanelMonth(context);
+		let start;
+		if (bound && isUnfocusable(rows ? getStartOfWeek(target, firstDayOfWeek) : target, context)) {
+			const edge = getStartOfView(bound, view);
+			start = rows ? getStartOfWeek(edge, firstDayOfWeek) : edge;
+		} else if (view === "days" && !rows && (date < first || date > last)) start = target;
+		else return {
+			date: target,
+			keptDay: {
+				day,
+				focused: rows ? getStartOfWeek(target, firstDayOfWeek) : target,
+				target
+			},
+			...offset,
+			type: "page"
+		};
+		const stop = walkToFocusable(start, date, context);
+		if (stop.getTime() === date.getTime()) return { type: "stay" };
+		return {
+			date: stop,
+			keptDay: {
+				day,
+				focused: stop,
+				target: stop
+			},
+			...getRevealOffset(stop, context),
+			type: "move"
+		};
+	};
+	const isForwardKey = (key, rtl) => key === "ArrowDown" || key === (rtl ? "ArrowLeft" : "ArrowRight");
+	const getGridKeyAction = ({ key, shiftKey }, context) => {
+		if (ARROW_KEYS.has(key)) return moveTo(getGridArrowTarget(isForwardKey(key, context.rtl), context), context);
+		if (key === "PageDown" || key === "PageUp") return {
+			...getPageOffset(key === "PageDown" ? 1 : -1, shiftKey, context.view),
+			type: "page"
+		};
+		return key === "End" || key === "Home" ? { type: "stay" } : null;
+	};
+	const getCellKeyAction = ({ code, key, repeat, shiftKey }, date, context) => {
+		if (ARROW_KEYS.has(key)) return moveTo(getArrowTarget(date, isForwardKey(key, context.rtl), key === "ArrowDown" || key === "ArrowUp", context), context);
+		if (code === "Space" || key === "Enter") return repeat ? { type: "stay" } : { type: "activate" };
+		if (key === "End" || key === "Home") {
+			const target = getRowEdge(date, key === "End", context);
+			if (target.getTime() === date.getTime()) return { type: "stay" };
+			if (!context.rows) return moveTo(target, context);
+			return {
+				date: target,
+				months: 0,
+				panel: context.panel,
+				type: "move",
+				years: 0
+			};
+		}
+		return key === "PageDown" || key === "PageUp" ? getPageAction(date, key === "PageDown" ? 1 : -1, shiftKey, context) : null;
+	};
+	const hasShortcutModifier = (event) => Boolean(event.altKey || event.ctrlKey || event.metaKey);
+	const getCalendarKeyAction = (event, date, context) => {
+		if (hasShortcutModifier(event)) return null;
+		return date ? getCellKeyAction(event, date, context) : getGridKeyAction(event, context);
+	};
+	const getKeptDay = (key, action, keptDay) => {
+		if (action && "keptDay" in action && action.keptDay) return action.keptDay;
+		return action?.type === "stay" || MODIFIER_KEYS.has(key) ? keptDay : null;
+	};
+	const constrainDate = (date, min, max) => {
+		if (min && date < min) return new Date(min);
+		if (max && date > max) return new Date(max);
+		return date;
+	};
 	const isDateDisabled = (date, min, max, disabledDates) => {
-		if (min && date < min) return true;
-		if (max && date > max) return true;
+		const day = removeTimeFromDate(date);
+		if (min && day < removeTimeFromDate(min) || date.getFullYear() < 1) return true;
+		if (max && day > removeTimeFromDate(max)) return true;
 		if (disabledDates === void 0) return false;
 		if (typeof disabledDates === "function") return disabledDates(date);
 		if (disabledDates instanceof Date && isSameDateAs(date, disabledDates)) return true;
@@ -611,157 +770,49 @@
 		}
 		return false;
 	};
-	/**
-	* Checks if a date is within a specified range.
-	* @param date - The date to check.
-	* @param start - Start date of the range.
-	* @param end - End date of the range.
-	* @returns True if the date is within the range, false otherwise.
-	*/
 	const isDateInRange = (date, start, end) => {
 		const _date = removeTimeFromDate(date);
 		const _start = start ? removeTimeFromDate(start) : null;
 		const _end = end ? removeTimeFromDate(end) : null;
 		return Boolean(_start && _end && _start <= _date && _date <= _end);
 	};
-	/**
-	* Checks if a date is selected based on start and end dates.
-	* @param date - The date to check.
-	* @param start - Start date.
-	* @param end - End date.
-	* @returns True if the date is selected, false otherwise.
-	*/
 	const isDateSelected = (date, start, end) => {
 		if (start !== null && isSameDateAs(start, date)) return true;
 		if (end !== null && isSameDateAs(end, date)) return true;
 		return false;
 	};
-	/**
-	* Determines if any date within a range is disabled.
-	* @param startDate - Start date of the range.
-	* @param endDate - End date of the range.
-	* @param disabledDates - Criteria for disabled dates.
-	* @returns True if any date in the range is disabled, false otherwise.
-	*/
-	const isDisableDateInRange = (startDate, endDate, disabledDates) => {
+	const isDisableDateInRange = (startDate, endDate, disabledDates, view = "days") => {
 		if (startDate && endDate) {
-			const date = new Date(startDate);
-			let disabled = false;
-			while (date < endDate) {
-				date.setDate(date.getDate() + 1);
-				if (isDateDisabled(date, null, null, disabledDates)) {
-					disabled = true;
-					break;
-				}
-			}
-			return disabled;
+			const end = createDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+			for (let date = createDate(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 1); date <= end; date = createDate(date.getFullYear(), date.getMonth(), date.getDate() + 1)) if (isCellDisabled(date, view, null, null, disabledDates)) return true;
 		}
 		return false;
 	};
-	/**
-	* Checks if a month is disabled based on the 'month' period type.
-	* @param date - The date representing the month to check.
-	* @param min - Minimum allowed date.
-	* @param max - Maximum allowed date.
-	* @param disabledDates - Criteria for disabled dates.
-	* @returns True if the month is disabled, false otherwise.
-	*/
-	const isMonthDisabled = (date, min, max, disabledDates) => {
-		const current = dateToMonthNumber(date);
-		const _min = min ? dateToMonthNumber(min) : null;
-		const _max = max ? dateToMonthNumber(max) : null;
-		if (isOutsideRange(current, _min, _max)) return true;
+	const isPeriodDisabled = (date, view, min, max, disabledDates) => {
+		const period = getPeriod(date, view);
+		if (min && period < getPeriod(min, view) || max && period > getPeriod(max, view) || date.getFullYear() < 1) return true;
 		if (disabledDates === void 0) return false;
-		const year = date.getFullYear();
-		const month = date.getMonth();
-		return isPeriodDisabled(new Date(year, month, 1), new Date(year, month + 1, 0), min, max, disabledDates);
-	};
-	/**
-	* Checks if a month is selected based on start and end dates.
-	* @param date - The date representing the month.
-	* @param start - Start date.
-	* @param end - End date.
-	* @returns True if the month is selected, false otherwise.
-	*/
-	const isMonthSelected = (date, start, end) => {
-		const year = date.getFullYear();
-		const month = date.getMonth();
-		if (start !== null && year === start.getFullYear() && month === start.getMonth()) return true;
-		if (end !== null && year === end.getFullYear() && month === end.getMonth()) return true;
-		return false;
-	};
-	/**
-	* Checks if a month is within a specified range.
-	* @param date - The date representing the month.
-	* @param start - Start date.
-	* @param end - End date.
-	* @returns True if the month is within the range, false otherwise.
-	*/
-	const isMonthInRange = (date, start, end) => {
-		const _start = start ? dateToMonthNumber(start) : null;
-		const _end = end ? dateToMonthNumber(end) : null;
-		const _date = dateToMonthNumber(date);
-		return Boolean(_start && _end && _start <= _date && _date <= _end);
-	};
-	/**
-	* Checks if a quarter is disabled based on the 'quarter' period type.
-	* @param date - The date representing the quarter to check.
-	* @param min - Minimum allowed date.
-	* @param max - Maximum allowed date.
-	* @param disabledDates - Criteria for disabled dates.
-	* @returns True if the quarter is disabled, false otherwise.
-	*/
-	const isQuarterDisabled = (date, min, max, disabledDates) => {
-		const current = dateToQuarterNumber(date);
-		const _min = min ? dateToQuarterNumber(min) : null;
-		const _max = max ? dateToQuarterNumber(max) : null;
-		if (isOutsideRange(current, _min, _max)) return true;
-		if (disabledDates === void 0) return false;
-		const year = date.getFullYear();
-		const quarterStartMonth = Math.floor(date.getMonth() / 3) * 3;
-		return isPeriodDisabled(new Date(year, quarterStartMonth, 1), new Date(year, quarterStartMonth + 3, 0), min, max, disabledDates);
-	};
-	/**
-	* Checks if a quarter is selected based on start and end dates.
-	* @param date - The date representing the quarter.
-	* @param start - Start date.
-	* @param end - End date.
-	* @returns True if the quarter is selected, false otherwise.
-	*/
-	const isQuarterSelected = (date, start, end) => {
-		const year = date.getFullYear();
-		const quarter = Math.floor(date.getMonth() / 3);
-		if (start !== null) {
-			const startYear = start.getFullYear();
-			const startQuarter = Math.floor(start.getMonth() / 3);
-			if (year === startYear && quarter === startQuarter) return true;
+		if (view === "weeks") {
+			const monday = getMonday(date);
+			return isEveryDayDisabled(monday, createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6), null, null, disabledDates);
 		}
-		if (end !== null) {
-			const endYear = end.getFullYear();
-			const endQuarter = Math.floor(end.getMonth() / 3);
-			if (year === endYear && quarter === endQuarter) return true;
-		}
-		return false;
+		const months = MONTHS_IN_PERIOD[view];
+		const year = date.getFullYear();
+		const month = Math.floor(date.getMonth() / months) * months;
+		return isEveryDayDisabled(createDate(year, month, 1), createDate(year, month + months, 0), min, max, disabledDates);
 	};
-	/**
-	* Checks if a quarter is within a specified range.
-	* @param date - The date representing the quarter.
-	* @param start - Start date.
-	* @param end - End date.
-	* @returns True if the quarter is within the range, false otherwise.
-	*/
-	const isQuarterInRange = (date, start, end) => {
-		const _start = start ? dateToQuarterNumber(start) : null;
-		const _end = end ? dateToQuarterNumber(end) : null;
-		const _date = dateToQuarterNumber(date);
-		return Boolean(_start && _end && _start <= _date && _date <= _end);
+	const isCellDisabled = (date, view, min, max, disabledDates) => view === "days" ? isDateDisabled(date, min, max, disabledDates) : isPeriodDisabled(date, view, min, max, disabledDates);
+	const isCellOutsideLimits = (date, view, min, max, rows = false) => {
+		const start = getStartOfView(date, view);
+		const end = view === "days" ? createDate(start.getFullYear(), start.getMonth(), start.getDate() + (rows ? 6 : 0)) : createDate(start.getFullYear(), start.getMonth() + MONTHS_IN_PERIOD[view], 0);
+		return end.getFullYear() < 1 || Boolean(min && end < getStartOfView(min, "days")) || Boolean(max && start > getStartOfView(max, "days"));
 	};
-	/**
-	* Checks if two dates are the same calendar date.
-	* @param date - First date.
-	* @param date2 - Second date.
-	* @returns True if both dates are the same, false otherwise.
-	*/
+	const isPeriodInRange = (date, view, start, end) => {
+		if (!start || !end) return false;
+		const period = getPeriod(date, view);
+		return getPeriod(start, view) <= period && period <= getPeriod(end, view);
+	};
+	const isPeriodSelected = (date, view, start, end) => [start, end].some((value) => value !== null && getPeriod(value, view) === getPeriod(date, view));
 	const isSameInstantAs = (date, date2) => {
 		if (date === null || date2 === null) return date === date2;
 		return date.getTime() === date2.getTime();
@@ -771,73 +822,14 @@
 		if (date === null && date2 === null) return true;
 		return false;
 	};
-	/**
-	* Checks if a date is today.
-	* @param date - The date to check.
-	* @returns True if the date is today, false otherwise.
-	*/
 	const isToday = (date) => {
 		return isSameDateAs(date, /* @__PURE__ */ new Date());
 	};
-	/**
-	* Checks if a year is disabled based on the 'year' period type.
-	* @param date - The date representing the year to check.
-	* @param min - Minimum allowed date.
-	* @param max - Maximum allowed date.
-	* @param disabledDates - Criteria for disabled dates.
-	* @returns True if the year is disabled, false otherwise.
-	*/
-	const isYearDisabled = (date, min, max, disabledDates) => {
-		const year = date.getFullYear();
-		const minYear = min ? min.getFullYear() : null;
-		const maxYear = max ? max.getFullYear() : null;
-		if (isOutsideRange(year, minYear, maxYear)) return true;
-		if (disabledDates === void 0) return false;
-		return isPeriodDisabled(new Date(year, 0, 1), new Date(year, 11, 31), min, max, disabledDates);
-	};
-	/**
-	* Checks if a year is selected based on start and end dates.
-	* @param date - The date representing the year.
-	* @param start - Start date.
-	* @param end - End date.
-	* @returns True if the year matches the start's or end's year, false otherwise.
-	*/
-	const isYearSelected = (date, start, end) => {
-		const year = date.getFullYear();
-		if (start !== null && year === start.getFullYear()) return true;
-		if (end !== null && year === end.getFullYear()) return true;
-		return false;
-	};
-	/**
-	* Checks if a year is within a specified range.
-	* @param date - The date representing the year.
-	* @param start - Start date.
-	* @param end - End date.
-	* @returns True if the year's value lies between start's year and end's year, false otherwise.
-	*/
-	const isYearInRange = (date, start, end) => {
-		const year = date.getFullYear();
-		const _start = start ? start.getFullYear() : null;
-		const _end = end ? end.getFullYear() : null;
-		return Boolean(_start && _end && _start <= year && year <= _end);
-	};
-	/**
-	* Removes the time component from a Date object.
-	* @param date - The original date.
-	* @returns A new Date object with the time set to 00:00:00.
-	*/
 	const removeTimeFromDate = (date) => {
 		const clearedDate = new Date(date);
 		clearedDate.setHours(0, 0, 0, 0);
 		return clearedDate;
 	};
-	/**
-	* Copies the time (hours, minutes, seconds, milliseconds) from one Date to another.
-	*
-	* @param {Date} target - The date whose time will be updated.
-	* @param {Date | null} source - The date to copy the time from.
-	* @returns {Date} A new Date instance with the date from `target` and time from `source`.
-	*/
 	const setTimeFromDate = (target, source) => {
 		if (target === null) return null;
 		if (!(source instanceof Date)) return target;
@@ -845,85 +837,74 @@
 		result.setHours(source.getHours(), source.getMinutes(), source.getSeconds(), source.getMilliseconds());
 		return result;
 	};
-	/**
-	* Parses a year string with smart 2-digit handling.
-	* @param yearString - The year string to parse.
-	* @returns The parsed year as a number with intelligent century assignment.
-	*/
 	const parseYearSmart = (yearString) => {
 		let parsedYear = Number.parseInt(yearString, 10);
-		if (parsedYear < 100) {
+		if (/^\s*\d{1,2}\D*$/.test(yearString)) {
 			const currentYear = (/* @__PURE__ */ new Date()).getFullYear();
 			parsedYear = Math.floor(currentYear / 100) * 100 + parsedYear;
 			if (parsedYear > currentYear + 50) parsedYear -= 100;
 		}
 		return parsedYear;
 	};
-	/**
-	* Creates a date from year groups.
-	* @param groups - The year groups containing year string.
-	* @returns A Date object for January 1st of the year.
-	*/
 	const createDateFromYear = (groups) => {
 		const { year } = groups;
 		const parsedYear = parseYearSmart(year);
-		return new Date(parsedYear, 0, 1);
-	};
-	/**
-	* Creates a date from month groups.
-	* @param groups - The month groups containing year and month strings.
-	* @returns A Date object for the first day of the month.
-	*/
-	const createDateFromMonth = (groups) => {
-		const { year, month } = groups;
-		const parsedYear = parseYearSmart(year);
-		const parsedMonth = Number.parseInt(month, 10) - 1;
-		return new Date(parsedYear, parsedMonth, 1);
-	};
-	/**
-	* Creates a date from week groups.
-	* @param groups - The week groups containing year and week strings.
-	* @returns A Date object for the Monday of the specified week.
-	*/
-	const createDateFromWeek = (groups) => {
-		const { year, week } = groups;
-		const parsedYear = parseYearSmart(year);
-		return getMondayOfISOWeek(parsedYear, Number.parseInt(week, 10));
+		return createDate(parsedYear, 0, 1);
 	};
 	//#endregion
+	exports.YEARS_PER_PAGE = YEARS_PER_PAGE;
+	exports.constrainDate = constrainDate;
 	exports.convertIsoWeekToDate = convertIsoWeekToDate;
 	exports.convertToDateObject = convertToDateObject;
-	exports.createDateFromMonth = createDateFromMonth;
-	exports.createDateFromWeek = createDateFromWeek;
-	exports.createDateFromYear = createDateFromYear;
+	exports.convertToLimitDate = convertToLimitDate;
+	exports.convertToSelectionDate = convertToSelectionDate;
+	exports.convertToShownDate = convertToShownDate;
+	exports.createDate = createDate;
+	exports.createDateFormatter = createDateFormatter;
+	exports.createDateTimeFormat = createDateTimeFormat;
 	exports.createGroupsInArray = createGroupsInArray;
+	exports.formatCellName = formatCellName;
+	exports.formatSelectionName = formatSelectionName;
+	exports.formatSelectionRangeName = formatSelectionRangeName;
+	exports.formatWeekName = formatWeekName;
+	exports.formatYearsRange = formatYearsRange;
 	exports.getCalendarDate = getCalendarDate;
+	exports.getCalendarKeyAction = getCalendarKeyAction;
+	exports.getClosestSelectable = getClosestSelectable;
 	exports.getDateBySelectionType = getDateBySelectionType;
-	exports.getFirstAvailableDateInRange = getFirstAvailableDateInRange;
+	exports.getDateOfISOWeek = getDateOfISOWeek;
 	exports.getISOWeekNumberAndYear = getISOWeekNumberAndYear;
+	exports.getKeptDay = getKeptDay;
 	exports.getLocalDateFromString = getLocalDateFromString;
 	exports.getMonthDetails = getMonthDetails;
 	exports.getMonthsNames = getMonthsNames;
 	exports.getSelectableDates = getSelectableDates;
+	exports.getStartOfView = getStartOfView;
+	exports.getStartOfWeek = getStartOfWeek;
+	exports.getTabStop = getTabStop;
+	exports.getWeekLabel = getWeekLabel;
+	exports.getWeekNumberName = getWeekNumberName;
+	exports.getWeekRowDate = getWeekRowDate;
+	exports.getWeekRowStart = getWeekRowStart;
 	exports.getYears = getYears;
+	exports.hasShortcutModifier = hasShortcutModifier;
+	exports.isCellDisabled = isCellDisabled;
+	exports.isCellOutsideLimits = isCellOutsideLimits;
 	exports.isDateDisabled = isDateDisabled;
 	exports.isDateInRange = isDateInRange;
 	exports.isDateSelected = isDateSelected;
 	exports.isDisableDateInRange = isDisableDateInRange;
-	exports.isMonthDisabled = isMonthDisabled;
-	exports.isMonthInRange = isMonthInRange;
-	exports.isMonthSelected = isMonthSelected;
-	exports.isQuarterDisabled = isQuarterDisabled;
-	exports.isQuarterInRange = isQuarterInRange;
-	exports.isQuarterSelected = isQuarterSelected;
+	exports.isPeriodDisabled = isPeriodDisabled;
+	exports.isPeriodInRange = isPeriodInRange;
+	exports.isPeriodSelected = isPeriodSelected;
 	exports.isSameDateAs = isSameDateAs;
 	exports.isSameInstantAs = isSameInstantAs;
 	exports.isToday = isToday;
-	exports.isYearDisabled = isYearDisabled;
-	exports.isYearInRange = isYearInRange;
-	exports.isYearSelected = isYearSelected;
+	exports.isYearBeforeMonth = isYearBeforeMonth;
+	exports.parseToDateString = parseToDateString;
 	exports.parseYearSmart = parseYearSmart;
 	exports.removeTimeFromDate = removeTimeFromDate;
+	exports.setRovingTabIndex = setRovingTabIndex;
 	exports.setTimeFromDate = setTimeFromDate;
 });
 

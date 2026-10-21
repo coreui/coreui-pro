@@ -5,18 +5,6 @@
 */
 import { arrow, autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
 //#region js/src/dom/data.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI dom/data.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This is a modified version of the Bootstrap's dom/data.js
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const elementMap = /* @__PURE__ */ new Map();
 var data_default = {
 	set(element, key, instance) {
@@ -44,11 +32,6 @@ var data_default = {
 const MAX_UID = 1e6;
 const MILLISECONDS_MULTIPLIER = 1e3;
 const TRANSITION_END = "transitionend";
-/**
-* Properly escape IDs selectors to handle weird IDs
-* @param {string} selector
-* @returns {string}
-*/
 const parseSelector = (selector) => {
 	if (selector && window.CSS && window.CSS.escape) selector = selector.replace(/#([^\s"#']+)/g, (match, id) => `#${CSS.escape(id)}`);
 	return selector;
@@ -57,9 +40,6 @@ const toType = (object) => {
 	if (object === null || object === void 0) return `${object}`;
 	return Object.prototype.toString.call(object).match(/\s([a-z]+)/i)[1].toLowerCase();
 };
-/**
-* Public Util API
-*/
 const getUID = (prefix) => {
 	do
 		prefix += Math.floor(Math.random() * MAX_UID);
@@ -108,6 +88,11 @@ const isDisabled = (element) => {
 const setAriaAttribute = (element, name, value) => {
 	element.setAttribute(name, String(value));
 };
+const writeAttribute = (element, name, value) => {
+	if (element.getAttribute(name) === value) return;
+	if (value === null) element.removeAttribute(name);
+	else element.setAttribute(name, value);
+};
 const findShadowRoot = (element) => {
 	if (!document.documentElement.attachShadow) return null;
 	if (typeof element.getRootNode === "function") {
@@ -119,14 +104,6 @@ const findShadowRoot = (element) => {
 	return findShadowRoot(element.parentNode);
 };
 const noop = () => {};
-/**
-* Trick to restart an element's animation
-*
-* @param {HTMLElement} element
-* @return void
-*
-* @see https://www.charistheo.io/blog/2021/02/restart-a-css-animation-with-javascript/#restarting-a-css-animation
-*/
 const reflow = (element) => {
 	element.offsetHeight;
 };
@@ -176,35 +153,43 @@ const jQueryDispatch = (collection, Component, config, args = []) => {
 const execute = (possibleCallback, args = [], defaultValue = possibleCallback) => {
 	return typeof possibleCallback === "function" ? possibleCallback.call(...args) : defaultValue;
 };
+const getCoveredTransitions = (element, duration, transitionProperty) => {
+	if (typeof element.getAnimations !== "function" || typeof CSSTransition === "undefined") return [];
+	return element.getAnimations().filter((animation) => animation instanceof CSSTransition && animation.playState !== "finished" && (transitionProperty ? animation.transitionProperty === transitionProperty : Number(animation.effect?.getComputedTiming().endTime) <= duration));
+};
 const executeAfterTransition = (callback, transitionElement, waitForTransition = true, transitionProperty) => {
 	if (!waitForTransition) {
 		execute(callback);
 		return;
 	}
 	const emulatedDuration = getTransitionDurationFromElement(transitionElement) + 5;
+	const start = Date.now();
+	const transitions = getCoveredTransitions(transitionElement, emulatedDuration, transitionProperty);
 	let called = false;
-	const handler = (event) => {
-		if (event.target !== transitionElement) return;
-		const { propertyName } = event;
-		if (transitionProperty && propertyName && propertyName !== transitionProperty) return;
+	const finish = () => {
+		if (called) return;
 		called = true;
 		transitionElement.removeEventListener(TRANSITION_END, handler);
 		execute(callback);
 	};
+	const handler = (event) => {
+		if (event.target !== transitionElement) return;
+		const { propertyName } = event;
+		if (transitionProperty && propertyName && propertyName !== transitionProperty) return;
+		finish();
+	};
 	transitionElement.addEventListener(TRANSITION_END, handler);
 	setTimeout(() => {
-		if (!called) triggerTransitionEnd(transitionElement);
+		const late = Date.now() - start > emulatedDuration + 16;
+		const running = called || document.hidden || !late ? [] : transitions.filter((transition) => transition.playState === "running");
+		if (running.length === 0) {
+			if (!called) triggerTransitionEnd(transitionElement);
+			return;
+		}
+		Promise.race(running.map((transition) => transition.finished)).then(finish, finish);
+		setTimeout(finish, emulatedDuration + 1e3);
 	}, emulatedDuration);
 };
-/**
-* Return the previous/next element of a list.
-*
-* @param {array} list    The list of elements
-* @param activeElement   The active element
-* @param shouldGetNext   Choose to get next or previous element
-* @param isCycleAllowed
-* @return {Element|elem} The proper element
-*/
 const getNextActiveElement = (list, activeElement, shouldGetNext, isCycleAllowed) => {
 	const listLength = list.length;
 	let index = list.indexOf(activeElement);
@@ -213,21 +198,8 @@ const getNextActiveElement = (list, activeElement, shouldGetNext, isCycleAllowed
 	if (isCycleAllowed) index = (index + listLength) % listLength;
 	return list[Math.max(0, Math.min(index, listLength - 1))];
 };
-const resolveCountLabel = (label, count, total) => typeof label === "function" ? label(count, total) : label.replace("{count}", String(count)).replace("{total}", String(total));
 //#endregion
 //#region js/src/dom/event-handler.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI dom/event-handler.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This is a modified version of the Bootstrap's dom/event-handler.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const namespaceRegex = /[^.]*(?=\..*)\.|.*/;
 const stripNameRegex = /\..*/;
 const stripUidRegex = /::\d+$/;
@@ -274,6 +246,7 @@ const nativeEvents = /* @__PURE__ */ new Set([
 	"blur",
 	"change",
 	"input",
+	"invalid",
 	"reset",
 	"select",
 	"submit",
@@ -293,9 +266,6 @@ const nativeEvents = /* @__PURE__ */ new Set([
 	"toggle",
 	"beforematch"
 ]);
-/**
-* Private methods
-*/
 function makeEventUid(element, uid) {
 	return uid && `${uid}::${uidEvent++}` || element.uidEvent || uidEvent++;
 }
@@ -447,15 +417,6 @@ function hydrateObj(obj, meta = {}) {
 }
 //#endregion
 //#region js/src/dom/manipulator.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI dom/manipulator.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This is a modified version of the Bootstrap's dom/manipulator.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
 function normalizeData(value) {
 	if (value === "true") return true;
 	if (value === "false") return false;
@@ -495,26 +456,11 @@ const Manipulator = {
 };
 //#endregion
 //#region js/src/util/config.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI util/config.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This is a modified version of the Bootstrap's util/config.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const DISALLOWED_ATTRIBUTES = /* @__PURE__ */ new Set([
 	"sanitize",
 	"allowList",
 	"sanitizeFn"
 ]);
-/**
-* Class definition
-*/
 var Config = class {
 	static get Default() {
 		return {};
@@ -557,22 +503,7 @@ var Config = class {
 };
 //#endregion
 //#region js/src/base-component.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI base-component.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's base-component.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const VERSION = "6.0.0-alpha.0";
-/**
-* Class definition
-*/
 var BaseComponent = class extends Config {
 	constructor(element, config) {
 		super();
@@ -624,15 +555,6 @@ var BaseComponent = class extends Config {
 };
 //#endregion
 //#region js/src/dom/selector-engine.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI dom/selector-engine.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This is a modified version of the Bootstrap's dom/selector-engine.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
 const getSelector = (element) => {
 	let selector = element.getAttribute("data-coreui-target");
 	if (!selector || selector === "#") {
@@ -710,12 +632,6 @@ const SelectorEngine = {
 };
 //#endregion
 //#region js/src/util/size-transition.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI util/size-transition.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
 const supportsInterpolateSize = () => typeof CSS !== "undefined" && typeof CSS.supports === "function" && CSS.supports("interpolate-size", "allow-keywords");
 const startSizeTransition = (element, property, from, to) => {
 	element.style.transition = "none";
@@ -726,34 +642,22 @@ const startSizeTransition = (element, property, from, to) => {
 };
 //#endregion
 //#region js/src/accordion.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI accordion.js
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$51 = "accordion";
-const EVENT_KEY$43 = `.coreui.accordion`;
+const NAME$53 = "accordion";
+const EVENT_KEY$44 = `.coreui.accordion`;
 const DATA_API_KEY$35 = ".data-api";
-const EVENT_SHOWN$7 = `shown${EVENT_KEY$43}`;
-const EVENT_HIDDEN$10 = `hidden${EVENT_KEY$43}`;
-const EVENT_CLICK_DATA_API$19 = `click${EVENT_KEY$43}${DATA_API_KEY$35}`;
-const EVENT_TOGGLE_DATA_API = `toggle${EVENT_KEY$43}${DATA_API_KEY$35}`;
+const EVENT_SHOWN$7 = `shown${EVENT_KEY$44}`;
+const EVENT_HIDDEN$10 = `hidden${EVENT_KEY$44}`;
+const EVENT_CLICK_DATA_API$19 = `click${EVENT_KEY$44}${DATA_API_KEY$35}`;
+const EVENT_TOGGLE_DATA_API = `toggle${EVENT_KEY$44}${DATA_API_KEY$35}`;
 const ATTRIBUTE_ANIMATING = "data-coreui-accordion-animating";
 const ATTRIBUTE_NAME = "data-coreui-accordion-name";
 const SELECTOR_ACCORDION = ".accordion";
 const SELECTOR_HEADER$2 = ".accordion-header";
-const SELECTOR_INTERACTIVE = "a, button, input, select, textarea";
+const SELECTOR_INTERACTIVE$1 = "a, button, input, select, textarea";
 const SELECTOR_ITEM$1 = "details.accordion-item";
-/**
-* Class definition
-*/
 var Accordion = class Accordion extends BaseComponent {
 	static get NAME() {
-		return NAME$51;
+		return NAME$53;
 	}
 	toggle(item) {
 		const details = this._resolve(item);
@@ -846,9 +750,6 @@ var Accordion = class Accordion extends BaseComponent {
 		return jQueryDispatch(this, Accordion, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, EVENT_TOGGLE_DATA_API, SELECTOR_ITEM$1, function() {
 	EventHandler.trigger(this, this.open ? EVENT_SHOWN$7 : EVENT_HIDDEN$10);
 });
@@ -857,28 +758,16 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$19, (event) => {
 	const target = event.target;
 	const header = target.closest(`${SELECTOR_ITEM$1} > ${SELECTOR_HEADER$2}`);
 	if (!header) return;
-	if (target !== header && target.closest(SELECTOR_INTERACTIVE)) return;
+	if (target !== header && target.closest(SELECTOR_INTERACTIVE$1)) return;
 	const item = header.parentElement;
 	const container = item.closest(SELECTOR_ACCORDION);
 	if (!container) return;
 	event.preventDefault();
 	Accordion.getOrCreateInstance(container).toggle(item);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Accordion);
 //#endregion
 //#region js/src/util/component-functions.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI util/component-functions.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This is a modified version of the Bootstrap's util/component-functions.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
 const enableDismissTrigger = (component, method = "hide", closestSelector) => {
 	const clickEvent = `click.dismiss${component.EVENT_KEY}`;
 	const name = component.NAME;
@@ -891,35 +780,20 @@ const enableDismissTrigger = (component, method = "hide", closestSelector) => {
 };
 //#endregion
 //#region js/src/alert.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI alert.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's alert.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$50 = "alert";
-const EVENT_KEY$42 = `.coreui.alert`;
-const EVENT_CLOSE = `close${EVENT_KEY$42}`;
-const EVENT_CLOSED = `closed${EVENT_KEY$42}`;
-const CLASS_NAME_HIDING$1 = "hiding";
-const CLASS_NAME_SHOW$18 = "show";
-/**
-* Class definition
-*/
+const NAME$52 = "alert";
+const EVENT_KEY$43 = `.coreui.alert`;
+const EVENT_CLOSE = `close${EVENT_KEY$43}`;
+const EVENT_CLOSED = `closed${EVENT_KEY$43}`;
+const CLASS_NAME_HIDING$2 = "hiding";
+const CLASS_NAME_SHOW$16 = "show";
 var Alert = class Alert extends BaseComponent {
 	static get NAME() {
-		return NAME$50;
+		return NAME$52;
 	}
 	async close() {
 		if (EventHandler.trigger(this._element, EVENT_CLOSE).defaultPrevented) return;
-		this._element.classList.remove(CLASS_NAME_SHOW$18);
-		this._element.classList.add(CLASS_NAME_HIDING$1);
+		this._element.classList.remove(CLASS_NAME_SHOW$16);
+		this._element.classList.add(CLASS_NAME_HIDING$2);
 		const isAnimated = getTransitionDurationFromElement(this._element) > 0;
 		await this._queueCallback(() => this._destroyElement(), this._element, isAnimated);
 	}
@@ -932,14 +806,184 @@ var Alert = class Alert extends BaseComponent {
 		return jQueryDispatch(this, Alert, config, (element) => [element]);
 	}
 };
-/**
-* Data API implementation
-*/
 enableDismissTrigger(Alert, "close");
-/**
-* jQuery
-*/
 defineJQueryPlugin(Alert);
+//#endregion
+//#region js/src/util/announce.ts
+const ATTRIBUTE = "data-coreui-live-announcer";
+const CLASS_NAME_HIDING$1 = "hiding";
+const CLOSE_DELAY = 500;
+const FIRST_MESSAGE_DELAY = 100;
+const VISUALLY_HIDDEN = {
+	border: "0",
+	clip: "rect(0 0 0 0)",
+	clipPath: "inset(50%)",
+	height: "1px",
+	margin: "-1px",
+	overflow: "hidden",
+	padding: "0",
+	position: "absolute",
+	whiteSpace: "nowrap",
+	width: "1px"
+};
+const holds = /* @__PURE__ */ new WeakMap();
+const readyAt = /* @__PURE__ */ new WeakMap();
+const pending = [];
+const isModal = (element) => {
+	if (element.matches("dialog[open]")) return element.matches(":modal");
+	return element.matches("[aria-modal=\"true\"]") && element.isConnected && (typeof element.checkVisibility !== "function" || element.checkVisibility());
+};
+const getDialogAround = (element) => {
+	let node = element;
+	while (node) {
+		if (isModal(node)) return node;
+		node = node.assignedSlot ?? node.parentElement ?? node.getRootNode().host ?? null;
+	}
+	return null;
+};
+const getModal = (context) => {
+	let focused = document.activeElement;
+	while (focused?.shadowRoot?.activeElement) focused = focused.shadowRoot.activeElement;
+	const modals = [...document.querySelectorAll("dialog[open], [aria-modal=\"true\"]")].filter(isModal);
+	return getDialogAround(focused) ?? getDialogAround(context) ?? modals.at(-1) ?? null;
+};
+const readTime = (times, element) => {
+	const [time, clock] = times.get(element) ?? [0, null];
+	return clock === performance.now ? time : 0;
+};
+const getMoment = (delay) => [performance.now() + delay, performance.now];
+const getAnnouncer = (host) => {
+	const existing = host.querySelector(`:scope > [${ATTRIBUTE}]`);
+	if (existing) {
+		if (!readyAt.has(existing)) readyAt.set(existing, getMoment(FIRST_MESSAGE_DELAY));
+		return existing;
+	}
+	const announcer = document.createElement("div");
+	announcer.setAttribute(ATTRIBUTE, "");
+	Object.assign(announcer.style, VISUALLY_HIDDEN);
+	for (const live of ["assertive", "polite"]) {
+		const region = document.createElement("div");
+		region.setAttribute("role", "log");
+		region.setAttribute("aria-live", live);
+		region.setAttribute("aria-relevant", "additions");
+		announcer.append(region);
+	}
+	if (host === document.body) host.prepend(announcer);
+	else {
+		const onClose = (event) => {
+			if (event.target === host && !host.open) {
+				announcer.remove();
+				host.removeEventListener("close", onClose);
+			}
+		};
+		host.append(announcer);
+		host.addEventListener("close", onClose);
+	}
+	readyAt.set(announcer, getMoment(FIRST_MESSAGE_DELAY));
+	return announcer;
+};
+const holdAnnouncements = () => {
+	if (typeof document === "undefined") return;
+	holds.set(getModal(null) ?? document.body, getMoment(CLOSE_DELAY));
+	if (pending.length > 0) setTimeout(flush, CLOSE_DELAY);
+};
+const flush = () => {
+	if (typeof document === "undefined") {
+		pending.length = 0;
+		return;
+	}
+	const sent = [];
+	while (pending.length > 0) {
+		const [{ context, page }] = pending;
+		if (page && !page.isConnected) {
+			pending.shift();
+			continue;
+		}
+		const modal = getModal(context);
+		if (modal?.classList.contains(CLASS_NAME_HIDING$1) || document.activeElement?.closest(`dialog.${CLASS_NAME_HIDING$1}`)) {
+			setTimeout(flush, CLOSE_DELAY);
+			break;
+		}
+		const host = modal ?? document.body;
+		const announcer = getAnnouncer(host);
+		const wait = Math.max(readTime(holds, host), readTime(readyAt, announcer)) - performance.now();
+		if (wait > 0) {
+			setTimeout(flush, wait);
+			break;
+		}
+		sent.push([pending.shift(), announcer]);
+	}
+	const loud = new Set(sent.filter(([{ priority }]) => priority === "high").map(([, announcer]) => announcer));
+	sent.sort(([first], [second]) => Number(second.priority === "high") - Number(first.priority === "high"));
+	for (const [{ node, timeout }, announcer] of sent) {
+		announcer.querySelector(`[aria-live="${loud.has(announcer) ? "assertive" : "polite"}"]`).append(node);
+		if (timeout > 0 && Number.isFinite(timeout)) setTimeout(() => node.remove(), timeout);
+	}
+};
+const announce = (message, { context = null, priority = "normal", timeout = 7e3 } = {}) => {
+	if (typeof document === "undefined" || !document.body || !message) return () => {};
+	const node = document.createElement("div");
+	node.textContent = message;
+	const modal = getModal(context);
+	const host = modal && !modal.classList.contains(CLASS_NAME_HIDING$1) ? modal : document.body;
+	const announcer = getAnnouncer(host);
+	pending.push({
+		context,
+		node,
+		page: host === document.body ? announcer : null,
+		priority,
+		timeout
+	});
+	setTimeout(flush, Math.max(0, readTime(readyAt, announcer) - performance.now()));
+	return () => {
+		const index = pending.findIndex((message) => message.node === node);
+		if (index !== -1) pending.splice(index, 1);
+		node.remove();
+	};
+};
+//#endregion
+//#region js/src/util/list-navigation.ts
+const createTypeaheadBuffer = (timeout = 500) => {
+	let text = "";
+	let timer;
+	return {
+		clear() {
+			clearTimeout(timer);
+			text = "";
+		},
+		push(key) {
+			if (key?.length !== 1 || key === " ") return null;
+			clearTimeout(timer);
+			text += key.toLowerCase();
+			timer = setTimeout(() => {
+				text = "";
+			}, timeout);
+			return text;
+		}
+	};
+};
+const findTypeaheadMatch = (items, current, text, textOf) => {
+	const needle = text.toLowerCase();
+	const start = needle.length > 1 ? Math.max(current, 0) : current + 1;
+	return [...items.slice(start), ...items.slice(0, start)].find((item) => textOf(item).trim().toLowerCase().startsWith(needle));
+};
+const rangeBetween = (items, from, to) => {
+	if (to === -1) return [];
+	const start = from === -1 ? to : from;
+	return items.slice(Math.min(start, to), Math.max(start, to) + 1);
+};
+const getRemovalNeighbor = (list, item) => {
+	const index = list.indexOf(item);
+	return list[index + 1] ?? list[index - 1] ?? null;
+};
+const isTypingKey = (event) => {
+	if (typeof event.key !== "string" || event.isComposing || event.metaKey || event.ctrlKey && !event.altKey) return false;
+	return [
+		"Backspace",
+		"Dead",
+		"Delete"
+	].includes(event.key) || event.key.length === 1 && event.key !== " ";
+};
 const DefaultAllowlist = {
 	"*": [
 		"class",
@@ -1157,7 +1201,8 @@ const SVGAllowlist = {
 		"y",
 		"width",
 		"height",
-		"href"
+		"href",
+		"xlink:href"
 	],
 	image: [
 		"id",
@@ -1256,19 +1301,7 @@ const uriAttributes = /* @__PURE__ */ new Set([
 	"src",
 	"xlink:href"
 ]);
-/**
-* A pattern that recognizes URLs that are safe wrt. XSS in URL navigation
-* contexts.
-*
-* Shout-out to Angular https://github.com/angular/angular/blob/15.2.8/packages/core/src/sanitization/url_sanitizer.ts#L38
-*/
 const SAFE_URL_PATTERN = /^(?!(?:javascript|data|vbscript):)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
-/**
-* A pattern that matches safe data URLs. Only matches image, video and audio
-* types — notably NOT `data:text/html`, which is an XSS vector.
-*
-* Shout-out to Angular https://github.com/angular/angular/blob/15.2.8/packages/core/src/sanitization/url_sanitizer.ts#L49
-*/
 const DATA_URL_PATTERN = /^data:(?:image\/(?:bmp|gif|jpeg|jpg|png|tiff|webp)|video\/(?:mpeg|mp4|ogg|webm)|audio\/(?:mp3|oga|ogg|opus));base64,[\d+/a-z=]+$/i;
 const allowedAttribute = (attribute, allowedAttributeList) => {
 	const attributeName = attribute.nodeName.toLowerCase();
@@ -1299,27 +1332,109 @@ function sanitizeByConfig(unsafeHtml, config) {
 	return config.sanitize ? sanitizeHtml(unsafeHtml, config.allowList ?? DefaultAllowlist, config.sanitizeFn) : unsafeHtml;
 }
 //#endregion
+//#region js/src/util/option-tree.ts
+const isOptionGroup = (option) => typeof option === "object" && option !== null && Array.isArray(option.options);
+const flattenOptions = (options) => options.flatMap((option) => isOptionGroup(option) ? flattenOptions(option.options) : [option]);
+const getOptionLabel = (option) => typeof option === "string" ? option : option.label ?? "";
+const getOptionValue = (option) => typeof option === "string" ? option : String(option.value ?? option.label ?? "");
+const isOptionDisabled = (option) => typeof option !== "string" && Boolean(option.disabled);
+const getSelectableOptions = (options) => flattenOptions(options).filter((option) => !isOptionDisabled(option));
+const findOptionByValue = (options, value) => flattenOptions(options).find((option) => getOptionValue(option) === String(value)) ?? null;
+const normalizeSearchText = (text, foldAccents = false) => {
+	const lowercase = text.trim().toLowerCase();
+	return foldAccents ? lowercase.normalize("NFD").replaceAll(/(?=\p{Diacritic})\p{M}/gu, "") : lowercase;
+};
+const filterOptionTree = (options, query, foldAccents = false) => {
+	const needle = normalizeSearchText(query, foldAccents);
+	const filter = (list) => list.flatMap((option) => {
+		if (isOptionGroup(option)) {
+			const matched = filter(option.options);
+			return matched.length > 0 ? {
+				...option,
+				options: matched
+			} : [];
+		}
+		return normalizeSearchText(getOptionLabel(option), foldAccents).includes(needle) ? option : [];
+	});
+	return filter(options);
+};
+const highlightMatches = (label, query) => {
+	const needle = query?.trim();
+	if (!needle) return escapeHtml(label);
+	const pattern = new RegExp(`(${needle.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+	return String(label).split(pattern).map((part, index) => index % 2 === 0 ? escapeHtml(part) : `<strong>${escapeHtml(part)}</strong>`).join("");
+};
+//#endregion
+//#region js/src/util/selection-state.ts
+const toSelectionValues = (value, mode) => {
+	if (mode === "none" || value === null || value === void 0) return [];
+	const values = Array.isArray(value) ? [...value] : [value];
+	return mode === "single" ? values.slice(0, 1) : values;
+};
+const getSelectionLimit = (multiple, limit) => multiple && typeof limit === "number" ? limit : null;
+const isSelectionLimitReached = (count, limit) => limit !== null && limit !== void 0 && count >= limit;
+const getSelectionState = (selected, total, limit) => {
+	const target = limit === null || limit === void 0 ? total : Math.min(total, limit);
+	if (target > 0 && selected >= target) return "all";
+	return selected > 0 ? "some" : "none";
+};
+const getScopeSelectionState = (selected, total, selectedOverall, limit) => getSelectionState(selected, total, limit === null || limit === void 0 ? null : limit - selectedOverall + selected);
+const getAriaPressed = (state) => {
+	if (state === "all") return "true";
+	return state === "some" ? "mixed" : "false";
+};
+const fillSelection = (selected, candidates, limit) => {
+	const present = new Set(selected);
+	const values = [...selected];
+	const added = [];
+	for (const value of candidates) {
+		if (present.has(value)) continue;
+		if (limit !== null && limit !== void 0 && values.length >= limit) return {
+			added,
+			refused: value,
+			values
+		};
+		present.add(value);
+		values.push(value);
+		added.push(value);
+	}
+	return {
+		added,
+		refused: null,
+		values
+	};
+};
+const createSelectionStore = (fit = (next) => next) => {
+	let selected = [];
+	let present = /* @__PURE__ */ new Set();
+	return {
+		commit(next) {
+			const values = [...new Set(fit([...next], selected))];
+			const changed = values.length !== selected.length || values.some((value, index) => value !== selected[index]);
+			if (changed) {
+				selected = values;
+				present = new Set(values);
+			}
+			return changed;
+		},
+		has: (value) => present.has(value),
+		size: () => selected.length,
+		values: () => [...selected]
+	};
+};
+const resolveCountLabel = (label, count, total) => typeof label === "function" ? label(count, total) : label.replaceAll("{count}", String(count)).replaceAll("{total}", String(total));
+//#endregion
 //#region js/src/list-box.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI list-box.ts
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$49 = "list-box";
-const EVENT_KEY$41 = `.coreui.list-box`;
+const NAME$51 = "list-box";
+const EVENT_KEY$42 = `.coreui.list-box`;
 const DATA_API_KEY$34 = ".data-api";
-const ARROW_UP_KEY$8 = "ArrowUp";
+const ARROW_UP_KEY$7 = "ArrowUp";
 const ARROW_DOWN_KEY$11 = "ArrowDown";
-const HOME_KEY$7 = "Home";
-const END_KEY$7 = "End";
-const ENTER_KEY$7 = "Enter";
-const SPACE_KEY$6 = " ";
+const HOME_KEY$6 = "Home";
+const END_KEY$6 = "End";
+const ENTER_KEY$6 = "Enter";
+const SPACE_KEY$3 = " ";
 const A_KEY$1 = "a";
-const TYPEAHEAD_TIMEOUT$1 = 500;
 const EVENT_ACTION = "action";
 const EVENT_ACTIVATE$1 = "activate";
 const EVENT_CHANGE$11 = "change";
@@ -1328,19 +1443,20 @@ const EVENT_DESELECTED$1 = "deselected";
 const EVENT_SEARCH$3 = "search";
 const EVENT_SELECT$2 = "select";
 const EVENT_SELECTED$1 = "selected";
-const EVENT_SELECTION_LIMIT$1 = "selectionLimit";
-const EVENT_CLICK$12 = "click";
-const EVENT_FOCUSIN$6 = "focusin";
+const EVENT_SELECTION_LIMIT$2 = "selectionLimit";
+const EVENT_CLICK$14 = "click";
+const EVENT_FOCUSIN$8 = "focusin";
 const EVENT_FOCUSOUT$4 = "focusout";
-const EVENT_INPUT$9 = "input";
-const EVENT_KEYDOWN$15 = "keydown";
+const EVENT_INPUT$12 = "input";
+const EVENT_KEYDOWN$18 = "keydown";
 const CLASS_NAME_ACTIVE$9 = "active";
 const CLASS_NAME_CHECK = "check";
-const CLASS_NAME_DISABLED$10 = "disabled";
+const CLASS_NAME_DISABLED$11 = "disabled";
 const CLASS_NAME_FORM_CONTROL$2 = "form-control";
 const CLASS_NAME_HEADER$1 = "list-box-header";
 const CLASS_NAME_INDETERMINATE$1 = "indeterminate";
 const CLASS_NAME_LOADING = "loading";
+const CLASS_NAME_LOADING_REGION = "list-box-loading";
 const CLASS_NAME_OPTION = "list-box-option";
 const CLASS_NAME_OPTION_DESCRIPTION = "list-box-option-description";
 const CLASS_NAME_OPTION_INDICATOR = "list-box-option-indicator";
@@ -1350,7 +1466,7 @@ const CLASS_NAME_SEARCH$2 = "list-box-search";
 const CLASS_NAME_SECTION$1 = "list-box-section";
 const CLASS_NAME_SECTION_LABEL = "list-box-section-label";
 const CLASS_NAME_SUBTITLE = "list-box-subtitle";
-const CLASS_NAME_SELECTED$3 = "selected";
+const CLASS_NAME_SELECTED$2 = "selected";
 const SELECTOR_DATA_LIST_BOX = "[data-coreui-list-box]";
 const SELECTOR_COUNTER = "[data-coreui-list-box-counter]";
 const SELECTOR_EMPTY = ".list-box-empty";
@@ -1360,7 +1476,7 @@ const SELECTOR_OPTION_INDICATOR = ".list-box-option-indicator";
 const SELECTOR_OPTION_LABEL$1 = ".list-box-option-label";
 const SELECTOR_OPTIONS$2 = ".list-box-options";
 const SELECTOR_SEARCH$3 = "[data-coreui-list-box-search]";
-const SELECTOR_SECTION$2 = ".list-box-section";
+const SELECTOR_SECTION$3 = ".list-box-section";
 const SELECTOR_SECTION_LABEL = ".list-box-section-label";
 const SELECTOR_SECTION_TOGGLE = "[data-coreui-section-toggle]";
 const SELECTOR_SELECT_ALL$2 = "[data-coreui-select-all]";
@@ -1371,7 +1487,7 @@ const SEARCH_EXTERNAL = "external";
 const SELECTION_MODE_MULTIPLE = "multiple";
 const SELECTION_MODE_NONE = "none";
 const SELECTION_MODE_SINGLE$1 = "single";
-const Default$47 = {
+const Default$45 = {
 	activeDescendant: null,
 	allowList: DefaultAllowlist,
 	ariaSearchLabel: "Search options",
@@ -1381,6 +1497,8 @@ const Default$47 = {
 	indicator: "none",
 	items: [],
 	loading: false,
+	loadingLabel: "Loading…",
+	resetSelectionOnItemsChange: false,
 	sanitize: true,
 	sanitizeFn: null,
 	search: false,
@@ -1393,7 +1511,7 @@ const Default$47 = {
 	selectionMode: SELECTION_MODE_SINGLE$1,
 	typeahead: true
 };
-const DefaultType$47 = {
+const DefaultType$44 = {
 	activeDescendant: "(string|element|null)",
 	allowList: "object",
 	ariaSearchLabel: "string",
@@ -1403,6 +1521,8 @@ const DefaultType$47 = {
 	indicator: "string",
 	items: "array",
 	loading: "boolean",
+	loadingLabel: "string",
+	resetSelectionOnItemsChange: "boolean",
 	sanitize: "boolean",
 	sanitizeFn: "(null|function)",
 	search: "(boolean|string)",
@@ -1415,39 +1535,40 @@ const DefaultType$47 = {
 	selectionMode: "string",
 	typeahead: "boolean"
 };
-/**
-* Class definition
-*/
 var ListBox = class ListBox extends BaseComponent {
-	constructor(element, config) {
+	constructor(element, config, store) {
 		super(element, config);
 		this._active = null;
 		this._anchor = null;
+		this._createdNodes = [];
+		this._disabledSections = /* @__PURE__ */ new WeakSet();
 		this._field = getElement(this._config.activeDescendant);
 		this._items = this._config.items.length > 0 ? this._normalizeItems(this._config.items) : null;
 		this._focused = false;
 		this._limited = null;
+		this._hostListNodes = null;
 		this._list = this._resolveList();
+		this._loadingAnnouncement = null;
 		this._counter = this._resolveCounter();
+		this._loadingRegion = this._createLoadingRegion();
 		this._query = null;
-		this._search = "";
 		this._searchField = this._resolveSearch();
-		this._searchTimeout = null;
 		this._selectAll = SelectorEngine.findOne(SELECTOR_SELECT_ALL$2, this._element);
-		this._selected = /* @__PURE__ */ new Set();
+		this._store = store ?? createSelectionStore((next) => this._fit(next));
+		this._typeaheadBuffer = createTypeaheadBuffer();
 		this._render();
-		this._selected = new Set(this._initialSelection());
+		this._store.commit([...this._store.values(), ...this._initialSelection()]);
 		this._addEventListeners();
 		this.update();
 	}
 	static get Default() {
-		return Default$47;
+		return Default$45;
 	}
 	static get DefaultType() {
-		return DefaultType$47;
+		return DefaultType$44;
 	}
 	static get NAME() {
-		return NAME$49;
+		return NAME$51;
 	}
 	select(value) {
 		this._limited = null;
@@ -1461,7 +1582,7 @@ var ListBox = class ListBox extends BaseComponent {
 		if (this._deselectValue(value)) this._triggerChange();
 	}
 	toggle(value) {
-		if (this._selected.has(value)) {
+		if (this._store.has(value)) {
 			this.deselect(value);
 			return;
 		}
@@ -1483,20 +1604,24 @@ var ListBox = class ListBox extends BaseComponent {
 		if (changed) this._triggerChange();
 	}
 	getSelectedValues() {
-		return [...this._selected];
+		return this._store.values();
 	}
 	setItems(items) {
 		const previous = this.getSelectedValues();
+		const previousValues = new Set(this._allOptions().map((option) => this._optionValue(option)));
 		this._items = this._normalizeItems(items);
 		this._render();
-		const values = new Set(this._flatItems().map((item) => item.value));
-		const kept = previous.filter((value) => values.has(value));
+		const values = new Set(this._allOptions().map((option) => this._optionValue(option)));
+		const reset = this._config.resetSelectionOnItemsChange && (values.size !== previousValues.size || [...values].some((value) => !previousValues.has(value)));
 		const marked = this._flatItems().filter((item) => item.selected).map((item) => item.value);
-		const next = [.../* @__PURE__ */ new Set([...kept, ...marked])];
+		const { refused, values: filled } = fillSelection(reset ? [] : previous, marked, this._selectionLimit());
 		this._anchor = null;
-		this._selected = new Set(this._selectable(this._selectionFor(next)));
+		this._store.commit(filled);
 		this.update();
-		if (previous.length !== this._selected.size || previous.some((value) => !this._selected.has(value))) this._triggerChange();
+		if (this._store.size() !== previous.length || previous.some((value) => !this._store.has(value))) this._triggerChange();
+		if (!this._config) return;
+		this._limited = refused;
+		this._reportLimit();
 	}
 	getItems() {
 		return this._items ?? [];
@@ -1506,8 +1631,8 @@ var ListBox = class ListBox extends BaseComponent {
 		this.update();
 	}
 	filter(query) {
-		this._query = query === null ? null : this._normalizeText(query.trim().toLowerCase());
-		if (this._query === null) for (const element of [...this._allOptions(), ...SelectorEngine.find(SELECTOR_SECTION$2, this._list)]) element.removeAttribute("hidden");
+		this._query = query === null ? null : normalizeSearchText(query, this._config.searchNormalize);
+		if (this._query === null) for (const element of [...this._allOptions(), ...SelectorEngine.find(SELECTOR_SECTION$3, this._list)]) element.removeAttribute("hidden");
 		this.update();
 	}
 	setActive(value) {
@@ -1541,8 +1666,8 @@ var ListBox = class ListBox extends BaseComponent {
 		this._decorateSearch();
 		this._filter();
 		this._updateListAttributes();
-		for (const section of SelectorEngine.find(SELECTOR_SECTION$2, this._list)) {
-			if (!section.hasAttribute("role")) section.setAttribute("role", "group");
+		for (const section of SelectorEngine.find(SELECTOR_SECTION$3, this._list)) {
+			section.setAttribute("role", "group");
 			this._decorateSection(section);
 		}
 		if (this._active !== null && !this._navigable().some((element) => this._optionValue(element) === this._active)) this._active = null;
@@ -1553,12 +1678,16 @@ var ListBox = class ListBox extends BaseComponent {
 		this._updateActiveDescendant();
 	}
 	dispose() {
-		if (this._searchTimeout) clearTimeout(this._searchTimeout);
+		this._typeaheadBuffer.clear();
+		for (const label of SelectorEngine.find(SELECTOR_SECTION_TOGGLE, this._list)) if (this._disabledSections.has(label)) label.removeAttribute("aria-disabled");
 		this._element.removeAttribute(ATTRIBUTE_INDICATOR);
 		this._element.classList.remove(CLASS_NAME_LOADING);
-		EventHandler.off(this._list, EVENT_KEY$41);
+		this._loadingAnnouncement?.();
+		if (this._hostListNodes) this._list.replaceChildren(...this._hostListNodes);
+		for (const node of this._createdNodes) node.remove();
+		EventHandler.off(this._list, EVENT_KEY$42);
 		if (this._field) {
-			EventHandler.off(this._field, EVENT_KEY$41);
+			EventHandler.off(this._field, EVENT_KEY$42);
 			this._field.removeAttribute("aria-activedescendant");
 			this._field.removeAttribute("aria-controls");
 		}
@@ -1573,18 +1702,36 @@ var ListBox = class ListBox extends BaseComponent {
 		this._element.classList.toggle(CLASS_NAME_LOADING, this._config.loading);
 		if (this._config.loading) this._list.setAttribute("aria-busy", "true");
 		else this._list.removeAttribute("aria-busy");
+		this._loadingRegion.hidden = !this._config.loading;
+		this._syncLoadingAnnouncement();
+	}
+	_syncLoadingAnnouncement() {
+		const loading = this._config.loading && this._element.isConnected;
+		if (loading === Boolean(this._loadingAnnouncement)) return;
+		this._loadingAnnouncement?.();
+		this._loadingAnnouncement = loading ? announce(this._config.loadingLabel, { context: this._element }) : null;
+	}
+	_createLoadingRegion() {
+		const region = document.createElement("div");
+		const spinner = document.createElement("span");
+		region.className = CLASS_NAME_LOADING_REGION;
+		spinner.className = "spinner-border spinner-border-sm";
+		spinner.setAttribute("aria-hidden", "true");
+		region.append(spinner, this._config.loadingLabel);
+		if (this._list !== this._element) this._list.after(region);
+		this._createdNodes.push(region);
+		return region;
 	}
 	_updateOptions() {
-		const navigable = this._navigableOptions();
 		const roving = this._rovingStop();
 		for (const option of this._allOptions()) {
 			option.setAttribute("role", "option");
-			if (this._field && !option.id) option.id = getUID(`${NAME$49}-option-`);
+			if (this._field && !option.id) option.id = getUID(`${NAME$51}-option-`);
 			const value = this._optionValue(option);
 			this._decorateOption(option);
 			if (this._config.selectionMode === SELECTION_MODE_NONE) option.removeAttribute("aria-selected");
-			else option.setAttribute("aria-selected", String(this._selected.has(value)));
-			option.classList.toggle(CLASS_NAME_SELECTED$3, this._selected.has(value));
+			else option.setAttribute("aria-selected", String(this._store.has(value)));
+			option.classList.toggle(CLASS_NAME_SELECTED$2, this._store.has(value));
 			option.classList.toggle(CLASS_NAME_ACTIVE$9, value === this._active && (this._focused || Boolean(this._field)));
 			if (this._field) {
 				option.removeAttribute("tabindex");
@@ -1593,7 +1740,7 @@ var ListBox = class ListBox extends BaseComponent {
 			option.setAttribute("tabindex", value === this._active || option === roving ? "0" : "-1");
 		}
 		const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._list);
-		if (empty) empty.toggleAttribute("hidden", this._config.loading || navigable.length > 0);
+		if (empty) empty.toggleAttribute("hidden", this._config.loading || this._navigableOptions().length > 0);
 	}
 	_resolveCounter() {
 		const existing = SelectorEngine.findOne(SELECTOR_COUNTER, this._element);
@@ -1602,6 +1749,7 @@ var ListBox = class ListBox extends BaseComponent {
 		counter.classList.add(CLASS_NAME_SUBTITLE);
 		counter.setAttribute("data-coreui-list-box-counter", "");
 		this._resolveHeader().append(counter);
+		this._createdNodes.push(counter);
 		return counter;
 	}
 	_resolveHeader() {
@@ -1610,12 +1758,13 @@ var ListBox = class ListBox extends BaseComponent {
 		const header = document.createElement("div");
 		header.classList.add(CLASS_NAME_HEADER$1);
 		this._element.prepend(header);
+		this._createdNodes.push(header);
 		return header;
 	}
 	_updateCounter() {
 		if (!this._counter) return;
 		const navigable = this._navigableOptions();
-		const count = navigable.filter((option) => this._selected.has(this._optionValue(option))).length;
+		const count = navigable.filter((option) => this._store.has(this._optionValue(option))).length;
 		this._counter.textContent = resolveCountLabel(this._config.selectedLabel, count, navigable.length);
 	}
 	_resolveSearch() {
@@ -1626,11 +1775,12 @@ var ListBox = class ListBox extends BaseComponent {
 		search.className = `${CLASS_NAME_FORM_CONTROL$2} ${CLASS_NAME_SEARCH$2}`;
 		search.setAttribute("data-coreui-list-box-search", "");
 		this._list.before(search);
+		this._createdNodes.push(search);
 		return search;
 	}
 	_decorateSearch() {
 		if (!this._searchField) return;
-		if (!this._list.id) this._list.id = getUID(`${NAME$49}-options-`);
+		if (!this._list.id) this._list.id = getUID(`${NAME$51}-options-`);
 		if (!this._searchField.placeholder) this._searchField.placeholder = this._config.searchPlaceholder;
 		if (!this._searchField.hasAttribute("aria-label")) this._searchField.setAttribute("aria-label", this._config.ariaSearchLabel);
 		this._searchField.setAttribute("aria-controls", this._list.id);
@@ -1638,27 +1788,15 @@ var ListBox = class ListBox extends BaseComponent {
 	}
 	_filter() {
 		if (this._query === null && (!this._searchField || this._config.search === SEARCH_EXTERNAL)) return;
-		const query = this._query ?? this._normalizeText(this._searchField.value.trim().toLowerCase());
-		for (const option of this._allOptions()) option.toggleAttribute("hidden", query !== "" && !this._normalizeText(this._optionText(option)).includes(query));
-		for (const section of SelectorEngine.find(SELECTOR_SECTION$2, this._list)) section.toggleAttribute("hidden", SelectorEngine.find(SELECTOR_OPTION$4, section).every((option) => option.hasAttribute("hidden")));
-	}
-	_normalizeText(text) {
-		return this._config.searchNormalize ? text.normalize("NFD").replaceAll(/[\u0300-\u036F]/g, "") : text;
+		const query = this._query ?? normalizeSearchText(this._searchField.value, this._config.searchNormalize);
+		for (const option of this._allOptions()) option.toggleAttribute("hidden", query !== "" && !normalizeSearchText(this._optionText(option), this._config.searchNormalize).includes(query));
+		for (const section of SelectorEngine.find(SELECTOR_SECTION$3, this._list)) section.toggleAttribute("hidden", SelectorEngine.find(SELECTOR_OPTION$4, section).every((option) => option.hasAttribute("hidden")));
 	}
 	_initialSelection() {
 		const { selected } = this._config;
-		const configured = selected === null ? [] : Array.isArray(selected) ? selected : [selected];
+		const configured = toSelectionValues(selected, SELECTION_MODE_MULTIPLE);
 		const marked = this._flatItems().filter((item) => item.selected).map((item) => item.value);
-		return this._selectable(this._selectionFor([.../* @__PURE__ */ new Set([...configured, ...marked])]));
-	}
-	_selectable(values) {
-		const disabled = new Set(this._allOptions().filter((option) => this._isDisabled(option)).map((option) => this._optionValue(option)));
-		return values.filter((value) => !disabled.has(value));
-	}
-	_selectionFor(values) {
-		const { selectionMode } = this._config;
-		if (selectionMode === SELECTION_MODE_NONE) return [];
-		return selectionMode === SELECTION_MODE_SINGLE$1 ? values.slice(0, 1) : values;
+		return toSelectionValues([.../* @__PURE__ */ new Set([...configured, ...marked])], this._config.selectionMode);
 	}
 	_normalizeItems(items) {
 		return (Array.isArray(items) ? items : []).filter((entry) => entry !== null && typeof entry === "object").map((entry) => Array.isArray(entry.items) ? this._normalizeGroup(entry) : this._normalizeItem(entry));
@@ -1666,11 +1804,12 @@ var ListBox = class ListBox extends BaseComponent {
 	_normalizeGroup(group) {
 		return {
 			label: String(group.label ?? ""),
-			items: group.items.filter((item) => item !== null && typeof item === "object").map((item) => this._normalizeItem(item))
+			items: group.items.filter((item) => item !== null && typeof item === "object").map((item) => this._normalizeItem(item)),
+			...group.disabled && { disabled: true }
 		};
 	}
 	_normalizeItem(item) {
-		const value = String(item.value ?? item.label ?? "");
+		const value = getOptionValue(item);
 		const normalized = {
 			value,
 			label: String(item.label ?? value)
@@ -1690,11 +1829,13 @@ var ListBox = class ListBox extends BaseComponent {
 		const created = document.createElement("div");
 		created.classList.add(CLASS_NAME_OPTIONS$3);
 		this._element.append(created);
+		this._createdNodes.push(created);
 		return created;
 	}
 	_render() {
 		if (this._items === null) return;
 		const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._list);
+		if (this._hostListNodes === null && !this._createdNodes.includes(this._list)) this._hostListNodes = [...this._list.childNodes];
 		this._list.replaceChildren(...this._items.map((entry) => Array.isArray(entry.items) ? this._renderSection(entry) : this._renderOption(entry)));
 		if (empty) this._list.append(empty);
 	}
@@ -1702,12 +1843,15 @@ var ListBox = class ListBox extends BaseComponent {
 		const section = document.createElement("div");
 		const label = document.createElement("div");
 		label.classList.add(CLASS_NAME_SECTION_LABEL);
-		label.id = getUID(`${NAME$49}-section-`);
+		label.id = getUID(`${NAME$51}-section-`);
 		this._setContent(label, group.label);
 		section.classList.add(CLASS_NAME_SECTION$1);
 		section.setAttribute("role", "group");
 		section.setAttribute("aria-labelledby", label.id);
-		section.append(label, ...group.items.map((item) => this._renderOption(item)));
+		section.append(label, ...group.items.map((item) => this._renderOption(group.disabled ? {
+			...item,
+			disabled: true
+		} : item)));
 		return section;
 	}
 	_renderOption(item) {
@@ -1715,7 +1859,7 @@ var ListBox = class ListBox extends BaseComponent {
 		option.classList.add(CLASS_NAME_OPTION);
 		option.dataset.coreuiValue = item.value;
 		if (item.disabled) {
-			option.classList.add(CLASS_NAME_DISABLED$10);
+			option.classList.add(CLASS_NAME_DISABLED$11);
 			option.setAttribute("aria-disabled", "true");
 		}
 		if (item.description === void 0) {
@@ -1763,23 +1907,27 @@ var ListBox = class ListBox extends BaseComponent {
 	_decorateSection(section) {
 		const label = SelectorEngine.findOne(SELECTOR_SECTION_LABEL, section);
 		if (!label || !this._sectionsSelectable()) return;
-		if (!label.id) label.id = getUID(`${NAME$49}-section-`);
+		if (!label.id) label.id = getUID(`${NAME$51}-section-`);
 		label.setAttribute(ATTRIBUTE_SECTION_TOGGLE, "");
 		label.setAttribute("role", "button");
 		label.dataset.coreuiValue = label.id;
 		this._decorateOption(label);
+		if (this._sectionOptions(section).length > 0) {
+			if (this._disabledSections.delete(label)) label.removeAttribute("aria-disabled");
+		} else if (!label.hasAttribute("aria-disabled")) {
+			label.setAttribute("aria-disabled", "true");
+			this._disabledSections.add(label);
+		}
 	}
 	_updateSections() {
 		if (!this._sectionsSelectable()) return;
 		const roving = this._rovingStop();
 		for (const label of SelectorEngine.find(SELECTOR_SECTION_TOGGLE, this._list)) {
-			const options = this._sectionOptions(label.closest(SELECTOR_SECTION$2));
-			const selected = options.filter((option) => this._selected.has(this._optionValue(option))).length;
-			const all = options.length > 0 && selected >= options.length;
-			const some = selected > 0;
-			label.setAttribute("aria-pressed", all ? "true" : some ? "mixed" : "false");
-			label.classList.toggle(CLASS_NAME_SELECTED$3, all);
-			label.classList.toggle(CLASS_NAME_INDETERMINATE$1, !all && some);
+			const section = label.closest(SELECTOR_SECTION$3);
+			const options = this._sectionOptions(section);
+			const shown = SelectorEngine.find(SELECTOR_OPTION$4, section).filter((option) => !this._isHidden(option));
+			const state = options.length > 0 ? this._scopeState(options) : getSelectionState(shown.filter((option) => this._store.has(this._optionValue(option))).length, shown.length);
+			this._showSelectionState(label, state);
 			label.classList.toggle(CLASS_NAME_ACTIVE$9, this._optionValue(label) === this._active && (this._focused || Boolean(this._field)));
 			if (this._field) {
 				label.removeAttribute("tabindex");
@@ -1790,8 +1938,9 @@ var ListBox = class ListBox extends BaseComponent {
 	}
 	_toggleSection(section) {
 		if (!section || !this._sectionsSelectable()) return;
-		const values = this._sectionOptions(section).map((option) => this._optionValue(option));
-		const all = values.length > 0 && values.every((value) => this._selected.has(value));
+		const options = this._sectionOptions(section);
+		const values = options.map((option) => this._optionValue(option));
+		const all = this._scopeState(options) === "all";
 		let changed = false;
 		this._limited = null;
 		for (const value of values) changed = (all ? this._deselectValue(value) : this._selectValue(value)) || changed;
@@ -1802,13 +1951,13 @@ var ListBox = class ListBox extends BaseComponent {
 		return option.hasAttribute("hidden") || option.closest("[hidden]") !== null;
 	}
 	_isDisabled(option) {
-		return option.classList.contains(CLASS_NAME_DISABLED$10) || option.getAttribute("aria-disabled") === "true";
+		return option.classList.contains(CLASS_NAME_DISABLED$11) || option.getAttribute("aria-disabled") === "true";
 	}
 	_isLink(option) {
 		return option.tagName === "A" && option.hasAttribute("href");
 	}
 	_fieldTakesText() {
-		return this._field instanceof HTMLInputElement || this._field instanceof HTMLTextAreaElement;
+		return this._field instanceof HTMLInputElement || this._field instanceof HTMLTextAreaElement || Boolean(this._field?.isContentEditable);
 	}
 	_optionValue(option) {
 		return option.dataset.coreuiValue ?? option.textContent?.trim() ?? "";
@@ -1834,44 +1983,45 @@ var ListBox = class ListBox extends BaseComponent {
 		option.prepend(indicator);
 	}
 	_atLimit() {
-		const { selectionLimit, selectionMode } = this._config;
-		return selectionMode === SELECTION_MODE_MULTIPLE && selectionLimit !== null && this._selected.size >= selectionLimit;
+		return isSelectionLimitReached(this._store.size(), this._selectionLimit());
 	}
 	_reportLimit() {
 		if (this._limited === null) return;
 		const value = this._limited;
 		this._limited = null;
-		EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECTION_LIMIT$1), {
+		EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECTION_LIMIT$2), {
 			limit: this._config.selectionLimit,
 			value
 		});
 	}
-	_selectionCap() {
-		const { selectionLimit, selectionMode } = this._config;
-		const options = this._navigableOptions().length;
-		return selectionMode === SELECTION_MODE_MULTIPLE && selectionLimit !== null ? Math.min(selectionLimit, options) : options;
+	_fit(next) {
+		return toSelectionValues(next, this._config.selectionMode);
 	}
-	_selectedNavigable() {
-		return this._navigableOptions().filter((option) => this._selected.has(this._optionValue(option))).length;
+	_selectionLimit() {
+		return getSelectionLimit(this._config.selectionMode === SELECTION_MODE_MULTIPLE, this._config.selectionLimit);
 	}
-	_allSelected() {
-		const cap = this._selectionCap();
-		return cap > 0 && this._selectedNavigable() >= cap;
+	_selectionState() {
+		return this._scopeState(this._navigableOptions());
+	}
+	_scopeState(options) {
+		const selected = options.filter((option) => this._store.has(this._optionValue(option))).length;
+		return getScopeSelectionState(selected, options.length, this._store.size(), this._selectionLimit());
+	}
+	_showSelectionState(element, state) {
+		element.setAttribute("aria-pressed", getAriaPressed(state));
+		element.classList.toggle(CLASS_NAME_SELECTED$2, state === "all");
+		element.classList.toggle(CLASS_NAME_INDETERMINATE$1, state === "some");
 	}
 	_updateSelectAll() {
 		if (!this._selectAll) return;
-		if (!this._list.id) this._list.id = getUID(`${NAME$49}-options-`);
+		if (!this._list.id) this._list.id = getUID(`${NAME$51}-options-`);
 		this._selectAll.setAttribute("aria-controls", this._list.id);
 		this._selectAll.disabled = this._config.disabled || this._config.selectionMode !== SELECTION_MODE_MULTIPLE;
-		const all = this._allSelected();
-		const some = this._selectedNavigable() > 0;
 		this._decorateOption(this._selectAll);
-		this._selectAll.setAttribute("aria-pressed", all ? "true" : some ? "mixed" : "false");
-		this._selectAll.classList.toggle(CLASS_NAME_SELECTED$3, all);
-		this._selectAll.classList.toggle(CLASS_NAME_INDETERMINATE$1, !all && some);
+		this._showSelectionState(this._selectAll, this._selectionState());
 	}
 	_toggleSelectAll() {
-		if (this._allSelected()) {
+		if (this._selectionState() === "all") {
 			this._deselectAll();
 			return;
 		}
@@ -1885,7 +2035,7 @@ var ListBox = class ListBox extends BaseComponent {
 	_selectValue(value) {
 		if (this._config.disabled || this._config.selectionMode === SELECTION_MODE_NONE) return false;
 		const option = this._findOption(value);
-		if (!option || this._isDisabled(option) || this._selected.has(value)) return false;
+		if (!option || this._isDisabled(option) || this._store.has(value)) return false;
 		if (this._atLimit()) {
 			this._limited ??= value;
 			return false;
@@ -1895,32 +2045,30 @@ var ListBox = class ListBox extends BaseComponent {
 			const previous = this.getSelectedValues();
 			for (const selected of previous) this._removeSelection(selected);
 		}
-		this._selected.add(value);
+		this._store.commit([...this._store.values(), value]);
 		this.update();
+		if (!this._store.has(value)) return false;
 		EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECTED$1), { value });
 		return true;
 	}
 	_deselectValue(value) {
-		if (this._config.disabled || !this._selected.has(value)) return false;
+		if (this._config.disabled || !this._store.has(value)) return false;
 		if (EventHandler.trigger(this._element, this.constructor.eventName(EVENT_DESELECT$1), { value }).defaultPrevented) return false;
 		this._removeSelection(value);
 		return true;
 	}
 	_removeSelection(value) {
-		this._selected.delete(value);
+		this._store.commit(this._store.values().filter((selected) => selected !== value));
 		this.update();
 		EventHandler.trigger(this._element, this.constructor.eventName(EVENT_DESELECTED$1), { value });
 	}
 	_selectRange(from, to) {
 		const options = this._navigableOptions();
-		const start = options.findIndex((option) => this._optionValue(option) === from);
-		const end = options.findIndex((option) => this._optionValue(option) === to);
-		if (end === -1) return;
-		const first = Math.min(start === -1 ? end : start, end);
-		const last = Math.max(start === -1 ? end : start, end);
+		const range = rangeBetween(options, options.findIndex((option) => this._optionValue(option) === from), options.findIndex((option) => this._optionValue(option) === to));
+		if (range.length === 0) return;
 		let changed = false;
 		this._limited = null;
-		for (const option of options.slice(first, last + 1)) changed = this._selectValue(this._optionValue(option)) || changed;
+		for (const option of range) changed = this._selectValue(this._optionValue(option)) || changed;
 		if (changed) this._triggerChange();
 		this._reportLimit();
 	}
@@ -1943,7 +2091,12 @@ var ListBox = class ListBox extends BaseComponent {
 	}
 	_updateActiveDescendant() {
 		if (!this._field) return;
-		if (!this._list.id) this._list.id = getUID(`${NAME$49}-options-`);
+		if (!this._list.id) this._list.id = getUID(`${NAME$51}-options-`);
+		if (!this._list.isConnected) {
+			this._field.removeAttribute("aria-controls");
+			this._field.removeAttribute("aria-activedescendant");
+			return;
+		}
 		this._field.setAttribute("aria-controls", this._list.id);
 		const option = this._activeOption();
 		if (option) {
@@ -1966,7 +2119,7 @@ var ListBox = class ListBox extends BaseComponent {
 	_activate(option) {
 		const value = this._optionValue(option);
 		if (this._isSectionToggle(option)) {
-			this._toggleSection(option.closest(SELECTOR_SECTION$2));
+			this._toggleSection(option.closest(SELECTOR_SECTION$3));
 			return;
 		}
 		if (this._config.selectionMode === SELECTION_MODE_NONE || this._isLink(option)) EventHandler.trigger(this._element, this.constructor.eventName(EVENT_ACTION), {
@@ -1980,24 +2133,19 @@ var ListBox = class ListBox extends BaseComponent {
 		if (this._config.selectionMode === SELECTION_MODE_SINGLE$1) this.select(value);
 	}
 	_typeahead(key) {
-		if (!this._config.typeahead || key.length !== 1 || key === SPACE_KEY$6) return;
-		if (this._searchTimeout) clearTimeout(this._searchTimeout);
-		this._search += key.toLowerCase();
-		this._searchTimeout = setTimeout(() => {
-			this._search = "";
-		}, TYPEAHEAD_TIMEOUT$1);
+		const text = this._config.typeahead ? this._typeaheadBuffer.push(key) : null;
+		if (!text) return;
 		const options = this._navigableOptions();
-		const start = options.findIndex((option) => this._optionValue(option) === this._active) + 1;
-		const from = this._search.length > 1 ? start - 1 : start;
-		const match = [...options.slice(from), ...options.slice(0, from)].find((option) => this._optionText(option).startsWith(this._search));
+		const current = options.findIndex((option) => this._optionValue(option) === this._active);
+		const match = findTypeaheadMatch(options, current, text, (option) => this._optionText(option));
 		if (match) this._setActive(this._optionValue(match), true);
 	}
 	_addEventListeners() {
-		EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$12), SELECTOR_OPTION$4, (event) => this._handleClick(event));
-		EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$12), SELECTOR_SELECT_ALL$2, () => {
+		EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$14), SELECTOR_OPTION$4, (event) => this._handleClick(event));
+		EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$14), SELECTOR_SELECT_ALL$2, () => {
 			if (!this._config.disabled) this._toggleSelectAll();
 		});
-		EventHandler.on(this._list, this.constructor.eventName(EVENT_FOCUSIN$6), () => {
+		EventHandler.on(this._list, this.constructor.eventName(EVENT_FOCUSIN$8), () => {
 			this._focused = true;
 			this.update();
 		});
@@ -2007,24 +2155,25 @@ var ListBox = class ListBox extends BaseComponent {
 				this.update();
 			}
 		});
-		EventHandler.on(this._element, this.constructor.eventName(EVENT_INPUT$9), SELECTOR_SEARCH$3, (event) => {
+		EventHandler.on(this._element, this.constructor.eventName(EVENT_INPUT$12), SELECTOR_SEARCH$3, (event) => {
 			if (this._config.search === SEARCH_EXTERNAL) {
 				EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SEARCH$3), { query: event.target.value });
 				return;
 			}
 			this.update();
 		});
-		EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$12), SELECTOR_SECTION_TOGGLE, (event) => {
+		EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$14), SELECTOR_SECTION_TOGGLE, (event) => {
 			const label = event.target.closest(SELECTOR_SECTION_TOGGLE);
 			if (!label || this._config.disabled) return;
 			this._setActive(this._optionValue(label), !this._field);
-			this._toggleSection(label.closest(SELECTOR_SECTION$2));
+			this._toggleSection(label.closest(SELECTOR_SECTION$3));
 		});
-		EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN$6), `${SELECTOR_OPTION$4}, ${SELECTOR_SECTION_TOGGLE}`, (event) => {
+		EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN$8), `${SELECTOR_OPTION$4}, ${SELECTOR_SECTION_TOGGLE}`, (event) => {
 			if (!this._config.disabled && !this._field) this._setActive(this._optionValue(event.target.closest(`${SELECTOR_OPTION$4}, ${SELECTOR_SECTION_TOGGLE}`)), false);
 		});
 		const target = this._field ?? this._list;
-		EventHandler.on(target, this.constructor.eventName(EVENT_KEYDOWN$15), (event) => this._handleKeydown(event));
+		EventHandler.on(target, this.constructor.eventName(EVENT_KEYDOWN$18), (event) => this._handleKeydown(event));
+		if (this._field) EventHandler.on(this._field, this.constructor.eventName(EVENT_FOCUSIN$8), () => this._updateActiveDescendant());
 	}
 	_handleClick(event) {
 		const option = event.target.closest(SELECTOR_OPTION$4);
@@ -2059,23 +2208,23 @@ var ListBox = class ListBox extends BaseComponent {
 			}
 			return;
 		}
-		if (key === ARROW_UP_KEY$8 || key === ARROW_DOWN_KEY$11) {
+		if (key === ARROW_UP_KEY$7 || key === ARROW_DOWN_KEY$11) {
 			event.preventDefault();
 			this._handleArrowKey(key === ARROW_DOWN_KEY$11, event.shiftKey);
 			return;
 		}
-		if (key === HOME_KEY$7 || key === END_KEY$7) {
+		if (key === HOME_KEY$6 || key === END_KEY$6) {
 			if (this._fieldTakesText()) return;
 			event.preventDefault();
-			this._handleEdgeKey(key === HOME_KEY$7 ? 0 : -1, event.shiftKey);
+			this._handleEdgeKey(key === HOME_KEY$6 ? 0 : -1, event.shiftKey);
 			return;
 		}
-		if (key === SPACE_KEY$6 || key === ENTER_KEY$7) {
-			if (key === SPACE_KEY$6 && this._fieldTakesText()) return;
-			this._handleActivationKey(event, key === ENTER_KEY$7);
+		if (key === SPACE_KEY$3 || key === ENTER_KEY$6) {
+			if (key === SPACE_KEY$3 && this._fieldTakesText()) return;
+			this._handleActivationKey(event, key === ENTER_KEY$6);
 			return;
 		}
-		this._typeahead(key);
+		if (!this._fieldTakesText()) this._typeahead(key);
 	}
 	_handleArrowKey(forward, extend) {
 		this._move(forward);
@@ -2108,30 +2257,12 @@ var ListBox = class ListBox extends BaseComponent {
 		return jQueryDispatch(this, ListBox, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$41}${DATA_API_KEY$34}`, () => {
+EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$42}${DATA_API_KEY$34}`, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_LIST_BOX)) ListBox.getOrCreateInstance(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(ListBox);
 //#endregion
 //#region js/src/util/floating-ui.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO util/floating-ui.ts
-* License (https://coreui.io/pro/license/)
-*
-* This is a modified version of Bootstrap's util/floating-ui.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Breakpoints for responsive placement (matches SCSS $breakpoints)
-*/
 const BREAKPOINTS = {
 	sm: 576,
 	md: 768,
@@ -2139,14 +2270,6 @@ const BREAKPOINTS = {
 	xl: 1280,
 	"2xl": 1536
 };
-/**
-* Parse a placement string that may contain responsive prefixes
-* Example: "bottom-start md:top-end lg:right" returns { xs: 'bottom-start', md: 'top-end', lg: 'right' }
-*
-* @param placementString - The placement string to parse
-* @param defaultPlacement - The default placement to use for xs/base
-* @returns Object with breakpoint keys and placement values, or null if not responsive
-*/
 const parseResponsivePlacement = (placementString, defaultPlacement = "bottom") => {
 	if (!placementString || !placementString.includes(":")) return null;
 	const parts = placementString.split(/\s+/);
@@ -2157,13 +2280,6 @@ const parseResponsivePlacement = (placementString, defaultPlacement = "bottom") 
 	} else placements.xs = part;
 	return placements;
 };
-/**
-* Get the active placement for the current viewport width
-*
-* @param responsivePlacements - Object with breakpoint keys and placement values
-* @param defaultPlacement - Fallback placement
-* @returns The active placement for current viewport
-*/
 const getResponsivePlacement = (responsivePlacements, defaultPlacement = "bottom") => {
 	if (!responsivePlacements) return defaultPlacement;
 	const viewportWidth = window.innerWidth;
@@ -2177,12 +2293,6 @@ const getResponsivePlacement = (responsivePlacements, defaultPlacement = "bottom
 	]) if (viewportWidth >= BREAKPOINTS[breakpoint] && responsivePlacements[breakpoint]) activePlacement = responsivePlacements[breakpoint];
 	return activePlacement;
 };
-/**
-* Create media query listeners for responsive placement changes
-*
-* @param callback - Callback to run when breakpoint changes
-* @returns Array of { mql, handler } objects for cleanup
-*/
 const createBreakpointListeners = (callback) => {
 	const listeners = [];
 	for (const breakpoint of Object.keys(BREAKPOINTS)) {
@@ -2196,35 +2306,15 @@ const createBreakpointListeners = (callback) => {
 	}
 	return listeners;
 };
-/**
-* Clean up media query listeners
-*
-* @param listeners - Array of { mql, handler } objects
-*/
 const disposeBreakpointListeners = (listeners) => {
 	for (const { mql, handler } of listeners) mql.removeEventListener("change", handler);
 };
-/**
-* Normalize an offset value into Floating UI's offset shape.
-* A `[skidding, distance]` array becomes `{ mainAxis: distance, crossAxis: skidding }`;
-* numbers and axis objects pass through unchanged.
-*/
 const toFloatingOffset = (value) => {
 	return Array.isArray(value) ? {
 		mainAxis: value[1] || 0,
 		crossAxis: value[0] || 0
 	} : value;
 };
-/**
-* The dropdown-shaped anchored panel: bottom-start placement (mirrored in
-* RTL), a 2px main-axis offset, flip and shift within the clipping ancestors.
-* Autocomplete, multi-select and the v1 pickers all position exactly this way,
-* so the wiring — initial position, autoUpdate resubscription and the
-* disconnect guards on both sides of the await — lives here once.
-*
-* `destroy()` also acts as the in-flight guard: a computePosition resolving
-* after teardown must not touch the content's styles.
-*/
 const createAnchoredPosition = (anchor, content) => {
 	let disposed = false;
 	const update = async () => {
@@ -2256,39 +2346,24 @@ const createAnchoredPosition = (anchor, content) => {
 };
 //#endregion
 //#region js/src/util/focustrap.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI util/focustrap.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This is a modified version of the Bootstrap's util/focustrap.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$48 = "focustrap";
-const EVENT_KEY$40 = `.coreui.focustrap`;
-const EVENT_FOCUSIN$5 = `focusin${EVENT_KEY$40}`;
-const EVENT_KEYDOWN_TAB = `keydown.tab${EVENT_KEY$40}`;
+const NAME$50 = "focustrap";
+const EVENT_KEY$41 = `.coreui.focustrap`;
+const EVENT_FOCUSIN$7 = `focusin${EVENT_KEY$41}`;
+const EVENT_KEYDOWN_TAB = `keydown.tab${EVENT_KEY$41}`;
 const TAB_KEY$4 = "Tab";
 const TAB_NAV_FORWARD = "forward";
 const TAB_NAV_BACKWARD = "backward";
-const Default$46 = {
+const Default$44 = {
 	additionalElement: null,
 	autofocus: true,
 	trapElement: null
 };
-const DefaultType$46 = {
+const DefaultType$43 = {
 	additionalElement: "(element|null|undefined)",
 	autofocus: "boolean",
 	trapElement: "element"
 };
 const activeTraps = [];
-/**
-* Class definition
-*/
 var FocusTrap = class extends Config {
 	constructor(config) {
 		super();
@@ -2299,18 +2374,18 @@ var FocusTrap = class extends Config {
 		this._keydownHandler = (event) => this._handleKeydown(event);
 	}
 	static get Default() {
-		return Default$46;
+		return Default$44;
 	}
 	static get DefaultType() {
-		return DefaultType$46;
+		return DefaultType$43;
 	}
 	static get NAME() {
-		return NAME$48;
+		return NAME$50;
 	}
 	activate() {
 		if (this._isActive) return;
 		if (this._config.autofocus) this._config.trapElement.focus();
-		EventHandler.on(document, EVENT_FOCUSIN$5, this._focusinHandler);
+		EventHandler.on(document, EVENT_FOCUSIN$7, this._focusinHandler);
 		EventHandler.on(document, EVENT_KEYDOWN_TAB, this._keydownHandler);
 		activeTraps.push(this);
 		this._isActive = true;
@@ -2319,7 +2394,7 @@ var FocusTrap = class extends Config {
 		if (!this._isActive) return;
 		this._isActive = false;
 		activeTraps.splice(activeTraps.indexOf(this), 1);
-		EventHandler.off(document, EVENT_FOCUSIN$5, this._focusinHandler);
+		EventHandler.off(document, EVENT_FOCUSIN$7, this._focusinHandler);
 		EventHandler.off(document, EVENT_KEYDOWN_TAB, this._keydownHandler);
 	}
 	_isTopmost() {
@@ -2327,8 +2402,9 @@ var FocusTrap = class extends Config {
 	}
 	_handleFocusin(event) {
 		const { additionalElement, trapElement } = this._config;
-		if (!this._isTopmost() || event.target === document || event.target === trapElement || trapElement.contains(event.target)) return;
-		if (additionalElement && (event.target === additionalElement || additionalElement.contains(event.target))) return;
+		const target = event.composedPath()[0] ?? event.target;
+		if (!this._isTopmost() || target === document || target === trapElement || trapElement.contains(target)) return;
+		if (additionalElement && (target === additionalElement || additionalElement.contains(target))) return;
 		const elements = SelectorEngine.focusableChildren(trapElement);
 		if (elements.length === 0) trapElement.focus();
 		else if (this._lastTabNavDirection === TAB_NAV_BACKWARD) elements[elements.length - 1].focus();
@@ -2359,43 +2435,26 @@ var FocusTrap = class extends Config {
 		const target = event.target;
 		const trapIndex = trapElements.indexOf(target);
 		const additionalIndex = additionalElements.indexOf(target);
-		const redirect = (element) => {
+		let destination;
+		if (trapIndex === trapElements.length - 1 && !event.shiftKey) destination = additionalElements[0];
+		else if (trapIndex === 0 && event.shiftKey) destination = additionalElements[additionalElements.length - 1];
+		else if (additionalIndex === additionalElements.length - 1 && !event.shiftKey) destination = trapElements[0];
+		else if (additionalIndex === 0 && event.shiftKey) destination = trapElements[trapElements.length - 1];
+		if (destination) {
 			event.preventDefault();
-			element.focus();
-		};
-		if (trapIndex === trapElements.length - 1 && !event.shiftKey) {
-			redirect(additionalElements[0]);
-			return;
+			destination.focus();
 		}
-		if (trapIndex === 0 && event.shiftKey) {
-			redirect(additionalElements[additionalElements.length - 1]);
-			return;
-		}
-		if (additionalIndex === additionalElements.length - 1 && !event.shiftKey) {
-			redirect(trapElements[0]);
-			return;
-		}
-		if (additionalIndex === 0 && event.shiftKey) redirect(trapElements[trapElements.length - 1]);
 	}
 };
 //#endregion
 //#region js/src/util/popup.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO util/popup.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$47 = "popup";
-const EVENT_KEY$39 = `.coreui.popup`;
-const EVENT_POINTERDOWN$2 = `pointerdown${EVENT_KEY$39}`;
-const EVENT_KEYDOWN$14 = `keydown${EVENT_KEY$39}`;
+const NAME$49 = "popup";
+const EVENT_KEY$40 = `.coreui.popup`;
+const EVENT_POINTERDOWN$4 = `pointerdown${EVENT_KEY$40}`;
+const EVENT_KEYDOWN$17 = `keydown${EVENT_KEY$40}`;
 const ESCAPE_KEY$6 = "Escape";
 const ARROW_DOWN_KEY$10 = "ArrowDown";
-const Default$45 = {
+const Default$43 = {
 	anchor: null,
 	container: false,
 	content: null,
@@ -2412,7 +2471,7 @@ const Default$45 = {
 	placement: "bottom-start",
 	returnFocus: true
 };
-const DefaultType$45 = {
+const DefaultType$42 = {
 	anchor: "element",
 	container: "(string|element|boolean)",
 	content: "element",
@@ -2439,21 +2498,11 @@ const hasConstrainingAncestor = (anchor, boundary = document.body) => {
 	return false;
 };
 const resolvePopupContainer = (anchor, explicitContainer = null) => {
-	if (explicitContainer) return explicitContainer;
 	const dialog = anchor?.closest("dialog[open]");
+	if (explicitContainer) return dialog?.matches(":modal") && !dialog.contains(explicitContainer) ? dialog : explicitContainer;
 	if (dialog) return hasConstrainingAncestor(anchor, dialog) ? dialog : null;
 	return hasConstrainingAncestor(anchor) ? document.body : null;
 };
-/**
-* Class definition
-*
-* Anchored-overlay primitive shared by the picker shells (and, over time,
-* autocomplete / multi-select / dropdown). Owns exactly four concerns:
-* positioning (Floating UI), container teleport, focus containment across the
-* anchor/content split, and dismissal (outside click, Escape, return focus).
-* Lifecycle notifications are callbacks — public events belong to the owning
-* component, so the primitive never emits on its own.
-*/
 var Popup = class extends Config {
 	constructor(config) {
 		super();
@@ -2463,11 +2512,14 @@ var Popup = class extends Config {
 		this._container = this._config.container ? getElement(this._config.container) : null;
 		this._cleanupAutoUpdate = null;
 		this._isShown = false;
+		this._transition = 0;
+		this._hiding = false;
 		this._previouslyFocused = null;
 		this._pointerdownListener = null;
 		this._keydownListener = null;
 		this._contentKeydownListener = null;
 		this._anchorKeydownListener = null;
+		this._revealPending = false;
 		this._focustrap = this._config.focusTrap ? new FocusTrap({
 			autofocus: false,
 			trapElement: this._content
@@ -2475,13 +2527,13 @@ var Popup = class extends Config {
 		this._addAnchorKeydownListener();
 	}
 	static get Default() {
-		return Default$45;
+		return Default$43;
 	}
 	static get DefaultType() {
-		return DefaultType$45;
+		return DefaultType$42;
 	}
 	static get NAME() {
-		return NAME$47;
+		return NAME$49;
 	}
 	get isShown() {
 		return this._isShown;
@@ -2492,14 +2544,22 @@ var Popup = class extends Config {
 	show() {
 		if (this._isShown || execute(this._config.onBeforeShow) === false) return;
 		this._isShown = true;
+		this._hiding = false;
+		const transition = ++this._transition;
 		this._previouslyFocused = document.activeElement;
 		this._mount();
 		execute(this._config.onShow);
-		if (!this.isMobile) this._startPositioning();
+		if (this.isMobile) Object.assign(this._content.style, {
+			left: "",
+			position: "",
+			top: ""
+		});
+		else this._startPositioning();
 		this._addDismissListeners();
 		if (this._focustrap) this._focustrap.activate();
 		this._focusPanel();
-		execute(this._config.onShown);
+		if (this.isMobile) this._revealEntry();
+		this._afterTransition(transition, () => execute(this._config.onShown));
 	}
 	hide() {
 		if (!this._isShown || execute(this._config.onBeforeHide) === false) return;
@@ -2508,13 +2568,19 @@ var Popup = class extends Config {
 	_hide() {
 		execute(this._config.onHide);
 		this._isShown = false;
+		this._revealPending = false;
+		this._hiding = true;
+		const transition = ++this._transition;
 		this._stopPositioning();
 		this._removeDismissListeners();
 		if (this._focustrap) this._focustrap.deactivate();
 		if (this._config.returnFocus && this._holdsFocus()) this._returnFocusTarget()?.focus();
 		this._previouslyFocused = null;
-		execute(this._config.onHidden);
-		executeAfterTransition(() => this._unmount(), this._content);
+		this._afterTransition(transition, () => {
+			this._hiding = false;
+			this._unmount();
+			execute(this._config.onHidden);
+		});
 	}
 	toggle() {
 		return this._isShown ? this.hide() : this.show();
@@ -2523,10 +2589,14 @@ var Popup = class extends Config {
 		if (this._isShown && !this.isMobile) this._updatePosition();
 	}
 	dispose() {
+		const owesHidden = this._isShown || this._hiding;
 		if (this._isShown) this._hide();
+		this._transition++;
+		this._hiding = false;
 		this._unmount();
+		if (owesHidden) execute(this._config.onHidden);
 		if (this._anchorKeydownListener) {
-			EventHandler.off(this._anchor, EVENT_KEYDOWN$14, this._anchorKeydownListener);
+			EventHandler.off(this._anchor, EVENT_KEYDOWN$17, this._anchorKeydownListener);
 			this._anchorKeydownListener = null;
 		}
 		this._focustrap = null;
@@ -2554,6 +2624,23 @@ var Popup = class extends Config {
 	_returnFocusTarget() {
 		if (this._previouslyFocused?.isConnected) return this._previouslyFocused;
 		return this._anchor ? SelectorEngine.focusableChildren(this._anchor)[0] ?? null : null;
+	}
+	_afterTransition(transition, callback) {
+		const content = this._content;
+		let settled = false;
+		const settle = () => {
+			if (settled) return;
+			settled = true;
+			if (transition === this._transition) callback();
+		};
+		const duration = getTransitionDurationFromElement(content);
+		const fades = typeof content.getAnimations === "function" ? content.getAnimations().filter((animation) => animation instanceof CSSTransition && animation.transitionProperty === "opacity") : [];
+		if (fades.length === 0) {
+			setTimeout(settle, duration + 5);
+			return;
+		}
+		Promise.allSettled(fades.map((fade) => fade.finished)).then(settle);
+		setTimeout(settle, duration + 1e3);
 	}
 	_unmount() {
 		if (!this._isShown) this._content?.remove();
@@ -2591,6 +2678,7 @@ var Popup = class extends Config {
 				position: "absolute",
 				top: `${y}px`
 			});
+			this._revealEntry();
 		});
 	}
 	_addAnchorKeydownListener() {
@@ -2600,12 +2688,24 @@ var Popup = class extends Config {
 			event.preventDefault();
 			this.show();
 		};
-		EventHandler.on(this._anchor, EVENT_KEYDOWN$14, this._anchorKeydownListener);
+		EventHandler.on(this._anchor, EVENT_KEYDOWN$17, this._anchorKeydownListener);
 	}
 	_focusPanel() {
 		if (!this._content) return;
-		const stops = SelectorEngine.find("[tabindex=\"0\"]", this._content);
-		(stops.find((element) => element.getAttribute("aria-selected") === "true") ?? stops.find((element) => element.getAttribute("aria-current") === "date" || Boolean(element.querySelector("[aria-current=\"date\"]"))) ?? stops[stops.length - 1] ?? SelectorEngine.focusableChildren(this._content)[0])?.focus();
+		const current = SelectorEngine.findOne("[aria-current=\"date\"]", this._content);
+		const today = current?.closest("[aria-disabled=\"true\"]") ? null : current;
+		const entry = SelectorEngine.findOne(".selected[aria-selected=\"true\"], [aria-selected=\"true\"]:not(.calendar-cell):not(.calendar-row)", this._content) ?? today?.closest("[data-coreui-selectable]") ?? today?.closest("[tabindex]") ?? SelectorEngine.findOne("[tabindex=\"0\"]", this._content) ?? SelectorEngine.focusableChildren(this._content)[0];
+		entry?.focus({ preventScroll: true });
+		this._revealPending = Boolean(entry);
+	}
+	_revealEntry() {
+		if (!this._revealPending) return;
+		this._revealPending = false;
+		const active = document.activeElement;
+		if (active instanceof HTMLElement && this._content?.contains(active)) active.scrollIntoView({
+			block: "nearest",
+			inline: "nearest"
+		});
 	}
 	_addDismissListeners() {
 		this._pointerdownListener = (event) => {
@@ -2623,16 +2723,16 @@ var Popup = class extends Config {
 				this.hide();
 			}
 		};
-		EventHandler.on(document, EVENT_POINTERDOWN$2, this._pointerdownListener);
-		EventHandler.on(document, EVENT_KEYDOWN$14, this._keydownListener);
-		EventHandler.on(this._content, EVENT_KEYDOWN$14, this._contentKeydownListener);
-		EventHandler.on(this._anchor, EVENT_KEYDOWN$14, this._contentKeydownListener);
+		EventHandler.on(document, EVENT_POINTERDOWN$4, this._pointerdownListener);
+		EventHandler.on(document, EVENT_KEYDOWN$17, this._keydownListener);
+		EventHandler.on(this._content, EVENT_KEYDOWN$17, this._contentKeydownListener);
+		EventHandler.on(this._anchor, EVENT_KEYDOWN$17, this._contentKeydownListener);
 	}
 	_removeDismissListeners() {
-		EventHandler.off(document, EVENT_POINTERDOWN$2, this._pointerdownListener);
-		EventHandler.off(document, EVENT_KEYDOWN$14, this._keydownListener);
-		EventHandler.off(this._content, EVENT_KEYDOWN$14, this._contentKeydownListener);
-		EventHandler.off(this._anchor, EVENT_KEYDOWN$14, this._contentKeydownListener);
+		EventHandler.off(document, EVENT_POINTERDOWN$4, this._pointerdownListener);
+		EventHandler.off(document, EVENT_KEYDOWN$17, this._keydownListener);
+		EventHandler.off(this._content, EVENT_KEYDOWN$17, this._contentKeydownListener);
+		EventHandler.off(this._anchor, EVENT_KEYDOWN$17, this._contentKeydownListener);
 		this._pointerdownListener = null;
 		this._keydownListener = null;
 		this._contentKeydownListener = null;
@@ -2640,35 +2740,19 @@ var Popup = class extends Config {
 };
 //#endregion
 //#region js/src/combobox-base.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO combobox-base.ts
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Internal shared engine for the combobox-pattern components (Combobox,
-* Autocomplete, MultiSelect). Not exported from the package and not
-* documented — the public surfaces stay the subclasses, which keep their own
-* markup, class names, events and options.
-*
-* The panel is a `.popup` wrapping a ListBox instance: the list renders the
-* options, owns the selection state it shows, and runs the keyboard from the
-* host's own field through `activeDescendant`. The engine keeps the panel
-* (mounting, width, anchored position, Escape) and translates between the
-* host's option model and the list's items.
-*/
 const ARROW_DOWN_KEY$9 = "ArrowDown";
 const ESCAPE_KEY$5 = "Escape";
-const ENTER_KEY$6 = "Enter";
-const CLASS_NAME_SHOW$17 = "show";
-const CLASS_NAME_POPUP$5 = "combobox-popup";
+const ENTER_KEY$5 = "Enter";
+const CLASS_NAME_SHOW$15 = "show";
+const CLASS_NAME_POPUP$2 = "combobox-popup";
 const CLASS_NAME_EMPTY = "list-box-empty";
 const CLASS_NAME_LIST_BOX$1 = "list-box";
 const CLASS_NAME_OPTIONS$2 = "list-box-options";
 const SELECTOR_OPTION$3 = ".list-box-option";
 const EVENT_LIST_BOX_CHANGE$1 = "change.coreui.list-box";
+const EVENT_LIST_BOX_DESELECT = "deselect.coreui.list-box";
 const EVENT_LIST_BOX_DESELECTED = "deselected.coreui.list-box";
+const EVENT_LIST_BOX_SELECT = "select.coreui.list-box";
 const EVENT_LIST_BOX_SELECTED = "selected.coreui.list-box";
 const EVENT_LIST_BOX_SELECTION_LIMIT = "selectionLimit.coreui.list-box";
 var ComboboxBase = class extends BaseComponent {
@@ -2676,13 +2760,14 @@ var ComboboxBase = class extends BaseComponent {
 		return this._isShown() ? this.hide() : this.show();
 	}
 	show() {
-		if (this._config.disabled || this._isShown() || !this._canShow()) return;
+		if (this._isDisabled() || this._isShown() || !this._canShow()) return;
 		if (EventHandler.trigger(this._element, this.constructor.eventName("show")).defaultPrevented) return;
 		const showTarget = this._getShowTarget();
 		this._mountMenu();
-		showTarget.classList.add(CLASS_NAME_SHOW$17);
+		showTarget.classList.add(CLASS_NAME_SHOW$15);
 		this._getAriaExpandedTarget().setAttribute("aria-expanded", "true");
-		this._menu.classList.add(CLASS_NAME_SHOW$17);
+		this._syncPanelReferences();
+		this._menu.classList.add(CLASS_NAME_SHOW$15);
 		EventHandler.trigger(this._element, this.constructor.eventName("shown"));
 		this._createFloating();
 		this._afterShow();
@@ -2693,18 +2778,25 @@ var ComboboxBase = class extends BaseComponent {
 		this._onHideStart();
 		this._disposeFloating();
 		this._afterHideDispose();
-		this._getShowTarget().classList.remove(CLASS_NAME_SHOW$17);
+		this._getShowTarget().classList.remove(CLASS_NAME_SHOW$15);
 		this._getAriaExpandedTarget().setAttribute("aria-expanded", "false");
-		this._menu.classList.remove(CLASS_NAME_SHOW$17);
+		this._menu.classList.remove(CLASS_NAME_SHOW$15);
 		this._listBox?.setActive(null);
 		this._onHideEnd();
+		this._syncPanelReferences();
 		EventHandler.trigger(this._element, this.constructor.eventName("hidden"));
 		executeAfterTransition(() => {
-			if (this._menu && !this._isShown()) this._menu.remove();
+			if (this._menu && !this._isShown()) {
+				this._menu.remove();
+				this._syncPanelReferences();
+			}
 		}, this._menu);
 	}
+	_isDisabled() {
+		return this._config.disabled;
+	}
 	_isShown() {
-		return this._getShowTarget().classList.contains(CLASS_NAME_SHOW$17);
+		return this._getShowTarget().classList.contains(CLASS_NAME_SHOW$15);
 	}
 	_canShow() {
 		return true;
@@ -2725,6 +2817,21 @@ var ComboboxBase = class extends BaseComponent {
 		this._widthObserver = new ResizeObserver(() => this._syncMenuWidth());
 		this._widthObserver.observe(showTarget);
 	}
+	_syncPanelReferences() {
+		this._listBox?._updateActiveDescendant();
+		this._listBox?._syncLoadingAnnouncement();
+		const open = this._menu.isConnected && this._isShown();
+		const field = this._getActiveDescendantField();
+		if (field && !open) {
+			field.removeAttribute("aria-controls");
+			field.removeAttribute("aria-activedescendant");
+		}
+		for (const [element, id] of this._getPanelReferences()) if (open) element.setAttribute("aria-controls", id);
+		else element.removeAttribute("aria-controls");
+	}
+	_getPanelReferences() {
+		return [];
+	}
 	_syncMenuWidth() {
 		if (this._menu) this._menu.style.minWidth = `${this._getShowTarget().offsetWidth}px`;
 	}
@@ -2737,15 +2844,18 @@ var ComboboxBase = class extends BaseComponent {
 	_addTogglerKeydownListeners() {
 		EventHandler.on(this._togglerElement, this.constructor.eventName("keydown"), (event) => {
 			if (event.defaultPrevented) return;
-			if (!this._isShown() && (event.key === ENTER_KEY$6 || event.key === ARROW_DOWN_KEY$9)) {
+			if (!this._isShown() && this._isOpenKey(event)) {
 				event.preventDefault();
 				this.show();
 			}
 		});
 	}
+	_isOpenKey(event) {
+		return event.key === ENTER_KEY$5 || event.key === ARROW_DOWN_KEY$9;
+	}
 	_createOptionsContainer() {
 		const popupDiv = document.createElement("div");
-		popupDiv.classList.add("popup", CLASS_NAME_POPUP$5);
+		popupDiv.classList.add("popup", CLASS_NAME_POPUP$2);
 		const listBoxDiv = document.createElement("div");
 		listBoxDiv.classList.add(CLASS_NAME_LIST_BOX$1);
 		popupDiv.append(listBoxDiv);
@@ -2771,8 +2881,7 @@ var ComboboxBase = class extends BaseComponent {
 		this._addPanelEscapeListener(popupDiv);
 		this._optionsElement = optionsDiv;
 		this._menu = popupDiv;
-		this._syncing = false;
-		this._listBox = new ListBox(listBoxDiv, this._getListBoxConfig());
+		this._listBox = new ListBox(listBoxDiv, this._getListBoxConfig(), this._store);
 		this._addListBoxListeners();
 		this._afterMenuCreated();
 	}
@@ -2809,7 +2918,7 @@ var ComboboxBase = class extends BaseComponent {
 	}
 	_getListBoxItems(options = this._options) {
 		return options.map((option) => {
-			if (Array.isArray(option.options)) return {
+			if (isOptionGroup(option)) return {
 				label: this._renderGroupLabel(option),
 				items: this._getListBoxItems(option.options)
 			};
@@ -2840,53 +2949,37 @@ var ComboboxBase = class extends BaseComponent {
 	}
 	_afterOptionsRendered() {}
 	_disposeListBox() {
+		this._listBoxElement?.removeEventListener(EVENT_LIST_BOX_CHANGE$1, this._listBoxChangeHandler);
 		this._listBox?.dispose();
 		this._listBox = null;
 	}
 	_addListBoxListeners() {
+		const refuseWhileDisabled = (event) => {
+			if (this._isDisabled()) event.preventDefault();
+		};
+		EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_DESELECT, refuseWhileDisabled);
 		EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTED, (event) => {
-			if (!this._syncing) this._onOptionSelected(String(event.value));
+			this._onOptionSelected(String(event.value));
 		});
 		EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_DESELECTED, (event) => {
-			if (!this._syncing) this._onOptionDeselected(String(event.value));
+			this._onOptionDeselected(String(event.value));
 		});
-		this._listBoxElement.addEventListener(EVENT_LIST_BOX_CHANGE$1, () => {
-			if (!this._syncing) this._onSelectionChange();
-		});
-		EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTION_LIMIT, () => {
-			if (!this._syncing) this._onSelectionLimit();
+		this._listBoxChangeHandler = () => this._onSelectionChange();
+		this._listBoxElement.addEventListener(EVENT_LIST_BOX_CHANGE$1, this._listBoxChangeHandler);
+		this._listBoxElement.addEventListener(EVENT_LIST_BOX_SELECT, refuseWhileDisabled);
+		EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTION_LIMIT, (event) => {
+			this._onSelectionLimit(event.limit, String(event.value));
 		});
 	}
 	_onOptionSelected(value) {}
 	_onOptionDeselected(value) {}
 	_onSelectionChange() {}
-	_onSelectionLimit() {}
-	_syncOptionElementState(value, selected) {
-		if (!this._listBox) return;
-		this._syncing = true;
-		if (selected) this._listBox.select(String(value));
-		else this._listBox.deselect(String(value));
-		this._syncing = false;
+	_commitSelection(values) {
+		if (this._store.commit(values)) this._listBox?.update();
 	}
-	_flattenOptions(options = this._options, flat = []) {
-		for (const option of options) {
-			if (option && Array.isArray(option.options)) {
-				this._flattenOptions(option.options, flat);
-				continue;
-			}
-			flat.push(option);
-		}
-		return flat;
-	}
+	_onSelectionLimit(limit, value) {}
 	_findOptionByValue(value, options = this._options) {
-		for (const option of options) {
-			if (String(option.value) === String(value)) return option;
-			if (option.options && Array.isArray(option.options)) {
-				const found = this._findOptionByValue(value, option.options);
-				if (found) return found;
-			}
-		}
-		return null;
+		return findOptionByValue(options, value);
 	}
 	_createFloating() {
 		this._anchoredPosition = createAnchoredPosition(this._togglerElement, this._menu);
@@ -2904,8 +2997,11 @@ var ComboboxBase = class extends BaseComponent {
 			this._anchoredPosition = null;
 		}
 	}
+	_filterQuery() {
+		return this._search === "" ? null : this._search;
+	}
 	_filterOptionsList() {
-		this._listBox?.filter(this._search === "" ? null : this._search);
+		this._listBox?.filter(this._filterQuery());
 		this._afterOptionsRendered();
 		this._afterFilter(this._getDisplayedOptions().length);
 	}
@@ -2923,75 +3019,582 @@ var ComboboxBase = class extends BaseComponent {
 	}
 };
 //#endregion
+//#region js/src/util/form-validation.ts
+const ATTRIBUTE_INVALID_FEEDBACK$1 = "data-coreui-invalid-feedback";
+const CLASS_NAME_IS_INVALID$1 = "is-invalid";
+const CLASS_NAME_IS_VALID$1 = "is-valid";
+const SELECTOR_ARIA_HIDDEN = "[aria-hidden=\"true\"]";
+const SELECTOR_AUTOCOMPLETE = ".autocomplete";
+const SELECTOR_CHIP_INPUT = ".chip-input";
+const SELECTOR_CHOICE = "[type=\"checkbox\"], [type=\"radio\"]";
+const SELECTOR_COMBOBOX_SELECT = ".combobox-select";
+const SELECTOR_COMBOBOX_TOGGLE = ".combobox-toggle";
+const SELECTOR_CONTROL = "input, select, textarea";
+const SELECTOR_DATE_TIME = ".form-date-time";
+const SELECTOR_FIELD = ".form-field";
+const SELECTOR_FIELD_CONTROL = ".check, .radio, .switch";
+const SELECTOR_FLOATING = ".form-floating";
+const SELECTOR_FORM_VALIDATE_VALID = "[data-coreui-validate~=\"valid\"]";
+const SELECTOR_FRAME = ".form-control-group";
+const SELECTOR_HIDDEN = `[hidden], ${SELECTOR_ARIA_HIDDEN}`;
+const SELECTOR_INPUT_GROUP = ".input-group";
+const SELECTOR_INPUT_GROUP_CONTROL = ".form-control, .form-select";
+const SELECTOR_INVALID_FEEDBACK = ".invalid-feedback, .invalid-tooltip";
+const SELECTOR_OTP = ".form-otp";
+const SELECTOR_POPUP$1 = ".popup";
+const SELECTOR_RANGE$1 = ".form-range";
+const SELECTOR_RANGE_INPUT = ".form-range-input";
+const SELECTOR_RATING = ".rating";
+const SELECTOR_USER_INVALID = "[data-coreui-validate] :user-invalid";
+const SELECTOR_USER_VALID = "[data-coreui-validate~=\"valid\"] :user-valid";
+const STATE_CLASSES = [CLASS_NAME_IS_INVALID$1, CLASS_NAME_IS_VALID$1];
+const STATE_INVALID_MESSAGE = "Invalid value.";
+const ownedControls = /* @__PURE__ */ new WeakSet();
+let stateSerial = 0;
+const stateMessages = /* @__PURE__ */ new WeakMap();
+const createMark = () => ({
+	ariaInvalid: false,
+	classes: [],
+	describedBy: []
+});
+const isValidatable = (control) => control?.willValidate === true && ![
+	"button",
+	"image",
+	"reset",
+	"submit"
+].includes(control.type);
+const splitIds = (value) => (value ?? "").split(/\s+/).filter(Boolean);
+const setDescribedBy = (control, ids) => {
+	if (ids.join(" ") === (control.getAttribute("aria-describedby") ?? "")) return;
+	if (ids.length > 0) control.setAttribute("aria-describedby", ids.join(" "));
+	else control.removeAttribute("aria-describedby");
+};
+const startsAnotherField = (element, control) => [element, ...element.querySelectorAll(SELECTOR_CONTROL)].some((other) => isValidatable(other) && other !== control && !(control.name && other.name === control.name && other.matches(SELECTOR_CHOICE)));
+const isShownFeedback = (element) => element.matches(SELECTOR_INVALID_FEEDBACK) && !element.matches(SELECTOR_HIDDEN);
+const getFollowingFeedback = (element, control) => {
+	const feedback = [];
+	for (let sibling = element.nextElementSibling; sibling && (sibling.matches(SELECTOR_POPUP$1) || !startsAnotherField(sibling, control)); sibling = sibling.nextElementSibling) if (isShownFeedback(sibling)) feedback.push(sibling);
+	return feedback;
+};
+const getLayoutElement = (control) => {
+	const previous = control.previousElementSibling;
+	return control.closest(`${SELECTOR_AUTOCOMPLETE}, ${SELECTOR_CHIP_INPUT}, ${SELECTOR_DATE_TIME}, ${SELECTOR_OTP}, ${SELECTOR_RATING}`) ?? (control.matches(SELECTOR_COMBOBOX_SELECT) && previous?.matches(SELECTOR_COMBOBOX_TOGGLE) ? previous : control);
+};
+const getFrame = (control) => {
+	const parent = control.parentElement;
+	const holder = parent?.matches(SELECTOR_FLOATING) ? parent.parentElement : parent;
+	return holder?.matches(SELECTOR_FRAME) ? holder : null;
+};
+const getMarkedAncestors = (element) => {
+	const ancestors = [];
+	for (let ancestor = element.parentElement; ancestor && ancestor.tagName !== "FORM"; ancestor = ancestor.parentElement) if (ancestor.classList.contains(CLASS_NAME_IS_INVALID$1)) ancestors.push(ancestor);
+	return ancestors;
+};
+const reachesField = (control, field) => {
+	const inputGroup = control.matches(SELECTOR_INPUT_GROUP_CONTROL) ? control.closest(SELECTOR_INPUT_GROUP) : null;
+	const frame = control.matches(SELECTOR_FRAME) ? control : getFrame(control);
+	return control.matches(SELECTOR_FIELD_CONTROL) || [frame, inputGroup].some((group) => group && group !== field && field.contains(group));
+};
+const getStructuralFeedback = (control) => {
+	const element = getLayoutElement(control);
+	const anchor = getFrame(element) ?? (element.matches(SELECTOR_RANGE_INPUT) ? element.closest(SELECTOR_RANGE$1) : null);
+	const fieldFeedback = [];
+	for (let field = element.closest(SELECTOR_FIELD); field; field = field.parentElement?.closest(SELECTOR_FIELD) ?? null) if (reachesField(element, field)) fieldFeedback.push(...[...field.querySelectorAll(SELECTOR_INVALID_FEEDBACK)].filter((feedback) => isShownFeedback(feedback) && feedback.closest(SELECTOR_FIELD)?.contains(element)));
+	return [
+		...getFollowingFeedback(element, control),
+		...anchor ? getFollowingFeedback(anchor, control) : [],
+		...getMarkedAncestors(element).flatMap((ancestor) => getFollowingFeedback(ancestor, control)),
+		...fieldFeedback
+	];
+};
+const getFeedbackIds = (control) => {
+	const named = splitIds(getLayoutElement(control).getAttribute(ATTRIBUTE_INVALID_FEEDBACK$1));
+	if (named.length > 0) return [...new Set(named)];
+	const form = control.closest("form");
+	const members = control.name && control.matches(SELECTOR_CHOICE) && form ? [...form.elements].filter((other) => isValidatable(other) && other.name === control.name && other.matches(SELECTOR_CHOICE)) : [control];
+	return [...new Set(members.flatMap((member) => getStructuralFeedback(member)))].map((element) => {
+		element.id ||= getUID("invalid-feedback-");
+		return element.id;
+	});
+};
+const markControl = (control, marks) => {
+	const mark = marks.get(control) ?? createMark();
+	if (control.getAttribute("aria-invalid") !== "true") {
+		control.setAttribute("aria-invalid", "true");
+		mark.ariaInvalid = true;
+	}
+	const feedbackIds = getFeedbackIds(control);
+	const describedBy = splitIds(control.getAttribute("aria-describedby")).filter((id) => feedbackIds.includes(id) || !mark.describedBy.includes(id));
+	const addedIds = feedbackIds.filter((id) => !describedBy.includes(id));
+	mark.describedBy = [...mark.describedBy.filter((id) => feedbackIds.includes(id) && describedBy.includes(id)), ...addedIds];
+	setDescribedBy(control, [...describedBy, ...addedIds]);
+	marks.set(control, mark);
+};
+const unmarkControl = (control, marks) => {
+	const mark = marks.get(control);
+	if (!mark) return;
+	if (mark.ariaInvalid) control.removeAttribute("aria-invalid");
+	setDescribedBy(control, splitIds(control.getAttribute("aria-describedby")).filter((id) => !mark.describedBy.includes(id)));
+	mark.ariaInvalid = false;
+	mark.describedBy = [];
+};
+const setStateClasses = (control, mark, classes) => {
+	const owned = STATE_CLASSES.some((name) => control.classList.contains(name) && !mark.classes.includes(name)) ? [] : classes;
+	for (const name of mark.classes.filter((name) => !owned.includes(name))) control.classList.remove(name);
+	control.classList.add(...owned);
+	mark.classes = owned;
+};
+const updateControlValidationState = (control, form, marks) => {
+	if (!isValidatable(control) || ownedControls.has(control)) {
+		const mark = marks.get(control);
+		if (mark) {
+			setStateClasses(control, mark, []);
+			unmarkControl(control, marks);
+			marks.delete(control);
+		}
+		return;
+	}
+	const mark = marks.get(control) ?? createMark();
+	const isValid = control.validity.valid;
+	marks.set(control, mark);
+	setStateClasses(control, mark, isValid ? form.matches(SELECTOR_FORM_VALIDATE_VALID) ? [CLASS_NAME_IS_VALID$1] : [] : [CLASS_NAME_IS_INVALID$1]);
+	if (isValid) unmarkControl(control, marks);
+	else markControl(control, marks);
+};
+const updateValidationState = (form, marks) => {
+	for (const control of form.elements) updateControlValidationState(control, form, marks);
+};
+const clearValidationState = (form, marks) => {
+	for (const control of form.elements) {
+		const mark = marks.get(control);
+		if (mark) setStateClasses(control, mark, []);
+		unmarkControl(control, marks);
+		marks.delete(control);
+	}
+};
+const getFocusedElement = (form) => form.getRootNode().activeElement ?? form.ownerDocument.activeElement;
+const moveFocusTo = (control) => {
+	let moved = false;
+	const handleFocusIn = () => {
+		moved = true;
+	};
+	control.ownerDocument.addEventListener("focusin", handleFocusIn, true);
+	control.focus();
+	control.ownerDocument.removeEventListener("focusin", handleFocusIn, true);
+	return moved;
+};
+const getText = (element) => {
+	if (!element) return "";
+	const clone = element.cloneNode(true);
+	for (const hidden of clone.querySelectorAll(SELECTOR_HIDDEN)) hidden.remove();
+	return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
+};
+const getFeedbackText = (control) => {
+	const root = control.getRootNode();
+	const getById = (id) => "getElementById" in root ? root.getElementById(id) : root.querySelector(`#${CSS.escape(id)}`);
+	const feedbackIds = getFeedbackIds(control);
+	return (feedbackIds.length > 0 ? feedbackIds : splitIds(control.getAttribute("aria-describedby")).filter((id) => getById(id)?.matches(SELECTOR_INVALID_FEEDBACK))).map((id) => getText(getById(id))).filter(Boolean).join(" ");
+};
+const announceInvalid = (control) => {
+	setTimeout(() => {
+		const message = getFeedbackText(control) || control.validationMessage;
+		if (message) announce(message, { context: control });
+	});
+};
+const focusFirstInvalidControl = (form) => {
+	const previous = getFocusedElement(form);
+	const invalidControls = [...form.elements].filter((control) => isValidatable(control) && !control.validity.valid);
+	for (const control of invalidControls) {
+		const moved = moveFocusTo(control);
+		const focused = getFocusedElement(form);
+		if (focused && focused !== form.ownerDocument.body && !focused.closest(SELECTOR_ARIA_HIDDEN) && (focused === control || moved)) {
+			if (focused === previous) announceInvalid(control);
+			return;
+		}
+	}
+	if (getFocusedElement(form) !== previous) previous?.focus();
+	if (getFocusedElement(form) !== previous) getFocusedElement(form)?.blur();
+	if (invalidControls.length > 0) announceInvalid(invalidControls[0]);
+};
+const isFormValid = (form) => [...form.elements].every((control) => control.willValidate !== true || control.validity.valid);
+const validateForm = (form, marks, onValidate) => {
+	const focusedElement = getFocusedElement(form);
+	const isValid = isFormValid(form);
+	if (onValidate?.(isValid)) return {
+		handled: false,
+		isValid
+	};
+	const isValidAfterHook = form.checkValidity();
+	updateValidationState(form, marks);
+	if (!isValidAfterHook && getFocusedElement(form) === focusedElement) focusFirstInvalidControl(form);
+	return {
+		handled: true,
+		isValid: isValidAfterHook
+	};
+};
+const getValidationState = (validationState, valid, invalid) => validationState || (invalid ? "invalid" : valid ? "valid" : void 0);
+const getStateClasses = (element) => STATE_CLASSES.filter((name) => element.classList.contains(name));
+const getServerState = (classes) => getValidationState(null, classes.includes(CLASS_NAME_IS_VALID$1), classes.includes(CLASS_NAME_IS_INVALID$1));
+const matchesSafely = (element, selector) => {
+	try {
+		return element.matches(selector);
+	} catch {
+		return false;
+	}
+};
+const getUserValidity = (control) => {
+	if (matchesSafely(control, SELECTOR_USER_INVALID)) return "invalid";
+	return matchesSafely(control, SELECTOR_USER_VALID) ? "valid" : void 0;
+};
+const nextStateSerial = () => ++stateSerial;
+const followUserValidity = (control, onUpdate, onReset, wasReported = false) => {
+	const root = control.getRootNode();
+	const roots = root instanceof ShadowRoot ? [control.ownerDocument, root] : [control.ownerDocument];
+	let current = control;
+	let reported = wasReported;
+	let reportedSinceReset = false;
+	let resetTimeout;
+	const read = () => reported && !current.validity.valid ? "invalid" : getUserValidity(current);
+	const update = () => onUpdate(read());
+	const handleInvalid = () => {
+		reported = true;
+		reportedSinceReset = true;
+		update();
+	};
+	const listen = (method) => {
+		for (const type of [
+			"change",
+			"focusout",
+			"input"
+		]) current[method](type, update);
+		current[method]("invalid", handleInvalid);
+	};
+	const handleFormEvent = (event) => {
+		if (event.target !== current.form) return;
+		if (event.type === "submit") {
+			update();
+			return;
+		}
+		const serial = stateSerial;
+		clearTimeout(resetTimeout);
+		reportedSinceReset = false;
+		resetTimeout = setTimeout(() => {
+			if (!event.defaultPrevented) {
+				reported = reportedSinceReset;
+				onReset?.(serial);
+			}
+			update();
+		});
+	};
+	listen("addEventListener");
+	for (const node of roots) {
+		node.addEventListener("reset", handleFormEvent, true);
+		node.addEventListener("submit", handleFormEvent);
+	}
+	return {
+		follow(next) {
+			listen("removeEventListener");
+			current = next;
+			listen("addEventListener");
+		},
+		read,
+		stop() {
+			clearTimeout(resetTimeout);
+			listen("removeEventListener");
+			for (const node of roots) {
+				node.removeEventListener("reset", handleFormEvent, true);
+				node.removeEventListener("submit", handleFormEvent);
+			}
+		}
+	};
+};
+const ownValidationState = (...controls) => {
+	for (const control of controls) ownedControls.add(control);
+	return () => {
+		for (const control of controls) ownedControls.delete(control);
+	};
+};
+const setStateValidity = (control, invalid) => {
+	const ownMessage = stateMessages.get(control);
+	const isOwn = ownMessage !== void 0 && control.validity.customError && (!control.willValidate || control.validationMessage === ownMessage);
+	if (ownMessage !== void 0 && !isOwn) stateMessages.delete(control);
+	if (!invalid) {
+		if (isOwn) {
+			control.setCustomValidity("");
+			stateMessages.delete(control);
+		}
+		return;
+	}
+	if (control.validity.customError && !isOwn) return;
+	const message = getFeedbackText(control) || STATE_INVALID_MESSAGE;
+	control.setCustomValidity(message);
+	stateMessages.set(control, control.willValidate ? control.validationMessage : message);
+};
+const createValueField = (tagName, getFocusTarget) => {
+	const field = document.createElement(tagName);
+	field.tabIndex = -1;
+	field.setAttribute("aria-hidden", "true");
+	field.setAttribute("autocomplete", "off");
+	field.addEventListener("focus", () => getFocusTarget()?.focus());
+	return field;
+};
+const configureValueField = (field, { disabled = false, name = null, readOnly = false, required = false } = {}) => {
+	field.disabled = disabled;
+	field.required = required;
+	if (!(field instanceof HTMLSelectElement)) field.readOnly = readOnly;
+	if (name) field.name = name;
+	else field.removeAttribute("name");
+};
+const writeValueField = (field, value) => {
+	if (field instanceof HTMLSelectElement) {
+		const list = Array.isArray(value) ? value : [value];
+		const values = field.multiple ? list : list.length > 0 ? list.slice(0, 1) : [""];
+		const current = [...field.selectedOptions].map((option) => option.value);
+		if (values.length === current.length && values.every((item, index) => item === current[index])) return false;
+		field.replaceChildren(...values.map((item) => new Option(item, item, true, true)));
+		return true;
+	}
+	const text = Array.isArray(value) ? value.join(",") : value;
+	if (field.value === text) return false;
+	field.value = text;
+	return true;
+};
+const dispatchValueChange = (field) => {
+	field.dispatchEvent(new Event("input", { bubbles: true }));
+	field.dispatchEvent(new Event("change", { bubbles: true }));
+};
+const alignValueField = (field, target) => {
+	const fieldRect = field.getBoundingClientRect();
+	const targetRect = target.getBoundingClientRect();
+	const style = getComputedStyle(field);
+	const offset = getComputedStyle(target).direction === "rtl" ? targetRect.right - fieldRect.right : targetRect.left - fieldRect.left;
+	field.style.top = `${Number.parseFloat(style.top) + targetRect.top - fieldRect.top}px`;
+	field.style.left = `${Number.parseFloat(style.left) + offset}px`;
+	field.style.height = `${targetRect.height}px`;
+};
+//#endregion
+//#region js/src/util/field-validation.ts
+var FieldValidation = class {
+	constructor(host, options) {
+		const root = host.getRootNode();
+		this._ariaInvalid = [];
+		this._described = /* @__PURE__ */ new Map();
+		this._describedBy = splitIds(host.getAttribute("aria-describedby"));
+		this._fields = [];
+		this._frames = /* @__PURE__ */ new Map();
+		this._host = host;
+		this._movedDescription = false;
+		this._onReset = (event) => this._handleReset(event);
+		this._options = options;
+		this._owner = null;
+		this._parts = [];
+		this._release = () => {};
+		this._resetRoots = root instanceof ShadowRoot ? [host.ownerDocument, root] : [host.ownerDocument];
+		this._resetTimeout = void 0;
+		this._serial = nextStateSerial();
+		this._serverClasses = /* @__PURE__ */ new Map();
+		for (const element of options.serverClassSources?.() ?? [host]) {
+			const classes = getStateClasses(element);
+			if (classes.length > 0) {
+				element.classList.remove(...classes);
+				this._serverClasses.set(element, classes);
+			}
+		}
+		for (const node of this._resetRoots) node.addEventListener("reset", this._onReset, true);
+		this._userValidity = /* @__PURE__ */ new Map();
+		this.userAction = false;
+	}
+	adopt(part) {
+		part._owner = this;
+		this._parts.push(part);
+		this.update();
+	}
+	configure(config) {
+		const keys = Object.keys(config ?? {});
+		const isValidationOption = (key) => key === "validationState" || Boolean(this._options.aliases && (key === "invalid" || key === "valid"));
+		if (!keys.some(isValidationOption)) return false;
+		this._serverClasses.clear();
+		this._serial = nextStateSerial();
+		if (keys.every(isValidationOption)) {
+			this.update();
+			return true;
+		}
+		return false;
+	}
+	runAsUser(action) {
+		const pending = this.userAction;
+		this.userAction = true;
+		try {
+			action();
+		} finally {
+			this.userAction = pending && this.userAction;
+		}
+	}
+	change() {
+		if (!this.userAction && !this._owner?.change()) return false;
+		this.userAction = false;
+		this.dismiss();
+		return true;
+	}
+	dismiss(serial = Number.POSITIVE_INFINITY) {
+		const config = this._options.config();
+		const isDropped = this._serial <= serial && this._givenState(config) !== void 0;
+		if (isDropped) {
+			config.validationState = null;
+			if (this._options.aliases) {
+				config.invalid = false;
+				config.valid = false;
+			}
+			this._serverClasses.clear();
+		}
+		this._owner?.dismiss(serial);
+		if (isDropped) this.update();
+	}
+	refresh() {
+		const fields = this._options.fields();
+		const followers = /* @__PURE__ */ new Map();
+		for (const [index, field] of fields.entries()) {
+			const replaced = this._fields[index];
+			let userValidity = this._userValidity.get(field);
+			if (!userValidity && replaced !== void 0 && !fields.includes(replaced)) {
+				userValidity = this._userValidity.get(replaced);
+				userValidity.follow(field);
+			}
+			followers.set(field, userValidity ?? followUserValidity(field, () => this.update()));
+		}
+		const kept = new Set(followers.values());
+		for (const [field, userValidity] of this._userValidity) {
+			if (!fields.includes(field)) setStateValidity(field, false);
+			if (!kept.has(userValidity)) userValidity.stop();
+		}
+		this._userValidity = followers;
+		if (!this._movedDescription && !fields.includes(this._host) && !this._options.pageDescribed?.(false).includes(this._host)) {
+			this._movedDescription = true;
+			writeAttribute(this._host, "aria-describedby", null);
+		}
+		this._fields = fields;
+		this._release();
+		this._release = ownValidationState(...this._options.owned?.() ?? fields);
+		this.update();
+	}
+	update() {
+		if (this._owner) {
+			this._owner.update();
+			return;
+		}
+		this._draw();
+	}
+	_draw() {
+		const config = this._options.config();
+		const givenState = this._givenState(config) ?? this._owner?._inheritedState();
+		const fields = this._options.fields();
+		const blockers = this._options.blockers?.() ?? fields;
+		const blocked = givenState === "invalid" && (this._options.canBlock?.() ?? !config.disabled) ? blockers : [];
+		for (const field of fields) if (!blocked.includes(field)) setStateValidity(field, false);
+		const shownState = this._shownState(givenState);
+		const isInvalid = shownState === "invalid" || Boolean(this._owner?._options.ownError?.());
+		const state = isInvalid && shownState !== "invalid" ? void 0 : shownState;
+		this._drawStateClass(state ? `is-${state}` : null);
+		const invalidTargets = this._options.invalidTargets();
+		this._markInvalid(invalidTargets, isInvalid);
+		this._describeTargets(invalidTargets, blockers[0] ?? invalidTargets[0], isInvalid);
+		for (const field of blocked) setStateValidity(field, true);
+		for (const part of this._parts) part._draw();
+	}
+	dispose() {
+		this._owner?._parts.splice(this._owner._parts.indexOf(this), 1);
+		this._owner = null;
+		clearTimeout(this._resetTimeout);
+		for (const node of this._resetRoots) node.removeEventListener("reset", this._onReset, true);
+		for (const userValidity of this._userValidity.values()) userValidity.stop();
+		for (const field of this._options.fields()) setStateValidity(field, false);
+		this._userValidity.clear();
+		this._release();
+		this._drawStateClass(null);
+		this._markInvalid([], false);
+		this._describe([]);
+		for (const [element, classes] of this._serverClasses) element.classList.add(...classes);
+		if (this._movedDescription) {
+			const ids = splitIds(this._host.getAttribute("aria-describedby"));
+			writeAttribute(this._host, "aria-describedby", [.../* @__PURE__ */ new Set([...this._describedBy, ...ids])].join(" ") || null);
+		}
+	}
+	_shownState(givenState) {
+		if (this._hasError()) return "invalid";
+		const reported = [...this._userValidity.values()].map((userValidity) => userValidity.read());
+		return givenState ?? (reported.includes("invalid") ? "invalid" : reported.find(Boolean));
+	}
+	_hasError() {
+		return Boolean(this._options.ownError?.()) || this._parts.some((part) => part._hasError());
+	}
+	_inheritedState() {
+		return this._givenState(this._options.config()) ?? this._owner?._inheritedState();
+	}
+	_givenState(config) {
+		const { aliases } = this._options;
+		return getValidationState(config.validationState, aliases && config.valid, aliases && config.invalid) ?? getServerState([...this._serverClasses.values()].flat());
+	}
+	_drawStateClass(stateClass) {
+		const frames = new Set(this._options.frames());
+		for (const [frame, owned] of this._frames) {
+			if (owned && (owned !== stateClass || !frames.has(frame))) {
+				frame.classList.remove(owned);
+				this._frames.set(frame, null);
+			}
+			if (!frames.has(frame)) this._frames.delete(frame);
+		}
+		for (const frame of frames) if (stateClass && !frame.classList.contains(stateClass)) {
+			frame.classList.add(stateClass);
+			this._frames.set(frame, stateClass);
+		} else if (!this._frames.has(frame)) this._frames.set(frame, null);
+	}
+	_markInvalid(targets, isInvalid) {
+		for (const target of this._ariaInvalid) if (!targets.includes(target)) writeAttribute(target, "aria-invalid", null);
+		this._ariaInvalid = targets;
+		for (const target of targets) writeAttribute(target, "aria-invalid", isInvalid ? "true" : null);
+	}
+	_describeTargets(invalidTargets, source, isInvalid) {
+		const feedbackIds = isInvalid && source ? getFeedbackIds(source) : [];
+		const describedTargets = this._options.describedTargets?.() ?? invalidTargets;
+		const pageDescribed = this._options.pageDescribed?.(isInvalid) ?? describedTargets.filter((_, index) => index === 0 || isInvalid);
+		this._describe(describedTargets.map((target) => [target, [...pageDescribed.includes(target) ? this._describedBy : [], ...feedbackIds]]));
+	}
+	_describe(entries) {
+		const next = new Map(entries);
+		for (const target of this._described.keys()) if (!next.has(target)) next.set(target, []);
+		for (const [target, ids] of next) {
+			const written = this._described.get(target) ?? [];
+			const base = splitIds(target.getAttribute("aria-describedby")).filter((id) => !written.includes(id));
+			const added = [...new Set(ids)].filter((id) => !base.includes(id));
+			writeAttribute(target, "aria-describedby", [...base, ...added].join(" ") || null);
+			if (added.length > 0) this._described.set(target, added);
+			else this._described.delete(target);
+		}
+	}
+	_handleReset(event) {
+		if (!this._options.fields().some((field) => field.form === event.target)) return;
+		const serial = nextStateSerial();
+		clearTimeout(this._resetTimeout);
+		this._resetTimeout = setTimeout(() => {
+			if (!event.defaultPrevented) {
+				this.dismiss(serial);
+				this._options.restore?.();
+			}
+		});
+	}
+};
+//#endregion
 //#region js/src/util/form-control-group.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO util/form-control-group.js
-* License (https://coreui.io/pro/license/)
-*
-* The JavaScript side of the `.form-control-group` primitive: components that
-* assemble a control out of parts build their adornments the same way, so the
-* markup contract lives in one place rather than in each shell.
-* --------------------------------------------------------------------------
-*/
 const CLASS_NAME_FORM_FLOATING = "form-floating";
 const CLASS_NAME_GROUP$1 = "form-control-group";
 const CLASS_NAME_FORM_CONTROL$1 = "form-control";
 const CLASS_NAME_STAYS_ON_CONTROL = /^(?:is|was|js)-/;
-const SIZE_CLASS_NAMES = [`${CLASS_NAME_FORM_CONTROL$1}-lg`, `${CLASS_NAME_FORM_CONTROL$1}-sm`];
-/**
-* Puts the configured size on the frame in place of one the markup carried, so
-* the two cannot both apply and leave the winner to stylesheet order.
-* @param {HTMLElement} element The frame.
-* @param {string | null} size The configured size, or null to leave sizes alone.
-*/
+const SIZE_CLASS_NAMES$1 = [`${CLASS_NAME_FORM_CONTROL$1}-lg`, `${CLASS_NAME_FORM_CONTROL$1}-sm`];
 const applyControlGroupSize = (element, size) => {
 	if (!size) return;
-	element.classList.remove(...SIZE_CLASS_NAMES);
+	element.classList.remove(...SIZE_CLASS_NAMES$1);
 	element.classList.add(`${CLASS_NAME_FORM_CONTROL$1}-${size}`);
 };
-/**
-* The size classes a component owns: none until it is given a size, and then
-* the pair it may have replaced plus the one it applied.
-* @param {string | null} size The configured size.
-* @returns {string[]} The owned size classes, without duplicates.
-*/
-const managedSizeClassNames = (size) => size ? [.../* @__PURE__ */ new Set([...SIZE_CLASS_NAMES, `${CLASS_NAME_FORM_CONTROL$1}-${size}`])] : [];
-/**
-* Records which of the classes a component is about to manage the host already
-* carried, so teardown can tell its own additions from the page's markup.
-* @param {HTMLElement} element The host the component builds on.
-* @param {string[]} managed Every class this component may put on the host.
-* @returns {HostClasses} What the host carried before the component ran.
-*/
-const captureHostClasses = (element, managed) => ({
-	classNames: managed.filter((className) => element.classList.contains(className)),
-	hadAttribute: element.hasAttribute("class")
-});
-/**
-* Puts the managed classes back the way the page had them: the ones it wrote
-* stay, the ones the component added go. Classes outside `managed` are never
-* touched, so anything the page added or removed in the meantime survives —
-* which is why a component owns the size classes only while it has a size of
-* its own to apply.
-* @param {HTMLElement} element The host to give back.
-* @param {string[]} managed Every class this component may have put on the host.
-* @param {HostClasses} host What `captureHostClasses` recorded.
-*/
-const restoreHostClasses = (element, managed, host) => {
-	for (const className of managed) element.classList.toggle(className, host.classNames.includes(className));
-	if (!host.hadAttribute && element.classList.length === 0) element.removeAttribute("class");
-};
-/**
-* Turns an element the author wrote into the frame. The frame transitions its
-* border colour, and an element that was not one a moment ago still carries the
-* initial `currentColor` — so without silencing the transition for that one
-* frame the takeover animates from the text colour to the border colour, a
-* black-to-grey flash on load. An element that is already a frame just gets
-* the extra classes.
-* @param {HTMLElement} element The element to turn into a frame.
-* @param {...string} classNames The frame class plus any component classes.
-*/
 const applyControlGroupClasses = (element, ...classNames) => {
 	if (element.classList.contains(CLASS_NAME_GROUP$1)) {
 		element.classList.add(...classNames);
@@ -3005,20 +3608,6 @@ const applyControlGroupClasses = (element, ...classNames) => {
 	element.style.transitionProperty = previous;
 	if (!hadStyleAttribute && element.getAttribute("style") === "") element.removeAttribute("style");
 };
-/**
-* Returns the group a control sits in, building one around it when there is
-* none. A component that supplies its own adornments can supply the frame that
-* lays them out too, so its markup is a plain form control.
-*
-* Everything the author wrote on that control except `.form-control` moves to
-* the group: a class on the control describes the field, and once it is
-* wrapped the field is the frame — a margin left behind would sit inside the
-* border. State classes (`is-*`, `was-*`) and `js-*` hooks stay: the control
-* is the source of truth the frame reads through `:has()`, and application
-* code keeps finding the control it wrote them on.
-* @param {HTMLElement} element The control.
-* @returns {ControlGroup} The group, whether it was created, and the classes moved onto it.
-*/
 const ensureControlGroup = (element) => {
 	const existing = element.closest(`.${CLASS_NAME_GROUP$1}`);
 	if (existing) return {
@@ -3039,13 +3628,6 @@ const ensureControlGroup = (element) => {
 		movedClassNames
 	};
 };
-/**
-* Undoes ensureControlGroup: the classes go back on the control, and a group
-* this library created is removed. One the author wrote stays — it is theirs,
-* and may hold more than this control.
-* @param {HTMLElement} element The control.
-* @param {ControlGroup} group The group returned by ensureControlGroup.
-*/
 const releaseControlGroup = (element, group) => {
 	element.classList.add(...group.movedClassNames);
 	group.element.classList.remove(...group.movedClassNames);
@@ -3054,23 +3636,6 @@ const releaseControlGroup = (element, group) => {
 		group.element.remove();
 	}
 };
-/**
-* Builds an adornment button for a form control group.
-* @param {object} options The button's class, icon, accessible label, disabled state and the icon sanitizer.
-* @returns {HTMLButtonElement} The button.
-*/
-/**
-* Appends a field to the group — wrapped in its own `.form-floating` with a
-* rendered `<label>` when `floatingLabel` is set, so a generated frame can
-* carry a floating label without any wrapper markup from the author. The
-* label text is the visible half; passing it on as the field's accessible
-* name is the caller's job, so the two stay one thing.
-* @param {HTMLElement} group The `.form-control-group` frame.
-* @param {HTMLElement} field The control to append.
-* @param {string | null} floatingLabel The label text, or null to append bare.
-* @param {string} uidPrefix Prefix for the generated id the label points at.
-* @returns {HTMLElement} The node appended to the group — the field, or its `.form-floating` wrapper.
-*/
 const appendControlGroupField = (group, field, floatingLabel, uidPrefix) => {
 	if (!floatingLabel) {
 		group.append(field);
@@ -3097,76 +3662,69 @@ const createControlGroupAction = (options) => {
 };
 //#endregion
 //#region js/src/util/icons.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO util/icons.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-const CALENDAR_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z\"/><rect width=\"32\" height=\"32\" x=\"112\" y=\"224\"/><rect width=\"32\" height=\"32\" x=\"200\" y=\"224\"/><rect width=\"32\" height=\"32\" x=\"280\" y=\"224\"/><rect width=\"32\" height=\"32\" x=\"368\" y=\"224\"/><rect width=\"32\" height=\"32\" x=\"112\" y=\"296\"/><rect width=\"32\" height=\"32\" x=\"200\" y=\"296\"/><rect width=\"32\" height=\"32\" x=\"280\" y=\"296\"/><rect width=\"32\" height=\"32\" x=\"368\" y=\"296\"/><rect width=\"32\" height=\"32\" x=\"112\" y=\"368\"/><rect width=\"32\" height=\"32\" x=\"200\" y=\"368\"/><rect width=\"32\" height=\"32\" x=\"280\" y=\"368\"/><rect width=\"32\" height=\"32\" x=\"368\" y=\"368\"/></svg>";
-const CARET_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M256 382.627 60.687 187.313l22.626-22.626L256 337.372l172.687-172.685 22.626 22.626z\"/></svg>";
-const CHECK_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z\"/></svg>";
-const CHEVRON_DOUBLE_LEFT_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M416.686 447.313 221.373 252 416.686 56.687l22.628 22.626L266.627 252l172.687 172.687z\"/><path d=\"M256.686 447.313 61.373 252 256.686 56.687l22.628 22.626L106.627 252l172.687 172.687z\"/></svg>";
-const CHEVRON_DOUBLE_RIGHT_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"m95.314 447.313-22.628-22.626L245.373 252 72.686 79.313l22.628-22.626L290.627 252z\"/><path d=\"m255.314 447.313-22.628-22.626L405.373 252 232.686 79.313l22.628-22.626L450.627 252z\"/></svg>";
-const CHEVRON_LEFT_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M324.687 451.313 129.373 256 324.687 60.687l22.626 22.626L174.628 256l172.685 172.687z\"/></svg>";
-const CHEVRON_RIGHT_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"m179.313 451.313-22.626-22.626L329.372 256 156.687 83.313l22.626-22.626L374.627 256z\"/></svg>";
-const CLEANER_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"39.15 39.15 433.71 433.71\" fill=\"currentColor\"><path d=\"m427.314 107.313-22.628-22.626L256 233.373 107.314 84.687l-22.628 22.626L233.373 256 84.686 404.687l22.628 22.626L256 278.627l148.686 148.686 22.628-22.626L278.627 256z\"/></svg>";
-const CLOCK_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16Zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208Z\"/><path d=\"M272 128h-32v139.314l84.686 84.687 22.628-22.628L272 254.059V128Z\"/></svg>";
-const PICKER_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z\"/></svg>";
-const MINUS_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M464 240H48v32h416z\"/></svg>";
-const PASSWORD_HIDE_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M397.222,131.1l-.218-.223C333.831,67.707,238.47,55.862,163.228,95.346l23.938,23.939c61.571-27.691,136.573-16.327,187.105,34.115L464,246.683v3.107l-71.744,74.585,22.63,22.63L496,262.683V233.79Z\"/><path d=\"M352.8,284.33A103.307,103.307,0,0,0,219.907,151.438L246.1,177.63a71.228,71.228,0,0,1,80.507,80.508Z\"/><path d=\"M369.9,347.268l-33.831-33.831c.088-.108.179-.212.266-.32l-22.805-22.806c-.083.113-.169.222-.253.334l-99.681-99.681c.112-.083.221-.17.334-.253L191.12,167.906c-.108.087-.213.179-.321.266L38.627,16H16V38.627l95.689,95.689L16,233.79v28.893l98.778,102.689.218.222A199.732,199.732,0,0,0,367.372,390l106,106H496V473.373L392.537,369.911Zm-177.157-131.9L288.871,311.5a71.28,71.28,0,0,1-96.133-96.133ZM137.729,343.073,48,249.79v-3.107l86.319-89.737,35.065,35.064A103.248,103.248,0,0,0,312.226,334.853l32.007,32.007C279.723,406.875,193.711,398.955,137.729,343.073Z\"/></svg>";
-const PASSWORD_SHOW_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M256,144.927A103.309,103.309,0,1,0,359.309,248.236,103.426,103.426,0,0,0,256,144.927Zm0,174.618a71.309,71.309,0,1,1,71.309-71.309A71.39,71.39,0,0,1,256,319.545Z\"/><path d=\"M397.222,131.1l-.218-.223c-77.75-77.749-204.258-77.749-282.008,0L16,233.79v28.893l98.778,102.689.218.222a199.409,199.409,0,0,0,282.008,0l99-102.911V233.79ZM464,249.79l-89.732,93.285a167.409,167.409,0,0,1-236.536,0L48,249.79v-3.107L137.729,153.4c65.247-65.13,171.3-65.13,236.542,0L464,246.683Z\"/><rect width=\"32\" height=\"32\" x=\"240\" y=\"232\" /></svg>";
-const PLUS_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"M464 240H272V48h-32v192H48v32h192v192h32V272h192z\"/></svg>";
+const svg = (content, viewBox = "0 0 512 512") => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" fill="currentColor">${content}</svg>`;
+const CALENDAR_ICON = /* @__PURE__ */ svg("<path d=\"M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z\"/><rect width=\"32\" height=\"32\" x=\"112\" y=\"224\"/><rect width=\"32\" height=\"32\" x=\"200\" y=\"224\"/><rect width=\"32\" height=\"32\" x=\"280\" y=\"224\"/><rect width=\"32\" height=\"32\" x=\"368\" y=\"224\"/><rect width=\"32\" height=\"32\" x=\"112\" y=\"296\"/><rect width=\"32\" height=\"32\" x=\"200\" y=\"296\"/><rect width=\"32\" height=\"32\" x=\"280\" y=\"296\"/><rect width=\"32\" height=\"32\" x=\"368\" y=\"296\"/><rect width=\"32\" height=\"32\" x=\"112\" y=\"368\"/><rect width=\"32\" height=\"32\" x=\"200\" y=\"368\"/><rect width=\"32\" height=\"32\" x=\"280\" y=\"368\"/><rect width=\"32\" height=\"32\" x=\"368\" y=\"368\"/>");
+const CARET_ICON = /* @__PURE__ */ svg("<path d=\"M256 382.627 60.687 187.313l22.626-22.626L256 337.372l172.687-172.685 22.626 22.626z\"/>");
+const CHECK_ICON = /* @__PURE__ */ svg("<path d=\"M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z\"/>");
+const CHEVRON_DOUBLE_LEFT_ICON = /* @__PURE__ */ svg("<path d=\"M416.686 447.313 221.373 252 416.686 56.687l22.628 22.626L266.627 252l172.687 172.687z\"/><path d=\"M256.686 447.313 61.373 252 256.686 56.687l22.628 22.626L106.627 252l172.687 172.687z\"/>");
+const CHEVRON_DOUBLE_RIGHT_ICON = /* @__PURE__ */ svg("<path d=\"m95.314 447.313-22.628-22.626L245.373 252 72.686 79.313l22.628-22.626L290.627 252z\"/><path d=\"m255.314 447.313-22.628-22.626L405.373 252 232.686 79.313l22.628-22.626L450.627 252z\"/>");
+const CHEVRON_LEFT_ICON = /* @__PURE__ */ svg("<path d=\"M324.687 451.313 129.373 256 324.687 60.687l22.626 22.626L174.628 256l172.685 172.687z\"/>");
+const CHEVRON_RIGHT_ICON = /* @__PURE__ */ svg("<path d=\"m179.313 451.313-22.626-22.626L329.372 256 156.687 83.313l22.626-22.626L374.627 256z\"/>");
+const CLEANER_ICON = /* @__PURE__ */ svg("<path d=\"m427.314 107.313-22.628-22.626L256 233.373 107.314 84.687l-22.628 22.626L233.373 256 84.686 404.687l22.628 22.626L256 278.627l148.686 148.686 22.628-22.626L278.627 256z\"/>", "39.15 39.15 433.71 433.71");
+const CLOCK_ICON = /* @__PURE__ */ svg("<path d=\"M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16Zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208Z\"/><path d=\"M272 128h-32v139.314l84.686 84.687 22.628-22.628L272 254.059V128Z\"/>");
+const PICKER_ICON = /* @__PURE__ */ svg("<path d=\"M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z\"/>");
+const MINUS_ICON = /* @__PURE__ */ svg("<path d=\"M464 240H48v32h416z\"/>");
+const PASSWORD_HIDE_ICON = /* @__PURE__ */ svg("<path d=\"M397.222,131.1l-.218-.223C333.831,67.707,238.47,55.862,163.228,95.346l23.938,23.939c61.571-27.691,136.573-16.327,187.105,34.115L464,246.683v3.107l-71.744,74.585,22.63,22.63L496,262.683V233.79Z\"/><path d=\"M352.8,284.33A103.307,103.307,0,0,0,219.907,151.438L246.1,177.63a71.228,71.228,0,0,1,80.507,80.508Z\"/><path d=\"M369.9,347.268l-33.831-33.831c.088-.108.179-.212.266-.32l-22.805-22.806c-.083.113-.169.222-.253.334l-99.681-99.681c.112-.083.221-.17.334-.253L191.12,167.906c-.108.087-.213.179-.321.266L38.627,16H16V38.627l95.689,95.689L16,233.79v28.893l98.778,102.689.218.222A199.732,199.732,0,0,0,367.372,390l106,106H496V473.373L392.537,369.911Zm-177.157-131.9L288.871,311.5a71.28,71.28,0,0,1-96.133-96.133ZM137.729,343.073,48,249.79v-3.107l86.319-89.737,35.065,35.064A103.248,103.248,0,0,0,312.226,334.853l32.007,32.007C279.723,406.875,193.711,398.955,137.729,343.073Z\"/>");
+const PASSWORD_SHOW_ICON = /* @__PURE__ */ svg("<path d=\"M256,144.927A103.309,103.309,0,1,0,359.309,248.236,103.426,103.426,0,0,0,256,144.927Zm0,174.618a71.309,71.309,0,1,1,71.309-71.309A71.39,71.39,0,0,1,256,319.545Z\"/><path d=\"M397.222,131.1l-.218-.223c-77.75-77.749-204.258-77.749-282.008,0L16,233.79v28.893l98.778,102.689.218.222a199.409,199.409,0,0,0,282.008,0l99-102.911V233.79ZM464,249.79l-89.732,93.285a167.409,167.409,0,0,1-236.536,0L48,249.79v-3.107L137.729,153.4c65.247-65.13,171.3-65.13,236.542,0L464,246.683Z\"/><rect width=\"32\" height=\"32\" x=\"240\" y=\"232\" />");
+const PLUS_ICON = /* @__PURE__ */ svg("<path d=\"M464 240H272V48h-32v192H48v32h192v192h32V272h192z\"/>");
 const REMOVE_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><line x1=\"4\" y1=\"4\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"4\" x2=\"4\" y2=\"12\"/></svg>";
-const SEPARATOR_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"m359.873 121.377-22.627 22.627 95.997 95.997H16v32.001h417.24l-95.994 95.994 22.627 22.627L494.498 256z\"/></svg>";
-const SEPARATOR_ICON_RTL = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"currentColor\"><path d=\"m152.127 121.377 22.627 22.627L78.757 240H496v32.001H78.76l95.994 95.994-22.627 22.627L17.502 256z\"/></svg>";
+const SEPARATOR_ICON = /* @__PURE__ */ svg("<path d=\"m359.873 121.377-22.627 22.627 95.997 95.997H16v32.001h417.24l-95.994 95.994 22.627 22.627L494.498 256z\"/>");
+const SEPARATOR_ICON_RTL = /* @__PURE__ */ svg("<path d=\"m152.127 121.377 22.627 22.627L78.757 240H496v32.001H78.76l95.994 95.994-22.627 22.627L17.502 256z\"/>");
 //#endregion
 //#region js/src/autocomplete.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO autocomplete.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* ------------------------------------------------------------------------
-* Constants
-* ------------------------------------------------------------------------
-*/
-const NAME$46 = "autocomplete";
+const NAME$48 = "autocomplete";
 const DATA_KEY$2 = "coreui.autocomplete";
-const EVENT_KEY$38 = `.${DATA_KEY$2}`;
+const EVENT_KEY$39 = `.${DATA_KEY$2}`;
 const DATA_API_KEY$33 = ".data-api";
+const ARROW_DOWN_KEY$8 = "ArrowDown";
 const BACKSPACE_KEY$3 = "Backspace";
 const DELETE_KEY$2 = "Delete";
-const ENTER_KEY$5 = "Enter";
+const ENTER_KEY$4 = "Enter";
 const ESCAPE_KEY$4 = "Escape";
 const TAB_KEY$3 = "Tab";
 const RIGHT_MOUSE_BUTTON$3 = 2;
-const EVENT_BLUR$2 = `blur${EVENT_KEY$38}`;
-const EVENT_CHANGE$10 = `change${EVENT_KEY$38}`;
-const EVENT_CLICK$11 = `click${EVENT_KEY$38}`;
-const EVENT_INPUT$8 = `input${EVENT_KEY$38}`;
-const EVENT_KEYDOWN$13 = `keydown${EVENT_KEY$38}`;
-const EVENT_KEYUP$1 = `keyup${EVENT_KEY$38}`;
-const EVENT_MOUSEDOWN$2 = `mousedown${EVENT_KEY$38}`;
-const EVENT_CLICK_DATA_API$18 = `click${EVENT_KEY$38}${DATA_API_KEY$33}`;
-const EVENT_KEYUP_DATA_API$4 = `keyup${EVENT_KEY$38}${DATA_API_KEY$33}`;
-const EVENT_LOAD_DATA_API$22 = `load${EVENT_KEY$38}${DATA_API_KEY$33}`;
+const EVENT_BLUR$2 = `blur${EVENT_KEY$39}`;
+const EVENT_CHANGE$10 = `change${EVENT_KEY$39}`;
+const EVENT_CLICK$13 = `click${EVENT_KEY$39}`;
+const EVENT_INPUT$11 = `input${EVENT_KEY$39}`;
+const EVENT_KEYDOWN$16 = `keydown${EVENT_KEY$39}`;
+const EVENT_KEYUP = `keyup${EVENT_KEY$39}`;
+const EVENT_MOUSEDOWN$1 = `mousedown${EVENT_KEY$39}`;
+const EVENT_CLICK_DATA_API$18 = `click${EVENT_KEY$39}${DATA_API_KEY$33}`;
+const EVENT_KEYUP_DATA_API$4 = `keyup${EVENT_KEY$39}${DATA_API_KEY$33}`;
+const EVENT_LOAD_DATA_API$21 = `load${EVENT_KEY$39}${DATA_API_KEY$33}`;
 const CLASS_NAME_AUTOCOMPLETE = "autocomplete";
-const CLASS_NAME_CLEANER$5 = "form-control-cleaner";
-const CLASS_NAME_DISABLED$9 = "disabled";
-const CLASS_NAME_INDICATOR$4 = "form-control-action";
+const CLASS_NAME_CLEANER$4 = "form-control-cleaner";
+const CLASS_NAME_DISABLED$10 = "disabled";
+const CLASS_NAME_INDICATOR$3 = "form-control-action";
 const CLASS_NAME_INPUT = "form-control";
 const CLASS_NAME_INPUT_HINT = "autocomplete-input-hint";
-const CLASS_NAME_INPUT_GROUP$5 = "form-control-group";
-const CLASS_NAME_IS_INVALID$3 = "is-invalid";
-const CLASS_NAME_IS_VALID$3 = "is-valid";
-const CLASS_NAME_SHOW$16 = "show";
-const SELECTOR_DATA_AUTOCOMPLETE = "[data-coreui-autocomplete]:not(.disabled)";
-const SELECTOR_DATA_TOGGLE_SHOWN$1 = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW$16}`;
+const CLASS_NAME_INPUT_GROUP$4 = "form-control-group";
+const CLASS_NAME_SHOW$14 = "show";
+const HOST_FIELD_ATTRIBUTES = /* @__PURE__ */ new Set([
+	"aria-description",
+	"aria-details",
+	"aria-errormessage",
+	"aria-label",
+	"aria-labelledby",
+	"aria-placeholder",
+	"aria-readonly",
+	"aria-required"
+]);
+const SELECTOR_DATA_AUTOCOMPLETE = "[data-coreui-autocomplete]";
+const SELECTOR_DATA_TOGGLE_SHOWN$1 = `.autocomplete.${CLASS_NAME_SHOW$14}`;
 const SELECTOR_INDICATOR = ".form-control-action";
-const Default$44 = {
+const Default$42 = {
 	allowList: DefaultAllowlist,
 	allowOnlyDefinedOptions: false,
 	ariaCleanerLabel: "Clear selection",
@@ -3175,6 +3733,7 @@ const Default$44 = {
 	clearSearchOnSelect: true,
 	container: false,
 	disabled: false,
+	globalSearch: true,
 	highlightOptionsOnSearch: false,
 	id: null,
 	invalid: false,
@@ -3192,9 +3751,10 @@ const Default$44 = {
 	searchNoResultsLabel: false,
 	showHints: false,
 	valid: false,
+	validationState: null,
 	value: null
 };
-const DefaultType$44 = {
+const DefaultType$41 = {
 	allowList: "object",
 	allowOnlyDefinedOptions: "boolean",
 	ariaCleanerLabel: "string",
@@ -3203,6 +3763,7 @@ const DefaultType$44 = {
 	clearSearchOnSelect: "boolean",
 	container: "(string|element|boolean)",
 	disabled: "boolean",
+	globalSearch: "boolean",
 	highlightOptionsOnSearch: "boolean",
 	id: "(string|null)",
 	invalid: "boolean",
@@ -3216,49 +3777,63 @@ const DefaultType$44 = {
 	required: "boolean",
 	sanitize: "boolean",
 	sanitizeFn: "(null|function)",
-	search: "(array|string|null)",
+	search: "(string|null)",
 	searchNoResultsLabel: "boolean|string",
 	showHints: "boolean",
 	valid: "boolean",
+	validationState: "(string|null|undefined)",
 	value: "(number|string|null)"
 };
-/**
-* ------------------------------------------------------------------------
-* Class Definition
-* ------------------------------------------------------------------------
-*/
 var Autocomplete = class Autocomplete extends ComboboxBase {
 	constructor(element, config) {
 		super(element, config);
 		this._uniqueId = this._config.id ?? getUID(`${this.constructor.NAME}`);
+		this._cleanerElement = null;
 		this._indicatorElement = null;
 		this._inputElement = null;
 		this._inputHintElement = null;
 		this._togglerElement = null;
-		this._addedClassNames = [];
-		this._previousTabIndex = null;
+		this._keySerial = null;
+		this._shownText = "";
+		this._validation = new FieldValidation(this._element, {
+			aliases: true,
+			canBlock: () => !this._disabled,
+			config: () => this._config,
+			fields: () => [this._inputElement],
+			frames: () => [this._element],
+			invalidTargets: () => [this._inputElement],
+			restore: () => this._restoreInitialSelection()
+		});
 		this._optionsElement = null;
 		this._menu = null;
-		this._selected = [];
-		this._options = this._getOptionsFromConfig();
+		this._known = /* @__PURE__ */ new Map();
+		this._store = createSelectionStore((next) => next.slice(-1));
+		this._disabled = this._config.disabled;
+		this._givenValue = this._config.value;
+		this._options = this._getOptionsFromConfig(this._config.options);
 		this._floatingCleanup = null;
 		this._anchoredPosition = null;
 		this._search = "";
+		this._seenOptionValues = /* @__PURE__ */ new Set();
+		this._valueApplied = false;
+		this._initialValue = this._config.value;
+		this._reportSeed = false;
 		this._createAutocomplete();
+		this._validation.refresh();
 		this._addEventListeners();
 		data_default.set(this._element, DATA_KEY$2, this);
 	}
 	static get Default() {
-		return Default$44;
+		return Default$42;
 	}
 	static get DefaultType() {
-		return DefaultType$44;
+		return DefaultType$41;
 	}
 	static get NAME() {
-		return NAME$46;
+		return NAME$48;
 	}
 	_canShow() {
-		return Boolean(this._config.searchNoResultsLabel) || this._flattenOptions().some((option) => option.label.toLowerCase().includes(this._search.toLowerCase()));
+		return Boolean(this._config.searchNoResultsLabel) || (this._isExternalSearch() ? this._options : filterOptionTree(this._options, this._search)).length > 0;
 	}
 	_getAriaExpandedTarget() {
 		return this._inputElement;
@@ -3271,6 +3846,7 @@ var Autocomplete = class Autocomplete extends ComboboxBase {
 	}
 	dispose() {
 		if (!this._element) return;
+		this._validation.dispose();
 		this._disposeFloating();
 		this._disposeListBox();
 		for (const element of [
@@ -3281,41 +3857,69 @@ var Autocomplete = class Autocomplete extends ComboboxBase {
 			this._cleanerElement,
 			this._indicatorElement
 		]) if (element) {
-			EventHandler.off(element, EVENT_KEY$38);
+			EventHandler.off(element, EVENT_KEY$39);
 			element.remove();
 		}
-		this._element.classList.remove(CLASS_NAME_IS_INVALID$3, CLASS_NAME_IS_VALID$3, CLASS_NAME_SHOW$16, ...this._addedClassNames);
-		if (this._previousTabIndex === null) this._element.removeAttribute("tabindex");
-		else this._element.setAttribute("tabindex", this._previousTabIndex);
+		this._element.classList.remove(CLASS_NAME_SHOW$14);
+		for (const [name, value] of this._hostAria) if (!this._element.hasAttribute(name)) this._element.setAttribute(name, value);
 		super.dispose();
 	}
 	clear() {
-		this.deselectAll();
+		const isChanged = this._store.size() > 0 || this._shownText !== "";
+		this._valueApplied = true;
+		this._clearSelection();
 		this.search("");
 		this._filterOptionsList();
-		this._inputElement.value = "";
-		this._triggerChangeEvent(null);
+		this._setText("");
+		this._validation.update();
+		if (isChanged) this._triggerChangeEvent(null);
 	}
 	search(label) {
 		this._search = label.length > 0 ? label.toLowerCase() : "";
 		if (!this._isExternalSearch()) this._filterOptionsList();
-		EventHandler.trigger(this._element, EVENT_INPUT$8, { value: label });
+		EventHandler.trigger(this._element, EVENT_INPUT$11, { value: label });
 	}
-	setConfig(config) {
-		if (config?.value) this.deselectAll();
+	disable() {
+		this._setDisabled(true);
+	}
+	enable() {
+		this._setDisabled(false);
+	}
+	setOptions(options) {
+		const normalized = this._normalizeOptions(options);
+		this._typeCheckConfig({ options: normalized }, { options: DefaultType$41.options });
+		this._options = this._getOptionsFromConfig(normalized);
+		this._setListBoxItems();
+		this._seedSelection();
+		this._validation.update();
+	}
+	setValidationState(validationState) {
+		const state = {
+			invalid: false,
+			valid: false,
+			validationState
+		};
 		this._config = this._getConfig({
 			...this._config,
-			...config
+			...state
 		});
-		this._options = this._getOptionsFromConfig();
-		this._setListBoxItems();
-		this._syncInputName();
+		this._validation.configure(state);
 	}
-	deselectAll(options = this._selected) {
-		if (this._selected.length === 0) return;
+	setValue(value) {
+		this._typeCheckConfig({ value }, { value: DefaultType$41.value });
+		this._givenValue = value;
+		this._valueApplied = false;
+		this._reportSeed = false;
+		this._clearSelection();
+		this._setText("");
+		this._seedSelection();
+		this._validation.update();
+	}
+	deselectAll(options = this._selectedOptions()) {
+		if (this._store.size() === 0) return;
 		for (const option of options) {
 			if (option.disabled) continue;
-			if (Array.isArray(option.options)) {
+			if (isOptionGroup(option)) {
 				this.deselectAll(option.options);
 				continue;
 			}
@@ -3326,116 +3930,149 @@ var Autocomplete = class Autocomplete extends ComboboxBase {
 	_triggerChangeEvent(value) {
 		EventHandler.trigger(this._element, EVENT_CHANGE$10, { value });
 	}
-	_highlightOption(label) {
-		if (!this._search) return escapeHtml(label);
-		const escapedSearch = this._search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-		const regex = new RegExp(`(${escapedSearch})`, "gi");
-		return String(label).split(regex).map((part, index) => index % 2 === 0 ? escapeHtml(part) : `<strong>${escapeHtml(part)}</strong>`).join("");
-	}
 	_isExternalSearch() {
-		return Array.isArray(this._config.search) && this._config.search.includes("external");
+		return this._config.search === "external";
 	}
-	_isGlobalSearch() {
-		return Array.isArray(this._config.search) && this._config.search.includes("global");
+	_isDisabled() {
+		return this._disabled;
+	}
+	_setDisabled(disabled) {
+		if (disabled === this._disabled) return;
+		this._disabled = disabled;
+		if (disabled) this.hide();
+		this._applyState();
+		this._validation.update();
 	}
 	_addEventListeners() {
-		EventHandler.on(this._element, EVENT_CLICK$11, (event) => {
-			if (!this._config.disabled && !event.target.closest(SELECTOR_INDICATOR)) this.show();
+		EventHandler.on(this._element, EVENT_CLICK$13, (event) => {
+			if (!this._disabled && !event.target.closest(SELECTOR_INDICATOR)) {
+				this.show();
+				this._inputElement.focus();
+			}
 		});
-		EventHandler.on(this._element, EVENT_KEYDOWN$13, (event) => {
+		EventHandler.on(this._element, EVENT_KEYDOWN$16, (event) => {
+			this._keySerial = nextStateSerial();
 			if (event.key === ESCAPE_KEY$4) {
 				if (this._isShown()) {
 					event.preventDefault();
 					event.stopPropagation();
 				}
 				this.hide();
-				if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
+				if (this._config.allowOnlyDefinedOptions && this._store.size() === 0) {
+					this._emptyByUser();
 					this.search("");
-					this._inputElement.value = "";
 				}
 				return;
 			}
-			if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$3 || event.key === DELETE_KEY$2)) this._inputElement.focus();
+			if (this._config.globalSearch && !event.defaultPrevented && isTypingKey(event)) this._inputElement.focus();
+			if (event.target === this._inputElement && (event.key === BACKSPACE_KEY$3 || event.key === DELETE_KEY$2) && this._store.size() > 0) {
+				this._validation.dismiss(this._keySerial);
+				this._clearSelection();
+				this._validation.update();
+				this._triggerChangeEvent(null);
+			}
 		});
-		EventHandler.on(this._menu, EVENT_KEYDOWN$13, (event) => {
-			if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$3 || event.key === DELETE_KEY$2)) this._inputElement.focus();
+		EventHandler.on(this._element, EVENT_KEYUP, () => {
+			this._keySerial = null;
+		});
+		EventHandler.on(this._menu, EVENT_KEYDOWN$16, (event) => {
+			if (this._config.globalSearch && !event.defaultPrevented && isTypingKey(event)) this._inputElement.focus();
 		});
 		this._addTogglerKeydownListeners();
-		EventHandler.on(this._indicatorElement, EVENT_CLICK$11, (event) => {
+		EventHandler.on(this._indicatorElement, EVENT_CLICK$13, (event) => {
 			event.preventDefault();
 			this.toggle();
 		});
 		EventHandler.on(this._inputElement, EVENT_BLUR$2, () => {
 			const inputValue = this._inputElement.value;
-			if (inputValue.length === 0) return;
-			const inputValueLower = inputValue.toLowerCase();
-			const exactMatches = this._flattenOptions().filter((option) => option.label.toLowerCase() === inputValueLower);
+			if (this._disabled || inputValue.length === 0) return;
+			if (this._namesSelection(inputValue)) {
+				this.hide();
+				return;
+			}
+			const inputValueLower = inputValue.trim().toLowerCase();
+			const exactMatches = getSelectableOptions(this._options).filter((option) => option.label.trim().toLowerCase() === inputValueLower);
 			if (exactMatches.length === 1) {
 				this._selectOption(exactMatches[0]);
 				return;
 			}
 			if (this._config.allowOnlyDefinedOptions) {
-				this.clear();
+				this._clearByUser();
 				return;
 			}
 			this._triggerChangeEvent(inputValue);
 		});
-		EventHandler.on(this._inputElement, EVENT_KEYDOWN$13, (event) => {
-			const handledByList = event.key === ENTER_KEY$5 && event.defaultPrevented;
-			if (!handledByList && !this._isShown() && event.key !== TAB_KEY$3 && event.key !== ESCAPE_KEY$4) this.show();
+		EventHandler.on(this._inputElement, EVENT_KEYDOWN$16, (event) => {
+			const handledByList = event.key === ENTER_KEY$4 && event.defaultPrevented;
+			if (!handledByList && !this._isShown() && event.key !== TAB_KEY$3 && event.key !== ESCAPE_KEY$4 && event.key !== ENTER_KEY$4) this.show();
 			if (handledByList) return;
-			if (event.key === TAB_KEY$3 && this._config.showHints && this._inputElement.value.length > 0) {
-				if (this._inputHintElement.value) {
-					event.preventDefault();
-					event.stopPropagation();
-				}
-				const options = this._flattenOptions().filter((option) => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()));
-				if (options.length > 0) this._selectOption(options[0]);
-			}
-			if (event.key === ENTER_KEY$5) {
+			if (event.key === TAB_KEY$3 && this._inputHintElement?.value) {
 				event.preventDefault();
 				event.stopPropagation();
-				if (this._inputElement.value.length === 0) return;
-				const options = this._flattenOptions().filter((option) => option.label.toLowerCase() === this._inputElement.value.toLowerCase());
-				if (options.length > 0) this._selectOption(options[0]);
-				if (options.length === 0 && !this._config.allowOnlyDefinedOptions) {
-					this._triggerChangeEvent(this._inputElement.value);
-					this.hide();
-					if (this._config.clearSearchOnSelect) this.search("");
-				}
+				const option = this._findHintOption(this._inputElement.value);
+				if (option) this._selectOption(option);
 			}
+			if (event.key === ENTER_KEY$4) this._handleEnterKey(event);
 		});
-		EventHandler.on(this._inputElement, EVENT_KEYUP$1, (event) => {
-			if (event.key.length === 1 || event.key === BACKSPACE_KEY$3 || event.key === DELETE_KEY$2) {
-				const { value } = event.target;
-				this.search(value);
-				if (this._config.showHints) {
-					const options = value ? this._flattenOptions().filter((option) => option.label.toLowerCase().startsWith(value.toLowerCase())) : [];
-					this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : "";
-				}
-				if (this._selected.length > 0) {
-					this.deselectAll();
-					this._triggerChangeEvent(null);
-				}
+		EventHandler.on(this._inputElement, EVENT_INPUT$11, () => {
+			const { value } = this._inputElement;
+			if (value !== this._shownText) this._validation.dismiss(this._keySerial ?? Number.POSITIVE_INFINITY);
+			this._shownText = value;
+			this._valueApplied = true;
+			this._validation.update();
+			if (this._store.size() > 0) {
+				this._clearSelection();
+				this._triggerChangeEvent(null);
 			}
+			this.search(value);
+			if (this._inputHintElement) {
+				const option = value.trim() ? this._findHintOption(value) : void 0;
+				this._inputHintElement.value = option ? `${value}${option.label.slice(value.trimStart().length)}` : "";
+			}
+			if (value && !this._isShown()) this.show();
 		});
-		EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN$2, (event) => {
+		EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN$1, (event) => {
 			event.preventDefault();
 		});
-		EventHandler.on(this._cleanerElement, EVENT_CLICK$11, (event) => {
-			if (!this._config.disabled) {
+		EventHandler.on(this._cleanerElement, EVENT_CLICK$13, (event) => {
+			if (!this._disabled) {
 				event.preventDefault();
 				event.stopPropagation();
-				this.clear();
+				this._clearByUser();
 			}
 		});
-		EventHandler.on(this._cleanerElement, EVENT_KEYDOWN$13, (event) => {
-			if (!this._config.disabled && event.key === ENTER_KEY$5) {
+		EventHandler.on(this._cleanerElement, EVENT_KEYDOWN$16, (event) => {
+			if (!this._disabled && event.key === ENTER_KEY$4) {
 				event.preventDefault();
 				event.stopPropagation();
-				this.clear();
+				this._clearByUser();
 			}
 		});
+	}
+	_handleEnterKey(event) {
+		if (event.isComposing || event.keyCode === 229) return;
+		if (this._isShown()) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+		if (this._inputElement.value.length === 0) return;
+		if (this._namesSelection(this._inputElement.value)) {
+			this.hide();
+			return;
+		}
+		const options = getSelectableOptions(this._options).filter((option) => option.label.trim().toLowerCase() === this._inputElement.value.trim().toLowerCase());
+		if (options.length > 0) {
+			if (this._store.has(String(options[0].value))) this.hide();
+			else this._selectOption(options[0]);
+			return;
+		}
+		if (this._config.allowOnlyDefinedOptions) {
+			event.preventDefault();
+			return;
+		}
+		this._triggerChangeEvent(this._inputElement.value);
+		this.hide();
+		if (this._config.clearSearchOnSelect) this.search("");
 	}
 	_syncInputName() {
 		if (this._config.name) {
@@ -3444,24 +4081,23 @@ var Autocomplete = class Autocomplete extends ComboboxBase {
 		}
 		this._inputElement.removeAttribute("name");
 	}
-	_getOptionsFromConfig(options = this._config.options) {
+	_getOptionsFromConfig(options, disabled = false) {
 		if (!options || !Array.isArray(options)) return [];
 		const _options = [];
 		for (const option of options) {
-			if (option.options && Array.isArray(option.options)) {
+			if (isOptionGroup(option)) {
 				const customGroupProperties = { ...option };
 				delete customGroupProperties.label;
 				delete customGroupProperties.options;
 				_options.push({
 					...customGroupProperties,
 					label: option.label,
-					options: this._getOptionsFromConfig(option.options)
+					options: this._getOptionsFromConfig(option.options, disabled || option.disabled)
 				});
 				continue;
 			}
 			const label = typeof option === "string" ? option : option.label;
 			const value = option.value ?? (typeof option === "string" ? option : option.label);
-			const isSelected = option.selected || this._config.value && this._config.value === value;
 			const customProperties = typeof option === "object" ? { ...option } : {};
 			delete customProperties.label;
 			delete customProperties.value;
@@ -3471,45 +4107,44 @@ var Autocomplete = class Autocomplete extends ComboboxBase {
 				...customProperties,
 				label,
 				value: String(value),
-				...isSelected && { selected: true },
-				...option.disabled && { disabled: true }
-			});
-			if (isSelected) this._selected.push({
-				label: option.label,
-				value: String(value)
+				...option.selected && { selected: true },
+				...(disabled || option.disabled) && { disabled: true }
 			});
 		}
 		return _options;
 	}
-	_addClassName(className) {
-		if (this._element.classList.contains(className)) return;
-		this._element.classList.add(className);
-		this._addedClassNames.push(className);
-	}
 	_createAutocomplete() {
-		this._addClassName(CLASS_NAME_AUTOCOMPLETE);
-		this._element.classList.toggle(CLASS_NAME_IS_INVALID$3, this._config.invalid);
-		this._element.classList.toggle(CLASS_NAME_IS_VALID$3, this._config.valid);
-		if (this._config.disabled) this._addClassName(CLASS_NAME_DISABLED$9);
+		this._element.classList.add(CLASS_NAME_AUTOCOMPLETE);
 		this._createInputGroup();
 		this._createButtons();
 		this._createOptionsContainer();
-		this._updateOptionsList();
+		this._seedSelection();
+		this._applyState();
+	}
+	_applyState() {
+		const { required } = this._config;
+		const disabled = this._disabled;
+		this._element.classList.toggle(CLASS_NAME_DISABLED$10, disabled);
+		this._inputElement.disabled = disabled;
+		this._inputElement.required = required;
+		writeAttribute(this._inputElement, "tabindex", disabled ? "-1" : null);
+		if (this._indicatorElement) this._indicatorElement.disabled = disabled;
+		this._updateCleaner();
 	}
 	_createInputGroup() {
 		const togglerEl = this._element;
-		this._previousTabIndex = togglerEl.getAttribute("tabindex");
-		if (!togglerEl.classList.contains(CLASS_NAME_INPUT_GROUP$5)) this._addedClassNames.push(CLASS_NAME_INPUT_GROUP$5);
-		applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP$5);
+		this._hostAria = [...togglerEl.attributes].filter(({ name }) => HOST_FIELD_ATTRIBUTES.has(name)).map(({ name, value }) => [name, value]);
+		togglerEl.removeAttribute("tabindex");
+		applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP$4);
 		this._togglerElement = togglerEl;
-		if (!this._config.search && !this._config.disabled) togglerEl.tabIndex = -1;
-		if (!this._config.disabled && this._config.showHints) {
+		if (this._config.showHints) {
 			const inputHintEl = document.createElement("input");
 			inputHintEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_HINT);
 			inputHintEl.autocomplete = "off";
 			inputHintEl.readOnly = true;
 			inputHintEl.tabIndex = -1;
 			inputHintEl.setAttribute("aria-hidden", true);
+			inputHintEl.setAttribute("form", "");
 			togglerEl.append(inputHintEl);
 			this._inputHintElement = inputHintEl;
 		}
@@ -3519,15 +4154,13 @@ var Autocomplete = class Autocomplete extends ComboboxBase {
 		inputEl.autocomplete = "off";
 		inputEl.placeholder = this._config.placeholder ?? "";
 		inputEl.role = "combobox";
+		for (const [name, value] of this._hostAria) {
+			inputEl.setAttribute(name, value);
+			togglerEl.removeAttribute(name);
+		}
 		inputEl.setAttribute("aria-autocomplete", "list");
 		inputEl.setAttribute("aria-expanded", "false");
 		inputEl.setAttribute("aria-haspopup", "listbox");
-		inputEl.setAttribute("aria-controls", `${this._uniqueId}-listbox`);
-		if (this._config.disabled) {
-			inputEl.setAttribute("disabled", true);
-			inputEl.tabIndex = -1;
-		}
-		if (this._config.required) inputEl.setAttribute("required", true);
 		togglerEl.append(inputEl);
 		this._inputElement = inputEl;
 		this._syncInputName();
@@ -3535,10 +4168,10 @@ var Autocomplete = class Autocomplete extends ComboboxBase {
 	_createButtons() {
 		if (!this._config.cleaner && !this._config.pickerIcon) return;
 		const buttons = this._togglerElement;
-		if (!this._config.disabled && this._config.cleaner) {
+		if (this._config.cleaner) {
 			const cleaner = document.createElement("button");
 			cleaner.type = "button";
-			cleaner.classList.add(CLASS_NAME_CLEANER$5);
+			cleaner.classList.add(CLASS_NAME_CLEANER$4);
 			cleaner.style.display = "none";
 			cleaner.setAttribute("aria-label", this._config.ariaCleanerLabel);
 			cleaner.innerHTML = CLEANER_ICON;
@@ -3548,8 +4181,7 @@ var Autocomplete = class Autocomplete extends ComboboxBase {
 		if (this._config.pickerIcon) {
 			const indicator = document.createElement("button");
 			indicator.type = "button";
-			indicator.classList.add(CLASS_NAME_INDICATOR$4);
-			indicator.disabled = this._config.disabled;
+			indicator.classList.add(CLASS_NAME_INDICATOR$3);
 			indicator.setAttribute("aria-label", this._config.ariaPickerLabel);
 			indicator.innerHTML = sanitizeByConfig(this._config.pickerIcon === true ? PICKER_ICON : this._config.pickerIcon, {
 				...this._config,
@@ -3563,62 +4195,123 @@ var Autocomplete = class Autocomplete extends ComboboxBase {
 	_decorateListbox(optionsDiv) {
 		optionsDiv.setAttribute("aria-labelledby", this._uniqueId);
 	}
-	_afterMenuCreated() {
-		if (this._config.container) this._inputElement.setAttribute("aria-owns", `${this._uniqueId}-listbox`);
-	}
 	_getActiveDescendantField() {
 		return this._inputElement;
 	}
 	_onOptionSelected(value) {
 		const foundOption = this._findOptionByValue(value);
-		if (foundOption) {
+		if (foundOption && !this._disabled) {
 			this._selectOption(foundOption);
 			this._inputElement.focus();
 		}
 	}
 	_selectOption(option) {
-		this.deselectAll();
-		if (this._selected.filter((selectedOption) => selectedOption.value === option.value).length === 0) this._selected.push(option);
-		this._syncOptionElementState(option.value, true);
+		if (option.disabled) return;
+		this._valueApplied = true;
+		if (this._inputElement.value !== option.label) this._validation.dismiss();
+		this._applySelection(option);
+		this._validation.update();
 		this._triggerChangeEvent(option);
-		this._inputElement.value = option.label;
-		if (this._config.showHints) this._inputHintElement.value = "";
+		if (this._inputHintElement) this._inputHintElement.value = "";
 		this.hide();
 		if (this._config.clearSearchOnSelect) this.search("");
+	}
+	_applySelection(option) {
+		this._known.set(String(option.value), option);
+		this._commitSelection([String(option.value)]);
+		this._setText(option.label);
+		this._updateCleaner();
+	}
+	_clearSelection() {
+		this._commitSelection([]);
 		this._updateCleaner();
 	}
 	_deselectOption(value) {
-		this._selected = this._selected.filter((option) => option.value !== value);
-		this._syncOptionElementState(value, false);
+		this._commitSelection(this._store.values().filter((selected) => selected !== String(value)));
+	}
+	_selectedOptions() {
+		return this._store.values().map((value) => this._known.get(value) ?? this._findOptionByValue(value)).filter(Boolean);
+	}
+	_findHintOption(text) {
+		return getSelectableOptions(this._options).find((option) => option.label.toLowerCase().startsWith(text.trimStart().toLowerCase()));
+	}
+	_namesSelection(text) {
+		return this._selectedOptions().some((option) => option.label.trim() === text.trim());
+	}
+	_clearByUser() {
+		if (this._store.size() > 0 || this._inputElement.value !== "") this._validation.dismiss();
+		this.clear();
+	}
+	_emptyByUser() {
+		if (this._inputElement.value !== "") this._validation.dismiss();
+		this._setText("");
+		this._validation.update();
+	}
+	_setText(text) {
+		this._inputElement.value = text;
+		this._shownText = text;
 	}
 	_updateCleaner() {
-		if (!this._config.cleaner || this._cleanerElement === null) return;
-		if (this._selected.length > 0) {
+		if (!this._cleanerElement) return;
+		if (this._store.size() > 0 && !this._disabled) {
 			this._cleanerElement.style.removeProperty("display");
 			return;
 		}
 		this._cleanerElement.style.display = "none";
 	}
-	_updateOptionsList(options = this._options) {
-		for (const option of options) {
-			if (Array.isArray(option.options)) {
-				this._updateOptionsList(option.options);
-				continue;
+	_isOpenKey(event) {
+		return event.key === ARROW_DOWN_KEY$8 || event.key === ENTER_KEY$4 && event.target === this._togglerElement;
+	}
+	_restoreInitialSelection() {
+		const previous = this._selectedOptions()[0]?.value;
+		const text = this._shownText;
+		this._reportSeed = false;
+		this._clearSelection();
+		this._setText("");
+		if (this._inputHintElement) this._inputHintElement.value = "";
+		if (this._search !== "") this.search("");
+		this._givenValue = this._initialValue;
+		this._valueApplied = false;
+		this._seenOptionValues.clear();
+		this._seedSelection();
+		this._validation.update();
+		const current = this._selectedOptions()[0];
+		if (current ? current.value !== previous : previous !== void 0 || text !== "") this._triggerChangeEvent(current ?? null);
+		this._reportSeed = !current;
+	}
+	_seedSelection() {
+		const options = flattenOptions(this._options);
+		const value = this._givenValue;
+		let seed;
+		if (value === null || value === void 0 || value === "") seed = options.find((option) => option.selected && !this._seenOptionValues.has(option.value));
+		else if (!this._valueApplied) {
+			seed = findOptionByValue(options, value);
+			this._valueApplied = Boolean(seed);
+		}
+		for (const option of options) this._seenOptionValues.add(option.value);
+		if (seed && !this._store.has(String(seed.value))) {
+			this._applySelection(seed);
+			if (this._reportSeed && this._store.has(String(seed.value))) {
+				this._reportSeed = false;
+				this._validation.update();
+				this._triggerChangeEvent(seed);
 			}
-			if (option.selected) this._selectOption(option);
 		}
 	}
 	_afterOptionsRendered() {
 		if (!this._config.highlightOptionsOnSearch || this._config.optionsTemplate) return;
-		for (const option of this._getDisplayedOptions()) option.innerHTML = this._highlightOption(option.textContent);
+		for (const option of this._getDisplayedOptions()) option.innerHTML = highlightMatches(option.textContent, this._search);
 	}
 	_afterFilter(visibleOptions) {
 		if (visibleOptions === 0 && !this._config.searchNoResultsLabel) this.hide();
 	}
+	_normalizeOptions(options) {
+		return typeof options === "string" ? options.split(/,\s*/).map(String) : options;
+	}
 	_configAfterMerge(config) {
 		config = this._normalizeContainerConfig(config);
-		if (typeof config.options === "string") config.options = config.options.split(/,\s*/).map(String);
-		if (typeof config.search === "string") config.search = config.search.split(/,\s*/).map(String);
+		config.options = this._normalizeOptions(config.options);
+		if (config.searchNoResultsLabel === true) config.searchNoResultsLabel = "No results found";
 		return config;
 	}
 	static autocompleteInterface(element, config, ...args) {
@@ -3639,53 +4332,30 @@ var Autocomplete = class Autocomplete extends ComboboxBase {
 			if (!context) continue;
 			const composedPath = event.composedPath();
 			if (composedPath.includes(context._element) || composedPath.includes(context._menu)) continue;
-			const relatedTarget = { relatedTarget: context._element };
-			if (event.type === "click") relatedTarget.clickEvent = event;
 			context.hide();
+			if (context._config.allowOnlyDefinedOptions && context._store.size() === 0) context._emptyByUser();
 			context.search("");
-			if (context._config.allowOnlyDefinedOptions && context._selected.length === 0) context._inputElement.value = "";
 		}
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(window, EVENT_LOAD_DATA_API$22, () => {
+EventHandler.on(window, EVENT_LOAD_DATA_API$21, () => {
 	for (const autocomplete of SelectorEngine.find(SELECTOR_DATA_AUTOCOMPLETE)) Autocomplete.autocompleteInterface(autocomplete);
 });
 EventHandler.on(document, EVENT_CLICK_DATA_API$18, Autocomplete.clearMenus);
 EventHandler.on(document, EVENT_KEYUP_DATA_API$4, Autocomplete.clearMenus);
-/**
-* jQuery
-*/
 defineJQueryPlugin(Autocomplete);
 //#endregion
 //#region js/src/button.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI button.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's button.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$45 = "button";
-const EVENT_KEY$37 = `.coreui.button`;
+const NAME$47 = "button";
+const EVENT_KEY$38 = `.coreui.button`;
 const DATA_API_KEY$32 = ".data-api";
 const CLASS_NAME_ACTIVE$8 = "active";
 const SELECTOR_DATA_TOGGLE$13 = "[data-coreui-toggle=\"button\"]";
-const EVENT_CLICK_DATA_API$17 = `click${EVENT_KEY$37}${DATA_API_KEY$32}`;
-const EVENT_DOM_CONTENT_LOADED$2 = `DOMContentLoaded${EVENT_KEY$37}${DATA_API_KEY$32}`;
-/**
-* Class definition
-*/
+const EVENT_CLICK_DATA_API$17 = `click${EVENT_KEY$38}${DATA_API_KEY$32}`;
+const EVENT_DOM_CONTENT_LOADED$2 = `DOMContentLoaded${EVENT_KEY$38}${DATA_API_KEY$32}`;
 var Button = class Button extends BaseComponent {
 	static get NAME() {
-		return NAME$45;
+		return NAME$47;
 	}
 	toggle() {
 		setAriaAttribute(this._element, "aria-pressed", this._element.classList.toggle(CLASS_NAME_ACTIVE$8));
@@ -3694,9 +4364,6 @@ var Button = class Button extends BaseComponent {
 		return jQueryDispatch(this, Button, config);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, EVENT_DOM_CONTENT_LOADED$2, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE$13)) if (!element.hasAttribute("aria-pressed")) setAriaAttribute(element, "aria-pressed", element.classList.contains(CLASS_NAME_ACTIVE$8));
 });
@@ -3705,101 +4372,107 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$17, SELECTOR_DATA_TOGGLE$13, (eve
 	const button = event.target.closest(SELECTOR_DATA_TOGGLE$13);
 	Button.getOrCreateInstance(button).toggle();
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Button);
 //#endregion
 //#region js/src/util/calendar.ts
-/**
-* Converts an ISO week string to a Date object representing the Monday of that week.
-* @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
-* @returns The Date object for the Monday of the specified week, or null if invalid.
-*/
-/**
-* Helper function to calculate Monday of ISO week 1 for a given year.
-* @param year - The year to calculate for.
-* @returns The Monday of ISO week 1.
-*/
-const getMondayOfISOWeek1 = (year) => {
-	const jan4 = new Date(year, 0, 4);
-	const jan4DayOfWeek = jan4.getDay();
-	const daysFromMonday = jan4DayOfWeek === 0 ? 6 : jan4DayOfWeek - 1;
-	const mondayOfWeek1 = new Date(jan4);
-	mondayOfWeek1.setDate(jan4.getDate() - daysFromMonday);
-	return mondayOfWeek1;
+const createDate = (year, month = 0, day = 1) => {
+	const date = new Date(year, month, day);
+	date.setFullYear(year, month, day);
+	date.setHours(0, 0, 0, 0);
+	return date;
 };
-/**
-* Helper function to calculate Monday of a specific ISO week.
-* @param year - The year.
-* @param week - The ISO week number.
-* @returns The Monday of the specified ISO week.
-*/
-const getMondayOfISOWeek = (year, week) => {
-	const mondayOfWeek1 = getMondayOfISOWeek1(year);
-	const weekStart = new Date(mondayOfWeek1);
-	weekStart.setDate(mondayOfWeek1.getDate() + (week - 1) * 7);
-	return weekStart;
+const parseToDateString = (value) => {
+	const [, month, day, year] = /^\w{3} (\w{3}) (\d{2}) (-?\d{4,})$/.exec(value) ?? [];
+	const monthIndex = [
+		"Jan",
+		"Feb",
+		"Mar",
+		"Apr",
+		"May",
+		"Jun",
+		"Jul",
+		"Aug",
+		"Sep",
+		"Oct",
+		"Nov",
+		"Dec"
+	].indexOf(month);
+	return monthIndex === -1 ? /* @__PURE__ */ new Date(NaN) : createDate(Number(year), monthIndex, Number(day));
 };
-/**
-* Helper function to convert a date to a month number for comparison.
-* @param date - The date to convert.
-* @returns A number representing year*12 + month for easy comparison.
-*/
-const dateToMonthNumber = (date) => {
-	return date.getFullYear() * 12 + date.getMonth();
+const getWeekLabel = (locale) => {
+	try {
+		const label = new Intl.DisplayNames(locale, { type: "dateTimeField" }).of("weekOfYear");
+		return label ? label.charAt(0).toLocaleUpperCase(locale) + label.slice(1) : "Week";
+	} catch {
+		return "Week";
+	}
 };
-/**
-* Helper function to convert a date to a quarter number for comparison.
-* @param date - The date to convert.
-* @returns A number representing year*4 + quarter for easy comparison.
-*/
-const dateToQuarterNumber = (date) => {
-	const quarter = Math.floor(date.getMonth() / 3);
-	return date.getFullYear() * 4 + quarter;
+const getWeekNumberName = (weekNumber, weekLabel, label) => label?.(weekNumber) || `${weekLabel} ${weekNumber}`;
+const getDateOfISOWeek = (year, week) => {
+	const date = createDate(year, 0, 4);
+	date.setDate(date.getDate() - (date.getDay() + 6) % 7 + (week - 1) * 7);
+	return date;
 };
-/**
-* Helper function to check if a value is within min/max range.
-* @param value - The value to check.
-* @param min - Minimum allowed value (null means no minimum).
-* @param max - Maximum allowed value (null means no maximum).
-* @returns True if the value is outside the range, false if within range.
-*/
-const isOutsideRange = (value, min, max) => {
-	if (min !== null && value < min) return true;
-	if (max !== null && value > max) return true;
-	return false;
+const ARROW_KEYS = /* @__PURE__ */ new Set([
+	"ArrowDown",
+	"ArrowLeft",
+	"ArrowRight",
+	"ArrowUp"
+]);
+const MODIFIER_KEYS$1 = /* @__PURE__ */ new Set([
+	"Alt",
+	"Control",
+	"Meta",
+	"Shift"
+]);
+const GREGORIAN_MONTH_CALENDARS = /* @__PURE__ */ new Set([
+	"buddhist",
+	"gregory",
+	"iso8601",
+	"japanese",
+	"roc"
+]);
+const yearBeforeMonth = /* @__PURE__ */ new Map();
+const CELL_NAME_FORMATS = {
+	days: {
+		weekday: "long",
+		day: "numeric",
+		month: "long",
+		year: "numeric"
+	},
+	months: {
+		month: "long",
+		year: "numeric"
+	},
+	years: { year: "numeric" }
 };
-/**
-* Helper function to check if every day of a period is disabled.
-* @param start - First day of the period.
-* @param end - Last day of the period.
-* @param min - Minimum allowed date.
-* @param max - Maximum allowed date.
-* @param disabledDates - Criteria for disabled dates.
-* @returns True if no day between start and end (clamped to min/max) is selectable.
-*/
-const isPeriodDisabled = (start, end, min, max, disabledDates) => {
-	const startTime = min ? Math.max(start.getTime(), min.getTime()) : start.getTime();
-	const endTime = max ? Math.min(end.getTime(), max.getTime()) : end.getTime();
-	for (const currentDate = new Date(startTime); currentDate.getTime() <= endTime; currentDate.setDate(currentDate.getDate() + 1)) if (!isDateDisabled(currentDate, min, max, disabledDates)) return false;
+const VIEW_BY_SELECTION_TYPE$1 = {
+	day: "days",
+	week: "days",
+	month: "months",
+	quarter: "quarters",
+	year: "years"
+};
+const MONTHS_IN_PERIOD = {
+	months: 1,
+	quarters: 3,
+	years: 12
+};
+const getPeriod = (date, view) => {
+	if (view === "weeks") return getMonday(date).getTime();
+	return Math.floor((date.getFullYear() * 12 + date.getMonth()) / MONTHS_IN_PERIOD[view]);
+};
+const isEveryDayDisabled = (start, end, min, max, disabledDates) => {
+	const first = min && min > start ? createDate(min.getFullYear(), min.getMonth(), min.getDate()) : start;
+	const last = max && max < end ? createDate(max.getFullYear(), max.getMonth(), max.getDate()) : end;
+	for (const currentDate = new Date(first); currentDate.getTime() <= last.getTime(); currentDate.setDate(currentDate.getDate() + 1)) if (!isDateDisabled(currentDate, null, null, disabledDates)) return false;
 	return true;
 };
-/**
-* Converts an ISO week string to a Date object representing the Monday of that week.
-* @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
-* @returns The Date object for the Monday of the specified week.
-*/
 const convertIsoWeekToDate = (isoWeek) => {
 	const [year, week] = isoWeek.split(/[Ww]/);
 	const parsedYear = parseYearSmart(year);
-	return getMondayOfISOWeek(parsedYear, Number.parseInt(week, 10));
+	return getDateOfISOWeek(parsedYear, Number.parseInt(week, 10));
 };
-/**
-* Parses a week string and returns a Date object for the Monday of that week.
-* @param dateString - The week string to parse.
-* @returns The Date object for the Monday of the week, or null if invalid.
-*/
 const parseWeekString = (dateString) => {
 	for (const pattern of [
 		/^(\d{4})-W(\d{1,2})$/,
@@ -3810,16 +4483,11 @@ const parseWeekString = (dateString) => {
 		if (match) {
 			const parsedYear = parseYearSmart(match[1]);
 			const parsedWeek = Number.parseInt(match[2], 10);
-			return getMondayOfISOWeek(parsedYear, parsedWeek);
+			return getDateOfISOWeek(parsedYear, parsedWeek);
 		}
 	}
 	return convertIsoWeekToDate(dateString);
 };
-/**
-* Parses a quarter string and returns a Date object for the first day of that quarter.
-* @param dateString - The quarter string to parse.
-* @returns The Date object for the first day of the quarter, or null if invalid.
-*/
 const parseQuarterString = (dateString) => {
 	for (const pattern of [
 		/^(\d{4})-Q(\d{1})$/,
@@ -3832,17 +4500,12 @@ const parseQuarterString = (dateString) => {
 			const parsedQuarter = Number.parseInt(match[2], 10);
 			if (parsedQuarter >= 1 && parsedQuarter <= 4) {
 				const monthIndex = (parsedQuarter - 1) * 3;
-				return new Date(parsedYear, monthIndex, 1);
+				return createDate(parsedYear, monthIndex, 1);
 			}
 		}
 	}
 	return null;
 };
-/**
-* Parses a month string and returns a Date object for the first day of that month.
-* @param dateString - The month string to parse.
-* @returns The Date object for the first day of the month, or null if invalid.
-*/
 const parseMonthString = (dateString) => {
 	for (const pattern of [/^(\d{2,4})[-/.\s](\d{1,2})$/, /^(\d{1,2})[-/.\s](\d{2,4})$/]) {
 		const match = dateString.trim().match(pattern);
@@ -3866,16 +4529,11 @@ const parseMonthString = (dateString) => {
 				parsedYear = parseYearSmart(secondGroup);
 				parsedMonth = parsedFirst - 1;
 			}
-			if (parsedMonth >= 0 && parsedMonth <= 11) return new Date(parsedYear, parsedMonth, 1);
+			if (parsedMonth >= 0 && parsedMonth <= 11) return createDate(parsedYear, parsedMonth, 1);
 		}
 	}
 	return null;
 };
-/**
-* Parses a year string or number and returns a Date object for January 1st of that year.
-* @param dateString - The year string or number to parse.
-* @returns The Date object for January 1st of the year, or null if invalid.
-*/
 const parseYearString = (dateString) => {
 	const yearString = String(dateString);
 	const match = yearString.trim().match(/^(\d{2,4})$/);
@@ -3885,17 +4543,11 @@ const parseYearString = (dateString) => {
 	}
 	return parseLocalDateString(yearString);
 };
-/**
-* Helper function to generate multiple date format patterns based on locale.
-* @param locale - The locale to use for date format patterns.
-* @param includeTime - Whether to include time in the patterns.
-* @returns Array of date format patterns.
-*/
 const generateDatePatterns = (locale, includeTime) => {
 	const referenceDate = new Date(2013, 11, 31, 17, 19, 22);
 	const patterns = [];
 	try {
-		const standardFormat = includeTime ? referenceDate.toLocaleString(locale) : referenceDate.toLocaleDateString(locale);
+		const standardFormat = includeTime ? referenceDate.toLocaleString(locale, { calendar: "gregory" }) : referenceDate.toLocaleDateString(locale, { calendar: "gregory" });
 		patterns.push(standardFormat);
 	} catch {
 		const standardFormat = includeTime ? referenceDate.toLocaleString("en-US") : referenceDate.toLocaleDateString("en-US");
@@ -3919,25 +4571,12 @@ const generateDatePatterns = (locale, includeTime) => {
 	}
 	return patterns;
 };
-/**
-* Helper function to build regex pattern for date parsing.
-* @param formatString - The date format string.
-* @param includeTime - Whether to include time patterns.
-* @returns The regex pattern string.
-*/
 const buildDateRegexPattern = (formatString, includeTime) => {
 	let regexPattern = formatString.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
 	regexPattern = regexPattern.replace("2013", String.raw`(?<year>\d{2,4})`).replace("12", String.raw`(?<month>\d{1,2})`).replace("31", String.raw`(?<day>\d{1,2})`);
 	if (includeTime) regexPattern = regexPattern.replaceAll(/17|5/g, String.raw`(?<hour>\d{1,2})`).replace("19", String.raw`(?<minute>\d{1,2})`).replace("22", String.raw`(?<second>\d{1,2})`).replaceAll(/AM|PM/gi, "(?<ampm>[APap][Mm])");
 	return regexPattern;
 };
-/**
-* Helper function to try parsing with multiple patterns.
-* @param dateString - The date string to parse.
-* @param patterns - Array of format patterns to try.
-* @param includeTime - Whether time parsing is included.
-* @returns Parsed groups or null if no match.
-*/
 const tryParseWithPatterns = (dateString, patterns, includeTime) => {
 	for (const pattern of patterns) {
 		const regexPattern = buildDateRegexPattern(pattern, includeTime);
@@ -3947,12 +4586,15 @@ const tryParseWithPatterns = (dateString, patterns, includeTime) => {
 	}
 	return null;
 };
-/**
-* Helper function to convert 12-hour to 24-hour format.
-* @param hour - Hour string.
-* @param ampm - AM/PM indicator.
-* @returns Hour in 24-hour format.
-*/
+const readWrittenDay = (dateString, locale) => {
+	const iso = /^(?<year>\d{4,})-(?<month>\d{1,2})-(?<day>\d{1,2})(?!\d)/.exec(dateString);
+	if (iso?.groups) return iso.groups;
+	for (const pattern of generateDatePatterns(locale, false)) {
+		const match = new RegExp(`^${buildDateRegexPattern(pattern, false)}(?!\\d)`).exec(dateString);
+		if (match?.groups) return match.groups;
+	}
+	return null;
+};
 const convertTo24Hour = (hour, ampm) => {
 	const parsedHour = Number.parseInt(hour, 10);
 	if (!ampm) return parsedHour;
@@ -3961,34 +4603,17 @@ const convertTo24Hour = (hour, ampm) => {
 	if (!isPM && parsedHour === 12) return 0;
 	return parsedHour;
 };
-/**
-* Helper function to validate time components.
-* @param hour - Hour value.
-* @param minute - Minute value.
-* @param second - Second value.
-* @returns True if time components are valid.
-*/
 const validateTimeComponents = (hour, minute, second) => {
 	return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59;
 };
-/**
-* Helper function to validate date components.
-* @param month - Month string.
-* @param day - Day string.
-* @returns True if date components are valid.
-*/
-const validateDateComponents = (month, day) => {
-	const parsedMonth = Number.parseInt(month, 10) - 1;
+const validateDateComponents = (year, month, day) => {
+	const parsedMonth = Number.parseInt(month, 10);
 	const parsedDay = Number.parseInt(day, 10);
-	return parsedMonth >= 0 && parsedMonth <= 11 && parsedDay >= 1 && parsedDay <= 31;
+	return parsedMonth >= 1 && parsedMonth <= 12 && parsedDay >= 1 && parsedDay <= createDate(parseYearSmart(year), parsedMonth, 0).getDate();
 };
-/**
-* Helper function to create date with time.
-* @param groups - Parsed date and time groups.
-* @returns Date object or null if invalid.
-*/
 const createDateWithTime = (groups) => {
 	const { year, month, day, hour, minute, second, ampm } = groups;
+	if (ampm && Number.parseInt(hour, 10) > 12) return null;
 	const parsedYear = parseYearSmart(year);
 	const parsedMonth = Number.parseInt(month, 10) - 1;
 	const parsedDay = Number.parseInt(day, 10);
@@ -3996,36 +4621,21 @@ const createDateWithTime = (groups) => {
 	const parsedMinute = Number.parseInt(minute ?? "0", 10) || 0;
 	const parsedSecond = Number.parseInt(second ?? "0", 10) || 0;
 	if (!validateTimeComponents(parsedHour, parsedMinute, parsedSecond)) return null;
-	return new Date(parsedYear, parsedMonth, parsedDay, parsedHour, parsedMinute, parsedSecond);
+	const date = createDate(parsedYear, parsedMonth, parsedDay);
+	date.setHours(parsedHour, parsedMinute, parsedSecond);
+	return date;
 };
-/**
-* Helper function to create date without time.
-* @param groups - Parsed date groups.
-* @returns Date object or null if invalid.
-*/
 const createDateOnly = (groups) => {
 	const { year, month, day } = groups;
-	if (!validateDateComponents(month, day)) return null;
+	if (!validateDateComponents(year, month, day)) return null;
 	const parsedYear = parseYearSmart(year);
 	const parsedMonth = Number.parseInt(month, 10) - 1;
-	return new Date(parsedYear, parsedMonth, Number.parseInt(day, 10));
+	return createDate(parsedYear, parsedMonth, Number.parseInt(day, 10));
 };
-/**
-* Helper function to determine expected parts count from patterns.
-* @param patterns - Array of date format patterns.
-* @returns Expected number of parts for a complete date.
-*/
 const getExpectedPartsCount = (patterns) => {
 	if (patterns.length === 0) return 3;
 	return patterns[0].split(/[-/.\s:]+/).filter((part) => part.length > 0).length;
 };
-/**
-* Enhanced day parsing with locale-aware patterns.
-* @param dateString - The day string to parse.
-* @param locale - The locale to use for parsing.
-* @param includeTime - Whether to include time parsing.
-* @returns Date object or null if invalid.
-*/
 const parseDayString = (dateString, locale, includeTime) => {
 	const patterns = generateDatePatterns(locale, includeTime);
 	const groups = tryParseWithPatterns(dateString, patterns, includeTime);
@@ -4035,20 +4645,18 @@ const parseDayString = (dateString, locale, includeTime) => {
 		const parts = trimmed.split(/[-/.\s:]+/).filter((part) => part.length > 0);
 		const expectedPartsCount = getExpectedPartsCount(patterns);
 		const hasRequiredParts = parts.length >= expectedPartsCount;
-		if (hasDateSeparators && hasRequiredParts) return parseLocalDateString(dateString);
+		if (hasDateSeparators && hasRequiredParts) {
+			const written = readWrittenDay(trimmed, locale);
+			return written && !validateDateComponents(written.year, written.month, written.day) ? null : parseLocalDateString(dateString);
+		}
 		return null;
 	}
 	if ("year" in groups && "month" in groups && "day" in groups) {
-		const { month, day } = groups;
-		if (!validateDateComponents(month, day)) return null;
+		const { year, month, day } = groups;
+		if (!validateDateComponents(year, month, day)) return null;
 	} else return null;
 	return includeTime ? createDateWithTime(groups) : createDateOnly(groups);
 };
-/**
-* Parses a date string into a local Date object.
-* @param dateString - The date string to parse.
-* @returns The Date object in local timezone, or null if invalid.
-*/
 const parseLocalDateString = (dateString) => {
 	const trimmed = dateString.trim();
 	const isoDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(trimmed);
@@ -4056,169 +4664,169 @@ const parseLocalDateString = (dateString) => {
 	if (!Number.isNaN(_date.getTime())) return _date;
 	return null;
 };
-/**
-* Converts a date string or Date object to a Date object based on selection type.
-* @param date - The date to convert.
-* @param selectionType - The type of selection ('day', 'week', 'month', 'year').
-* @param locale - The locale to use for date parsing (for day parsing).
-* @param includeTime - Whether to include time parsing (for day parsing).
-* @returns The corresponding Date object or null if invalid.
-*/
 const convertToDateObject = (date, selectionType, locale = "en-US", includeTime = false) => {
-	if (date === null) return null;
+	if (!date) return null;
 	if (date instanceof Date) return Number.isNaN(date.getTime()) ? null : date;
-	const dateString = date;
-	switch (selectionType) {
-		case "week": return parseWeekString(dateString);
-		case "month": return parseMonthString(dateString);
-		case "quarter": return parseQuarterString(dateString);
-		case "year": return parseYearString(dateString);
-		default: return parseDayString(dateString, locale, includeTime);
-	}
+	const parsers = {
+		week: parseWeekString,
+		month: parseMonthString,
+		quarter: parseQuarterString,
+		year: parseYearString
+	};
+	const value = typeof date === "number" ? String(date) : date;
+	const parse = selectionType ? parsers[selectionType] : void 0;
+	const parsed = parse ? parse(value) : parseDayString(value, locale, includeTime);
+	return parsed && !Number.isNaN(parsed.getTime()) ? parsed : null;
 };
-/**
-* Enhanced locale-aware date parsing function (replaces getLocalDateFromString).
-* @param dateString - The date string to parse.
-* @param locale - The locale to use for date format patterns.
-* @param includeTime - Whether to include time parsing.
-* @param selectionType - The selection type ('day', 'week', 'month', 'quarter', 'year').
-* @returns A Date object if parsing succeeds, null if parsing fails.
-*/
+const convertToSelectionDate = (date, selectionType) => {
+	const value = convertToDateObject(date, selectionType);
+	return value && selectionType === "week" ? getMonday(value) : value;
+};
+const convertToShownDate = (date, selectionType, firstDayOfWeek) => {
+	const value = convertToDateObject(date, selectionType);
+	if (!value || selectionType !== "week") return value;
+	const rowStart = getWeekRowStart(value, firstDayOfWeek);
+	const rowEnd = createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 6);
+	const monday = getMonday(value);
+	return [rowStart, rowEnd].some((day) => day.getFullYear() === value.getFullYear() && day.getMonth() === value.getMonth()) ? value : createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3);
+};
+const convertToLimitDate = (date, selectionType) => {
+	const value = convertToDateObject(date, selectionType);
+	if (!value || selectionType !== "week") return value;
+	const monday = getMonday(value);
+	return createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3);
+};
 const getLocalDateFromString = (dateString, locale = "en-US", includeTime = false, selectionType = "day") => {
 	if (!dateString || typeof dateString !== "string") return null;
 	return convertToDateObject(dateString, selectionType, locale, includeTime);
 };
-/**
-* Creates groups from an array.
-* @param arr - The array to group.
-* @param numberOfGroups - Number of groups to create.
-* @returns An array of grouped arrays.
-*/
 const createGroupsInArray = (arr, numberOfGroups) => {
 	const perGroup = Math.ceil(arr.length / numberOfGroups);
 	return Array.from({ length: numberOfGroups }).fill("").map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
 };
-/**
-* Adjusts the calendar date based on order and view type.
-* @param calendarDate - The current calendar date.
-* @param order - The order to adjust by.
-* @param view - The current view type.
-* @returns The adjusted Date object.
-*/
 const getCalendarDate = (calendarDate, order, view) => {
-	if (order !== 0 && view === "days") return new Date(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1);
-	if (order !== 0 && (view === "months" || view === "quarters")) return new Date(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1);
-	if (order !== 0 && view === "years") return new Date(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1);
+	if (order !== 0 && view === "days") return createDate(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1);
+	if (order !== 0 && (view === "months" || view === "quarters")) return createDate(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1);
+	if (order !== 0 && view === "years") return createDate(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1);
 	return calendarDate;
 };
-/**
-* Formats a date based on the selection type.
-* @param date - The date to format.
-* @param selectionType - The type of selection ('day', 'week', 'month', 'quarter', 'year').
-* @returns A formatted date string or the original Date object.
-*/
 const getDateBySelectionType = (date, selectionType) => {
 	if (date === null) return null;
 	if (selectionType === "week") {
 		const { year, weekNumber } = getISOWeekNumberAndYear(date);
-		return `${year}W${weekNumber.toString().padStart(2, "0")}`;
+		return `${String(year).padStart(4, "0")}W${weekNumber.toString().padStart(2, "0")}`;
 	}
-	if (selectionType === "month") {
-		const monthNumber = `0${date.getMonth() + 1}`.slice(-2);
-		return `${date.getFullYear()}-${monthNumber}`;
-	}
-	if (selectionType === "quarter") {
-		const quarter = Math.floor(date.getMonth() / 3) + 1;
-		return `${date.getFullYear()}Q${quarter}`;
-	}
-	if (selectionType === "year") return `${date.getFullYear()}`;
+	const year = String(date.getFullYear()).padStart(4, "0");
+	if (selectionType === "month") return `${year}-${`0${date.getMonth() + 1}`.slice(-2)}`;
+	if (selectionType === "quarter") return `${year}Q${Math.floor(date.getMonth() / 3) + 1}`;
+	if (selectionType === "year") return year;
 	return date;
 };
-/**
-* Retrieves an array of month names based on locale and format.
-* @param locale - The locale string (e.g., 'en-US').
-* @param format - The format of the month names ('short' or 'long').
-* @returns An array of month names.
-*/
-const getMonthsNames = (locale, format = "short") => {
-	return Array.from({ length: 12 }, (_, i) => {
-		return new Date(2e3, i, 1).toLocaleString(locale, { month: format });
+const createDateTimeFormat = (locale, options) => {
+	const formatter = new Intl.DateTimeFormat(locale, options);
+	return options?.calendar || GREGORIAN_MONTH_CALENDARS.has(formatter.resolvedOptions().calendar) ? formatter : new Intl.DateTimeFormat(locale, {
+		...options,
+		calendar: "gregory"
 	});
 };
-/**
-* Generates an array of years centered around a given year.
-* @param year - The central year.
-* @param range - The number of years before and after the central year.
-* @returns An array of years.
-*/
+const isYearBeforeMonth = (locale) => {
+	const key = locale ?? "";
+	if (!yearBeforeMonth.has(key)) {
+		const parts = createDateTimeFormat(locale, {
+			month: "long",
+			year: "numeric"
+		}).formatToParts(new Date(2e3, 0, 1));
+		yearBeforeMonth.set(key, parts.findIndex(({ type }) => type === "year") < parts.findIndex(({ type }) => type === "month"));
+	}
+	return yearBeforeMonth.get(key);
+};
+const getMonthsNames = (locale, format = "short") => {
+	const formatter = createDateTimeFormat(locale, { month: format });
+	return Array.from({ length: 12 }, (_, i) => formatter.format(new Date(2e3, i, 1)));
+};
+const createDateFormatter = () => {
+	const formatters = /* @__PURE__ */ new Map();
+	return (date, locale, options) => {
+		if (Number.isNaN(date.getTime())) return date.toLocaleDateString(locale, options);
+		const key = `${locale}|${options ? JSON.stringify(options) : ""}`;
+		let formatter = formatters.get(key);
+		if (!formatter) {
+			formatter = createDateTimeFormat(locale, options);
+			formatters.set(key, formatter);
+		}
+		return formatter.format(date);
+	};
+};
 const getYears = (year, range = 6) => {
 	return Array.from({ length: range * 2 }, (_, i) => year - range + i);
 };
-/**
-* Retrieves leading days (from the previous month) for a calendar view.
-* @param year - The year.
-* @param month - The month (0-11).
-* @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
-* @returns An array of leading day objects.
-*/
+const formatYearsRange = (year, locale) => {
+	const years = getYears(year);
+	const [start, end] = [years[0], years.at(-1)].map((value) => createDate(value));
+	const range = createDateTimeFormat(locale, { year: "numeric" }).formatRange(start, end);
+	return /(?!\p{Nd})[\u0590-\u08FF]/u.test(range) ? `\u2067${range}\u2069` : range;
+};
+const formatCellName = (date, view, format) => view === "quarters" ? `Q${Math.floor(date.getMonth() / 3) + 1} ${format(date, { year: "numeric" })}` : format(date, CELL_NAME_FORMATS[view]);
+const formatWeekName = (days, locale) => createDateTimeFormat(locale, {
+	day: "numeric",
+	month: "long",
+	year: "numeric"
+}).formatRange(days[0].date, days.at(-1).date);
+const formatSelectionName = (date, { ariaWeekNumberLabel = null, firstDayOfWeek = 1, locale, selectionType = "day", showWeekNumber = false } = {}) => {
+	if (selectionType !== "week") return formatCellName(date, VIEW_BY_SELECTION_TYPE$1[selectionType], (value, options) => createDateTimeFormat(locale, options).format(value));
+	const first = getWeekRowStart(date, firstDayOfWeek);
+	const name = formatWeekName([{ date: first }, { date: createDate(first.getFullYear(), first.getMonth(), first.getDate() + 6) }], locale);
+	return showWeekNumber ? `${getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale ?? ""), ariaWeekNumberLabel)}, ${name}` : name;
+};
+const formatSelectionRangeName = (start, end, options = {}) => {
+	const { ariaWeekNumberLabel = null, firstDayOfWeek = 1, locale, selectionType = "day", showWeekNumber = false } = options;
+	const startName = formatSelectionName(start, options);
+	const endName = formatSelectionName(end, options);
+	if (startName === endName) return startName;
+	if (selectionType === "quarter" || end < start) return `${startName} – ${endName}`;
+	if (selectionType === "week") {
+		const last = getWeekRowStart(end, firstDayOfWeek);
+		const days = createDateTimeFormat(locale, {
+			day: "numeric",
+			month: "long",
+			year: "numeric"
+		}).formatRange(getWeekRowStart(start, firstDayOfWeek), createDate(last.getFullYear(), last.getMonth(), last.getDate() + 6));
+		const weekName = (date) => getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale ?? ""), ariaWeekNumberLabel);
+		return showWeekNumber ? `${weekName(start)} – ${weekName(end)}, ${days}` : days;
+	}
+	return createDateTimeFormat(locale, CELL_NAME_FORMATS[VIEW_BY_SELECTION_TYPE$1[selectionType]]).formatRange(start, end);
+};
 const getLeadingDays = (year, month, firstDayOfWeek) => {
 	const dates = [];
-	const d = new Date(year, month);
+	const d = createDate(year, month);
 	const y = d.getFullYear();
 	const m = d.getMonth();
-	let leadingDays = 6 - (6 - new Date(y, m, 1).getDay()) - firstDayOfWeek;
+	let leadingDays = 6 - (6 - createDate(y, m, 1).getDay()) - firstDayOfWeek;
 	if (firstDayOfWeek) leadingDays = leadingDays < 0 ? 7 + leadingDays : leadingDays;
 	for (let i = leadingDays * -1; i < 0; i++) dates.push({
-		date: new Date(y, m, i + 1),
+		date: createDate(y, m, i + 1),
 		month: "previous"
 	});
 	return dates;
 };
-/**
-* Retrieves all days within a specific month.
-* @param year - The year.
-* @param month - The month (0-11).
-* @returns An array of day objects.
-*/
 const getMonthDays = (year, month) => {
 	const dates = [];
-	const lastDay = new Date(year, month + 1, 0).getDate();
+	const lastDay = createDate(year, month + 1, 0).getDate();
 	for (let i = 1; i <= lastDay; i++) dates.push({
-		date: new Date(year, month, i),
+		date: createDate(year, month, i),
 		month: "current"
 	});
 	return dates;
 };
-/**
-* Retrieves trailing days (from the next month) for a calendar view.
-* @param year - The year.
-* @param month - The month (0-11).
-* @param leadingDays - Array of leading day objects.
-* @param monthDays - Array of current month day objects.
-* @returns An array of trailing day objects.
-*/
 const getTrailingDays = (year, month, leadingDays, monthDays) => {
 	const dates = [];
 	const days = 42 - (leadingDays.length + monthDays.length);
 	for (let i = 1; i <= days; i++) dates.push({
-		date: new Date(year, month + 1, i),
+		date: createDate(year, month + 1, i),
 		month: "next"
 	});
 	return dates;
 };
-/**
-* Calculates the ISO 8601 week number and year for a given date.
-*
-* In the ISO 8601 standard:
-* - Weeks start on Monday.
-* - The first week of the year is the one that contains January 4th.
-* - The year of the week may differ from the calendar year (e.g., Dec 29, 2025 is in ISO year 2026).
-*
-* @param {Date} date - The date for which to calculate the ISO week number and year.
-* @returns {{ weekNumber: number, year: number }} An object containing:
-*   - `weekNumber`: the ISO week number (1–53),
-*   - `year`: the ISO year (may differ from the calendar year of the date).
-*/
 const getISOWeekNumberAndYear = (date) => {
 	const tempDate = new Date(date);
 	tempDate.setHours(0, 0, 0, 0);
@@ -4230,13 +4838,6 @@ const getISOWeekNumberAndYear = (date) => {
 		year: tempDate.getFullYear()
 	};
 };
-/**
-* Retrieves detailed information about each week in a month for calendar rendering.
-* @param year - The year.
-* @param month - The month (0-11).
-* @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
-* @returns An array of week objects containing week numbers and day details.
-*/
 const getMonthDetails = (year, month, firstDayOfWeek) => {
 	const daysPrevMonth = getLeadingDays(year, month, firstDayOfWeek);
 	const daysThisMonth = getMonthDays(year, month);
@@ -4255,7 +4856,7 @@ const getMonthDetails = (year, month, firstDayOfWeek) => {
 			},
 			days: []
 		});
-		if ((index + 1) % 7 === 0) {
+		if (index % 7 === 3) {
 			const { weekNumber, year } = getISOWeekNumberAndYear(day.date);
 			const lastWeek = weeks[weeks.length - 1];
 			if (lastWeek) lastWeek.week = {
@@ -4268,17 +4869,262 @@ const getMonthDetails = (year, month, firstDayOfWeek) => {
 	}
 	return weeks;
 };
-/**
-* Checks if a date is disabled based on the 'date' period type.
-* @param date - The date to check.
-* @param min - Minimum allowed date.
-* @param max - Maximum allowed date.
-* @param disabledDates - Criteria for disabled dates.
-* @returns True if the date is disabled, false otherwise.
-*/
+const getClosestTarget = (targets, anchor, rows) => {
+	let closest;
+	let closestGap = Number.POSITIVE_INFINITY;
+	for (const target of targets) {
+		if (!rows && target.adjacent) continue;
+		const time = anchor.getTime();
+		const gap = time < target.position.getTime() ? target.position.getTime() - time : Math.max(0, time - target.end.getTime());
+		if (gap < closestGap || gap === closestGap && closest?.adjacent && !target.adjacent) {
+			closest = target;
+			closestGap = gap;
+		}
+	}
+	return closest;
+};
+const getSelectableDates = (element, selector = "tr[tabindex], td[tabindex]") => [...Element.prototype.querySelectorAll.call(element, selector)];
+const getClosestSelectable = (elements, anchor, rows) => {
+	const targets = [];
+	for (const element of elements) {
+		const cells = rows ? [...element.querySelectorAll("td[data-coreui-date]")] : [element];
+		const first = cells[0]?.dataset.coreuiDate;
+		const last = cells.at(-1)?.dataset.coreuiDate;
+		if (first && last) {
+			const position = parseToDateString(first);
+			targets.push({
+				adjacent: cells[0].matches(".previous, .next"),
+				date: position,
+				element,
+				end: parseToDateString(last),
+				position,
+				selected: element.classList.contains("selected")
+			});
+		}
+	}
+	return getClosestTarget(targets, anchor, rows)?.element;
+};
+const setRovingTabIndex = (element, selector, anchor, rows, preferred) => {
+	const empty = !element.querySelector(selector);
+	for (const panel of element.querySelectorAll(".calendar")) {
+		const targets = getSelectableDates(panel, selector);
+		const grid = panel.querySelector("table");
+		if (empty) grid?.setAttribute("tabindex", "0");
+		else grid?.removeAttribute("tabindex");
+		for (const stale of panel.querySelectorAll("td[tabindex=\"0\"], tr[tabindex=\"0\"]")) if (!targets.includes(stale)) stale.tabIndex = -1;
+		if (targets.length === 0) continue;
+		const active = (preferred && targets.includes(preferred) ? preferred : void 0) ?? targets.find((target) => target.classList.contains("selected")) ?? (anchor ? getClosestSelectable(targets, anchor, rows) : void 0) ?? targets[0];
+		for (const target of targets) {
+			const tabIndex = target === active ? 0 : -1;
+			if (target.tabIndex !== tabIndex) target.tabIndex = tabIndex;
+		}
+	}
+};
+const getStartOfView = (date, view) => {
+	const value = new Date(date);
+	value.setHours(0, 0, 0, 0);
+	if (view === "months") value.setDate(1);
+	if (view === "quarters") value.setMonth(Math.floor(value.getMonth() / 3) * 3, 1);
+	if (view === "years") value.setMonth(0, 1);
+	return value;
+};
+const getStartOfWeek = (date, firstDayOfWeek) => {
+	const value = new Date(date);
+	value.setDate(value.getDate() - (value.getDay() - firstDayOfWeek + 7) % 7);
+	return value;
+};
+const getWeekRowDate = (rowStart) => getMonday(createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 3));
+const getMonday = (date) => {
+	const monday = getStartOfWeek(date, 1);
+	return createDate(monday.getFullYear(), monday.getMonth(), monday.getDate());
+};
+const getWeekRowStart = (date, firstDayOfWeek) => {
+	const monday = getMonday(date);
+	return getStartOfWeek(createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3), firstDayOfWeek);
+};
+const getViewEdge = (forward, { calendarDate, calendars, view }) => {
+	const year = calendarDate.getFullYear();
+	const month = calendarDate.getMonth();
+	const last = calendars - 1;
+	if (view === "days") return forward ? createDate(year, month + last + 1, 0) : createDate(year, month, 1);
+	if (view === "years") return createDate(forward ? year + 6 - 1 + 12 * last : year - 6, 0, 1);
+	return forward ? createDate(year + last, view === "quarters" ? 9 : 11, 1) : createDate(year, 0, 1);
+};
+const getPanelMonth = ({ calendarDate, panel }) => [createDate(calendarDate.getFullYear(), calendarDate.getMonth() + panel, 1), createDate(calendarDate.getFullYear(), calendarDate.getMonth() + panel + 1, 0)];
+const isUnfocusable = (date, { maxDate, minDate, rows, view }) => isCellOutsideLimits(date, view, minDate, maxDate, rows);
+const walkToFocusable = (start, date, context) => {
+	const { rows, view } = context;
+	const sign = start > date ? -1 : 1;
+	const isShort = (value) => sign * (date.getTime() - value.getTime()) > 0;
+	while (isUnfocusable(start, context) && isShort(start)) if (view === "days") start.setDate(start.getDate() + sign * (rows ? 7 : 1));
+	else start.setMonth(start.getMonth() + sign * MONTHS_IN_PERIOD[view]);
+	return start;
+};
+const getArrowTarget = (date, forward, vertical, context) => {
+	const { firstDayOfWeek, rows, view } = context;
+	const [days, months] = {
+		days: vertical || rows ? [7, 0] : [1, 0],
+		months: vertical ? [0, 3] : [0, 1],
+		quarters: vertical ? [0, 12] : [0, 3],
+		years: vertical ? [0, 36] : [0, 12]
+	}[view];
+	const sign = forward ? 1 : -1;
+	const target = rows ? getStartOfWeek(date, firstDayOfWeek) : new Date(date);
+	target.setMonth(target.getMonth() + sign * months, target.getDate() + sign * days);
+	return isUnfocusable(target, context) ? null : target;
+};
+const getGridArrowTarget = (forward, context) => {
+	const { firstDayOfWeek, maxDate, minDate, rows, view } = context;
+	const limit = forward ? minDate ?? createDate(1) : maxDate;
+	if (!limit) return null;
+	const target = getStartOfView(limit, view);
+	const edge = getViewEdge(forward, context);
+	if (forward ? edge >= target : edge <= target) return null;
+	return rows ? getStartOfWeek(target, firstDayOfWeek) : target;
+};
+const getRevealOffset = (date, { calendarDate, calendars, rows, view }) => {
+	if (view === "days") {
+		const end = new Date(date);
+		end.setDate(end.getDate() + (rows ? 6 : 0));
+		const monthsFrom = (value) => (value.getFullYear() - calendarDate.getFullYear()) * 12 + value.getMonth() - calendarDate.getMonth();
+		return {
+			months: monthsFrom(end) < 0 ? monthsFrom(end) : Math.max(0, monthsFrom(date) - calendars + 1),
+			years: 0
+		};
+	}
+	if (view === "years") {
+		const page = Math.floor((date.getFullYear() - calendarDate.getFullYear() + 6) / 12);
+		return {
+			months: 0,
+			years: 12 * (page < 0 ? page : Math.max(0, page - calendars + 1))
+		};
+	}
+	const delta = date.getFullYear() - calendarDate.getFullYear();
+	return {
+		months: 0,
+		years: delta < 0 ? delta : Math.max(0, delta - calendars + 1)
+	};
+};
+const getRowEdge = (date, last, context) => {
+	const { calendarDate, firstDayOfWeek, rows, view } = context;
+	const year = date.getFullYear();
+	const month = date.getMonth();
+	let edge;
+	if (view === "days" && rows) edge = getStartOfWeek(getPanelMonth(context)[last ? 1 : 0], firstDayOfWeek);
+	else switch (view) {
+		case "days":
+			edge = getStartOfWeek(createDate(year, month, date.getDate()), firstDayOfWeek);
+			edge.setDate(edge.getDate() + (last ? 6 : 0));
+			break;
+		case "months":
+			edge = createDate(year, month - month % 3 + (last ? 2 : 0), 1);
+			break;
+		case "quarters":
+			edge = createDate(year, last ? 9 : 0, 1);
+			break;
+		default: {
+			const offset = year - calendarDate.getFullYear() + 6;
+			edge = createDate(year - offset % 3 + (last ? 2 : 0), 0, 1);
+		}
+	}
+	if ((last ? -1 : 1) * (date.getTime() - edge.getTime()) < 0) return new Date(date);
+	return walkToFocusable(edge, date, context);
+};
+const moveTo = (target, context) => target ? {
+	date: target,
+	...getRevealOffset(target, context),
+	type: "move"
+} : { type: "stay" };
+const getPageOffset = (direction, shiftKey, view) => view === "days" && !shiftKey ? {
+	months: direction,
+	years: 0
+} : {
+	months: 0,
+	years: direction * (view === "years" ? 12 : 1)
+};
+const getPageAction = (date, direction, shiftKey, context) => {
+	const { firstDayOfWeek, keptDay, maxDate, minDate, rows, view } = context;
+	const offset = getPageOffset(direction, shiftKey, view);
+	const kept = keptDay && isSameDateAs(keptDay.focused, date) ? keptDay : null;
+	const day = kept ? kept.day : date.getDate();
+	const from = kept ? kept.target : date;
+	const target = new Date(date);
+	target.setFullYear(from.getFullYear() + offset.years, from.getMonth() + offset.months, 1);
+	target.setDate(Math.min(day, createDate(target.getFullYear(), target.getMonth() + 1, 0).getDate()));
+	const bound = direction > 0 ? maxDate : minDate ?? createDate(1);
+	const [first, last] = getPanelMonth(context);
+	let start;
+	if (bound && isUnfocusable(rows ? getStartOfWeek(target, firstDayOfWeek) : target, context)) {
+		const edge = getStartOfView(bound, view);
+		start = rows ? getStartOfWeek(edge, firstDayOfWeek) : edge;
+	} else if (view === "days" && !rows && (date < first || date > last)) start = target;
+	else return {
+		date: target,
+		keptDay: {
+			day,
+			focused: rows ? getStartOfWeek(target, firstDayOfWeek) : target,
+			target
+		},
+		...offset,
+		type: "page"
+	};
+	const stop = walkToFocusable(start, date, context);
+	if (stop.getTime() === date.getTime()) return { type: "stay" };
+	return {
+		date: stop,
+		keptDay: {
+			day,
+			focused: stop,
+			target: stop
+		},
+		...getRevealOffset(stop, context),
+		type: "move"
+	};
+};
+const isForwardKey = (key, rtl) => key === "ArrowDown" || key === (rtl ? "ArrowLeft" : "ArrowRight");
+const getGridKeyAction = ({ key, shiftKey }, context) => {
+	if (ARROW_KEYS.has(key)) return moveTo(getGridArrowTarget(isForwardKey(key, context.rtl), context), context);
+	if (key === "PageDown" || key === "PageUp") return {
+		...getPageOffset(key === "PageDown" ? 1 : -1, shiftKey, context.view),
+		type: "page"
+	};
+	return key === "End" || key === "Home" ? { type: "stay" } : null;
+};
+const getCellKeyAction = ({ code, key, repeat, shiftKey }, date, context) => {
+	if (ARROW_KEYS.has(key)) return moveTo(getArrowTarget(date, isForwardKey(key, context.rtl), key === "ArrowDown" || key === "ArrowUp", context), context);
+	if (code === "Space" || key === "Enter") return repeat ? { type: "stay" } : { type: "activate" };
+	if (key === "End" || key === "Home") {
+		const target = getRowEdge(date, key === "End", context);
+		if (target.getTime() === date.getTime()) return { type: "stay" };
+		if (!context.rows) return moveTo(target, context);
+		return {
+			date: target,
+			months: 0,
+			panel: context.panel,
+			type: "move",
+			years: 0
+		};
+	}
+	return key === "PageDown" || key === "PageUp" ? getPageAction(date, key === "PageDown" ? 1 : -1, shiftKey, context) : null;
+};
+const hasShortcutModifier = (event) => Boolean(event.altKey || event.ctrlKey || event.metaKey);
+const getCalendarKeyAction = (event, date, context) => {
+	if (hasShortcutModifier(event)) return null;
+	return date ? getCellKeyAction(event, date, context) : getGridKeyAction(event, context);
+};
+const getKeptDay = (key, action, keptDay) => {
+	if (action && "keptDay" in action && action.keptDay) return action.keptDay;
+	return action?.type === "stay" || MODIFIER_KEYS$1.has(key) ? keptDay : null;
+};
+const constrainDate = (date, min, max) => {
+	if (min && date < min) return new Date(min);
+	if (max && date > max) return new Date(max);
+	return date;
+};
 const isDateDisabled = (date, min, max, disabledDates) => {
-	if (min && date < min) return true;
-	if (max && date > max) return true;
+	const day = removeTimeFromDate(date);
+	if (min && day < removeTimeFromDate(min) || date.getFullYear() < 1) return true;
+	if (max && day > removeTimeFromDate(max)) return true;
 	if (disabledDates === void 0) return false;
 	if (typeof disabledDates === "function") return disabledDates(date);
 	if (disabledDates instanceof Date && isSameDateAs(date, disabledDates)) return true;
@@ -4289,157 +5135,49 @@ const isDateDisabled = (date, min, max, disabledDates) => {
 	}
 	return false;
 };
-/**
-* Checks if a date is within a specified range.
-* @param date - The date to check.
-* @param start - Start date of the range.
-* @param end - End date of the range.
-* @returns True if the date is within the range, false otherwise.
-*/
 const isDateInRange = (date, start, end) => {
 	const _date = removeTimeFromDate(date);
 	const _start = start ? removeTimeFromDate(start) : null;
 	const _end = end ? removeTimeFromDate(end) : null;
 	return Boolean(_start && _end && _start <= _date && _date <= _end);
 };
-/**
-* Checks if a date is selected based on start and end dates.
-* @param date - The date to check.
-* @param start - Start date.
-* @param end - End date.
-* @returns True if the date is selected, false otherwise.
-*/
 const isDateSelected = (date, start, end) => {
 	if (start !== null && isSameDateAs(start, date)) return true;
 	if (end !== null && isSameDateAs(end, date)) return true;
 	return false;
 };
-/**
-* Determines if any date within a range is disabled.
-* @param startDate - Start date of the range.
-* @param endDate - End date of the range.
-* @param disabledDates - Criteria for disabled dates.
-* @returns True if any date in the range is disabled, false otherwise.
-*/
-const isDisableDateInRange = (startDate, endDate, disabledDates) => {
+const isDisableDateInRange = (startDate, endDate, disabledDates, view = "days") => {
 	if (startDate && endDate) {
-		const date = new Date(startDate);
-		let disabled = false;
-		while (date < endDate) {
-			date.setDate(date.getDate() + 1);
-			if (isDateDisabled(date, null, null, disabledDates)) {
-				disabled = true;
-				break;
-			}
-		}
-		return disabled;
+		const end = createDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+		for (let date = createDate(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 1); date <= end; date = createDate(date.getFullYear(), date.getMonth(), date.getDate() + 1)) if (isCellDisabled(date, view, null, null, disabledDates)) return true;
 	}
 	return false;
 };
-/**
-* Checks if a month is disabled based on the 'month' period type.
-* @param date - The date representing the month to check.
-* @param min - Minimum allowed date.
-* @param max - Maximum allowed date.
-* @param disabledDates - Criteria for disabled dates.
-* @returns True if the month is disabled, false otherwise.
-*/
-const isMonthDisabled = (date, min, max, disabledDates) => {
-	const current = dateToMonthNumber(date);
-	const _min = min ? dateToMonthNumber(min) : null;
-	const _max = max ? dateToMonthNumber(max) : null;
-	if (isOutsideRange(current, _min, _max)) return true;
+const isPeriodDisabled = (date, view, min, max, disabledDates) => {
+	const period = getPeriod(date, view);
+	if (min && period < getPeriod(min, view) || max && period > getPeriod(max, view) || date.getFullYear() < 1) return true;
 	if (disabledDates === void 0) return false;
-	const year = date.getFullYear();
-	const month = date.getMonth();
-	return isPeriodDisabled(new Date(year, month, 1), new Date(year, month + 1, 0), min, max, disabledDates);
-};
-/**
-* Checks if a month is selected based on start and end dates.
-* @param date - The date representing the month.
-* @param start - Start date.
-* @param end - End date.
-* @returns True if the month is selected, false otherwise.
-*/
-const isMonthSelected = (date, start, end) => {
-	const year = date.getFullYear();
-	const month = date.getMonth();
-	if (start !== null && year === start.getFullYear() && month === start.getMonth()) return true;
-	if (end !== null && year === end.getFullYear() && month === end.getMonth()) return true;
-	return false;
-};
-/**
-* Checks if a month is within a specified range.
-* @param date - The date representing the month.
-* @param start - Start date.
-* @param end - End date.
-* @returns True if the month is within the range, false otherwise.
-*/
-const isMonthInRange = (date, start, end) => {
-	const _start = start ? dateToMonthNumber(start) : null;
-	const _end = end ? dateToMonthNumber(end) : null;
-	const _date = dateToMonthNumber(date);
-	return Boolean(_start && _end && _start <= _date && _date <= _end);
-};
-/**
-* Checks if a quarter is disabled based on the 'quarter' period type.
-* @param date - The date representing the quarter to check.
-* @param min - Minimum allowed date.
-* @param max - Maximum allowed date.
-* @param disabledDates - Criteria for disabled dates.
-* @returns True if the quarter is disabled, false otherwise.
-*/
-const isQuarterDisabled = (date, min, max, disabledDates) => {
-	const current = dateToQuarterNumber(date);
-	const _min = min ? dateToQuarterNumber(min) : null;
-	const _max = max ? dateToQuarterNumber(max) : null;
-	if (isOutsideRange(current, _min, _max)) return true;
-	if (disabledDates === void 0) return false;
-	const year = date.getFullYear();
-	const quarterStartMonth = Math.floor(date.getMonth() / 3) * 3;
-	return isPeriodDisabled(new Date(year, quarterStartMonth, 1), new Date(year, quarterStartMonth + 3, 0), min, max, disabledDates);
-};
-/**
-* Checks if a quarter is selected based on start and end dates.
-* @param date - The date representing the quarter.
-* @param start - Start date.
-* @param end - End date.
-* @returns True if the quarter is selected, false otherwise.
-*/
-const isQuarterSelected = (date, start, end) => {
-	const year = date.getFullYear();
-	const quarter = Math.floor(date.getMonth() / 3);
-	if (start !== null) {
-		const startYear = start.getFullYear();
-		const startQuarter = Math.floor(start.getMonth() / 3);
-		if (year === startYear && quarter === startQuarter) return true;
+	if (view === "weeks") {
+		const monday = getMonday(date);
+		return isEveryDayDisabled(monday, createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6), null, null, disabledDates);
 	}
-	if (end !== null) {
-		const endYear = end.getFullYear();
-		const endQuarter = Math.floor(end.getMonth() / 3);
-		if (year === endYear && quarter === endQuarter) return true;
-	}
-	return false;
+	const months = MONTHS_IN_PERIOD[view];
+	const year = date.getFullYear();
+	const month = Math.floor(date.getMonth() / months) * months;
+	return isEveryDayDisabled(createDate(year, month, 1), createDate(year, month + months, 0), min, max, disabledDates);
 };
-/**
-* Checks if a quarter is within a specified range.
-* @param date - The date representing the quarter.
-* @param start - Start date.
-* @param end - End date.
-* @returns True if the quarter is within the range, false otherwise.
-*/
-const isQuarterInRange = (date, start, end) => {
-	const _start = start ? dateToQuarterNumber(start) : null;
-	const _end = end ? dateToQuarterNumber(end) : null;
-	const _date = dateToQuarterNumber(date);
-	return Boolean(_start && _end && _start <= _date && _date <= _end);
+const isCellDisabled = (date, view, min, max, disabledDates) => view === "days" ? isDateDisabled(date, min, max, disabledDates) : isPeriodDisabled(date, view, min, max, disabledDates);
+const isCellOutsideLimits = (date, view, min, max, rows = false) => {
+	const start = getStartOfView(date, view);
+	const end = view === "days" ? createDate(start.getFullYear(), start.getMonth(), start.getDate() + (rows ? 6 : 0)) : createDate(start.getFullYear(), start.getMonth() + MONTHS_IN_PERIOD[view], 0);
+	return end.getFullYear() < 1 || Boolean(min && end < getStartOfView(min, "days")) || Boolean(max && start > getStartOfView(max, "days"));
 };
-/**
-* Checks if two dates are the same calendar date.
-* @param date - First date.
-* @param date2 - Second date.
-* @returns True if both dates are the same, false otherwise.
-*/
+const isPeriodInRange = (date, view, start, end) => {
+	if (!start || !end) return false;
+	const period = getPeriod(date, view);
+	return getPeriod(start, view) <= period && period <= getPeriod(end, view);
+};
+const isPeriodSelected = (date, view, start, end) => [start, end].some((value) => value !== null && getPeriod(value, view) === getPeriod(date, view));
 const isSameInstantAs = (date, date2) => {
 	if (date === null || date2 === null) return date === date2;
 	return date.getTime() === date2.getTime();
@@ -4449,73 +5187,14 @@ const isSameDateAs = (date, date2) => {
 	if (date === null && date2 === null) return true;
 	return false;
 };
-/**
-* Checks if a date is today.
-* @param date - The date to check.
-* @returns True if the date is today, false otherwise.
-*/
 const isToday = (date) => {
 	return isSameDateAs(date, /* @__PURE__ */ new Date());
 };
-/**
-* Checks if a year is disabled based on the 'year' period type.
-* @param date - The date representing the year to check.
-* @param min - Minimum allowed date.
-* @param max - Maximum allowed date.
-* @param disabledDates - Criteria for disabled dates.
-* @returns True if the year is disabled, false otherwise.
-*/
-const isYearDisabled = (date, min, max, disabledDates) => {
-	const year = date.getFullYear();
-	const minYear = min ? min.getFullYear() : null;
-	const maxYear = max ? max.getFullYear() : null;
-	if (isOutsideRange(year, minYear, maxYear)) return true;
-	if (disabledDates === void 0) return false;
-	return isPeriodDisabled(new Date(year, 0, 1), new Date(year, 11, 31), min, max, disabledDates);
-};
-/**
-* Checks if a year is selected based on start and end dates.
-* @param date - The date representing the year.
-* @param start - Start date.
-* @param end - End date.
-* @returns True if the year matches the start's or end's year, false otherwise.
-*/
-const isYearSelected = (date, start, end) => {
-	const year = date.getFullYear();
-	if (start !== null && year === start.getFullYear()) return true;
-	if (end !== null && year === end.getFullYear()) return true;
-	return false;
-};
-/**
-* Checks if a year is within a specified range.
-* @param date - The date representing the year.
-* @param start - Start date.
-* @param end - End date.
-* @returns True if the year's value lies between start's year and end's year, false otherwise.
-*/
-const isYearInRange = (date, start, end) => {
-	const year = date.getFullYear();
-	const _start = start ? start.getFullYear() : null;
-	const _end = end ? end.getFullYear() : null;
-	return Boolean(_start && _end && _start <= year && year <= _end);
-};
-/**
-* Removes the time component from a Date object.
-* @param date - The original date.
-* @returns A new Date object with the time set to 00:00:00.
-*/
 const removeTimeFromDate = (date) => {
 	const clearedDate = new Date(date);
 	clearedDate.setHours(0, 0, 0, 0);
 	return clearedDate;
 };
-/**
-* Copies the time (hours, minutes, seconds, milliseconds) from one Date to another.
-*
-* @param {Date} target - The date whose time will be updated.
-* @param {Date | null} source - The date to copy the time from.
-* @returns {Date} A new Date instance with the date from `target` and time from `source`.
-*/
 const setTimeFromDate = (target, source) => {
 	if (target === null) return null;
 	if (!(source instanceof Date)) return target;
@@ -4523,73 +5202,44 @@ const setTimeFromDate = (target, source) => {
 	result.setHours(source.getHours(), source.getMinutes(), source.getSeconds(), source.getMilliseconds());
 	return result;
 };
-/**
-* Parses a year string with smart 2-digit handling.
-* @param yearString - The year string to parse.
-* @returns The parsed year as a number with intelligent century assignment.
-*/
 const parseYearSmart = (yearString) => {
 	let parsedYear = Number.parseInt(yearString, 10);
-	if (parsedYear < 100) {
+	if (/^\s*\d{1,2}\D*$/.test(yearString)) {
 		const currentYear = (/* @__PURE__ */ new Date()).getFullYear();
 		parsedYear = Math.floor(currentYear / 100) * 100 + parsedYear;
 		if (parsedYear > currentYear + 50) parsedYear -= 100;
 	}
 	return parsedYear;
 };
-/**
-* Creates a date from year groups.
-* @param groups - The year groups containing year string.
-* @returns A Date object for January 1st of the year.
-*/
 const createDateFromYear = (groups) => {
 	const { year } = groups;
 	const parsedYear = parseYearSmart(year);
-	return new Date(parsedYear, 0, 1);
+	return createDate(parsedYear, 0, 1);
 };
 //#endregion
 //#region js/src/calendar.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO calendar.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$44 = "calendar";
-const EVENT_KEY$36 = `.coreui.calendar`;
+const NAME$46 = "calendar";
+const EVENT_KEY$37 = `.coreui.calendar`;
 const DATA_API_KEY$31 = ".data-api";
-const ARROW_UP_KEY$7 = "ArrowUp";
-const ARROW_RIGHT_KEY$9 = "ArrowRight";
-const ARROW_DOWN_KEY$8 = "ArrowDown";
-const ARROW_LEFT_KEY$9 = "ArrowLeft";
-const ENTER_KEY$4 = "Enter";
-const SPACE_KEY$5 = "Space";
-const HOME_KEY$6 = "Home";
-const END_KEY$6 = "End";
-const PAGE_UP_KEY = "PageUp";
-const PAGE_DOWN_KEY = "PageDown";
-const EVENT_BLUR$1 = `blur${EVENT_KEY$36}`;
-const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$36}`;
-const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$36}`;
-const EVENT_CALENDAR_VIEW_CHANGE = `calendarViewChange${EVENT_KEY$36}`;
-const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$36}`;
-const EVENT_END_DATE_CHANGE$2 = `endDateChange${EVENT_KEY$36}`;
-const EVENT_FOCUS$2 = `focus${EVENT_KEY$36}`;
-const EVENT_KEYDOWN$12 = `keydown${EVENT_KEY$36}`;
-const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$36}`;
-const EVENT_START_DATE_CHANGE$2 = `startDateChange${EVENT_KEY$36}`;
-const EVENT_MOUSEENTER$4 = `mouseenter${EVENT_KEY$36}`;
-const EVENT_MOUSELEAVE$3 = `mouseleave${EVENT_KEY$36}`;
-const EVENT_LOAD_DATA_API$21 = `load${EVENT_KEY$36}${DATA_API_KEY$31}`;
-const EVENT_CLICK_DATA_API$16 = `click${EVENT_KEY$36}${DATA_API_KEY$31}`;
+const EVENT_BLUR$1 = `blur${EVENT_KEY$37}`;
+const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$37}`;
+const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$37}`;
+const EVENT_CALENDAR_VIEW_CHANGE = `calendarViewChange${EVENT_KEY$37}`;
+const EVENT_END_DATE_CHANGE$2 = `endDateChange${EVENT_KEY$37}`;
+const EVENT_FOCUS$5 = `focus${EVENT_KEY$37}`;
+const EVENT_KEYDOWN$15 = `keydown${EVENT_KEY$37}`;
+const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$37}`;
+const EVENT_START_DATE_CHANGE$2 = `startDateChange${EVENT_KEY$37}`;
+const EVENT_MOUSEENTER$4 = `mouseenter${EVENT_KEY$37}`;
+const EVENT_MOUSELEAVE$3 = `mouseleave${EVENT_KEY$37}`;
+const EVENT_LOAD_DATA_API$20 = `load${EVENT_KEY$37}${DATA_API_KEY$31}`;
+const EVENT_CLICK_DATA_API$16 = `click${EVENT_KEY$37}${DATA_API_KEY$31}`;
 const CLASS_NAME_CALENDAR_CELL = "calendar-cell";
 const CLASS_NAME_CALENDAR_CELL_INNER = "calendar-cell-inner";
 const CLASS_NAME_CALENDAR_ROW = "calendar-row";
-const CLASS_NAME_CALENDARS$3 = "calendars";
+const CLASS_NAME_CALENDARS$2 = "calendars";
 const CLASS_NAME_SHOW_WEEK_NUMBERS = "show-week-numbers";
+const CLASS_NAME_VISUALLY_HIDDEN = "visually-hidden";
 const SELECTOR_BTN_DOUBLE_NEXT = ".btn-double-next";
 const SELECTOR_BTN_DOUBLE_PREV = ".btn-double-prev";
 const SELECTOR_BTN_MONTH = ".btn-month";
@@ -4598,16 +5248,37 @@ const SELECTOR_BTN_PREV = ".btn-prev";
 const SELECTOR_BTN_YEAR = ".btn-year";
 const SELECTOR_CALENDAR = ".calendar";
 const SELECTOR_CALENDAR_CELL = ".calendar-cell";
-const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`;
+const SELECTOR_CALENDAR_CELL_FOCUSABLE = `${SELECTOR_CALENDAR_CELL}[tabindex]`;
+const SELECTOR_CALENDAR_CELL_SELECTABLE = `${SELECTOR_CALENDAR_CELL}[data-coreui-selectable]`;
 const SELECTOR_CALENDAR_ROW = ".calendar-row";
-const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`;
+const SELECTOR_CALENDAR_ROW_FOCUSABLE = `${SELECTOR_CALENDAR_ROW}[tabindex]`;
+const SELECTOR_CALENDAR_ROW_SELECTABLE = `${SELECTOR_CALENDAR_ROW}[data-coreui-selectable]`;
 const SELECTOR_DATA_CALENDAR = "[data-coreui-calendar]";
-const Default$43 = {
+const CELL_RENDERERS = {
+	days: "renderDayCell",
+	months: "renderMonthCell",
+	quarters: "renderQuarterCell",
+	years: "renderYearCell"
+};
+const VIEW_BY_SELECTION_TYPE = {
+	day: "days",
+	week: "days",
+	month: "months",
+	quarter: "quarters",
+	year: "years"
+};
+const Default$41 = {
 	allowList: SVGAllowlist,
 	ariaNavNextMonthLabel: "Next month",
 	ariaNavNextYearLabel: "Next year",
+	ariaNavNextYearsLabel: "Next 12 years",
 	ariaNavPrevMonthLabel: "Previous month",
 	ariaNavPrevYearLabel: "Previous year",
+	ariaNavPrevYearsLabel: "Previous 12 years",
+	ariaNothingToPickLabel: "Nothing on this page can be picked",
+	ariaSelectedDateAnnouncement: "Selected date: {date}",
+	ariaSelectedRangeAnnouncement: "Selected range: {start} to {end}",
+	ariaWeekNumberLabel: null,
 	calendarDate: null,
 	calendars: 1,
 	dayFormat: "numeric",
@@ -4618,10 +5289,10 @@ const Default$43 = {
 	maxDate: null,
 	minDate: null,
 	monthFormat: "short",
-	navIconDoubleNext: CHEVRON_DOUBLE_RIGHT_ICON,
-	navIconDoublePrev: CHEVRON_DOUBLE_LEFT_ICON,
-	navIconNext: CHEVRON_RIGHT_ICON,
-	navIconPrev: CHEVRON_LEFT_ICON,
+	navNextDoubleIcon: CHEVRON_DOUBLE_RIGHT_ICON,
+	navNextIcon: CHEVRON_RIGHT_ICON,
+	navPrevDoubleIcon: CHEVRON_DOUBLE_LEFT_ICON,
+	navPrevIcon: CHEVRON_LEFT_ICON,
 	range: false,
 	renderDayCell: null,
 	renderMonthCell: null,
@@ -4639,12 +5310,18 @@ const Default$43 = {
 	weekNumbersLabel: null,
 	yearFormat: "numeric"
 };
-const DefaultType$43 = {
+const DefaultType$40 = {
 	allowList: "object",
 	ariaNavNextMonthLabel: "string",
 	ariaNavNextYearLabel: "string",
+	ariaNavNextYearsLabel: "string",
 	ariaNavPrevMonthLabel: "string",
 	ariaNavPrevYearLabel: "string",
+	ariaNavPrevYearsLabel: "string",
+	ariaNothingToPickLabel: "(string|null)",
+	ariaSelectedDateAnnouncement: "(string|null)",
+	ariaSelectedRangeAnnouncement: "(string|null)",
+	ariaWeekNumberLabel: "(function|null)",
 	calendarDate: "(date|number|string|null)",
 	calendars: "number",
 	dayFormat: "string",
@@ -4655,10 +5332,10 @@ const DefaultType$43 = {
 	maxDate: "(date|number|string|null)",
 	minDate: "(date|number|string|null)",
 	monthFormat: "string",
-	navIconDoubleNext: "string",
-	navIconDoublePrev: "string",
-	navIconNext: "string",
-	navIconPrev: "string",
+	navNextDoubleIcon: "string",
+	navNextIcon: "string",
+	navPrevDoubleIcon: "string",
+	navPrevIcon: "string",
 	range: "boolean",
 	renderDayCell: "(function|null)",
 	renderMonthCell: "(function|null)",
@@ -4676,13 +5353,12 @@ const DefaultType$43 = {
 	weekNumbersLabel: "(string|null)",
 	yearFormat: "string"
 };
-/**
-* Class definition
-*/
 var Calendar = class Calendar extends BaseComponent {
 	constructor(element, config) {
 		super(element);
-		this._formatters = /* @__PURE__ */ new Map();
+		this._formatter = createDateFormatter();
+		this._announcements = [];
+		this._selectionAnnouncement = null;
 		this._config = this._getConfig(config);
 		this._initializeDates();
 		this._initializeView();
@@ -4690,207 +5366,216 @@ var Calendar = class Calendar extends BaseComponent {
 		this._addEventListeners();
 	}
 	static get Default() {
-		return Default$43;
+		return Default$41;
 	}
 	static get DefaultType() {
-		return DefaultType$43;
+		return DefaultType$40;
 	}
 	static get NAME() {
-		return NAME$44;
+		return NAME$46;
 	}
-	setConfig(config) {
-		this._config = this._getConfig({
-			...this._config,
-			...config
+	setCalendarDate(calendarDate) {
+		this._setDates({ calendarDate });
+	}
+	setEndDate(endDate) {
+		this._setDates({ endDate });
+	}
+	setRange(startDate, endDate) {
+		this._setDates({
+			endDate,
+			startDate
 		});
-		this._initializeDates();
-		this._initializeView();
-		this._element.innerHTML = "";
-		this._createCalendar();
+	}
+	setSelectEndDate(selectEndDate) {
+		this._setDates({ selectEndDate });
+	}
+	setStartDate(startDate) {
+		this._setDates({ startDate });
 	}
 	refresh() {
-		this._element.innerHTML = "";
-		this._createCalendar();
+		this._updateCalendar();
 	}
 	dispose() {
-		this._element.innerHTML = "";
-		this._element.classList.remove(CLASS_NAME_CALENDARS$3, CLASS_NAME_SHOW_WEEK_NUMBERS, `select-${this._config.selectionType}`);
+		for (const remove of this._announcements) remove();
+		this._element.replaceChildren();
 		super.dispose();
 	}
-	_focusOnFirstAvailableCell() {
-		const cell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element);
-		if (cell) cell.focus();
+	_setDates(values) {
+		this._typeCheckConfig(values, Object.fromEntries(Object.keys(values).map((name) => [name, DefaultType$40[name]])));
+		this._initializeDates(values);
+		this._updateCalendar();
+	}
+	_setAnnouncements(announcements) {
+		this._config = this._getConfig({
+			...this._config,
+			...announcements
+		});
+	}
+	_focusOnFirstAvailableCell(index) {
+		const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element)[index];
+		const target = SelectorEngine.findOne(this._rovingSelector(), panel) ?? SelectorEngine.findOne("[tabindex=\"0\"]", panel) ?? SelectorEngine.findOne("[tabindex=\"0\"]", this._element);
+		if (target) target.focus();
 	}
 	_focusOnDate(date) {
-		const focusables = SelectorEngine.find(this._config.selectionType === "week" ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE, this._element).filter((element) => !element.classList.contains("previous") && !element.classList.contains("next"));
-		let closest = null;
-		let closestGap = Number.POSITIVE_INFINITY;
-		for (const element of focusables) {
-			const gap = Math.abs(this._getDate(element).getTime() - date.getTime());
-			if (gap < closestGap) {
-				closest = element;
-				closestGap = gap;
-			}
-		}
-		closest?.focus();
+		const targets = SelectorEngine.find(this._rovingSelector(), this._element);
+		const target = getClosestSelectable(targets, getStartOfView(date, this._view), this._rowsAreTargets()) ?? SelectorEngine.findOne("table[tabindex=\"0\"]", this._element);
+		if (target) target.focus();
+	}
+	_focusOnCell(date, panel) {
+		const scope = panel === void 0 ? this._element : SelectorEngine.find(SELECTOR_CALENDAR, this._element)[panel];
+		const matches = SelectorEngine.find(this._rovingSelector(), scope).filter((element) => this._getDate(element).toDateString() === date.toDateString());
+		const cell = matches.find((element) => {
+			const cell = this._rowsAreTargets() ? SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, element) : element;
+			return !cell?.classList.contains("previous") && !cell?.classList.contains("next");
+		}) ?? matches[0];
+		if (cell) cell.focus();
 	}
 	_getEventTarget(event) {
 		return event.target.closest(SELECTOR_CALENDAR_CELL) ?? event.target.closest(SELECTOR_CALENDAR_ROW);
 	}
+	_rowsAreTargets() {
+		return this._config.selectionType === "week" && this._view === "days";
+	}
+	_cellUnit() {
+		return this._rowsAreTargets() ? "weeks" : this._view;
+	}
 	_getDate(target) {
-		if (this._config.selectionType === "week") {
+		if (this._rowsAreTargets()) {
 			const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW));
-			return new Date(Manipulator.getDataAttribute(firstCell, "date"));
+			return getStartOfWeek(parseToDateString(Manipulator.getDataAttribute(firstCell, "date")), this._config.firstDayOfWeek);
 		}
-		return new Date(Manipulator.getDataAttribute(target, "date"));
+		return parseToDateString(Manipulator.getDataAttribute(target, "date"));
+	}
+	_getPickedDate(target) {
+		const date = this._getDate(target);
+		return this._rowsAreTargets() ? getWeekRowDate(date) : date;
 	}
 	_handleCalendarClick(event) {
 		const target = this._getEventTarget(event);
 		if (!target) return;
-		const date = this._getDate(target);
+		const date = this._getPickedDate(target);
 		const cloneDate = new Date(date);
 		const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR), "calendar-index");
-		if (this._view === "days") this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
+		if (isCellDisabled(date, this._cellUnit(), this._minDate, this._maxDate, this._config.disabledDates)) return;
 		if (this._view === "months" && this._config.selectionType !== "month") {
 			this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date, "days");
 			this._setCalendarView("days", "cellClick");
-			this._updateCalendar(this._focusOnFirstAvailableCell.bind(this));
+			this._updateCalendar(() => this._focusOnFirstAvailableCell(index));
 			return;
 		}
 		if (this._view === "years" && this._config.selectionType !== "year") {
 			this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date, "months");
 			this._setCalendarView(this._config.selectionType === "quarter" ? "quarters" : "months", "cellClick");
-			this._updateCalendar(this._focusOnFirstAvailableCell.bind(this));
+			this._updateCalendar(() => this._focusOnFirstAvailableCell(index));
 			return;
 		}
-		if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) return;
+		const visible = this._element.checkVisibility();
 		this._hoverDate = null;
 		this._selectDate(date);
+		this._announceSelection(visible);
 		this._updateClassNamesAndAriaLabels();
+		this._updateCellContent();
+		this._updateRovingTabIndex(SelectorEngine.findOne(":focus", this._element));
 	}
 	_handleCalendarKeydown(event) {
-		const date = this._getDate(event.target);
-		if (event.code === SPACE_KEY$5 || event.key === ENTER_KEY$4) {
-			event.preventDefault();
+		const target = this._getEventTarget(event);
+		const action = getCalendarKeyAction(event, this._getDate(target), this._getKeyContext(target));
+		this._keptDay = getKeptDay(event.key, action, this._keptDay);
+		if (!action) return;
+		event.preventDefault();
+		if (action.type === "activate") {
 			this._handleCalendarClick(event);
-		}
-		if (event.key === HOME_KEY$6 || event.key === END_KEY$6) {
-			event.preventDefault();
-			const cells = SelectorEngine.find(SELECTOR_CALENDAR_CELL_CLICKABLE, event.target.closest("tr"));
-			(event.key === HOME_KEY$6 ? cells[0] : cells[cells.length - 1])?.focus();
 			return;
 		}
-		if (event.key === PAGE_UP_KEY || event.key === PAGE_DOWN_KEY) {
-			event.preventDefault();
-			const direction = event.key === PAGE_DOWN_KEY ? 1 : -1;
-			const target = new Date(date);
-			if (this._view === "days") {
-				const day = target.getDate();
-				target.setDate(1);
-				if (event.shiftKey) target.setFullYear(target.getFullYear() + direction);
-				else target.setMonth(target.getMonth() + direction);
-				target.setDate(Math.min(day, new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()));
-			} else target.setFullYear(target.getFullYear() + (this._view === "years" ? 10 : 1) * direction);
-			if (this._maxDate && target > this._maxDate) target.setTime(this._maxDate.getTime());
-			if (this._minDate && target < this._minDate) target.setTime(this._minDate.getTime());
-			if (target.getTime() === date.getTime()) return;
-			const monthsDelta = (target.getFullYear() - date.getFullYear()) * 12 + (target.getMonth() - date.getMonth());
-			this._modifyCalendarDate(0, monthsDelta, () => this._focusOnDate(target));
+		if (action.type === "page" && action.date) {
+			const target = action.date;
+			this._modifyCalendarDate(action.years, action.months, () => this._focusOnDate(target));
 			return;
 		}
-		if (event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_LEFT_KEY$9 || event.key === ARROW_UP_KEY$7 || event.key === ARROW_DOWN_KEY$8) {
-			event.preventDefault();
-			if (this._maxDate && date >= convertToDateObject(this._maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_DOWN_KEY$8)) return;
-			if (this._minDate && date <= convertToDateObject(this._minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY$9 || event.key === ARROW_UP_KEY$7)) return;
-			let element = event.target;
-			if (this._config.selectionType === "week" && element.tabIndex === -1) element = element.closest(SELECTOR_CALENDAR_ROW_CLICKABLE);
-			const list = SelectorEngine.find(this._config.selectionType === "week" ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE, this._element);
-			const index = list.indexOf(element);
-			const first = index === 0;
-			const last = index === list.length - 1;
-			const toBoundary = {
-				start: index,
-				end: list.length - (index + 1)
-			};
-			const gap = {
-				ArrowRight: 1,
-				ArrowLeft: -1,
-				ArrowUp: this._config.selectionType === "week" && this._view === "days" ? -1 : this._view === "days" ? -7 : -3,
-				ArrowDown: this._config.selectionType === "week" && this._view === "days" ? 1 : this._view === "days" ? 7 : 3
-			};
-			if (event.key === ARROW_RIGHT_KEY$9 && last || event.key === ARROW_DOWN_KEY$8 && toBoundary.end < gap.ArrowDown || event.key === ARROW_LEFT_KEY$9 && first || event.key === ARROW_UP_KEY$7 && toBoundary.start < Math.abs(gap.ArrowUp)) {
-				const callback = (key) => {
-					const _list = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`, this._element);
-					if (_list.length && key === ARROW_RIGHT_KEY$9) _list[0].focus();
-					if (_list.length && key === ARROW_LEFT_KEY$9) _list[_list.length - 1].focus();
-					if (_list.length && key === ARROW_DOWN_KEY$8) _list[gap.ArrowDown - (list.length - index)].focus();
-					if (_list.length && key === ARROW_UP_KEY$7) _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus();
-				};
-				if (this._view === "days") this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_DOWN_KEY$8 ? 1 : -1, callback.bind(this, event.key));
-				if (this._view === "months" || this._view === "quarters") this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_DOWN_KEY$8 ? 1 : -1, 0, callback.bind(this, event.key));
-				if (this._view === "years") this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_DOWN_KEY$8 ? 10 : -10, 0, callback.bind(this, event.key));
-				return;
-			}
-			if (list[index + gap[event.key]].tabIndex === 0) {
-				list[index + gap[event.key]].focus();
-				return;
-			}
-			for (let i = index; i < list.length; event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_DOWN_KEY$8 ? i++ : i--) if (list[i + gap[event.key]].tabIndex === 0) {
-				list[i + gap[event.key]].focus();
-				break;
-			}
+		this._moveFocus(action);
+	}
+	_handleGridKeydown(event) {
+		if (!event.target.matches("table")) return;
+		const context = this._getKeyContext(event.target);
+		const action = getCalendarKeyAction(event, null, context);
+		this._keptDay = getKeptDay(event.key, action, this._keptDay);
+		if (!action) return;
+		event.preventDefault();
+		if (action.type !== "page") {
+			this._moveFocus(action);
+			return;
 		}
+		this._modifyCalendarDate(action.years, action.months, () => {
+			const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element)[context.panel];
+			const stop = SelectorEngine.findOne("[tabindex=\"0\"]", panel) ?? SelectorEngine.findOne("[tabindex=\"0\"]", this._element);
+			if (stop) stop.focus();
+		});
+	}
+	_getKeyContext(target) {
+		return {
+			calendarDate: this._calendarDate,
+			calendars: this._config.calendars,
+			firstDayOfWeek: this._config.firstDayOfWeek,
+			keptDay: this._keptDay,
+			maxDate: this._maxDate,
+			minDate: this._minDate,
+			panel: SelectorEngine.find(SELECTOR_CALENDAR, this._element).indexOf(target.closest(SELECTOR_CALENDAR)),
+			rows: this._rowsAreTargets(),
+			rtl: isRTL(this._element),
+			view: this._view
+		};
+	}
+	_moveFocus(action) {
+		if (action.type !== "move") return;
+		if (action.years || action.months) {
+			this._modifyCalendarDate(action.years, action.months, () => this._focusOnCell(action.date));
+			return;
+		}
+		this._focusOnCell(action.date, action.panel);
 	}
 	_handleCalendarMouseEnter(event) {
 		const target = this._getEventTarget(event);
 		if (!target) return;
-		const date = this._getDate(target);
-		if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) return;
+		const date = this._getPickedDate(target);
+		if (isCellDisabled(date, this._cellUnit(), this._minDate, this._maxDate, this._config.disabledDates)) return;
 		this._hoverDate = setTimeFromDate(date, this._selectEndDate ? this._endDate : this._startDate);
-		EventHandler.trigger(this._element, EVENT_CELL_HOVER, { date: getDateBySelectionType(this._hoverDate, this._config.selectionType) });
-		this._updateClassNamesAndAriaLabels();
+		this._updateRangeHover();
 	}
 	_handleCalendarMouseLeave() {
 		this._hoverDate = null;
-		EventHandler.trigger(this._element, EVENT_CELL_HOVER, { date: null });
-		this._updateClassNamesAndAriaLabels();
+		this._updateRangeHover();
+	}
+	_updateRangeHover() {
+		if (this._selectEndDate ? this._startDate : this._endDate) this._updateClassNamesAndAriaLabels();
 	}
 	_addEventListeners() {
-		EventHandler.on(this._element, EVENT_CLICK_DATA_API$16, SELECTOR_CALENDAR_CELL_CLICKABLE, (event) => {
+		const focusable = `${SELECTOR_CALENDAR_CELL_FOCUSABLE}, ${SELECTOR_CALENDAR_ROW_FOCUSABLE}`;
+		const selectable = `${SELECTOR_CALENDAR_CELL_SELECTABLE}, ${SELECTOR_CALENDAR_ROW_SELECTABLE}`;
+		EventHandler.on(this._element, EVENT_CLICK_DATA_API$16, () => {
+			this._keptDay = null;
+		});
+		EventHandler.on(this._element, EVENT_CLICK_DATA_API$16, focusable, (event) => {
 			this._handleCalendarClick(event);
 		});
-		EventHandler.on(this._element, EVENT_KEYDOWN$12, SELECTOR_CALENDAR_CELL_CLICKABLE, (event) => {
+		EventHandler.on(this._element, EVENT_KEYDOWN$15, focusable, (event) => {
 			this._handleCalendarKeydown(event);
 		});
-		EventHandler.on(this._element, EVENT_MOUSEENTER$4, SELECTOR_CALENDAR_CELL_CLICKABLE, (event) => {
+		EventHandler.on(this._element, EVENT_MOUSEENTER$4, selectable, (event) => {
 			this._handleCalendarMouseEnter(event);
 		});
-		EventHandler.on(this._element, EVENT_MOUSELEAVE$3, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
+		EventHandler.on(this._element, EVENT_MOUSELEAVE$3, selectable, () => {
 			this._handleCalendarMouseLeave();
 		});
-		EventHandler.on(this._element, EVENT_FOCUS$2, SELECTOR_CALENDAR_CELL_CLICKABLE, (event) => {
+		EventHandler.on(this._element, EVENT_FOCUS$5, focusable, (event) => {
+			this._updateRovingTabIndex(this._getEventTarget(event));
 			this._handleCalendarMouseEnter(event);
 		});
-		EventHandler.on(this._element, EVENT_BLUR$1, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
+		EventHandler.on(this._element, EVENT_BLUR$1, focusable, () => {
 			this._handleCalendarMouseLeave();
+			this._updateRovingTabIndex();
 		});
-		EventHandler.on(this._element, EVENT_CLICK_DATA_API$16, SELECTOR_CALENDAR_ROW_CLICKABLE, (event) => {
-			this._handleCalendarClick(event);
-		});
-		EventHandler.on(this._element, EVENT_KEYDOWN$12, SELECTOR_CALENDAR_ROW_CLICKABLE, (event) => {
-			this._handleCalendarKeydown(event);
-		});
-		EventHandler.on(this._element, EVENT_MOUSEENTER$4, SELECTOR_CALENDAR_ROW_CLICKABLE, (event) => {
-			this._handleCalendarMouseEnter(event);
-		});
-		EventHandler.on(this._element, EVENT_MOUSELEAVE$3, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
-			this._handleCalendarMouseLeave();
-		});
-		EventHandler.on(this._element, EVENT_FOCUS$2, SELECTOR_CALENDAR_ROW_CLICKABLE, (event) => {
-			this._handleCalendarMouseEnter(event);
-		});
-		EventHandler.on(this._element, EVENT_BLUR$1, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
-			this._handleCalendarMouseLeave();
+		EventHandler.on(this._element, EVENT_KEYDOWN$15, "table[tabindex]", (event) => {
+			this._handleGridKeydown(event);
 		});
 		this._addNavigationEventListeners();
 		EventHandler.on(this._element, EVENT_MOUSELEAVE$3, "table", () => {
@@ -4900,24 +5585,16 @@ var Calendar = class Calendar extends BaseComponent {
 	_addNavigationEventListeners() {
 		const navigationSelectors = {
 			[SELECTOR_BTN_PREV]: () => this._modifyCalendarDate(0, -1),
-			[SELECTOR_BTN_DOUBLE_PREV]: () => this._modifyCalendarDate(this._view === "years" ? -10 : -1),
+			[SELECTOR_BTN_DOUBLE_PREV]: () => this._modifyCalendarDate(this._view === "years" ? -12 : -1),
 			[SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
-			[SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === "years" ? 10 : 1),
-			[SELECTOR_BTN_MONTH]: () => {
-				this._setCalendarView("months", "navigation");
-				this._updateCalendar();
-			},
-			[SELECTOR_BTN_YEAR]: () => {
-				this._setCalendarView("years", "navigation");
-				this._updateCalendar();
-			}
+			[SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === "years" ? 12 : 1),
+			[SELECTOR_BTN_MONTH]: (index) => this._showPeriodView("months", index),
+			[SELECTOR_BTN_YEAR]: (index) => this._showPeriodView(this._view === "years" ? this._selectionView() : "years", index)
 		};
 		for (const [selector, handler] of Object.entries(navigationSelectors)) EventHandler.on(this._element, EVENT_CLICK_DATA_API$16, selector, (event) => {
 			event.preventDefault();
-			const selectorIndex = SelectorEngine.find(selector, this._element).indexOf(event.target.closest(selector));
-			handler();
-			const _selectors = SelectorEngine.find(selector, this._element);
-			if (_selectors && _selectors[selectorIndex]) _selectors[selectorIndex].focus();
+			const index = SelectorEngine.find(selector, this._element).indexOf(event.target.closest(selector));
+			if (!handler(index)) SelectorEngine.find(selector, this._element)[index]?.focus();
 		});
 	}
 	_setCalendarDate(date, view = this._view) {
@@ -4934,20 +5611,27 @@ var Calendar = class Calendar extends BaseComponent {
 			source
 		});
 	}
-	_modifyCalendarDate(years, months = 0, callback) {
-		const year = this._calendarDate.getFullYear();
-		const month = this._calendarDate.getMonth();
-		const d = new Date(year, month, 1);
-		if (years) d.setFullYear(d.getFullYear() + years);
-		if (months) d.setMonth(d.getMonth() + months);
-		this._calendarDate = d;
-		EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-			date: d,
-			view: this._view
+	_showPeriodView(view, index) {
+		const shown = getCalendarDate(this._calendarDate, index, this._view === "years" ? view : this._view);
+		const start = getStartOfView(createDate(shown.getFullYear(), shown.getMonth(), 1), view).toDateString();
+		const focus = view !== this._view && this._element.contains(document.activeElement);
+		this._setCalendarView(view, "navigation");
+		this._updateCalendar(() => {
+			if (focus) {
+				const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element)[index];
+				(SelectorEngine.find(`[data-coreui-date="${start}"]`, this._element).map((cell) => cell.closest(this._rovingSelector())).find(Boolean) ?? SelectorEngine.findOne("[tabindex=\"0\"]", panel))?.focus();
+			}
 		});
+		return focus;
+	}
+	_modifyCalendarDate(years, months = 0, callback) {
+		const year = this._calendarDate.getFullYear() + years;
+		const month = this._calendarDate.getMonth() + months;
+		this._setCalendarDate(createDate(year, month, 1));
 		this._updateCalendar(callback);
 	}
 	_setEndDate(date) {
+		if (date === this._endDate) return;
 		this._endDate = setTimeFromDate(date, this._endDate);
 		EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE$2, {
 			date: getDateBySelectionType(this._endDate, this._config.selectionType),
@@ -4955,6 +5639,7 @@ var Calendar = class Calendar extends BaseComponent {
 		});
 	}
 	_setStartDate(date) {
+		if (date === this._startDate) return;
 		this._startDate = setTimeFromDate(date, this._startDate);
 		EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE$2, {
 			date: getDateBySelectionType(this._startDate, this._config.selectionType),
@@ -4966,16 +5651,18 @@ var Calendar = class Calendar extends BaseComponent {
 		EventHandler.trigger(this._element, EVENT_SELECT_END_CHANGE, { value });
 	}
 	_selectDate(date) {
-		if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) return;
+		if (isCellDisabled(date, this._cellUnit(), this._minDate, this._maxDate, this._config.disabledDates)) return;
 		if (this._config.range) {
+			const start = convertToSelectionDate(this._startDate, this._config.selectionType);
+			const end = convertToSelectionDate(this._endDate, this._config.selectionType);
 			if (this._selectEndDate) {
-				if (this._startDate && this._startDate > date) {
+				if (start && start > date) {
 					this._setStartDate(date);
 					this._setEndDate(null);
 					return;
 				}
 				this._setSelectEndDate(false);
-				if (isDisableDateInRange(this._startDate, date, this._config.disabledDates)) {
+				if (isDisableDateInRange(start, date, this._config.disabledDates, this._cellUnit())) {
 					this._setStartDate(null);
 					this._setEndDate(null);
 					return;
@@ -4983,13 +5670,13 @@ var Calendar = class Calendar extends BaseComponent {
 				this._setEndDate(date);
 				return;
 			}
-			if (this._endDate && this._endDate < date) {
+			if (end && end < date) {
 				this._setStartDate(date);
 				this._setEndDate(null);
 				this._setSelectEndDate(true);
 				return;
 			}
-			if (isDisableDateInRange(date, this._endDate, this._config.disabledDates)) {
+			if (isDisableDateInRange(date, end, this._config.disabledDates, this._cellUnit())) {
 				this._setStartDate(null);
 				this._setEndDate(null);
 				return;
@@ -5001,232 +5688,301 @@ var Calendar = class Calendar extends BaseComponent {
 		this._setStartDate(date);
 	}
 	_createCalendarPanel(order) {
-		const calendarDate = getCalendarDate(this._calendarDate, order, this._view);
-		const year = calendarDate.getFullYear();
-		const month = calendarDate.getMonth();
 		const calendarPanelEl = document.createElement("div");
 		calendarPanelEl.classList.add("calendar");
 		Manipulator.setDataAttribute(calendarPanelEl, "calendar-index", order);
-		const navigationElement = document.createElement("div");
-		navigationElement.classList.add("calendar-nav");
-		navigationElement.innerHTML = `
-      <div class="calendar-nav-prev">
-        <button type="button" class="calendar-nav-btn btn-double-prev" aria-label="${escapeHtml(this._config.ariaNavPrevYearLabel)}">
-          <span class="calendar-nav-icon">${this._navIcon("navIconDoublePrev")}</span>
-        </button>
-        ${this._view === "days" ? `<button type="button" class="calendar-nav-btn btn-prev" aria-label="${escapeHtml(this._config.ariaNavPrevMonthLabel)}">
-          <span class="calendar-nav-icon">${this._navIcon("navIconPrev")}</span>
-        </button>` : ""}
-      </div>
-      <div class="calendar-nav-date" aria-live="polite">
-        ${this._view === "days" ? `<button type="button" class="calendar-nav-btn btn-sm btn-month">
-          ${this._formatDate(calendarDate, { month: "long" })}
-        </button>` : ""}
-        <button type="button" class="calendar-nav-btn btn-year">
-          ${this._formatDate(calendarDate, { year: "numeric" })}
-        </button>
-      </div>
-      <div class="calendar-nav-next">
-        ${this._view === "days" ? `<button type="button" class="calendar-nav-btn btn-next" aria-label="${escapeHtml(this._config.ariaNavNextMonthLabel)}">
-          <span class="calendar-nav-icon">${this._navIcon("navIconNext")}</span>
-        </button>` : ""}
-        <button type="button" class="calendar-nav-btn btn-double-next" aria-label="${escapeHtml(this._config.ariaNavNextYearLabel)}">
-          <span class="calendar-nav-icon">${this._navIcon("navIconDoubleNext")}</span>
-        </button>
-      </div>
-    `;
-		const monthDetails = getMonthDetails(year, month, this._config.firstDayOfWeek);
-		const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale, this._config.monthFormat), 4);
-		const listOfYears = createGroupsInArray(getYears(calendarDate.getFullYear()), 4);
-		const weekDays = monthDetails[0].days;
-		const calendarTable = document.createElement("table");
-		calendarTable.setAttribute("role", "grid");
-		calendarTable.innerHTML = `
-    ${this._view === "days" ? `
-      <thead>
-        <tr>
-          ${this._config.showWeekNumber ? `<th class="${CLASS_NAME_CALENDAR_CELL}">
-              <div class="calendar-header-cell-inner">
-               ${this._config.weekNumbersLabel ? escapeHtml(this._config.weekNumbersLabel) : ""}
-              </div>
-            </th>` : ""}
-          ${weekDays.map(({ date }) => `<th class="${CLASS_NAME_CALENDAR_CELL}" abbr="${this._formatDate(date, { weekday: "long" })}">
-              <div class="calendar-header-cell-inner">
-              ${typeof this._config.weekdayFormat === "string" ? this._formatDate(date, { weekday: this._config.weekdayFormat }) : this._formatDate(date, { weekday: "long" }).slice(0, this._config.weekdayFormat)}
-              </div>
-            </th>`).join("")}
-        </tr>
-      </thead>` : ""}
-      <tbody>
-        ${this._view === "days" ? monthDetails.map(({ week, days }) => {
-			const { date } = days[0];
-			const rowAttributes = this._rowWeekAttributes(date);
-			return `<tr 
-              class="${rowAttributes.className}"
-              tabindex="${rowAttributes.tabIndex}"
-              ${rowAttributes.ariaSelected ? "aria-selected=\"true\"" : ""}
-            >
-              ${this._config.showWeekNumber ? `<th class="calendar-cell-week-number">${week.number}</td>` : ""}
-              ${days.map(({ date, month }) => {
-				const cellAttributes = this._cellDayAttributes(date, month);
-				return month === "current" || this._config.showAdjacentDays ? `<td
-                    class="${cellAttributes.className}"
-                    role="gridcell"
-                    tabindex="${cellAttributes.tabIndex}"
-                    ${cellAttributes.ariaSelected ? "aria-selected=\"true\"" : ""}
-                    ${cellAttributes.ariaCurrent ? "aria-current=\"date\"" : ""}
-                    aria-label="${escapeHtml(cellAttributes.ariaLabel)}"
-                    data-coreui-date="${date}"
-                  >
-                    <div class="${CLASS_NAME_CALENDAR_CELL_INNER} day">
-                      ${this._config.renderDayCell ? sanitizeByConfig(this._config.renderDayCell(date, cellAttributes.meta), this._config) : this._formatDate(date, { day: this._config.dayFormat })}
-                    </div>
-                  </td>` : "<td role=\"gridcell\"></td>";
-			}).join("")}</tr>`;
-		}).join("") : ""}
-        ${this._view === "months" ? listOfMonths.map((row, index) => `<tr>
-            ${row.map((month, idx) => {
-			const date = new Date(calendarDate.getFullYear(), index * 3 + idx, 1);
-			const cellAttributes = this._cellMonthAttributes(date);
-			return `<td
-                  class="${cellAttributes.className}"
-                  role="gridcell"
-                  tabindex="${cellAttributes.tabIndex}"
-                  ${cellAttributes.ariaSelected ? "aria-selected=\"true\"" : ""}
-                  data-coreui-date="${date.toDateString()}"
-                >
-                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} month">
-                    ${this._config.renderMonthCell ? sanitizeByConfig(this._config.renderMonthCell(date, cellAttributes.meta), this._config) : month}
-                  </div>
-                </td>`;
-		}).join("")}
-          </tr>`).join("") : ""}
-        ${this._view === "quarters" ? `<tr>
-            ${Array.from({ length: 4 }, (_, index) => {
-			const date = new Date(calendarDate.getFullYear(), index * 3, 1);
-			const cellAttributes = this._cellQuarterAttributes(date);
-			return `<td
-                  class="${cellAttributes.className}"
-                  role="gridcell"
-                  tabindex="${cellAttributes.tabIndex}"
-                  ${cellAttributes.ariaSelected ? "aria-selected=\"true\"" : ""}
-                  data-coreui-date="${date.toDateString()}"
-                >
-                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} quarter">
-                    ${this._config.renderQuarterCell ? sanitizeByConfig(this._config.renderQuarterCell(date, cellAttributes.meta), this._config) : `Q${index + 1}`}
-                  </div>
-                </td>`;
-		}).join("")}
-          </tr>` : ""}
-        ${this._view === "years" ? listOfYears.map((row) => `<tr>
-            ${row.map((year) => {
-			const date = new Date(year, 0, 1);
-			const cellAttributes = this._cellYearAttributes(date);
-			return `<td
-                  class="${cellAttributes.className}"
-                  role="gridcell"
-                  tabindex="${cellAttributes.tabIndex}"
-                  ${cellAttributes.ariaSelected ? "aria-selected=\"true\"" : ""}
-                  data-coreui-date="${date.toDateString()}"
-                >
-                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} year">
-                    ${this._config.renderYearCell ? sanitizeByConfig(this._config.renderYearCell(date, cellAttributes.meta), this._config) : this._formatDate(date, { year: this._config.yearFormat })}
-                  </div>
-                </td>`;
-		}).join("")}
-          </tr>`).join("") : ""}
-      </tbody>
-    `;
-		calendarPanelEl.append(navigationElement, calendarTable);
+		calendarPanelEl.innerHTML = `<div class="calendar-nav"><div class="calendar-nav-prev"></div><div class="calendar-nav-date"></div><div class="calendar-nav-next"></div></div><table role="grid"></table><span id="${getUID("calendar-description")}" hidden></span>`;
+		this._renderCalendarPanel(calendarPanelEl, order);
 		return calendarPanelEl;
 	}
-	_createCalendar() {
-		if (this._config.selectionType && this._view === "days") this._element.classList.add(`select-${this._config.selectionType}`);
-		if (this._config.showWeekNumber) this._element.classList.add(CLASS_NAME_SHOW_WEEK_NUMBERS);
-		for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) this._element.append(this._createCalendarPanel(index));
-		this._element.classList.add(CLASS_NAME_CALENDARS$3);
+	_renderCalendarPanel(panel, order) {
+		const calendarDate = getCalendarDate(this._calendarDate, order, this._view);
+		const days = this._view === "days";
+		const years = this._view === "years";
+		const [navigation, calendarTable] = panel.children;
+		const [prev, region, next] = navigation.children;
+		const monthLabel = days ? this._formatDate(calendarDate, { month: "long" }) : "";
+		const yearLabel = years ? formatYearsRange(calendarDate.getFullYear(), this._config.locale) : this._formatDate(calendarDate, { year: "numeric" });
+		const gridLabel = this._gridLabel(calendarDate);
+		const turned = calendarTable.getAttribute("aria-label") !== gridLabel;
+		prev.innerHTML = `${this._navButton("btn-double-prev", "navPrevDoubleIcon", years ? this._config.ariaNavPrevYearsLabel : this._config.ariaNavPrevYearLabel)} ${days ? this._navButton("btn-prev", "navPrevIcon", this._config.ariaNavPrevMonthLabel) : ""}`;
+		next.innerHTML = `${days ? this._navButton("btn-next", "navNextIcon", this._config.ariaNavNextMonthLabel) : ""} ${this._navButton("btn-double-next", "navNextDoubleIcon", years ? this._config.ariaNavNextYearsLabel : this._config.ariaNavNextYearLabel)}`;
+		calendarTable.setAttribute("aria-label", gridLabel);
+		if (this._picksRange()) calendarTable.setAttribute("aria-multiselectable", "true");
+		else calendarTable.removeAttribute("aria-multiselectable");
+		calendarTable.innerHTML = days ? this._daysHtml(calendarDate) : this._periodsHtml(calendarDate);
+		if (turned) {
+			const month = days ? `<button type="button" class="calendar-nav-btn btn-month">${monthLabel}</button>` : "";
+			const year = `<button type="button" class="calendar-nav-btn btn-year">${yearLabel}</button>`;
+			region.innerHTML = isYearBeforeMonth(this._config.locale) ? `${year} ${month}` : `${month} ${year}`;
+		}
+		SelectorEngine.findOne(SELECTOR_BTN_YEAR, region).disabled = years && this._selectionView() === "years";
+		this._describeGrid(panel);
 	}
-	_initializeDates() {
-		this._calendarDate = convertToDateObject(this._config.calendarDate || this._config.startDate || this._config.endDate, this._config.selectionType) || /* @__PURE__ */ new Date();
-		this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType);
-		this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType);
-		this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType);
-		this._maxDate = convertToDateObject(this._config.maxDate, this._config.selectionType);
-		this._hoverDate = null;
-		this._selectEndDate = this._config.selectEndDate;
-	}
-	_initializeView() {
-		const viewMap = {
-			day: "days",
-			week: "days",
-			month: "months",
-			quarter: "quarters",
-			year: "years"
-		};
-		this._view = viewMap[this._config.selectionType] || "days";
-	}
-	_updateCalendar(callback) {
-		this._element.innerHTML = "";
-		this._createCalendar();
-		if (callback) callback();
-	}
-	_updateClassNamesAndAriaLabels() {
-		if (this._config.selectionType === "week") {
-			const rows = SelectorEngine.find(SELECTOR_CALENDAR_ROW, this._element);
-			for (const row of rows) {
-				const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, row);
-				const date = new Date(Manipulator.getDataAttribute(firstCell, "date"));
-				const rowAttributes = this._rowWeekAttributes(date);
-				row.className = rowAttributes.className;
-				row.tabIndex = rowAttributes.tabIndex;
-				if (rowAttributes.ariaSelected) row.setAttribute("aria-selected", true);
-				else row.removeAttribute("aria-selected");
-			}
+	_describeGrid(panel) {
+		const [navigation, grid, description] = panel.children;
+		const region = navigation.children[1];
+		const label = this._config.ariaNothingToPickLabel;
+		const note = SelectorEngine.findOne(`.${CLASS_NAME_VISUALLY_HIDDEN}`, region);
+		description.textContent = label;
+		if (!label || SelectorEngine.findOne("[data-coreui-selectable]", grid)) {
+			grid.removeAttribute("aria-describedby");
+			note?.remove();
 			return;
 		}
-		const cells = SelectorEngine.find(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element);
-		for (const cell of cells) {
-			const date = new Date(Manipulator.getDataAttribute(cell, "date"));
-			let cellAttributes;
-			switch (this._view) {
-				case "days":
-					cellAttributes = this._cellDayAttributes(date, "current");
-					break;
-				case "months":
-					cellAttributes = this._cellMonthAttributes(date);
-					break;
-				case "quarters":
-					cellAttributes = this._cellQuarterAttributes(date);
-					break;
-				default: cellAttributes = this._cellYearAttributes(date);
-			}
-			cell.className = cellAttributes.className;
-			cell.tabIndex = cellAttributes.tabIndex;
-			if (cellAttributes.ariaSelected) cell.setAttribute("aria-selected", true);
-			else cell.removeAttribute("aria-selected");
+		grid.setAttribute("aria-describedby", description.id);
+		if (!note) region.insertAdjacentHTML("beforeend", `<span class="${CLASS_NAME_VISUALLY_HIDDEN}">${escapeHtml(label)}</span>`);
+		else if (note.textContent !== label) note.textContent = label;
+	}
+	_pages() {
+		return SelectorEngine.find(SELECTOR_CALENDAR, this._element).map((panel) => {
+			const grid = panel.children[1];
+			return [grid.getAttribute("aria-label"), grid.hasAttribute("aria-describedby")];
+		});
+	}
+	_announceSelection(visible) {
+		this._selectionAnnouncement?.();
+		this._selectionAnnouncement = null;
+		const { ariaSelectedDateAnnouncement, ariaSelectedRangeAnnouncement, range } = this._config;
+		const start = this._startDate;
+		const end = range ? this._endDate : start;
+		if (!visible || !start || !end) return;
+		const startName = this._selectionName(start);
+		const endName = this._selectionName(end);
+		const message = startName === endName ? ariaSelectedDateAnnouncement?.replaceAll("{date}", () => startName) : ariaSelectedRangeAnnouncement?.replaceAll("{start}", () => startName).replaceAll("{end}", () => endName);
+		if (message) this._selectionAnnouncement = announce(message, { context: this._element });
+	}
+	_selectionName(date) {
+		const { ariaWeekNumberLabel, firstDayOfWeek, locale, selectionType, showWeekNumber } = this._config;
+		return formatSelectionName(date, {
+			ariaWeekNumberLabel,
+			firstDayOfWeek,
+			locale,
+			selectionType,
+			showWeekNumber
+		});
+	}
+	_announcePages(pages) {
+		if (!this._element.isConnected || !this._element.checkVisibility()) return;
+		const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element);
+		const active = this._element.getRootNode().activeElement;
+		const date = active && this._element.contains(active) ? active.closest(`${SELECTOR_CALENDAR_CELL}[aria-label], ${SELECTOR_CALENDAR_ROW}[aria-label]`) : null;
+		const messages = this._pages().flatMap(([label, nothing], index) => {
+			const [previousLabel, previousNothing] = pages[index] ?? [];
+			if (label === previousLabel && (previousNothing || !nothing) || date && !nothing) return [];
+			return [[date && panels[index].contains(date) ? "" : label, nothing && this._config.ariaNothingToPickLabel].filter(Boolean).join(", ")];
+		});
+		if (messages.length > 0) {
+			for (const remove of this._announcements) remove();
+			this._announcements = messages.map((message) => announce(message, { context: this._element }));
 		}
+	}
+	_daysHtml(calendarDate) {
+		const { ariaWeekNumberLabel, showAdjacentDays, showWeekNumber, weekdayFormat, weekNumbersLabel } = this._config;
+		const weeks = getMonthDetails(calendarDate.getFullYear(), calendarDate.getMonth(), this._config.firstDayOfWeek);
+		const weekLabel = getWeekLabel(this._config.locale);
+		const headerCell = (content, abbr = "") => `<th class="${CLASS_NAME_CALENDAR_CELL}"${abbr}><div class="calendar-header-cell-inner">${content}</div></th>`;
+		const weekdays = weeks[0].days.map(({ date }) => {
+			const long = this._formatDate(date, { weekday: "long" });
+			return headerCell(typeof weekdayFormat === "string" ? this._formatDate(date, { weekday: weekdayFormat }) : long.slice(0, weekdayFormat), ` abbr="${long}"`);
+		});
+		const rows = weeks.map(({ week, days }) => {
+			const visible = showAdjacentDays || days.some(({ month }) => month === "current");
+			const attributes = this._rowWeekAttributes(days[0].date, visible);
+			const cells = days.map(({ date, month }) => month === "current" || showAdjacentDays ? this._cellHtml(date, this._cellDayAttributes(date, month, attributes.meta), this._formatDate(date, { day: this._config.dayFormat })) : "<td role=\"gridcell\"></td>");
+			const weekNumberName = showWeekNumber ? getWeekNumberName(week.number, weekLabel, ariaWeekNumberLabel) : "";
+			const rowName = () => `${showWeekNumber ? `${weekNumberName}, ` : ""}${formatWeekName(days, this._config.locale)}`;
+			const ariaLabel = this._config.selectionType === "week" && visible ? ` aria-label="${escapeHtml(rowName())}"` : "";
+			return `<tr class="${attributes.className}"${this._stateHtml(attributes)}${ariaLabel}>${showWeekNumber ? `<th class="calendar-cell-week-number" scope="row" aria-label="${escapeHtml(weekNumberName)}">${week.number}</th>` : ""}${cells.join("")}</tr>`;
+		});
+		const weekNumberHeader = weekNumbersLabel ? escapeHtml(weekNumbersLabel) : `<span class="${CLASS_NAME_VISUALLY_HIDDEN}">${escapeHtml(weekLabel)}</span>`;
+		return `<thead><tr>${showWeekNumber ? headerCell(weekNumberHeader) : ""}${weekdays.join("")}</tr></thead><tbody>${rows.join("")}</tbody>`;
+	}
+	_periodsHtml(calendarDate) {
+		const view = this._view;
+		const year = calendarDate.getFullYear();
+		const monthNames = view === "months" ? getMonthsNames(this._config.locale, this._config.monthFormat) : [];
+		const dates = view === "years" ? getYears(year).map((value) => createDate(value)) : Array.from({ length: view === "months" ? 12 : 4 }, (_, index) => createDate(year, index * (view === "months" ? 1 : 3), 1));
+		const label = (date) => {
+			if (view === "months") return monthNames[date.getMonth()];
+			return view === "quarters" ? `Q${date.getMonth() / 3 + 1}` : this._formatDate(date, { year: this._config.yearFormat });
+		};
+		return `<tbody>${createGroupsInArray(dates, view === "quarters" ? 1 : 4).map((row) => `<tr>${row.map((date) => this._cellHtml(date, this._cellPeriodAttributes(date), label(date))).join("")}</tr>`).join("")}</tbody>`;
+	}
+	_cellHtml(date, attributes, label) {
+		const renderer = CELL_RENDERERS[this._view];
+		const content = this._config[renderer] ? this._cellContent(date, attributes.meta) : label;
+		const ariaLabel = attributes.ariaLabel && !this._config[renderer] ? ` aria-label="${escapeHtml(attributes.ariaLabel)}"` : "";
+		const ariaCurrent = attributes.ariaCurrent ? " aria-current=\"date\"" : "";
+		return `<td class="${attributes.className}" role="gridcell"${this._stateHtml(attributes)}${ariaCurrent}${ariaLabel} data-coreui-date="${date.toDateString()}"><div class="${CLASS_NAME_CALENDAR_CELL_INNER} ${this._view.slice(0, -1)}">${content}</div></td>`;
+	}
+	_cellContent(date, meta) {
+		return sanitizeByConfig(this._config[CELL_RENDERERS[this._view]](date, {
+			...meta,
+			label: this._cellName(date)
+		}), this._config);
+	}
+	_stateHtml({ ariaDisabled, ariaSelected, focusable, selectable }) {
+		return `${focusable ? " tabindex=\"-1\"" : ""}${selectable ? " data-coreui-selectable" : ""}${ariaSelected ? " aria-selected=\"true\"" : ""}${ariaDisabled ? " aria-disabled=\"true\"" : ""}`;
+	}
+	_updateRovingTabIndex(preferred) {
+		setRovingTabIndex(this._element, this._rovingSelector(), getStartOfView(this._calendarDate, this._view), this._rowsAreTargets(), preferred);
+	}
+	_gridLabel(date) {
+		if (this._view === "days") return this._formatDate(date, {
+			month: "long",
+			year: "numeric"
+		});
+		if (this._view === "years") return formatYearsRange(date.getFullYear(), this._config.locale);
+		return this._formatDate(date, { year: "numeric" });
+	}
+	_rovingSelector() {
+		return this._rowsAreTargets() ? SELECTOR_CALENDAR_ROW_FOCUSABLE : SELECTOR_CALENDAR_CELL_FOCUSABLE;
+	}
+	_createCalendar() {
+		this._setCalendarClasses();
+		for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) this._element.append(this._createCalendarPanel(index));
+		this._updateRovingTabIndex();
+	}
+	_setCalendarClasses() {
+		const { selectionType, showWeekNumber } = this._config;
+		for (const type of [
+			"day",
+			"month",
+			"quarter",
+			"week",
+			"year"
+		]) if (type !== selectionType) this._element.classList.remove(`select-${type}`);
+		if (selectionType && this._view === "days") this._element.classList.add(`select-${selectionType}`);
+		this._element.classList.toggle(CLASS_NAME_SHOW_WEEK_NUMBERS, Boolean(showWeekNumber));
+		this._element.classList.add(CLASS_NAME_CALENDARS$2);
+	}
+	_initializeDates(values) {
+		const given = values ?? this._config;
+		const changed = (...names) => !values || names.some((name) => name in values);
+		if (!values) {
+			this._minDate = convertToLimitDate(this._config.minDate, this._config.selectionType);
+			this._maxDate = convertToLimitDate(this._config.maxDate, this._config.selectionType);
+		}
+		if (changed("calendarDate", "startDate", "endDate")) {
+			const source = values ? [
+				"calendarDate",
+				"startDate",
+				"endDate"
+			].filter((name) => name in values).map((name) => values[name]).find(Boolean) ?? null : given.calendarDate || given.startDate || given.endDate;
+			const date = source === given.calendarDate ? convertToDateObject(source, this._config.selectionType) : convertToShownDate(source, this._config.selectionType, this._config.firstDayOfWeek);
+			this._calendarDate = date || this._calendarDate || constrainDate(/* @__PURE__ */ new Date(), this._minDate, this._maxDate);
+		}
+		if (changed("startDate")) this._startDate = convertToDateObject(given.startDate, this._config.selectionType);
+		if (changed("endDate")) this._endDate = convertToDateObject(given.endDate, this._config.selectionType);
+		if (changed("selectEndDate")) this._selectEndDate = Boolean(given.selectEndDate);
+		this._hoverDate = null;
+	}
+	_initializeView() {
+		this._view = this._selectionView();
+	}
+	_picksRange() {
+		return this._config.range && this._selectionView() === this._view;
+	}
+	_selectionView() {
+		return VIEW_BY_SELECTION_TYPE[this._config.selectionType] || "days";
+	}
+	_updateCalendar(callback) {
+		const focused = this._element.contains(document.activeElement) ? document.activeElement : null;
+		const restoreFocus = focused && this._focusRestorer(focused);
+		const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element);
+		const pages = this._pages();
+		if (panels.length === this._config.calendars) {
+			this._setCalendarClasses();
+			for (const [index, panel] of panels.entries()) this._renderCalendarPanel(panel, index);
+			this._updateRovingTabIndex();
+		} else {
+			this._element.replaceChildren();
+			this._createCalendar();
+		}
+		if (callback) callback();
+		if (restoreFocus && (!document.activeElement || document.activeElement === document.body)) restoreFocus();
+		this._announcePages(pages);
+	}
+	_focusRestorer(focused) {
+		const index = SelectorEngine.find(SELECTOR_CALENDAR, this._element).indexOf(focused.closest(SELECTOR_CALENDAR));
+		const date = (focused.matches(SELECTOR_CALENDAR_ROW) ? SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, focused) : focused.closest(SELECTOR_CALENDAR_CELL))?.getAttribute("data-coreui-date");
+		const { className } = focused;
+		return () => {
+			const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element)[index] ?? this._element;
+			const matches = SelectorEngine.find(this._rovingSelector(), this._element).filter((target) => (target.matches(SELECTOR_CALENDAR_ROW) ? SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target) : target)?.getAttribute("data-coreui-date") === date);
+			((date ? matches.find((target) => !target.matches(".next, .previous")) ?? matches[0] : panel.getElementsByClassName(className)[0]) ?? SelectorEngine.findOne("[tabindex=\"0\"]", panel) ?? SelectorEngine.findOne("[tabindex=\"0\"]", this._element))?.focus({ preventScroll: true });
+		};
+	}
+	_updateClassNamesAndAriaLabels() {
+		const pages = this._pages();
+		if (this._rowsAreTargets()) for (const row of SelectorEngine.find(SELECTOR_CALENDAR_ROW, this._element)) {
+			const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, row);
+			if (firstCell) this._applyState(row, this._rowWeekAttributes(this._getDate(firstCell)));
+		}
+		else for (const cell of SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[data-coreui-date]`, this._element)) {
+			const date = this._getDate(cell);
+			this._applyState(cell, this._view === "days" ? this._cellDayAttributes(date, ["previous", "next"].find((month) => cell.classList.contains(month)) ?? "current") : this._cellPeriodAttributes(date));
+		}
+		for (const panel of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) this._describeGrid(panel);
+		this._announcePages(pages);
+	}
+	_updateCellContent() {
+		if (!this._config[CELL_RENDERERS[this._view]]) return;
+		const focused = this._element.contains(document.activeElement) ? document.activeElement : null;
+		const restoreFocus = focused && this._focusRestorer(focused);
+		for (const cell of SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[data-coreui-date]`, this._element)) {
+			const date = parseToDateString(Manipulator.getDataAttribute(cell, "date"));
+			const attributes = this._view === "days" ? this._cellDayAttributes(date, ["previous", "next"].find((month) => cell.classList.contains(month)) ?? "current", this._rowWeekAttributes(this._getDate(cell)).meta) : this._cellPeriodAttributes(date);
+			const inner = SelectorEngine.findOne(`.${CLASS_NAME_CALENDAR_CELL_INNER}`, cell);
+			const content = this._cellContent(date, attributes.meta);
+			if (inner.innerHTML !== content) inner.innerHTML = content;
+		}
+		if (restoreFocus && (!document.activeElement || document.activeElement === document.body)) restoreFocus();
+	}
+	_applyState(element, { ariaDisabled, ariaSelected, className, selectable }) {
+		element.className = className;
+		element.toggleAttribute("data-coreui-selectable", selectable);
+		if (ariaSelected) element.setAttribute("aria-selected", "true");
+		else element.removeAttribute("aria-selected");
+		if (ariaDisabled) element.setAttribute("aria-disabled", "true");
+		else element.removeAttribute("aria-disabled");
+	}
+	_isRangeHover(inRange) {
+		return Boolean(this._hoverDate) && (this._selectEndDate ? inRange(this._startDate, this._hoverDate) : inRange(this._hoverDate, this._endDate));
 	}
 	_classNames(classNames) {
 		return Object.entries(classNames).filter(([_, value]) => Boolean(value)).map(([key]) => key).join(" ");
 	}
-	_cellDayAttributes(date, month) {
+	_cellDayAttributes(date, month, row) {
 		const isCurrentMonth = month === "current";
+		const isFiller = this._config.selectionType === "day" && !isCurrentMonth && !this._config.selectAdjacentDays;
 		const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
 		const isSelected = isDateSelected(date, this._startDate, this._endDate);
-		const isTodayDate = isToday(date);
+		const isTodayDate = isCurrentMonth && isToday(date);
+		const isInRange = !isFiller && isDateInRange(date, this._startDate, this._endDate);
+		const meta = {
+			isDisabled: isDisabled || isFiller,
+			isInCurrentMonth: isCurrentMonth,
+			isInRange,
+			isSelected: isSelected && !isFiller,
+			isToday: isTodayDate,
+			...row
+		};
 		if (this._config.selectionType !== "day" || this._view !== "days") return {
 			className: this._classNames({
 				[CLASS_NAME_CALENDAR_CELL]: true,
 				today: isTodayDate,
 				[month]: true
 			}),
-			tabIndex: -1,
+			focusable: false,
+			selectable: false,
 			ariaSelected: false,
-			ariaLabel: this._formatDate(date),
-			ariaCurrent: isTodayDate
+			ariaLabel: this._cellName(date),
+			ariaCurrent: isTodayDate,
+			meta
 		};
-		const isInRange = isCurrentMonth && isDateInRange(date, this._startDate, this._endDate);
-		const isRangeHover = isCurrentMonth && this._hoverDate && (this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate));
+		const isRangeHover = !isFiller && this._isRangeHover((start, end) => isDateInRange(date, start, end));
 		return {
 			className: this._classNames({
 				[CLASS_NAME_CALENDAR_CELL]: true,
@@ -5238,24 +5994,24 @@ var Calendar = class Calendar extends BaseComponent {
 				today: isTodayDate,
 				[month]: true
 			}),
-			tabIndex: (isCurrentMonth || this._config.selectAdjacentDays) && !isDisabled ? 0 : -1,
-			ariaSelected: isSelected,
-			ariaLabel: this._formatDate(date),
+			focusable: !isFiller && !isCellOutsideLimits(date, "days", this._minDate, this._maxDate),
+			selectable: !isDisabled && !isFiller,
+			ariaDisabled: isDisabled || isFiller,
+			ariaSelected: !isFiller && (isSelected || this._picksRange() && !isDisabled && isDateInRange(date, this._startDate, this._endDate)),
+			ariaLabel: this._cellName(date),
 			ariaCurrent: isTodayDate,
-			meta: {
-				isDisabled,
-				isInCurrentMonth: isCurrentMonth,
-				isInRange,
-				isSelected,
-				isToday: isTodayDate
-			}
+			meta
 		};
 	}
-	_cellMonthAttributes(date) {
-		const isDisabled = isMonthDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
-		const isSelected = isMonthSelected(date, this._startDate, this._endDate);
-		const isInRange = isMonthInRange(date, this._startDate, this._endDate);
-		const isRangeHover = this._config.selectionType === "month" && this._hoverDate && (this._selectEndDate ? isMonthInRange(date, this._startDate, this._hoverDate) : isMonthInRange(date, this._hoverDate, this._endDate));
+	_cellPeriodAttributes(date) {
+		const view = this._view;
+		const { firstDayOfWeek, selectionType } = this._config;
+		const start = convertToShownDate(this._startDate, selectionType, firstDayOfWeek);
+		const end = convertToShownDate(this._endDate, selectionType, firstDayOfWeek);
+		const isDisabled = isPeriodDisabled(date, view, this._minDate, this._maxDate, this._config.disabledDates);
+		const isSelected = isPeriodSelected(date, view, start, end);
+		const isInRange = isPeriodInRange(date, view, start, end);
+		const isRangeHover = VIEW_BY_SELECTION_TYPE[this._config.selectionType] === view && this._isRangeHover((start, end) => isPeriodInRange(date, view, start, end));
 		return {
 			className: this._classNames({
 				[CLASS_NAME_CALENDAR_CELL]: true,
@@ -5264,8 +6020,10 @@ var Calendar = class Calendar extends BaseComponent {
 				range: isInRange,
 				selected: isSelected
 			}),
-			tabIndex: isDisabled ? -1 : 0,
-			ariaSelected: isSelected,
+			focusable: !isCellOutsideLimits(date, view, this._minDate, this._maxDate),
+			selectable: !isDisabled,
+			ariaDisabled: isDisabled,
+			ariaSelected: isSelected || this._picksRange() && isInRange && !isDisabled,
 			meta: {
 				isDisabled,
 				isInRange,
@@ -5273,60 +6031,18 @@ var Calendar = class Calendar extends BaseComponent {
 			}
 		};
 	}
-	_cellQuarterAttributes(date) {
-		const isDisabled = isQuarterDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
-		const isSelected = isQuarterSelected(date, this._startDate, this._endDate);
-		const isInRange = isQuarterInRange(date, this._startDate, this._endDate);
-		const isRangeHover = this._config.selectionType === "quarter" && this._hoverDate && (this._selectEndDate ? isQuarterInRange(date, this._startDate, this._hoverDate) : isQuarterInRange(date, this._hoverDate, this._endDate));
-		return {
-			className: this._classNames({
-				[CLASS_NAME_CALENDAR_CELL]: true,
-				disabled: isDisabled,
-				"range-hover": isRangeHover,
-				range: isInRange,
-				selected: isSelected
-			}),
-			tabIndex: isDisabled ? -1 : 0,
-			ariaSelected: isSelected,
-			meta: {
-				isDisabled,
-				isInRange,
-				isSelected
-			}
-		};
-	}
-	_cellYearAttributes(date) {
-		const isDisabled = isYearDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
-		const isSelected = isYearSelected(date, this._startDate, this._endDate);
-		const isInRange = isYearInRange(date, this._startDate, this._endDate);
-		const isRangeHover = this._config.selectionType === "year" && this._hoverDate && (this._selectEndDate ? isYearInRange(date, this._startDate, this._hoverDate) : isYearInRange(date, this._hoverDate, this._endDate));
-		return {
-			className: this._classNames({
-				[CLASS_NAME_CALENDAR_CELL]: true,
-				disabled: isDisabled,
-				"range-hover": isRangeHover,
-				range: isInRange,
-				selected: isSelected
-			}),
-			tabIndex: isDisabled ? -1 : 0,
-			ariaSelected: isSelected,
-			meta: {
-				isDisabled,
-				isInRange,
-				isSelected
-			}
-		};
-	}
-	_rowWeekAttributes(date) {
-		if (this._config.selectionType !== "week") return {
+	_rowWeekAttributes(date, visible = true) {
+		if (this._config.selectionType !== "week" || !visible) return {
 			className: this._classNames({ [CLASS_NAME_CALENDAR_ROW]: true }),
-			tabIndex: -1,
+			focusable: false,
+			selectable: false,
 			ariaSelected: false
 		};
-		const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
-		const isSelected = isDateSelected(date, this._startDate, this._endDate);
-		const isInRange = isDateInRange(date, this._startDate, this._endDate);
-		const isRangeHover = this._hoverDate && (this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate));
+		const weekDate = getWeekRowDate(date);
+		const isDisabled = isPeriodDisabled(weekDate, "weeks", this._minDate, this._maxDate, this._config.disabledDates);
+		const isSelected = isPeriodSelected(weekDate, "weeks", this._startDate, this._endDate);
+		const isInRange = isPeriodInRange(weekDate, "weeks", this._startDate, this._endDate);
+		const isRangeHover = this._isRangeHover((start, end) => isPeriodInRange(weekDate, "weeks", start, end));
 		return {
 			className: this._classNames({
 				[CLASS_NAME_CALENDAR_ROW]: true,
@@ -5335,27 +6051,33 @@ var Calendar = class Calendar extends BaseComponent {
 				"range-hover": isRangeHover,
 				selected: isSelected
 			}),
-			tabIndex: isDisabled ? -1 : 0,
-			ariaSelected: isSelected
+			focusable: !isCellOutsideLimits(date, "days", this._minDate, this._maxDate, true),
+			selectable: !isDisabled,
+			ariaDisabled: isDisabled,
+			ariaSelected: isSelected || this._picksRange() && isInRange && !isDisabled,
+			meta: {
+				isDisabled,
+				isInRange,
+				isSelected
+			}
 		};
+	}
+	_navButton(className, icon, label) {
+		return `<button type="button" class="calendar-nav-btn ${className}" aria-label="${escapeHtml(label)}"><span class="calendar-nav-icon">${this._navIcon(icon)}</span></button>`;
 	}
 	_navIcon(name) {
 		return sanitizeByConfig(this._config[isRTL(this._element) ? {
-			navIconDoubleNext: "navIconDoublePrev",
-			navIconDoublePrev: "navIconDoubleNext",
-			navIconNext: "navIconPrev",
-			navIconPrev: "navIconNext"
+			navNextDoubleIcon: "navPrevDoubleIcon",
+			navNextIcon: "navPrevIcon",
+			navPrevDoubleIcon: "navNextDoubleIcon",
+			navPrevIcon: "navNextIcon"
 		}[name] : name], this._config);
 	}
 	_formatDate(date, options) {
-		if (Number.isNaN(date.getTime())) return date.toLocaleDateString(this._config.locale, options);
-		const key = `${this._config.locale}|${options ? JSON.stringify(options) : ""}`;
-		let formatter = this._formatters.get(key);
-		if (!formatter) {
-			formatter = new Intl.DateTimeFormat(this._config.locale, options);
-			this._formatters.set(key, formatter);
-		}
-		return formatter.format(date);
+		return this._formatter(date, this._config.locale, options);
+	}
+	_cellName(date) {
+		return formatCellName(date, this._view, (value, options) => this._formatDate(value, options));
 	}
 	static calendarInterface(element, config, ...args) {
 		const data = Calendar.getOrCreateInstance(element, config);
@@ -5368,45 +6090,27 @@ var Calendar = class Calendar extends BaseComponent {
 		return jQueryDispatch(this, Calendar, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(window, EVENT_LOAD_DATA_API$21, () => {
+EventHandler.on(window, EVENT_LOAD_DATA_API$20, () => {
 	for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_CALENDAR))) Calendar.calendarInterface(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Calendar);
 //#endregion
 //#region js/src/carousel.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI carousel.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's carousel.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$43 = "carousel";
-const EVENT_KEY$35 = `.coreui.carousel`;
+const NAME$45 = "carousel";
+const EVENT_KEY$36 = `.coreui.carousel`;
 const DATA_API_KEY$30 = ".data-api";
-const ARROW_LEFT_KEY$8 = "ArrowLeft";
-const ARROW_RIGHT_KEY$8 = "ArrowRight";
+const ARROW_LEFT_KEY$10 = "ArrowLeft";
+const ARROW_RIGHT_KEY$10 = "ArrowRight";
 const DIRECTION_LEFT = "left";
 const DIRECTION_RIGHT = "right";
-const EVENT_SLIDE = `slide${EVENT_KEY$35}`;
-const EVENT_SLID = `slid${EVENT_KEY$35}`;
-const EVENT_KEYDOWN$11 = `keydown${EVENT_KEY$35}`;
-const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$35}`;
-const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$35}`;
-const EVENT_POINTERDOWN$1 = `pointerdown${EVENT_KEY$35}`;
-const EVENT_LOAD_DATA_API$20 = `load${EVENT_KEY$35}${DATA_API_KEY$30}`;
-const EVENT_CLICK_DATA_API$15 = `click${EVENT_KEY$35}${DATA_API_KEY$30}`;
+const EVENT_SLIDE = `slide${EVENT_KEY$36}`;
+const EVENT_SLID = `slid${EVENT_KEY$36}`;
+const EVENT_KEYDOWN$14 = `keydown${EVENT_KEY$36}`;
+const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$36}`;
+const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$36}`;
+const EVENT_POINTERDOWN$3 = `pointerdown${EVENT_KEY$36}`;
+const EVENT_LOAD_DATA_API$19 = `load${EVENT_KEY$36}${DATA_API_KEY$30}`;
+const EVENT_CLICK_DATA_API$15 = `click${EVENT_KEY$36}${DATA_API_KEY$30}`;
 const CLASS_NAME_CAROUSEL = "carousel";
 const CLASS_NAME_ACTIVE$7 = "active";
 const CLASS_NAME_FADE$1 = "carousel-fade";
@@ -5429,20 +6133,20 @@ const SELECTOR_DATA_SLIDE_PREV = "[data-coreui-slide=\"prev\"]";
 const SELECTOR_DATA_SLIDE_NEXT = "[data-coreui-slide=\"next\"]";
 const SELECTOR_DATA_AUTOPLAY = "[data-coreui-autoplay=\"true\"]";
 const KEY_TO_DIRECTION = {
-	[ARROW_LEFT_KEY$8]: DIRECTION_RIGHT,
-	[ARROW_RIGHT_KEY$8]: DIRECTION_LEFT
+	[ARROW_LEFT_KEY$10]: DIRECTION_RIGHT,
+	[ARROW_RIGHT_KEY$10]: DIRECTION_LEFT
 };
 const ENDS_STOP = "stop";
 const ENDS_WRAP = "wrap";
 const ENDS_LOOP = "loop";
-const Default$42 = {
+const Default$40 = {
 	autoplay: false,
 	ends: ENDS_LOOP,
 	interval: 5e3,
 	keyboard: true,
 	pause: "hover"
 };
-const DefaultType$42 = {
+const DefaultType$39 = {
 	autoplay: "boolean",
 	ends: "string",
 	interval: "number",
@@ -5450,9 +6154,6 @@ const DefaultType$42 = {
 	pause: "(string|boolean)"
 };
 const easeInOutCubic = (progress) => progress < .5 ? 4 * progress * progress * progress : 1 - (-2 * progress + 2) ** 3 / 2;
-/**
-* Class definition
-*/
 var Carousel = class Carousel extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
@@ -5475,13 +6176,13 @@ var Carousel = class Carousel extends BaseComponent {
 		this._updatePlayPauseControl();
 	}
 	static get Default() {
-		return Default$42;
+		return Default$40;
 	}
 	static get DefaultType() {
-		return DefaultType$42;
+		return DefaultType$39;
 	}
 	static get NAME() {
-		return NAME$43;
+		return NAME$45;
 	}
 	next() {
 		this.to(this._navIndex() + 1);
@@ -5536,7 +6237,7 @@ var Carousel = class Carousel extends BaseComponent {
 		if (this._scrollFrame !== null) cancelAnimationFrame(this._scrollFrame);
 		for (const clone of SelectorEngine.find(`.${CLASS_NAME_CLONE}`, this._viewport)) clone.remove();
 		this._viewport.style.scrollSnapType = "";
-		EventHandler.off(this._viewport, EVENT_KEY$35);
+		EventHandler.off(this._viewport, EVENT_KEY$36);
 		super.dispose();
 	}
 	static jQueryInterface(config, ...args) {
@@ -5550,7 +6251,7 @@ var Carousel = class Carousel extends BaseComponent {
 			ENDS_STOP,
 			ENDS_WRAP,
 			ENDS_LOOP
-		].includes(config.ends)) config.ends = Default$42.ends;
+		].includes(config.ends)) config.ends = Default$40.ends;
 		return config;
 	}
 	_initialActiveIndex() {
@@ -5559,12 +6260,12 @@ var Carousel = class Carousel extends BaseComponent {
 		return Math.max(index, 0);
 	}
 	_addEventListeners() {
-		if (this._config.keyboard) EventHandler.on(this._element, EVENT_KEYDOWN$11, (event) => this._keydown(event));
+		if (this._config.keyboard) EventHandler.on(this._element, EVENT_KEYDOWN$14, (event) => this._keydown(event));
 		if (this._config.pause === "hover") {
 			EventHandler.on(this._element, EVENT_MOUSEENTER$3, () => this.pause());
 			EventHandler.on(this._element, EVENT_MOUSELEAVE$2, () => this._maybeEnableCycle());
 		}
-		EventHandler.on(this._viewport, EVENT_POINTERDOWN$1, () => this._pauseFromInteraction());
+		EventHandler.on(this._viewport, EVENT_POINTERDOWN$3, () => this._pauseFromInteraction());
 	}
 	_keydown(event) {
 		if (/input|textarea/i.test(event.target.tagName)) return;
@@ -5759,12 +6460,20 @@ var Carousel = class Carousel extends BaseComponent {
 			atStart = this._activeIndex <= 0;
 			atEnd = this._activeIndex >= last;
 		}
-		this._setControlsDisabled(this._prevControls, atStart);
-		this._setControlsDisabled(this._nextControls, atEnd);
+		if (atStart) {
+			this._setControlsDisabled(this._nextControls, atEnd);
+			this._setControlsDisabled(this._prevControls, atStart);
+		} else {
+			this._setControlsDisabled(this._prevControls, atStart);
+			this._setControlsDisabled(this._nextControls, atEnd);
+		}
 	}
 	_setControlsDisabled(controls, disabled) {
 		for (const control of controls) {
-			if (disabled && control === document.activeElement) ((controls === this._prevControls ? this._nextControls : this._prevControls)[0] ?? this._viewport).focus({ preventScroll: true });
+			if (disabled && control === document.activeElement) {
+				((controls === this._prevControls ? this._nextControls : this._prevControls)[0] ?? this._viewport).focus({ preventScroll: true });
+				if (document.activeElement === control) control.blur();
+			}
 			control.disabled = disabled;
 		}
 	}
@@ -5862,9 +6571,6 @@ var Carousel = class Carousel extends BaseComponent {
 		}
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, EVENT_CLICK_DATA_API$15, SELECTOR_DATA_SLIDE, function(event) {
 	const target = SelectorEngine.getElementFromSelector(this);
 	if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) return;
@@ -5888,45 +6594,53 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$15, SELECTOR_PLAY_PAUSE, function
 	event.preventDefault();
 	Carousel.getOrCreateInstance(target)._togglePlayPause();
 });
-EventHandler.on(window, EVENT_LOAD_DATA_API$20, () => {
+EventHandler.on(window, EVENT_LOAD_DATA_API$19, () => {
 	const carousels = SelectorEngine.find(SELECTOR_DATA_AUTOPLAY);
 	for (const carousel of carousels) Carousel.getOrCreateInstance(carousel);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Carousel);
 //#endregion
+//#region js/src/util/chip-values.ts
+const splitChipText = (text, separator) => separator && text.includes(separator) ? text.split(separator) : null;
+const resolveChipClassName = (chipClassName, value) => {
+	const className = typeof chipClassName === "function" ? chipClassName(value) : chipClassName;
+	return typeof className === "string" ? className : "";
+};
+const getChipAnnouncement = (before, after, addedLabel, removedLabel) => {
+	let changed = [...new Set(after.filter((value) => value && !before.includes(value)))];
+	let label = addedLabel;
+	if (changed.length === 0) {
+		changed = [...new Set(before.filter((value) => value && !after.includes(value)))];
+		label = removedLabel;
+	}
+	return changed.length > 0 && (typeof label === "function" ? label(changed) : `${changed.join(", ")} ${label}`) || null;
+};
+const getChipRemoveLabel = (removeLabel, label) => {
+	if (typeof removeLabel === "function") return removeLabel(label);
+	return removeLabel.includes("{label}") ? removeLabel.replaceAll("{label}", () => label) : `${removeLabel} ${label}`.trim();
+};
+//#endregion
 //#region js/src/chip.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI chip.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$42 = "chip";
-const EVENT_KEY$34 = `.coreui.chip`;
+const NAME$44 = "chip";
+const EVENT_KEY$35 = `.coreui.chip`;
 const DATA_API_KEY$29 = ".data-api";
-const EVENT_REMOVE$2 = `remove${EVENT_KEY$34}`;
-const EVENT_REMOVED = `removed${EVENT_KEY$34}`;
-const EVENT_SELECT$1 = `select${EVENT_KEY$34}`;
-const EVENT_SELECTED = `selected${EVENT_KEY$34}`;
-const EVENT_DESELECT = `deselect${EVENT_KEY$34}`;
-const EVENT_DESELECTED = `deselected${EVENT_KEY$34}`;
-const EVENT_CLICK$10 = `click${EVENT_KEY$34}`;
-const EVENT_KEYDOWN$10 = `keydown${EVENT_KEY$34}`;
+const EVENT_REMOVE$2 = `remove${EVENT_KEY$35}`;
+const EVENT_REMOVED = `removed${EVENT_KEY$35}`;
+const EVENT_SELECT$1 = `select${EVENT_KEY$35}`;
+const EVENT_SELECTED = `selected${EVENT_KEY$35}`;
+const EVENT_DESELECT = `deselect${EVENT_KEY$35}`;
+const EVENT_DESELECTED = `deselected${EVENT_KEY$35}`;
+const EVENT_CLICK$12 = `click${EVENT_KEY$35}`;
+const EVENT_KEYDOWN$13 = `keydown${EVENT_KEY$35}`;
 const SELECTOR_CHIP_CHECK = ".chip-check";
-const SELECTOR_CHIP_REMOVE$2 = ".chip-remove";
+const SELECTOR_CHIP_REMOVE$3 = ".chip-remove";
 const SELECTOR_DATA_CHIP = "[data-coreui-chip]";
 const CLASS_NAME_CHIP_CHECK = "chip-check";
 const CLASS_NAME_CHIP_CLICKABLE = "chip-clickable";
 const CLASS_NAME_CHIP_REMOVE = "chip-remove";
 const CLASS_NAME_ACTIVE$6 = "active";
-const CLASS_NAME_DISABLED$8 = "disabled";
-const Default$41 = {
+const CLASS_NAME_DISABLED$9 = "disabled";
+const Default$39 = {
 	allowList: SVGAllowlist,
 	ariaRemoveLabel: "Remove",
 	disabled: false,
@@ -5939,9 +6653,9 @@ const Default$41 = {
 	selected: false,
 	selectedIcon: CHECK_ICON
 };
-const DefaultType$41 = {
+const DefaultType$38 = {
 	allowList: "object",
-	ariaRemoveLabel: "string",
+	ariaRemoveLabel: "(string|function)",
 	disabled: "boolean",
 	filter: "boolean",
 	removable: "boolean",
@@ -5952,28 +6666,27 @@ const DefaultType$41 = {
 	selected: "boolean",
 	selectedIcon: "string"
 };
-/**
-* Class definition
-*/
 var Chip = class Chip extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
-		this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED$8);
-		this._selected = this._config.selected || this._element.classList.contains(CLASS_NAME_ACTIVE$6);
+		this._checkIcon = null;
+		this._disabled = this._config.disabled;
+		this._removeControl = null;
+		this._selected = this._config.selected;
 		this._applyRole();
 		this._ensureRemoveControl();
 		this._applyState();
-		if (this._config.selectable || this._config.removable) this._makeFocusable();
+		this._makeFocusable();
 		this._addEventListeners();
 	}
 	static get Default() {
-		return Default$41;
+		return Default$39;
 	}
 	static get DefaultType() {
-		return DefaultType$41;
+		return DefaultType$38;
 	}
 	static get NAME() {
-		return NAME$42;
+		return NAME$44;
 	}
 	remove() {
 		if (EventHandler.trigger(this._element, EVENT_REMOVE$2).defaultPrevented) return;
@@ -6003,54 +6716,46 @@ var Chip = class Chip extends BaseComponent {
 		this._applyState();
 		EventHandler.trigger(this._element, EVENT_DESELECTED);
 	}
+	dispose() {
+		if (!this._element) return;
+		this._checkIcon?.remove();
+		this._removeControl?.remove();
+		super.dispose();
+	}
 	_configAfterMerge(config) {
 		if (config.filter) config.selectable = true;
 		return config;
 	}
 	_addEventListeners() {
-		EventHandler.on(this._element, EVENT_KEYDOWN$10, (event) => this._handleKeydown(event));
-		EventHandler.on(this._element, EVENT_CLICK$10, (event) => {
+		EventHandler.on(this._element, EVENT_KEYDOWN$13, (event) => this._handleKeydown(event));
+		EventHandler.on(this._element, EVENT_CLICK$12, (event) => {
 			if (this._disabled) return;
-			if (event.target.closest(SELECTOR_CHIP_REMOVE$2)) return;
+			if (event.target.closest(SELECTOR_CHIP_REMOVE$3)) return;
 			if (event.shiftKey && this._element.getAttribute("role") === "option") return;
 			this.toggle();
 		});
-		EventHandler.on(this._element, EVENT_CLICK$10, SELECTOR_CHIP_REMOVE$2, (event) => {
+		EventHandler.on(this._element, EVENT_CLICK$12, SELECTOR_CHIP_REMOVE$3, (event) => {
 			event.stopPropagation();
-			this.remove();
+			if (this._config.removable && !this._disabled) this.remove();
 		});
 	}
 	_applyRole() {
-		if (this._config.selectable && !this._element.hasAttribute("role")) this._element.setAttribute("role", "button");
-	}
-	_selectionStateAttribute() {
-		return this._element.getAttribute("role") === "option" ? "aria-selected" : "aria-pressed";
+		const option = this._element.getAttribute("role") === "option";
+		writeAttribute(this._element, "role", option ? "option" : this._config.selectable ? "button" : null);
 	}
 	_applyState() {
-		if (!this._disabled && (this._config.clickable || this._config.selectable)) this._element.classList.add(CLASS_NAME_CHIP_CLICKABLE);
-		const hasRole = this._element.hasAttribute("role");
-		if (this._disabled) {
-			this._element.classList.add(CLASS_NAME_DISABLED$8);
-			if (hasRole) this._element.setAttribute("aria-disabled", "true");
-			else this._element.removeAttribute("aria-disabled");
-		} else {
-			this._element.classList.remove(CLASS_NAME_DISABLED$8);
-			if (this._element.hasAttribute("aria-disabled")) {
-				if (hasRole) this._element.setAttribute("aria-disabled", "false");
-				else this._element.removeAttribute("aria-disabled");
-			}
-		}
-		if (this._config.selectable) {
-			this._element.classList.toggle(CLASS_NAME_ACTIVE$6, this._selected);
-			this._element.setAttribute(this._selectionStateAttribute(), this._selected ? "true" : "false");
-			if (this._config.filter) {
-				if (this._selected) this._ensureCheckIcon();
-				else SelectorEngine.findOne(SELECTOR_CHIP_CHECK, this._element)?.remove();
-			}
-		} else {
-			this._element.classList.remove(CLASS_NAME_ACTIVE$6);
-			if (this._element.getAttribute("role") === "option") this._element.setAttribute("aria-selected", "false");
-			else this._element.removeAttribute("aria-selected");
+		this._element.classList.toggle(CLASS_NAME_CHIP_CLICKABLE, !this._disabled && (this._config.clickable || this._config.selectable));
+		this._element.classList.toggle(CLASS_NAME_DISABLED$9, this._disabled);
+		if (this._disabled && this._element.hasAttribute("role")) this._element.setAttribute("aria-disabled", "true");
+		else this._element.removeAttribute("aria-disabled");
+		const selected = this._config.selectable && this._selected;
+		const option = this._element.getAttribute("role") === "option";
+		this._element.classList.toggle(CLASS_NAME_ACTIVE$6, selected);
+		writeAttribute(this._element, "aria-selected", option ? String(selected) : null);
+		writeAttribute(this._element, "aria-pressed", !option && this._config.selectable ? String(selected) : null);
+		if (this._config.filter) {
+			if (selected) this._ensureCheckIcon();
+			else SelectorEngine.findOne(SELECTOR_CHIP_CHECK, this._element)?.remove();
 		}
 	}
 	_ensureCheckIcon() {
@@ -6060,9 +6765,10 @@ var Chip = class Chip extends BaseComponent {
 		check.setAttribute("aria-hidden", "true");
 		check.innerHTML = sanitizeByConfig(this._config.selectedIcon, this._config);
 		this._element.prepend(check);
+		this._checkIcon = check;
 	}
 	_createRemoveControl() {
-		if (this._element.getAttribute("role") === "option") {
+		if (this._element.hasAttribute("role")) {
 			const indicator = document.createElement("span");
 			indicator.className = CLASS_NAME_CHIP_REMOVE;
 			indicator.setAttribute("aria-hidden", "true");
@@ -6072,19 +6778,28 @@ var Chip = class Chip extends BaseComponent {
 		const button = document.createElement("button");
 		button.type = "button";
 		button.className = CLASS_NAME_CHIP_REMOVE;
-		button.setAttribute("aria-label", this._config.ariaRemoveLabel);
+		button.setAttribute("aria-label", this._getRemoveLabel());
 		button.setAttribute("tabindex", "-1");
 		button.innerHTML = sanitizeByConfig(this._config.removeIcon, this._config);
 		return button;
 	}
+	_getRemoveLabel() {
+		return getChipRemoveLabel(this._config.ariaRemoveLabel, this._element.textContent.replaceAll(/\s+/g, " ").trim());
+	}
 	_ensureRemoveControl() {
 		if (!this._config.removable || this._disabled) return;
-		if (SelectorEngine.findOne(SELECTOR_CHIP_REMOVE$2, this._element)) return;
-		this._element.append(this._createRemoveControl());
+		const existing = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE$3, this._element);
+		if (existing) {
+			if (existing.tagName === "BUTTON" && !existing.hasAttribute("aria-label")) existing.setAttribute("aria-label", this._getRemoveLabel());
+			return;
+		}
+		this._removeControl = this._createRemoveControl();
+		this._element.append(this._removeControl);
 	}
 	_makeFocusable() {
-		if (this._element.hasAttribute("tabindex") || this._disabled) return;
-		this._element.setAttribute("tabindex", "0");
+		const focusable = !this._disabled && (this._config.selectable || this._config.removable);
+		writeAttribute(this._element, "tabindex", focusable ? "0" : null);
+		writeAttribute(this._element, "data-coreui-chip-focusable", focusable ? "true" : null);
 	}
 	_handleKeydown(event) {
 		const { key } = event;
@@ -6120,43 +6835,46 @@ var Chip = class Chip extends BaseComponent {
 		return jQueryDispatch(this, Chip, config, (element) => [element]);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$34}${DATA_API_KEY$29}`, () => {
+EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$35}${DATA_API_KEY$29}`, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP)) Chip.chipInterface(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Chip);
 //#endregion
+//#region js/src/util/focus.ts
+const containsFocus = (element) => Boolean(element?.contains(element.getRootNode().activeElement));
+const focusWithTemporaryTabindex = (element) => {
+	if (element.hasAttribute("tabindex")) {
+		element.focus();
+		return;
+	}
+	const release = () => {
+		if (element.getRootNode().activeElement !== element) {
+			element.removeEventListener("blur", release);
+			element.removeAttribute("tabindex");
+		}
+	};
+	element.setAttribute("tabindex", "-1");
+	element.addEventListener("blur", release);
+	element.focus();
+	release();
+};
+//#endregion
 //#region js/src/chip-set.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI chip-set.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$41 = "chip-set";
-const EVENT_KEY$33 = `.coreui.chip-set`;
+const NAME$43 = "chip-set";
+const EVENT_KEY$34 = `.coreui.chip-set`;
 const DATA_API_KEY$28 = ".data-api";
 const EVENT_ADD$1 = "add";
 const EVENT_REMOVE$1 = "remove";
 const EVENT_CHANGE$9 = "change";
 const EVENT_SELECT = "select";
-const EVENT_CLICK$9 = "click";
-const EVENT_KEYDOWN$9 = "keydown";
+const EVENT_CLICK$11 = "click";
+const EVENT_FOCUSIN$6 = "focusin";
+const EVENT_KEYDOWN$12 = "keydown";
 const A_KEY = "a";
-const ARROW_LEFT_KEY$7 = "ArrowLeft";
-const ARROW_RIGHT_KEY$7 = "ArrowRight";
+const ARROW_LEFT_KEY$9 = "ArrowLeft";
+const ARROW_RIGHT_KEY$9 = "ArrowRight";
 const END_KEY$5 = "End";
 const HOME_KEY$5 = "Home";
-const SPACE_KEY$4 = " ";
-const TYPEAHEAD_TIMEOUT = 500;
 const EVENT_CHIP_SELECTED = "selected.coreui.chip";
 const EVENT_CHIP_DESELECTED = "deselected.coreui.chip";
 const EVENT_CHIP_REMOVE$1 = "remove.coreui.chip";
@@ -6164,12 +6882,12 @@ const EVENT_CHIP_REMOVED = "removed.coreui.chip";
 const SELECTOR_DATA_CHIP_SET = "[data-coreui-chip-set]";
 const SELECTOR_CHIP$2 = ".chip";
 const SELECTOR_CHIP_ACTIVE = `${SELECTOR_CHIP$2}.active`;
-const SELECTOR_CHIP_REMOVE$1 = ".chip-remove";
-const SELECTOR_FOCUSABLE_ITEMS = ".chip:not(.disabled)";
+const SELECTOR_CHIP_REMOVE$2 = ".chip-remove";
+const SELECTOR_FOCUSABLE_ITEMS = ".chip[data-coreui-chip-focusable]";
 const CLASS_NAME_CHIP$1 = "chip";
-const CLASS_NAME_DISABLED$7 = "disabled";
+const CLASS_NAME_DISABLED$8 = "disabled";
 const SELECTION_MODE_SINGLE = "single";
-const Default$40 = {
+const Default$38 = {
 	ariaAddedAnnouncement: "added",
 	ariaRemoveLabel: "Remove",
 	ariaRemovedAnnouncement: "removed",
@@ -6185,10 +6903,10 @@ const Default$40 = {
 	typeahead: true,
 	unique: false
 };
-const DefaultType$40 = {
-	ariaAddedAnnouncement: "string",
-	ariaRemoveLabel: "string",
-	ariaRemovedAnnouncement: "string",
+const DefaultType$37 = {
+	ariaAddedAnnouncement: "(string|function)",
+	ariaRemoveLabel: "(string|function)",
+	ariaRemovedAnnouncement: "(string|function)",
 	chipClassName: "(string|function|null)",
 	disabled: "boolean",
 	filter: "boolean",
@@ -6201,32 +6919,34 @@ const DefaultType$40 = {
 	typeahead: "boolean",
 	unique: "boolean"
 };
-/**
-* Class definition
-*/
 var ChipSet = class ChipSet extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
-		this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED$7);
+		this._disabled = this._config.disabled;
 		this._pendingFocus = null;
 		this._chips = [];
-		this._liveRegion = null;
+		this._ownedChips = /* @__PURE__ */ new Map();
 		this._anchor = null;
-		this._search = "";
-		this._searchTimeout = null;
+		this._typeaheadBuffer = createTypeaheadBuffer();
+		this._announcedFrom = null;
+		this._batch = null;
+		this._settled = false;
 		this._applyAccessibilityRoles();
 		this._initChips();
-		this._createLiveRegion();
+		this._moveTabStop();
 		this._addEventListeners();
+		queueMicrotask(() => {
+			this._settled = true;
+		});
 	}
 	static get Default() {
-		return Default$40;
+		return Default$38;
 	}
 	static get DefaultType() {
-		return DefaultType$40;
+		return DefaultType$37;
 	}
 	static get NAME() {
-		return NAME$41;
+		return NAME$43;
 	}
 	add(chip) {
 		if (!this._canModify()) return null;
@@ -6242,9 +6962,11 @@ var ChipSet = class ChipSet extends BaseComponent {
 		const element = isElement ? chip : this._createChip(value);
 		this._appendChip(element);
 		this._setupChip(element);
+		this._moveTabStop();
+		this._noteChange();
 		this._chips.push(value);
-		this._announce(`${value} ${this._config.ariaAddedAnnouncement}`);
-		EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE$9), { value: this.getValues() });
+		if (this._batch) this._batch.added = true;
+		else this._triggerChange();
 		return element;
 	}
 	remove(chipOrValue) {
@@ -6273,10 +6995,10 @@ var ChipSet = class ChipSet extends BaseComponent {
 		return !chip.isConnected;
 	}
 	removeSelected() {
-		for (const chip of this._getSelectedChipElements()) this.remove(chip);
+		this._removeChips(this._getSelectedChipElements());
 	}
 	clear() {
-		for (const chip of this._getChipElements()) this.remove(chip);
+		this._removeChips(this._getChipElements());
 	}
 	selectChip(chip) {
 		if (!this._getChipElements().includes(chip)) return;
@@ -6300,12 +7022,11 @@ var ChipSet = class ChipSet extends BaseComponent {
 		return this._getSelectedChipElements().map((chip) => this._getChipValue(chip));
 	}
 	dispose() {
+		if (!this._element) return;
 		EventHandler.off(this._element, Chip.EVENT_KEY);
-		if (this._searchTimeout) clearTimeout(this._searchTimeout);
-		if (this._liveRegion) {
-			this._liveRegion.remove();
-			this._liveRegion = null;
-		}
+		for (const [chip, instance] of this._ownedChips) if (Chip.getInstance(chip) === instance && this._element.contains(chip)) instance.dispose();
+		if (this._containerRole() === "listbox") for (const chip of this._getChipElements()) chip.removeAttribute("role");
+		this._typeaheadBuffer.clear();
 		super.dispose();
 	}
 	_configAfterMerge(config) {
@@ -6330,7 +7051,7 @@ var ChipSet = class ChipSet extends BaseComponent {
 	_getChipValue(chip) {
 		if (chip.dataset.coreuiChipValue) return chip.dataset.coreuiChipValue;
 		const clone = chip.cloneNode(true);
-		const remove = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE$1, clone);
+		const remove = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE$2, clone);
 		if (remove) remove.remove();
 		return clone.textContent?.trim() || "";
 	}
@@ -6347,26 +7068,42 @@ var ChipSet = class ChipSet extends BaseComponent {
 			this._setupChip(chip);
 		}
 	}
+	_containerRole() {
+		return this._config.selectable ? "listbox" : "group";
+	}
 	_applyAccessibilityRoles() {
-		if (!this._element.hasAttribute("role")) this._element.setAttribute("role", this._config.selectable ? "listbox" : "group");
-		if (this._config.selectable && this._element.getAttribute("role") === "listbox") {
-			this._element.setAttribute("aria-orientation", "horizontal");
-			if (this._config.selectionMode === "multiple") this._element.setAttribute("aria-multiselectable", "true");
-		}
+		const role = this._containerRole();
+		if (!role) return;
+		const listbox = role === "listbox";
+		this._element.setAttribute("role", role);
+		writeAttribute(this._element, "aria-orientation", listbox ? "horizontal" : null);
+		writeAttribute(this._element, "aria-multiselectable", listbox && this._config.selectionMode === "multiple" ? "true" : null);
 	}
-	_createLiveRegion() {
-		const region = document.createElement("span");
-		region.classList.add("visually-hidden");
-		region.setAttribute("role", "status");
-		this._element.after(region);
-		this._liveRegion = region;
+	_moveTabStop(stop = null) {
+		const chips = this._getFocusableChips();
+		const current = stop ?? chips.find((chip) => chip.tabIndex === 0) ?? chips[0];
+		for (const chip of chips) chip.tabIndex = chip === current ? 0 : -1;
 	}
-	_announce(message) {
-		if (this._liveRegion) this._liveRegion.textContent = message;
+	_noteChange() {
+		if (!this._settled || this._announcedFrom) return;
+		this._announcedFrom = [...this._chips];
+		queueMicrotask(() => this._announceChange());
+	}
+	_announceChange() {
+		const before = this._announcedFrom ?? [];
+		this._announcedFrom = null;
+		if (!this._element?.isConnected || !this._element.checkVisibility()) return;
+		const message = getChipAnnouncement(before, this._chips, this._config.ariaAddedAnnouncement, this._config.ariaRemovedAnnouncement);
+		if (message) announce(message, { context: this._element });
+	}
+	_triggerChange() {
+		EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE$9), { value: this.getValues() });
 	}
 	_setupChip(chip) {
-		if (this._element.getAttribute("role") === "listbox" && !chip.hasAttribute("role")) chip.setAttribute("role", "option");
-		Chip.getOrCreateInstance(chip, this._getChipConfig(chip));
+		if (!Chip.getInstance(chip)) {
+			if (this._containerRole() === "listbox") chip.setAttribute("role", "option");
+			this._ownedChips.set(chip, new Chip(chip, this._getChipConfig(chip)));
+		}
 	}
 	_getChipConfig(chip) {
 		return {
@@ -6389,22 +7126,14 @@ var ChipSet = class ChipSet extends BaseComponent {
 		return chip;
 	}
 	_applyChipClassName(chip, value) {
-		const className = this._resolveChipClassName(value);
+		const className = resolveChipClassName(this._config.chipClassName, value);
 		if (!className) return;
 		chip.classList.add(...className.split(/\s+/).filter(Boolean));
 	}
-	_resolveChipClassName(value) {
-		const { chipClassName } = this._config;
-		if (!chipClassName) return "";
-		if (typeof chipClassName === "function") {
-			const resolvedClassName = chipClassName(value);
-			return typeof resolvedClassName === "string" ? resolvedClassName : "";
-		}
-		return typeof chipClassName === "string" ? chipClassName : "";
-	}
 	_addEventListeners() {
-		EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN$9), SELECTOR_CHIP$2, (event) => this._handleKeydown(event));
-		EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$9), SELECTOR_CHIP$2, (event) => this._handleClick(event));
+		EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN$12), SELECTOR_CHIP$2, (event) => this._handleKeydown(event));
+		EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$11), SELECTOR_CHIP$2, (event) => this._handleClick(event));
+		EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN$6), SELECTOR_CHIP$2, (event) => this._moveTabStop(event.delegateTarget));
 		EventHandler.on(this._element, EVENT_CHIP_SELECTED, SELECTOR_CHIP$2, (event) => this._handleSelectionChange(event));
 		EventHandler.on(this._element, EVENT_CHIP_DESELECTED, SELECTOR_CHIP$2, (event) => this._handleSelectionChange(event));
 		EventHandler.on(this._element, EVENT_CHIP_REMOVE$1, SELECTOR_CHIP$2, (event) => this._handleChipRemove(event));
@@ -6412,7 +7141,7 @@ var ChipSet = class ChipSet extends BaseComponent {
 	}
 	_handleKeydown(event) {
 		const chip = event.target.closest(SELECTOR_CHIP$2);
-		if (!chip || chip.classList.contains(CLASS_NAME_DISABLED$7)) return;
+		if (!chip || chip.classList.contains(CLASS_NAME_DISABLED$8)) return;
 		if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === A_KEY) {
 			if (this._selectsRange()) {
 				event.preventDefault();
@@ -6422,11 +7151,11 @@ var ChipSet = class ChipSet extends BaseComponent {
 		}
 		const rtl = isRTL(this._element);
 		switch (event.key) {
-			case ARROW_LEFT_KEY$7:
+			case ARROW_LEFT_KEY$9:
 				event.preventDefault();
 				this._moveFocus(this._focusSibling(chip, rtl), event.shiftKey);
 				break;
-			case ARROW_RIGHT_KEY$7:
+			case ARROW_RIGHT_KEY$9:
 				event.preventDefault();
 				this._moveFocus(this._focusSibling(chip, !rtl), event.shiftKey);
 				break;
@@ -6443,7 +7172,7 @@ var ChipSet = class ChipSet extends BaseComponent {
 	}
 	_handleClick(event) {
 		const chip = event.target.closest(SELECTOR_CHIP$2);
-		if (!chip || chip.classList.contains(CLASS_NAME_DISABLED$7) || event.target.closest(SELECTOR_CHIP_REMOVE$1)) return;
+		if (!chip || chip.classList.contains(CLASS_NAME_DISABLED$8) || event.target.closest(SELECTOR_CHIP_REMOVE$2)) return;
 		if (event.shiftKey && this._selectsRange()) {
 			this._selectRange(this._anchor ?? chip, chip);
 			return;
@@ -6463,24 +7192,14 @@ var ChipSet = class ChipSet extends BaseComponent {
 	}
 	_selectRange(from, to) {
 		const chips = this._getFocusableChips();
-		const start = chips.indexOf(from);
-		const end = chips.indexOf(to);
-		if (end === -1) return;
-		const first = Math.min(start === -1 ? end : start, end);
-		const last = Math.max(start === -1 ? end : start, end);
-		for (const chip of chips.slice(first, last + 1)) Chip.getInstance(chip)?.select();
+		for (const chip of rangeBetween(chips, chips.indexOf(from), chips.indexOf(to))) Chip.getInstance(chip)?.select();
 	}
 	_typeahead(key) {
-		if (!this._config.typeahead || key.length !== 1 || key === SPACE_KEY$4) return;
-		if (this._searchTimeout) clearTimeout(this._searchTimeout);
-		this._search += key.toLowerCase();
-		this._searchTimeout = setTimeout(() => {
-			this._search = "";
-		}, TYPEAHEAD_TIMEOUT);
+		const text = this._config.typeahead ? this._typeaheadBuffer.push(key) : null;
+		if (!text) return;
 		const chips = this._getFocusableChips();
 		const current = chips.indexOf(document.activeElement);
-		const start = this._search.length > 1 ? Math.max(current, 0) : current + 1;
-		[...chips.slice(start), ...chips.slice(0, start)].find((chip) => this._getChipValue(chip).toLowerCase().startsWith(this._search))?.focus();
+		findTypeaheadMatch(chips, current, text, (chip) => this._getChipValue(chip))?.focus();
 	}
 	_focusSibling(chip, shouldGetNext) {
 		const chips = this._getFocusableChips();
@@ -6492,13 +7211,11 @@ var ChipSet = class ChipSet extends BaseComponent {
 		}
 		return null;
 	}
-	_getRemovalNeighbor(chip) {
-		const chips = this._getFocusableChips();
-		if (chips.length === 0) return null;
-		const next = getNextActiveElement(chips, chip, true, false);
-		if (next && next !== chip) return next;
-		const previous = getNextActiveElement(chips, chip, false, false);
-		return previous && previous !== chip ? previous : null;
+	_getRemovalFocusTarget(chip) {
+		return getRemovalNeighbor(this._getFocusableChips(), chip) ?? this._getRemovalFallback();
+	}
+	_getRemovalFallback() {
+		return this._element;
 	}
 	_navigateToEdge(targetIndex) {
 		const chips = this._getFocusableChips();
@@ -6516,19 +7233,48 @@ var ChipSet = class ChipSet extends BaseComponent {
 	}
 	_handleChipRemove(event) {
 		const chip = event.target.closest(SELECTOR_CHIP$2);
-		this._pendingFocus = chip ? this._getRemovalNeighbor(chip) : null;
+		this._pendingFocus = chip ? this._getRemovalFocusTarget(chip) : null;
 	}
 	_handleChipRemoved(event) {
 		const chip = event.target.closest(SELECTOR_CHIP$2);
-		this._pendingFocus?.focus();
+		const target = this._pendingFocus;
 		this._pendingFocus = null;
+		if (target && containsFocus(chip)) {
+			if (target === this._element) focusWithTemporaryTabindex(this._element);
+			else target.focus();
+		}
 		this._handleChipRemoval(chip, this._getChipValue(chip));
 	}
 	_handleChipRemoval(chip, value) {
+		this._ownedChips.delete(chip);
+		this._moveTabStop();
 		const index = this._chips.indexOf(value);
-		if (index !== -1) this._chips.splice(index, 1);
-		this._announce(`${value} ${this._config.ariaRemovedAnnouncement}`);
-		EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE$9), { value: this.getValues() });
+		if (index !== -1) {
+			this._noteChange();
+			this._chips.splice(index, 1);
+		}
+		if (this._batch) this._batch.removed = true;
+		else this._reportRemoval();
+	}
+	_removeChips(chips) {
+		const outer = !this._batch;
+		const batch = this._batch ?? {
+			added: false,
+			removed: false
+		};
+		this._batch = batch;
+		try {
+			for (const chip of chips) if (this._element.contains(chip)) this.remove(chip);
+		} finally {
+			if (outer) {
+				this._batch = null;
+				if (batch.removed) this._reportRemoval();
+				else if (batch.added) this._triggerChange();
+			}
+		}
+	}
+	_reportRemoval() {
+		this._triggerChange();
 		EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), { selected: this.getSelectedValues() });
 	}
 	static chipSetInterface(element, config, ...args) {
@@ -6542,44 +7288,29 @@ var ChipSet = class ChipSet extends BaseComponent {
 		return jQueryDispatch(this, ChipSet, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$33}${DATA_API_KEY$28}`, () => {
+EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$34}${DATA_API_KEY$28}`, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP_SET)) ChipSet.chipSetInterface(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(ChipSet);
 //#endregion
 //#region js/src/chip-input.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI chip-input.js
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$40 = "chip-input";
-const EVENT_KEY$32 = `.coreui.chip-input`;
+const NAME$42 = "chip-input";
+const EVENT_KEY$33 = `.coreui.chip-input`;
 const DATA_API_KEY$27 = ".data-api";
-const EVENT_BLUR = `blur${EVENT_KEY$32}`;
-const EVENT_CLICK$8 = `click${EVENT_KEY$32}`;
-const EVENT_FOCUS$1 = `focus${EVENT_KEY$32}`;
-const EVENT_INPUT$7 = `input${EVENT_KEY$32}`;
-const EVENT_KEYDOWN$8 = `keydown${EVENT_KEY$32}`;
-const EVENT_PASTE$1 = `paste${EVENT_KEY$32}`;
+const EVENT_BLUR = `blur${EVENT_KEY$33}`;
+const EVENT_CLICK$10 = `click${EVENT_KEY$33}`;
+const EVENT_FOCUS$4 = `focus${EVENT_KEY$33}`;
+const EVENT_INPUT$10 = `input${EVENT_KEY$33}`;
+const EVENT_KEYDOWN$11 = `keydown${EVENT_KEY$33}`;
+const EVENT_PASTE$1 = `paste${EVENT_KEY$33}`;
 const SELECTOR_DATA_CHIP_INPUT = "[data-coreui-chip-input]";
 const SELECTOR_CHIP$1 = ".chip";
 const SELECTOR_CHIP_INPUT_LABEL = ".chip-input-label";
-const SELECTOR_CHIP_REMOVE = ".chip-remove";
-const CLASS_NAME_DISABLED$6 = "disabled";
+const SELECTOR_CHIP_REMOVE$1 = ".chip-remove";
+const CLASS_NAME_DISABLED$7 = "disabled";
 const CLASS_NAME_CHIP_INPUT_FIELD = "chip-input-field";
 const CLASS_NAME_GROUP = "form-control-group";
-const Default$39 = {
+const Default$37 = {
 	...ChipSet.Default,
 	create: true,
 	createOnBlur: true,
@@ -6588,10 +7319,12 @@ const Default$39 = {
 	placeholder: "",
 	readonly: false,
 	removable: true,
+	required: false,
 	separator: ",",
-	unique: true
+	unique: true,
+	validationState: null
 };
-const DefaultType$39 = {
+const DefaultType$36 = {
 	...ChipSet.DefaultType,
 	create: "boolean",
 	createOnBlur: "boolean",
@@ -6599,61 +7332,81 @@ const DefaultType$39 = {
 	name: "(string|null)",
 	placeholder: "string",
 	readonly: "boolean",
-	separator: "(string|null)"
+	required: "boolean",
+	separator: "(string|null)",
+	validationState: "(string|null|undefined)"
 };
-/**
-* Class definition
-*
-* ChipInput is a thin input layer on top of ChipSet: ChipSet owns the chips
-* (the single source of truth), while ChipInput only adds the text field, form
-* integration (hidden input) and turns typed text into chips. The public API
-* (methods + `*.coreui.chip-input` events) is preserved through overrides.
-*/
 var ChipInput = class extends ChipSet {
 	constructor(element, config) {
 		super(element, config);
-		this._addedGroupClass = false;
 		this._createdInput = false;
 		this._labelledFor = null;
-		this._uniqueId = this._config.id ?? getUID(NAME$40);
-		this._hiddenInput = null;
-		this._addedGroupClass = !this._element.classList.contains(CLASS_NAME_GROUP);
+		this._uniqueId = this._config.id ?? getUID(NAME$42);
+		this._valueField = null;
+		this._removingByCode = false;
+		this._validation = new FieldValidation(this._element, {
+			config: () => this._config,
+			fields: () => this._valueField ? [this._valueField] : [],
+			frames: () => [this._element],
+			invalidTargets: () => [this._input],
+			owned: () => [this._valueField, this._input].filter(Boolean),
+			restore: () => this._restoreChips()
+		});
 		applyControlGroupClasses(this._element, CLASS_NAME_GROUP);
 		this._input = SelectorEngine.findOne("input", this._element);
 		if (this._input) this._setInputSize();
 		else this._createInput();
 		this._applyInteractionState();
-		if (this._config.create) this._createHiddenInput();
+		if (this._config.create) this._createValueField();
+		this._initialChips = this._getChipElements();
 		this._addInputEventListeners();
+		this._validation.refresh();
 	}
 	static get Default() {
-		return Default$39;
+		return Default$37;
 	}
 	static get DefaultType() {
-		return DefaultType$39;
+		return DefaultType$36;
 	}
 	static get NAME() {
-		return NAME$40;
+		return NAME$42;
 	}
-	add(value) {
-		const chip = super.add(value);
-		if (chip) this._syncHiddenInput();
-		return chip;
+	remove(chipOrValue) {
+		const previous = this._removingByCode;
+		this._removingByCode = true;
+		try {
+			return super.remove(chipOrValue);
+		} finally {
+			this._removingByCode = previous;
+		}
 	}
 	focus() {
 		this._input?.focus();
 	}
+	setValidationState(validationState) {
+		this._setConfig({ validationState });
+	}
 	dispose() {
-		if (this._addedGroupClass) this._element.classList.remove(CLASS_NAME_GROUP);
-		EventHandler.off(this._input, EVENT_KEY$32);
-		this._hiddenInput?.remove();
+		this._validation.dispose();
+		EventHandler.off(this._input, EVENT_KEY$33);
+		this._valueField?.remove();
 		if (this._createdInput) {
 			this._input.remove();
 			this._labelledFor?.removeAttribute("for");
 		}
 		super.dispose();
 	}
-	_applyAccessibilityRoles() {}
+	_setConfig(config) {
+		if (!config || !("validationState" in config)) return;
+		this._config = this._getConfig({
+			...this._config,
+			validationState: config.validationState
+		});
+		this._validation.configure({ validationState: config.validationState });
+	}
+	_containerRole() {
+		return null;
+	}
 	_canModify() {
 		return !this._disabled && !this._config.readonly;
 	}
@@ -6661,29 +7414,64 @@ var ChipInput = class extends ChipSet {
 		this._element.insertBefore(chip, this._input);
 	}
 	_getChipConfig(chip) {
+		const disabled = this._disabled || Manipulator.getDataAttribute(chip, "disabled") === true;
 		return {
-			ariaRemoveLabel: `Remove ${this._getChipValue(chip)}`,
-			disabled: this._disabled,
-			removable: this._config.removable && !this._config.readonly && !this._disabled,
+			ariaRemoveLabel: this._config.ariaRemoveLabel,
+			disabled,
+			removable: this._config.removable && !this._config.readonly && !disabled,
 			removeIcon: this._config.removeIcon,
 			selectable: this._config.selectable
 		};
 	}
 	_setupChip(chip) {
 		super._setupChip(chip);
-		const removeButton = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip);
+		const removeButton = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE$1, chip);
 		if (removeButton) removeButton.disabled = this._disabled || this._config.readonly;
 	}
-	_handleChipRemoved(event) {
-		super._handleChipRemoved(event);
-		this._syncHiddenInput();
-		this._input?.focus();
+	_getRemovalFallback() {
+		return this._input ?? super._getRemovalFallback();
 	}
-	_syncHiddenInput() {
-		if (this._hiddenInput) this._hiddenInput.value = this.getValues().join(",");
+	_handleChipRemoved(event) {
+		if (this._removingByCode) {
+			super._handleChipRemoved(event);
+			return;
+		}
+		this._validation.runAsUser(() => super._handleChipRemoved(event));
+	}
+	_noteChange() {
+		super._noteChange();
+		this._validation.change();
+	}
+	_triggerChange() {
+		const isChanged = this._valueField ? writeValueField(this._valueField, this.getValues()) : false;
+		this._validation.update();
+		super._triggerChange();
+		if (isChanged) dispatchValueChange(this._valueField);
+	}
+	_restoreChips() {
+		const values = this.getValues().join(",");
+		let hadFocus = false;
+		for (const chip of this._getChipElements()) if (!this._initialChips.includes(chip)) {
+			hadFocus ||= containsFocus(chip);
+			Chip.getInstance(chip)?.dispose();
+			this._ownedChips.delete(chip);
+			chip.remove();
+		}
+		let anchor = this._input;
+		for (const chip of this._initialChips.toReversed()) {
+			if (!this._element.contains(chip)) {
+				this._element.insertBefore(chip, anchor);
+				this._setupChip(chip);
+			}
+			anchor = chip;
+		}
+		this._chips = this._initialChips.map((chip) => this._getChipValue(chip));
+		this._setInputSize();
+		if (hadFocus) this._input.focus();
+		if (this.getValues().join(",") !== values || this._valueField.value !== this.getValues().join(",")) this._triggerChange();
 	}
 	_addInputEventListeners() {
-		EventHandler.on(this._element, EVENT_KEYDOWN$8, (event) => {
+		EventHandler.on(this._element, EVENT_KEYDOWN$11, (event) => {
 			if (event.target === this._input) return;
 			if (event.key === (isRTL(this._element) ? "ArrowLeft" : "ArrowRight")) {
 				const chips = this._getFocusableChips();
@@ -6693,16 +7481,16 @@ var ChipInput = class extends ChipSet {
 					return;
 				}
 			}
-			if (event.key.length === 1) this._input.focus();
+			if (event.key?.length === 1) this._input.focus();
 		});
-		EventHandler.on(this._input, EVENT_KEYDOWN$8, (event) => this._handleInputKeydown(event));
-		EventHandler.on(this._input, EVENT_INPUT$7, (event) => this._handleInput(event));
+		EventHandler.on(this._input, EVENT_KEYDOWN$11, (event) => this._handleInputKeydown(event));
+		EventHandler.on(this._input, EVENT_INPUT$10, (event) => this._handleInput(event));
 		EventHandler.on(this._input, EVENT_PASTE$1, (event) => this._handlePaste(event));
-		EventHandler.on(this._input, EVENT_FOCUS$1, () => this.clearSelection());
+		EventHandler.on(this._input, EVENT_FOCUS$4, () => this.clearSelection());
 		if (this._config.createOnBlur) EventHandler.on(this._input, EVENT_BLUR, (event) => {
 			if (!event.relatedTarget?.closest(SELECTOR_CHIP$1)) this._createChipFromInput();
 		});
-		EventHandler.on(this._element, EVENT_CLICK$8, (event) => {
+		EventHandler.on(this._element, EVENT_CLICK$10, (event) => {
 			if (event.target === this._element) this._input?.focus();
 		});
 	}
@@ -6710,41 +7498,48 @@ var ChipInput = class extends ChipSet {
 		const input = document.createElement("input");
 		const label = SelectorEngine.findOne(SELECTOR_CHIP_INPUT_LABEL, this._element);
 		const labelFor = label?.getAttribute("for");
-		const generatedInputId = labelFor || getUID(`${NAME$40}-input`);
+		const generatedInputId = labelFor || getUID(`${NAME$42}-input`);
 		this._createdInput = true;
-		this._labelledFor = label && !labelFor ? label : null;
 		input.type = "text";
 		input.className = CLASS_NAME_CHIP_INPUT_FIELD;
 		input.id = generatedInputId;
 		if (this._config.placeholder) input.placeholder = this._config.placeholder;
-		if (label && !labelFor) label.setAttribute("for", generatedInputId);
+		if (label && !labelFor) {
+			label.setAttribute("for", generatedInputId);
+			this._labelledFor = label;
+		}
 		this._input = input;
 		this._setInputSize();
 		this._element.append(input);
 	}
-	_createHiddenInput() {
-		const hiddenInput = document.createElement("input");
-		hiddenInput.type = "hidden";
-		hiddenInput.id = this._uniqueId;
-		if (this._config.name) hiddenInput.name = this._config.name;
-		this._element.append(hiddenInput);
-		this._hiddenInput = hiddenInput;
-		this._hiddenInput.value = this.getValues().join(",");
+	_createValueField() {
+		const field = createValueField("textarea", () => this._input);
+		field.id = this._uniqueId;
+		configureValueField(field, {
+			disabled: this._disabled,
+			name: this._config.name,
+			readOnly: this._config.readonly,
+			required: this._config.required
+		});
+		field.defaultValue = this.getValues().join(",");
+		this._element.append(field);
+		this._valueField = field;
 	}
 	_createChipFromInput() {
 		if (!this._canModify() || !this._config.create) return;
 		const value = this._input.value.trim();
 		if (value) {
-			this.add(value);
+			this._validation.runAsUser(() => this.add(value));
 			this._input.value = "";
 			this._setInputSize();
 		}
 	}
 	_applyInteractionState() {
 		const { readonly } = this._config;
-		this._element.classList.toggle(CLASS_NAME_DISABLED$6, this._disabled);
+		this._element.classList.toggle(CLASS_NAME_DISABLED$7, this._disabled);
 		this._input.disabled = this._disabled;
 		this._input.readOnly = !this._disabled && readonly;
+		writeAttribute(this._input, "aria-required", this._config.create && this._config.required ? "true" : null);
 	}
 	_handleInputKeydown(event) {
 		const { key } = event;
@@ -6776,28 +7571,29 @@ var ChipInput = class extends ChipSet {
 	}
 	_handleInput(event) {
 		if (!this._canModify()) return;
-		const { value } = event.target;
-		const { separator } = this._config;
-		if (this._config.create && separator && value.includes(separator)) {
-			const parts = value.split(separator);
-			for (const part of parts.slice(0, -1)) this.add(part.trim());
-			this._input.value = parts[parts.length - 1];
+		const parts = this._config.create ? splitChipText(event.target.value, this._config.separator) : null;
+		if (parts) {
+			const rest = parts.pop();
+			this._validation.runAsUser(() => {
+				for (const part of parts) this.add(part);
+			});
+			this._input.value = rest;
 		}
 		this._setInputSize();
-		EventHandler.trigger(this._element, EVENT_INPUT$7, {
+		EventHandler.trigger(this._element, EVENT_INPUT$10, {
 			value: this._input.value,
 			relatedTarget: this._input
 		});
 	}
 	_handlePaste(event) {
 		if (!this._canModify()) return;
-		const { separator } = this._config;
-		if (!separator || !this._config.create) return;
-		const pastedData = (event.clipboardData || window.clipboardData).getData("text");
-		if (pastedData.includes(separator)) {
+		if (!this._config.create || !this._config.separator) return;
+		const parts = splitChipText((event.clipboardData || window.clipboardData).getData("text"), this._config.separator);
+		if (parts) {
 			event.preventDefault();
-			const parts = pastedData.split(separator);
-			for (const part of parts) this.add(part.trim());
+			this._validation.runAsUser(() => {
+				for (const part of parts) this.add(part);
+			});
 		}
 	}
 	_setInputSize() {
@@ -6805,37 +7601,22 @@ var ChipInput = class extends ChipSet {
 		this._input.size = Math.max(this._input.placeholder.length, this._input.value.length) || 1;
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$32}${DATA_API_KEY$27}`, () => {
+EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$33}${DATA_API_KEY$27}`, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP_INPUT)) ChipInput.getOrCreateInstance(element);
 });
 //#endregion
 //#region js/src/collapse.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI collapse.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's collapse.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$39 = "collapse";
-const EVENT_KEY$31 = `.coreui.collapse`;
+const NAME$41 = "collapse";
+const EVENT_KEY$32 = `.coreui.collapse`;
 const DATA_API_KEY$26 = ".data-api";
-const EVENT_SHOW$6 = `show${EVENT_KEY$31}`;
-const EVENT_SHOWN$6 = `shown${EVENT_KEY$31}`;
-const EVENT_HIDE$4 = `hide${EVENT_KEY$31}`;
-const EVENT_HIDDEN$9 = `hidden${EVENT_KEY$31}`;
-const EVENT_CLICK_DATA_API$14 = `click${EVENT_KEY$31}${DATA_API_KEY$26}`;
-const EVENT_LOAD_DATA_API$19 = `DOMContentLoaded${EVENT_KEY$31}${DATA_API_KEY$26}`;
-const EVENT_BEFOREMATCH = `beforematch${EVENT_KEY$31}`;
-const CLASS_NAME_SHOW$15 = "show";
+const EVENT_SHOW$6 = `show${EVENT_KEY$32}`;
+const EVENT_SHOWN$6 = `shown${EVENT_KEY$32}`;
+const EVENT_HIDE$4 = `hide${EVENT_KEY$32}`;
+const EVENT_HIDDEN$9 = `hidden${EVENT_KEY$32}`;
+const EVENT_CLICK_DATA_API$14 = `click${EVENT_KEY$32}${DATA_API_KEY$26}`;
+const EVENT_LOAD_DATA_API$18 = `DOMContentLoaded${EVENT_KEY$32}${DATA_API_KEY$26}`;
+const EVENT_BEFOREMATCH = `beforematch${EVENT_KEY$32}`;
+const CLASS_NAME_SHOW$13 = "show";
 const CLASS_NAME_COLLAPSE = "collapse";
 const CLASS_NAME_COLLAPSING$1 = "collapsing";
 const CLASS_NAME_DEEPER_CHILDREN = `:scope .${CLASS_NAME_COLLAPSE} .${CLASS_NAME_COLLAPSE}`;
@@ -6847,18 +7628,15 @@ const VALUE_UNTIL_FOUND = "until-found";
 const SELECTOR_ACTIVES = ".collapse.show";
 const SELECTOR_DATA_TOGGLE$12 = "[data-coreui-toggle=\"collapse\"]";
 const SELECTOR_HIDDEN_UNTIL_FOUND = ".collapse[data-coreui-hidden-until-found=\"true\"]";
-const Default$38 = {
+const Default$36 = {
 	hiddenUntilFound: false,
 	parent: null
 };
-const DefaultType$38 = {
+const DefaultType$35 = {
 	hiddenUntilFound: "boolean",
 	parent: "(null|element)"
 };
 const supportsUntilFound = () => typeof document !== "undefined" && "onbeforematch" in document.documentElement;
-/**
-* Class definition
-*/
 var Collapse = class Collapse extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
@@ -6878,13 +7656,13 @@ var Collapse = class Collapse extends BaseComponent {
 		}
 	}
 	static get Default() {
-		return Default$38;
+		return Default$36;
 	}
 	static get DefaultType() {
-		return DefaultType$38;
+		return DefaultType$35;
 	}
 	static get NAME() {
-		return NAME$39;
+		return NAME$41;
 	}
 	toggle() {
 		return this._isShown() ? this.hide() : this.show();
@@ -6898,7 +7676,7 @@ var Collapse = class Collapse extends BaseComponent {
 		for (const activeInstance of activeChildren) activeInstance.hide();
 		const dimension = this._getDimension();
 		this._setHiddenUntilFound(false);
-		this._element.classList.add(CLASS_NAME_COLLAPSING$1, CLASS_NAME_SHOW$15);
+		this._element.classList.add(CLASS_NAME_COLLAPSING$1, CLASS_NAME_SHOW$13);
 		this._setAriaExpanded(this._triggerArray, true);
 		this._isTransitioning = true;
 		const complete = () => {
@@ -6923,7 +7701,7 @@ var Collapse = class Collapse extends BaseComponent {
 		const size = cssPath ? 0 : this._element.getBoundingClientRect()[dimension];
 		this._element.classList.add(CLASS_NAME_COLLAPSING$1);
 		if (cssPath) this._setHiddenUntilFound(true);
-		this._element.classList.remove(CLASS_NAME_SHOW$15);
+		this._element.classList.remove(CLASS_NAME_SHOW$13);
 		for (const trigger of this._triggerArray) {
 			const element = SelectorEngine.getElementFromSelector(trigger);
 			if (element && !this._isShown(element)) this._setAriaExpanded([trigger], false);
@@ -6940,7 +7718,7 @@ var Collapse = class Collapse extends BaseComponent {
 		await this._queueCallback(complete, this._element, true, dimension);
 	}
 	_isShown(element = this._element) {
-		return element.classList.contains(CLASS_NAME_SHOW$15);
+		return element.classList.contains(CLASS_NAME_SHOW$13);
 	}
 	_configAfterMerge(config) {
 		config.parent = getElement(config.parent);
@@ -6974,7 +7752,7 @@ var Collapse = class Collapse extends BaseComponent {
 	}
 	_onBeforeMatch() {
 		if (this._isShown()) return;
-		this._element.classList.add(CLASS_NAME_SHOW$15);
+		this._element.classList.add(CLASS_NAME_SHOW$13);
 		this._setAriaExpanded(this._triggerArray, true);
 		EventHandler.trigger(this._element, EVENT_SHOWN$6);
 	}
@@ -6990,65 +7768,52 @@ var Collapse = class Collapse extends BaseComponent {
 		return jQueryDispatch(this, Collapse, config);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(document, EVENT_LOAD_DATA_API$19, () => {
+EventHandler.on(document, EVENT_LOAD_DATA_API$18, () => {
 	Collapse._initializeDataApi();
 });
 EventHandler.on(document, EVENT_CLICK_DATA_API$14, SELECTOR_DATA_TOGGLE$12, function(event) {
 	if (event.target.tagName === "A" || event.delegateTarget && event.delegateTarget.tagName === "A") event.preventDefault();
 	for (const element of SelectorEngine.getMultipleElementsFromSelector(this)) Collapse.getOrCreateInstance(element).toggle();
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Collapse);
 //#endregion
 //#region js/src/combobox.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI combobox.ts
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$38 = "combobox";
+const NAME$40 = "combobox";
 const DATA_KEY$1 = "coreui.combobox";
-const EVENT_KEY$30 = `.${DATA_KEY$1}`;
+const EVENT_KEY$31 = `.${DATA_KEY$1}`;
 const DATA_API_KEY$25 = ".data-api";
 const ARROW_UP_KEY$6 = "ArrowUp";
 const ARROW_DOWN_KEY$7 = "ArrowDown";
 const ENTER_KEY$3 = "Enter";
 const ESCAPE_KEY$3 = "Escape";
-const SPACE_KEY$3 = " ";
+const SPACE_KEY$2 = " ";
 const TAB_KEY$2 = "Tab";
 const RIGHT_MOUSE_BUTTON$2 = 2;
-const EVENT_CHANGE$8 = `change${EVENT_KEY$30}`;
-const EVENT_KEYDOWN$7 = `keydown${EVENT_KEY$30}`;
-const EVENT_SEARCH$2 = `search${EVENT_KEY$30}`;
-const EVENT_CLICK_DATA_API$13 = `click${EVENT_KEY$30}${DATA_API_KEY$25}`;
-const EVENT_KEYUP_DATA_API$3 = `keyup${EVENT_KEY$30}${DATA_API_KEY$25}`;
-const EVENT_LOAD_DATA_API$18 = `load${EVENT_KEY$30}${DATA_API_KEY$25}`;
+const EVENT_CHANGE$8 = `change${EVENT_KEY$31}`;
+const EVENT_KEYDOWN$10 = `keydown${EVENT_KEY$31}`;
+const EVENT_SEARCH$2 = `search${EVENT_KEY$31}`;
+const EVENT_SELECTION_LIMIT$1 = `selectionLimit${EVENT_KEY$31}`;
+const EVENT_CLICK_DATA_API$13 = `click${EVENT_KEY$31}${DATA_API_KEY$25}`;
+const EVENT_KEYUP_DATA_API$3 = `keyup${EVENT_KEY$31}${DATA_API_KEY$25}`;
+const EVENT_LOAD_DATA_API$17 = `load${EVENT_KEY$31}${DATA_API_KEY$25}`;
 const EVENT_LIST_BOX = ".coreui.list-box";
 const EVENT_LIST_BOX_SEARCH$1 = `search${EVENT_LIST_BOX}`;
 const CLASS_NAME_CARET = "combobox-caret";
-const CLASS_NAME_DISABLED$5 = "disabled";
+const CLASS_NAME_DISABLED$6 = "disabled";
 const CLASS_NAME_LIST_BOX = "list-box";
 const CLASS_NAME_OPTIONS$1 = "list-box-options";
+const CLASS_NAME_INPUT_GROUP_IGNORE = "input-group-ignore";
 const CLASS_NAME_PLACEHOLDER = "combobox-placeholder";
-const CLASS_NAME_POPUP$4 = "popup";
+const CLASS_NAME_POPUP$1 = "popup";
 const CLASS_NAME_POPUP_COMBOBOX = "combobox-popup";
 const CLASS_NAME_SEARCH$1 = "list-box-search";
-const CLASS_NAME_SELECTED$2 = "selected";
-const CLASS_NAME_SHOW$14 = "show";
+const CLASS_NAME_SELECT$1 = "combobox-select";
+const CLASS_NAME_SHOW$12 = "show";
 const CLASS_NAME_TOGGLE = "combobox-toggle";
 const CLASS_NAME_VALUE = "combobox-value";
 const SELECTOR_CARET = ".combobox-caret";
 const SELECTOR_DATA_TOGGLE$11 = "[data-coreui-toggle=\"combobox\"]";
-const SELECTOR_DATA_TOGGLE_SHOWN = `.${CLASS_NAME_TOGGLE}.${CLASS_NAME_SHOW$14}`;
+const SELECTOR_DATA_TOGGLE_SHOWN = `.${CLASS_NAME_TOGGLE}.${CLASS_NAME_SHOW$12}`;
 const SELECTOR_LIST_BOX = ".list-box";
 const SELECTOR_OPTION$2 = ".list-box-option";
 const SELECTOR_OPTION_LABEL = ".list-box-option-label";
@@ -7056,7 +7821,7 @@ const SELECTOR_OPTIONS$1 = ".list-box-options";
 const SELECTOR_POPUP = ".popup";
 const SELECTOR_SEARCH$2 = "[data-coreui-list-box-search]";
 const SELECTOR_VALUE = ".combobox-value";
-const Default$37 = {
+const Default$35 = {
 	allowList: DefaultAllowlist,
 	ariaSearchLabel: "Search options",
 	caretIcon: CARET_ICON,
@@ -7068,6 +7833,8 @@ const Default$37 = {
 	multiple: false,
 	name: null,
 	placeholder: "",
+	required: false,
+	resetSelectionOnItemsChange: false,
 	sanitize: true,
 	sanitizeFn: null,
 	search: false,
@@ -7076,9 +7843,10 @@ const Default$37 = {
 	selectedLabel: (count) => `${count} selected`,
 	selectionLimit: null,
 	typeahead: true,
+	validationState: null,
 	value: null
 };
-const DefaultType$37 = {
+const DefaultType$34 = {
 	allowList: "object",
 	ariaSearchLabel: "string",
 	caretIcon: "string",
@@ -7090,6 +7858,8 @@ const DefaultType$37 = {
 	multiple: "boolean",
 	name: "(string|null)",
 	placeholder: "string",
+	required: "boolean",
+	resetSelectionOnItemsChange: "boolean",
 	sanitize: "boolean",
 	sanitizeFn: "(null|function)",
 	search: "(boolean|string)",
@@ -7098,19 +7868,28 @@ const DefaultType$37 = {
 	selectedLabel: "(string|function)",
 	selectionLimit: "(null|number)",
 	typeahead: "boolean",
+	validationState: "(string|null|undefined)",
 	value: "(string|array|null)"
 };
-/**
-* Class definition
-*/
 var Combobox = class Combobox extends ComboboxBase {
 	constructor(element, config) {
 		super(element, config);
-		this._uniqueId = this._element.id || getUID(NAME$38);
+		this._uniqueId = this._element.id || getUID(NAME$40);
 		this._togglerElement = this._element;
-		this._caretElement = null;
-		this._hiddenInput = null;
+		this._createdNodes = [];
+		this._hostValue = null;
+		this._labels = /* @__PURE__ */ new Map();
+		this._resetValues = [];
 		this._searchElement = null;
+		this._validation = new FieldValidation(this._element, {
+			config: () => this._config,
+			describedTargets: () => [this._element],
+			fields: () => [this._valueField],
+			frames: () => [this._element],
+			invalidTargets: () => [],
+			owned: () => [this._valueField, this._searchElement].filter(Boolean),
+			restore: () => this._restoreValue()
+		});
 		this._listBox = null;
 		this._listBoxElement = null;
 		this._menu = null;
@@ -7118,31 +7897,34 @@ var Combobox = class Combobox extends ComboboxBase {
 		this._floatingCleanup = null;
 		this._anchoredPosition = null;
 		this._search = "";
-		this._syncing = false;
 		this._createCombobox();
 		this._addEventListeners();
 		data_default.set(this._element, DATA_KEY$1, this);
 	}
 	static get Default() {
-		return Default$37;
+		return Default$35;
 	}
 	static get DefaultType() {
-		return DefaultType$37;
+		return DefaultType$34;
 	}
 	static get NAME() {
-		return NAME$38;
+		return NAME$40;
 	}
 	getValue() {
 		const selected = this._listBox ? this._listBox.getSelectedValues() : [];
 		return this._config.multiple ? selected : selected[0] ?? null;
 	}
 	setValue(value) {
-		this._applySelection(value === null ? [] : Array.isArray(value) ? value.map(String) : [String(value)]);
+		const given = typeof value === "number" ? String(value) : value;
+		this._typeCheckConfig({ value: given }, { value: DefaultType$34.value });
+		this._applySelection(toSelectionValues(given, "multiple").map(String), false);
 	}
 	clear() {
 		this._applySelection([]);
 	}
 	setItems(items) {
+		const listed = new Map(SelectorEngine.find(SELECTOR_OPTION$2, this._optionsElement).map((option) => [this._valueOf(option), this._labelOf(option)]));
+		this._labels = new Map((this._listBox?.getSelectedValues() ?? []).map((value) => [value, listed.get(value) ?? this._labels.get(value) ?? value]));
 		this._listBox?.setItems(items);
 		this._updateValue();
 	}
@@ -7150,24 +7932,33 @@ var Combobox = class Combobox extends ComboboxBase {
 		this._listBox?.update();
 		this._updateValue();
 	}
+	setValidationState(validationState) {
+		this._setConfig({ validationState });
+	}
 	dispose() {
+		if (!this._element) return;
+		this._validation.dispose();
 		this._disposeFloating();
 		this._disposeListBox();
-		this._hiddenInput?.remove();
-		if (this._caretElement) {
-			this._caretElement.classList.remove(CLASS_NAME_CARET);
-			this._caretElement.removeAttribute("aria-hidden");
-		}
-		if (this._menu) {
-			this._menu.classList.remove(CLASS_NAME_SHOW$14);
-			this._element.after(this._menu);
-			EventHandler.off(this._menu, EVENT_KEY$30);
-		}
+		this._valueField.remove();
+		if (this._menu) EventHandler.off(this._menu, EVENT_KEY$31);
+		this._element.after(this._menu);
+		this._menu.classList.remove(CLASS_NAME_SHOW$12);
 		if (this._listBoxElement) EventHandler.off(this._listBoxElement, EVENT_LIST_BOX);
-		this._element.classList.remove(CLASS_NAME_SHOW$14);
-		this._element.removeAttribute("aria-expanded");
-		this._element.removeAttribute("aria-haspopup");
+		if (this._searchElement) EventHandler.off(this._searchElement, EVENT_KEY$31);
+		for (const node of this._createdNodes) node.remove();
+		if (this._hostValue) this._valueElement.replaceChildren(...this._hostValue);
+		this._element.classList.remove(CLASS_NAME_SHOW$12);
+		this._element.setAttribute("aria-expanded", "false");
 		super.dispose();
+	}
+	_setConfig(config) {
+		if (!config || !("validationState" in config)) return;
+		this._config = this._getConfig({
+			...this._config,
+			validationState: config.validationState
+		});
+		this._validation.configure({ validationState: config.validationState });
 	}
 	_getConfig(config) {
 		this._valueFromMarkup = !(config !== null && typeof config === "object" && "value" in config);
@@ -7175,75 +7966,91 @@ var Combobox = class Combobox extends ComboboxBase {
 	}
 	_configAfterMerge(config) {
 		config = this._normalizeContainerConfig(config);
+		if (typeof config.value === "number") config.value = String(config.value);
 		if (config.multiple && this._valueFromMarkup && typeof config.value === "string") config.value = config.value.split(/,\s*/);
 		return config;
 	}
 	_createCombobox() {
 		this._element.classList.add(CLASS_NAME_TOGGLE);
+		this._element.classList.toggle(CLASS_NAME_DISABLED$6, this._config.disabled);
 		this._element.setAttribute("aria-haspopup", "listbox");
 		this._element.setAttribute("aria-expanded", "false");
 		if (this._element instanceof HTMLButtonElement) {
 			this._element.type = "button";
-			this._config.disabled = this._config.disabled || this._element.disabled;
 			this._element.disabled = this._config.disabled;
 		}
-		this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED$5);
-		this._element.classList.toggle(CLASS_NAME_DISABLED$5, this._config.disabled);
 		this._createValueElement();
 		this._createCaret();
-		this._createHiddenInput();
+		this._createValueField();
 		this._resolveMenu();
 		this._createSearchInput();
-		this._listBox = new ListBox(this._listBoxElement, this._getListBoxConfig());
+		this._validation.refresh();
+		this._store = createSelectionStore((next) => toSelectionValues(next, this._config.multiple ? "multiple" : "single"));
+		this._store.commit(toSelectionValues(this._config.value, "multiple").map(String));
+		this._listBox = new ListBox(this._listBoxElement, this._getListBoxConfig(), this._store);
 		this._addListBoxListeners();
 		this._addPanelEscapeListener(this._menu);
 		this._updateValue();
+		this._resetValues = this._listBox.getSelectedValues();
 	}
 	_createValueElement() {
 		const existing = SelectorEngine.findOne(SELECTOR_VALUE, this._element);
 		if (existing) {
+			this._hostValue = [...existing.childNodes];
 			this._valueElement = existing;
 			return;
 		}
 		const value = document.createElement("span");
 		value.classList.add(CLASS_NAME_VALUE);
 		this._element.prepend(value);
+		this._createdNodes.push(value);
 		this._valueElement = value;
 	}
 	_createCaret() {
-		const existing = SelectorEngine.findOne(SELECTOR_CARET, this._element);
-		if (existing || !this._config.caretIcon) {
-			this._caretElement = existing;
-			return;
-		}
-		this._element.insertAdjacentHTML("beforeend", this._config.caretIcon);
-		const caret = this._element.lastElementChild;
+		if (SelectorEngine.findOne(SELECTOR_CARET, this._element) || !this._config.caretIcon) return;
+		const template = document.createElement("template");
+		template.innerHTML = sanitizeByConfig(this._config.caretIcon, {
+			...this._config,
+			allowList: SVGAllowlist
+		});
+		const caret = template.content.lastElementChild;
+		if (!caret) return;
 		caret.classList.add(CLASS_NAME_CARET);
 		caret.setAttribute("aria-hidden", "true");
-		this._caretElement = caret;
+		this._createdNodes.push(...template.content.childNodes);
+		this._element.append(template.content);
 	}
-	_createHiddenInput() {
-		if (!this._config.name) return;
-		const input = document.createElement("input");
-		input.type = "hidden";
-		input.name = this._config.name;
-		this._element.before(input);
-		this._hiddenInput = input;
+	_createValueField() {
+		const field = createValueField("select", () => this._element);
+		field.classList.add(CLASS_NAME_SELECT$1, CLASS_NAME_INPUT_GROUP_IGNORE);
+		field.multiple = this._config.multiple;
+		configureValueField(field, {
+			disabled: this._config.disabled,
+			name: this._config.name,
+			required: this._config.required
+		});
+		field.addEventListener("invalid", () => alignValueField(field, this._element));
+		this._element.after(field);
+		this._valueField = field;
 	}
 	_resolveMenu() {
-		const popup = SelectorEngine.next(this._element, SELECTOR_POPUP)[0] ?? document.createElement("div");
-		popup.classList.add(CLASS_NAME_POPUP$4, CLASS_NAME_POPUP_COMBOBOX);
+		const pagePopup = SelectorEngine.next(this._element, SELECTOR_POPUP)[0];
+		const popup = pagePopup ?? document.createElement("div");
+		if (!pagePopup) this._createdNodes.push(popup);
+		popup.classList.add(CLASS_NAME_POPUP$1, CLASS_NAME_POPUP_COMBOBOX);
 		let listBox = SelectorEngine.findOne(SELECTOR_LIST_BOX, popup);
 		if (!listBox) {
 			listBox = document.createElement("div");
 			listBox.classList.add(CLASS_NAME_LIST_BOX);
 			popup.append(listBox);
+			this._createdNodes.push(listBox);
 		}
 		let options = SelectorEngine.findOne(SELECTOR_OPTIONS$1, listBox);
 		if (!options) {
 			options = document.createElement("div");
 			options.classList.add(CLASS_NAME_OPTIONS$1);
 			listBox.append(options);
+			this._createdNodes.push(options);
 		}
 		if (!options.id) options.id = `${this._uniqueId}-listbox`;
 		popup.remove();
@@ -7263,6 +8070,7 @@ var Combobox = class Combobox extends ComboboxBase {
 		search.className = `form-control ${CLASS_NAME_SEARCH$1}`;
 		search.setAttribute("data-coreui-list-box-search", "");
 		this._optionsElement.before(search);
+		this._createdNodes.push(search);
 		this._searchElement = search;
 	}
 	_getListBoxConfig() {
@@ -7274,50 +8082,56 @@ var Combobox = class Combobox extends ComboboxBase {
 			html: this._config.html,
 			indicator: this._config.indicator,
 			items: this._config.items,
+			resetSelectionOnItemsChange: this._config.resetSelectionOnItemsChange,
 			sanitize: this._config.sanitize,
 			sanitizeFn: this._config.sanitizeFn,
 			search: this._config.search,
 			searchNormalize: this._config.searchNormalize,
 			searchPlaceholder: this._config.searchPlaceholder,
-			selected: this._initialValues(),
+			selected: null,
 			selectionLimit: this._config.selectionLimit,
 			selectionMode: this._config.multiple ? "multiple" : "single",
 			typeahead: this._config.typeahead
 		};
 	}
-	_initialValues() {
-		const { value } = this._config;
-		const configured = value === null ? [] : (Array.isArray(value) ? value : [value]).map(String);
-		const marked = SelectorEngine.find(`${SELECTOR_OPTION$2}.${CLASS_NAME_SELECTED$2}`, this._optionsElement).map((option) => this._valueOf(option));
-		return [.../* @__PURE__ */ new Set([...configured, ...marked])];
-	}
 	_valueOf(option) {
 		return option.dataset.coreuiValue ?? option.textContent?.trim() ?? "";
 	}
-	_applySelection(values) {
+	_applySelection(values, notify = true) {
 		if (!this._listBox) return;
-		this._syncing = true;
-		this._listBox.clear();
-		for (const value of this._config.multiple ? values : values.slice(0, 1)) this._listBox.select(value);
-		this._syncing = false;
-		this._updateValue();
+		const listed = new Set(SelectorEngine.find(SELECTOR_OPTION$2, this._optionsElement).map((option) => this._valueOf(option)));
+		const next = [...new Set(values)].filter((value) => listed.has(value) || this._store.has(value));
+		this._commitSelection(next.slice(0, getSelectionLimit(this._config.multiple, this._config.selectionLimit) ?? next.length));
+		if (notify) this._commitValue();
+		else this._updateValue();
+	}
+	_commitValue() {
+		if (!this._updateValue()) return;
 		EventHandler.trigger(this._element, EVENT_CHANGE$8, { value: this.getValue() });
+		dispatchValueChange(this._valueField);
 	}
 	_updateValue() {
 		const values = this._listBox ? this._listBox.getSelectedValues() : [];
-		if (this._hiddenInput) this._hiddenInput.value = values.join(",");
+		const isChanged = writeValueField(this._valueField, values);
+		this._validation.update();
+		this._updateValueText(values);
+		return isChanged;
+	}
+	_updateValueText(values) {
 		if (values.length === 0) {
 			this._valueElement.textContent = this._config.placeholder;
 			this._valueElement.classList.add(CLASS_NAME_PLACEHOLDER);
 			return;
 		}
 		this._valueElement.classList.remove(CLASS_NAME_PLACEHOLDER);
-		this._valueElement.textContent = this._config.multiple && values.length > 1 ? resolveCountLabel(this._config.selectedLabel, values.length, SelectorEngine.find(SELECTOR_OPTION$2, this._optionsElement).length) : this._optionLabel(values[0]);
+		this._valueElement.textContent = this._config.multiple && values.length > 1 ? resolveCountLabel(this._config.selectedLabel, values.length, (/* @__PURE__ */ new Set([...SelectorEngine.find(SELECTOR_OPTION$2, this._optionsElement).map((option) => this._valueOf(option)), ...values])).size) : this._optionLabel(values[0]);
 	}
 	_optionLabel(value) {
 		const option = SelectorEngine.find(SELECTOR_OPTION$2, this._optionsElement).find((element) => this._valueOf(element) === value);
-		if (!option) return value;
-		return (SelectorEngine.findOne(SELECTOR_OPTION_LABEL, option) ?? option).textContent?.trim() ?? value;
+		return option ? this._labelOf(option) : this._labels.get(value) ?? value;
+	}
+	_labelOf(option) {
+		return (SelectorEngine.findOne(SELECTOR_OPTION_LABEL, option) ?? option).textContent?.trim() ?? this._valueOf(option);
 	}
 	_afterShow() {
 		this._searchElement?.focus();
@@ -7328,20 +8142,34 @@ var Combobox = class Combobox extends ComboboxBase {
 			this._listBox?.update();
 		}
 	}
+	_onOptionSelected() {
+		this._validation.dismiss();
+	}
+	_onOptionDeselected() {
+		this._validation.dismiss();
+	}
 	_onSelectionChange() {
-		this._updateValue();
-		EventHandler.trigger(this._element, EVENT_CHANGE$8, { value: this.getValue() });
+		this._commitValue();
 		if (!this._config.multiple && this._isShown()) {
 			this.hide();
 			this._element.focus();
 		}
 	}
+	_onSelectionLimit(limit, value) {
+		EventHandler.trigger(this._element, EVENT_SELECTION_LIMIT$1, {
+			limit,
+			value
+		});
+	}
+	_restoreValue() {
+		if (this._listBox && this._listBox.getSelectedValues().join("\0") !== this._resetValues.join("\0")) this._applySelection(this._resetValues);
+	}
 	_addEventListeners() {
-		EventHandler.on(this._element, EVENT_KEYDOWN$7, (event) => this._handleToggleKeydown(event));
+		EventHandler.on(this._element, EVENT_KEYDOWN$10, (event) => this._handleToggleKeydown(event));
 		EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SEARCH$1, (event) => {
 			EventHandler.trigger(this._element, EVENT_SEARCH$2, { query: event.query });
 		});
-		if (this._searchElement) EventHandler.on(this._searchElement, EVENT_KEYDOWN$7, (event) => {
+		if (this._searchElement) EventHandler.on(this._searchElement, EVENT_KEYDOWN$10, (event) => {
 			if (event.key === TAB_KEY$2) this.hide();
 		});
 	}
@@ -7364,7 +8192,7 @@ var Combobox = class Combobox extends ComboboxBase {
 			this.show();
 			return;
 		}
-		if ((key === ENTER_KEY$3 || key === SPACE_KEY$3) && !event.defaultPrevented) {
+		if ((key === ENTER_KEY$3 || key === SPACE_KEY$2) && !event.defaultPrevented) {
 			event.preventDefault();
 			this.show();
 		}
@@ -7383,10 +8211,7 @@ var Combobox = class Combobox extends ComboboxBase {
 		return jQueryDispatch(this, Combobox, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(window, EVENT_LOAD_DATA_API$18, () => {
+EventHandler.on(window, EVENT_LOAD_DATA_API$17, () => {
 	for (const toggle of SelectorEngine.find(SELECTOR_DATA_TOGGLE$11)) Combobox.getOrCreateInstance(toggle);
 });
 EventHandler.on(document, EVENT_CLICK_DATA_API$13, SELECTOR_DATA_TOGGLE$11, function(event) {
@@ -7395,52 +8220,33 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$13, SELECTOR_DATA_TOGGLE$11, func
 });
 EventHandler.on(document, EVENT_CLICK_DATA_API$13, Combobox.clearMenus);
 EventHandler.on(document, EVENT_KEYUP_DATA_API$3, Combobox.clearMenus);
-/**
-* jQuery
-*/
 defineJQueryPlugin(Combobox);
 //#endregion
 //#region js/src/menu.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI menu.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's menu.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-*
-* Deviation from upstream: the selectors and class hooks live in static
-* getters, not module constants, so Dropdown can subclass Menu and keep the
-* v5 markup working.
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$37 = "menu";
-const EVENT_KEY$29 = `.coreui.menu`;
+const NAME$39 = "menu";
+const EVENT_KEY$30 = `.coreui.menu`;
 const DATA_API_KEY$24 = ".data-api";
 const ESCAPE_KEY$2 = "Escape";
 const TAB_KEY$1 = "Tab";
 const ARROW_UP_KEY$5 = "ArrowUp";
 const ARROW_DOWN_KEY$6 = "ArrowDown";
-const ARROW_LEFT_KEY$6 = "ArrowLeft";
-const ARROW_RIGHT_KEY$6 = "ArrowRight";
+const ARROW_LEFT_KEY$8 = "ArrowLeft";
+const ARROW_RIGHT_KEY$8 = "ArrowRight";
 const HOME_KEY$4 = "Home";
 const END_KEY$4 = "End";
 const ENTER_KEY$2 = "Enter";
-const SPACE_KEY$2 = " ";
+const SPACE_KEY$1 = " ";
 const RIGHT_MOUSE_BUTTON$1 = 2;
 const SUBMENU_CLOSE_DELAY = 100;
-const EVENT_CLICK_DATA_API$12 = `click${EVENT_KEY$29}${DATA_API_KEY$24}`;
-const EVENT_KEYDOWN_DATA_API$3 = `keydown${EVENT_KEY$29}${DATA_API_KEY$24}`;
-const EVENT_KEYUP_DATA_API$2 = `keyup${EVENT_KEY$29}${DATA_API_KEY$24}`;
-const CLASS_NAME_SHOW$13 = "show";
+const EVENT_CLICK_DATA_API$12 = `click${EVENT_KEY$30}${DATA_API_KEY$24}`;
+const EVENT_KEYDOWN_DATA_API$3 = `keydown${EVENT_KEY$30}${DATA_API_KEY$24}`;
+const EVENT_KEYUP_DATA_API$2 = `keyup${EVENT_KEY$30}${DATA_API_KEY$24}`;
+const CLASS_NAME_SHOW$11 = "show";
 const SELECTOR_NAVBAR_NAV = ".navbar-nav";
 const DEFAULT_PLACEMENT = "bottom-start";
 const SUBMENU_PLACEMENT = "end-start";
 const triangleSign = (p1, p2, p3) => (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
-const Default$36 = {
+const Default$34 = {
 	autoClose: true,
 	boundary: "clippingParents",
 	container: false,
@@ -7454,7 +8260,7 @@ const Default$36 = {
 	submenuDelay: SUBMENU_CLOSE_DELAY,
 	submenuTrigger: "both"
 };
-const DefaultType$36 = {
+const DefaultType$33 = {
 	autoClose: "(boolean|string)",
 	boundary: "(string|element)",
 	container: "(string|element|boolean)",
@@ -7468,9 +8274,6 @@ const DefaultType$36 = {
 	submenuDelay: "number",
 	submenuTrigger: "string"
 };
-/**
-* Class definition
-*/
 var Menu = class Menu extends BaseComponent {
 	static {
 		this._openInstances = /* @__PURE__ */ new Set();
@@ -7484,6 +8287,7 @@ var Menu = class Menu extends BaseComponent {
 		this._parent = this._element.parentNode;
 		this._openSubmenus = /* @__PURE__ */ new Map();
 		this._submenuCloseTimeouts = /* @__PURE__ */ new Map();
+		this._submenuListeners = [];
 		this._hoverIntentData = null;
 		this._menu = this._config.menu || this._findMenu();
 		if (!this._config.menu && this._menu) this._parent = this._findWrapper(this._menu);
@@ -7509,13 +8313,13 @@ var Menu = class Menu extends BaseComponent {
 		return ".menu-item:not(.disabled):not(:disabled)";
 	}
 	static get Default() {
-		return Default$36;
+		return Default$34;
 	}
 	static get DefaultType() {
-		return DefaultType$36;
+		return DefaultType$33;
 	}
 	static get NAME() {
-		return NAME$37;
+		return NAME$39;
 	}
 	toggle() {
 		return this._isShown() ? this.hide() : this.show();
@@ -7529,9 +8333,9 @@ var Menu = class Menu extends BaseComponent {
 		if ("ontouchstart" in document.documentElement && !this._parent.closest(SELECTOR_NAVBAR_NAV)) for (const element of document.body.children) EventHandler.on(element, "mouseover", noop);
 		this._element.focus({ focusVisible: false });
 		this._element.setAttribute("aria-expanded", "true");
-		this._menu.classList.add(CLASS_NAME_SHOW$13);
-		this._element.classList.add(CLASS_NAME_SHOW$13);
-		if (this._parent) this._parent.classList.add(CLASS_NAME_SHOW$13);
+		this._menu.classList.add(CLASS_NAME_SHOW$11);
+		this._element.classList.add(CLASS_NAME_SHOW$11);
+		if (this._parent) this._parent.classList.add(CLASS_NAME_SHOW$11);
 		Menu._openInstances.add(this);
 		EventHandler.trigger(this._element, this.constructor.eventName("shown"), relatedTarget);
 	}
@@ -7547,6 +8351,8 @@ var Menu = class Menu extends BaseComponent {
 		this._closeAllSubmenus();
 		this._clearAllSubmenuTimeouts();
 		Menu._openInstances.delete(this);
+		for (const [type, selector, handler] of this._submenuListeners) if (selector) EventHandler.off(this._menu, type, selector, handler);
+		else EventHandler.off(this._menu, type, handler);
 		super.dispose();
 	}
 	update() {
@@ -7567,9 +8373,9 @@ var Menu = class Menu extends BaseComponent {
 		if ("ontouchstart" in document.documentElement) for (const element of document.body.children) EventHandler.off(element, "mouseover", noop);
 		this._disposeFloating();
 		this._restoreMenuToOriginalParent();
-		this._menu.classList.remove(CLASS_NAME_SHOW$13);
-		this._element.classList.remove(CLASS_NAME_SHOW$13);
-		if (this._parent) this._parent.classList.remove(CLASS_NAME_SHOW$13);
+		this._menu.classList.remove(CLASS_NAME_SHOW$11);
+		this._element.classList.remove(CLASS_NAME_SHOW$11);
+		if (this._parent) this._parent.classList.remove(CLASS_NAME_SHOW$11);
 		this._element.setAttribute("aria-expanded", "false");
 		this._removeMenuAttributes();
 		Menu._openInstances.delete(this);
@@ -7581,7 +8387,7 @@ var Menu = class Menu extends BaseComponent {
 	}
 	_getConfig(config) {
 		config = super._getConfig(config);
-		if (typeof config.reference === "object" && !isElement(config.reference) && typeof config.reference.getBoundingClientRect !== "function") throw new TypeError(`${NAME$37.toUpperCase()}: Option "reference" provided type "object" without a required "getBoundingClientRect" method.`);
+		if (typeof config.reference === "object" && !isElement(config.reference) && typeof config.reference.getBoundingClientRect !== "function") throw new TypeError(`${this.constructor.NAME.toUpperCase()}: Option "reference" provided type "object" without a required "getBoundingClientRect" method.`);
 		return config;
 	}
 	_createFloating() {
@@ -7609,7 +8415,7 @@ var Menu = class Menu extends BaseComponent {
 		return this._element;
 	}
 	_isShown() {
-		return this._menu.classList.contains(CLASS_NAME_SHOW$13);
+		return this._menu.classList.contains(CLASS_NAME_SHOW$11);
 	}
 	_isToggleTarget(composedPath) {
 		return composedPath.includes(this._element);
@@ -7765,7 +8571,8 @@ var Menu = class Menu extends BaseComponent {
 	_getContainer() {
 		const { container } = this._config;
 		if (container === false) return null;
-		return container === true ? document.body : getElement(container);
+		const target = container === true ? document.body : getElement(container);
+		return target ? resolvePopupContainer(this._element, target) : null;
 	}
 	_moveMenuToContainer() {
 		const container = this._getContainer();
@@ -7803,19 +8610,28 @@ var Menu = class Menu extends BaseComponent {
 	}
 	_setupSubmenuListeners() {
 		if (this._config.submenuTrigger === "hover" || this._config.submenuTrigger === "both") {
-			EventHandler.on(this._menu, "mouseenter", this.constructor.SELECTOR_SUBMENU_TOGGLE, (event) => {
+			this._listenOnMenu("mouseenter", this.constructor.SELECTOR_SUBMENU_TOGGLE, (event) => {
 				this._onSubmenuTriggerEnter(event);
 			});
-			EventHandler.on(this._menu, "mouseleave", this.constructor.SELECTOR_SUBMENU, (event) => {
+			this._listenOnMenu("mouseleave", this.constructor.SELECTOR_SUBMENU, (event) => {
 				this._onSubmenuLeave(event);
 			});
-			EventHandler.on(this._menu, "mousemove", (event) => {
+			this._listenOnMenu("mousemove", null, (event) => {
 				this._trackMousePosition(event);
 			});
 		}
-		if (this._config.submenuTrigger === "click" || this._config.submenuTrigger === "both") EventHandler.on(this._menu, "click", this.constructor.SELECTOR_SUBMENU_TOGGLE, (event) => {
+		if (this._config.submenuTrigger === "click" || this._config.submenuTrigger === "both") this._listenOnMenu("click", this.constructor.SELECTOR_SUBMENU_TOGGLE, (event) => {
 			this._onSubmenuTriggerClick(event);
 		});
+	}
+	_listenOnMenu(type, selector, handler) {
+		if (selector) EventHandler.on(this._menu, type, selector, handler);
+		else EventHandler.on(this._menu, type, handler);
+		this._submenuListeners.push([
+			type,
+			selector,
+			handler
+		]);
 	}
 	_onSubmenuTriggerEnter(event) {
 		const trigger = event.target.closest(this.constructor.SELECTOR_SUBMENU_TOGGLE);
@@ -7853,17 +8669,21 @@ var Menu = class Menu extends BaseComponent {
 		trigger.setAttribute("aria-expanded", "true");
 		trigger.setAttribute("aria-haspopup", "true");
 		submenu.style.opacity = "0";
-		submenu.classList.add(CLASS_NAME_SHOW$13);
-		submenuWrapper.classList.add(CLASS_NAME_SHOW$13);
+		submenu.classList.add(CLASS_NAME_SHOW$11);
+		submenuWrapper.classList.add(CLASS_NAME_SHOW$11);
 		const cleanup = this._createSubmenuFloating(trigger, submenu, submenuWrapper);
-		this._openSubmenus.set(submenu, cleanup);
-		EventHandler.on(submenu, "mouseenter", () => {
+		const cancelClose = () => {
 			this._cancelSubmenuCloseTimeout(submenu);
+		};
+		this._openSubmenus.set(submenu, () => {
+			cleanup();
+			EventHandler.off(submenu, "mouseenter", cancelClose);
 		});
+		EventHandler.on(submenu, "mouseenter", cancelClose);
 	}
 	_closeSubmenu(submenu, submenuWrapper) {
 		if (!this._openSubmenus.has(submenu)) return;
-		const nestedSubmenus = SelectorEngine.find(`${this.constructor.SELECTOR_SUBMENU} ${this.constructor.SELECTOR_MENU}.${CLASS_NAME_SHOW$13}`, submenu);
+		const nestedSubmenus = SelectorEngine.find(`${this.constructor.SELECTOR_SUBMENU} ${this.constructor.SELECTOR_MENU}.${CLASS_NAME_SHOW$11}`, submenu);
 		for (const nested of nestedSubmenus) {
 			const nestedWrapper = nested.closest(this.constructor.SELECTOR_SUBMENU);
 			this._closeSubmenu(nested, nestedWrapper);
@@ -7872,10 +8692,9 @@ var Menu = class Menu extends BaseComponent {
 		const cleanup = this._openSubmenus.get(submenu);
 		if (cleanup) cleanup();
 		this._openSubmenus.delete(submenu);
-		EventHandler.off(submenu, "mouseenter");
 		if (trigger) trigger.setAttribute("aria-expanded", "false");
-		submenu.classList.remove(CLASS_NAME_SHOW$13);
-		submenuWrapper.classList.remove(CLASS_NAME_SHOW$13);
+		submenu.classList.remove(CLASS_NAME_SHOW$11);
+		submenuWrapper.classList.remove(CLASS_NAME_SHOW$11);
 		submenu.style.opacity = "";
 	}
 	_closeAllSubmenus() {
@@ -7886,7 +8705,7 @@ var Menu = class Menu extends BaseComponent {
 	}
 	_closeSiblingSubmenus(currentSubmenuWrapper) {
 		const parent = currentSubmenuWrapper.parentNode;
-		const siblingSubmenus = SelectorEngine.find(`${this.constructor.SELECTOR_SUBMENU} > ${this.constructor.SELECTOR_MENU}.${CLASS_NAME_SHOW$13}`, parent);
+		const siblingSubmenus = SelectorEngine.find(`${this.constructor.SELECTOR_SUBMENU} > ${this.constructor.SELECTOR_MENU}.${CLASS_NAME_SHOW$11}`, parent);
 		for (const siblingMenu of siblingSubmenus) {
 			const siblingWrapper = siblingMenu.closest(this.constructor.SELECTOR_SUBMENU);
 			if (siblingWrapper !== currentSubmenuWrapper) this._closeSubmenu(siblingMenu, siblingWrapper);
@@ -7989,11 +8808,11 @@ var Menu = class Menu extends BaseComponent {
 	_handleSubmenuKeydown(event) {
 		const { key, target } = event;
 		const isRtl = isRTL(target);
-		const enterKey = isRtl ? ARROW_LEFT_KEY$6 : ARROW_RIGHT_KEY$6;
-		const exitKey = isRtl ? ARROW_RIGHT_KEY$6 : ARROW_LEFT_KEY$6;
+		const enterKey = isRtl ? ARROW_LEFT_KEY$8 : ARROW_RIGHT_KEY$8;
+		const exitKey = isRtl ? ARROW_RIGHT_KEY$8 : ARROW_LEFT_KEY$8;
 		const submenuWrapper = target.closest(this.constructor.SELECTOR_SUBMENU);
 		const isSubmenuToggle = target.matches(this.constructor.SELECTOR_SUBMENU_TOGGLE);
-		if ((key === ENTER_KEY$2 || key === SPACE_KEY$2) && submenuWrapper && isSubmenuToggle) {
+		if ((key === ENTER_KEY$2 || key === SPACE_KEY$1) && submenuWrapper && isSubmenuToggle) {
 			event.preventDefault();
 			event.stopPropagation();
 			const submenu = SelectorEngine.findOne(this.constructor.SELECTOR_MENU, submenuWrapper);
@@ -8067,9 +8886,9 @@ var Menu = class Menu extends BaseComponent {
 		const isInput = /input|textarea/i.test(event.target.tagName) || event.target.isContentEditable;
 		const isEscapeEvent = event.key === ESCAPE_KEY$2;
 		const isUpOrDownEvent = [ARROW_UP_KEY$5, ARROW_DOWN_KEY$6].includes(event.key);
-		const isLeftOrRightEvent = [ARROW_LEFT_KEY$6, ARROW_RIGHT_KEY$6].includes(event.key);
+		const isLeftOrRightEvent = [ARROW_LEFT_KEY$8, ARROW_RIGHT_KEY$8].includes(event.key);
 		const isHomeOrEndEvent = [HOME_KEY$4, END_KEY$4].includes(event.key);
-		const isEnterOrSpaceEvent = [ENTER_KEY$2, SPACE_KEY$2].includes(event.key);
+		const isEnterOrSpaceEvent = [ENTER_KEY$2, SPACE_KEY$1].includes(event.key);
 		const isSubmenuTrigger = event.target.matches(this.SELECTOR_SUBMENU_TOGGLE);
 		if (!isUpOrDownEvent && !isEscapeEvent && !isLeftOrRightEvent && !isHomeOrEndEvent && !(isEnterOrSpaceEvent && isSubmenuTrigger)) return;
 		if (isInput && !isEscapeEvent) return;
@@ -8107,9 +8926,6 @@ var Menu = class Menu extends BaseComponent {
 		return jQueryDispatch(this, Menu, config);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API$3, Menu.SELECTOR_DATA_TOGGLE, (event) => Menu.dataApiKeydownHandler(event));
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API$3, Menu.SELECTOR_MENU, (event) => Menu.dataApiKeydownHandler(event));
 EventHandler.on(document, EVENT_CLICK_DATA_API$12, Menu.clearMenus);
@@ -8118,22 +8934,16 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$12, Menu.SELECTOR_DATA_TOGGLE, fu
 	event.preventDefault();
 	Menu.getOrCreateInstance(this).toggle();
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Menu);
 //#endregion
 //#region js/src/context-menu.ts
-/**
-* Constants
-*/
-const NAME$36 = "context-menu";
-const EVENT_KEY$28 = `.coreui.context-menu`;
+const NAME$38 = "context-menu";
+const EVENT_KEY$29 = `.coreui.context-menu`;
 const DATA_API_KEY$23 = ".data-api";
 const CONTEXT_MENU_KEY = "ContextMenu";
 const F10_KEY = "F10";
-const EVENT_CONTEXTMENU_DATA_API = `contextmenu${EVENT_KEY$28}${DATA_API_KEY$23}`;
-const EVENT_KEYDOWN_DATA_API$2 = `keydown${EVENT_KEY$28}${DATA_API_KEY$23}`;
+const EVENT_CONTEXTMENU_DATA_API = `contextmenu${EVENT_KEY$29}${DATA_API_KEY$23}`;
+const EVENT_KEYDOWN_DATA_API$2 = `keydown${EVENT_KEY$29}${DATA_API_KEY$23}`;
 const SCROLL_EVENTS = [
 	"wheel",
 	"touchmove",
@@ -8144,17 +8954,14 @@ const SCROLL_KEYS = /* @__PURE__ */ new Set([
 	"PageUp",
 	"PageDown"
 ]);
-const CLASS_NAME_SHOW$12 = "show";
+const CLASS_NAME_SHOW$10 = "show";
 const SELECTOR_DATA_TOGGLE$10 = "[data-coreui-toggle=\"context-menu\"]";
-const Default$35 = {
+const Default$33 = {
 	...Menu.Default,
 	reference: "pointer",
 	strategy: "fixed"
 };
-const DefaultType$35 = { ...Menu.DefaultType };
-/**
-* Class definition
-*/
+const DefaultType$32 = { ...Menu.DefaultType };
 var ContextMenu = class ContextMenu extends Menu {
 	constructor(element, config) {
 		super(element, config);
@@ -8166,13 +8973,13 @@ var ContextMenu = class ContextMenu extends Menu {
 		return SELECTOR_DATA_TOGGLE$10;
 	}
 	static get Default() {
-		return Default$35;
+		return Default$33;
 	}
 	static get DefaultType() {
-		return DefaultType$35;
+		return DefaultType$32;
 	}
 	static get NAME() {
-		return NAME$36;
+		return NAME$38;
 	}
 	toggle(point) {
 		return this._isShown() ? this.hide() : this.show(point);
@@ -8192,7 +8999,7 @@ var ContextMenu = class ContextMenu extends Menu {
 		this._createFloating();
 		this._lockScroll();
 		if ("ontouchstart" in document.documentElement) for (const element of document.body.children) EventHandler.on(element, "mouseover", noop);
-		this._menu.classList.add(CLASS_NAME_SHOW$12);
+		this._menu.classList.add(CLASS_NAME_SHOW$10);
 		this._menu.focus({ preventScroll: true });
 		Menu._openInstances.add(this);
 		EventHandler.trigger(this._element, this.constructor.eventName("shown"), relatedTarget);
@@ -8201,11 +9008,11 @@ var ContextMenu = class ContextMenu extends Menu {
 		if (EventHandler.trigger(this._element, this.constructor.eventName("hide"), relatedTarget).defaultPrevented) return;
 		this._closeAllSubmenus();
 		if ("ontouchstart" in document.documentElement) for (const element of document.body.children) EventHandler.off(element, "mouseover", noop);
-		const hadFocus = this._menu.contains(document.activeElement);
+		const hadFocus = containsFocus(this._menu);
 		this._unlockScroll();
 		this._disposeFloating();
 		this._restoreMenuToOriginalParent();
-		this._menu.classList.remove(CLASS_NAME_SHOW$12);
+		this._menu.classList.remove(CLASS_NAME_SHOW$10);
 		this._removeMenuAttributes();
 		this._point = null;
 		if (hadFocus) this._element.focus({ preventScroll: true });
@@ -8281,18 +9088,8 @@ var ContextMenu = class ContextMenu extends Menu {
 		return jQueryDispatch(this, ContextMenu, config, args);
 	}
 };
-/**
-* Data API implementation
-*
-* Keyboard handling and dismissal come from Menu's document-level listeners:
-* the menu carries the same `.menu` class and the open-instance registry
-* resolves key events to this instance.
-*/
 EventHandler.on(document, EVENT_CONTEXTMENU_DATA_API, ContextMenu.dataApiContextMenuHandler);
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API$2, SELECTOR_DATA_TOGGLE$10, ContextMenu.dataApiKeydownHandler);
-/**
-* jQuery
-*/
 defineJQueryPlugin(ContextMenu);
 //#endregion
 //#region js/src/util/time.ts
@@ -8302,22 +9099,9 @@ const convert12hTo24h = (abbr, hour) => {
 	if (abbr === "pm" && hour === 12) return 12;
 	return hour + 12;
 };
-/**
-* Converts a 24-hour time format to a 12-hour format.
-* @param {number} hour The hour to be converted.
-* @returns {number} The hour in 12-hour format.
-*/
 const convert24hTo12h = (hour) => hour % 12 || 12;
-/**
-* Formats an array of time values (hours, minutes, or seconds) according to the specified locale and partial.
-* @param {number[]} values An array of time values to format.
-* @param {string} locale The locale to use for formatting.
-* @param {('hour' | 'minute' | 'second')} partial The type of time value to format.
-* @param {boolean} [hour12] Whether the hour labels should use the 12-hour cycle. When omitted the formatter falls back to the locale's default cycle.
-* @returns {Array} An array of objects with the original value and its localized label.
-*/
 const formatTimePartials = (values, locale, partial, hour12) => {
-	const date = /* @__PURE__ */ new Date();
+	const date = new Date(2020, 0, 1);
 	const forceTwoDigit = shouldUseTwoDigitHour(locale);
 	const hourCycle = hour12 === void 0 ? void 0 : hour12 ? "h12" : "h23";
 	const formatter = new Intl.DateTimeFormat(locale, {
@@ -8336,78 +9120,67 @@ const formatTimePartials = (values, locale, partial, hour12) => {
 		};
 	});
 };
-/**
-* Generates localized time partials (hours, minutes, seconds) based on the given parameters.
-* @param {string} locale The locale to use for generating localized time partials.
-* @param {'auto' | boolean} ampm Determines whether to use 12-hour or 24-hour format. 'auto' decides based on locale.
-* @param {boolean | number[] | Function} hours An array of hours, a boolean, or a function to generate hours.
-* @param {boolean | number[] | Function} minutes An array of minutes, a boolean, or a function to generate minutes.
-* @param {boolean | number[] | Function} seconds An array of seconds, a boolean, or a function to generate seconds.
-* @returns {LocalizedTimePartials} An object containing arrays of localized time partials and a boolean indicating if 12-hour format is used.
-*/
 const getLocalizedTimePartials = (locale, ampm = "auto", hours = [], minutes = [], seconds = []) => {
 	const hour12 = ampm === "auto" && isAmPm(locale) || ampm === true;
-	const listOfHours = Array.isArray(hours) && hours.length > 0 ? hours : typeof hours === "function" ? Array.from({ length: hour12 ? 12 : 24 }, (_, i) => hour12 ? i + 1 : i).filter((hour) => hours(hour)) : Array.from({ length: hour12 ? 12 : 24 }, (_, i) => hour12 ? i + 1 : i);
+	const cycle = Array.from({ length: 24 }, (_, i) => hour12 ? (i + 1) % 24 : i);
+	const allowedHours = Array.isArray(hours) && hours.length > 0 ? new Set(hours) : cycle.filter((hour) => typeof hours !== "function" || hours(hour));
+	const hourValues = /* @__PURE__ */ new Map();
+	for (const hour of allowedHours) {
+		const value = hour12 ? convert24hTo12h(hour) : hour;
+		hourValues.set(value, [...hourValues.get(value) ?? [], hour]);
+	}
 	const listOfMinutes = Array.isArray(minutes) && minutes.length > 0 ? minutes : typeof minutes === "function" ? Array.from({ length: 60 }, (_, i) => i).filter((minute) => minutes(minute)) : Array.from({ length: 60 }, (_, i) => i);
 	const listOfSeconds = Array.isArray(seconds) && seconds.length > 0 ? seconds : typeof seconds === "function" ? Array.from({ length: 60 }, (_, i) => i).filter((second) => seconds(second)) : Array.from({ length: 60 }, (_, i) => i);
 	return {
-		listOfHours: formatTimePartials(listOfHours, locale, "hour", hour12),
+		listOfHours: formatTimePartials([...hourValues.keys()], locale, "hour", hour12).map((partial) => ({
+			...partial,
+			hours: hourValues.get(partial.value)
+		})),
 		listOfMinutes: formatTimePartials(listOfMinutes, locale, "minute"),
 		listOfSeconds: formatTimePartials(listOfSeconds, locale, "second"),
 		hour12
 	};
 };
-/**
-* Gets the selected hour from a date object in either 12-hour or 24-hour format based on locale and preference.
-* @param {Date | null} date The date object from which to extract the hour. If null, the function returns an empty string.
-* @param {string} locale The locale to use when determining whether to return in 12-hour or 24-hour format.
-* @param {'auto' | boolean} ampm Determines the format of the hour returned. 'auto' decides based on locale, true forces 12-hour format, and false forces 24-hour format.
-* @returns {string | number} The hour in the specified format or an empty string if the date is null.
-*/
 const getSelectedHour = (date, locale, ampm = "auto") => date ? ampm === "auto" && isAmPm(locale) || ampm === true ? convert24hTo12h(date.getHours()) : date.getHours() : "";
-/**
-* Gets the selected minutes from a date object.
-* @param {Date | null} date The date object from which to extract the minutes. If null, the function returns an empty string.
-* @returns {string | number} The minutes from the date or an empty string if the date is null.
-*/
 const getSelectedMinutes = (date) => date ? date.getMinutes() : "";
-/**
-* Gets the selected seconds from a date object.
-* @param {Date | null} date The date object from which to extract the seconds. If null, the function returns an empty string.
-* @returns {string | number} The seconds from the date or an empty string if the date is null.
-*/
 const getSelectedSeconds = (date) => date ? date.getSeconds() : "";
-/**
-* Determines if the given locale uses AM/PM format.
-* @param {string} locale The locale to check.
-* @returns {boolean} True if the locale uses AM/PM format, otherwise false.
-*/
 const isAmPm = (locale) => [
 	"am",
 	"AM",
 	"pm",
 	"PM"
 ].some((el) => (/* @__PURE__ */ new Date()).toLocaleString(locale).includes(el));
-/**
-* Checks whether the given locale formats the hour "9" with a leading zero ("09")
-* when using `hour: 'numeric'` in `toLocaleTimeString`.
-*
-* This helps determine if you should force `hour: '2-digit'` for consistent formatting.
-*
-* @param {string} locale - The locale code (e.g., "en-US", "pl-PL").
-* @returns {boolean} `true` if the formatted hour starts with a leading zero, otherwise `false`.
-*/
+const isTimeOutsideLimits = (date, part, value, { max, min }, offered = []) => {
+	const start = new Date(date);
+	const end = new Date(date);
+	if (part === "meridiem") {
+		start.setHours(value === "pm" ? 12 : 0, 0, 0, 0);
+		end.setHours(value === "pm" ? 23 : 11, 59, 59, 999);
+	}
+	if (part === "hours") {
+		start.setHours(Number(value), 0, 0, 0);
+		end.setHours(Number(value), 59, 59, 999);
+	}
+	if (part === "minutes") {
+		start.setMinutes(Number(value), 0, 0);
+		end.setMinutes(Number(value), 59, 999);
+	}
+	if (part === "seconds") {
+		start.setSeconds(Number(value), 0);
+		end.setSeconds(Number(value), 999);
+	}
+	if (offered.length > 0 && (part === "hours" || part === "minutes")) return offered.every((inner) => isTimeOutsideLimits(start, part === "hours" ? "minutes" : "seconds", inner, {
+		max,
+		min
+	}));
+	return Boolean(min && end < min || max && start > max);
+};
 const shouldUseTwoDigitHour = (locale) => {
 	return new Date(2020, 0, 1, 7, 5, 7).toLocaleTimeString(locale).startsWith("0");
 };
 //#endregion
 //#region js/src/util/date-sections.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO util/date-sections.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
+const isEditableSection = (section) => section.type !== "literal";
 const TOKEN_TYPES = {
 	d: "day",
 	D: "day",
@@ -8430,27 +9203,15 @@ const QUARTER_NAMES = [
 	"Q3",
 	"Q4"
 ];
-/**
-* Returns the localized month names in the grammatical form used inside a
-* full date (e.g. Polish genitive "lipca", not the standalone "lipiec"),
-* extracted from the month part of a formatted day-month-year date.
-* @param {string} locale The locale to use.
-* @param {('short' | 'long')} width The month name width.
-* @returns {string[]} The twelve month names.
-*/
 const getFormatMonthNames = (locale, width) => {
 	const formatter = new Intl.DateTimeFormat(locale, {
+		calendar: "gregory",
 		year: "numeric",
 		month: width,
 		day: "numeric"
 	});
 	return Array.from({ length: 12 }, (_, index) => formatter.formatToParts(new Date(2e3, index, 15)).find((part) => part.type === "month").value);
 };
-/**
-* Returns the localized day period names, e.g. ["AM", "PM"].
-* @param {string} locale The locale to use.
-* @returns {string[]} The two day period names.
-*/
 const getDayPeriodNames = (locale) => {
 	const formatter = new Intl.DateTimeFormat(locale, {
 		hour: "numeric",
@@ -8461,14 +9222,6 @@ const getDayPeriodNames = (locale) => {
 		return part ? part.value : date.getHours() < 12 ? "AM" : "PM";
 	});
 };
-/**
-* Creates an editable section descriptor for a format token.
-* @param {string} char The token character (e.g. "d", "M", "H", "a").
-* @param {number} tokenLength The length of the token run (e.g. 2 for "dd", 4 for "yyyy").
-* @param {string} [locale] The locale used to resolve month and day period names.
-* @param {string[] | null} [monthNames] Custom month names overriding the locale-derived ones.
-* @returns {object} The section descriptor with `type`, `length`, `padded` and an empty `value`.
-*/
 const createSection = (char, tokenLength, locale = "default", monthNames = null) => {
 	const type = TOKEN_TYPES[char];
 	if (type === "year") return {
@@ -8531,11 +9284,6 @@ const createSection = (char, tokenLength, locale = "default", monthNames = null)
 		value: null
 	};
 };
-/**
-* Returns the allowed value bounds for a section.
-* @param {object} section The section descriptor (or an object with `type` and, for hours, `cycle`).
-* @returns {{min: number, max: number}} The inclusive bounds.
-*/
 const getSectionBounds = (section) => {
 	switch (section.type) {
 		case "day": return {
@@ -8571,24 +9319,11 @@ const getSectionBounds = (section) => {
 			max: 2
 		};
 		default: return {
-			min: 1,
+			min: section.length === 2 ? 0 : 1,
 			max: 9999
 		};
 	}
 };
-/**
-* Parses a date or time format string into a list of sections and literals.
-* Accepts both dayjs/moment-style (`DD.MM.YYYY`) and date-fns/Unicode-style
-* (`dd.MM.yyyy`) tokens, including text month tokens (`MMM`, `MMMM`) and time
-* tokens (`HH`/`H` for the 23-hour cycle, `hh`/`h` for the 12-hour cycle,
-* `mm`, `ss`, `A`/`a`); any other character becomes a literal. Text wrapped in
-* single quotes is always a literal — even token letters (`'Week' ww` renders
-* "Week 29") — and a doubled quote (`''`) escapes the quote character itself.
-* @param {string} format The format string.
-* @param {string} [locale] The locale used to resolve month and day period names.
-* @param {string[] | null} [monthNames] Custom month names overriding the locale-derived ones.
-* @returns {Array} The ordered list of section and literal descriptors.
-*/
 const getSectionsFromFormat = (format, locale = "default", monthNames = null) => {
 	const sections = [];
 	let literal = "";
@@ -8643,12 +9378,6 @@ const PART_TOKENS = {
 	second: "s",
 	dayPeriod: "A"
 };
-/**
-* Maps the parts of a formatted reference date to section descriptors.
-* @param {Intl.DateTimeFormat} formatter The formatter to read parts from.
-* @param {string} locale The locale used to resolve names.
-* @returns {Array} The ordered list of section and literal descriptors.
-*/
 const getSectionsFromParts = (formatter, locale) => {
 	const { hourCycle } = formatter.resolvedOptions();
 	const hourChar = hourCycle === "h11" || hourCycle === "h12" ? "h" : "H";
@@ -8671,57 +9400,20 @@ const getSectionsFromParts = (formatter, locale) => {
 	}
 	return sections;
 };
-/**
-* Derives the list of sections and literals from the locale's numeric date format.
-* @param {string} locale The locale to use.
-* @returns {Array} The ordered list of section and literal descriptors.
-*/
 const getSectionsFromLocale = (locale) => getSectionsFromParts(new Intl.DateTimeFormat(locale, {
+	calendar: "gregory",
 	year: "numeric",
 	month: "2-digit",
 	day: "2-digit"
 }), locale);
-/**
-* Returns the localized week-of-year label, capitalized the way the native
-* week input renders it ("Week", "Tydzień", "Woche"). Falls back to "Week"
-* where `Intl.DisplayNames` has no data.
-* @param {string} locale The locale to use.
-* @returns {string} The label.
-*/
-const getWeekLabel = (locale) => {
-	try {
-		const label = new Intl.DisplayNames(locale, { type: "dateTimeField" }).of("weekOfYear");
-		return label ? label.charAt(0).toLocaleUpperCase(locale) + label.slice(1) : "Week";
-	} catch {
-		return "Week";
-	}
-};
-/**
-* Derives the week mask from the locale, mirroring the native week input's
-* presentation ("Week 29, 2026"): a fixed localized label, the ISO week
-* number, and the ISO week-numbering year.
-* @param {string} locale The locale to use.
-* @returns {Array} The ordered list of section and literal descriptors.
-*/
 const getWeekSectionsFromLocale = (locale) => getSectionsFromFormat(`'${getWeekLabel(locale).replaceAll("'", "''")}' ww, yyyy`, locale);
-/**
-* Derives the list of sections and literals from the locale's time format.
-* @param {string} locale The locale to use.
-* @param {boolean} [seconds] Whether to include a seconds section.
-* @returns {Array} The ordered list of section and literal descriptors.
-*/
 const getTimeSectionsFromLocale = (locale, seconds = false) => getSectionsFromParts(new Intl.DateTimeFormat(locale, {
 	hour: "2-digit",
 	minute: "2-digit",
 	second: seconds ? "2-digit" : void 0
 }), locale);
-/**
-* Derives the list of sections and literals from the locale's date and time format.
-* @param {string} locale The locale to use.
-* @param {boolean} [seconds] Whether to include a seconds section.
-* @returns {Array} The ordered list of section and literal descriptors.
-*/
 const getDateTimeSectionsFromLocale = (locale, seconds = false) => getSectionsFromParts(new Intl.DateTimeFormat(locale, {
+	calendar: "gregory",
 	year: "numeric",
 	month: "2-digit",
 	day: "2-digit",
@@ -8729,18 +9421,25 @@ const getDateTimeSectionsFromLocale = (locale, seconds = false) => getSectionsFr
 	minute: "2-digit",
 	second: seconds ? "2-digit" : void 0
 }), locale);
-/**
-* Applies a typed digit to a section, MUI DateField-style: digits accumulate
-* while the value stays ambiguous and restart when it would exceed the bounds.
-* @param {object} section The section descriptor.
-* @param {string} draft The digits typed into the section so far.
-* @param {string} digit The newly typed digit.
-* @param {number} [max] The upper bound, e.g. the day count of the selected month.
-* @returns {{draft: string, value: number, completed: boolean}} The next draft, numeric value and whether the section is complete.
-*/
+const FORMAT_BY_SELECTION_TYPE = {
+	month: "MM/yyyy",
+	quarter: "QQQ yyyy",
+	week: getWeekSectionsFromLocale,
+	year: "yyyy"
+};
+const getPickerFormat = (format, selectionType = "day") => format || FORMAT_BY_SELECTION_TYPE[selectionType] || null;
+const getSectionLayout = (format, locale, monthNames = null, includeTime = false) => {
+	if (typeof format === "function") return format(locale);
+	if (format) return getSectionsFromFormat(format, locale, monthNames);
+	return includeTime ? getDateTimeSectionsFromLocale(locale, typeof includeTime === "object" ? includeTime.seconds : true) : getSectionsFromLocale(locale);
+};
+const getHourCycle = (layout) => layout.find((section) => section.type === "hour")?.cycle;
+const isTypedKey = (event) => event.key?.length === 1 && !hasShortcutModifier(event);
 const applyDigitToSection = (section, draft, digit, max = getSectionBounds(section).max) => {
+	const typed = Number.parseInt(digit, 10);
+	if (typed > max || max < 10 && typed < getSectionBounds(section).min) return null;
 	const length = section.type === "year" ? section.length : 2;
-	let next = `${draft || ""}${digit}`.slice(-length);
+	let next = `${/^\d+$/.test(draft) ? draft : ""}${digit}`.slice(-length);
 	if (Number.parseInt(next, 10) > max) next = digit;
 	const value = Number.parseInt(next, 10);
 	return {
@@ -8749,17 +9448,6 @@ const applyDigitToSection = (section, draft, digit, max = getSectionBounds(secti
 		completed: next.length >= length || value * 10 > max
 	};
 };
-/**
-* Applies a typed letter to a text section (month names, day periods) by
-* prefix-matching its names, MUI DateField-style: "m" selects March,
-* continuing with "may" switches to May; the section completes when the
-* prefix matches a single name. A letter that matches no name restarts the
-* draft.
-* @param {object} section The text section descriptor (with `names`).
-* @param {string} draft The letters typed into the section so far.
-* @param {string} letter The newly typed letter.
-* @returns {{draft: string, value: number, completed: boolean} | null} The next draft, section value and completion state, or null when nothing matches.
-*/
 const applyLetterToSection = (section, draft, letter) => {
 	if (!section.names) return null;
 	const names = section.names.map((name) => name.toLowerCase());
@@ -8776,17 +9464,6 @@ const applyLetterToSection = (section, draft, letter) => {
 		completed: matches.length === 1
 	};
 };
-/**
-* Returns the section value after an increment or decrement, wrapping within
-* the bounds (except year, which clamps). An empty section starts at the
-* minimum when incrementing and at the maximum when decrementing — except the
-* year, which starts at the current year (jumping to 0001 or 9999 would be
-* useless).
-* @param {object} section The section descriptor.
-* @param {number} delta The signed step.
-* @param {number} [max] The upper bound, e.g. the day count of the selected month.
-* @returns {number} The next section value.
-*/
 const getIncrementedSectionValue = (section, delta, max = getSectionBounds(section).max) => {
 	const { min } = getSectionBounds(section);
 	if (section.value === null) {
@@ -8797,60 +9474,18 @@ const getIncrementedSectionValue = (section, delta, max = getSectionBounds(secti
 	const range = max - min + 1;
 	return ((section.value - min + delta) % range + range) % range + min;
 };
-/**
-* Returns the number of days in the given month, valid for any year.
-* @param {number} year The full year.
-* @param {number} month The 1-based month.
-* @returns {number} The number of days.
-*/
 const getDaysInMonth = (year, month) => {
-	const date = new Date(2e3, 0, 1);
-	date.setFullYear(year, month, 0);
-	return date.getDate();
+	return createDate(year, month, 0).getDate();
 };
-/**
-* Returns the number of ISO weeks in the given week-numbering year (52 or 53).
-* @param {number} year The full week-numbering year.
-* @returns {number} The week count.
-*/
 const getISOWeeksInYear = (year) => {
-	const date = new Date(2e3, 0, 1);
-	date.setFullYear(year, 11, 28);
-	return getISOWeekNumberAndYear(date).weekNumber;
+	return getISOWeekNumberAndYear(createDate(year, 11, 28)).weekNumber;
 };
-/**
-* Returns the Monday of the given ISO week.
-* @param {number} year The full week-numbering year.
-* @param {number} week The 1-based ISO week number.
-* @returns {Date} The Monday starting the week.
-*/
-const getDateOfISOWeek = (year, week) => {
-	const date = new Date(2e3, 0, 1);
-	date.setFullYear(year, 0, 4);
-	date.setDate(date.getDate() - (date.getDay() + 6) % 7 + (week - 1) * 7);
-	return date;
-};
-/**
-* Returns the effective upper bound of the week section for the currently
-* selected year. Falls back to 53 while the year is unknown (the year can
-* still turn out to be a long one).
-* @param {Array} sections The section and literal descriptors.
-* @returns {number} The week count of the selected year.
-*/
 const getWeekSectionMax = (sections) => {
 	const yearSection = sections.find((section) => section.type === "year");
-	const year = yearSection ? getFullYearFromSection(yearSection) : null;
+	const year = yearSection && isEditableSection(yearSection) ? getFullYearFromSection(yearSection) : null;
 	if (year === null) return getSectionBounds({ type: "week" }).max;
 	return getISOWeeksInYear(year);
 };
-/**
-* Returns the effective upper bound of the day section for the currently
-* selected month and year. Falls back to 31 while the month is unknown and to
-* a leap year while the year is unknown (February can still turn out to have
-* 29 days).
-* @param {Array} sections The section and literal descriptors.
-* @returns {number} The day count of the selected month.
-*/
 const getDaySectionMax = (sections) => {
 	let month = null;
 	let year = null;
@@ -8861,34 +9496,22 @@ const getDaySectionMax = (sections) => {
 	if (month === null) return getSectionBounds({ type: "day" }).max;
 	return getDaysInMonth(year === null ? 2e3 : year, month);
 };
-/**
-* Resolves the full year of a year section, expanding 2-digit values with
-* smart century assignment.
-* @param {object} section The year section descriptor.
-* @returns {number | null} The full year or null when empty.
-*/
 const getFullYearFromSection = (section) => {
 	if (section.value === null) return null;
 	if (section.length === 2 && section.value < 100) return parseYearSmart(String(section.value).padStart(2, "0"));
 	return section.value;
 };
-/**
-* Builds a Date from fully filled sections, clamping the day to the month's
-* length. A week section resolves to the Monday of the ISO week (the year
-* section then holds the ISO week-numbering year) and a quarter section to
-* the first day of the quarter. Section types absent from the layout get
-* defaults (1970-01-01 for the date part — the `util/time.js` convention for
-* time-only values — and midnight for the time part). Returns null while any
-* section is empty.
-* @param {Array} sections The section and literal descriptors.
-* @returns {Date | null} The date or null when incomplete.
-*/
+const isBeforeYearOne = (sections) => {
+	const editable = sections.filter(isEditableSection);
+	const year = editable.find((section) => section.type === "year");
+	return year !== void 0 && (getFullYearFromSection(year) ?? 1) < 1 && editable.every((section) => section === year || section.value !== null && section.value >= getSectionBounds(section).min);
+};
 const getDateFromSections = (sections) => {
 	const values = {};
 	let hourCycle = null;
 	for (const section of sections) {
 		if (section.type === "literal") continue;
-		if (section.value === null) return null;
+		if (section.value === null || section.value < getSectionBounds(section).min) return null;
 		values[section.type] = section.type === "year" ? getFullYearFromSection(section) : section.value;
 		if (section.type === "hour") hourCycle = section.cycle;
 	}
@@ -8897,19 +9520,10 @@ const getDateFromSections = (sections) => {
 	const day = values.day === void 0 ? 1 : values.day;
 	let hour = values.hour === void 0 ? 0 : values.hour;
 	if (hourCycle === "h12") hour = convert12hTo24h(values.meridiem === 2 ? "pm" : "am", hour);
-	const date = values.week === void 0 ? new Date(2e3, 0, 1) : getDateOfISOWeek(year, Math.min(values.week, getISOWeeksInYear(year)));
-	if (values.week === void 0) date.setFullYear(year, month - 1, Math.min(day, getDaysInMonth(year, month)));
+	const date = values.week === void 0 ? createDate(year, month - 1, Math.min(day, getDaysInMonth(year, month))) : getDateOfISOWeek(year, Math.min(values.week, getISOWeeksInYear(year)));
 	date.setHours(hour, values.minute === void 0 ? 0 : values.minute, values.second === void 0 ? 0 : values.second, 0);
 	return date;
 };
-/**
-* Returns a copy of the sections with values taken from the given date. In a
-* layout with a week section the year section holds the ISO week-numbering
-* year, which can differ from the calendar year around January 1st.
-* @param {Array} sections The section and literal descriptors.
-* @param {Date | null} date The date to read values from, or null to clear.
-* @returns {Array} The updated sections.
-*/
 const setSectionsFromDate = (sections, date) => {
 	const weekInfo = date && sections.some((section) => section.type === "week") ? getISOWeekNumberAndYear(date) : null;
 	return sections.map((section) => {
@@ -8958,38 +9572,26 @@ const setSectionsFromDate = (sections, date) => {
 		}
 	});
 };
-/**
-* Formats a section value for display, padding with zeros when the section is
-* padded and shortening 4-digit years stored in 2-digit sections. Text
-* sections (month names, day periods) show their name.
-* @param {object} section The section descriptor.
-* @param {string} placeholder The placeholder to show when the section is empty.
-* @returns {string} The display string.
-*/
 const formatSectionValue = (section, placeholder = "") => {
 	if (section.value === null) return placeholder;
 	if (section.names) return section.names[section.value - 1];
 	const value = section.type === "year" && section.length === 2 ? section.value % 100 : section.value;
 	return section.padded === false ? String(value) : String(value).padStart(section.length, "0");
 };
-/**
-* Serializes the sections into the masked string (values and literals).
-* @param {Array} sections The section and literal descriptors.
-* @returns {string} The formatted string.
-*/
+const getSectionValueText = (section, locale) => {
+	if (section.value === null) return "Empty";
+	if (section.names) return section.names[section.value - 1];
+	if (section.type === "month" && section.value > 0) return new Intl.DateTimeFormat(locale, {
+		calendar: "gregory",
+		month: "long"
+	}).format(new Date(2e3, section.value - 1, 15));
+	return String(section.type === "year" ? getFullYearFromSection(section) : section.value);
+};
 const formatSections = (sections) => sections.map((section) => section.type === "literal" ? section.value : formatSectionValue(section)).join("");
-/**
-* Parses a pasted string against the section layout by matching names (months,
-* day periods) and digit groups to editable sections in order. Returns null
-* when the string doesn't match.
-* @param {string} text The pasted text.
-* @param {Array} sections The section and literal descriptors.
-* @returns {Array | null} The filled sections or null.
-*/
 const getSectionsFromString = (text, sections) => {
 	let normalizedText = text;
 	for (const section of sections) {
-		if (!section.names) continue;
+		if (!isEditableSection(section) || !section.names) continue;
 		const match = section.names.toSorted((a, b) => b.length - a.length).find((name) => normalizedText.toLowerCase().includes(name.toLowerCase()));
 		if (!match) continue;
 		const index = normalizedText.toLowerCase().indexOf(match.toLowerCase());
@@ -9015,51 +9617,120 @@ const getSectionsFromString = (text, sections) => {
 	}
 	return next;
 };
+const convertValue = (value, type, locale) => {
+	if (value === null || value === void 0) return null;
+	if (type === "time" && typeof value === "string") {
+		const match = /^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(am|pm))?$/i.exec(value.trim());
+		if (match) {
+			const [, hour, minute, second, meridiem] = match;
+			if (Number.parseInt(hour, 10) > (meridiem ? 12 : 23) || Number.parseInt(minute, 10) > 59 || Number.parseInt(second ?? "0", 10) > 59) return null;
+			const hours = meridiem ? convert12hTo24h(meridiem.toLowerCase(), Number.parseInt(hour, 10)) : Number.parseInt(hour, 10);
+			return new Date(1970, 0, 1, hours, Number.parseInt(minute, 10), second ? Number.parseInt(second, 10) : 0);
+		}
+	}
+	if (type === "datetime") {
+		const withTime = convertToDateObject(value, "day", locale, true);
+		if (withTime) return withTime;
+	}
+	return convertToDateObject(value, "day", locale, type === "time");
+};
+const getDateWithin = (layout, date) => date && !Number.isNaN(date.getTime()) ? getDateFromSections(setSectionsFromDate(layout, date)) : null;
+const getLayoutPeriod = (layout) => {
+	const types = new Set(layout.map((section) => section.type));
+	if (types.has("day")) return null;
+	if (types.has("week")) return "weeks";
+	if (types.has("month")) return "months";
+	if (types.has("quarter")) return "quarters";
+	return types.has("year") ? "years" : null;
+};
+const getInclusiveMax = (maxDate) => maxDate && maxDate.getTime() === removeTimeFromDate(maxDate).getTime() ? new Date(new Date(maxDate).setHours(23, 59, 59, 999)) : maxDate;
+const constrainDateTime = (date, minDate, maxDate) => constrainDate(date, minDate, getInclusiveMax(maxDate));
+const getDateLimitError = (layout, date, minDate, maxDate, disabledDates) => {
+	const period = getLayoutPeriod(layout);
+	const timed = layout.some((section) => section.type === "hour");
+	const timeOnly = timed && !period && !layout.some((section) => section.type === "day");
+	const min = period || timed ? getDateWithin(layout, minDate) : minDate && removeTimeFromDate(minDate);
+	const max = timed ? getInclusiveMax(timeOnly ? getDateWithin(layout, maxDate) : maxDate) : maxDate;
+	if (min && date < min) return "minDate";
+	if (max && date > max) return "maxDate";
+	if (timeOnly ? isCellDisabled(date, "days", null, null, disabledDates) : isCellDisabled(date, period ?? "days", minDate, maxDate, disabledDates)) return "disabledDate";
+	return null;
+};
 //#endregion
-//#region js/src/section-input.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO section-input.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
+//#region js/src/util/field-label.ts
+const SELECTOR_INTERACTIVE = "a[href], button, input, select, textarea, [tabindex]";
+const SELECTOR_LABEL = "label, .form-label";
+const fields = /* @__PURE__ */ new Map();
+const getLabelledElement = (label) => {
+	const root = label.getRootNode();
+	const forId = label.htmlFor;
+	if (forId) {
+		const target = [...root.querySelectorAll("[id]")].find((element) => element.id === forId);
+		if (target) return target;
+	}
+	if (!label.id) return null;
+	return [...root.querySelectorAll("[aria-labelledby]")].find((element) => element.getAttribute("aria-labelledby").split(/\s+/).includes(label.id)) ?? null;
+};
+const getFieldHandler = (element) => {
+	const field = fields.has(element) ? element : [...element.querySelectorAll("*")].find((descendant) => fields.has(descendant));
+	return field && fields.get(field);
+};
+const handleClick = (event) => {
+	const target = event.composedPath()[0];
+	if (event.defaultPrevented || event.detail > 1 || !(target instanceof Element)) return;
+	const label = target.closest(SELECTOR_LABEL);
+	if (!label || label.control) return;
+	const interactive = target.closest(SELECTOR_INTERACTIVE);
+	const selection = label.ownerDocument.getSelection();
+	if (interactive && interactive !== label && label.contains(interactive) || selection && !selection.isCollapsed && label.contains(selection.anchorNode)) return;
+	const element = getLabelledElement(label);
+	if (element) getFieldHandler(element)?.();
+};
+const onLabelClick = (element, handler) => {
+	const document = element.ownerDocument;
+	fields.set(element, handler);
+	document.addEventListener("click", handleClick);
+	return () => {
+		if (fields.get(element) === handler) fields.delete(element);
+		if (![...fields.keys()].some((field) => field.ownerDocument === document)) document.removeEventListener("click", handleClick);
+	};
+};
+//#endregion
+//#region js/src/date-input.ts
+const NAME$37 = "date-input";
+const EVENT_LOAD_DATA_API$16 = `load.coreui.date-input.data-api`;
 const ARROW_DOWN_KEY$5 = "ArrowDown";
-const ARROW_LEFT_KEY$5 = "ArrowLeft";
-const ARROW_RIGHT_KEY$5 = "ArrowRight";
+const ARROW_LEFT_KEY$7 = "ArrowLeft";
+const ARROW_RIGHT_KEY$7 = "ArrowRight";
 const ARROW_UP_KEY$4 = "ArrowUp";
 const BACKSPACE_KEY$2 = "Backspace";
 const DELETE_KEY$1 = "Delete";
+const INPUT_TYPE_KEYS = {
+	deleteContentBackward: BACKSPACE_KEY$2,
+	deleteContentForward: DELETE_KEY$1
+};
 const END_KEY$3 = "End";
 const HOME_KEY$3 = "Home";
 const CLASS_NAME_SECTION_INPUT = "form-date-time";
 const CLASS_NAME_ALL_SELECTED = "form-date-time-all-selected";
-const CLASS_NAME_DISABLED$4 = "disabled";
+const CLASS_NAME_DISABLED$5 = "disabled";
 const CLASS_NAME_FORM_CONTROL = "form-control";
 const CLASS_NAME_FILLED = "form-date-time-filled";
-const CLASS_NAME_IS_INVALID$2 = "is-invalid";
-const CLASS_NAME_IS_VALID$2 = "is-valid";
 const CLASS_NAME_SECTION = "form-date-time-section";
 const CLASS_NAME_SECTION_EMPTY = "form-date-time-section-empty";
 const CLASS_NAME_SEPARATOR$1 = "form-date-time-separator";
-const HOST_CLASS_NAMES = [
-	CLASS_NAME_ALL_SELECTED,
-	CLASS_NAME_DISABLED$4,
-	CLASS_NAME_FILLED,
-	CLASS_NAME_FORM_CONTROL,
-	CLASS_NAME_IS_INVALID$2,
-	CLASS_NAME_IS_VALID$2,
-	CLASS_NAME_SECTION_INPUT
-];
-const SELECTOR_FORM_VALIDATE = "[data-coreui-validate]";
-const SELECTOR_FORM_VALIDATE_VALID$1 = "[data-coreui-validate~=\"valid\"]";
-const SELECTOR_SECTION$1 = ".form-date-time-section";
-const Default$34 = {
+const SELECTOR_DATA_DATE_INPUT = "[data-coreui-date-input]";
+const SELECTOR_SECTION$2 = ".form-date-time-section";
+const SELECTOR_VALUE_FIELD = "textarea";
+const ARIA_LABELS = {
+	date: "Date input",
+	datetime: "Date and time input",
+	time: "Time input"
+};
+const Default$32 = {
 	ariaDayLabel: "Day",
 	ariaHourLabel: "Hour",
-	ariaLabel: "Date input",
+	ariaLabel: ARIA_LABELS.date,
 	ariaMeridiemLabel: "AM/PM",
 	ariaMinuteLabel: "Minute",
 	ariaMonthLabel: "Month",
@@ -9075,7 +9746,6 @@ const Default$34 = {
 	format: null,
 	hourPlaceholder: null,
 	inputDateParse: null,
-	invalid: false,
 	locale: "default",
 	maxDate: null,
 	meridiemPlaceholder: null,
@@ -9088,11 +9758,13 @@ const Default$34 = {
 	readonly: false,
 	required: false,
 	secondPlaceholder: null,
-	valid: false,
+	seconds: false,
+	type: "date",
+	validationState: null,
 	weekPlaceholder: null,
 	yearPlaceholder: null
 };
-const DefaultType$34 = {
+const DefaultType$31 = {
 	ariaDayLabel: "string",
 	ariaHourLabel: "string",
 	ariaLabel: "string",
@@ -9111,7 +9783,6 @@ const DefaultType$34 = {
 	format: "(function|string|null)",
 	hourPlaceholder: "(string|null)",
 	inputDateParse: "(function|null)",
-	invalid: "boolean",
 	locale: "string",
 	maxDate: "(date|number|string|null)",
 	meridiemPlaceholder: "(string|null)",
@@ -9124,7 +9795,9 @@ const DefaultType$34 = {
 	readonly: "boolean",
 	required: "boolean",
 	secondPlaceholder: "(string|null)",
-	valid: "boolean",
+	seconds: "boolean",
+	type: "string",
+	validationState: "(string|null|undefined)",
 	weekPlaceholder: "(string|null)",
 	yearPlaceholder: "(string|null)"
 };
@@ -9139,314 +9812,295 @@ const DefaultPlaceholders = {
 	second: "ss",
 	meridiem: "AM"
 };
-/**
-* Class definition
-*/
-var SectionInput = class extends BaseComponent {
+var DateInput = class DateInput extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
-		this._config = this._getConfig(config);
-		this._date = this._config.date ? this._convertDate(this._config.date) : null;
-		this._minDate = this._convertDate(this._config.minDate);
-		this._maxDate = this._convertDate(this._config.maxDate);
-		this._sections = setSectionsFromDate(this._resolveSections(), this._date);
+		this._applyConfig();
 		this._date = getDateFromSections(this._sections);
-		this._draft = "";
+		this._disabled = this._config.disabled;
+		this._notifying = 0;
+		this._reports = 0;
 		this._allSelected = false;
 		this._error = null;
+		this._errorHolds = 0;
+		this._fieldValue = "";
 		this._inputElement = null;
-		this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: "long" });
-		this._form = null;
-		this._resetHandler = () => {
-			setTimeout(() => {
-				if (this._element) this.reset();
-			});
-		};
-		this._submitHandler = () => this._onFormSubmit();
-		this._submitValid = false;
+		this._isBuilt = false;
+		this._rejected = false;
+		this._validationError = null;
 		this._hostAriaLabel = this._element.getAttribute("aria-label");
-		this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES);
 		this._hostNodes = [...this._element.childNodes];
-		this._hostRole = this._element.getAttribute("role");
+		this._validation = new FieldValidation(this._element, {
+			canBlock: () => !this._disabled,
+			config: () => this._config,
+			fields: () => [this._inputElement],
+			frames: () => [this._element],
+			invalidTargets: () => this._getSectionElements(),
+			ownError: () => this._rejected,
+			pageDescribed: (isInvalid) => [this._element, ...this._getSectionElements().filter((_, index) => index === 0 || isInvalid)],
+			restore: () => this.reset()
+		});
 		this._createSectionInput();
-		this._date = this._applyValidationState();
-		this._initialDate = this._date;
+		this._initialDate = getDateFromSections(this._sections);
+		this._applyValidationState();
+		this._reportedDate = this._date;
+		this._announceError();
+		this._valueKey = this._getValueKey(this._sections);
+		this._inputElement.defaultValue = this._getResetValue();
+		this._isBuilt = true;
 		this._addEventListeners();
-		if (this._config.autofocus && !this._config.disabled) this._getSectionElements()[0]?.focus();
+		this._removeLabelClick = onLabelClick(this._element, () => this._focusFirstEmptySection());
+		if (this._config.autofocus && !this._disabled) this._getSectionElements()[0]?.focus();
 	}
 	static get Default() {
-		return Default$34;
+		return Default$32;
 	}
 	static get DefaultType() {
-		return DefaultType$34;
+		return DefaultType$31;
+	}
+	static get NAME() {
+		return NAME$37;
 	}
 	static get CHANGE_EVENT_NAME() {
 		return "dateChange";
 	}
 	clear() {
-		this._sections = setSectionsFromDate(this._sections, null);
 		this._draft = "";
-		this._syncSections();
-		this._updateDate();
+		this._commitSections(setSectionsFromDate(this._sections, null));
 	}
 	reset() {
-		this._sections = setSectionsFromDate(this._sections, this._initialDate);
 		this._draft = "";
-		this._syncSections();
-		this._updateDate();
+		this._setAllSelected(false);
+		this._commitSections(setSectionsFromDate(this._sections, this._initialDate));
 	}
 	getDate() {
 		return this._date;
 	}
 	isDateSelectable(date) {
-		if (!(date instanceof Date) || Number.isNaN(date.getTime())) return false;
-		const normalized = getDateFromSections(setSectionsFromDate(this._sections, date));
+		const normalized = date instanceof Date ? getDateWithin(this._sections, date) : null;
 		return normalized !== null && this._getValidationError(normalized, true) === null;
 	}
-	setConfig(config) {
-		if (typeof config !== "object") return;
+	disable() {
+		this._setDisabled(true);
+	}
+	enable() {
+		this._setDisabled(false);
+	}
+	setDate(date, triggerChange = false) {
+		this._typeCheckConfig({ date }, { date: this.constructor.DefaultType.date });
+		this._draft = "";
+		this._setAllSelected(false);
+		this._commitSections(setSectionsFromDate(this._sections, date ? this._convertDate(date) : null), triggerChange);
+	}
+	setValidationState(validationState) {
 		this._config = this._getConfig({
 			...this._config,
-			...config
+			validationState
 		});
-		const previousDate = this._date;
-		this._date = this._config.date ? this._convertDate(this._config.date) : null;
-		this._minDate = this._convertDate(this._config.minDate);
-		this._maxDate = this._convertDate(this._config.maxDate);
-		this._sections = setSectionsFromDate(this._resolveSections(), this._date);
-		this._draft = "";
-		this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: "long" });
-		this._createSectionInput();
-		this._date = previousDate;
-		this._updateDate();
+		this._validation.configure({ validationState });
 	}
 	dispose() {
 		if (!this._element) return;
-		EventHandler.off(this._form, this.constructor.eventName("reset"), this._resetHandler);
-		EventHandler.off(this._form, this.constructor.eventName("submit"), this._submitHandler);
-		restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses);
-		this._restoreAttribute("aria-label", this._hostAriaLabel);
-		this._restoreAttribute("role", this._hostRole);
+		this._removeLabelClick();
+		EventHandler.off(this._element, this.constructor.EVENT_KEY);
+		this._validation.dispose();
+		if (!this._hostAriaLabel) writeAttribute(this._element, "aria-label", this._hostAriaLabel);
+		this._element.classList.remove(CLASS_NAME_ALL_SELECTED);
 		this._element.replaceChildren(...this._hostNodes);
 		super.dispose();
 	}
-	_getDefaultSections() {
-		throw new Error("Method \"_getDefaultSections\" must be implemented.");
+	_setDisabled(disabled) {
+		if (disabled === this._disabled) return;
+		const focused = this._getSectionElements().find((sectionElement) => containsFocus(sectionElement)) ?? null;
+		this._disabled = disabled;
+		if (disabled) focused?.blur();
+		this._element.classList.toggle(CLASS_NAME_DISABLED$5, disabled);
+		for (const sectionElement of this._getSectionElements()) {
+			writeAttribute(sectionElement, "aria-disabled", disabled ? "true" : null);
+			writeAttribute(sectionElement, "contenteditable", disabled ? null : "true");
+		}
+		this._inputElement.disabled = disabled;
+		this._setTabIndexes(focused);
+		this._validation.update();
 	}
 	_getAriaLabel() {
-		return this._config.ariaLabel;
+		const { type } = this._config;
+		const ariaLabel = this._config.ariaLabel || this.constructor.Default.ariaLabel;
+		return ariaLabel === ARIA_LABELS.date && Object.hasOwn(ARIA_LABELS, type) ? ARIA_LABELS[type] : ariaLabel;
 	}
 	_convertDate(value) {
-		return convertToDateObject(value, "day", this._config.locale);
+		return convertValue(value, this._config.type, this._config.locale);
 	}
-	_resolveSections() {
-		const { format, locale, monthNames } = this._config;
-		if (typeof format === "function") return format(locale);
-		if (typeof format === "string" && format.length > 0) return getSectionsFromFormat(format, locale, monthNames);
-		return this._getDefaultSections(locale);
+	_applyConfig() {
+		const { date, format, locale, maxDate, minDate, monthNames } = this._config;
+		const sections = format ? getSectionLayout(format, locale, monthNames) : this._getDefaultSections(locale);
+		this._minDate = this._convertDate(minDate);
+		this._maxDate = this._convertDate(maxDate);
+		this._sections = setSectionsFromDate(sections, date ? this._convertDate(date) : null);
+		this._draft = "";
+	}
+	_getValueKey(sections) {
+		return JSON.stringify(sections.map((section) => section.value));
 	}
 	_addEventListeners() {
 		const eventName = (name) => this.constructor.eventName(name);
-		EventHandler.on(this._element, eventName("keydown"), SELECTOR_SECTION$1, (event) => {
+		EventHandler.on(this._element, eventName("keydown"), SELECTOR_SECTION$2, (event) => {
 			this._onKeydown(event);
 		});
-		EventHandler.on(this._element, eventName("beforeinput"), SELECTOR_SECTION$1, (event) => {
+		EventHandler.on(this._element, eventName("beforeinput"), SELECTOR_SECTION$2, (event) => {
 			event.preventDefault();
-			if (!this._isEditable() || event.inputType !== "insertText" || !event.data) return;
-			if (/^\d$/.test(event.data)) {
-				this._applyDigit(event.target, event.data);
-				return;
-			}
-			if (event.data.length === 1) this._applyLetter(event.target, event.data);
+			const key = event.inputType === "insertText" && event.data?.length === 1 ? event.data : INPUT_TYPE_KEYS[event.inputType];
+			if (key && this._isEditable()) event.target.dispatchEvent(new KeyboardEvent("keydown", {
+				bubbles: true,
+				cancelable: true,
+				key
+			}));
 		});
-		EventHandler.on(this._element, eventName("focusin"), SELECTOR_SECTION$1, (event) => {
-			this._draft = "";
+		EventHandler.on(this._element, eventName("focusin"), SELECTOR_SECTION$2, (event) => {
+			if (this._draft) {
+				this._draft = "";
+				this._commitSections();
+			}
 			this._setTabIndexes(event.target);
 			this._selectSectionContent(event.target);
 		});
-		EventHandler.on(this._element, eventName("mousedown"), SELECTOR_SECTION$1, (event) => {
-			if (this._config.disabled) return;
+		EventHandler.on(this._element, eventName("focusin"), SELECTOR_VALUE_FIELD, () => {
+			this._focusFirstEmptySection();
+		});
+		EventHandler.on(this._element, eventName("mousedown"), SELECTOR_SECTION$2, (event) => {
+			if (this._disabled) return;
 			event.preventDefault();
 			event.target.focus();
 			this._selectSectionContent(event.target);
 		});
 		EventHandler.on(this._element, eventName("focusout"), (event) => {
 			if (!this._element.contains(event.relatedTarget)) {
-				this._allSelected = false;
-				this._element.classList.remove(CLASS_NAME_ALL_SELECTED);
-				this._normalizeSections();
+				this._setAllSelected(false);
+				if (!this._disabled) this._normalizeSections();
 			}
 		});
 		EventHandler.on(this._element, eventName("paste"), (event) => {
 			event.preventDefault();
 			if (this._isEditable()) this._handlePaste(event.clipboardData.getData("text"));
 		});
-		EventHandler.on(this._element, eventName("copy"), (event) => {
-			if (this._allSelected) {
-				event.preventDefault();
-				event.clipboardData.setData("text/plain", formatSections(this._sections));
-			}
+		for (const type of ["copy", "cut"]) EventHandler.on(this._element, eventName(type), (event) => {
+			if (!this._allSelected) return;
+			event.preventDefault();
+			event.clipboardData.setData("text/plain", formatSections(this._sections));
+			if (type === "cut" && this._isEditable()) this._clearAndFocus();
 		});
-		EventHandler.on(this._element, eventName("cut"), (event) => {
-			if (this._allSelected) {
-				event.preventDefault();
-				event.clipboardData.setData("text/plain", formatSections(this._sections));
-				if (this._isEditable()) {
-					this.clear();
-					this._getSectionElements()[0].focus();
-				}
-			}
-		});
-		this._form = this._element.closest("form");
-		if (this._form) {
-			EventHandler.on(this._form, eventName("reset"), this._resetHandler);
-			EventHandler.on(this._form, eventName("submit"), this._submitHandler);
-		}
 		EventHandler.on(this._element, eventName("click"), (event) => {
-			if (this._config.disabled || event.target.closest(SELECTOR_SECTION$1)) return;
-			const sections = this._getSectionElements();
-			const target = sections.find((sectionElement, index) => this._getSection(index).value === null) || sections[0];
-			if (target) target.focus();
+			if (event.target.closest(SELECTOR_SECTION$2)) {
+				event.preventDefault();
+				return;
+			}
+			this._focusFirstEmptySection();
 		});
 	}
-	_onFormSubmit() {
-		const form = this._form;
-		queueMicrotask(() => {
-			if (!this._element || !form.matches(SELECTOR_FORM_VALIDATE)) return;
-			const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID$2) || this._config.required && this._date === null;
-			this._submitValid = !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID$1);
-			this._element.classList.toggle(CLASS_NAME_IS_INVALID$2, isInvalid);
-			this._element.classList.toggle(CLASS_NAME_IS_VALID$2, this._submitValid);
-		});
+	_getResetValue() {
+		const sections = setSectionsFromDate(this._sections, this._initialDate);
+		const date = getDateFromSections(sections);
+		return date && !getDateLimitError(sections, date, this._minDate, this._maxDate, this._config.disabledDates) ? formatSections(sections) : "";
+	}
+	_focusFirstEmptySection() {
+		if (this._inputElement?.matches(":disabled")) return;
+		const sections = this._getSectionElements();
+		(sections.find((sectionElement, index) => this._getSection(index).value === null) || sections[0])?.focus();
 	}
 	_onKeydown(event) {
-		const { key, target } = event;
-		if (key === "Tab") return;
+		const { key } = event;
+		const target = event.target;
 		if ((event.ctrlKey || event.metaKey) && key.toLowerCase() === "a") {
 			event.preventDefault();
-			this._selectAllSections();
+			this._setAllSelected(true);
 			return;
 		}
 		if ([
-			ARROW_LEFT_KEY$5,
-			ARROW_RIGHT_KEY$5,
+			ARROW_LEFT_KEY$7,
+			ARROW_RIGHT_KEY$7,
 			HOME_KEY$3,
 			END_KEY$3
-		].includes(key)) {
+		].includes(key) && !hasShortcutModifier(event)) {
 			event.preventDefault();
 			this._focusSectionByKey(target, key);
 			return;
 		}
 		if (!this._isEditable()) {
-			if (key.length === 1) event.preventDefault();
+			if (isTypedKey(event)) event.preventDefault();
 			return;
 		}
 		if (this._allSelected && this._onKeydownAllSelected(event)) return;
-		if ((key === ARROW_UP_KEY$4 || key === ARROW_DOWN_KEY$5) && !(event.altKey && key === ARROW_DOWN_KEY$5)) {
+		const section = this._getSection(this._getSectionIndex(target));
+		if ((key === ARROW_UP_KEY$4 || key === ARROW_DOWN_KEY$5) && !hasShortcutModifier(event)) {
 			event.preventDefault();
-			const section = this._getSection(this._getSectionIndex(target));
 			section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY$4 ? 1 : -1, this._getSectionMax(section));
 			this._draft = "";
-			this._syncSections();
-			this._updateDate();
+			this._runAsUser(() => this._commitSections());
 			return;
 		}
 		if (key === BACKSPACE_KEY$2 || key === DELETE_KEY$1) {
 			event.preventDefault();
-			const section = this._getSection(this._getSectionIndex(target));
 			if (key === BACKSPACE_KEY$2 && section.value === null) {
 				this._focusSibling(target, false);
 				return;
 			}
 			section.value = null;
 			this._draft = "";
-			this._syncSections();
-			this._updateDate();
+			this._runAsUser(() => this._commitSections());
 			return;
 		}
-		if (/^\d$/.test(key)) {
+		if (isTypedKey(event)) {
 			event.preventDefault();
-			this._applyDigit(target, key);
-			return;
-		}
-		if (key.length === 1 && !event.ctrlKey && !event.metaKey) {
-			event.preventDefault();
-			this._applyLetter(target, key);
+			this._applyCharacter(target, key);
 		}
 	}
 	_onKeydownAllSelected(event) {
 		const { key } = event;
-		if (key === BACKSPACE_KEY$2 || key === DELETE_KEY$1) {
-			event.preventDefault();
-			this.clear();
-			this._getSectionElements()[0].focus();
-			return true;
-		}
-		if (key.length === 1 && !event.ctrlKey && !event.metaKey) {
-			event.preventDefault();
-			this.clear();
-			const firstSection = this._getSectionElements()[0];
-			firstSection.focus();
-			if (/^\d$/.test(key)) this._applyDigit(firstSection, key);
-			else this._applyLetter(firstSection, key);
-			return true;
-		}
-		return false;
+		const isCharacter = isTypedKey(event);
+		if (!isCharacter && key !== BACKSPACE_KEY$2 && key !== DELETE_KEY$1) return false;
+		event.preventDefault();
+		const firstSection = this._clearAndFocus();
+		if (isCharacter) this._applyCharacter(firstSection, key);
+		return true;
 	}
 	_focusSectionByKey(sectionElement, key) {
 		const rtl = isRTL(this._element);
 		if (key === HOME_KEY$3 || key === END_KEY$3) {
 			const sections = this._getSectionElements();
-			const first = rtl ? sections.length - 1 : 0;
-			const last = rtl ? 0 : sections.length - 1;
-			sections[key === HOME_KEY$3 ? first : last].focus();
+			sections[key === HOME_KEY$3 ? 0 : sections.length - 1].focus();
 			return;
 		}
-		const shouldMoveNext = key === (rtl ? ARROW_LEFT_KEY$5 : ARROW_RIGHT_KEY$5);
+		const shouldMoveNext = key === (rtl ? ARROW_LEFT_KEY$7 : ARROW_RIGHT_KEY$7);
 		this._focusSibling(sectionElement, shouldMoveNext);
 	}
-	_applyDigit(sectionElement, digit) {
+	_applyCharacter(sectionElement, character) {
 		const section = this._getSection(this._getSectionIndex(sectionElement));
-		this._applySectionInput(sectionElement, section, applyDigitToSection(section, this._draft, digit, this._getSectionMax(section)));
-	}
-	_applyLetter(sectionElement, letter) {
-		const section = this._getSection(this._getSectionIndex(sectionElement));
-		this._applySectionInput(sectionElement, section, applyLetterToSection(section, this._draft, letter));
-	}
-	_applySectionInput(sectionElement, section, result) {
+		const result = /^\d$/.test(character) ? applyDigitToSection(section, this._draft, character, this._getSectionMax(section)) : applyLetterToSection(section, this._draft, character);
 		if (!result) return;
-		const { draft, value, completed } = result;
-		this._draft = completed ? "" : draft;
-		section.value = value;
-		this._syncSections();
-		this._updateDate();
-		if (completed) this._focusSibling(sectionElement, true);
+		this._draft = result.completed ? "" : result.draft;
+		section.value = result.value;
+		this._runAsUser(() => this._commitSections());
+		if (result.completed) this._focusSibling(sectionElement, true);
 		else this._selectSectionContent(sectionElement);
+	}
+	_clearAndFocus() {
+		this._setAllSelected(false);
+		this._draft = "";
+		this._runAsUser(() => this._commitSections(setSectionsFromDate(this._sections, null)));
+		const [firstSection] = this._getSectionElements();
+		firstSection.focus();
+		return firstSection;
 	}
 	_handlePaste(text) {
 		if (!text) return;
-		if (this._config.inputDateParse) {
-			const date = this._config.inputDateParse(text);
-			if (date instanceof Date && !Number.isNaN(date.getTime())) {
-				this._sections = setSectionsFromDate(this._sections, date);
-				this._syncSections();
-				this._updateDate();
-			}
-			return;
-		}
-		const sections = getSectionsFromString(text, this._sections);
+		this._draft = "";
+		const sections = this._config.inputDateParse ? null : getSectionsFromString(text, this._sections);
 		if (sections) {
-			this._sections = sections;
-			this._syncSections();
-			this._updateDate();
+			this._runAsUser(() => this._commitSections(sections));
 			return;
 		}
-		const date = getLocalDateFromString(text, this._config.locale);
-		if (date instanceof Date && !Number.isNaN(date.getTime())) {
-			this._sections = setSectionsFromDate(this._sections, date);
-			this._syncSections();
-			this._updateDate();
-		}
+		const date = this._config.inputDateParse ? this._config.inputDateParse(text) : getLocalDateFromString(text, this._config.locale);
+		if (date instanceof Date && !Number.isNaN(date.getTime())) this._runAsUser(() => this._commitSections(setSectionsFromDate(this._sections, date)));
 	}
 	_normalizeSections() {
 		for (const section of this._sections) {
@@ -9455,17 +10109,38 @@ var SectionInput = class extends BaseComponent {
 			section.value = Math.min(Math.max(section.value, min), this._getSectionMax(section));
 		}
 		this._draft = "";
-		this._syncSections();
-		this._updateDate();
+		this._commitSections();
 	}
-	_updateDate() {
-		const nextDate = this._applyValidationState();
-		if (this._isSameDate(nextDate, this._date)) return;
-		this._date = nextDate;
-		EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), { date: nextDate });
+	_commitSections(sections = this._sections, notify = true) {
+		if (this._getValueKey(sections) !== this._valueKey) this._validation.change();
+		this._sections = sections;
+		this._syncSections();
+		const value = this._applyValidationState();
+		this._valueKey = this._getValueKey(this._sections);
+		try {
+			if (notify) {
+				this._notifying += 1;
+				this._report(value);
+			}
+		} finally {
+			if (notify) this._notifying -= 1;
+			if (!this._notifying) this._reportedDate = this._date;
+		}
+		if (!this._notifying) this._announceError();
+	}
+	_report(value) {
+		if (value !== null) {
+			const reports = ++this._reports;
+			this._inputElement.dispatchEvent(new Event("input", { bubbles: true }));
+			if (this._reports === reports) this._inputElement.dispatchEvent(new Event("change", { bubbles: true }));
+		}
+		if (!isSameInstantAs(this._date, this._reportedDate)) {
+			this._reportedDate = this._date;
+			EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), { date: this._date });
+		}
 	}
 	_applyValidationState() {
-		for (const section of this._sections) if ((section.type === "day" || section.type === "week") && section.value !== null && section.value > this._getSectionMax(section)) {
+		for (const section of this._sections) if (!this._draft && (section.type === "day" || section.type === "week") && section.value !== null && section.value > this._getSectionMax(section)) {
 			section.value = this._getSectionMax(section);
 			this._syncSections();
 		}
@@ -9473,130 +10148,119 @@ var SectionInput = class extends BaseComponent {
 		const isFilled = this._sections.some((section) => section.type !== "literal" && section.value !== null);
 		const error = this._getValidationError(date, isFilled);
 		const isDisabled = error !== null && error !== "incomplete";
+		const value = date && !isDisabled ? formatSections(this._sections) : "";
+		const isChanged = this._fieldValue !== value;
 		this._element.classList.toggle(CLASS_NAME_FILLED, isFilled);
-		this._element.classList.toggle(CLASS_NAME_IS_INVALID$2, isDisabled || this._config.invalid);
-		this._element.classList.toggle(CLASS_NAME_IS_VALID$2, this._config.valid || this._submitValid && isFilled && !isDisabled);
-		this._setHiddenInputValue();
-		if (error !== this._error) {
-			this._error = error;
-			EventHandler.trigger(this._element, this.constructor.eventName("errorChange"), { error });
-		}
-		return isDisabled ? null : date;
+		this._rejected = isDisabled;
+		this._fieldValue = value;
+		if (this._inputElement.value !== value) this._inputElement.value = value;
+		this._date = isDisabled ? null : date;
+		this._validationError = error;
+		this._validation.update();
+		return isChanged && this._isBuilt ? value : null;
+	}
+	_announceError() {
+		if (this._errorHolds || this._validationError === this._error) return;
+		this._error = this._validationError;
+		EventHandler.trigger(this._element, this.constructor.eventName("errorChange"), { error: this._error });
+		this._validation.update();
+	}
+	_holdErrors(hold) {
+		this._errorHolds += hold ? 1 : -1;
+		this._announceError();
+	}
+	_runAsUser(action) {
+		this._validation.runAsUser(action);
 	}
 	_getValidationError(date, isFilled) {
-		if (!(date instanceof Date)) return isFilled ? "incomplete" : null;
-		if (this._minDate && date < this._minDate) return "minDate";
-		if (this._maxDate && date > this._maxDate) return "maxDate";
-		if (isDateDisabled(date, null, null, this._config.disabledDates)) return "disabledDate";
-		return null;
-	}
-	_isSameDate(date, date2) {
-		return isSameInstantAs(date, date2);
-	}
-	_restoreAttribute(name, value) {
-		if (value === null) {
-			this._element.removeAttribute(name);
-			return;
+		if (!(date instanceof Date)) {
+			if (!isFilled) return null;
+			return !containsFocus(this._element) && isBeforeYearOne(this._sections) ? "minDate" : "incomplete";
 		}
-		this._element.setAttribute(name, value);
+		return getDateLimitError(this._sections, date, this._minDate, this._maxDate, this._config.disabledDates);
 	}
 	_createSectionInput() {
+		const { name, readonly, required } = this._config;
+		const disabled = this._disabled;
 		this._element.classList.add(CLASS_NAME_FORM_CONTROL, CLASS_NAME_SECTION_INPUT);
-		this._element.classList.toggle(CLASS_NAME_DISABLED$4, this._config.disabled);
-		this._element.classList.toggle(CLASS_NAME_IS_INVALID$2, this._config.invalid);
-		this._element.classList.toggle(CLASS_NAME_IS_VALID$2, this._config.valid);
+		this._element.classList.toggle(CLASS_NAME_DISABLED$5, disabled);
 		this._element.setAttribute("role", "group");
-		this._element.setAttribute("aria-label", this._getAriaLabel());
-		this._element.innerHTML = "";
+		if (!this._hostAriaLabel) this._element.setAttribute("aria-label", this._getAriaLabel());
+		this._element.replaceChildren();
 		for (const section of this._sections) {
+			const element = document.createElement("span");
 			if (section.type === "literal") {
-				const separatorElement = document.createElement("span");
-				separatorElement.classList.add(CLASS_NAME_SEPARATOR$1);
-				separatorElement.setAttribute("aria-hidden", "true");
-				separatorElement.textContent = section.value;
-				this._element.append(separatorElement);
+				element.className = CLASS_NAME_SEPARATOR$1;
+				element.setAttribute("aria-hidden", "true");
+				element.textContent = section.value;
+				this._element.append(element);
 				continue;
 			}
 			const { min, max } = getSectionBounds(section);
-			const sectionElement = document.createElement("span");
-			sectionElement.classList.add(CLASS_NAME_SECTION);
-			sectionElement.setAttribute("role", "spinbutton");
-			sectionElement.setAttribute("inputmode", section.names ? "text" : "numeric");
-			sectionElement.setAttribute("autocorrect", "off");
-			sectionElement.setAttribute("spellcheck", "false");
-			sectionElement.setAttribute("aria-label", this._sectionLabel(section.type));
-			sectionElement.setAttribute("aria-valuemin", min);
-			sectionElement.setAttribute("aria-valuemax", max);
-			sectionElement.dataset.coreuiSection = section.type;
-			if (!this._config.disabled) sectionElement.contentEditable = "true";
-			if (this._config.disabled) sectionElement.setAttribute("aria-disabled", "true");
-			if (this._config.readonly) sectionElement.setAttribute("aria-readonly", "true");
-			this._element.append(sectionElement);
+			const labelKey = `aria${section.type[0].toUpperCase()}${section.type.slice(1)}Label`;
+			const attributes = {
+				role: "spinbutton",
+				inputmode: section.names ? "text" : "numeric",
+				autocorrect: "off",
+				spellcheck: "false",
+				"aria-label": this._config[labelKey] || this.constructor.Default[labelKey],
+				"aria-valuemin": String(min),
+				"aria-valuemax": String(max),
+				"data-coreui-section": section.type
+			};
+			if (disabled) attributes["aria-disabled"] = "true";
+			else attributes.contenteditable = "true";
+			if (readonly) attributes["aria-readonly"] = "true";
+			if (required) attributes["aria-required"] = "true";
+			element.className = CLASS_NAME_SECTION;
+			for (const [attribute, value] of Object.entries(attributes)) element.setAttribute(attribute, value);
+			this._element.append(element);
 		}
-		this._createHiddenInput();
+		if (!this._inputElement) {
+			this._inputElement = document.createElement("textarea");
+			this._inputElement.autocomplete = "off";
+			this._inputElement.tabIndex = -1;
+			this._inputElement.setAttribute("aria-hidden", "true");
+		}
+		this._inputElement.defaultValue = this._isBuilt ? this._getResetValue() : "";
+		this._inputElement.disabled = disabled;
+		this._inputElement.readOnly = readonly;
+		this._inputElement.required = required;
+		if (name) this._inputElement.name = name;
+		else this._inputElement.removeAttribute("name");
+		this._element.append(this._inputElement);
 		this._syncSections();
 		this._setTabIndexes();
-		this._element.classList.toggle(CLASS_NAME_FILLED, this._sections.some((section) => section.type !== "literal" && section.value !== null));
-	}
-	_createHiddenInput() {
-		const hiddenInput = document.createElement("input");
-		hiddenInput.type = "hidden";
-		hiddenInput.disabled = this._config.disabled;
-		hiddenInput.required = this._config.required;
-		if (this._config.name) hiddenInput.name = this._config.name;
-		this._element.append(hiddenInput);
-		this._inputElement = hiddenInput;
-		this._setHiddenInputValue();
-	}
-	_setHiddenInputValue() {
-		if (this._inputElement) this._inputElement.value = getDateFromSections(this._sections) ? formatSections(this._sections) : "";
-	}
-	_sectionLabel(type) {
-		return this._config[`aria${type[0].toUpperCase()}${type.slice(1)}Label`];
-	}
-	_sectionPlaceholder(type) {
-		return this._config[`${type}Placeholder`];
+		this._validation.refresh();
 	}
 	_syncSections() {
-		const sectionElements = this._getSectionElements();
-		for (const [index, sectionElement] of sectionElements.entries()) {
+		for (const [index, sectionElement] of this._getSectionElements().entries()) {
 			const section = this._getSection(index);
-			const placeholder = this._sectionPlaceholder(section.type) || section.placeholder || DefaultPlaceholders[section.type].slice(0, section.length);
+			const placeholder = this._config[`${section.type}Placeholder`] || section.placeholder || DefaultPlaceholders[section.type].slice(0, section.length);
 			sectionElement.textContent = formatSectionValue(section, placeholder);
 			sectionElement.classList.toggle(CLASS_NAME_SECTION_EMPTY, section.value === null);
-			if (section.type === "day") sectionElement.setAttribute("aria-valuemax", this._getSectionMax(section));
-			if (section.value === null) {
-				sectionElement.removeAttribute("aria-valuenow");
-				sectionElement.setAttribute("aria-valuetext", "Empty");
-				continue;
-			}
-			const value = section.type === "year" ? getFullYearFromSection(section) : section.value;
-			sectionElement.setAttribute("aria-valuenow", value);
-			sectionElement.setAttribute("aria-valuetext", this._getSectionValueText(section, value));
+			if (section.type === "day" || section.type === "week") sectionElement.setAttribute("aria-valuemax", String(this._getSectionMax(section)));
+			sectionElement.setAttribute("aria-valuetext", getSectionValueText(section, this._config.locale));
+			if (section.value === null) sectionElement.removeAttribute("aria-valuenow");
+			else sectionElement.setAttribute("aria-valuenow", String(section.type === "year" ? getFullYearFromSection(section) : section.value));
 		}
-	}
-	_getSectionValueText(section, value) {
-		if (section.names) return section.names[section.value - 1];
-		if (section.type === "month") return this._monthFormatter.format(new Date(2e3, section.value - 1, 1));
-		return String(value);
 	}
 	_setTabIndexes(activeElement = null) {
 		const sectionElements = this._getSectionElements();
 		const focusableElement = activeElement || sectionElements[0];
-		for (const sectionElement of sectionElements) sectionElement.tabIndex = !this._config.disabled && sectionElement === focusableElement ? 0 : -1;
+		for (const sectionElement of sectionElements) sectionElement.tabIndex = !this._disabled && sectionElement === focusableElement ? 0 : -1;
 	}
 	_selectSectionContent(sectionElement) {
-		this._allSelected = false;
-		this._element.classList.remove(CLASS_NAME_ALL_SELECTED);
+		this._setAllSelected(false);
 		const selection = window.getSelection();
 		const range = document.createRange();
 		range.selectNodeContents(sectionElement);
 		selection.removeAllRanges();
 		selection.addRange(range);
 	}
-	_selectAllSections() {
-		this._allSelected = true;
-		this._element.classList.add(CLASS_NAME_ALL_SELECTED);
+	_setAllSelected(allSelected) {
+		this._allSelected = allSelected;
+		this._element.classList.toggle(CLASS_NAME_ALL_SELECTED, allSelected);
 	}
 	_focusSibling(sectionElement, shouldMoveNext) {
 		const sections = this._getSectionElements();
@@ -9609,118 +10273,47 @@ var SectionInput = class extends BaseComponent {
 		return getSectionBounds(section).max;
 	}
 	_isEditable() {
-		return !this._config.disabled && !this._config.readonly;
+		return !this._disabled && !this._config.readonly;
 	}
 	_getSection(index) {
-		return this._sections.filter((section) => section.type !== "literal")[index];
+		return this._sections.filter(isEditableSection)[index];
 	}
 	_getSectionIndex(sectionElement) {
 		return this._getSectionElements().indexOf(sectionElement);
 	}
 	_getSectionElements() {
-		return SelectorEngine.find(SELECTOR_SECTION$1, this._element);
-	}
-	static componentInterface(element, config, ...args) {
-		const data = this.getOrCreateInstance(element, config);
-		if (typeof config === "string") {
-			if (typeof data[config] === "undefined") throw new TypeError(`No method named "${config}"`);
-			data[config](...args);
-		}
-	}
-};
-//#endregion
-//#region js/src/date-input.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO date-input.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$35 = "date-input";
-const EVENT_LOAD_DATA_API$17 = `load.coreui.date-input.data-api`;
-const SELECTOR_DATA_DATE_INPUT = "[data-coreui-date-input]";
-const ARIA_LABEL_DATE = "Date input";
-const ARIA_LABEL_DATE_TIME = "Date and time input";
-const Default$33 = {
-	...SectionInput.Default,
-	ariaLabel: ARIA_LABEL_DATE,
-	seconds: false,
-	type: "date"
-};
-const DefaultType$33 = {
-	...SectionInput.DefaultType,
-	seconds: "boolean",
-	type: "string"
-};
-/**
-* Class definition
-*/
-var DateInput = class DateInput extends SectionInput {
-	static get Default() {
-		return Default$33;
-	}
-	static get DefaultType() {
-		return DefaultType$33;
-	}
-	static get NAME() {
-		return NAME$35;
-	}
-	_getAriaLabel() {
-		return this._config.ariaLabel === ARIA_LABEL_DATE && this._config.type === "datetime" ? ARIA_LABEL_DATE_TIME : this._config.ariaLabel;
-	}
-	_convertDate(value) {
-		if (this._config.type === "datetime") {
-			const withTime = convertToDateObject(value, "day", this._config.locale, true);
-			if (withTime) return withTime;
-		}
-		return super._convertDate(value);
+		return SelectorEngine.find(SELECTOR_SECTION$2, this._element);
 	}
 	_getDefaultSections(locale) {
-		return this._config.type === "datetime" ? getDateTimeSectionsFromLocale(locale, this._config.seconds) : getSectionsFromLocale(locale);
+		const { seconds, type } = this._config;
+		return type === "time" ? getTimeSectionsFromLocale(locale, seconds) : getSectionLayout(null, locale, null, type === "datetime" && { seconds });
 	}
 	static jQueryInterface(config, ...args) {
 		return jQueryDispatch(this, DateInput, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(window, EVENT_LOAD_DATA_API$17, () => {
-	for (const dateInput of SelectorEngine.find(SELECTOR_DATA_DATE_INPUT)) DateInput.componentInterface(dateInput);
+EventHandler.on(window, EVENT_LOAD_DATA_API$16, () => {
+	for (const dateInput of SelectorEngine.find(SELECTOR_DATA_DATE_INPUT)) DateInput.getOrCreateInstance(dateInput);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(DateInput);
 //#endregion
+//#region js/src/util/composite.ts
+const getForwardedOptions = (keys, config, defaults, original) => {
+	const forwarded = {};
+	for (const key of keys) {
+		const value = config[key] === "" && /^aria(?:Day|End|Hour|Meridiem|Minute|Month|Quarter|Second|Start|Week|Year)Label$/.test(key) ? defaults[key] : config[key];
+		if (key in config && value !== original[key]) forwarded[key] = value;
+	}
+	return forwarded;
+};
+//#endregion
 //#region js/src/picker-base.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO picker-base.js
-* License (https://coreui.io/pro/license/)
-*
-* Shared shell for the four pickers. Each of them is the same product with a
-* different filling: a section field, one or two bodies and a popup, joined by
-* the value the picker owns. What lives here is the part that does not depend
-* on that value — the popup and its events, the toggle and cleaner wiring, the
-* projected footer, the attributes adopted from markup the author wrote, and
-* teardown. The value model stays in the picker: what `reset()` restores, what
-* `getContext()` hands to a footer button, which bodies the popup gets.
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const CLASS_NAME_SHOW$11 = "show";
+const CLASS_NAME_POPUP = "popup";
+const CLASS_NAME_SHOW$9 = "show";
 const SELECTOR_ACTION$1 = "[data-coreui-picker-action]";
-const SELECTOR_SVG$1 = "svg";
+const SELECTOR_SECTION$1 = "[data-coreui-section]";
+const SELECTOR_SVG = "svg";
 const SELECTOR_TEMPLATE_FOOTER = "template[data-coreui-template=\"footer\"]";
-/**
-* Class definition
-*/
 var PickerBase = class extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
@@ -9729,9 +10322,15 @@ var PickerBase = class extends BaseComponent {
 		this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element);
 		this._menu = null;
 		this._popup = null;
+		this._validation = new FieldValidation(this._element, {
+			aliases: true,
+			config: () => this._config,
+			fields: () => [],
+			frames: () => this._stateFrames(),
+			invalidTargets: () => []
+		});
 	}
 	show() {
-		if (this._config.disabled) return;
 		this._popup.show();
 	}
 	hide() {
@@ -9740,14 +10339,29 @@ var PickerBase = class extends BaseComponent {
 	toggle() {
 		return this._popup.isShown ? this.hide() : this.show();
 	}
+	setValidationState(validationState) {
+		this._setConfig({
+			invalid: false,
+			valid: false,
+			validationState
+		});
+	}
 	dispose() {
 		if (!this._element) return;
 		for (const element of this._listeningElements()) EventHandler.off(element, this.constructor.EVENT_KEY);
 		this._popup.dispose();
 		this._disposeParts();
 		this._restoreAdoptedAttributes();
-		restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses);
+		this._validation.dispose();
 		super.dispose();
+	}
+	_setConfig(config) {
+		if (!config || Object.keys(config).length === 0) return;
+		this._config = this._getConfig({
+			...this._config,
+			...config
+		});
+		this._validation.configure(config);
 	}
 	_createPopup() {
 		this._popup = new Popup({
@@ -9755,18 +10369,18 @@ var PickerBase = class extends BaseComponent {
 			container: this._config.container,
 			content: this._menu,
 			onBeforeHide: () => !EventHandler.trigger(this._element, this.constructor.eventName("hide"))?.defaultPrevented,
-			onBeforeShow: () => !EventHandler.trigger(this._element, this.constructor.eventName("show"))?.defaultPrevented,
+			onBeforeShow: () => !this._config.disabled && !EventHandler.trigger(this._element, this.constructor.eventName("show"))?.defaultPrevented,
 			onHidden: () => EventHandler.trigger(this._element, this.constructor.eventName("hidden")),
 			onHide: () => {
 				this._clearToggleAttribute("aria-controls");
-				this._menu.classList.remove(CLASS_NAME_SHOW$11);
-				this._element.classList.remove(CLASS_NAME_SHOW$11);
+				this._menu.classList.remove(CLASS_NAME_SHOW$9);
+				this._element.classList.remove(CLASS_NAME_SHOW$9);
 				this._writeToggleAttribute("aria-expanded", "false");
 			},
 			onShow: () => {
 				this._writeToggleAttribute("aria-controls", this._menu.id);
-				this._menu.classList.add(CLASS_NAME_SHOW$11);
-				this._element.classList.add(CLASS_NAME_SHOW$11);
+				this._menu.classList.add(CLASS_NAME_SHOW$9);
+				this._element.classList.add(CLASS_NAME_SHOW$9);
 				this._onPopupShow();
 				this._writeToggleAttribute("aria-expanded", "true");
 			},
@@ -9777,7 +10391,8 @@ var PickerBase = class extends BaseComponent {
 		const eventName = this.constructor.eventName("click");
 		if (this._cleanerElement) EventHandler.on(this._cleanerElement, eventName, (event) => {
 			event.stopPropagation();
-			this.clear();
+			this._runAsUser(() => this.clear());
+			if (this._element && [this._cleanerElement, document.body].includes(document.activeElement)) SelectorEngine.findOne(SELECTOR_SECTION$1, this._popupAnchor())?.focus();
 		});
 		EventHandler.on(this._toggleElement, eventName, () => {
 			if (!this._config.disabled) this.toggle();
@@ -9788,44 +10403,90 @@ var PickerBase = class extends BaseComponent {
 			if (typeof context[action] === "function") context[action]();
 		});
 	}
+	_stateFrames() {
+		return [];
+	}
+	_runAsUser(action) {
+		this._validation.runAsUser(action);
+	}
+	_createAction(className, icon, label) {
+		return createControlGroupAction({
+			className,
+			disabled: this._config.disabled,
+			icon,
+			label,
+			sanitizeIcon: (value) => sanitizeByConfig(value, this._config)
+		});
+	}
+	_createMenu(prefix, body, nowAction) {
+		this._menu = document.createElement("div");
+		this._menu.id = getUID(`${this.constructor.NAME}-popup-`);
+		this._menu.classList.add(CLASS_NAME_POPUP, `${prefix}-popup`);
+		this._menu.setAttribute("aria-label", this._popupLabel());
+		this._menu.append(body);
+		this._writeToggleAttribute("aria-expanded", "false");
+		this._writeToggleAttribute("aria-haspopup", "dialog");
+		if (!this._footerTemplate) return;
+		const footer = document.createElement("div");
+		footer.classList.add(`${prefix}-footer`);
+		footer.append(this._footerTemplate.content.cloneNode(true));
+		if (nowAction && !this._isNowSelectable()) {
+			for (const button of SelectorEngine.find(nowAction, footer)) if ("disabled" in button) button.disabled = true;
+		}
+		this._menu.append(footer);
+	}
+	_originalDefault() {
+		return this.constructor.Default;
+	}
 	_forwardConfig(Component, overrides = {}, extra = {}) {
-		const forwarded = {};
-		for (const key of Object.keys(Component.Default)) if (key in this._config && this._config[key] !== this.constructor.Default[key]) forwarded[key] = this._config[key];
 		return {
-			...forwarded,
+			...getForwardedOptions(Object.keys(Component.Default), this._config, this.constructor.Default, this._originalDefault()),
 			...overrides,
 			...extra
 		};
 	}
 	_baseContext() {
 		return {
-			clear: () => this.clear(),
+			clear: () => this._runAsUser(() => this.clear()),
 			close: () => this.hide(),
 			disabled: this._config.disabled,
-			reset: () => this.reset()
+			reset: () => this._runAsUser(() => this.reset())
 		};
 	}
-	_disableUnselectableActions(selector, container) {
-		if (this._isNowSelectable()) return;
-		for (const button of SelectorEngine.find(selector, container)) if ("disabled" in button) button.disabled = true;
-	}
 	_writeAdoptedAttribute(element, name, value) {
-		if (!this._adoptedAttributes.some(([recorded, recordedName]) => recorded === element && recordedName === name)) this._adoptedAttributes.push([
+		const recorded = this._adoptedAttributes.find(([recordedElement, recordedName]) => recordedElement === element && recordedName === name);
+		if (recorded) recorded[3] = value;
+		else this._adoptedAttributes.push([
 			element,
 			name,
 			element.getAttribute(name),
 			value
 		]);
-		element.setAttribute(name, value);
+		if (value === null) element.removeAttribute(name);
+		else element.setAttribute(name, value);
 	}
 	_adoptAction(element, label) {
-		if (!element.hasAttribute("aria-label") && !element.hasAttribute("aria-labelledby")) this._writeAdoptedAttribute(element, "aria-label", label);
-		for (const svg of SelectorEngine.find(SELECTOR_SVG$1, element)) if (!svg.hasAttribute("aria-hidden")) this._writeAdoptedAttribute(svg, "aria-hidden", "true");
-		if (this._config.disabled && "disabled" in element) {
-			this._writeAdoptedAttribute(element, "disabled", "");
-			element.disabled = true;
-		}
+		if (!element.hasAttribute("aria-label") && !element.hasAttribute("aria-labelledby") && !this._showsText(element)) this._writeAdoptedAttribute(element, "aria-label", label);
+		for (const svg of SelectorEngine.find(SELECTOR_SVG, element)) svg.setAttribute("aria-hidden", "true");
+		if ("disabled" in element) element.disabled = this._config.disabled;
 		return element;
+	}
+	_showsText(element) {
+		return [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE ? Boolean(node.textContent?.trim()) : node instanceof HTMLElement && !node.hidden && node.getAttribute("aria-hidden") !== "true" && this._showsText(node));
+	}
+	_moveAriaToField(element) {
+		const isNamed = element.hasAttribute("aria-label") || element.hasAttribute("aria-labelledby");
+		for (const name of [
+			"aria-describedby",
+			"aria-label",
+			"aria-labelledby"
+		]) {
+			const value = this._element.getAttribute(name);
+			const own = element.getAttribute(name);
+			if (value === null || name !== "aria-describedby" && isNamed) continue;
+			this._writeAdoptedAttribute(element, name, own ? `${own} ${value}` : value);
+			this._writeAdoptedAttribute(this._element, name, null);
+		}
 	}
 	_restoreAdoptedAttributes() {
 		for (const [element, name, previous, written] of this._adoptedAttributes) {
@@ -9844,6 +10505,9 @@ var PickerBase = class extends BaseComponent {
 	_popupAnchor() {
 		return this._element;
 	}
+	_popupLabel() {
+		return this._config.ariaPopupLabel;
+	}
 	_writeToggleAttribute(name, value) {
 		this._toggleElement?.setAttribute(name, value);
 	}
@@ -9856,72 +10520,337 @@ var PickerBase = class extends BaseComponent {
 		}
 		this._toggleElement.setAttribute(name, recorded[2]);
 	}
-	_onPopupShow() {
-		throw new Error("Method \"_onPopupShow\" must be implemented.");
+};
+//#endregion
+//#region js/src/time-selection/base.ts
+const NAME$36 = "time-selection";
+const EVENT_KEY$28 = ".coreui.time-selection";
+const EVENT_FOCUSIN$5 = `focusin${EVENT_KEY$28}`;
+const EVENT_KEYDOWN$9 = `keydown${EVENT_KEY$28}`;
+const Default$31 = {
+	ariaSelectHoursLabel: "Select hours",
+	ariaSelectMeridiemLabel: "Select AM/PM",
+	ariaSelectMinutesLabel: "Select minutes",
+	ariaLabel: "Time",
+	ariaSelectSecondsLabel: "Select seconds",
+	hourCycle: null,
+	hours: null,
+	locale: "default",
+	maxDate: null,
+	minDate: null,
+	minutes: true,
+	onChange: null,
+	seconds: true,
+	time: null
+};
+const DefaultType$30 = {
+	ariaSelectHoursLabel: "string",
+	ariaSelectMeridiemLabel: "string",
+	ariaSelectMinutesLabel: "string",
+	ariaLabel: "string",
+	ariaSelectSecondsLabel: "string",
+	hourCycle: "(string|null)",
+	hours: "(array|function|null)",
+	locale: "string",
+	maxDate: "(date|string|null)",
+	minDate: "(date|string|null)",
+	minutes: "(array|boolean|function)",
+	onChange: "(function|null)",
+	seconds: "(array|boolean|function)",
+	time: "(date|null)"
+};
+var TimeSelection = class extends Config {
+	constructor(element, config) {
+		super();
+		this._element = element;
+		this._config = this._getConfig(config);
+		this._date = this._config.time;
+		this._render();
 	}
-	_disposeParts() {
-		throw new Error("Method \"_disposeParts\" must be implemented.");
+	static get Default() {
+		return Default$31;
 	}
-	_managedClassNames() {
-		throw new Error("Method \"_managedClassNames\" must be implemented.");
+	static get DefaultType() {
+		return DefaultType$30;
 	}
-	_isNowSelectable() {
-		throw new Error("Method \"_isNowSelectable\" must be implemented.");
+	static get NAME() {
+		return NAME$36;
 	}
-	getContext() {
-		throw new Error("Method \"getContext\" must be implemented.");
+	getTime() {
+		return this._date;
 	}
-	clear() {
-		throw new Error("Method \"clear\" must be implemented.");
+	setTime(time) {
+		this._config.time = time;
+		this._date = time;
+		this._ampm = this._dayPeriod();
+		this._markSelected();
 	}
-	reset() {
-		throw new Error("Method \"reset\" must be implemented.");
+	setConfig(config) {
+		this._config = this._getConfig({
+			...this._config,
+			...config
+		});
+		this._date = this._config.time;
+		this._render();
+	}
+	dispose() {
+		EventHandler.off(this._element, EVENT_FOCUSIN$5);
+		EventHandler.off(this._element, EVENT_KEYDOWN$9);
+		this._element.replaceChildren();
+		this._element = null;
+	}
+	_ampmOption() {
+		return this._config.hourCycle === null ? "auto" : this._config.hourCycle === "h12";
+	}
+	_render() {
+		this._element.setAttribute("role", "group");
+		this._element.setAttribute("aria-label", this._config.ariaLabel);
+		this._minDate = convertValue(this._config.minDate, "datetime", this._config.locale);
+		this._maxDate = getInclusiveMax(convertValue(this._config.maxDate, "datetime", this._config.locale));
+		this._partials = getLocalizedTimePartials(this._config.locale, this._ampmOption(), this._config.hours, this._config.minutes, this._config.seconds);
+		this._ampm = this._dayPeriod();
+		this._element.replaceChildren();
+		EventHandler.off(this._element, EVENT_KEYDOWN$9);
+		this._renderBody();
+		EventHandler.off(this._element, EVENT_FOCUSIN$5);
+		EventHandler.on(this._element, EVENT_FOCUSIN$5, (event) => {
+			this._updateRovingTabIndex(event.target);
+		});
+		this._markSelected(true);
+		this._updateRovingTabIndex();
+	}
+	_parts() {
+		const parts = [{
+			ariaLabel: this._config.ariaSelectHoursLabel,
+			name: "hours",
+			options: this._partials.listOfHours
+		}];
+		if (this._config.minutes) parts.push({
+			ariaLabel: this._config.ariaSelectMinutesLabel,
+			name: "minutes",
+			options: this._partials.listOfMinutes
+		});
+		if (this._config.seconds) parts.push({
+			ariaLabel: this._config.ariaSelectSecondsLabel,
+			name: "seconds",
+			options: this._partials.listOfSeconds
+		});
+		if (this._partials.hour12) {
+			const [am, pm] = getDayPeriodNames(this._config.locale);
+			parts.push({
+				ariaLabel: this._config.ariaSelectMeridiemLabel,
+				name: "meridiem",
+				options: [{
+					label: am,
+					value: "am"
+				}, {
+					label: pm,
+					value: "pm"
+				}]
+			});
+		}
+		return parts.map((part) => ({
+			...part,
+			options: part.options.map((option) => ({
+				...option,
+				disabled: this._isUnavailable(part.name, option.value) || this._isOutsideLimits(part.name, option.value)
+			}))
+		}));
+	}
+	_isOutsideLimits(part, value) {
+		if (part === "meridiem" && (this._minDate || this._maxDate)) return this._firstAllowedHour(value) === void 0;
+		return this._isValueOutsideLimits(part, part === "hours" ? this._hourOf(value) : value);
+	}
+	_isValueOutsideLimits(part, value) {
+		if (!this._minDate && !this._maxDate || !this._date && (part === "minutes" || part === "seconds")) return false;
+		const date = new Date(this._config.time ?? constrainDate(/* @__PURE__ */ new Date(), this._minDate, this._maxDate));
+		if (this._date) date.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds());
+		const offered = (part === "hours" && this._config.minutes ? this._partials.listOfMinutes : part === "minutes" && this._config.seconds ? this._partials.listOfSeconds : []).map((option) => option.value);
+		return isTimeOutsideLimits(date, part, value, {
+			max: this._maxDate,
+			min: this._minDate
+		}, offered);
+	}
+	_firstAllowedHour(period) {
+		return this._partials.listOfHours.flatMap((option) => option.hours ?? []).toSorted((a, b) => a - b).find((hour) => (!period || hour >= 12 === (period === "pm")) && !this._isValueOutsideLimits("hours", hour));
+	}
+	_startTime() {
+		const hour = this._minDate || this._maxDate ? this._firstAllowedHour() : void 0;
+		if (hour === void 0) return null;
+		const date = /* @__PURE__ */ new Date("1970-01-01T00:00:00");
+		date.setHours(hour, this._config.minutes ? Number(this._partials.listOfMinutes[0]?.value ?? 0) : 0, this._config.seconds ? Number(this._partials.listOfSeconds[0]?.value ?? 0) : 0);
+		return date;
+	}
+	_hourOf(value) {
+		const hour = Number(value);
+		if (!this._partials.hour12) return hour;
+		const hours = this._partials.listOfHours.find((option) => option.value === hour)?.hours ?? [];
+		return hours.length === 1 ? hours[0] : convert12hTo24h(this._ampm, hour);
+	}
+	_dayPeriod() {
+		return (this._date?.getHours() ?? this._startTime()?.getHours() ?? this._partials.listOfHours[0]?.hours?.[0] ?? 0) >= 12 ? "pm" : "am";
+	}
+	_isUnavailable(part, value) {
+		if (part !== "meridiem") return false;
+		const option = this._date && this._partials.listOfHours.find((item) => item.hours?.includes(this._date.getHours()));
+		if (this._date && !option) return false;
+		return !(option ? option.hours ?? [] : this._partials.listOfHours.flatMap((item) => item.hours ?? [])).some((hour) => hour >= 12 === (value === "pm"));
+	}
+	_renderBody() {
+		throw new Error("TimeSelection is abstract — use TimeRoll or TimeSelects.");
+	}
+	_stops() {
+		return [];
+	}
+	_entryStop(list) {
+		return list[0] ?? null;
+	}
+	_markPart(_part, _value, _instant) {}
+	_markDisabled() {}
+	_updateRovingTabIndex(preferred) {
+		const list = this._stops();
+		if (list.length === 0) return;
+		const active = (preferred && list.includes(preferred) ? preferred : null) ?? this._entryStop(list) ?? list[0];
+		for (const element of list) element.tabIndex = element === active ? 0 : -1;
+	}
+	_change(part, value) {
+		const start = this._date ? null : this._startTime();
+		const date = new Date(this._date ?? start ?? /* @__PURE__ */ new Date("1970-01-01T00:00:00"));
+		if (part === "meridiem") {
+			const hours = date.getHours();
+			this._ampm = value;
+			if (value === "am" && hours >= 12) date.setHours(hours - 12);
+			if (value === "pm" && hours < 12) date.setHours(hours + 12);
+			const allowed = this._partials.listOfHours.flatMap((option) => option.hours ?? []);
+			const first = start ? this._firstAllowedHour(value) : void 0;
+			if (first !== void 0) date.setHours(first);
+			else if (!allowed.includes(date.getHours())) date.setHours(allowed.find((hour) => hour >= 12 === (value === "pm")) ?? date.getHours());
+		}
+		if (part === "hours") {
+			const hour = this._hourOf(value);
+			date.setHours(hour);
+			if (this._partials.hour12) this._ampm = hour < 12 ? "am" : "pm";
+		}
+		if (part === "minutes") date.setMinutes(Number.parseInt(value, 10));
+		if (part === "seconds") date.setSeconds(Number.parseInt(value, 10));
+		this._date = date;
+		this._markSelected();
+		execute(this._config.onChange, [void 0, date]);
+	}
+	_markSelected(instant = false) {
+		const time = this._date;
+		const selected = {
+			hours: getSelectedHour(time, this._config.locale, this._ampmOption()),
+			meridiem: time ? this._ampm : "",
+			minutes: getSelectedMinutes(time),
+			seconds: getSelectedSeconds(time)
+		};
+		for (const [part, value] of Object.entries(selected)) this._markPart(part, value, instant);
+		this._markDisabled();
+		this._updateRovingTabIndex(SelectorEngine.findOne(":focus", this._element));
+	}
+};
+//#endregion
+//#region js/src/time-selection/selects.ts
+const NAME$35 = "time-selects";
+const CLASS_NAME_TIME_ICON = "date-picker-time-icon";
+const CLASS_NAME_TIME_SELECT = "date-picker-time-select";
+const ARROW_LEFT_KEY$6 = "ArrowLeft";
+const ARROW_RIGHT_KEY$6 = "ArrowRight";
+const SELECTOR_TIME_SELECT = `select.${CLASS_NAME_TIME_SELECT}`;
+var TimeSelects = class extends TimeSelection {
+	static get NAME() {
+		return NAME$35;
+	}
+	_renderBody() {
+		this._renderSelects();
+	}
+	_stops() {
+		return SelectorEngine.find(SELECTOR_TIME_SELECT, this._element);
+	}
+	_markPart(part, value) {
+		const select = SelectorEngine.findOne(`select.${part}`, this._element);
+		if (!select) return;
+		const shown = [...select.options].some((option) => option.value === String(value)) ? String(value) : "";
+		for (const option of select.options) option.defaultSelected = option.value === shown;
+		select.value = shown;
+		select.options[0].hidden = shown !== "";
+	}
+	_markDisabled() {
+		for (const part of this._parts()) {
+			const { options } = SelectorEngine.findOne(`select.${part.name}`, this._element);
+			for (const [index, option] of part.options.entries()) options[index + 1].disabled = option.disabled;
+		}
+	}
+	_renderSelects() {
+		const icon = document.createElement("span");
+		icon.classList.add(CLASS_NAME_TIME_ICON);
+		icon.setAttribute("aria-hidden", "true");
+		icon.innerHTML = CLOCK_ICON;
+		this._element.append(icon);
+		for (const [index, part] of this._parts().entries()) {
+			if (index > 0 && part.name !== "meridiem") {
+				const separator = document.createElement("span");
+				separator.setAttribute("aria-hidden", "true");
+				separator.textContent = ":";
+				this._element.append(separator);
+			}
+			const select = document.createElement("select");
+			select.classList.add(CLASS_NAME_TIME_SELECT, part.name);
+			select.setAttribute("aria-label", part.ariaLabel);
+			select.addEventListener("change", (event) => this._change(part.name, event.target.value));
+			select.addEventListener("keydown", (event) => {
+				if (event.key !== ARROW_LEFT_KEY$6 && event.key !== ARROW_RIGHT_KEY$6) return;
+				event.preventDefault();
+				const rtl = isRTL(select);
+				const goLeft = event.key === ARROW_LEFT_KEY$6 && !rtl || event.key === ARROW_RIGHT_KEY$6 && rtl;
+				const list = SelectorEngine.find(SELECTOR_TIME_SELECT, this._element);
+				const index = list.indexOf(select) + (goLeft ? -1 : 1);
+				if (index < 0 || index > list.length - 1) return;
+				list[index].focus();
+			});
+			const placeholder = document.createElement("option");
+			placeholder.value = "";
+			placeholder.disabled = true;
+			placeholder.textContent = "--";
+			select.append(placeholder);
+			for (const option of part.options) {
+				const optionEl = document.createElement("option");
+				optionEl.value = option.value;
+				optionEl.textContent = option.label;
+				select.append(optionEl);
+			}
+			this._element.append(select);
+		}
 	}
 };
 //#endregion
 //#region js/src/date-picker.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO date-picker.js
-* License (https://coreui.io/pro/license/)
-*
-* Composed from existing components — DateInput (section field), Calendar and
-* the Popup — joined by one piece of state, the date, that the picker owns.
-* The markup is the composition surface: a field, a toggle and a cleaner the
-* author wrote (by role attribute) are adopted; whatever is missing is
-* generated, so a bare `<div data-coreui-date-picker>` keeps working.
-* Projected regions (footer) come from a <template> child and act through the
-* slot context, not through configuration props.
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const NAME$34 = "date-picker";
 const EVENT_KEY$27 = `.coreui.date-picker`;
 const DATA_API_KEY$22 = ".data-api";
-const EVENT_DATE_CHANGE$1 = `dateChange${EVENT_KEY$27}`;
-const EVENT_LOAD_DATA_API$16 = `load${EVENT_KEY$27}${DATA_API_KEY$22}`;
-const CLASS_NAME_BODY$3 = "date-picker-body";
-const CLASS_NAME_CALENDAR$2 = "date-picker-calendar";
-const CLASS_NAME_CALENDARS$2 = "date-picker-calendars";
-const CLASS_NAME_DATE_PICKER$2 = "date-picker";
-const CLASS_NAME_DROPDOWN$3 = "date-picker-popup";
-const CLASS_NAME_FOOTER$3 = "date-picker-footer";
-const CLASS_NAME_CLEANER$4 = "form-control-cleaner";
-const CLASS_NAME_INDICATOR$3 = "form-control-action";
-const CLASS_NAME_INPUT_GROUP$4 = "form-control-group";
-const CLASS_NAME_PICKER$3 = "picker";
-const CLASS_NAME_POPUP$3 = "popup";
+const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY$27}`;
+const EVENT_LOAD_DATA_API$15 = `load${EVENT_KEY$27}${DATA_API_KEY$22}`;
+const CLASS_NAME_BODY$2 = "date-picker-body";
+const CLASS_NAME_CALENDAR$1 = "date-picker-calendar";
+const CLASS_NAME_CALENDARS$1 = "date-picker-calendars";
+const CLASS_NAME_DATE_PICKER$1 = "date-picker";
+const CLASS_NAME_CLEANER$3 = "form-control-cleaner";
+const CLASS_NAME_INDICATOR$2 = "form-control-action";
+const CLASS_NAME_INPUT_GROUP$3 = "form-control-group";
+const CLASS_NAME_PICKER$2 = "picker";
+const CLASS_NAME_TIME_BODY = "date-picker-time-body";
+const CLASS_NAME_TIME_PICKERS = "date-picker-timepickers";
 const SELECTOR_DATA_DATE_PICKER = "[data-coreui-date-picker]";
 const SELECTOR_ROLE_CLEANER = "[data-coreui-picker-cleaner]";
 const SELECTOR_ROLE_FIELD = "[data-coreui-picker-field]";
 const SELECTOR_ROLE_TOGGLE = "[data-coreui-picker-toggle]";
-const SELECTOR_ACTION_TODAY$1 = "[data-coreui-picker-action=\"today\"]";
-const Default$32 = {
+const SELECTOR_ACTION_TODAY = "[data-coreui-picker-action=\"today\"]";
+const Default$30 = {
 	allowList: SVGAllowlist,
 	ariaCleanerLabel: "Clear date",
 	ariaPickerLabel: "Toggle calendar",
+	ariaPopupLabel: "Calendar",
 	calendarOptions: {},
 	cleaner: true,
 	cleanerIcon: CLEANER_ICON,
@@ -9929,20 +10858,31 @@ const Default$32 = {
 	date: null,
 	disabled: false,
 	floatingLabel: null,
+	format: null,
 	inputOptions: {},
+	invalid: false,
 	locale: navigator.language,
 	maxDate: null,
 	minDate: null,
+	monthNames: null,
 	name: null,
 	pickerIcon: true,
 	sanitize: true,
 	sanitizeFn: null,
-	size: null
+	seconds: true,
+	selectionOptions: {},
+	selectionType: "day",
+	size: null,
+	timepicker: false,
+	valid: false,
+	validationState: null
 };
-const DefaultType$32 = {
+const ORIGINAL_DEFAULT$3 = { ...Default$30 };
+const DefaultType$29 = {
 	allowList: "object",
 	ariaCleanerLabel: "string",
 	ariaPickerLabel: "string",
+	ariaPopupLabel: "string",
 	calendarOptions: "object",
 	cleaner: "boolean",
 	cleanerIcon: "string",
@@ -9950,19 +10890,25 @@ const DefaultType$32 = {
 	date: "(date|string|null)",
 	disabled: "boolean",
 	floatingLabel: "(string|null)",
+	format: "(function|string|null)",
 	inputOptions: "object",
+	invalid: "boolean",
 	locale: "string",
 	maxDate: "(date|string|null)",
 	minDate: "(date|string|null)",
+	monthNames: "(array|null)",
 	name: "(string|null)",
 	pickerIcon: "(string|boolean)",
 	sanitize: "boolean",
 	sanitizeFn: "(function|null)",
-	size: "(string|null)"
+	seconds: "(array|boolean|function)",
+	selectionOptions: "object",
+	selectionType: "string",
+	size: "(string|null)",
+	timepicker: "boolean",
+	valid: "boolean",
+	validationState: "(string|null|undefined)"
 };
-/**
-* Class definition
-*/
 var DatePicker = class DatePicker extends PickerBase {
 	constructor(element, config) {
 		super(element, config);
@@ -9974,168 +10920,216 @@ var DatePicker = class DatePicker extends PickerBase {
 		};
 		this._input = null;
 		this._calendar = null;
-		this._applying = false;
 		this._calendarElement = null;
-		this._hostClasses = captureHostClasses(this._element, this._managedClassNames());
+		this._selection = null;
+		this._selectionElement = null;
+		this._source = null;
 		this._createDatePicker();
-		this._date = this._input.getDate();
+		this._nameToggle();
 		this._createPopup();
 		this._addEventListeners();
 	}
 	static get Default() {
-		return Default$32;
+		return Default$30;
 	}
 	static get DefaultType() {
-		return DefaultType$32;
+		return DefaultType$29;
 	}
 	static get NAME() {
 		return NAME$34;
 	}
 	getDate() {
-		return this._date;
+		return this._input?.getDate() ?? null;
 	}
 	setDate(date) {
-		this._applyDate(date);
+		this._typeCheckConfig({ date }, { date: DefaultType$29.date });
+		this._writeField(date, "code", false);
 	}
 	clear() {
-		this._applyDate(null);
+		this._writeField(null);
 	}
 	reset() {
-		this._applyDate(this._initialDate);
+		this._writeField(this._initialDate);
 	}
 	today() {
-		this._applyDate(/* @__PURE__ */ new Date());
+		this._writeField(/* @__PURE__ */ new Date());
 	}
 	getContext() {
 		return {
 			...this._baseContext(),
 			date: this.getDate(),
 			isDateSelectable: (date) => this._input.isDateSelectable(date),
-			setDate: (date) => this.setDate(date),
-			today: () => this.today()
+			setDate: (date) => this._runAsUser(() => this._writeField(date)),
+			today: () => this._runAsUser(() => this.today())
 		};
 	}
 	_disposeParts() {
 		this._input.dispose();
 		this._calendar?.dispose();
+		this._selection?.dispose();
 		if (this._created.field) this._fieldElement.remove();
 		if (this._created.cleaner) this._cleanerElement?.remove();
 		if (this._created.toggle) this._toggleElement?.remove();
 	}
-	_managedClassNames() {
-		return [
-			CLASS_NAME_DATE_PICKER$2,
-			CLASS_NAME_PICKER$3,
-			CLASS_NAME_INPUT_GROUP$4,
-			...managedSizeClassNames(this._config.size)
-		].filter(Boolean);
-	}
-	_resolveFormat() {
-		if (this._config.format) return this._config.format;
-		return {
-			month: "MM/yyyy",
-			quarter: "QQQ yyyy",
-			week: getWeekSectionsFromLocale,
-			year: "yyyy"
-		}[this._config.selectionType] ?? null;
+	_originalDefault() {
+		return ORIGINAL_DEFAULT$3;
 	}
 	_createDatePicker() {
-		this._element.classList.add(CLASS_NAME_DATE_PICKER$2, CLASS_NAME_PICKER$3);
+		this._element.classList.add(CLASS_NAME_DATE_PICKER$1, CLASS_NAME_PICKER$2);
 		const inputGroup = this._element;
-		applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP$4);
+		applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP$3);
 		applyControlGroupSize(inputGroup, this._config.size);
 		const ownField = SelectorEngine.findOne(SELECTOR_ROLE_FIELD, inputGroup);
 		const inputEl = ownField ?? document.createElement("div");
 		this._created.field = !ownField;
 		this._fieldElement = ownField ?? appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`);
-		const action = (className, icon, label) => createControlGroupAction({
-			className,
-			disabled: this._config.disabled,
-			icon,
-			label,
-			sanitizeIcon: (value) => sanitizeByConfig(value, this._config)
-		});
+		this._moveAriaToField(inputEl);
+		const cleanerLabel = this._withTime("ariaCleanerLabel", "Clear date and time");
+		const pickerLabel = this._withTime("ariaPickerLabel", "Toggle calendar and time selection");
 		const ownCleaner = SelectorEngine.findOne(SELECTOR_ROLE_CLEANER, inputGroup);
-		if (ownCleaner) this._cleanerElement = this._adoptAction(ownCleaner, this._config.ariaCleanerLabel);
+		if (ownCleaner) this._cleanerElement = this._adoptAction(ownCleaner, cleanerLabel);
 		else if (this._config.cleaner) {
-			this._cleanerElement = action(CLASS_NAME_CLEANER$4, this._config.cleanerIcon, this._config.ariaCleanerLabel);
+			this._cleanerElement = this._createAction(CLASS_NAME_CLEANER$3, this._config.cleanerIcon, cleanerLabel);
 			this._created.cleaner = true;
 			inputGroup.append(this._cleanerElement);
 		}
 		const ownToggle = SelectorEngine.findOne(SELECTOR_ROLE_TOGGLE, inputGroup);
 		this._toggleElement = null;
-		if (ownToggle) this._toggleElement = this._adoptAction(ownToggle, this._config.ariaPickerLabel);
-		else if (this._config.pickerIcon) {
-			this._toggleElement = action(CLASS_NAME_INDICATOR$3, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel);
+		this._toggleLabel = null;
+		if (ownToggle) {
+			this._toggleLabel = ownToggle.hasAttribute("aria-label") || ownToggle.hasAttribute("aria-labelledby") || this._showsText(ownToggle) ? null : pickerLabel;
+			this._toggleElement = this._adoptAction(ownToggle, pickerLabel);
+		} else if (this._config.pickerIcon) {
+			this._toggleLabel = pickerLabel;
+			this._toggleElement = this._createAction(CLASS_NAME_INDICATOR$2, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, pickerLabel);
 			this._created.toggle = true;
 			inputGroup.append(this._toggleElement);
 		}
+		const format = getPickerFormat(this._config.format, this._config.selectionType);
 		this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
 			date: this._config.date,
 			disabled: this._config.disabled,
 			locale: this._config.locale,
 			name: this._config.name,
-			...this._resolveFormat() ? { format: this._resolveFormat() } : {}
+			seconds: Boolean(this._config.seconds),
+			type: this._config.timepicker ? "datetime" : "date",
+			...format ? { format } : {}
 		}, {
 			...this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {},
-			...this._config.inputOptions
+			...this._config.inputOptions,
+			validationState: null
 		}));
+		this._validation.adopt(this._input._validation);
 		EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event) => {
-			this._applyDate(event.date, { field: false });
+			this._onFieldChange(event.date);
 		});
-		this._menu = document.createElement("div");
-		this._menu.id = getUID(`${this.constructor.NAME}-popup-`);
-		this._menu.classList.add(CLASS_NAME_POPUP$3, CLASS_NAME_DROPDOWN$3);
-		this._writeToggleAttribute("aria-expanded", "false");
-		this._writeToggleAttribute("aria-haspopup", "dialog");
 		const body = document.createElement("div");
-		body.classList.add(CLASS_NAME_BODY$3);
+		body.classList.add(CLASS_NAME_BODY$2);
 		const calendars = document.createElement("div");
-		calendars.classList.add(CLASS_NAME_CALENDARS$2);
+		calendars.classList.add(CLASS_NAME_CALENDARS$1);
 		this._calendarElement = document.createElement("div");
-		this._calendarElement.classList.add(CLASS_NAME_CALENDAR$2);
+		this._calendarElement.classList.add(CLASS_NAME_CALENDAR$1);
 		calendars.append(this._calendarElement);
 		body.append(calendars);
-		this._menu.append(body);
-		if (this._footerTemplate) {
-			const footer = document.createElement("div");
-			footer.classList.add(CLASS_NAME_FOOTER$3);
-			footer.append(this._footerTemplate.content.cloneNode(true));
-			this._disableUnselectableActions(SELECTOR_ACTION_TODAY$1, footer);
-			this._menu.append(footer);
+		if (this._config.timepicker) {
+			const timePickers = document.createElement("div");
+			timePickers.classList.add(CLASS_NAME_TIME_PICKERS);
+			this._selectionElement = document.createElement("div");
+			this._selectionElement.classList.add(CLASS_NAME_TIME_BODY);
+			timePickers.append(this._selectionElement);
+			body.append(timePickers);
 		}
+		this._createMenu(CLASS_NAME_DATE_PICKER$1, body, SELECTOR_ACTION_TODAY);
 	}
 	_isNowSelectable() {
 		return this._input.isDateSelectable(/* @__PURE__ */ new Date());
+	}
+	_popupLabel() {
+		return this._withTime("ariaPopupLabel", "Calendar and time selection");
+	}
+	_withTime(key, timed) {
+		return this._config.timepicker && this._config[key] === ORIGINAL_DEFAULT$3[key] ? timed : this._config[key];
 	}
 	_ensureCalendar() {
 		if (this._calendar) return;
 		this._calendar = new Calendar(this._calendarElement, this._forwardConfig(Calendar, {
 			locale: this._config.locale,
 			startDate: this.getDate()
-		}, this._config.calendarOptions));
+		}, {
+			...this._config.calendarOptions,
+			...this._config.timepicker || !this._toggleLabel ? {} : { ariaSelectedDateAnnouncement: "" }
+		}));
 		EventHandler.on(this._calendar._element, "startDateChange.coreui.calendar", (event) => {
-			this._applyDate(event.dateObject, { calendar: false });
-			this.hide();
+			this._runAsUser(() => this._writeField(this._withCurrentTime(event.dateObject), "calendar"));
+			if (!this._config.timepicker) this.hide();
+		});
+		if (!this._config.timepicker) return;
+		const hourCycle = getHourCycle(this._input._sections);
+		this._selection = new TimeSelects(this._selectionElement, this._forwardConfig(TimeSelects, { locale: this._config.locale }, {
+			...this._config.selectionOptions,
+			...hourCycle && { hourCycle },
+			onChange: (time) => this._runAsUser(() => this._applyTime(time)),
+			time: this.getDate()
+		}));
+	}
+	_withinTimeLimits(date) {
+		const { locale, maxDate, minDate } = this._config;
+		return constrainDateTime(date, convertValue(minDate, "datetime", locale), convertValue(maxDate, "datetime", locale));
+	}
+	_withCurrentTime(date) {
+		if (!date || !this._config.timepicker) return date;
+		const merged = new Date(date);
+		const current = this.getDate();
+		if (current) merged.setHours(current.getHours(), current.getMinutes(), current.getSeconds());
+		return this._withinTimeLimits(merged);
+	}
+	_applyTime(time) {
+		if (!time) return;
+		const merged = new Date(this.getDate() ?? this._withinTimeLimits(/* @__PURE__ */ new Date()));
+		merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds());
+		const limited = this._withinTimeLimits(merged);
+		this._writeField(limited, "selection");
+		if (this._element && isSameInstantAs(this._selection?.getTime(), time)) this._selection.setTime(this.getDate() ?? limited);
+	}
+	_writeField(date, source = "code", triggerChange = true) {
+		const previous = this._source;
+		this._source = source;
+		try {
+			this._input.setDate(date, triggerChange);
+			if (this._element && this._source === source) this._syncParts();
+		} finally {
+			this._source = previous;
+		}
+	}
+	_onFieldChange(date) {
+		this._syncParts();
+		EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
+			date,
+			formattedDate: getDateBySelectionType(date, this._config.selectionType)
 		});
 	}
-	_applyDate(date, { calendar = true, field = true } = {}) {
-		if (this._applying) return;
-		this._applying = true;
-		if (field) this._input.setConfig({ date });
-		const applied = field ? this._input.getDate() : date;
-		this._applying = false;
-		const changed = !isSameDateAs(applied, this._date);
-		this._date = applied;
-		if (calendar) this._calendar?.setConfig({ startDate: applied });
-		if (changed) EventHandler.trigger(this._element, EVENT_DATE_CHANGE$1, {
-			date: applied,
-			formattedDate: getDateBySelectionType(applied, this._config.selectionType)
-		});
+	_syncParts() {
+		const source = this._source;
+		const date = this.getDate();
+		this._source = null;
+		if (this._calendar && (source === "code" || !isSameDateAs(this._calendar._startDate, date))) this._calendar.setStartDate(date);
+		if (source !== "selection") this._selection?.setConfig({ time: date });
+		this._nameToggle();
+	}
+	_nameToggle() {
+		if (!this._toggleElement || !this._toggleLabel) return;
+		const date = this.getDate();
+		const name = date && formatSelectionName(date, this._forwardConfig(Calendar, { locale: this._config.locale }, this._config.calendarOptions));
+		const time = date && this._config.timepicker && createDateTimeFormat(this._config.locale, { timeStyle: this._config.seconds === false ? "short" : "medium" }).format(date);
+		this._writeToggleAttribute("aria-label", [
+			this._toggleLabel,
+			name,
+			time
+		].filter(Boolean).join(", "));
 	}
 	_writeToggleAttribute(name, value) {
 		if (!this._toggleElement) return;
-		if (this._created.toggle) {
+		if (this._created.toggle || name !== "aria-label" && name !== "aria-controls") {
 			this._toggleElement.setAttribute(name, value);
 			return;
 		}
@@ -10148,57 +11142,31 @@ var DatePicker = class DatePicker extends PickerBase {
 		return jQueryDispatch(this, DatePicker, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(window, EVENT_LOAD_DATA_API$16, () => {
+EventHandler.on(window, EVENT_LOAD_DATA_API$15, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_DATE_PICKER)) DatePicker.getOrCreateInstance(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(DatePicker);
 //#endregion
 //#region js/src/date-range-input.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO date-range-input.js
-* License (https://coreui.io/pro/license/)
-*
-* Two DateInput fields and a separator inside one frame, joined by the range
-* the component owns. The markup is the composition surface: a start host, an
-* end host and a separator the author wrote (by role attribute) are adopted;
-* whatever is missing is generated.
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const NAME$33 = "date-range-input";
 const EVENT_KEY$26 = `.coreui.date-range-input`;
 const DATA_API_KEY$21 = ".data-api";
 const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$26}`;
-const EVENT_RANGE_CHANGE = `rangeChange${EVENT_KEY$26}`;
 const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$26}`;
-const EVENT_KEYDOWN$6 = `keydown${EVENT_KEY$26}`;
-const EVENT_LOAD_DATA_API$15 = `load${EVENT_KEY$26}${DATA_API_KEY$21}`;
-const ARROW_LEFT_KEY$4 = "ArrowLeft";
-const ARROW_RIGHT_KEY$4 = "ArrowRight";
+const EVENT_KEYDOWN$8 = `keydown${EVENT_KEY$26}`;
+const EVENT_LOAD_DATA_API$14 = `load${EVENT_KEY$26}${DATA_API_KEY$21}`;
+const ARROW_LEFT_KEY$5 = "ArrowLeft";
+const ARROW_RIGHT_KEY$5 = "ArrowRight";
 const CLASS_NAME_DATE_RANGE = "form-date-range";
-const CLASS_NAME_INPUT_GROUP$3 = "form-control-group";
-const CLASS_NAME_IS_INVALID$1 = "is-invalid";
-const CLASS_NAME_IS_VALID$1 = "is-valid";
+const CLASS_NAME_INPUT_GROUP$2 = "form-control-group";
 const CLASS_NAME_SEPARATOR = "form-control-icon";
 const ATTRIBUTE_ROLE_END = "data-coreui-range-end";
 const ATTRIBUTE_ROLE_SEPARATOR = "data-coreui-range-separator";
 const ATTRIBUTE_ROLE_START = "data-coreui-range-start";
 const SELECTOR_DATA_DATE_RANGE_INPUT = "[data-coreui-date-range-input]";
-const SELECTOR_ROLE_END = `[${ATTRIBUTE_ROLE_END}]`;
 const SELECTOR_ROLE_SEPARATOR = `[${ATTRIBUTE_ROLE_SEPARATOR}]`;
-const SELECTOR_ROLE_START = `[${ATTRIBUTE_ROLE_START}]`;
 const SELECTOR_SECTION = ".form-date-time-section";
-const SELECTOR_SVG = "svg";
-const Default$31 = {
+const Default$29 = {
 	allowList: SVGAllowlist,
 	ariaDayLabel: "Day",
 	ariaEndLabel: "End date",
@@ -10222,7 +11190,6 @@ const Default$31 = {
 	hourPlaceholder: null,
 	inputDateParse: null,
 	inputOptions: {},
-	invalid: false,
 	locale: navigator.language,
 	maxDate: null,
 	meridiemPlaceholder: null,
@@ -10244,11 +11211,12 @@ const Default$31 = {
 	startFloatingLabel: null,
 	startName: null,
 	type: "date",
-	valid: false,
+	validationState: null,
 	weekPlaceholder: null,
 	yearPlaceholder: null
 };
-const DefaultType$31 = {
+const ORIGINAL_DEFAULT$2 = { ...Default$29 };
+const DefaultType$28 = {
 	allowList: "object",
 	ariaDayLabel: "string",
 	ariaEndLabel: "string",
@@ -10272,7 +11240,6 @@ const DefaultType$31 = {
 	hourPlaceholder: "(string|null)",
 	inputDateParse: "(function|null)",
 	inputOptions: "object",
-	invalid: "boolean",
 	locale: "string",
 	maxDate: "(date|string|null)",
 	meridiemPlaceholder: "(string|null)",
@@ -10294,58 +11261,59 @@ const DefaultType$31 = {
 	startFloatingLabel: "(string|null)",
 	startName: "(string|null)",
 	type: "string",
-	valid: "boolean",
+	validationState: "(string|null|undefined)",
 	weekPlaceholder: "(string|null)",
 	yearPlaceholder: "(string|null)"
 };
-/**
-* Class definition
-*/
 var DateRangeInput = class DateRangeInput extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
-		this._created = {
-			end: false,
-			separator: false,
-			start: false
-		};
-		this._hiddenFromAssistiveTech = [];
-		this._hostClasses = captureHostClasses(this._element, [
-			...this._managedClassNames(),
-			CLASS_NAME_IS_INVALID$1,
-			CLASS_NAME_IS_VALID$1
-		]);
-		this._claimedInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID$1);
-		this._claimedValid = this._element.classList.contains(CLASS_NAME_IS_VALID$1);
-		this._addedStateClassNames = /* @__PURE__ */ new Set();
+		this._createdElements = [];
+		this._hostDescribedBy = this._element.getAttribute("aria-describedby");
+		this._describedFields = [];
+		this._validation = new FieldValidation(this._element, {
+			config: () => this._config,
+			fields: () => [],
+			frames: () => [this._element],
+			invalidTargets: () => [],
+			ownError: () => !this.isRangeValid()
+		});
 		this._initialStartDate = config?.startDate ?? this._config.startDate;
 		this._initialEndDate = config?.endDate ?? this._config.endDate;
-		this._applying = false;
+		this._batching = false;
+		this._generation = 0;
 		this._createDateRangeInput();
-		this._startDate = this._startInput.getDate();
-		this._endDate = this._endInput.getDate();
-		this._claimedStartDate = this._startDate;
-		this._claimedEndDate = this._endDate;
-		this._applyOrder();
+		this._reported = {
+			end: this.getEndDate(),
+			start: this.getStartDate()
+		};
+		this._validation.update();
 		this._addEventListeners();
 	}
 	static get Default() {
-		return Default$31;
+		return Default$29;
 	}
 	static get DefaultType() {
-		return DefaultType$31;
+		return DefaultType$28;
 	}
 	static get NAME() {
 		return NAME$33;
 	}
 	getStartDate() {
-		return this._startDate;
+		return this._startInput?.getDate() ?? null;
 	}
 	getEndDate() {
-		return this._endDate;
+		return this._endInput?.getDate() ?? null;
 	}
-	setRange(startDate, endDate) {
-		this._applyRange(startDate, endDate);
+	setRange(startDate, endDate, triggerChange = false) {
+		this._typeCheckConfig({
+			endDate,
+			startDate
+		}, {
+			endDate: DefaultType$28.endDate,
+			startDate: DefaultType$28.startDate
+		});
+		this._applyRange(startDate, endDate, triggerChange);
 	}
 	clear() {
 		this._applyRange(null, null);
@@ -10363,129 +11331,177 @@ var DateRangeInput = class DateRangeInput extends BaseComponent {
 		return this._endElement;
 	}
 	isRangeValid() {
-		return this._startDate === null || this._endDate === null || this._endDate >= this._startDate;
+		const start = this.getStartDate();
+		const end = this.getEndDate();
+		return start === null || end === null || end >= start;
+	}
+	setEndDate(endDate, triggerChange = false) {
+		this._typeCheckConfig({ endDate }, { endDate: DefaultType$28.endDate });
+		this._applyRange(void 0, endDate, triggerChange);
+	}
+	setStartDate(startDate, triggerChange = false) {
+		this._typeCheckConfig({ startDate }, { startDate: DefaultType$28.startDate });
+		this._applyRange(startDate, void 0, triggerChange);
+	}
+	setValidationState(validationState) {
+		this._setConfig({ validationState });
 	}
 	dispose() {
 		if (!this._element) return;
 		for (const element of [this._startElement, this._endElement]) EventHandler.off(element, EVENT_KEY$26);
 		this._startInput.dispose();
 		this._endInput.dispose();
-		if (this._created.start) this._startFieldElement.remove();
-		if (this._created.separator) this._separatorElement.remove();
-		if (this._created.end) this._endFieldElement.remove();
-		this._element.classList.remove(...this._addedStateClassNames);
-		for (const className of [CLASS_NAME_IS_INVALID$1, CLASS_NAME_IS_VALID$1]) if (this._hostClasses.classNames.includes(className)) this._element.classList.add(className);
-		for (const element of this._hiddenFromAssistiveTech) element.removeAttribute("aria-hidden");
-		restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses);
+		for (const element of this._createdElements) element.remove();
+		this._validation.dispose();
+		for (const [element, own, written] of this._describedFields) {
+			if (element.getAttribute("aria-describedby") !== written) continue;
+			if (own === null) element.removeAttribute("aria-describedby");
+			else element.setAttribute("aria-describedby", own);
+		}
+		if (this._hostDescribedBy !== null && !this._element.hasAttribute("aria-describedby")) this._element.setAttribute("aria-describedby", this._hostDescribedBy);
 		super.dispose();
 	}
-	_markupClaimApplies() {
-		return isSameInstantAs(this._startDate, this._claimedStartDate) && isSameInstantAs(this._endDate, this._claimedEndDate);
-	}
-	_toggleStateClassName(className, on) {
-		if (on && !this._hostClasses.classNames.includes(className)) this._addedStateClassNames.add(className);
-		this._element.classList.toggle(className, on);
-	}
-	_hideFromAssistiveTech(element) {
-		if (element.hasAttribute("aria-hidden")) return;
-		element.setAttribute("aria-hidden", "true");
-		this._hiddenFromAssistiveTech.push(element);
-	}
-	_managedClassNames() {
-		return [
-			CLASS_NAME_DATE_RANGE,
-			CLASS_NAME_INPUT_GROUP$3,
-			...managedSizeClassNames(this._config.size)
-		].filter(Boolean);
+	_setConfig(config) {
+		if (!config || !("validationState" in config)) return;
+		this._config = this._getConfig({
+			...this._config,
+			validationState: config.validationState
+		});
+		this._validation.configure({ validationState: config.validationState });
 	}
 	_createDateRangeInput() {
-		const group = this._element;
-		applyControlGroupClasses(group, CLASS_NAME_INPUT_GROUP$3, CLASS_NAME_DATE_RANGE);
-		applyControlGroupSize(group, this._config.size);
-		const ownStart = SelectorEngine.findOne(SELECTOR_ROLE_START, group);
-		this._startElement = ownStart ?? document.createElement("div");
-		this._created.start = !ownStart;
-		if (!ownStart) this._startElement.setAttribute(ATTRIBUTE_ROLE_START, "");
-		this._startFieldElement = ownStart ?? appendControlGroupField(group, this._startElement, this._config.startFloatingLabel, `${NAME$33}-`);
-		const ownSeparator = SelectorEngine.findOne(SELECTOR_ROLE_SEPARATOR, group);
-		this._separatorElement = ownSeparator ?? this._createSeparator();
-		this._created.separator = !ownSeparator;
-		if (!ownSeparator) this._separatorElement.setAttribute(ATTRIBUTE_ROLE_SEPARATOR, "");
-		this._hideFromAssistiveTech(this._separatorElement);
-		if (!ownSeparator) group.append(this._separatorElement);
-		const ownEnd = SelectorEngine.findOne(SELECTOR_ROLE_END, group);
-		this._endElement = ownEnd ?? document.createElement("div");
-		this._created.end = !ownEnd;
-		if (!ownEnd) this._endElement.setAttribute(ATTRIBUTE_ROLE_END, "");
-		this._endFieldElement = ownEnd ?? appendControlGroupField(group, this._endElement, this._config.endFloatingLabel, `${NAME$33}-`);
+		applyControlGroupClasses(this._element, CLASS_NAME_INPUT_GROUP$2, CLASS_NAME_DATE_RANGE);
+		applyControlGroupSize(this._element, this._config.size);
+		this._element.setAttribute("role", "group");
+		this._startElement = this._createField(ATTRIBUTE_ROLE_START, this._config.startFloatingLabel);
+		this._separatorElement = SelectorEngine.findOne(SELECTOR_ROLE_SEPARATOR, this._element) ?? this._createSeparator();
+		this._separatorElement.setAttribute("aria-hidden", "true");
+		this._endElement = this._createField(ATTRIBUTE_ROLE_END, this._config.endFloatingLabel);
+		this._placeCreatedParts();
+		this._moveDescriptionToFields();
 		this._startInput = this._createInput(this._startElement, {
-			ariaLabel: this._config.startFloatingLabel ?? this._config.ariaStartLabel,
+			ariaLabel: this._config.startFloatingLabel || this._config.ariaStartLabel || this.constructor.Default.ariaStartLabel,
 			date: this._config.startDate,
 			name: this._config.startName
 		});
 		this._endInput = this._createInput(this._endElement, {
-			ariaLabel: this._config.endFloatingLabel ?? this._config.ariaEndLabel,
+			ariaLabel: this._config.endFloatingLabel || this._config.ariaEndLabel || this.constructor.Default.ariaEndLabel,
 			date: this._config.endDate,
 			name: this._config.endName
 		});
 		if (this._config.autofocus && !this._config.disabled) SelectorEngine.find(SELECTOR_SECTION, this._startElement)[0]?.focus();
 	}
 	_createInput(element, overrides) {
-		const forwarded = {};
-		for (const key of Object.keys(DateInput.Default)) if (key in this._config && this._config[key] !== Default$31[key]) forwarded[key] = this._config[key];
-		return new DateInput(element, {
-			...forwarded,
+		const input = new DateInput(element, {
+			...getForwardedOptions(Object.keys(DateInput.Default), this._config, this.constructor.Default, ORIGINAL_DEFAULT$2),
 			...overrides,
 			autofocus: false,
-			...this._config.inputOptions
+			disabled: this._config.disabled,
+			...this._config.inputOptions,
+			validationState: null
 		});
+		this._validation.adopt(input._validation);
+		return input;
+	}
+	_moveDescriptionToFields() {
+		if (this._hostDescribedBy === null) return;
+		this._element.removeAttribute("aria-describedby");
+		for (const element of [this._startElement, this._endElement]) {
+			const own = element.getAttribute("aria-describedby");
+			const written = own ? `${own} ${this._hostDescribedBy}` : this._hostDescribedBy;
+			element.setAttribute("aria-describedby", written);
+			this._describedFields.push([
+				element,
+				own,
+				written
+			]);
+		}
+	}
+	_createField(attribute, floatingLabel) {
+		const ownElement = SelectorEngine.findOne(`[${attribute}]`, this._element);
+		if (ownElement) return ownElement;
+		const element = document.createElement("div");
+		element.setAttribute(attribute, "");
+		this._createdElements.push(appendControlGroupField(this._element, element, floatingLabel, `${NAME$33}-`));
+		return element;
+	}
+	_getHostChild(part) {
+		let child = part;
+		while (child.parentElement !== this._element) child = child.parentElement;
+		return child;
+	}
+	_placeCreatedParts() {
+		const [start, separator, end] = [
+			this._startElement,
+			this._separatorElement,
+			this._endElement
+		].map((part) => this._getHostChild(part));
+		const isCreated = (element) => this._createdElements.includes(element);
+		if (isCreated(separator)) {
+			if (isCreated(end)) start.after(separator);
+			else if (isCreated(start)) end.before(separator);
+			else this._placeBetweenEnds(separator);
+		}
+		if (isCreated(start)) separator.before(start);
+		if (isCreated(end)) separator.after(end);
+	}
+	_placeBetweenEnds(separator) {
+		const start = this._getHostChild(this._startElement);
+		const end = this._getHostChild(this._endElement);
+		const children = [...this._element.children];
+		if (children.indexOf(start) <= children.indexOf(end)) end.before(separator);
+		else end.after(separator);
 	}
 	_createSeparator() {
 		const separator = document.createElement("span");
 		separator.classList.add(CLASS_NAME_SEPARATOR);
+		separator.setAttribute(ATTRIBUTE_ROLE_SEPARATOR, "");
 		separator.innerHTML = sanitizeByConfig(isRTL(this._element) ? this._config.separatorIconRtl : this._config.separatorIcon, this._config);
+		this._element.append(separator);
+		this._createdElements.push(separator);
 		return separator;
 	}
-	_applyRange(startDate, endDate, { fields = true } = {}) {
-		if (this._applying) return;
-		this._applying = true;
-		if (fields) {
-			this._startInput.setConfig({ date: startDate });
-			this._endInput.setConfig({ date: endDate });
+	_applyRange(startDate, endDate, triggerChange = true) {
+		const batching = this._batching;
+		const generation = ++this._generation;
+		this._batching = true;
+		this._startInput._holdErrors(true);
+		this._endInput._holdErrors(true);
+		try {
+			if (startDate !== void 0) this._startInput.setDate(startDate, triggerChange);
+			if (generation === this._generation && endDate !== void 0) this._endInput.setDate(endDate, triggerChange);
+			if (this._element && triggerChange) {
+				this._reportDate("start");
+				this._reportDate("end");
+			}
+		} finally {
+			this._batching = batching;
+			this._startInput?._holdErrors(false);
+			this._endInput?._holdErrors(false);
+			if (this._element && !batching && (triggerChange || startDate !== void 0)) this._reported.start = this.getStartDate();
+			if (this._element && !batching && (triggerChange || endDate !== void 0)) this._reported.end = this.getEndDate();
 		}
-		const start = fields ? this._startInput.getDate() : startDate;
-		const end = fields ? this._endInput.getDate() : endDate;
-		this._applying = false;
-		const startChanged = !isSameInstantAs(start, this._startDate);
-		const endChanged = !isSameInstantAs(end, this._endDate);
-		this._startDate = start;
-		this._endDate = end;
-		this._applyOrder();
-		if (startChanged) EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE$1, { date: start });
-		if (endChanged) EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE$1, { date: end });
-		if (startChanged || endChanged) EventHandler.trigger(this._element, EVENT_RANGE_CHANGE, {
-			endDate: end,
-			startDate: start
-		});
 	}
-	_applyOrder() {
-		const claimed = this._markupClaimApplies();
-		const isInvalid = claimed && this._claimedInvalid || this._config.invalid || !this.isRangeValid();
-		const isValid = (claimed && this._claimedValid || this._config.valid) && !isInvalid;
-		this._toggleStateClassName(CLASS_NAME_IS_INVALID$1, isInvalid);
-		this._toggleStateClassName(CLASS_NAME_IS_VALID$1, isValid);
+	_onFieldChange(end) {
+		if (this._batching) return;
+		this._reportDate(end);
+	}
+	_reportDate(end) {
+		const date = end === "start" ? this.getStartDate() : this.getEndDate();
+		if (!this._reported || isSameInstantAs(date, this._reported[end])) return;
+		this._reported[end] = date;
+		EventHandler.trigger(this._element, end === "start" ? EVENT_START_DATE_CHANGE$1 : EVENT_END_DATE_CHANGE$1, { date });
 	}
 	_addEventListeners() {
-		EventHandler.on(this._startElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event) => {
-			this._applyRange(event.date, this._endDate, { fields: false });
+		EventHandler.on(this._startElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), () => {
+			this._onFieldChange("start");
 		});
-		EventHandler.on(this._endElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event) => {
-			this._applyRange(this._startDate, event.date, { fields: false });
+		EventHandler.on(this._endElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), () => {
+			this._onFieldChange("end");
 		});
-		if (this._separatorElement.getAttribute("aria-hidden") !== "true") for (const svg of SelectorEngine.find(SELECTOR_SVG, this._separatorElement)) this._hideFromAssistiveTech(svg);
-		EventHandler.on(this._element, EVENT_KEYDOWN$6, (event) => {
-			if (event.key !== ARROW_LEFT_KEY$4 && event.key !== ARROW_RIGHT_KEY$4) return;
-			const forward = event.key === (isRTL(this._element) ? ARROW_LEFT_KEY$4 : ARROW_RIGHT_KEY$4);
+		EventHandler.on(this._element, EVENT_KEYDOWN$8, (event) => {
+			if (event.key !== ARROW_LEFT_KEY$5 && event.key !== ARROW_RIGHT_KEY$5 || hasShortcutModifier(event)) return;
+			const forward = event.key === (isRTL(this._element) ? ARROW_LEFT_KEY$5 : ARROW_RIGHT_KEY$5);
 			const startSections = SelectorEngine.find(SELECTOR_SECTION, this._startElement);
 			const endSections = SelectorEngine.find(SELECTOR_SECTION, this._endElement);
 			if (forward && event.target === startSections.at(-1)) endSections[0]?.focus();
@@ -10496,58 +11512,35 @@ var DateRangeInput = class DateRangeInput extends BaseComponent {
 		return jQueryDispatch(this, DateRangeInput, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(window, EVENT_LOAD_DATA_API$15, () => {
+EventHandler.on(window, EVENT_LOAD_DATA_API$14, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_DATE_RANGE_INPUT)) DateRangeInput.getOrCreateInstance(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(DateRangeInput);
 //#endregion
 //#region js/src/date-range-picker.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO date-range-picker.js
-* License (https://coreui.io/pro/license/)
-*
-* Composed from a DateRangeInput field and one multi-month Calendar in a
-* Popup. The field owns the range — both dates and their validation — the
-* calendar owns the range mechanics (start/end, auto-advance), and the picker
-* joins them and projects the footer/ranges regions. The element is the
-* picker, not the frame: the frame is the field inside it.
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const NAME$32 = "date-range-picker";
 const EVENT_KEY$25 = `.coreui.date-range-picker`;
 const DATA_API_KEY$20 = ".data-api";
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY$25}`;
 const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY$25}`;
-const EVENT_LOAD_DATA_API$14 = `load${EVENT_KEY$25}${DATA_API_KEY$20}`;
-const CLASS_NAME_BODY$2 = "date-picker-body";
-const CLASS_NAME_CALENDAR$1 = "date-picker-calendar";
-const CLASS_NAME_CALENDARS$1 = "date-picker-calendars";
-const CLASS_NAME_DATE_PICKER$1 = "date-picker";
+const EVENT_LOAD_DATA_API$13 = `load${EVENT_KEY$25}${DATA_API_KEY$20}`;
+const CLASS_NAME_BODY$1 = "date-picker-body";
+const CLASS_NAME_CALENDAR = "date-picker-calendar";
+const CLASS_NAME_CALENDARS = "date-picker-calendars";
+const CLASS_NAME_DATE_PICKER = "date-picker";
 const CLASS_NAME_DATE_RANGE_PICKER = "date-range-picker";
-const CLASS_NAME_DROPDOWN$2 = "date-picker-popup";
-const CLASS_NAME_FOOTER$2 = "date-picker-footer";
-const CLASS_NAME_CLEANER$3 = "form-control-cleaner";
-const CLASS_NAME_INDICATOR$2 = "form-control-action";
-const CLASS_NAME_PICKER$2 = "picker";
-const CLASS_NAME_POPUP$2 = "popup";
+const CLASS_NAME_CLEANER$2 = "form-control-cleaner";
+const CLASS_NAME_INDICATOR$1 = "form-control-action";
+const CLASS_NAME_PICKER$1 = "picker";
 const CLASS_NAME_RANGES = "date-picker-ranges";
 const SELECTOR_DATA_DATE_RANGE_PICKER = "[data-coreui-date-range-picker]";
 const SELECTOR_TEMPLATE_RANGES = "template[data-coreui-template=\"ranges\"]";
-const Default$30 = {
+const Default$28 = {
 	allowList: SVGAllowlist,
 	ariaCleanerLabel: "Clear date range",
 	ariaEndLabel: "End date",
 	ariaPickerLabel: "Toggle calendar",
+	ariaPopupLabel: "Calendar",
 	ariaStartLabel: "Start date",
 	calendarOptions: {},
 	calendars: 2,
@@ -10558,25 +11551,32 @@ const Default$30 = {
 	endDate: null,
 	endFloatingLabel: null,
 	endName: null,
+	format: null,
 	inputOptions: {},
+	invalid: false,
 	locale: navigator.language,
 	maxDate: null,
 	minDate: null,
 	pickerIcon: true,
 	sanitize: true,
 	sanitizeFn: null,
+	selectionType: "day",
 	separatorIcon: SEPARATOR_ICON,
 	separatorIconRtl: SEPARATOR_ICON_RTL,
 	size: null,
 	startDate: null,
 	startFloatingLabel: null,
-	startName: null
+	startName: null,
+	valid: false,
+	validationState: null
 };
-const DefaultType$30 = {
+const ORIGINAL_DEFAULT$1 = { ...Default$28 };
+const DefaultType$27 = {
 	allowList: "object",
 	ariaCleanerLabel: "string",
 	ariaEndLabel: "string",
 	ariaPickerLabel: "string",
+	ariaPopupLabel: "string",
 	ariaStartLabel: "string",
 	calendarOptions: "object",
 	calendars: "number",
@@ -10587,55 +11587,70 @@ const DefaultType$30 = {
 	endDate: "(date|string|null)",
 	endFloatingLabel: "(string|null)",
 	endName: "(string|null)",
+	format: "(function|string|null)",
 	inputOptions: "object",
+	invalid: "boolean",
 	locale: "string",
 	maxDate: "(date|string|null)",
 	minDate: "(date|string|null)",
 	pickerIcon: "(string|boolean)",
 	sanitize: "boolean",
 	sanitizeFn: "(function|null)",
+	selectionType: "string",
 	separatorIcon: "string",
 	separatorIconRtl: "string",
 	size: "(string|null)",
 	startDate: "(date|string|null)",
 	startFloatingLabel: "(string|null)",
-	startName: "(string|null)"
+	startName: "(string|null)",
+	valid: "boolean",
+	validationState: "(string|null|undefined)"
 };
-/**
-* Class definition
-*/
 var DateRangePicker = class DateRangePicker extends PickerBase {
 	constructor(element, config) {
 		super(element, config);
 		this._rangesTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_RANGES, this._element);
 		this._rangeInput = null;
 		this._calendar = null;
-		this._syncingFromPanel = false;
 		this._calendarElement = null;
 		this._selectEndDate = false;
-		this._hostClasses = captureHostClasses(this._element, this._managedClassNames());
 		this._createDateRangePicker();
+		this._nameToggle();
 		this._createPopup();
 		this._addEventListeners();
 	}
 	static get Default() {
-		return Default$30;
+		return Default$28;
 	}
 	static get DefaultType() {
-		return DefaultType$30;
+		return DefaultType$27;
 	}
 	static get NAME() {
 		return NAME$32;
 	}
 	getStartDate() {
-		return this._rangeInput.getStartDate();
+		return this._rangeInput?.getStartDate() ?? null;
 	}
 	getEndDate() {
-		return this._rangeInput.getEndDate();
+		return this._rangeInput?.getEndDate() ?? null;
+	}
+	setEndDate(endDate) {
+		this._typeCheckConfig({ endDate }, { endDate: DefaultType$27.endDate });
+		this._applyRange(() => this._rangeInput.setEndDate(endDate));
 	}
 	setRange(startDate, endDate) {
-		this._rangeInput.setRange(startDate, endDate);
-		this._setSelectEndDate(false);
+		this._typeCheckConfig({
+			endDate,
+			startDate
+		}, {
+			endDate: DefaultType$27.endDate,
+			startDate: DefaultType$27.startDate
+		});
+		this._applyRange(() => this._rangeInput.setRange(startDate, endDate));
+	}
+	setStartDate(startDate) {
+		this._typeCheckConfig({ startDate }, { startDate: DefaultType$27.startDate });
+		this._applyRange(() => this._rangeInput.setStartDate(startDate));
 	}
 	clear() {
 		this._rangeInput.clear();
@@ -10643,6 +11658,7 @@ var DateRangePicker = class DateRangePicker extends PickerBase {
 	}
 	reset() {
 		this._rangeInput.reset();
+		this._showRange();
 		this._setSelectEndDate(false);
 	}
 	getContext() {
@@ -10650,7 +11666,7 @@ var DateRangePicker = class DateRangePicker extends PickerBase {
 			...this._baseContext(),
 			endDate: this.getEndDate(),
 			isDateSelectable: (date) => this._rangeInput.isDateSelectable(date),
-			setRange: (startDate, endDate) => this.setRange(startDate, endDate),
+			setRange: (startDate, endDate) => this._runAsUser(() => this._applyRange(() => this._rangeInput.setRange(startDate, endDate, true))),
 			startDate: this.getStartDate()
 		};
 	}
@@ -10662,76 +11678,83 @@ var DateRangePicker = class DateRangePicker extends PickerBase {
 		this._calendar?.dispose();
 		this._frameElement.remove();
 	}
-	_managedClassNames() {
-		return [
-			CLASS_NAME_DATE_PICKER$1,
-			CLASS_NAME_DATE_RANGE_PICKER,
-			CLASS_NAME_PICKER$2
-		].filter(Boolean);
+	_applyRange(write) {
+		write();
+		this._showRange();
+		this._nameToggle();
+		this._setSelectEndDate(false);
 	}
-	_resolveFormat() {
-		if (this._config.format) return this._config.format;
-		return {
-			month: "MM/yyyy",
-			quarter: "QQQ yyyy",
-			week: getWeekSectionsFromLocale,
-			year: "yyyy"
-		}[this._config.selectionType] ?? null;
+	_originalDefault() {
+		return ORIGINAL_DEFAULT$1;
 	}
 	_setSelectEndDate(value) {
 		if (this._selectEndDate === value) return;
 		this._selectEndDate = value;
-		this._calendar?.setConfig({ selectEndDate: value });
+		this._calendar?.setSelectEndDate(value);
+		this._syncPickMessages();
+	}
+	_pickMessages() {
+		if (!this._footerTemplate && this._toggleElement && this._selectEndDate && this.getStartDate()) return {
+			ariaSelectedDateAnnouncement: "",
+			ariaSelectedRangeAnnouncement: ""
+		};
+		const { ariaSelectedDateAnnouncement = Calendar.Default.ariaSelectedDateAnnouncement, ariaSelectedRangeAnnouncement = Calendar.Default.ariaSelectedRangeAnnouncement } = this._forwardConfig(Calendar, {}, this._config.calendarOptions);
+		return {
+			ariaSelectedDateAnnouncement,
+			ariaSelectedRangeAnnouncement
+		};
+	}
+	_syncPickMessages() {
+		queueMicrotask(() => this._calendar?._setAnnouncements(this._pickMessages()));
+	}
+	_showRange() {
+		this._calendar?.setRange(this.getStartDate(), this.getEndDate());
 	}
 	_createDateRangePicker() {
-		this._element.classList.add(CLASS_NAME_DATE_PICKER$1, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER$2);
+		this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER$1);
+		this._element.setAttribute("role", "group");
+		const describedBy = this._element.getAttribute("aria-describedby");
 		const inputGroup = document.createElement("div");
+		if (describedBy !== null) {
+			inputGroup.setAttribute("aria-describedby", describedBy);
+			this._writeAdoptedAttribute(this._element, "aria-describedby", null);
+		}
 		this._element.append(inputGroup);
 		this._frameElement = inputGroup;
+		const format = getPickerFormat(this._config.format, this._config.selectionType);
 		this._rangeInput = new DateRangeInput(inputGroup, this._forwardConfig(DateRangeInput, {
 			disabled: this._config.disabled,
 			endDate: this._config.endDate,
 			locale: this._config.locale,
 			size: this._config.size,
 			startDate: this._config.startDate,
-			...this._resolveFormat() ? { format: this._resolveFormat() } : {}
+			validationState: null,
+			...format ? { format } : {}
 		}, { inputOptions: this._config.inputOptions }));
+		inputGroup.setAttribute("role", "none");
+		this._validation.adopt(this._rangeInput._validation);
 		EventHandler.on(inputGroup, DateRangeInput.eventName("startDateChange"), (event) => {
-			if (!this._syncingFromPanel) {
-				this._calendar?.setConfig({ startDate: event.date });
-				this._triggerDateChange(EVENT_START_DATE_CHANGE, event.date);
-			}
+			this._nameToggle();
+			this._syncPickMessages();
+			if (this._calendar && !isSameDateAs(this._calendar._startDate, event.date)) this._calendar.setStartDate(event.date);
+			this._triggerDateChange(EVENT_START_DATE_CHANGE, event.date);
 		});
 		EventHandler.on(inputGroup, DateRangeInput.eventName("endDateChange"), (event) => {
-			if (!this._syncingFromPanel) {
-				this._calendar?.setConfig({ endDate: event.date });
-				this._triggerDateChange(EVENT_END_DATE_CHANGE, event.date);
-			}
-		});
-		const action = (className, icon, label) => createControlGroupAction({
-			className,
-			disabled: this._config.disabled,
-			icon,
-			label,
-			sanitizeIcon: (value) => sanitizeByConfig(value, this._config)
+			this._nameToggle();
+			if (this._calendar && !isSameDateAs(this._calendar._endDate, event.date)) this._calendar.setEndDate(event.date);
+			this._triggerDateChange(EVENT_END_DATE_CHANGE, event.date);
 		});
 		if (this._config.cleaner) {
-			this._cleanerElement = action(CLASS_NAME_CLEANER$3, this._config.cleanerIcon, this._config.ariaCleanerLabel);
+			this._cleanerElement = this._createAction(CLASS_NAME_CLEANER$2, this._config.cleanerIcon, this._config.ariaCleanerLabel);
 			inputGroup.append(this._cleanerElement);
 		}
 		this._toggleElement = null;
 		if (this._config.pickerIcon) {
-			const indicator = action(CLASS_NAME_INDICATOR$2, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel);
-			inputGroup.append(indicator);
-			this._toggleElement = indicator;
+			this._toggleElement = this._createAction(CLASS_NAME_INDICATOR$1, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel);
+			inputGroup.append(this._toggleElement);
 		}
-		this._menu = document.createElement("div");
-		this._menu.id = getUID(`${this.constructor.NAME}-popup-`);
-		this._menu.classList.add(CLASS_NAME_POPUP$2, CLASS_NAME_DROPDOWN$2);
-		this._writeToggleAttribute("aria-expanded", "false");
-		this._writeToggleAttribute("aria-haspopup", "dialog");
 		const body = document.createElement("div");
-		body.classList.add(CLASS_NAME_BODY$2);
+		body.classList.add(CLASS_NAME_BODY$1);
 		if (this._rangesTemplate) {
 			const ranges = document.createElement("div");
 			ranges.classList.add(CLASS_NAME_RANGES);
@@ -10739,18 +11762,12 @@ var DateRangePicker = class DateRangePicker extends PickerBase {
 			body.append(ranges);
 		}
 		const calendars = document.createElement("div");
-		calendars.classList.add(CLASS_NAME_CALENDARS$1);
+		calendars.classList.add(CLASS_NAME_CALENDARS);
 		this._calendarElement = document.createElement("div");
-		this._calendarElement.classList.add(CLASS_NAME_CALENDAR$1);
+		this._calendarElement.classList.add(CLASS_NAME_CALENDAR);
 		calendars.append(this._calendarElement);
 		body.append(calendars);
-		this._menu.append(body);
-		if (this._footerTemplate) {
-			const footer = document.createElement("div");
-			footer.classList.add(CLASS_NAME_FOOTER$2);
-			footer.append(this._footerTemplate.content.cloneNode(true));
-			this._menu.append(footer);
-		}
+		this._createMenu(CLASS_NAME_DATE_PICKER, body);
 	}
 	_ensureCalendar() {
 		if (this._calendar) return;
@@ -10761,23 +11778,28 @@ var DateRangePicker = class DateRangePicker extends PickerBase {
 			range: true,
 			selectEndDate: this._selectEndDate,
 			startDate: this.getStartDate()
-		}, this._config.calendarOptions));
+		}, {
+			...this._config.calendarOptions,
+			...this._pickMessages()
+		}));
 		EventHandler.on(this._calendar._element, "selectEndChange.coreui.calendar", (event) => {
 			this._selectEndDate = event.value;
+			this._syncPickMessages();
 		});
 		EventHandler.on(this._calendar._element, "startDateChange.coreui.calendar", (event) => {
-			this._syncingFromPanel = true;
-			this._rangeInput.setRange(event.dateObject, this.getEndDate());
-			this._syncingFromPanel = false;
-			this._triggerDateChange(EVENT_START_DATE_CHANGE, this.getStartDate());
+			this._runAsUser(() => this._rangeInput.setRange(event.dateObject, this.getEndDate(), true));
 		});
 		EventHandler.on(this._calendar._element, "endDateChange.coreui.calendar", (event) => {
-			this._syncingFromPanel = true;
-			this._rangeInput.setRange(this.getStartDate(), event.dateObject);
-			this._syncingFromPanel = false;
-			this._triggerDateChange(EVENT_END_DATE_CHANGE, this.getEndDate());
+			this._runAsUser(() => this._rangeInput.setRange(this.getStartDate(), event.dateObject, true));
 			if (this.getEndDate() && this.getStartDate() && !this._footerTemplate) this.hide();
 		});
+	}
+	_nameToggle() {
+		if (!this._toggleElement) return;
+		const start = this.getStartDate();
+		const end = this.getEndDate();
+		const name = start && end && formatSelectionRangeName(start, end, this._forwardConfig(Calendar, { locale: this._config.locale }, this._config.calendarOptions));
+		this._toggleElement.setAttribute("aria-label", name ? `${this._config.ariaPickerLabel}, ${name}` : this._config.ariaPickerLabel);
 	}
 	_triggerDateChange(eventName, date) {
 		EventHandler.trigger(this._element, eventName, {
@@ -10804,587 +11826,19 @@ var DateRangePicker = class DateRangePicker extends PickerBase {
 	_isNowSelectable() {
 		return this._rangeInput.isDateSelectable(/* @__PURE__ */ new Date());
 	}
+	_stateFrames() {
+		return [this._element];
+	}
 	static jQueryInterface(config, ...args) {
 		return jQueryDispatch(this, DateRangePicker, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(window, EVENT_LOAD_DATA_API$14, () => {
+EventHandler.on(window, EVENT_LOAD_DATA_API$13, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_DATE_RANGE_PICKER)) DateRangePicker.getOrCreateInstance(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(DateRangePicker);
 //#endregion
-//#region js/src/util/time-selection.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO util/time-selection.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$31 = "time-selection";
-const CLASS_NAME_INLINE_SELECT = "time-picker-inline-select";
-const CLASS_NAME_ROLL = "time-picker-roll";
-const CLASS_NAME_ROLL_CELL = "time-picker-roll-cell";
-const CLASS_NAME_ROLL_COL = "time-picker-roll-col";
-const CLASS_NAME_SELECTED$1 = "selected";
-const ARROW_DOWN_KEY$4 = "ArrowDown";
-const ARROW_LEFT_KEY$3 = "ArrowLeft";
-const ARROW_RIGHT_KEY$3 = "ArrowRight";
-const ARROW_UP_KEY$3 = "ArrowUp";
-const END_KEY$2 = "End";
-const ENTER_KEY$1 = "Enter";
-const HOME_KEY$2 = "Home";
-const SPACE_KEY$1 = "Space";
-const EVENT_KEYDOWN$5 = `keydown.coreui.time-selection`;
-const SELECTOR_ROLL_CELL = `.${CLASS_NAME_ROLL_CELL}`;
-const SELECTOR_ROLL_CELL_FOCUSABLE = `.${CLASS_NAME_ROLL_CELL}[tabindex="0"]`;
-const SELECTOR_ROLL_COL = `.${CLASS_NAME_ROLL_COL}`;
-const Default$29 = {
-	ariaSelectHoursLabel: "Select hours",
-	ariaSelectMeridiemLabel: "Select AM/PM",
-	ariaSelectMinutesLabel: "Select minutes",
-	ariaSelectSecondsLabel: "Select seconds",
-	hours: null,
-	locale: "default",
-	minutes: true,
-	onChange: null,
-	seconds: true,
-	time: null,
-	variant: "roll"
-};
-const DefaultType$29 = {
-	ariaSelectHoursLabel: "string",
-	ariaSelectMeridiemLabel: "string",
-	ariaSelectMinutesLabel: "string",
-	ariaSelectSecondsLabel: "string",
-	hours: "(array|function|null)",
-	locale: "string",
-	minutes: "(array|boolean|function)",
-	onChange: "(function|null)",
-	seconds: "(array|boolean|function)",
-	time: "(date|null)",
-	variant: "string"
-};
-/**
-* Class definition
-*
-* The popup body of the time pickers — the counterpart of Calendar for the time
-* half. Owns the roll/select rendering and the hour/minute/second/meridiem
-* arithmetic; reports a Date through `onChange` and holds no popup, field, or
-* event-name concerns. Shared by TimePicker and DateTimePicker.
-*/
-var TimeSelection = class extends Config {
-	constructor(element, config) {
-		super();
-		this._element = element;
-		this._config = this._getConfig(config);
-		this._date = this._config.time;
-		this._ampm = this._date ? this._date.getHours() >= 12 ? "pm" : "am" : "am";
-		this._render();
-	}
-	static get Default() {
-		return Default$29;
-	}
-	static get DefaultType() {
-		return DefaultType$29;
-	}
-	static get NAME() {
-		return NAME$31;
-	}
-	getTime() {
-		return this._date;
-	}
-	setConfig(config) {
-		this._config = this._getConfig({
-			...this._config,
-			...config
-		});
-		this._date = this._config.time;
-		this._ampm = this._date ? this._date.getHours() >= 12 ? "pm" : "am" : "am";
-		this._render();
-	}
-	dispose() {
-		EventHandler.off(this._element, EVENT_KEYDOWN$5);
-		this._element.innerHTML = "";
-		this._element = null;
-	}
-	_render() {
-		this._partials = getLocalizedTimePartials(this._config.locale, "auto", this._config.hours, this._config.minutes, this._config.seconds);
-		this._element.innerHTML = "";
-		this._element.classList.toggle(CLASS_NAME_ROLL, this._config.variant === "roll");
-		if (this._config.variant === "select") {
-			EventHandler.off(this._element, EVENT_KEYDOWN$5);
-			this._renderSelects();
-		} else {
-			this._renderRoll();
-			this._addRollKeyboardNavigation();
-		}
-		this._markSelected(true);
-	}
-	_parts() {
-		const parts = [{
-			ariaLabel: this._config.ariaSelectHoursLabel,
-			name: "hours",
-			options: this._partials.listOfHours
-		}];
-		if (this._config.minutes) parts.push({
-			ariaLabel: this._config.ariaSelectMinutesLabel,
-			name: "minutes",
-			options: this._partials.listOfMinutes
-		});
-		if (this._config.seconds) parts.push({
-			ariaLabel: this._config.ariaSelectSecondsLabel,
-			name: "seconds",
-			options: this._partials.listOfSeconds
-		});
-		if (this._partials.hour12) parts.push({
-			ariaLabel: this._config.ariaSelectMeridiemLabel,
-			name: "meridiem",
-			options: [{
-				label: "AM",
-				value: "am"
-			}, {
-				label: "PM",
-				value: "pm"
-			}]
-		});
-		return parts;
-	}
-	_renderRoll() {
-		for (const part of this._parts()) {
-			const column = document.createElement("div");
-			column.classList.add(CLASS_NAME_ROLL_COL);
-			column.setAttribute("role", "listbox");
-			column.setAttribute("aria-label", part.ariaLabel);
-			for (const [index, option] of part.options.entries()) {
-				const cell = document.createElement("div");
-				cell.classList.add(CLASS_NAME_ROLL_CELL);
-				cell.setAttribute("role", "option");
-				cell.setAttribute("aria-label", option.label.toString());
-				cell.setAttribute("aria-selected", "false");
-				cell.tabIndex = index === 0 ? 0 : -1;
-				cell.textContent = option.label;
-				Manipulator.setDataAttribute(cell, part.name, option.value);
-				cell.addEventListener("click", () => this._change(part.name, option.value));
-				cell.addEventListener("keydown", (event) => {
-					if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$1) {
-						event.preventDefault();
-						this._change(part.name, option.value);
-						this._moveFocusToColumn(cell, 1);
-					}
-				});
-				column.append(cell);
-			}
-			this._element.append(column);
-		}
-	}
-	_addRollKeyboardNavigation() {
-		EventHandler.off(this._element, EVENT_KEYDOWN$5);
-		EventHandler.on(this._element, EVENT_KEYDOWN$5, SELECTOR_ROLL_CELL, (event) => {
-			const target = event.target;
-			if (event.key === ARROW_DOWN_KEY$4 || event.key === ARROW_UP_KEY$3) {
-				event.preventDefault();
-				const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement);
-				if (items.length === 0) return;
-				getNextActiveElement(items, target, event.key === ARROW_DOWN_KEY$4, !items.includes(target))?.focus();
-				return;
-			}
-			if (event.key === HOME_KEY$2 || event.key === END_KEY$2) {
-				event.preventDefault();
-				const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement);
-				if (items.length === 0) return;
-				items[event.key === HOME_KEY$2 ? 0 : items.length - 1].focus();
-				return;
-			}
-			if (event.key === ARROW_LEFT_KEY$3 || event.key === ARROW_RIGHT_KEY$3) {
-				event.preventDefault();
-				const rtl = isRTL(target);
-				const goLeft = event.key === ARROW_LEFT_KEY$3 && !rtl || event.key === ARROW_RIGHT_KEY$3 && rtl;
-				this._moveFocusToColumn(target, goLeft ? -1 : 1);
-			}
-		});
-	}
-	_moveFocusToColumn(cell, offset) {
-		const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._element);
-		const index = columns.indexOf(cell.parentElement) + offset;
-		if (index < 0 || index > columns.length - 1) return;
-		SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[index])?.focus();
-	}
-	_renderSelects() {
-		for (const [index, part] of this._parts().entries()) {
-			if (index > 0 && part.name !== "meridiem") {
-				const separator = document.createElement("span");
-				separator.textContent = ":";
-				this._element.append(separator);
-			}
-			const select = document.createElement("select");
-			select.classList.add(CLASS_NAME_INLINE_SELECT, part.name);
-			select.setAttribute("aria-label", part.ariaLabel);
-			select.addEventListener("change", (event) => this._change(part.name, event.target.value));
-			for (const option of part.options) {
-				const optionEl = document.createElement("option");
-				optionEl.value = option.value;
-				optionEl.textContent = option.label;
-				select.append(optionEl);
-			}
-			this._element.append(select);
-		}
-	}
-	_change(part, value) {
-		const date = this._date ? new Date(this._date) : /* @__PURE__ */ new Date("1970-01-01T00:00:00");
-		if (part === "meridiem") {
-			const hours = date.getHours();
-			this._ampm = value;
-			if (value === "am" && hours >= 12) date.setHours(hours - 12);
-			if (value === "pm" && hours < 12) date.setHours(hours + 12);
-		}
-		if (part === "hours") date.setHours(isAmPm(this._config.locale) ? convert12hTo24h(this._ampm, Number.parseInt(value, 10)) : Number.parseInt(value, 10));
-		if (part === "minutes") date.setMinutes(Number.parseInt(value, 10));
-		if (part === "seconds") date.setSeconds(Number.parseInt(value, 10));
-		this._date = date;
-		this._markSelected();
-		execute(this._config.onChange, [void 0, date]);
-	}
-	_scrollToSelected(column, cell, instant) {
-		column.scrollTo({
-			behavior: instant ? "instant" : "smooth",
-			top: cell.offsetTop
-		});
-	}
-	_markSelected(instant = false) {
-		const selected = {
-			hours: getSelectedHour(this._date, this._config.locale),
-			meridiem: this._ampm,
-			minutes: getSelectedMinutes(this._date),
-			seconds: getSelectedSeconds(this._date)
-		};
-		for (const [part, value] of Object.entries(selected)) {
-			if (value === "") continue;
-			if (this._config.variant === "select") {
-				const select = SelectorEngine.findOne(`select.${part}`, this._element);
-				if (select) select.value = value;
-				continue;
-			}
-			for (const cell of SelectorEngine.find(`[data-coreui-${part}]`, this._element)) {
-				const isSelected = String(Manipulator.getDataAttribute(cell, part)) === String(value);
-				cell.classList.toggle(CLASS_NAME_SELECTED$1, isSelected);
-				cell.setAttribute("aria-selected", isSelected ? "true" : "false");
-				cell.tabIndex = isSelected ? 0 : -1;
-				if (isSelected && cell.parentElement) this._scrollToSelected(cell.parentElement, cell, instant);
-			}
-		}
-	}
-};
-//#endregion
-//#region js/src/date-time-picker.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO date-time-picker.js
-* License (https://coreui.io/pro/license/)
-*
-* A DateInput section field in datetime mode plus a popup holding a Calendar and the
-* TimeSelection body — the date and the time halves are independent primitives,
-* composed here.
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$30 = "date-time-picker";
-const EVENT_KEY$24 = `.coreui.date-time-picker`;
-const DATA_API_KEY$19 = ".data-api";
-const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY$24}`;
-const EVENT_LOAD_DATA_API$13 = `load${EVENT_KEY$24}${DATA_API_KEY$19}`;
-const CLASS_NAME_BODY$1 = "date-picker-body";
-const CLASS_NAME_CALENDAR = "date-picker-calendar";
-const CLASS_NAME_CALENDARS = "date-picker-calendars";
-const CLASS_NAME_DATE_PICKER = "date-picker";
-const CLASS_NAME_DATE_TIME_PICKER = "date-time-picker";
-const CLASS_NAME_DROPDOWN$1 = "date-picker-popup";
-const CLASS_NAME_FOOTER$1 = "date-picker-footer";
-const CLASS_NAME_CLEANER$2 = "form-control-cleaner";
-const CLASS_NAME_INDICATOR$1 = "form-control-action";
-const CLASS_NAME_INPUT_GROUP$2 = "form-control-group";
-const CLASS_NAME_PICKER$1 = "picker";
-const CLASS_NAME_POPUP$1 = "popup";
-const CLASS_NAME_TIME_BODY = "time-picker-body";
-const CLASS_NAME_TIME_PICKERS = "date-picker-timepickers";
-const SELECTOR_ACTION_TODAY = "[data-coreui-picker-action=\"today\"]";
-const SELECTOR_DATA_DATE_TIME_PICKER = "[data-coreui-date-time-picker]";
-const Default$28 = {
-	allowList: SVGAllowlist,
-	ariaCleanerLabel: "Clear date and time",
-	ariaPickerLabel: "Toggle calendar and time selection",
-	calendarOptions: {},
-	cleaner: true,
-	cleanerIcon: CLEANER_ICON,
-	container: false,
-	date: null,
-	disabled: false,
-	floatingLabel: null,
-	inputOptions: {},
-	locale: navigator.language,
-	maxDate: null,
-	minDate: null,
-	name: null,
-	pickerIcon: true,
-	sanitize: true,
-	sanitizeFn: null,
-	seconds: true,
-	selectionOptions: {},
-	size: null,
-	variant: "roll"
-};
-const DefaultType$28 = {
-	allowList: "object",
-	ariaCleanerLabel: "string",
-	ariaPickerLabel: "string",
-	calendarOptions: "object",
-	cleaner: "boolean",
-	cleanerIcon: "string",
-	container: "(string|element|boolean)",
-	date: "(date|string|null)",
-	disabled: "boolean",
-	floatingLabel: "(string|null)",
-	inputOptions: "object",
-	locale: "string",
-	maxDate: "(date|string|null)",
-	minDate: "(date|string|null)",
-	name: "(string|null)",
-	pickerIcon: "(string|boolean)",
-	sanitize: "boolean",
-	sanitizeFn: "(function|null)",
-	seconds: "(array|boolean|function)",
-	selectionOptions: "object",
-	size: "(string|null)",
-	variant: "string"
-};
-/**
-* Class definition
-*/
-var DateTimePicker = class DateTimePicker extends PickerBase {
-	constructor(element, config) {
-		super(element, config);
-		this._initialDate = config?.date ?? this._config.date;
-		this._input = null;
-		this._calendar = null;
-		this._syncingFromPanel = false;
-		this._calendarElement = null;
-		this._selection = null;
-		this._selectionElement = null;
-		this._hostClasses = captureHostClasses(this._element, this._managedClassNames());
-		this._createDateTimePicker();
-		this._createPopup();
-		this._addEventListeners();
-	}
-	static get Default() {
-		return Default$28;
-	}
-	static get DefaultType() {
-		return DefaultType$28;
-	}
-	static get NAME() {
-		return NAME$30;
-	}
-	getDate() {
-		return this._input.getDate();
-	}
-	setDate(date) {
-		this._input.setConfig({ date });
-	}
-	today() {
-		this.setDate(/* @__PURE__ */ new Date());
-	}
-	clear() {
-		this._input.clear();
-	}
-	reset() {
-		this.setDate(this._initialDate);
-	}
-	getContext() {
-		return {
-			...this._baseContext(),
-			date: this.getDate(),
-			isDateSelectable: (date) => this._input.isDateSelectable(date),
-			setDate: (date) => this.setDate(date),
-			today: () => this.today()
-		};
-	}
-	_disposeParts() {
-		this._input.dispose();
-		this._calendar?.dispose();
-		this._selection?.dispose();
-		this._fieldElement.remove();
-		this._cleanerElement?.remove();
-		this._toggleElement?.remove();
-	}
-	_managedClassNames() {
-		return [
-			CLASS_NAME_DATE_PICKER,
-			CLASS_NAME_DATE_TIME_PICKER,
-			CLASS_NAME_PICKER$1,
-			CLASS_NAME_INPUT_GROUP$2,
-			...managedSizeClassNames(this._config.size)
-		].filter(Boolean);
-	}
-	_createDateTimePicker() {
-		this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_TIME_PICKER, CLASS_NAME_PICKER$1);
-		const inputGroup = this._element;
-		applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP$2);
-		applyControlGroupSize(inputGroup, this._config.size);
-		const inputEl = document.createElement("div");
-		this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`);
-		const action = (className, icon, label) => createControlGroupAction({
-			className,
-			disabled: this._config.disabled,
-			icon,
-			label,
-			sanitizeIcon: (value) => sanitizeByConfig(value, this._config)
-		});
-		if (this._config.cleaner) {
-			this._cleanerElement = action(CLASS_NAME_CLEANER$2, this._config.cleanerIcon, this._config.ariaCleanerLabel);
-			inputGroup.append(this._cleanerElement);
-		}
-		this._toggleElement = null;
-		if (this._config.pickerIcon) {
-			const indicator = action(CLASS_NAME_INDICATOR$1, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel);
-			inputGroup.append(indicator);
-			this._toggleElement = indicator;
-		}
-		this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
-			date: this._config.date,
-			disabled: this._config.disabled,
-			locale: this._config.locale,
-			name: this._config.name,
-			seconds: Boolean(this._config.seconds),
-			type: "datetime"
-		}, {
-			...this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {},
-			...this._config.inputOptions
-		}));
-		EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event) => {
-			if (!this._syncingFromPanel) {
-				this._calendar?.setConfig({ startDate: event.date });
-				this._selection?.setConfig({ time: event.date });
-				EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: event.date });
-			}
-		});
-		this._menu = document.createElement("div");
-		this._menu.id = getUID(`${this.constructor.NAME}-popup-`);
-		this._menu.classList.add(CLASS_NAME_POPUP$1, CLASS_NAME_DROPDOWN$1);
-		this._writeToggleAttribute("aria-expanded", "false");
-		this._writeToggleAttribute("aria-haspopup", "dialog");
-		const body = document.createElement("div");
-		body.classList.add(CLASS_NAME_BODY$1);
-		const calendars = document.createElement("div");
-		calendars.classList.add(CLASS_NAME_CALENDARS);
-		this._calendarElement = document.createElement("div");
-		this._calendarElement.classList.add(CLASS_NAME_CALENDAR);
-		calendars.append(this._calendarElement);
-		body.append(calendars);
-		const timePickers = document.createElement("div");
-		timePickers.classList.add(CLASS_NAME_TIME_PICKERS);
-		this._selectionElement = document.createElement("div");
-		this._selectionElement.classList.add(CLASS_NAME_TIME_BODY);
-		timePickers.append(this._selectionElement);
-		body.append(timePickers);
-		this._menu.append(body);
-		if (this._footerTemplate) {
-			const footer = document.createElement("div");
-			footer.classList.add(CLASS_NAME_FOOTER$1);
-			footer.append(this._footerTemplate.content.cloneNode(true));
-			this._disableUnselectableActions(SELECTOR_ACTION_TODAY, footer);
-			this._menu.append(footer);
-		}
-	}
-	_isNowSelectable() {
-		return this._input.isDateSelectable(/* @__PURE__ */ new Date());
-	}
-	_ensureBodies() {
-		if (this._calendar) return;
-		this._calendar = new Calendar(this._calendarElement, this._forwardConfig(Calendar, {
-			locale: this._config.locale,
-			startDate: this.getDate()
-		}, this._config.calendarOptions));
-		this._selection = new TimeSelection(this._selectionElement, this._forwardConfig(TimeSelection, {
-			locale: this._config.locale,
-			onChange: (time) => this._applyTime(time),
-			time: this.getDate(),
-			variant: this._config.variant
-		}, this._config.selectionOptions));
-		EventHandler.on(this._calendar._element, "startDateChange.coreui.calendar", (event) => {
-			this._applyDate(event.dateObject);
-		});
-	}
-	_applyDate(date) {
-		if (!date) return;
-		const current = this.getDate();
-		const merged = new Date(date);
-		if (current) merged.setHours(current.getHours(), current.getMinutes(), current.getSeconds());
-		this._syncingFromPanel = true;
-		this._input.setConfig({ date: merged });
-		this._syncingFromPanel = false;
-		this._selection?.setConfig({ time: merged });
-		EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: this.getDate() });
-	}
-	_applyTime(time) {
-		if (!time) return;
-		const current = this.getDate();
-		const merged = current ? new Date(current) : /* @__PURE__ */ new Date();
-		merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds());
-		this._syncingFromPanel = true;
-		this._input.setConfig({ date: merged });
-		this._syncingFromPanel = false;
-		this._calendar?.setConfig({ startDate: merged });
-		EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: this.getDate() });
-	}
-	_onPopupShow() {
-		this._ensureBodies();
-	}
-	static jQueryInterface(config, ...args) {
-		return jQueryDispatch(this, DateTimePicker, config, args);
-	}
-};
-/**
-* Data API implementation
-*/
-EventHandler.on(window, EVENT_LOAD_DATA_API$13, () => {
-	for (const element of SelectorEngine.find(SELECTOR_DATA_DATE_TIME_PICKER)) DateTimePicker.getOrCreateInstance(element);
-});
-/**
-* jQuery
-*/
-defineJQueryPlugin(DateTimePicker);
-//#endregion
 //#region js/src/util/legacy-markup.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI util/legacy-markup.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Transitional v5 → v6 markup upgrade for Modal and Offcanvas, removed in v7.
-*
-* v5 shipped both components as <div> structures; v6 renders them on the
-* native <dialog> element. When a component is instantiated on legacy markup,
-* the markup is rebuilt in place: a <dialog> carrying the element's
-* attributes and (flattened) children is inserted INSIDE the original
-* element, which stays in the DOM as an inert `display: contents` shell.
-* Keeping the shell preserves consumer references to the old element —
-* bubbling `*.coreui.*` events still reach listeners bound to it, and
-* constructing a component with the old reference resolves to the inner
-* <dialog>. Only selectors targeting the removed wrapper layers
-* (`.modal-dialog`, `.modal-content`) cannot be preserved.
-*/
 const ATTRIBUTE_SHELL = "data-coreui-legacy-shell";
 const SKIPPED_ATTRIBUTES = /* @__PURE__ */ new Set([
 	"aria-hidden",
@@ -11437,20 +11891,11 @@ const migrate = (element, name) => {
 	console.warn(`CoreUI ${name}: legacy v5 markup detected and upgraded to the native <dialog> structure at runtime. Update the markup to the v6 structure — this automatic migration will be removed in v7. See https://coreui.io/docs/migration/`, element);
 	return dialog;
 };
-/**
-* Unwraps a previously migrated shell without touching anything else — safe
-* for lookups (getInstance) that must not mutate the DOM.
-*/
 const unwrapLegacyShell = (element, name) => {
 	const resolved = getElement(element);
 	if (resolved && resolved.getAttribute(ATTRIBUTE_SHELL) === name) return resolved.querySelector("dialog");
 	return resolved;
 };
-/**
-* Resolves the element a dialog-based component should mount on. Returns the
-* element untouched when it is already a <dialog>; unwraps a previously
-* migrated shell; rebuilds legacy v5 markup.
-*/
 const resolveDialogElement = (element, name) => {
 	const resolved = getElement(element);
 	if (!resolved || resolved instanceof HTMLDialogElement) return resolved;
@@ -11460,35 +11905,29 @@ const resolveDialogElement = (element, name) => {
 };
 //#endregion
 //#region js/src/dialog-base.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI dialog-base.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's dialog-base.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const CLASS_NAME_OPEN = "dialog-open";
 const CLASS_NAME_HIDING = "hiding";
-/**
-* Class definition
-*
-* Shared base class for the Modal and Offcanvas components, built on the
-* native <dialog> element. Provides the show/hide/toggle lifecycle with
-* events, opening via showModal()/show(), Escape handling for modal and
-* non-modal states, backdrop-click dismissal, the static-backdrop "bounce",
-* body scroll prevention, and child component cleanup.
-*/
+const SELECTOR_NAVBAR_EXPAND = ".navbar[class*=\"navbar-expand\"]";
+const POPUP_DATA_KEYS = [
+	"coreui.autocomplete",
+	"coreui.combobox",
+	"coreui.context-menu",
+	"coreui.date-picker",
+	"coreui.date-range-picker",
+	"coreui.dropdown",
+	"coreui.menu",
+	"coreui.multi-select",
+	"coreui.time-picker"
+];
 var DialogBase = class extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
 		this._isTransitioning = false;
 		this._openedAsModal = false;
 		this._closedByComponent = false;
+		this._hiddenByComponent = !this._element?.open;
+		this._resizeObserver = null;
+		this._resizeFrame = null;
 		this._addDialogListeners();
 	}
 	static get NAME() {
@@ -11501,9 +11940,20 @@ var DialogBase = class extends BaseComponent {
 		return this._element.open ? this.hide() : this.show(relatedTarget);
 	}
 	async show(relatedTarget) {
-		if (this._element.open || this._isTransitioning) return;
-		if (EventHandler.trigger(this._element, this.constructor.eventName("show"), { relatedTarget }).defaultPrevented) return;
+		if (!this._canShow(relatedTarget)) return;
+		await this._show(relatedTarget);
+	}
+	async hide() {
+		if (!this._canHide()) return;
+		await this._hide();
+	}
+	_canShow(relatedTarget) {
+		if (this._element.open || this._isTransitioning) return false;
+		return !EventHandler.trigger(this._element, this.constructor.eventName("show"), { relatedTarget }).defaultPrevented;
+	}
+	async _show(relatedTarget) {
 		this._isTransitioning = true;
+		this._hiddenByComponent = false;
 		this._onBeforeShow();
 		const { modal, preventBodyScroll } = this._getShowOptions();
 		this._showElement({
@@ -11515,18 +11965,24 @@ var DialogBase = class extends BaseComponent {
 			EventHandler.trigger(this._element, this.constructor.eventName("shown"), { relatedTarget });
 		}, this._element, this._isAnimated());
 	}
-	async hide() {
-		if (!this._element.open || this._isTransitioning) return;
-		if (EventHandler.trigger(this._element, this.constructor.eventName("hide")).defaultPrevented) return;
+	_canHide() {
+		if (!this._element.open || this._isTransitioning) return false;
+		return !EventHandler.trigger(this._element, this.constructor.eventName("hide")).defaultPrevented;
+	}
+	async _hide() {
 		this._isTransitioning = true;
+		this._hiddenByComponent = true;
 		this._hideElement();
 		await this._queueCallback(() => {
-			if (this._element.open) this._closeAndCleanup();
+			this._closeAndCleanup();
 			this._finishHide();
 		}, this._element, this._isAnimated());
 	}
 	dispose() {
+		this._resizeObserver?.disconnect();
+		if (this._resizeFrame !== null) cancelAnimationFrame(this._resizeFrame);
 		if (this._element.open) this._closeAndCleanup();
+		this._element.classList.remove(CLASS_NAME_HIDING);
 		EventHandler.off(this._element, "cancel", this._cancelHandler);
 		EventHandler.off(this._element, "close", this._closeHandler);
 		super.dispose();
@@ -11563,6 +12019,7 @@ var DialogBase = class extends BaseComponent {
 			this._closedByComponent = true;
 			this._element.close();
 		}
+		holdAnnouncements();
 		this._openedAsModal = false;
 		if (!document.querySelector("dialog[open]:modal")) document.documentElement.classList.remove(CLASS_NAME_OPEN);
 	}
@@ -11585,10 +12042,31 @@ var DialogBase = class extends BaseComponent {
 			const instance = data_default.get(element, "coreui.tooltip") ?? data_default.get(element, "coreui.popover");
 			if (instance && typeof instance.hide === "function") instance.hide();
 		}
+		for (const element of SelectorEngine.find("*", this._element)) for (const key of POPUP_DATA_KEYS) {
+			const instance = data_default.get(element, key);
+			if (instance && typeof instance.hide === "function") instance.hide();
+		}
 		for (const element of SelectorEngine.find(".toast.show", this._element)) {
 			const instance = data_default.get(element, "coreui.toast");
 			if (instance && typeof instance.hide === "function") instance.hide();
 		}
+	}
+	_initResizeObserver() {
+		const navbar = this._element?.classList.contains(this.constructor.NAME) && this._element.closest(SELECTOR_NAVBAR_EXPAND);
+		if (!navbar || typeof ResizeObserver === "undefined") return;
+		const hideWhenInline = () => {
+			if (this._isTransitioning) {
+				this._resizeFrame = requestAnimationFrame(hideWhenInline);
+				return;
+			}
+			this._resizeFrame = null;
+			if (this._element.open && getComputedStyle(this._element).position !== "fixed") this.hide();
+		};
+		this._resizeObserver = new ResizeObserver(() => {
+			if (this._resizeFrame !== null) cancelAnimationFrame(this._resizeFrame);
+			this._resizeFrame = requestAnimationFrame(hideWhenInline);
+		});
+		this._resizeObserver.observe(navbar);
 	}
 	_addDialogListeners() {
 		const eventKey = this.constructor.EVENT_KEY;
@@ -11607,6 +12085,7 @@ var DialogBase = class extends BaseComponent {
 				this._closedByComponent = false;
 				return;
 			}
+			if (this._hiddenByComponent || this._element.open) return;
 			this._hideChildComponents();
 			this._closeAndCleanup();
 			this._finishHide();
@@ -11631,26 +12110,14 @@ var DialogBase = class extends BaseComponent {
 };
 //#endregion
 //#region js/src/dialog.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI dialog.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's dialog.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$29 = "dialog";
-const EVENT_KEY$23 = `.coreui.dialog`;
-const DATA_API_KEY$18 = ".data-api";
-const EVENT_SHOW$5 = `show${EVENT_KEY$23}`;
-const EVENT_SHOWN$5 = `shown${EVENT_KEY$23}`;
-const EVENT_HIDDEN$8 = `hidden${EVENT_KEY$23}`;
-const EVENT_CANCEL$1 = `cancel${EVENT_KEY$23}`;
-const EVENT_CLICK_DATA_API$11 = `click${EVENT_KEY$23}${DATA_API_KEY$18}`;
+const NAME$31 = "dialog";
+const EVENT_KEY$24 = `.coreui.dialog`;
+const DATA_API_KEY$19 = ".data-api";
+const EVENT_SHOW$5 = `show${EVENT_KEY$24}`;
+const EVENT_SHOWN$5 = `shown${EVENT_KEY$24}`;
+const EVENT_HIDDEN$8 = `hidden${EVENT_KEY$24}`;
+const EVENT_CANCEL$1 = `cancel${EVENT_KEY$24}`;
+const EVENT_CLICK_DATA_API$11 = `click${EVENT_KEY$24}${DATA_API_KEY$19}`;
 const CLASS_NAME_NONMODAL$1 = "dialog-nonmodal";
 const CLASS_NAME_INSTANT$3 = "dialog-instant";
 const CLASS_NAME_SWAP_IN$1 = "dialog-swap-in";
@@ -11660,25 +12127,26 @@ const Default$27 = {
 	keyboard: true,
 	modal: true
 };
-const DefaultType$27 = {
+const DefaultType$26 = {
 	backdrop: "(boolean|string)",
 	keyboard: "boolean",
 	modal: "boolean"
 };
-/**
-* Class definition
-*/
 var Dialog = class Dialog extends DialogBase {
 	static get Default() {
 		return Default$27;
 	}
 	static get DefaultType() {
-		return DefaultType$27;
+		return DefaultType$26;
 	}
 	static get NAME() {
-		return NAME$29;
+		return NAME$31;
 	}
 	handleUpdate() {}
+	dispose() {
+		this._element.classList.remove(CLASS_NAME_SWAP_IN$1);
+		super.dispose();
+	}
 	_getShowOptions() {
 		return {
 			modal: this._config.modal,
@@ -11697,69 +12165,61 @@ var Dialog = class Dialog extends DialogBase {
 	_onCancel() {
 		EventHandler.trigger(this._element, EVENT_CANCEL$1);
 	}
+	static {
+		EventHandler.on(document, EVENT_CLICK_DATA_API$11, SELECTOR_DATA_TOGGLE$9, function(event) {
+			Dialog._handleDataApiClick(this, event);
+		});
+	}
 	static jQueryInterface(config, relatedTarget) {
 		return jQueryDispatch(this, Dialog, config, [relatedTarget]);
 	}
-};
-/**
-* Data API implementation
-*/
-EventHandler.on(document, EVENT_CLICK_DATA_API$11, SELECTOR_DATA_TOGGLE$9, function(event) {
-	const target = SelectorEngine.getElementFromSelector(this);
-	if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
-	EventHandler.one(target, EVENT_SHOW$5, (showEvent) => {
-		if (showEvent.defaultPrevented) return;
-		EventHandler.one(target, EVENT_HIDDEN$8, () => {
-			if (isVisible(this)) this.focus({ preventScroll: true });
-		});
-	});
-	const currentDialog = this.closest("dialog[open]");
-	if (currentDialog && currentDialog !== target && target) {
+	static _handleDataApiClick(trigger, event) {
+		const target = SelectorEngine.getElementFromSelector(trigger);
+		if (!target) return;
+		if (["A", "AREA"].includes(trigger.tagName)) event.preventDefault();
+		const currentDialog = trigger.closest("dialog[open]");
+		const currentInstance = currentDialog && currentDialog !== target ? Dialog.getInstance(currentDialog) : null;
+		if (!currentDialog || !currentInstance) {
+			EventHandler.one(target, EVENT_SHOW$5, (showEvent) => {
+				if (!showEvent.defaultPrevented) Dialog._registerFocusRestoration(target, trigger);
+			});
+			Dialog.getOrCreateInstance(target).toggle(trigger);
+			return;
+		}
+		if (currentDialog.classList.contains(CLASS_NAME_SWAP_IN$1)) return;
 		const newDialog = Dialog.getOrCreateInstance(target);
+		if (!newDialog._canShow(trigger) || !currentInstance._canHide()) return;
+		Dialog._registerFocusRestoration(target, trigger);
 		target.classList.add(CLASS_NAME_SWAP_IN$1);
-		newDialog.show(this);
 		EventHandler.one(target, EVENT_SHOWN$5, () => {
 			target.classList.remove(CLASS_NAME_SWAP_IN$1);
 		});
-		const currentInstance = Dialog.getInstance(currentDialog);
-		if (currentInstance) {
-			currentDialog.classList.add(CLASS_NAME_INSTANT$3);
-			EventHandler.one(currentDialog, EVENT_HIDDEN$8, () => {
-				currentDialog.classList.remove(CLASS_NAME_INSTANT$3);
-			});
-			currentInstance.hide();
-		}
-		return;
+		newDialog._show(trigger);
+		currentDialog.classList.add(CLASS_NAME_INSTANT$3);
+		EventHandler.one(currentDialog, EVENT_HIDDEN$8, () => {
+			currentDialog.classList.remove(CLASS_NAME_INSTANT$3);
+		});
+		currentInstance._hide();
 	}
-	Dialog.getOrCreateInstance(target).toggle(this);
-});
+	static _registerFocusRestoration(target, trigger) {
+		EventHandler.one(target, EVENT_HIDDEN$8, () => {
+			if (isVisible(trigger)) trigger.focus({ preventScroll: true });
+		});
+	}
+};
 enableDismissTrigger(Dialog);
-/**
-* jQuery
-*/
 defineJQueryPlugin(Dialog);
 //#endregion
 //#region js/src/drawer.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI drawer.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's drawer.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$28 = "drawer";
-const EVENT_KEY$22 = `.coreui.drawer`;
-const DATA_API_KEY$17 = ".data-api";
-const EVENT_LOAD_DATA_API$12 = `load${EVENT_KEY$22}${DATA_API_KEY$17}`;
-const EVENT_HIDDEN$7 = `hidden${EVENT_KEY$22}`;
-const EVENT_RESIZE$3 = `resize${EVENT_KEY$22}`;
-const EVENT_CLICK_DATA_API$10 = `click${EVENT_KEY$22}${DATA_API_KEY$17}`;
-const OPEN_SELECTOR$1 = "dialog[open][class*=\"drawer\"]";
+const NAME$30 = "drawer";
+const EVENT_KEY$23 = `.coreui.drawer`;
+const DATA_API_KEY$18 = ".data-api";
+const EVENT_LOAD_DATA_API$12 = `load${EVENT_KEY$23}${DATA_API_KEY$18}`;
+const EVENT_HIDDEN$7 = `hidden${EVENT_KEY$23}`;
+const EVENT_RESIZE$3 = `resize${EVENT_KEY$23}`;
+const EVENT_CLICK_DATA_API$10 = `click${EVENT_KEY$23}${DATA_API_KEY$18}`;
+const OPEN_SELECTOR$1 = "dialog[open]:is(.drawer, [class^=\"drawer-\"], [class*=\" drawer-\"])";
+const SELECTOR_OPEN_RESPONSIVE$1 = "dialog[open]:not(.drawer):is([class^=\"drawer-\"], [class*=\" drawer-\"])";
 const SELECTOR_DATA_TOGGLE$8 = "[data-coreui-toggle=\"drawer\"]";
 const SELECTOR_DISMISS_SCOPE$1 = ".drawer, .drawer-sm, .drawer-md, .drawer-lg, .drawer-xl, .drawer-2xl";
 const Default$26 = {
@@ -11767,23 +12227,24 @@ const Default$26 = {
 	keyboard: true,
 	scroll: false
 };
-const DefaultType$26 = {
+const DefaultType$25 = {
 	backdrop: "(boolean|string)",
 	keyboard: "boolean",
 	scroll: "boolean"
 };
-/**
-* Class definition
-*/
 var Drawer = class Drawer extends DialogBase {
+	constructor(element, config) {
+		super(element, config);
+		this._initResizeObserver();
+	}
 	static get Default() {
 		return Default$26;
 	}
 	static get DefaultType() {
-		return DefaultType$26;
+		return DefaultType$25;
 	}
 	static get NAME() {
-		return NAME$28;
+		return NAME$30;
 	}
 	_getShowOptions() {
 		return {
@@ -11798,9 +12259,6 @@ var Drawer = class Drawer extends DialogBase {
 		return jQueryDispatch(this, Drawer, config, (element) => [element]);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, EVENT_CLICK_DATA_API$10, SELECTOR_DATA_TOGGLE$8, function(event) {
 	const target = SelectorEngine.getElementFromSelector(this);
 	if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
@@ -11816,24 +12274,18 @@ EventHandler.on(window, EVENT_LOAD_DATA_API$12, () => {
 	for (const selector of SelectorEngine.find(OPEN_SELECTOR$1)) Drawer.getOrCreateInstance(selector).show();
 });
 EventHandler.on(window, EVENT_RESIZE$3, () => {
-	for (const element of SelectorEngine.find(OPEN_SELECTOR$1)) if (getComputedStyle(element).position !== "fixed") Drawer.getOrCreateInstance(element).hide();
+	for (const element of SelectorEngine.find(SELECTOR_OPEN_RESPONSIVE$1)) if (getComputedStyle(element).position !== "fixed") Drawer.getOrCreateInstance(element).hide();
 });
 enableDismissTrigger(Drawer, "hide", SELECTOR_DISMISS_SCOPE$1);
-/**
-* jQuery
-*/
 defineJQueryPlugin(Drawer);
 //#endregion
 //#region js/src/dropdown.ts
-/**
-* Constants
-*/
-const NAME$27 = "dropdown";
-const EVENT_KEY$21 = `.coreui.dropdown`;
-const DATA_API_KEY$16 = ".data-api";
-const ARROW_DOWN_KEY$3 = "ArrowDown";
-const EVENT_CLICK_DATA_API$9 = `click${EVENT_KEY$21}${DATA_API_KEY$16}`;
-const EVENT_KEYDOWN_DATA_API$1 = `keydown${EVENT_KEY$21}${DATA_API_KEY$16}`;
+const NAME$29 = "dropdown";
+const EVENT_KEY$22 = `.coreui.dropdown`;
+const DATA_API_KEY$17 = ".data-api";
+const ARROW_DOWN_KEY$4 = "ArrowDown";
+const EVENT_CLICK_DATA_API$9 = `click${EVENT_KEY$22}${DATA_API_KEY$17}`;
+const EVENT_KEYDOWN_DATA_API$1 = `keydown${EVENT_KEY$22}${DATA_API_KEY$17}`;
 const CLASS_NAME_DROPUP = "dropup";
 const CLASS_NAME_DROPEND = "dropend";
 const CLASS_NAME_DROPSTART = "dropstart";
@@ -11852,13 +12304,10 @@ const Default$25 = {
 	...Menu.Default,
 	placement: null
 };
-const DefaultType$25 = {
+const DefaultType$24 = {
 	...Menu.DefaultType,
 	placement: "(null|string)"
 };
-/**
-* Class definition
-*/
 var Dropdown = class Dropdown extends Menu {
 	constructor(element, config) {
 		super(element, config);
@@ -11877,10 +12326,10 @@ var Dropdown = class Dropdown extends Menu {
 		return Default$25;
 	}
 	static get DefaultType() {
-		return DefaultType$25;
+		return DefaultType$24;
 	}
 	static get NAME() {
-		return NAME$27;
+		return NAME$29;
 	}
 	update() {
 		this._inNavbar = this._detectNavbar();
@@ -11923,7 +12372,7 @@ var Dropdown = class Dropdown extends Menu {
 	_selectMenuItem({ key, target }) {
 		const items = SelectorEngine.find(this.constructor.SELECTOR_VISIBLE_ITEMS, this._menu).filter((element) => isVisible(element));
 		if (!items.length) return;
-		getNextActiveElement(items, target, key === ARROW_DOWN_KEY$3, !items.includes(target)).focus();
+		getNextActiveElement(items, target, key === ARROW_DOWN_KEY$4, !items.includes(target)).focus();
 	}
 	_detectNavbar() {
 		return this._element.closest(SELECTOR_NAVBAR) !== null;
@@ -11932,58 +12381,101 @@ var Dropdown = class Dropdown extends Menu {
 		return jQueryDispatch(this, Dropdown, config);
 	}
 };
-/**
-* Data API implementation
-*
-* clearMenus is not re-registered here: Menu's document-level registration
-* iterates the open-instance registry, which the subclass shares.
-*/
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API$1, Dropdown.SELECTOR_DATA_TOGGLE, (event) => Dropdown.dataApiKeydownHandler(event));
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API$1, Dropdown.SELECTOR_MENU, (event) => Dropdown.dataApiKeydownHandler(event));
 EventHandler.on(document, EVENT_CLICK_DATA_API$9, Dropdown.SELECTOR_DATA_TOGGLE, function(event) {
 	event.preventDefault();
 	Dropdown.getOrCreateInstance(this).toggle();
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Dropdown);
 //#endregion
+//#region js/src/form.ts
+const NAME$28 = "form";
+const EVENT_KEY$21 = `.coreui.form`;
+const DATA_API_KEY$16 = ".data-api";
+const EVENT_INPUT$9 = `input${EVENT_KEY$21}`;
+const EVENT_RESET$3 = `reset${EVENT_KEY$21}`;
+const EVENT_SUBMIT_DATA_API = `submit${EVENT_KEY$21}${DATA_API_KEY$16}`;
+const EVENT_VALIDATE = `validate${EVENT_KEY$21}`;
+const SELECTOR_DATA_VALIDATE = "form[data-coreui-validate][novalidate]";
+var Form = class Form extends BaseComponent {
+	constructor(element) {
+		super(element);
+		this._validated = false;
+		this._validatedSinceReset = false;
+		this._validationMarks = /* @__PURE__ */ new WeakMap();
+		EventHandler.on(this._element, EVENT_RESET$3, (event) => {
+			this._validatedSinceReset = false;
+			setTimeout(() => {
+				if (this._element && !event.defaultPrevented && !this._validatedSinceReset) this.reset();
+			});
+		});
+	}
+	static get NAME() {
+		return NAME$28;
+	}
+	validate() {
+		return this._validate().isValid;
+	}
+	reset() {
+		EventHandler.off(this._element, EVENT_INPUT$9);
+		clearValidationState(this._element, this._validationMarks);
+		this._validated = false;
+	}
+	dispose() {
+		this.reset();
+		super.dispose();
+	}
+	_validate() {
+		const result = validateForm(this._element, this._validationMarks, (isValid) => EventHandler.trigger(this._element, EVENT_VALIDATE, { isValid }).defaultPrevented);
+		if (result.handled) {
+			this._validatedSinceReset = true;
+			if (!this._validated) {
+				this._validated = true;
+				EventHandler.on(this._element, EVENT_INPUT$9, () => updateValidationState(this._element, this._validationMarks));
+			}
+		}
+		return result;
+	}
+	static jQueryInterface(config) {
+		return jQueryDispatch(this, Form, config);
+	}
+};
+EventHandler.on(document, EVENT_SUBMIT_DATA_API, SELECTOR_DATA_VALIDATE, function(event) {
+	if (event.submitter?.hasAttribute("formnovalidate")) return;
+	const { handled, isValid } = Form.getOrCreateInstance(this)._validate();
+	if (handled && !isValid) event.preventDefault();
+});
+defineJQueryPlugin(Form);
+//#endregion
 //#region js/src/loading-button.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO loading-button.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$26 = "loading-button";
+const NAME$27 = "loading-button";
 const EVENT_KEY$20 = `.coreui.loading-button`;
 const DATA_API_KEY$15 = ".data-api";
 const EVENT_START = `start${EVENT_KEY$20}`;
 const EVENT_STOP = `stop${EVENT_KEY$20}`;
+const EVENT_CLICK$9 = "click";
 const EVENT_CLICK_DATA_API$8 = `click${EVENT_KEY$20}${DATA_API_KEY$15}`;
+const CLASS_NAME_DISABLED$4 = "disabled";
 const CLASS_NAME_IS_LOADING = "is-loading";
 const CLASS_NAME_LOADING_BUTTON = "btn-loading";
 const CLASS_NAME_LOADING_BUTTON_SPINNER = "btn-loading-spinner";
+const SELECTOR_HIDDEN_CONTENT = `[aria-hidden="true"], [hidden], .${CLASS_NAME_LOADING_BUTTON_SPINNER}`;
 const SELECTOR_DATA_TOGGLE$7 = "[data-coreui-toggle=\"loading-button\"]";
 const Default$24 = {
+	ariaLoadingLabel: "Loading",
 	disabledOnLoading: false,
 	spinner: true,
 	spinnerType: "border",
 	timeout: false
 };
-const DefaultType$24 = {
+const DefaultType$23 = {
+	ariaLoadingLabel: "string",
 	disabledOnLoading: "boolean",
 	spinner: "boolean",
 	spinnerType: "string",
 	timeout: "(boolean|number)"
 };
-/**
-* Class definition
-*/
 var LoadingButton = class LoadingButton extends BaseComponent {
 	constructor(element, config) {
 		super(element);
@@ -11992,16 +12484,20 @@ var LoadingButton = class LoadingButton extends BaseComponent {
 		this._timeout = null;
 		this._spinner = null;
 		this._state = "idle";
+		this._handleClick = (event) => this._blockClick(event);
+		this._blocked = false;
+		this._announcement = null;
 		this._createButton();
+		this._element.addEventListener(EVENT_CLICK$9, this._handleClick, true);
 	}
 	static get Default() {
 		return Default$24;
 	}
 	static get DefaultType() {
-		return DefaultType$24;
+		return DefaultType$23;
 	}
 	static get NAME() {
-		return NAME$26;
+		return NAME$27;
 	}
 	start() {
 		if (this._state === "loading") return;
@@ -12009,8 +12505,9 @@ var LoadingButton = class LoadingButton extends BaseComponent {
 		this._state = "loading";
 		this._startTimeout = setTimeout(() => {
 			this._element.classList.add(CLASS_NAME_IS_LOADING);
+			if (this._config.disabledOnLoading) this._block();
+			this._announcement = this._announce([this._getName(), this._config.ariaLoadingLabel].filter(Boolean).join(", "), "high");
 			EventHandler.trigger(this._element, EVENT_START);
-			if (this._config.disabledOnLoading) this._element.setAttribute("disabled", true);
 		}, 1);
 		if (this._config.timeout) this._timeout = setTimeout(() => {
 			this.stop();
@@ -12023,7 +12520,12 @@ var LoadingButton = class LoadingButton extends BaseComponent {
 		const stoped = () => {
 			this._removeSpinner();
 			this._state = "idle";
-			if (this._config.disabledOnLoading) this._element.removeAttribute("disabled");
+			this._unblock();
+			if (this._announcement) {
+				this._announcement();
+				this._announcement = null;
+				this._announce(this._getName(), "normal");
+			}
 			EventHandler.trigger(this._element, EVENT_STOP);
 		};
 		if (this._spinner) {
@@ -12034,7 +12536,31 @@ var LoadingButton = class LoadingButton extends BaseComponent {
 	}
 	dispose() {
 		this._clearTimeouts();
+		this._unblock();
+		this._spinner?.remove();
+		this._announcement?.();
+		this._element.removeEventListener(EVENT_CLICK$9, this._handleClick, true);
+		this._element.classList.remove(CLASS_NAME_IS_LOADING);
 		super.dispose();
+	}
+	_announce(message, priority) {
+		if (!message || this._element.getRootNode().activeElement !== this._element) return null;
+		return announce(message, {
+			context: this._element,
+			priority
+		});
+	}
+	_block() {
+		if (this._element.classList.contains(CLASS_NAME_DISABLED$4) || this._element.getAttribute("aria-disabled") === "true") return;
+		this._element.classList.add(CLASS_NAME_DISABLED$4);
+		this._element.setAttribute("aria-disabled", "true");
+		this._blocked = true;
+	}
+	_blockClick(event) {
+		if (this._blocked) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+		}
 	}
 	_clearTimeouts() {
 		if (this._startTimeout) {
@@ -12054,11 +12580,32 @@ var LoadingButton = class LoadingButton extends BaseComponent {
 			const spinner = document.createElement("span");
 			const type = this._config.spinnerType;
 			spinner.classList.add(CLASS_NAME_LOADING_BUTTON_SPINNER, `spinner-${type}`);
-			spinner.setAttribute("role", "status");
-			spinner.setAttribute("aria-hidden", "true");
+			if (this._config.ariaLoadingLabel) {
+				spinner.setAttribute("role", "img");
+				spinner.setAttribute("aria-label", this._config.ariaLoadingLabel);
+			} else spinner.setAttribute("aria-hidden", "true");
 			this._element.insertBefore(spinner, this._element.firstChild);
 			this._spinner = spinner;
 		}
+	}
+	_getName() {
+		const root = this._element.getRootNode();
+		const ids = this._element.getAttribute("aria-labelledby");
+		if (ids && (root instanceof Document || root instanceof ShadowRoot)) {
+			const labelledBy = ids.split(/\s+/).map((id) => root.getElementById(id)?.textContent?.trim()).filter(Boolean).join(" ");
+			if (labelledBy) return labelledBy;
+		}
+		const label = this._element.getAttribute("aria-label")?.trim();
+		if (label) return label;
+		const content = this._element.cloneNode(true);
+		for (const hidden of content.querySelectorAll(SELECTOR_HIDDEN_CONTENT)) hidden.remove();
+		return content.textContent?.trim() || this._element.getAttribute("title")?.trim() || "";
+	}
+	_unblock() {
+		if (!this._blocked) return;
+		this._element.classList.remove(CLASS_NAME_DISABLED$4);
+		this._element.removeAttribute("aria-disabled");
+		this._blocked = false;
 	}
 	_removeSpinner() {
 		if (this._config.spinner) {
@@ -12077,32 +12624,14 @@ var LoadingButton = class LoadingButton extends BaseComponent {
 		return jQueryDispatch(this, LoadingButton, config);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, EVENT_CLICK_DATA_API$8, SELECTOR_DATA_TOGGLE$7, (event) => {
 	const button = event.target.closest(SELECTOR_DATA_TOGGLE$7);
 	LoadingButton.getOrCreateInstance(button).start();
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(LoadingButton);
 //#endregion
 //#region js/src/modal.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI modal.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's dialog.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$25 = "modal";
+const NAME$26 = "modal";
 const EVENT_KEY$19 = `.coreui.modal`;
 const DATA_API_KEY$14 = ".data-api";
 const EVENT_SHOW$4 = `show${EVENT_KEY$19}`;
@@ -12119,28 +12648,29 @@ const Default$23 = {
 	keyboard: true,
 	modal: true
 };
-const DefaultType$23 = {
+const DefaultType$22 = {
 	backdrop: "(boolean|string)",
 	keyboard: "boolean",
 	modal: "boolean"
 };
-/**
-* Class definition
-*/
 var Modal = class Modal extends DialogBase {
 	constructor(element, config) {
-		super(resolveDialogElement(element, NAME$25), config);
+		super(resolveDialogElement(element, NAME$26), config);
 	}
 	static get Default() {
 		return Default$23;
 	}
 	static get DefaultType() {
-		return DefaultType$23;
+		return DefaultType$22;
 	}
 	static get NAME() {
-		return NAME$25;
+		return NAME$26;
 	}
 	handleUpdate() {}
+	dispose() {
+		this._element.classList.remove(CLASS_NAME_SWAP_IN);
+		super.dispose();
+	}
 	_getShowOptions() {
 		return {
 			modal: this._config.modal,
@@ -12159,87 +12689,82 @@ var Modal = class Modal extends DialogBase {
 	_onCancel() {
 		EventHandler.trigger(this._element, EVENT_CANCEL);
 	}
+	static {
+		EventHandler.on(document, EVENT_CLICK_DATA_API$7, SELECTOR_DATA_TOGGLE$6, function(event) {
+			Modal._handleDataApiClick(this, event);
+		});
+	}
 	static jQueryInterface(config, relatedTarget) {
 		return jQueryDispatch(this, Modal, config, [relatedTarget]);
 	}
-};
-/**
-* Data API implementation
-*/
-EventHandler.on(document, EVENT_CLICK_DATA_API$7, SELECTOR_DATA_TOGGLE$6, function(event) {
-	const target = resolveDialogElement(SelectorEngine.getElementFromSelector(this), NAME$25);
-	if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
-	EventHandler.one(target, EVENT_SHOW$4, (showEvent) => {
-		if (showEvent.defaultPrevented) return;
-		EventHandler.one(target, EVENT_HIDDEN$6, () => {
-			if (isVisible(this)) this.focus({ preventScroll: true });
-		});
-	});
-	const currentDialog = this.closest("dialog[open]");
-	if (currentDialog && currentDialog !== target && target) {
+	static _handleDataApiClick(trigger, event) {
+		const target = resolveDialogElement(SelectorEngine.getElementFromSelector(trigger), NAME$26);
+		if (!target) return;
+		if (["A", "AREA"].includes(trigger.tagName)) event.preventDefault();
+		const currentDialog = trigger.closest("dialog[open]");
+		const currentInstance = currentDialog && currentDialog !== target ? Modal.getInstance(currentDialog) : null;
+		if (!currentDialog || !currentInstance) {
+			EventHandler.one(target, EVENT_SHOW$4, (showEvent) => {
+				if (!showEvent.defaultPrevented) Modal._registerFocusRestoration(target, trigger);
+			});
+			Modal.getOrCreateInstance(target).toggle(trigger);
+			return;
+		}
+		if (currentDialog.classList.contains(CLASS_NAME_SWAP_IN)) return;
 		const newModal = Modal.getOrCreateInstance(target);
+		if (!newModal._canShow(trigger) || !currentInstance._canHide()) return;
+		Modal._registerFocusRestoration(target, trigger);
 		target.classList.add(CLASS_NAME_SWAP_IN);
-		newModal.show(this);
 		EventHandler.one(target, EVENT_SHOWN$4, () => {
 			target.classList.remove(CLASS_NAME_SWAP_IN);
 		});
-		const currentInstance = Modal.getInstance(currentDialog);
-		if (currentInstance) {
-			currentDialog.classList.add(CLASS_NAME_INSTANT$2);
-			EventHandler.one(currentDialog, EVENT_HIDDEN$6, () => {
-				currentDialog.classList.remove(CLASS_NAME_INSTANT$2);
-			});
-			currentInstance.hide();
-		}
-		return;
+		newModal._show(trigger);
+		currentDialog.classList.add(CLASS_NAME_INSTANT$2);
+		EventHandler.one(currentDialog, EVENT_HIDDEN$6, () => {
+			currentDialog.classList.remove(CLASS_NAME_INSTANT$2);
+		});
+		currentInstance._hide();
 	}
-	Modal.getOrCreateInstance(target).toggle(this);
-});
+	static _registerFocusRestoration(target, trigger) {
+		EventHandler.one(target, EVENT_HIDDEN$6, () => {
+			if (isVisible(trigger)) trigger.focus({ preventScroll: true });
+		});
+	}
+};
 enableDismissTrigger(Modal);
-/**
-* jQuery
-*/
 defineJQueryPlugin(Modal);
 //#endregion
 //#region js/src/multi-select.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO multi-select.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* ------------------------------------------------------------------------
-* Constants
-* ------------------------------------------------------------------------
-*/
-const NAME$24 = "multi-select";
+const NAME$25 = "multi-select";
 const DATA_KEY = "coreui.multi-select";
 const EVENT_KEY$18 = `.${DATA_KEY}`;
 const DATA_API_KEY$13 = ".data-api";
-const ARROW_DOWN_KEY$2 = "ArrowDown";
-const ARROW_UP_KEY$2 = "ArrowUp";
+const ARROW_DOWN_KEY$3 = "ArrowDown";
+const ARROW_LEFT_KEY$4 = "ArrowLeft";
+const ARROW_RIGHT_KEY$4 = "ArrowRight";
+const ARROW_UP_KEY$3 = "ArrowUp";
 const BACKSPACE_KEY$1 = "Backspace";
 const DELETE_KEY = "Delete";
-const ENTER_KEY = "Enter";
+const ENTER_KEY$1 = "Enter";
 const ESCAPE_KEY$1 = "Escape";
-const SPACE_KEY = " ";
 const TAB_KEY = "Tab";
 const RIGHT_MOUSE_BUTTON = 2;
+const SELECTOR_CHIP_REMOVE = ".chip-remove";
 const SELECTOR_CHIP = ".chip";
 const SELECTOR_CLEANER = ".form-control-cleaner";
 const SELECTOR_OPTION$1 = ".list-box-option";
-const SELECTOR_SEARCH$1 = ".form-multi-select-search";
+const SELECTOR_SEARCH$1 = ".multi-select-search";
 const SELECTOR_SELECT_ALL$1 = "[data-coreui-select-all]";
 const SELECTOR_TEXT_ENTRY = "input, textarea, select, [contenteditable=\"\"], [contenteditable=\"true\"]";
 const SELECTOR_DATA_MULTI_SELECT = "[data-coreui-multi-select]";
-const SELECTOR_SELECT = "select.form-multi-select";
-const SELECTOR_SELECTION = ".form-multi-select-selection";
+const SELECTOR_SELECT = "select.multi-select";
+const SELECTOR_SELECTION = ".multi-select-selection";
 const EVENT_CHANGE$7 = `change${EVENT_KEY$18}`;
-const EVENT_CLICK$7 = `click${EVENT_KEY$18}`;
+const EVENT_CLICK$8 = `click${EVENT_KEY$18}`;
+const EVENT_FOCUS$3 = `focus${EVENT_KEY$18}`;
 const EVENT_HIDDEN$5 = `hidden${EVENT_KEY$18}`;
-const EVENT_KEYDOWN$4 = `keydown${EVENT_KEY$18}`;
-const EVENT_KEYUP = `keyup${EVENT_KEY$18}`;
+const EVENT_KEYDOWN$7 = `keydown${EVENT_KEY$18}`;
+const EVENT_INPUT$8 = `input${EVENT_KEY$18}`;
 const EVENT_SEARCH$1 = `search${EVENT_KEY$18}`;
 const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY$18}`;
 const EVENT_CLICK_DATA_API$6 = `click${EVENT_KEY$18}${DATA_API_KEY$13}`;
@@ -12251,29 +12776,26 @@ const CLASS_NAME_CLEANER$1 = "form-control-cleaner";
 const CLASS_NAME_DISABLED$3 = "disabled";
 const CLASS_NAME_HEADER = "list-box-header";
 const CLASS_NAME_INPUT_GROUP$1 = "form-control-group";
-const CLASS_NAME_SELECT = "form-multi-select";
-const HOST_ATTRIBUTES = [
-	"aria-hidden",
-	"id",
-	"multiple",
-	"name",
-	"required",
-	"tabindex"
-];
-const CLASS_NAME_SELECT_FILLED = "form-multi-select-filled";
+const CLASS_NAME_IS_INVALID = "is-invalid";
+const CLASS_NAME_IS_VALID = "is-valid";
+const CLASS_NAME_SELECT = "multi-select";
+const HOST_ATTRIBUTES$1 = ["id", "name"];
+const CLASS_NAME_SELECT_FILLED = "multi-select-filled";
 const CLASS_NAME_SELECT_ALL = "list-box-select-all";
-const CLASS_NAME_SEARCH = "form-multi-select-search";
-const CLASS_NAME_SELECTED = "selected";
+const CLASS_NAME_SEARCH = "multi-select-search";
+const CLASS_NAME_SELECTED$1 = "selected";
 const CLASS_NAME_INDETERMINATE = "indeterminate";
-const CLASS_NAME_SELECTION = "form-multi-select-selection";
-const CLASS_NAME_SELECTION_TAGS = "form-multi-select-selection-tags";
-const CLASS_NAME_SHOW$10 = "show";
+const CLASS_NAME_SELECTION = "multi-select-selection";
+const CLASS_NAME_SELECTION_CHIPS = "multi-select-selection-chips";
+const CLASS_NAME_SHOW$8 = "show";
 const Default$22 = {
 	allowList: DefaultAllowlist,
+	ariaChipRemoveLabel: "Remove",
 	ariaCleanerLabel: "Clear all selections",
 	ariaPickerLabel: "Toggle options list",
+	ariaRemovedAnnouncement: "removed",
 	ariaSearchLabel: "Search",
-	ariaTagDeleteLabel: "Remove",
+	ariaTagDeleteLabel: null,
 	cleaner: true,
 	clearSearchOnSelect: false,
 	container: false,
@@ -12286,6 +12808,7 @@ const Default$22 = {
 	id: null,
 	indicator: "checkbox",
 	invalid: false,
+	loadingLabel: "Loading…",
 	multiple: true,
 	name: null,
 	options: false,
@@ -12296,6 +12819,7 @@ const Default$22 = {
 	pickerIcon: true,
 	placeholder: "Select...",
 	required: false,
+	resetSelectionOnOptionsChange: false,
 	sanitize: true,
 	sanitizeFn: null,
 	search: false,
@@ -12306,16 +12830,20 @@ const Default$22 = {
 	selectedLabel: (count) => `${count} item(s) selected`,
 	selectFilteredLabel: "Select filtered",
 	selectionLimit: null,
-	selectionType: "tags",
+	selectionType: "chips",
+	total: null,
 	valid: false,
+	validationState: null,
 	value: null
 };
-const DefaultType$22 = {
+const DefaultType$21 = {
 	allowList: "object",
+	ariaChipRemoveLabel: "(string|function)",
 	ariaCleanerLabel: "string",
 	ariaPickerLabel: "string",
+	ariaRemovedAnnouncement: "(string|function)",
 	ariaSearchLabel: "string",
-	ariaTagDeleteLabel: "string",
+	ariaTagDeleteLabel: "(string|null)",
 	cleaner: "boolean",
 	clearSearchOnSelect: "boolean",
 	container: "(string|element|boolean)",
@@ -12328,6 +12856,7 @@ const DefaultType$22 = {
 	id: "(string|null)",
 	indicator: "string",
 	invalid: "boolean",
+	loadingLabel: "string",
 	multiple: "boolean",
 	name: "(string|null)",
 	options: "(boolean|array)",
@@ -12338,9 +12867,10 @@ const DefaultType$22 = {
 	pickerIcon: "(string|boolean)",
 	placeholder: "string",
 	required: "boolean",
+	resetSelectionOnOptionsChange: "boolean",
 	sanitize: "boolean",
 	sanitizeFn: "(null|function)",
-	search: "boolean",
+	search: "(boolean|string)",
 	searchNoResultsLabel: "string",
 	selectAll: "boolean",
 	selectAllLabel: "string",
@@ -12349,23 +12879,31 @@ const DefaultType$22 = {
 	selectFilteredLabel: "string",
 	selectionLimit: "(number|null)",
 	selectionType: "string",
+	total: "(number|null|undefined)",
 	valid: "boolean",
+	validationState: "(string|null|undefined)",
 	value: "(string|array|null)"
 };
-/**
-* ------------------------------------------------------------------------
-* Class Definition
-* ------------------------------------------------------------------------
-*/
 var MultiSelectChipSet = class extends ChipSet {
-	_applyAccessibilityRoles() {}
+	_containerRole() {
+		return null;
+	}
 };
 var MultiSelect = class MultiSelect extends ComboboxBase {
 	constructor(element, config) {
 		super(element, config);
-		this._hostAttributes = new Map(HOST_ATTRIBUTES.map((name) => [name, this._element.getAttribute(name)]));
-		this._addedSelectClass = !this._element.classList.contains(CLASS_NAME_SELECT);
-		this._configureNativeSelect();
+		this._hostAttributes = new Map(HOST_ATTRIBUTES$1.map((name) => [name, this._element.getAttribute(name)]));
+		this._hostOptions = [...this._element.childNodes];
+		this._validation = new FieldValidation(this._element, {
+			aliases: true,
+			config: () => this._config,
+			canBlock: () => !this._disabled,
+			fields: () => [this._element],
+			frames: () => [this._wrapperElement],
+			invalidTargets: () => [this._getFocusTarget()],
+			owned: () => [this._element, this._searchElement].filter(Boolean),
+			restore: () => this._restoreSelection()
+		});
 		this._indicatorElement = null;
 		this._selectAllElement = null;
 		this._dropdownHeaderElement = null;
@@ -12377,14 +12915,28 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		this._optionsElement = null;
 		this._wrapperElement = null;
 		this._menu = null;
+		this._nativeFocusHandler = null;
 		this._nativeKeydownHandler = null;
-		this._selected = [];
+		this._initialSelection = [];
+		this._known = /* @__PURE__ */ new Map();
+		this._seenValues = /* @__PURE__ */ new Set();
+		this._disabled = this._config.disabled;
+		this._givenApplies = Boolean(this._config.value);
+		this._givenValues = this._config.value ? new Set(this._config.value) : null;
+		this._sourceOptions = this._config.options || this._getOptionsFromElement();
+		this._total = this._config.total;
+		this._store = createSelectionStore((next) => this._fit(next));
 		this._options = this._getOptions();
+		this._store.commit(this._markedValues());
+		this._configureNativeSelect();
 		this._floatingCleanup = null;
 		this._anchoredPosition = null;
 		this._search = "";
-		if (this._config.options.length > 0) this._createNativeOptions(this._element, this._config.options);
+		this._loading = false;
+		this._offListOptions = [];
+		if (this._config.options.length > 0) this._createNativeOptions(this._element, this._options);
 		this._createSelect();
+		this._initialSelection = this._selectedOptions();
 		this._addEventListeners();
 		data_default.set(this._element, DATA_KEY, this);
 	}
@@ -12392,10 +12944,10 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		return Default$22;
 	}
 	static get DefaultType() {
-		return DefaultType$22;
+		return DefaultType$21;
 	}
 	static get NAME() {
-		return NAME$24;
+		return NAME$25;
 	}
 	_escapeFocusTarget() {
 		return this._config.search ? this._searchElement : this._togglerElement;
@@ -12430,11 +12982,11 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 	_focusListBox() {
 		if (!this._listBox) return;
 		if (this._listBox.getActive() === null && !this._searchElement?.value) {
-			const selected = SelectorEngine.findOne(`${SELECTOR_OPTION$1}.${CLASS_NAME_SELECTED}:not([hidden])`, this._menu);
+			const selected = SelectorEngine.findOne(`${SELECTOR_OPTION$1}.${CLASS_NAME_SELECTED$1}:not([hidden])`, this._menu);
 			if (selected?.dataset.coreuiValue) this._listBox.setActive(selected.dataset.coreuiValue);
 		}
 		this._listBox.focusActive();
-		if (!this._menu.contains(document.activeElement)) this._menu.focus();
+		if (!containsFocus(this._menu)) this._menu.focus();
 	}
 	_releaseFocus() {
 		if (this._pointerDownListener) {
@@ -12446,78 +12998,139 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 	}
 	_onHideStart() {
 		this._releaseFocus();
-		this._refocusOnHide = this._wrapperElement.contains(document.activeElement) || this._menu.contains(document.activeElement);
+		this._refocusOnHide = containsFocus(this._wrapperElement) || containsFocus(this._menu);
 	}
 	_afterHideDispose() {
 		if (this._config.search) this._searchElement.value = "";
 		this._onSearchChange(this._searchElement);
 	}
 	_onHideEnd() {
-		if (this._refocusOnHide && !this._config.disabled) {
+		if (this._refocusOnHide && !this._disabled) {
 			const refocusTarget = this._config.search ? this._searchElement : this._togglerElement;
 			if (refocusTarget) refocusTarget.focus();
 		}
 	}
 	dispose() {
+		this._validation.dispose();
 		this._destroySelect();
-		for (const [name, value] of this._hostAttributes) this._restoreAttribute(name, value);
-		if (this._addedSelectClass) this._element.classList.remove(CLASS_NAME_SELECT);
+		if (this._element.firstChild !== this._hostOptions[0]) this._element.replaceChildren(...this._hostOptions);
+		for (const [name, value] of this._hostAttributes) writeAttribute(this._element, name, value);
 		super.dispose();
 	}
 	search(text) {
-		this._search = text.length > 0 ? text.toLowerCase() : text;
+		const changed = text !== this._search;
+		this._search = text;
 		this._filterOptionsList();
-		EventHandler.trigger(this._element, EVENT_SEARCH$1);
+		if (changed) EventHandler.trigger(this._element, EVENT_SEARCH$1, { query: text });
 	}
-	setConfig(config) {
-		if (config?.value) this.deselectAll();
+	setLoading(loading) {
+		this._loading = loading;
+		this._listBox?.setLoading(loading);
+	}
+	setOptions(options) {
+		if (!this._config) return;
+		this._typeCheckConfig({ options }, { options: DefaultType$21.options });
+		const hadFocus = containsFocus(this._menu);
+		const active = this._listBox?.getActive();
+		const previous = new Set(flattenOptions(this._options).map((option) => String(option.value)));
+		const seen = new Set(this._seenValues);
+		this._sourceOptions = options;
+		this._givenApplies = false;
+		this._options = this._getOptionsFromConfig(options);
+		const values = new Set(flattenOptions(this._options).map((option) => String(option.value)));
+		const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || [...values].some((value) => !previous.has(value)));
+		const marked = this._markedValues();
+		const seeded = this._givenValues ? marked.filter((value) => !seen.has(value)) : [];
+		const selected = this._store.values();
+		const next = reset ? marked : [...selected, ...this._config.multiple || selected.length === 0 ? seeded : []];
+		const listed = this._listedOptions();
+		const initial = [...this._initialSelection, ...seeded.map((value) => ({
+			value,
+			...this._describe(listed.get(value))
+		}))];
+		this._initialSelection = this._fit(initial.map((option) => option.value)).map((value) => initial.find((option) => option.value === value));
+		this._element.replaceChildren();
+		this._createNativeOptions(this._element, this._options);
+		this._listBox?.setItems(this._getListBoxItems());
+		this._filterOptionsList();
+		this._commit(next, reset);
+		if (!this._config) return;
+		const focused = this._menu.getRootNode().activeElement;
+		if (!hadFocus || focused !== this._menu && containsFocus(this._menu) && isVisible(focused)) return;
+		const items = this._getDisplayedItems();
+		const target = items.find((item) => item.dataset.coreuiValue === active) ?? (this._config.search ? null : items[0]);
+		if (target) {
+			this._listBox.setActive(target.dataset.coreuiValue);
+			this._listBox.focusActive();
+		} else (this._config.search ? this._searchElement : this._menu).focus();
+	}
+	disable() {
+		this._setDisabled(true);
+	}
+	enable() {
+		this._setDisabled(false);
+	}
+	setTotal(total) {
+		this._typeCheckConfig({ total }, { total: DefaultType$21.total });
+		this._total = total;
+		this._render();
+	}
+	setValidationState(validationState) {
+		const state = {
+			invalid: false,
+			valid: false,
+			validationState
+		};
 		this._config = this._getConfig({
 			...this._config,
-			...config
+			...state
 		});
-		this._selected = [];
+		this._validation.configure(state);
+	}
+	setValue(value) {
+		this._typeCheckConfig({ value }, { value: DefaultType$21.value });
+		const select = this._element;
+		const values = this._normalizeValue(value);
+		this._givenValues = values ? new Set(values) : /* @__PURE__ */ new Set();
+		this._givenApplies = true;
 		this._options = this._getOptions();
-		this._destroySelect();
-		this._element.innerHTML = "";
-		this._configureNativeSelect();
-		this._createNativeOptions(this._element, this._options);
-		this._createSelect();
-		this._addEventListeners();
+		select.selectedIndex = -1;
+		this._commit(this._markedValues(), false);
 	}
 	selectAll(options = this._options) {
-		const limitReached = this._selectAllOptions(options);
-		this._refreshAfterSelectionChange();
-		if (limitReached) this._triggerSelectionLimit();
+		this._selectUpToLimit(this._enabledOptions(options));
 	}
-	deselectAll(options = this._options) {
-		this._deselectAllOptions(options);
-		this._refreshAfterSelectionChange();
+	deselectAll(options) {
+		const values = options ? new Set(this._enabledOptions(options).map((option) => String(option.value))) : null;
+		this._commit(this._selectedOptions().filter((option) => option.disabled === true || values !== null && !values.has(option.value)).map((option) => option.value));
 	}
 	selectFiltered() {
-		const items = this._getDisplayedItems();
-		let limitReached = false;
-		for (const item of items) {
-			if (this._isSelectionLimitReached()) {
-				limitReached = true;
-				break;
-			}
-			const value = String(item.dataset.coreuiValue);
-			const option = this._findOptionByValue(value);
-			if (option && !this._selected.some((selected) => selected.value === value)) this._selectOption(value, option.text, { refresh: false });
-		}
-		this._refreshAfterSelectionChange();
-		if (limitReached) this._triggerSelectionLimit();
+		const options = this._getDisplayedItems().map((item) => this._findOptionByValue(String(item.dataset.coreuiValue))).filter(Boolean);
+		this._selectUpToLimit(options);
 	}
 	deselectFiltered() {
-		const items = this._getDisplayedItems();
-		for (const item of items) {
-			const value = String(item.dataset.coreuiValue);
-			if (this._selected.some((selected) => selected.value === value)) this._deselectOption(value, { refresh: false });
-		}
-		this._refreshAfterSelectionChange();
+		const values = new Set(this._getDisplayedItems().map((item) => String(item.dataset.coreuiValue)));
+		this._commit(this._store.values().filter((value) => !values.has(value)));
 	}
 	getValue() {
-		return this._selected;
+		return this._selectedOptions();
+	}
+	_isDisabled() {
+		return this._disabled;
+	}
+	_setDisabled(disabled) {
+		if (disabled === this._disabled) return;
+		this._disabled = disabled;
+		if (disabled) this.hide();
+		this._element.toggleAttribute("disabled", disabled);
+		this._element.classList.toggle(CLASS_NAME_DISABLED$3, disabled);
+		this._wrapperElement.classList.toggle(CLASS_NAME_DISABLED$3, disabled);
+		this._togglerElement.classList.toggle(CLASS_NAME_DISABLED$3, disabled);
+		writeAttribute(this._togglerElement, "aria-disabled", disabled ? "true" : null);
+		if (!this._config.search) writeAttribute(this._togglerElement, "tabindex", disabled ? null : "0");
+		if (this._indicatorElement) this._indicatorElement.disabled = disabled;
+		if (this._searchElement) this._searchElement.disabled = disabled;
+		this._render();
 	}
 	_destroySelect() {
 		this._releaseFocus();
@@ -12545,19 +13158,29 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		EventHandler.on(this._selectionElement, EVENT_CHIP_REMOVE, SELECTOR_CHIP, (event) => {
 			event.preventDefault();
 			const chip = event.target.closest(SELECTOR_CHIP);
-			if (chip) this._deselectOption(String(chip.dataset.value));
+			if (!chip) return;
+			const target = containsFocus(chip) ? getRemovalNeighbor(this._getChips(), chip) ?? (this._config.search ? this._searchElement : this._togglerElement) : null;
+			this._removeAsUser(() => this._deselectOption(String(chip.dataset.value)));
+			target?.focus();
 		});
-		EventHandler.on(this._togglerElement, EVENT_CLICK$7, SELECTOR_CLEANER, (event) => {
-			if (!this._config.disabled) {
+		EventHandler.on(this._selectionElement, EVENT_KEYDOWN$7, SELECTOR_CHIP, (event) => {
+			const towardField = isRTL(this._wrapperElement) ? ARROW_LEFT_KEY$4 : ARROW_RIGHT_KEY$4;
+			if (this._config.search && event.key === towardField && event.delegateTarget === this._getChips().at(-1)) {
 				event.preventDefault();
-				event.stopPropagation();
-				this.deselectAll();
+				this._searchElement.focus();
 			}
 		});
-		EventHandler.on(this._wrapperElement, EVENT_CLICK$7, () => {
-			if (!this._config.disabled) this.show();
+		EventHandler.on(this._togglerElement, EVENT_CLICK$8, SELECTOR_CLEANER, (event) => {
+			if (!this._disabled) {
+				event.preventDefault();
+				event.stopPropagation();
+				this._removeAsUser(() => this.deselectAll());
+			}
 		});
-		EventHandler.on(this._wrapperElement, EVENT_KEYDOWN$4, (event) => {
+		EventHandler.on(this._wrapperElement, EVENT_CLICK$8, () => {
+			if (!this._disabled) this.show();
+		});
+		EventHandler.on(this._wrapperElement, EVENT_KEYDOWN$7, (event) => {
 			if (event.key === ESCAPE_KEY$1) {
 				if (this._isShown()) {
 					event.preventDefault();
@@ -12567,16 +13190,16 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 				return;
 			}
 			if (this._isShown() && event.target === this._searchElement) {
-				if (event.key === ARROW_DOWN_KEY$2 || event.key === ARROW_UP_KEY$2) {
+				if (event.key === ARROW_DOWN_KEY$3 || event.key === ARROW_UP_KEY$3) {
 					event.preventDefault();
-					if (event.key === ARROW_UP_KEY$2 && this._listBox?.getActive() === null) {
+					if (event.key === ARROW_UP_KEY$3 && this._listBox?.getActive() === null) {
 						this._listBox.last();
 						return;
 					}
 					this._focusListBox();
 					return;
 				}
-				if (event.key === ENTER_KEY) {
+				if (event.key === ENTER_KEY$1) {
 					const stop = SelectorEngine.findOne(`${SELECTOR_OPTION$1}[tabindex="0"]`, this._menu);
 					if (stop?.dataset.coreuiValue) {
 						event.preventDefault();
@@ -12585,18 +13208,18 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 					return;
 				}
 			}
-			if (this._routesTypingToSearch() && (this._isTyping(event) || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY)) this._searchElement.focus();
+			if (this._routesTypingToSearch() && isTypingKey(event) && !event.defaultPrevented) this._searchElement.focus();
 		});
-		EventHandler.on(this._menu, EVENT_KEYDOWN$4, (event) => {
-			if (this._routesTypingToSearch() && (this._isTyping(event) || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY) && !event.target.closest(SELECTOR_TEXT_ENTRY)) this._searchElement.focus();
+		EventHandler.on(this._menu, EVENT_KEYDOWN$7, (event) => {
+			if (this._routesTypingToSearch() && isTypingKey(event) && !event.target.closest(SELECTOR_TEXT_ENTRY)) this._searchElement.focus();
 		});
 		this._addTogglerKeydownListeners();
-		if (this._nativeKeydownHandler) EventHandler.off(this._element, EVENT_KEYDOWN$4, this._nativeKeydownHandler);
+		if (this._nativeKeydownHandler) EventHandler.off(this._element, EVENT_KEYDOWN$7, this._nativeKeydownHandler);
 		this._nativeKeydownHandler = (event) => {
-			if (event.key === TAB_KEY || event.key === ESCAPE_KEY$1) return;
+			if (!event.key || event.key === TAB_KEY || event.key === ESCAPE_KEY$1) return;
 			event.preventDefault();
 			const isPrintable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
-			if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY$2 || this._config.search && isPrintable)) this.show();
+			if (!this._isShown() && (event.key === ENTER_KEY$1 || event.key === ARROW_DOWN_KEY$3 || this._config.search && isPrintable)) this.show();
 			if (this._config.search) {
 				this._searchElement.focus();
 				if (isPrintable) {
@@ -12605,46 +13228,53 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 				}
 			} else this._togglerElement.focus();
 		};
-		EventHandler.on(this._element, EVENT_KEYDOWN$4, this._nativeKeydownHandler);
-		EventHandler.on(this._indicatorElement, EVENT_CLICK$7, (event) => {
+		EventHandler.on(this._element, EVENT_KEYDOWN$7, this._nativeKeydownHandler);
+		if (this._nativeFocusHandler) EventHandler.off(this._element, EVENT_FOCUS$3, this._nativeFocusHandler);
+		this._nativeFocusHandler = () => {
+			this._getFocusTarget().focus();
+		};
+		EventHandler.on(this._element, EVENT_FOCUS$3, this._nativeFocusHandler);
+		EventHandler.on(this._indicatorElement, EVENT_CLICK$8, (event) => {
 			event.preventDefault();
 			event.stopPropagation();
 			this.toggle();
 		});
-		EventHandler.on(this._searchElement, EVENT_KEYUP, () => {
+		EventHandler.on(this._searchElement, EVENT_INPUT$8, () => {
 			this._onSearchChange(this._searchElement);
 		});
-		EventHandler.on(this._searchElement, EVENT_KEYDOWN$4, (event) => {
-			if (!this._isShown() && event.key.length === 1 && !event.ctrlKey && !event.metaKey || event.key === ARROW_DOWN_KEY$2) this.show();
+		EventHandler.on(this._searchElement, EVENT_KEYDOWN$7, (event) => {
+			if (!this._isShown() && event.key?.length === 1 && !event.ctrlKey && !event.metaKey || event.key === ARROW_DOWN_KEY$3) this.show();
+			if (this._handleSearchToChips(event)) return;
 			if ((event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY) && event.target.value.length === 0) this._deselectLastOption();
-			this._searchElement.focus();
+			this._searchElement?.focus();
 		});
-		if (this._selectAllElement) EventHandler.on(this._menu, EVENT_CLICK$7, SELECTOR_SELECT_ALL$1, (event) => {
+		if (this._selectAllElement) EventHandler.on(this._menu, EVENT_CLICK$8, SELECTOR_SELECT_ALL$1, (event) => {
 			event.preventDefault();
 			event.stopPropagation();
-			if (!this._config.disabled) this._toggleSelectAll();
+			if (!this._disabled) this._validation.runAsUser(() => this._toggleSelectAll());
 		});
 	}
 	_getOptions() {
-		if (this._config.options) return this._getOptionsFromConfig();
-		return this._getOptionsFromElement();
+		return this._getOptionsFromConfig(this._sourceOptions);
 	}
-	_getOptionsFromConfig(options = this._config.options) {
+	_getOptionsFromConfig(options = this._sourceOptions, disabled = false) {
 		const _options = [];
 		for (const option of options) {
-			if (this._isOptionGroup(option)) {
+			if (isOptionGroup(option)) {
 				const customGroupProperties = { ...option };
 				delete customGroupProperties.label;
 				delete customGroupProperties.options;
 				_options.push({
 					...customGroupProperties,
 					label: option.label,
-					options: this._getOptionsFromConfig(option.options)
+					options: this._getOptionsFromConfig(option.options, disabled || option.disabled)
 				});
 				continue;
 			}
 			const value = String(option.value);
-			const shouldSelect = (option.selected || this._config.value && this._config.value.includes(value)) && !this._isSelectionLimitReached();
+			const values = this._givenApplies || !this._seenValues.has(value) ? this._givenValues : null;
+			const isSelected = values ? values.has(value) : option.selected;
+			this._seenValues.add(value);
 			const customProperties = typeof option === "object" ? { ...option } : {};
 			delete customProperties.value;
 			delete customProperties.selected;
@@ -12652,43 +13282,23 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 			_options.push({
 				...customProperties,
 				value,
-				...shouldSelect && { selected: true },
-				...option.disabled && { disabled: true }
-			});
-			if (shouldSelect) this._selected.push({
-				value: String(option.value),
-				text: option.text
+				...isSelected && { selected: true },
+				...(disabled || option.disabled) && { disabled: true }
 			});
 		}
 		return _options;
 	}
 	_getOptionsFromElement(node = this._element) {
-		const nodes = Array.from(node.childNodes).filter((element) => element.nodeName === "OPTION" || element.nodeName === "OPTGROUP");
-		const options = [];
-		for (const node of nodes) {
-			if (node.nodeName === "OPTION" && node.value) {
-				const value = String(node.value);
-				const text = node.textContent;
-				const shouldSelect = (node.selected || this._config.value && this._config.value.includes(node.value)) && !this._isSelectionLimitReached();
-				options.push({
-					value,
-					text,
-					selected: shouldSelect,
-					disabled: node.disabled
-				});
-				node.selected = shouldSelect;
-				if (shouldSelect) this._selected.push({
-					value,
-					text: node.textContent,
-					...node.disabled && { disabled: true }
-				});
-			}
-			if (node.nodeName === "OPTGROUP") options.push({
-				label: node.label,
-				options: this._getOptionsFromElement(node)
-			});
-		}
-		return options;
+		return [...node.children].filter((child) => child.nodeName === "OPTGROUP" || child.nodeName === "OPTION" && child.value).map((child) => child.nodeName === "OPTGROUP" ? {
+			label: child.label,
+			disabled: child.disabled,
+			options: this._getOptionsFromElement(child)
+		} : {
+			value: child.value,
+			text: child.textContent,
+			selected: child.selected,
+			disabled: child.disabled
+		});
 	}
 	_configureNativeSelect() {
 		this._element.classList.add(CLASS_NAME_SELECT);
@@ -12696,11 +13306,13 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		else this._element.removeAttribute("multiple");
 		if (this._config.required) this._element.setAttribute("required", true);
 		else this._element.removeAttribute("required");
+		this._element.toggleAttribute("disabled", this._disabled);
 	}
 	_createNativeOptions(parentElement, options) {
-		for (const option of options) if (this._isOptionGroup(option)) {
+		for (const option of options) if (isOptionGroup(option)) {
 			const optgroup = document.createElement("optgroup");
 			optgroup.label = option.label;
+			optgroup.disabled = option.disabled === true;
 			this._createNativeOptions(optgroup, option.options);
 			parentElement.append(optgroup);
 		} else {
@@ -12712,34 +13324,32 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 			parentElement.append(opt);
 		}
 	}
-	_restoreAttribute(name, value) {
-		if (value === null) {
-			this._element.removeAttribute(name);
-			return;
-		}
-		this._element.setAttribute(name, value);
-	}
 	_hideNativeSelect() {
 		this._element.tabIndex = "-1";
 		this._element.setAttribute("aria-hidden", "true");
 	}
 	_wireTogglerAccessibleName() {
-		const nativeLabel = this._element.labels?.[0];
-		if (nativeLabel) {
+		const labelledBy = this._element.getAttribute("aria-labelledby");
+		const ariaLabel = this._element.getAttribute("aria-label");
+		const nativeLabel = [...this._element.labels ?? []].find((label) => !label.contains(this._element));
+		if (labelledBy) this._togglerElement.setAttribute("aria-labelledby", labelledBy);
+		else if (ariaLabel) this._togglerElement.setAttribute("aria-label", ariaLabel);
+		else if (nativeLabel) {
 			if (!nativeLabel.id) nativeLabel.id = `${this._uniqueId}-label`;
 			this._togglerElement.setAttribute("aria-labelledby", nativeLabel.id);
-			return;
 		}
-		const ariaLabel = this._element.getAttribute("aria-label");
-		if (ariaLabel) this._togglerElement.setAttribute("aria-label", ariaLabel);
+	}
+	_getFocusTarget() {
+		return this._config.search ? this._searchElement : this._togglerElement;
+	}
+	_markRequired() {
+		if (this._config.required) (this._config.search ? this._searchElement : this._togglerElement).setAttribute("aria-required", "true");
 	}
 	_createSelect() {
 		const wrapper = document.createElement("div");
 		wrapper.classList.add(CLASS_NAME_SELECT);
-		wrapper.classList.toggle("is-invalid", this._config.invalid);
-		wrapper.classList.toggle("is-valid", this._config.valid);
-		if (this._config.disabled) this._element.classList.add(CLASS_NAME_DISABLED$3);
-		for (const className of this._element.classList.value.split(" ")) wrapper.classList.add(className);
+		this._element.classList.toggle(CLASS_NAME_DISABLED$3, this._disabled);
+		for (const className of this._element.classList) if (className !== CLASS_NAME_IS_INVALID && className !== CLASS_NAME_IS_VALID) wrapper.classList.add(className);
 		this._wrapperElement = wrapper;
 		this._element.parentNode.insertBefore(wrapper, this._element);
 		wrapper.prepend(this._element);
@@ -12754,9 +13364,11 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		this._element.setAttribute("id", this._uniqueId);
 		if (this._uniqueName) this._element.setAttribute("name", this._uniqueName);
 		this._wireTogglerAccessibleName();
+		this._markRequired();
+		this._validation.refresh();
 		this._createOptionsContainer();
 		this._hideNativeSelect();
-		this._selectInitialOptions();
+		this._render();
 	}
 	_createSelection() {
 		const togglerEl = this._wrapperElement;
@@ -12764,20 +13376,22 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		togglerEl.setAttribute("role", "combobox");
 		togglerEl.setAttribute("aria-expanded", "false");
 		togglerEl.setAttribute("aria-haspopup", "dialog");
-		togglerEl.setAttribute("aria-controls", `${this._uniqueId}-listbox`);
 		this._togglerElement = togglerEl;
-		if (this._config.disabled) {
+		if (this._disabled) {
 			togglerEl.classList.add(CLASS_NAME_DISABLED$3);
 			togglerEl.setAttribute("aria-disabled", "true");
 		}
-		if (!this._config.search && !this._config.disabled) togglerEl.tabIndex = 0;
+		if (!this._config.search && !this._disabled) togglerEl.tabIndex = 0;
 		const selectionEl = document.createElement("div");
 		selectionEl.classList.add(CLASS_NAME_SELECTION);
-		if (this._config.multiple && ["chips", "tags"].includes(this._config.selectionType)) selectionEl.classList.add(CLASS_NAME_SELECTION_TAGS);
+		if (this._config.multiple && ["chips", "tags"].includes(this._config.selectionType)) selectionEl.classList.add(CLASS_NAME_SELECTION_CHIPS);
 		togglerEl.append(selectionEl);
 		this._updateSelection();
 		this._selectionElement = selectionEl;
-		if (this._config.multiple && ["chips", "tags"].includes(this._config.selectionType)) this._selectionChipSet = new MultiSelectChipSet(selectionEl, { removable: !this._config.disabled });
+		if (this._config.multiple && ["chips", "tags"].includes(this._config.selectionType)) this._selectionChipSet = new MultiSelectChipSet(selectionEl, {
+			removable: !this._disabled,
+			typeahead: false
+		});
 	}
 	_createButtons() {
 		this._indicatorElement = null;
@@ -12785,7 +13399,7 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 			const indicator = document.createElement("button");
 			indicator.type = "button";
 			indicator.classList.add("form-control-action");
-			indicator.disabled = this._config.disabled;
+			indicator.disabled = this._disabled;
 			indicator.setAttribute("aria-label", this._config.ariaPickerLabel);
 			indicator.innerHTML = sanitizeByConfig(this._config.pickerIcon === true ? PICKER_ICON : this._config.pickerIcon, {
 				...this._config,
@@ -12807,11 +13421,10 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 	_createSearchInput() {
 		const input = document.createElement("input");
 		input.classList.add(CLASS_NAME_SEARCH);
-		if (this._config.disabled) input.disabled = true;
+		if (this._disabled) input.disabled = true;
 		input.setAttribute("id", `search-${this._uniqueId}`);
 		input.autocomplete = "off";
 		input.setAttribute("aria-label", this._config.ariaSearchLabel);
-		input.setAttribute("aria-controls", `${this._uniqueId}-listbox`);
 		this._searchElement = input;
 		this._updateSearchSize();
 		this._selectionElement.append(input);
@@ -12825,7 +13438,7 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		this._dropdownHeaderElement = header;
 		if (hasHeaderTemplate) {
 			const headerContent = document.createElement("div");
-			EventHandler.on(headerContent, EVENT_CLICK$7, (event) => {
+			EventHandler.on(headerContent, EVENT_CLICK$8, (event) => {
 				event.stopPropagation();
 			});
 			this._headerElement = headerContent;
@@ -12844,6 +13457,7 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		listBoxDiv.append(header);
 	}
 	_afterMenuCreated() {
+		this._menu.id = getUID(`${this.constructor.NAME}-dialog-`);
 		this._menu.setAttribute("role", "dialog");
 		this._menu.setAttribute("tabindex", "-1");
 		this._nameMenu();
@@ -12865,9 +13479,6 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		this._togglerElement.id ||= getUID(`${this.constructor.NAME}-toggler-`);
 		this._menu.setAttribute("aria-labelledby", this._togglerElement.id);
 	}
-	_isTyping(event) {
-		return event.key.length === 1 && event.key !== SPACE_KEY && !event.ctrlKey && !event.metaKey;
-	}
 	_routesTypingToSearch() {
 		return Boolean(this._config.search && this._config.globalSearch);
 	}
@@ -12878,11 +13489,18 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 			sectionsSelectable: this._config.optionsGroupsSelectable,
 			selectionLimit: this._config.selectionLimit,
 			selectionMode: this._config.multiple ? "multiple" : "single",
-			typeahead: !this._routesTypingToSearch()
+			loading: this._loading,
+			loadingLabel: this._config.loadingLabel,
+			typeahead: !this._routesTypingToSearch() && this._config.search !== "external"
 		};
 	}
 	_getActiveDescendantField() {
 		return null;
+	}
+	_getPanelReferences() {
+		const references = [[this._togglerElement, this._menu.id]];
+		if (this._searchElement) references.push([this._searchElement, this._optionsElement.id]);
+		return references;
 	}
 	_optionText(option) {
 		return option.text;
@@ -12893,37 +13511,44 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		chip.dataset.value = value;
 		chip.textContent = text;
 		new Chip(chip, {
-			ariaRemoveLabel: `${this._config.ariaTagDeleteLabel} ${text}`.trim(),
-			removable: !this._config.disabled && disabled !== true
+			ariaRemoveLabel: this._config.ariaTagDeleteLabel ?? this._config.ariaChipRemoveLabel,
+			disabled: disabled === true,
+			removable: !this._disabled && disabled !== true
 		});
 		return chip;
 	}
 	_updateChips(selection, search) {
-		const placeholder = SelectorEngine.findOne(".form-multi-select-placeholder", selection);
+		const placeholder = SelectorEngine.findOne(".multi-select-placeholder", selection);
 		if (placeholder) placeholder.remove();
-		const existingChips = /* @__PURE__ */ new Map();
-		for (const chip of SelectorEngine.children(selection, SELECTOR_CHIP)) existingChips.set(chip.dataset.value, chip);
-		const selectedValues = new Set(this._selected.map((option) => String(option.value)));
-		for (const [value, chip] of existingChips) if (!selectedValues.has(value)) {
+		const chips = /* @__PURE__ */ new Map();
+		let focused;
+		const selected = this._selectedOptions();
+		for (const chip of SelectorEngine.children(selection, SELECTOR_CHIP)) {
+			const option = selected.find((option) => option.value === chip.dataset.value);
+			if (option && chip.firstChild?.textContent === option.text && Boolean(SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip)) === (!this._disabled && option.disabled !== true)) {
+				chips.set(option.value, chip);
+				continue;
+			}
+			if (containsFocus(chip)) focused = chip.dataset.value;
 			Chip.getInstance(chip)?.dispose();
 			chip.remove();
-			existingChips.delete(value);
 		}
-		for (const option of this._selected) {
-			const value = String(option.value);
-			const chip = existingChips.get(value) || this._createChip(option.value, option.text, option.disabled);
-			if (search) search.before(chip);
-			else selection.append(chip);
+		const stop = [...chips.values()].find((chip) => chip.tabIndex === 0);
+		let next = search?.parentElement === selection ? search : null;
+		for (const option of selected.toReversed()) {
+			const chip = chips.get(option.value) ?? this._createChip(option.value, option.text, option.disabled);
+			if (chip.parentElement !== selection || chip.nextElementSibling !== next) {
+				if (next) next.before(chip);
+				else selection.append(chip);
+			}
+			if (option.value === focused) chip.focus();
+			next = chip;
 		}
-	}
-	_onOptionSelected(value) {
-		const option = this._findOptionByValue(value);
-		this._selectOption(value, option ? option.text : value, { refresh: false });
-	}
-	_onOptionDeselected(value) {
-		this._deselectOption(value, { refresh: false });
+		this._selectionChipSet?._moveTabStop(stop);
 	}
 	_onSelectionChange() {
+		this._validation.runAsUser(() => this._settle(true));
+		if (!this._config) return;
 		if (!this._config.multiple) {
 			this.hide();
 			this.search("");
@@ -12934,117 +13559,167 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 			this._searchElement.value = null;
 			this._searchElement.focus();
 		}
-		this._refreshAfterSelectionChange();
+		this._updateSearchSize();
 	}
 	_onSelectionLimit() {
 		this._triggerSelectionLimit();
 	}
-	_selectAllOptions(options) {
-		for (const option of options) {
-			if (option.disabled) continue;
-			if (this._isOptionGroup(option)) {
-				if (this._selectAllOptions(option.options)) return true;
-				continue;
-			}
-			if (this._isSelectionLimitReached()) return true;
-			this._selectOption(option.value, option.text, { refresh: false });
-		}
-		return false;
+	_lockedValues() {
+		return new Set([...this._listedOptions()].filter(([, option]) => option.disabled).map(([value]) => value));
 	}
-	_deselectAllOptions(options) {
-		for (const option of options) {
-			if (option.disabled) continue;
-			if (this._isOptionGroup(option)) {
-				this._deselectAllOptions(option.options);
-				continue;
-			}
-			this._deselectOption(option.value, { refresh: false });
-		}
+	_listedOptions() {
+		return new Map(flattenOptions(this._options).toReversed().map((option) => [String(option.value), option]));
 	}
-	_getNativeOption(value) {
-		return SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element);
+	_enabledOptions(options, locked = this._lockedValues()) {
+		return options.filter((option) => !option.disabled && !locked.has(String(option.value))).flatMap((option) => isOptionGroup(option) ? this._enabledOptions(option.options, locked) : [option]);
 	}
-	_getOptionElement(value) {
-		return SelectorEngine.findOne(`[data-coreui-value="${CSS.escape(value)}"]`, this._optionsElement);
+	_selectUpToLimit(options) {
+		const given = new Map(options.toReversed().map((option) => [String(option.value), option]));
+		const { added, refused } = fillSelection(this._config.multiple ? this._store.values() : [], options.map((option) => String(option.value)), this._selectionLimit());
+		for (const value of added) this._known.set(value, this._describe(given.get(value)));
+		this._commit([...this._store.values(), ...added]);
+		if (this._config && refused !== null) this._triggerSelectionLimit();
 	}
 	_getDisplayedItems() {
-		return this._getDisplayedOptions().filter((element) => !element.classList.contains(CLASS_NAME_DISABLED$3));
+		return this._takeable(this._getDisplayedOptions());
 	}
-	_isOptionGroup(option) {
-		return Array.isArray(option.options);
+	_takeable(elements) {
+		const locked = this._lockedValues();
+		return elements.filter((element) => !element.classList.contains(CLASS_NAME_DISABLED$3) && !locked.has(String(element.dataset.coreuiValue)));
 	}
-	_selectOption(value, text, { refresh = true } = {}) {
-		if (!this._config.multiple) this.deselectAll();
-		const isSelected = this._selected.some((option) => option.value === String(value));
-		if (!isSelected && this._isSelectionLimitReached()) {
-			this._triggerSelectionLimit();
-			return;
-		}
-		if (!isSelected) this._selected.push({
-			value: String(value),
-			text
-		});
-		const nativeOption = this._getNativeOption(value);
-		if (nativeOption) nativeOption.selected = true;
-		this._syncOptionElementState(value, true);
-		EventHandler.trigger(this._element, EVENT_CHANGE$7, { value: this._selected });
-		if (refresh) this._refreshAfterSelectionChange();
+	_getTotalCount() {
+		if (typeof this._total === "number") return this._total;
+		const values = new Set(flattenOptions(this._options).map((option) => String(option.value)));
+		return values.size + this._store.values().filter((value) => !values.has(value)).length;
 	}
-	_deselectOption(value, { refresh = true } = {}) {
-		this._selected = this._selected.filter((option) => option.value !== String(value));
-		const nativeOption = this._getNativeOption(value);
-		if (nativeOption) nativeOption.selected = false;
-		this._syncOptionElementState(value, false);
-		EventHandler.trigger(this._element, EVENT_CHANGE$7, { value: this._selected });
-		if (refresh) this._refreshAfterSelectionChange();
+	_deselectOption(value) {
+		this._commit(this._store.values().filter((selected) => selected !== String(value)));
 	}
 	_deselectLastOption() {
-		if (this._selected.length > 0) {
-			const last = this._selected.findLast((option) => option.disabled !== true);
-			if (last) this._deselectOption(last.value);
+		const last = this._selectedOptions().findLast((option) => option.disabled !== true);
+		if (last) this._removeAsUser(() => this._deselectOption(last.value));
+	}
+	_getChips() {
+		return this._selectionChipSet?._getFocusableChips() ?? [];
+	}
+	_handleSearchToChips(event) {
+		const removing = event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY;
+		const arrow = event.key === ARROW_LEFT_KEY$4 || event.key === ARROW_RIGHT_KEY$4;
+		if (!removing && !arrow || event.isComposing || event.shiftKey || hasShortcutModifier(event)) return false;
+		const field = event.target;
+		const towardChips = isRTL(this._wrapperElement) ? ARROW_RIGHT_KEY$4 : ARROW_LEFT_KEY$4;
+		const last = (removing ? field.value.length === 0 : event.key === towardChips && field.selectionStart === 0 && field.selectionEnd === 0) ? this._getChips().at(-1) : void 0;
+		if (!last) return false;
+		event.preventDefault();
+		this.hide();
+		last.focus();
+		return true;
+	}
+	_removeAsUser(remove) {
+		const before = this._selectedOptions();
+		this._validation.runAsUser(remove);
+		const after = new Set(this._store.values());
+		const removed = before.filter((option) => !after.has(String(option.value))).map((option) => option.text);
+		const message = getChipAnnouncement(removed, [], this._config.ariaRemovedAnnouncement, this._config.ariaRemovedAnnouncement);
+		if (message) announce(message, { context: this._wrapperElement });
+	}
+	_fit(values) {
+		if (!this._config.multiple) return values.slice(-1);
+		const unique = [...new Set(values)];
+		return unique.slice(0, this._selectionLimit() ?? unique.length);
+	}
+	_markedValues() {
+		return flattenOptions(this._options).filter((option) => option.selected).map((option) => String(option.value));
+	}
+	_describe(option) {
+		return {
+			text: option.text,
+			...option.disabled && { disabled: true }
+		};
+	}
+	_selectedOptions() {
+		return this._store.values().map((value) => ({
+			value,
+			...this._known.get(value)
+		}));
+	}
+	_commit(values, notify = true) {
+		const previous = new Set(this._store.values());
+		this._commitSelection(values);
+		this._settle(this._store.size() !== previous.size || this._store.values().some((value) => !previous.has(value)), notify);
+	}
+	_settle(changed, notify = true) {
+		const element = this._element;
+		if (changed) this._validation.change();
+		this._render();
+		if (changed && notify) {
+			EventHandler.trigger(element, EVENT_CHANGE$7, { value: this._selectedOptions() });
+			element.dispatchEvent(new Event("input", { bubbles: true }));
+			element.dispatchEvent(new Event("change", { bubbles: true }));
 		}
 	}
-	_refreshAfterSelectionChange() {
+	_render() {
+		const options = this._listedOptions();
+		for (const value of this._store.values()) {
+			const listed = options.get(value);
+			if (listed) this._known.set(value, this._describe(listed));
+		}
+		this._syncNativeSelection(options);
+		this._validation.userAction = false;
 		this._updateSelection();
 		this._updateSelectionCleaner();
 		this._updateSearch();
 		this._updateSearchSize();
 		this._updateHeader();
 		this._updateMasterCheckbox();
+		this._validation.update();
 	}
-	_selectInitialOptions() {
-		for (const option of this._selected) this._selectOption(option.value, option.text, { refresh: false });
-		this._refreshAfterSelectionChange();
+	_syncNativeSelection(options) {
+		for (const option of this._offListOptions) option.remove();
+		this._offListOptions = this._selectedOptions().filter((option) => !options.has(option.value)).map((option) => Object.assign(new Option(option.text, option.value), {
+			disabled: option.disabled === true,
+			hidden: true
+		}));
+		this._element.append(...this._offListOptions);
+		if (!this._config.multiple) {
+			this._element.value = this._store.values()[0] ?? "";
+			return;
+		}
+		for (const option of SelectorEngine.find("option", this._element)) option.selected = this._store.has(option.value);
+	}
+	_restoreSelection() {
+		this._onSearchChange(this._searchElement);
+		for (const { value, ...option } of this._initialSelection) this._known.set(value, option);
+		this._commit(this._initialSelection.map((option) => option.value));
 	}
 	_updateSelection() {
 		const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._wrapperElement);
 		const search = SelectorEngine.findOne(SELECTOR_SEARCH$1, this._wrapperElement);
-		this._wrapperElement.classList.toggle(CLASS_NAME_SELECT_FILLED, this._selected.length > 0);
-		if (this._selected.length === 0 && !this._config.search) {
+		this._wrapperElement.classList.toggle(CLASS_NAME_SELECT_FILLED, this._store.size() > 0);
+		if (this._store.size() === 0 && !this._config.search) {
 			this._renderEmptySelection(selection);
 			return;
 		}
-		if (this._config.multiple && this._config.selectionType === "counter" && !this._config.search) selection.textContent = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._options.length);
+		if (this._config.multiple && this._config.selectionType === "counter" && !this._config.search) selection.textContent = resolveCountLabel(this._config.selectedLabel, this._store.size(), this._getTotalCount());
 		if (this._config.multiple && ["chips", "tags"].includes(this._config.selectionType)) this._updateChips(selection, search);
 		if (this._config.multiple && this._config.selectionType === "text") {
-			selection.innerHTML = "";
-			for (const [index, option] of this._selected.entries()) {
+			while (selection.firstChild && selection.firstChild !== search) selection.firstChild.remove();
+			selection.prepend(...this._selectedOptions().map((option, index) => {
 				const span = document.createElement("span");
-				span.textContent = `${option.text}${index === this._selected.length - 1 ? "" : ","}\u00A0`;
-				selection.append(span);
-			}
+				span.textContent = `${option.text}${index === this._store.size() - 1 ? "" : ","}\u00A0`;
+				return span;
+			}));
 		}
-		if (!this._config.multiple && this._selected.length > 0 && !this._config.search) selection.textContent = this._selected[0].text;
-		if (search) selection.append(search);
+		if (!this._config.multiple && this._store.size() > 0 && !this._config.search) selection.textContent = this._selectedOptions()[0].text;
+		if (search && selection.lastElementChild !== search) selection.append(search);
 		if (this._floatingCleanup) this._updateFloatingPosition();
 	}
 	_renderEmptySelection(selection) {
 		const placeholder = document.createElement("span");
-		placeholder.classList.add("form-multi-select-placeholder");
+		placeholder.classList.add("multi-select-placeholder");
 		placeholder.textContent = this._config.placeholder;
 		for (const chip of SelectorEngine.find(SELECTOR_CHIP, selection)) Chip.getInstance(chip)?.dispose();
-		selection.innerHTML = "";
-		selection.append(placeholder);
+		selection.replaceChildren(placeholder);
 	}
 	_disposeSelection() {
 		if (!this._selectionElement) return;
@@ -13054,54 +13729,34 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		EventHandler.off(this._selectionElement, Chip.EVENT_KEY);
 	}
 	_updateSelectionCleaner() {
-		if (!this._config.cleaner || this._config.disabled) return;
-		if (this._selected.length > 0 && this._selectionCleanerElement === null) {
+		if (!this._config.cleaner) return;
+		if (this._store.size() > 0 && !this._disabled && this._selectionCleanerElement === null) {
 			const selectionCleaner = this._createSelectionCleaner();
 			if (this._indicatorElement) this._indicatorElement.before(selectionCleaner);
 			else this._togglerElement.append(selectionCleaner);
 			this._selectionCleanerElement = selectionCleaner;
 			return;
 		}
-		if (this._selected.length === 0 && this._selectionCleanerElement !== null) {
+		if ((this._store.size() === 0 || this._disabled) && this._selectionCleanerElement !== null) {
 			this._selectionCleanerElement.remove();
 			this._selectionCleanerElement = null;
 		}
 	}
 	_updateSearch() {
 		if (!this._config.search) return;
-		if (!this._config.multiple && this._selected.length > 0) {
-			this._searchElement.placeholder = this._selected[0].text;
-			return;
-		}
-		if (!this._config.multiple && this._selected.length === 0) {
-			this._searchElement.placeholder = this._config.placeholder;
-			return;
-		}
-		if (this._config.multiple && this._selected.length > 0 && this._config.selectionType !== "counter") {
-			this._searchElement.removeAttribute("placeholder");
-			return;
-		}
-		if (this._config.multiple && this._selected.length === 0) {
-			this._searchElement.placeholder = this._config.placeholder;
-			return;
-		}
-		if (this._config.multiple && this._config.selectionType === "counter") this._searchElement.placeholder = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._options.length);
+		if (this._store.size() === 0) this._searchElement.placeholder = this._config.placeholder;
+		else if (!this._config.multiple) this._searchElement.placeholder = this._selectedOptions()[0].text;
+		else if (this._config.selectionType === "counter") this._searchElement.placeholder = resolveCountLabel(this._config.selectedLabel, this._store.size(), this._getTotalCount());
+		else this._searchElement.removeAttribute("placeholder");
 	}
-	_updateSearchSize(size = 2) {
-		if (!this._searchElement || !this._config.multiple) return;
-		if (this._selected.length > 0 && [
+	_updateSearchSize(size = Math.max(2, (this._searchElement?.value.length ?? 0) + 1)) {
+		if (!this._searchElement || !this._config.multiple || ![
 			"chips",
 			"tags",
 			"text"
-		].includes(this._config.selectionType)) {
-			this._searchElement.size = size;
-			return;
-		}
-		if (this._selected.length === 0 && [
-			"chips",
-			"tags",
-			"text"
-		].includes(this._config.selectionType)) this._searchElement.removeAttribute("size");
+		].includes(this._config.selectionType)) return;
+		if (this._store.size() > 0) this._searchElement.size = size;
+		else this._searchElement.removeAttribute("size");
 	}
 	_updateHeader() {
 		if (this._headerElement) {
@@ -13117,19 +13772,12 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		return allSelected ? this._config.deselectAllLabel : this._config.selectAllLabel;
 	}
 	_isAllSelected() {
-		const { selected, total } = this._getSelectAllScope();
-		const target = this._getSelectableTarget(total);
-		return target > 0 && selected >= target;
+		return this._getSelectAllState() === "all";
 	}
-	_getSelectAllScope() {
-		const { selected, total, filtered, filteredSelected } = this._getSelectionState();
-		return this._config.selectAllMode === "filtered" ? {
-			selected: filteredSelected,
-			total: filtered
-		} : {
-			selected,
-			total
-		};
+	_getSelectAllState() {
+		const scope = this._config.selectAllMode === "filtered" ? this._getDisplayedItems() : this._getSelectableElements();
+		const selected = scope.filter((element) => element.classList.contains(CLASS_NAME_SELECTED$1)).length;
+		return getScopeSelectionState(selected, scope.length, this._store.size(), this._selectionLimit());
 	}
 	_isFilteredScopeNarrowed() {
 		if (this._config.selectAllMode !== "filtered") return false;
@@ -13140,28 +13788,18 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		const filteredMode = this._config.selectAllMode === "filtered";
 		if (this._isAllSelected()) {
 			if (filteredMode) this.deselectFiltered();
-			else this.deselectAll();
+			else this.deselectAll(this._options);
 			return;
 		}
 		if (filteredMode) this.selectFiltered();
 		else this.selectAll();
 	}
-	_getSelectableTarget(total) {
-		return this._hasSelectionLimit() ? Math.min(total, this._config.selectionLimit) : total;
-	}
-	_getCheckboxState(selected, total) {
-		if (total > 0 && selected >= total) return "all";
-		return selected === 0 ? "none" : "indeterminate";
-	}
-	_applyCheckboxState(element, state) {
-		element.classList.toggle(CLASS_NAME_SELECTED, state === "all");
-		element.classList.toggle(CLASS_NAME_INDETERMINATE, state === "indeterminate");
-		element.setAttribute("aria-pressed", state === "all" ? "true" : state === "none" ? "false" : "mixed");
-	}
 	_updateMasterCheckbox() {
 		if (!this._selectAllElement) return;
-		const { selected, total } = this._getSelectAllScope();
-		this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total)));
+		const state = this._getSelectAllState();
+		this._selectAllElement.classList.toggle(CLASS_NAME_SELECTED$1, state === "all");
+		this._selectAllElement.classList.toggle(CLASS_NAME_INDETERMINATE, state === "some");
+		this._selectAllElement.setAttribute("aria-pressed", getAriaPressed(state));
 	}
 	_renderHeader() {
 		if (!this._headerElement || typeof this._config.headerTemplate !== "function") return;
@@ -13169,23 +13807,29 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		if (result instanceof Node) this._headerElement.replaceChildren(result);
 		else this._headerElement.innerHTML = sanitizeByConfig(result, this._config);
 	}
+	_getSelectableElements() {
+		return this._takeable(SelectorEngine.find(SELECTOR_OPTION$1, this._optionsElement));
+	}
 	_getSelectionState() {
-		const allItems = SelectorEngine.find(SELECTOR_OPTION$1, this._optionsElement).filter((element) => !element.classList.contains(CLASS_NAME_DISABLED$3));
+		const allItems = this._getSelectableElements();
 		const filteredItems = allItems.filter((element) => this._isOptionDisplayed(element));
 		return {
-			selected: this._selected.length,
+			selected: this._store.size(),
 			total: allItems.length,
 			filtered: filteredItems.length,
-			filteredSelected: filteredItems.filter((element) => element.classList.contains(CLASS_NAME_SELECTED)).length
+			filteredSelected: filteredItems.filter((element) => element.classList.contains(CLASS_NAME_SELECTED$1)).length
 		};
 	}
 	_getSelectionActions() {
 		return {
-			selectAll: () => this.selectAll(),
-			deselectAll: () => this.deselectAll(),
-			selectFiltered: () => this.selectFiltered(),
-			deselectFiltered: () => this.deselectFiltered()
+			selectAll: () => this._validation.runAsUser(() => this.selectAll()),
+			deselectAll: () => this._validation.runAsUser(() => this.deselectAll()),
+			selectFiltered: () => this._validation.runAsUser(() => this.selectFiltered()),
+			deselectFiltered: () => this._validation.runAsUser(() => this.deselectFiltered())
 		};
+	}
+	_filterQuery() {
+		return this._config.search === "external" ? null : super._filterQuery();
 	}
 	_onSearchChange(element) {
 		if (element) {
@@ -13193,11 +13837,8 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 			this._updateSearchSize(element.value.length + 1);
 		}
 	}
-	_hasSelectionLimit() {
-		return this._config.multiple && this._config.selectionLimit !== null;
-	}
-	_isSelectionLimitReached() {
-		return this._hasSelectionLimit() && this._selected.length >= this._config.selectionLimit;
+	_selectionLimit() {
+		return getSelectionLimit(this._config.multiple, this._config.selectionLimit);
 	}
 	_triggerSelectionLimit() {
 		EventHandler.trigger(this._element, EVENT_SELECTION_LIMIT, { selectionLimit: this._config.selectionLimit });
@@ -13214,9 +13855,13 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 	}
 	_configAfterMerge(config) {
 		config = this._normalizeContainerConfig(config);
-		if (typeof config.value === "number") config.value = [String(config.value)];
-		if (typeof config.value === "string") config.value = config.value.split(/,\s*/).map(String);
+		if (typeof config.search === "string" && config.search !== "external") throw new TypeError(`${NAME$25.toUpperCase()}: Option "search" takes true, false or "external".`);
+		config.value = this._normalizeValue(config.value);
 		return config;
+	}
+	_normalizeValue(value) {
+		if (typeof value === "number" || typeof value === "string") return value === "" ? null : String(value).split(/,\s*/);
+		return Array.isArray(value) ? value.map(String) : value;
 	}
 	static multiSelectInterface(element, config, ...args) {
 		const data = MultiSelect.getOrCreateInstance(element, config);
@@ -13231,58 +13876,38 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 	static clearMenus(event) {
 		if (event && (event.button === RIGHT_MOUSE_BUTTON || event.type === "keyup" && event.key !== TAB_KEY)) return;
 		const selects = SelectorEngine.find(SELECTOR_SELECT);
-		for (let i = 0, len = selects.length; i < len; i++) {
-			const context = data_default.get(selects[i], DATA_KEY);
-			const relatedTarget = { relatedTarget: selects[i] };
-			if (event && event.type === "click") relatedTarget.clickEvent = event;
+		for (const select of selects) {
+			const context = data_default.get(select, DATA_KEY);
 			if (!context) continue;
-			if (!context._wrapperElement.classList.contains(CLASS_NAME_SHOW$10)) continue;
+			if (!context._wrapperElement.classList.contains(CLASS_NAME_SHOW$8)) continue;
 			if (context._wrapperElement.contains(event.target) || context._menu.contains(event.target)) continue;
 			context.hide();
 			EventHandler.trigger(context._element, EVENT_HIDDEN$5);
 		}
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(window, EVENT_LOAD_DATA_API$11, () => {
-	const elements = /* @__PURE__ */ new Set([...SelectorEngine.find(SELECTOR_DATA_MULTI_SELECT), ...SelectorEngine.find(SELECTOR_SELECT)]);
-	for (const ms of elements) if (ms.tabIndex !== -1) MultiSelect.multiSelectInterface(ms);
+	for (const multiSelect of SelectorEngine.find(SELECTOR_DATA_MULTI_SELECT)) MultiSelect.multiSelectInterface(multiSelect);
 });
 EventHandler.on(document, EVENT_CLICK_DATA_API$6, MultiSelect.clearMenus);
 EventHandler.on(document, EVENT_KEYUP_DATA_API$1, MultiSelect.clearMenus);
-/**
-* jQuery
-*/
 defineJQueryPlugin(MultiSelect);
 //#endregion
 //#region js/src/navigation.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI navigation.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* ------------------------------------------------------------------------
-* Constants
-* ------------------------------------------------------------------------
-*/
-const NAME$23 = "navigation";
+const NAME$24 = "navigation";
 const EVENT_KEY$17 = `.coreui.navigation`;
 const DATA_API_KEY$12 = ".data-api";
 const Default$21 = {
 	activeLinksExact: true,
 	groupsAutoCollapse: true
 };
-const DefaultType$21 = {
+const DefaultType$20 = {
 	activeLinksExact: "boolean",
 	groupsAutoCollapse: "(string|boolean)"
 };
 const CLASS_NAME_ACTIVE$5 = "active";
 const CLASS_NAME_COLLAPSING = "collapsing";
-const CLASS_NAME_SHOW$9 = "show";
+const CLASS_NAME_SHOW$7 = "show";
 const CLASS_NAME_NAV_GROUP = "nav-group";
 const CLASS_NAME_NAV_GROUP_TOGGLE = "nav-group-toggle";
 const EVENT_CLICK_DATA_API$5 = `click${EVENT_KEY$17}${DATA_API_KEY$12}`;
@@ -13292,11 +13917,6 @@ const SELECTOR_NAV_GROUP_ITEMS = ".nav-group-items";
 const SELECTOR_NAV_GROUP_TOGGLE = ".nav-group-toggle";
 const SELECTOR_NAV_LINK = ".nav-link";
 const SELECTOR_DATA_NAVIGATION = "[data-coreui-navigation]";
-/**
-* ------------------------------------------------------------------------
-* Class Definition
-* ------------------------------------------------------------------------
-*/
 var Navigation = class Navigation extends BaseComponent {
 	constructor(element, config) {
 		super(element);
@@ -13308,10 +13928,10 @@ var Navigation = class Navigation extends BaseComponent {
 		return Default$21;
 	}
 	static get DefaultType() {
-		return DefaultType$21;
+		return DefaultType$20;
 	}
 	static get NAME() {
-		return NAME$23;
+		return NAME$24;
 	}
 	_setActiveLink() {
 		const currentUrl = String(window.location).split(/[?#]/)[0];
@@ -13336,13 +13956,13 @@ var Navigation = class Navigation extends BaseComponent {
 		if (toggle) toggle.setAttribute("aria-expanded", String(expanded));
 		const items = SelectorEngine.findOne(`:scope > ${SELECTOR_NAV_GROUP_ITEMS}`, group);
 		if (!items || !animate) {
-			group.classList.toggle(CLASS_NAME_SHOW$9, expanded);
+			group.classList.toggle(CLASS_NAME_SHOW$7, expanded);
 			return;
 		}
 		const cssPath = supportsInterpolateSize();
 		const size = expanded || cssPath ? 0 : items.getBoundingClientRect().height;
 		items.classList.add(CLASS_NAME_COLLAPSING);
-		group.classList.toggle(CLASS_NAME_SHOW$9, expanded);
+		group.classList.toggle(CLASS_NAME_SHOW$7, expanded);
 		if (!cssPath) startSizeTransition(items, "height", expanded ? 0 : size, expanded ? items.scrollHeight : 0);
 		this._queueCallback(() => {
 			items.classList.remove(CLASS_NAME_COLLAPSING);
@@ -13354,9 +13974,9 @@ var Navigation = class Navigation extends BaseComponent {
 		const group = toggler ? toggler.closest(SELECTOR_NAV_GROUP) : null;
 		if (!group) return;
 		if (this._config.groupsAutoCollapse === true && group.parentElement) {
-			for (const sibling of Array.from(group.parentElement.children)) if (sibling !== group && sibling.classList.contains(CLASS_NAME_NAV_GROUP) && sibling.classList.contains(CLASS_NAME_SHOW$9)) this._setExpanded(sibling, false);
+			for (const sibling of Array.from(group.parentElement.children)) if (sibling !== group && sibling.classList.contains(CLASS_NAME_NAV_GROUP) && sibling.classList.contains(CLASS_NAME_SHOW$7)) this._setExpanded(sibling, false);
 		}
-		this._setExpanded(group, !group.classList.contains(CLASS_NAME_SHOW$9));
+		this._setExpanded(group, !group.classList.contains(CLASS_NAME_SHOW$7));
 	}
 	_addEventListeners() {
 		EventHandler.on(this._element, EVENT_CLICK_DATA_API$5, SELECTOR_NAV_GROUP_TOGGLE, (event) => {
@@ -13375,139 +13995,33 @@ var Navigation = class Navigation extends BaseComponent {
 		return jQueryDispatch(this, Navigation, config);
 	}
 };
-/**
-* ------------------------------------------------------------------------
-* Data Api implementation
-* ------------------------------------------------------------------------
-*/
 EventHandler.on(window, EVENT_LOAD_DATA_API$10, () => {
 	for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_NAVIGATION))) Navigation.navigationInterface(element);
 });
-/**
-* ------------------------------------------------------------------------
-* jQuery
-* ------------------------------------------------------------------------
-* add .Navigation to jQuery only if jQuery is present
-*/
 defineJQueryPlugin(Navigation);
 //#endregion
-//#region js/src/offcanvas.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI offcanvas.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's drawer.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$22 = "offcanvas";
-const EVENT_KEY$16 = `.coreui.offcanvas`;
-const DATA_API_KEY$11 = ".data-api";
-const EVENT_LOAD_DATA_API$9 = `load${EVENT_KEY$16}${DATA_API_KEY$11}`;
-const EVENT_HIDDEN$4 = `hidden${EVENT_KEY$16}`;
-const EVENT_RESIZE$2 = `resize${EVENT_KEY$16}`;
-const EVENT_CLICK_DATA_API$4 = `click${EVENT_KEY$16}${DATA_API_KEY$11}`;
-const OPEN_SELECTOR = "dialog[open][class*=\"offcanvas\"]";
-const SELECTOR_DATA_TOGGLE$5 = "[data-coreui-toggle=\"offcanvas\"]";
-const SELECTOR_DISMISS_SCOPE = ".offcanvas, .offcanvas-sm, .offcanvas-md, .offcanvas-lg, .offcanvas-xl, .offcanvas-2xl";
-const Default$20 = {
-	backdrop: true,
-	keyboard: true,
-	scroll: false
-};
-const DefaultType$20 = {
-	backdrop: "(boolean|string)",
-	keyboard: "boolean",
-	scroll: "boolean"
-};
-/**
-* Class definition
-*/
-var Offcanvas = class Offcanvas extends DialogBase {
-	constructor(element, config) {
-		super(resolveDialogElement(element, NAME$22), config);
-	}
-	static get Default() {
-		return Default$20;
-	}
-	static get DefaultType() {
-		return DefaultType$20;
-	}
-	static get NAME() {
-		return NAME$22;
-	}
-	_getShowOptions() {
-		return {
-			modal: Boolean(this._config.backdrop) || !this._config.scroll,
-			preventBodyScroll: !this._config.scroll
-		};
-	}
-	_shouldDeferClose() {
-		return this._isAnimated();
-	}
-	static jQueryInterface(config) {
-		return jQueryDispatch(this, Offcanvas, config, (element) => [element]);
-	}
-};
-/**
-* Data API implementation
-*/
-EventHandler.on(document, EVENT_CLICK_DATA_API$4, SELECTOR_DATA_TOGGLE$5, function(event) {
-	const target = resolveDialogElement(SelectorEngine.getElementFromSelector(this), NAME$22);
-	if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
-	if (isDisabled(this)) return;
-	EventHandler.one(target, EVENT_HIDDEN$4, () => {
-		if (isVisible(this)) this.focus({ preventScroll: true });
-	});
-	const alreadyOpen = SelectorEngine.findOne(OPEN_SELECTOR);
-	if (alreadyOpen && alreadyOpen !== target) Offcanvas.getInstance(alreadyOpen)?.hide();
-	Offcanvas.getOrCreateInstance(target).toggle(this);
-});
-EventHandler.on(window, EVENT_LOAD_DATA_API$9, () => {
-	for (const selector of SelectorEngine.find(OPEN_SELECTOR)) Offcanvas.getOrCreateInstance(selector).show();
-});
-EventHandler.on(window, EVENT_RESIZE$2, () => {
-	for (const element of SelectorEngine.find(OPEN_SELECTOR)) if (getComputedStyle(element).position !== "fixed") Offcanvas.getOrCreateInstance(element).hide();
-});
-enableDismissTrigger(Offcanvas, "hide", SELECTOR_DISMISS_SCOPE);
-/**
-* jQuery
-*/
-defineJQueryPlugin(Offcanvas);
-//#endregion
 //#region js/src/number-input.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI number-input.js
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$21 = "number-input";
-const EVENT_KEY$15 = `.coreui.number-input`;
-const DATA_API_KEY$10 = ".data-api";
-const EVENT_CHANGE$6 = `change${EVENT_KEY$15}`;
-const EVENT_CLICK$6 = `click${EVENT_KEY$15}`;
-const EVENT_INPUT$6 = `input${EVENT_KEY$15}`;
-const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$15}`;
-const EVENT_RESET$1 = `reset${EVENT_KEY$15}`;
+const NAME$23 = "number-input";
+const EVENT_KEY$16 = `.coreui.number-input`;
+const DATA_API_KEY$11 = ".data-api";
+const EVENT_CHANGE$6 = `change${EVENT_KEY$16}`;
+const EVENT_CLICK$7 = `click${EVENT_KEY$16}`;
+const EVENT_FOCUS$2 = `focus${EVENT_KEY$16}`;
+const EVENT_INPUT$7 = `input${EVENT_KEY$16}`;
+const EVENT_MOUSEOVER$2 = `mouseover${EVENT_KEY$16}`;
+const EVENT_POINTERDOWN$2 = `pointerdown${EVENT_KEY$16}`;
+const EVENT_RESET$2 = `reset${EVENT_KEY$16}`;
 const EVENTS_STOP_REPEAT = [
 	"pointerup",
 	"pointercancel",
 	"pointerleave"
-].map((event) => `${event}${EVENT_KEY$15}`);
+].map((event) => `${event}${EVENT_KEY$16}`);
 const CLASS_NAME_ACTION$1 = "form-control-action";
 const CLASS_NAME_NUMBER_INPUT = "number-input";
 const SELECTOR_DATA_NUMBER_INPUT = "[data-coreui-number-input]";
 const REPEAT_DELAY = 400;
 const REPEAT_INTERVAL = 60;
-const Default$19 = {
+const Default$20 = {
 	allowList: SVGAllowlist,
 	ariaDecrementLabel: "Decrease",
 	ariaIncrementLabel: "Increase",
@@ -13527,9 +14041,6 @@ const DefaultType$19 = {
 	sanitize: "boolean",
 	sanitizeFn: "(null|function)"
 };
-/**
-* Class definition
-*/
 var NumberInput = class NumberInput extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
@@ -13538,6 +14049,7 @@ var NumberInput = class NumberInput extends BaseComponent {
 		this._group = null;
 		this._repeatTimeout = null;
 		this._repeatInterval = null;
+		this._repeated = false;
 		this._stopRepeatingHandler = () => this._stopRepeating();
 		this._resetHandler = () => {
 			setTimeout(() => this._updateButtonState());
@@ -13547,13 +14059,13 @@ var NumberInput = class NumberInput extends BaseComponent {
 		this._updateButtonState();
 	}
 	static get Default() {
-		return Default$19;
+		return Default$20;
 	}
 	static get DefaultType() {
 		return DefaultType$19;
 	}
 	static get NAME() {
-		return NAME$21;
+		return NAME$23;
 	}
 	increment() {
 		this._step("up");
@@ -13564,36 +14076,43 @@ var NumberInput = class NumberInput extends BaseComponent {
 	dispose() {
 		this._stopRepeating();
 		for (const event of EVENTS_STOP_REPEAT) EventHandler.off(document, event, this._stopRepeatingHandler);
-		EventHandler.off(this._element.form, EVENT_RESET$1, this._resetHandler);
+		EventHandler.off(this._element.form, EVENT_RESET$2, this._resetHandler);
 		for (const button of [this._decrementElement, this._incrementElement]) {
-			EventHandler.off(button, EVENT_KEY$15);
+			EventHandler.off(button, EVENT_KEY$16);
 			button?.remove();
 		}
 		if (this._group) {
+			EventHandler.off(this._group.element, EVENT_KEY$16);
 			this._group.element.classList.remove(CLASS_NAME_NUMBER_INPUT);
 			releaseControlGroup(this._element, this._group);
 		}
 		super.dispose();
 	}
 	_step(direction) {
-		if (this._element.disabled || this._element.readOnly) return;
-		const previousValue = this._element.value;
-		if (previousValue === "") this._element.value = this._element.min === "" ? "0" : this._element.min;
-		else if (this._element.step === "any") this._stepByOne(direction);
-		else if (direction === "up") this._element.stepUp();
-		else this._element.stepDown();
-		if (this._element.value === previousValue) return;
-		this._updateButtonState();
+		if (!this._canStep(direction)) return false;
+		this._stepValue(this._element, direction);
 		EventHandler.trigger(this._element, "input", { bubbles: true });
 		EventHandler.trigger(this._element, "change", { bubbles: true });
 		EventHandler.trigger(this._element, EVENT_CHANGE$6, { value: this._element.value });
+		return true;
 	}
-	_stepByOne(direction) {
-		const { max, min, value } = this._element;
-		let next = Number(value) + (direction === "up" ? 1 : -1);
-		if (min !== "") next = Math.max(next, Number(min));
-		if (max !== "") next = Math.min(next, Number(max));
-		this._element.value = String(next);
+	_stepValue(input, direction) {
+		if (input.step.toLowerCase() === "any") {
+			this._stepByOne(input, direction);
+			return;
+		}
+		input[direction === "up" ? "stepUp" : "stepDown"]();
+		if (input.value === "") input[direction === "up" ? "stepDown" : "stepUp"]();
+	}
+	_stepByOne(input, direction) {
+		const delta = direction === "up" ? 1 : -1;
+		const value = input.value === "" ? 0 : Number(input.value);
+		const next = this._clamp(Number((value + delta).toPrecision(15)));
+		if (input.value === "" || (next - value) * delta > 0) input.value = String(next);
+	}
+	_clamp(value) {
+		const { max, min } = this._element;
+		return Math.min(Math.max(value, min === "" ? -Infinity : Number(min)), max === "" ? Infinity : Number(max));
 	}
 	_createButtons() {
 		this._group = ensureControlGroup(this._element);
@@ -13619,20 +14138,40 @@ var NumberInput = class NumberInput extends BaseComponent {
 	_addEventListeners() {
 		for (const [button, direction] of [[this._decrementElement, "down"], [this._incrementElement, "up"]]) {
 			if (!button) continue;
-			EventHandler.on(button, EVENT_CLICK$6, () => this._step(direction));
-			if (this._config.repeat) EventHandler.on(button, EVENT_POINTERDOWN, (event) => {
+			EventHandler.on(button, EVENT_CLICK$7, (event) => {
+				const repeated = this._repeated;
+				this._repeated = false;
+				if (!repeated || event.detail === 0) this._step(direction);
+			});
+			if (this._config.repeat) EventHandler.on(button, EVENT_POINTERDOWN$2, (event) => {
 				if (event.button !== 0) return;
 				this._startRepeating(direction);
 			});
 		}
-		EventHandler.on(this._element, EVENT_INPUT$6, () => this._updateButtonState());
-		if (this._element.form) EventHandler.on(this._element.form, EVENT_RESET$1, this._resetHandler);
+		if (this._group) {
+			EventHandler.on(this._group.element, EVENT_MOUSEOVER$2, () => this._updateButtonState());
+			EventHandler.on(this._group.element, EVENT_POINTERDOWN$2, (event) => this._handleFramePointerDown(event));
+		}
+		EventHandler.on(this._element, EVENT_INPUT$7, () => this._updateButtonState());
+		EventHandler.on(this._element, EVENT_FOCUS$2, () => this._updateButtonState());
+		if (this._element.form) EventHandler.on(this._element.form, EVENT_RESET$2, this._resetHandler);
 		for (const event of EVENTS_STOP_REPEAT) EventHandler.on(document, event, this._stopRepeatingHandler);
+	}
+	_handleFramePointerDown(event) {
+		const target = event.target;
+		this._updateButtonState();
+		if (event.pointerType !== "mouse" || target !== this._group?.element && ![this._decrementElement, this._incrementElement].includes(target.closest("button"))) return;
+		event.preventDefault();
+		if (document.activeElement !== this._element) this._element.focus({ preventScroll: true });
 	}
 	_startRepeating(direction) {
 		this._stopRepeating();
+		this._repeated = false;
 		this._repeatTimeout = setTimeout(() => {
-			this._repeatInterval = setInterval(() => this._step(direction), REPEAT_INTERVAL);
+			this._repeatInterval = setInterval(() => {
+				this._repeated = true;
+				if (!this._step(direction)) this._stopRepeating();
+			}, REPEAT_INTERVAL);
 		}, REPEAT_DELAY);
 	}
 	_stopRepeating() {
@@ -13646,9 +14185,15 @@ var NumberInput = class NumberInput extends BaseComponent {
 		}
 	}
 	_updateButtonState() {
-		const { max, min, value } = this._element;
-		if (this._decrementElement) this._decrementElement.disabled = min !== "" && value !== "" && Number(value) <= Number(min);
-		if (this._incrementElement) this._incrementElement.disabled = max !== "" && value !== "" && Number(value) >= Number(max);
+		if (this._decrementElement) this._decrementElement.disabled = !this._canStep("down");
+		if (this._incrementElement) this._incrementElement.disabled = !this._canStep("up");
+	}
+	_canStep(direction) {
+		if (this._element.matches(":disabled") || this._element.readOnly) return false;
+		const input = this._element.cloneNode();
+		input.value = this._element.value;
+		this._stepValue(input, direction);
+		return input.value !== "" && input.valueAsNumber !== this._element.valueAsNumber;
 	}
 	static _initializeDataApi() {
 		for (const element of SelectorEngine.find(SELECTOR_DATA_NUMBER_INPUT)) NumberInput.getOrCreateInstance(element);
@@ -13657,39 +14202,93 @@ var NumberInput = class NumberInput extends BaseComponent {
 		return jQueryDispatch(this, NumberInput, config);
 	}
 };
-/**
-* Data API implementation
-*/
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$15}${DATA_API_KEY$10}`, () => {
+EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$16}${DATA_API_KEY$11}`, () => {
 	NumberInput._initializeDataApi();
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(NumberInput);
 //#endregion
+//#region js/src/offcanvas.ts
+const NAME$22 = "offcanvas";
+const EVENT_KEY$15 = `.coreui.offcanvas`;
+const DATA_API_KEY$10 = ".data-api";
+const EVENT_LOAD_DATA_API$9 = `load${EVENT_KEY$15}${DATA_API_KEY$10}`;
+const EVENT_HIDDEN$4 = `hidden${EVENT_KEY$15}`;
+const EVENT_RESIZE$2 = `resize${EVENT_KEY$15}`;
+const EVENT_CLICK_DATA_API$4 = `click${EVENT_KEY$15}${DATA_API_KEY$10}`;
+const OPEN_SELECTOR = "dialog[open]:is(.offcanvas, [class^=\"offcanvas-\"], [class*=\" offcanvas-\"])";
+const SELECTOR_OPEN_RESPONSIVE = "dialog[open]:not(.offcanvas):is([class^=\"offcanvas-\"], [class*=\" offcanvas-\"])";
+const SELECTOR_DATA_TOGGLE$5 = "[data-coreui-toggle=\"offcanvas\"]";
+const SELECTOR_DISMISS_SCOPE = ".offcanvas, .offcanvas-sm, .offcanvas-md, .offcanvas-lg, .offcanvas-xl, .offcanvas-2xl";
+const Default$19 = {
+	backdrop: true,
+	keyboard: true,
+	scroll: false
+};
+const DefaultType$18 = {
+	backdrop: "(boolean|string)",
+	keyboard: "boolean",
+	scroll: "boolean"
+};
+var Offcanvas = class Offcanvas extends DialogBase {
+	constructor(element, config) {
+		super(resolveDialogElement(element, NAME$22), config);
+		this._initResizeObserver();
+	}
+	static get Default() {
+		return Default$19;
+	}
+	static get DefaultType() {
+		return DefaultType$18;
+	}
+	static get NAME() {
+		return NAME$22;
+	}
+	_getShowOptions() {
+		return {
+			modal: Boolean(this._config.backdrop) || !this._config.scroll,
+			preventBodyScroll: !this._config.scroll
+		};
+	}
+	_shouldDeferClose() {
+		return this._isAnimated();
+	}
+	static jQueryInterface(config) {
+		return jQueryDispatch(this, Offcanvas, config, (element) => [element]);
+	}
+};
+EventHandler.on(document, EVENT_CLICK_DATA_API$4, SELECTOR_DATA_TOGGLE$5, function(event) {
+	const target = resolveDialogElement(SelectorEngine.getElementFromSelector(this), NAME$22);
+	if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
+	if (isDisabled(this)) return;
+	EventHandler.one(target, EVENT_HIDDEN$4, () => {
+		if (isVisible(this)) this.focus({ preventScroll: true });
+	});
+	const alreadyOpen = SelectorEngine.findOne(OPEN_SELECTOR);
+	if (alreadyOpen && alreadyOpen !== target) Offcanvas.getInstance(alreadyOpen)?.hide();
+	Offcanvas.getOrCreateInstance(target).toggle(this);
+});
+EventHandler.on(window, EVENT_LOAD_DATA_API$9, () => {
+	for (const selector of SelectorEngine.find(OPEN_SELECTOR)) Offcanvas.getOrCreateInstance(selector).show();
+});
+EventHandler.on(window, EVENT_RESIZE$2, () => {
+	for (const element of SelectorEngine.find(SELECTOR_OPEN_RESPONSIVE)) if (getComputedStyle(element).position !== "fixed") Offcanvas.getOrCreateInstance(element).hide();
+});
+enableDismissTrigger(Offcanvas, "hide", SELECTOR_DISMISS_SCOPE);
+defineJQueryPlugin(Offcanvas);
+//#endregion
 //#region js/src/otp-input.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI otp-input.js
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$20 = "otp-input";
+const NAME$21 = "otp-input";
 const EVENT_KEY$14 = `.coreui.otp-input`;
 const DATA_API_KEY$9 = ".data-api";
-const ARROW_RIGHT_KEY$2 = "ArrowRight";
-const ARROW_LEFT_KEY$2 = "ArrowLeft";
+const ARROW_RIGHT_KEY$3 = "ArrowRight";
+const ARROW_LEFT_KEY$3 = "ArrowLeft";
 const BACKSPACE_KEY = "Backspace";
 const EVENT_BEFORE_INPUT = `beforeinput${EVENT_KEY$14}`;
 const EVENT_CHANGE$5 = `change${EVENT_KEY$14}`;
 const EVENT_COMPLETE = `complete${EVENT_KEY$14}`;
-const EVENT_FOCUS = `focus${EVENT_KEY$14}`;
-const EVENT_INPUT$5 = `input${EVENT_KEY$14}`;
-const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$14}`;
+const EVENT_FOCUS$1 = `focus${EVENT_KEY$14}`;
+const EVENT_INPUT$6 = `input${EVENT_KEY$14}`;
+const EVENT_KEYDOWN$6 = `keydown${EVENT_KEY$14}`;
 const EVENT_PASTE = `paste${EVENT_KEY$14}`;
 const EVENT_LOAD_DATA_API$8 = `load${EVENT_KEY$14}${DATA_API_KEY$9}`;
 const SELECTOR_DATA_OTP = "[data-coreui-otp]";
@@ -13703,12 +14302,12 @@ const Default$18 = {
 	masked: false,
 	name: null,
 	placeholder: null,
-	readonly: false,
 	required: false,
 	type: "number",
+	validationState: null,
 	value: null
 };
-const DefaultType$18 = {
+const DefaultType$17 = {
 	ariaLabel: "function",
 	autoSubmit: "boolean",
 	disabled: "boolean",
@@ -13717,72 +14316,100 @@ const DefaultType$18 = {
 	masked: "boolean",
 	name: "(string|null)",
 	placeholder: "(number|string|null)",
-	readonly: "boolean",
 	required: "boolean",
 	type: "string",
+	validationState: "(string|null|undefined)",
 	value: "(number|string|null)"
 };
-/**
-* Class definition
-*/
 var OTPInput = class OTPInput extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
 		this._config = this._getConfig(config);
+		this._disabled = this._config.disabled;
 		this._inputElement = null;
+		this._placeholders = /* @__PURE__ */ new Map();
+		this._resetCode = null;
+		this._value = "";
+		this._validation = new FieldValidation(this._element, {
+			canBlock: () => !this._disabled,
+			config: () => this._config,
+			fields: () => this._inputElement ? [this._inputElement] : [],
+			frames: () => [this._element],
+			invalidTargets: () => this._getInputs(),
+			owned: () => [this._inputElement, ...this._getInputs()],
+			restore: () => this._restoreValue(),
+			serverClassSources: () => [this._element, ...this._getInputs()]
+		});
 		this._setRoleAttribute();
 		this._setInputsAttributes();
-		this._seedSlots();
-		this._createHiddenInput();
+		this._seedSlots(this._config.value);
+		this._createValueField();
 		this._setInputsTabIndexes();
 		this._addEventListeners();
+		this._removeLabelClick = onLabelClick(this._element, () => this._getFirstEmptySlot()?.focus());
 	}
 	static get Default() {
 		return Default$18;
 	}
 	static get DefaultType() {
-		return DefaultType$18;
+		return DefaultType$17;
 	}
 	static get NAME() {
-		return NAME$20;
+		return NAME$21;
 	}
 	clear() {
 		const inputs = this._getInputs();
 		for (const input of inputs) input.value = "";
-		this._setHiddenInputValue(null);
+		this._setValue(null);
 		this._syncFirstInputMaxLength();
 		this._setInputsTabIndexes();
 	}
 	dispose() {
+		if (!this._element) return;
+		this._removeLabelClick();
+		this._validation.dispose();
 		this._inputElement?.remove();
+		this._inputElement = null;
+		for (const input of this._placeholders.keys()) this._restorePlaceholder(input);
 		super.dispose();
 	}
 	reset() {
-		this._seedSlots({ clearWhenEmpty: true });
-		this._setHiddenInputValue(this._readSlots() || null);
-		this._setInputsTabIndexes();
+		this._restoreValue();
 	}
-	setConfig(config) {
-		if (typeof config !== "object" || config === null) return;
-		const previousValue = this._config.value;
+	disable() {
+		this._setDisabled(true);
+	}
+	enable() {
+		this._setDisabled(false);
+	}
+	setValidationState(validationState) {
 		this._config = this._getConfig({
 			...this._config,
-			...config
+			validationState
 		});
-		const repaint = this._config.value !== previousValue;
-		this._setInputsAttributes();
-		if (repaint) this._seedSlots({ clearWhenEmpty: true });
+		this._validation.configure({ validationState });
+	}
+	setValue(value) {
+		this._typeCheckConfig({ value }, { value: DefaultType$17.value });
+		this._seedSlots(value, true);
 		this._setInputsTabIndexes();
-		this._inputElement.remove();
-		this._createHiddenInput();
-		if (repaint) this._setHiddenInputValue(this._readSlots() || null);
+		this._value = this._readSlots();
+		writeValueField(this._inputElement, this._value);
+		this._validation.update();
+	}
+	_setDisabled(disabled) {
+		if (disabled === this._disabled) return;
+		this._disabled = disabled;
+		for (const input of this._getInputs()) input.disabled = disabled;
+		this._inputElement.disabled = disabled;
+		this._validation.update();
 	}
 	_addEventListeners() {
 		EventHandler.on(this._element, EVENT_BEFORE_INPUT, SELECTOR_FORM_OTP_CONTROL, (event) => {
 			const { data, inputType } = event;
 			if (inputType === "insertText" && data && data.length === 1 && !this._isValidInput(data)) event.preventDefault();
 		});
-		EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_FORM_OTP_CONTROL, (event) => {
+		EventHandler.on(this._element, EVENT_FOCUS$1, SELECTOR_FORM_OTP_CONTROL, (event) => {
 			const { target } = event;
 			if (target.value) {
 				setTimeout(() => {
@@ -13795,7 +14422,7 @@ var OTPInput = class OTPInput extends BaseComponent {
 				if (firstEmptyInput && firstEmptyInput !== target) firstEmptyInput.focus();
 			}
 		});
-		EventHandler.on(this._element, EVENT_INPUT$5, SELECTOR_FORM_OTP_CONTROL, (event) => {
+		EventHandler.on(this._element, EVENT_INPUT$6, SELECTOR_FORM_OTP_CONTROL, (event) => {
 			const { target } = event;
 			if (target.value.length > 1) {
 				const chars = this._extractValidChars(target.value);
@@ -13809,7 +14436,7 @@ var OTPInput = class OTPInput extends BaseComponent {
 			const inputs = this._getInputs();
 			if (!inputs.length) return;
 			const value = inputs.map((input) => input.value).join("");
-			if (value !== (this._inputElement ? this._inputElement.value : "")) this._setHiddenInputValue(value);
+			if (value !== (this._inputElement ? this._inputElement.value : "")) this._setValue(value, true);
 			if (target.value.length === 1) {
 				const nextInput = getNextActiveElement(inputs, target, true);
 				if (nextInput) nextInput.focus();
@@ -13818,7 +14445,7 @@ var OTPInput = class OTPInput extends BaseComponent {
 			this._syncFirstInputMaxLength();
 			this._checkAutoSubmit(inputs);
 		});
-		EventHandler.on(this._element, EVENT_KEYDOWN$3, SELECTOR_FORM_OTP_CONTROL, (event) => {
+		EventHandler.on(this._element, EVENT_KEYDOWN$6, SELECTOR_FORM_OTP_CONTROL, (event) => {
 			const { key, target } = event;
 			if (key === BACKSPACE_KEY && target.value === "") {
 				const inputs = this._getInputs();
@@ -13827,8 +14454,8 @@ var OTPInput = class OTPInput extends BaseComponent {
 				this._setInputsTabIndexes();
 				return;
 			}
-			if (key === ARROW_RIGHT_KEY$2 || key === ARROW_LEFT_KEY$2) {
-				const shouldMoveNext = key === ARROW_RIGHT_KEY$2 !== isRTL(this._element);
+			if (key === ARROW_RIGHT_KEY$3 || key === ARROW_LEFT_KEY$3) {
+				const shouldMoveNext = key === ARROW_RIGHT_KEY$3 !== isRTL(this._element);
 				if (shouldMoveNext && this._config.linear && target.value === "") return;
 				const inputs = this._getInputs();
 				if (!inputs.length) return;
@@ -13850,7 +14477,7 @@ var OTPInput = class OTPInput extends BaseComponent {
 		for (let i = 0; i < chars.length && startIndex + i < inputs.length; i++) inputs[startIndex + i].value = chars[i];
 		const nextEmptyIndex = startIndex + chars.length;
 		inputs[nextEmptyIndex < inputs.length ? nextEmptyIndex : inputs.length - 1].focus();
-		this._setHiddenInputValue(inputs.map((input) => input.value).join(""));
+		this._setValue(inputs.map((input) => input.value).join(""), true);
 		this._syncFirstInputMaxLength();
 		this._setInputsTabIndexes();
 		this._checkAutoSubmit(inputs);
@@ -13867,21 +14494,37 @@ var OTPInput = class OTPInput extends BaseComponent {
 			if (form && typeof form.requestSubmit === "function") form.requestSubmit();
 		}
 	}
+	_getFirstEmptySlot() {
+		const inputs = this._getInputs();
+		return inputs.find((input) => !input.value) ?? inputs[0];
+	}
 	_getInputs() {
 		return SelectorEngine.find(SELECTOR_FORM_OTP_CONTROL, this._element);
 	}
 	_readSlots() {
 		return this._getInputs().map((input) => input.value).join("");
 	}
-	_createHiddenInput() {
-		const hiddenInput = document.createElement("input");
-		hiddenInput.type = "hidden";
-		if (this._config.disabled) hiddenInput.disabled = true;
-		if (this._config.id) hiddenInput.id = this._config.id;
-		if (this._config.name) hiddenInput.name = this._config.name;
-		hiddenInput.value = this._readSlots();
-		this._element.append(hiddenInput);
-		this._inputElement = hiddenInput;
+	_createValueField() {
+		const field = createValueField("input", () => this._getFirstEmptySlot());
+		this._resetCode = this._extractValidChars(String(this._config.value ?? "")) ? this._readSlots() : null;
+		field.defaultValue = this._resetCode ?? this._getInputs().map((input) => input.defaultValue).join("");
+		this._value = this._readSlots();
+		field.value = this._value;
+		this._element.append(field);
+		this._inputElement = field;
+		this._syncValueField();
+	}
+	_syncValueField() {
+		const field = this._inputElement;
+		configureValueField(field, {
+			disabled: this._disabled,
+			name: this._config.name,
+			required: this._config.required
+		});
+		field.pattern = `${this._config.type === "number" ? "[0-9]" : "."}{${this._getInputs().length}}`;
+		if (this._config.id) field.id = this._config.id;
+		else field.removeAttribute("id");
+		this._validation.refresh();
 	}
 	_extractValidChars(text) {
 		switch (this._config.type) {
@@ -13896,13 +14539,28 @@ var OTPInput = class OTPInput extends BaseComponent {
 			default: return /^.$/s.test(value);
 		}
 	}
-	_setHiddenInputValue(value) {
-		if (this._inputElement) this._inputElement.value = value || "";
+	_setValue(value, byUser = false) {
+		if (!this._inputElement) return;
+		const code = value || "";
+		const isChanged = code !== this._value;
+		this._value = code;
+		writeValueField(this._inputElement, code);
+		if (isChanged && byUser) this._validation.dismiss();
+		this._validation.update();
+		if (!isChanged) return;
+		dispatchValueChange(this._inputElement);
 		EventHandler.trigger(this._element, EVENT_CHANGE$5, { value });
 		if (value && value.length === this._getInputs().length) EventHandler.trigger(this._element, EVENT_COMPLETE, { value });
 	}
-	_seedSlots({ clearWhenEmpty = false } = {}) {
-		const value = this._extractValidChars(String(this._config.value ?? ""));
+	_restoreValue() {
+		const code = this._resetCode;
+		for (const [index, input] of this._getInputs().entries()) input.value = code === null ? input.defaultValue : code[index] ?? "";
+		this._setValue(this._readSlots() || null);
+		this._syncFirstInputMaxLength();
+		this._setInputsTabIndexes();
+	}
+	_seedSlots(code, clearWhenEmpty = false) {
+		const value = this._extractValidChars(String(code ?? ""));
 		if (!value && !clearWhenEmpty) return;
 		for (const [index, input] of this._getInputs().entries()) input.value = value[index] ?? "";
 		this._syncFirstInputMaxLength();
@@ -13918,10 +14576,11 @@ var OTPInput = class OTPInput extends BaseComponent {
 			input.spellcheck = false;
 			input.enterKeyHint = index === inputs.length - 1 ? "done" : "next";
 			if (this._config.placeholder !== null) {
+				if (!this._placeholders.has(input)) this._placeholders.set(input, input.getAttribute("placeholder"));
 				const placeholder = String(this._config.placeholder);
 				input.placeholder = placeholder.length > 1 ? placeholder[index] || "" : placeholder;
 			}
-			input.required = this._config.required;
+			writeAttribute(input, "aria-required", this._config.required ? "true" : null);
 			switch (this._config.type) {
 				case "number":
 					input.inputMode = "numeric";
@@ -13931,15 +14590,21 @@ var OTPInput = class OTPInput extends BaseComponent {
 					input.inputMode = "text";
 					input.pattern = ".*";
 			}
-			if (this._config.disabled) input.disabled = true;
+			input.disabled = this._disabled;
+			input.readOnly = false;
 			if (this._config.id && !input.id) input.id = `${this._config.id}-${index}`;
-			if (this._config.readonly) input.readOnly = true;
 			if (typeof this._config.ariaLabel === "function") {
 				const ariaLabel = this._config.ariaLabel(index, inputs.length);
 				input.setAttribute("aria-label", ariaLabel);
 			}
 		}
 		this._syncFirstInputMaxLength();
+	}
+	_restorePlaceholder(input) {
+		const placeholder = this._placeholders.get(input);
+		if (typeof placeholder === "string") input.placeholder = placeholder;
+		else input.removeAttribute("placeholder");
+		this._placeholders.delete(input);
 	}
 	_setInputsTabIndexes() {
 		const inputs = this._getInputs();
@@ -13969,31 +14634,17 @@ var OTPInput = class OTPInput extends BaseComponent {
 		return jQueryDispatch(this, OTPInput, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(window, EVENT_LOAD_DATA_API$8, () => {
 	for (const otp of SelectorEngine.find(SELECTOR_DATA_OTP)) OTPInput.otpInputInterface(otp);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(OTPInput);
 //#endregion
 //#region js/src/password-input.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI password-input.js
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$19 = "password-input";
+const NAME$20 = "password-input";
 const EVENT_KEY$13 = `.coreui.password-input`;
 const DATA_API_KEY$8 = ".data-api";
-const EVENT_CLICK$5 = `click${EVENT_KEY$13}`;
+const EVENT_CLICK$6 = `click${EVENT_KEY$13}`;
+const EVENT_FOCUS = `focus${EVENT_KEY$13}`;
 const CLASS_NAME_ACTION = "form-control-action";
 const CLASS_NAME_PASSWORD_INPUT = "password-input";
 const SELECTOR_DATA_PASSWORD_INPUT = "[data-coreui-password-input]";
@@ -14005,7 +14656,7 @@ const Default$17 = {
 	sanitizeFn: null,
 	showIcon: PASSWORD_SHOW_ICON
 };
-const DefaultType$17 = {
+const DefaultType$16 = {
 	allowList: "object",
 	ariaToggleLabel: "string",
 	hideIcon: "string",
@@ -14013,31 +14664,36 @@ const DefaultType$17 = {
 	sanitizeFn: "(null|function)",
 	showIcon: "string"
 };
-/**
-* Class definition
-*/
 var PasswordInput = class PasswordInput extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
 		this._group = null;
+		this._hostType = null;
 		this._toggleElement = null;
+		this._hostType = this._element.getAttribute("type");
 		this._createToggle();
 		this._updateToggleState();
+		this._updateDisabledState();
 	}
 	static get Default() {
 		return Default$17;
 	}
 	static get DefaultType() {
-		return DefaultType$17;
+		return DefaultType$16;
 	}
 	static get NAME() {
-		return NAME$19;
+		return NAME$20;
 	}
 	toggle() {
+		if (this._element.matches(":disabled")) {
+			this._updateDisabledState();
+			return;
+		}
 		this._element.type = this._element.type === "password" ? "text" : "password";
 		this._updateToggleState();
 	}
 	dispose() {
+		if (!this._element) return;
 		if (this._toggleElement) {
 			EventHandler.off(this._toggleElement, EVENT_KEY$13);
 			this._toggleElement.remove();
@@ -14046,6 +14702,8 @@ var PasswordInput = class PasswordInput extends BaseComponent {
 			this._group.element.classList.remove(CLASS_NAME_PASSWORD_INPUT);
 			releaseControlGroup(this._element, this._group);
 		}
+		if (this._hostType === null) this._element.removeAttribute("type");
+		else this._element.setAttribute("type", this._hostType);
 		super.dispose();
 	}
 	_createToggle() {
@@ -14053,13 +14711,16 @@ var PasswordInput = class PasswordInput extends BaseComponent {
 		this._group.element.classList.add(CLASS_NAME_PASSWORD_INPUT);
 		this._toggleElement = createControlGroupAction({
 			className: CLASS_NAME_ACTION,
-			disabled: this._element.disabled,
 			icon: this._config.showIcon,
 			label: this._config.ariaToggleLabel,
 			sanitizeIcon: (icon) => sanitizeByConfig(icon, this._config)
 		});
-		EventHandler.on(this._toggleElement, EVENT_CLICK$5, () => this.toggle());
+		EventHandler.on(this._toggleElement, EVENT_CLICK$6, () => this.toggle());
+		EventHandler.on(this._element, EVENT_FOCUS, () => this._updateDisabledState());
 		this._group.element.append(this._toggleElement);
+	}
+	_updateDisabledState() {
+		if (this._toggleElement) this._toggleElement.disabled = this._element.disabled;
 	}
 	_updateToggleState() {
 		if (!this._toggleElement) return;
@@ -14074,35 +14735,17 @@ var PasswordInput = class PasswordInput extends BaseComponent {
 		return jQueryDispatch(this, PasswordInput, config, (element) => [element]);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$13}${DATA_API_KEY$8}`, () => {
 	PasswordInput._initializeDataApi();
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(PasswordInput);
 //#endregion
 //#region js/src/password-strength.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI password-strength.js
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's strength.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$18 = "password-strength";
+const NAME$19 = "password-strength";
 const EVENT_KEY$12 = `.coreui.password-strength`;
 const DATA_API_KEY$7 = ".data-api";
 const EVENT_CHANGE$4 = `change${EVENT_KEY$12}`;
-const EVENT_INPUT$4 = `input${EVENT_KEY$12}`;
+const EVENT_INPUT$5 = `input${EVENT_KEY$12}`;
 const CLASS_NAME_BUSY = "password-strength-busy";
 const CLASS_NAME_FEEDBACK = "password-strength-feedback";
 const CLASS_NAME_METER = "password-strength-meter";
@@ -14143,7 +14786,7 @@ const Default$16 = {
 		multipleSpecial: 1
 	}
 };
-const DefaultType$16 = {
+const DefaultType$15 = {
 	busyLabel: "string",
 	debounce: "number",
 	input: "(string|element|null)",
@@ -14155,9 +14798,6 @@ const DefaultType$16 = {
 	weights: "object"
 };
 const isThenable = (value) => Boolean(value) && typeof value.then === "function";
-/**
-* Class definition
-*/
 var PasswordStrength = class PasswordStrength extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
@@ -14173,7 +14813,7 @@ var PasswordStrength = class PasswordStrength extends BaseComponent {
 		this._input = this._getInput();
 		this._createMeter();
 		if (this._input) {
-			EventHandler.on(this._input, EVENT_INPUT$4, () => this._schedule());
+			EventHandler.on(this._input, EVENT_INPUT$5, () => this._schedule());
 			EventHandler.on(this._input, EVENT_CHANGE$4, () => this._schedule());
 			this._evaluate();
 		}
@@ -14182,10 +14822,10 @@ var PasswordStrength = class PasswordStrength extends BaseComponent {
 		return Default$16;
 	}
 	static get DefaultType() {
-		return DefaultType$16;
+		return DefaultType$15;
 	}
 	static get NAME() {
-		return NAME$18;
+		return NAME$19;
 	}
 	getScore() {
 		return this._score;
@@ -14198,7 +14838,7 @@ var PasswordStrength = class PasswordStrength extends BaseComponent {
 		if (this._input) EventHandler.off(this._input, EVENT_KEY$12);
 		this._meterElement?.remove();
 		SelectorEngine.findOne(`.${CLASS_NAME_FEEDBACK}`, this._element)?.remove();
-		this._element.classList.remove(CLASS_NAME_PASSWORD_STRENGTH, CLASS_NAME_BUSY);
+		this._element.classList.remove(CLASS_NAME_BUSY);
 		super.dispose();
 	}
 	_getInput() {
@@ -14364,31 +15004,13 @@ var PasswordStrength = class PasswordStrength extends BaseComponent {
 		return jQueryDispatch(this, PasswordStrength, config, (element) => [element]);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$12}${DATA_API_KEY$7}`, () => {
 	PasswordStrength._initializeDataApi();
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(PasswordStrength);
 //#endregion
 //#region js/src/util/template-factory.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI util/template-factory.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This is a modified version of the Bootstrap's util/template-factory.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$17 = "TemplateFactory";
+const NAME$18 = "TemplateFactory";
 const Default$15 = {
 	allowList: DefaultAllowlist,
 	content: {},
@@ -14398,7 +15020,7 @@ const Default$15 = {
 	sanitizeFn: null,
 	template: "<div></div>"
 };
-const DefaultType$15 = {
+const DefaultType$14 = {
 	allowList: "object",
 	content: "object",
 	extraClass: "(string|function)",
@@ -14411,9 +15033,6 @@ const DefaultContentType = {
 	entry: "(string|element|function|null)",
 	selector: "(string|element)"
 };
-/**
-* Class definition
-*/
 var TemplateFactory = class extends Config {
 	constructor(config) {
 		super();
@@ -14423,10 +15042,10 @@ var TemplateFactory = class extends Config {
 		return Default$15;
 	}
 	static get DefaultType() {
-		return DefaultType$15;
+		return DefaultType$14;
 	}
 	static get NAME() {
-		return NAME$17;
+		return NAME$18;
 	}
 	getContent() {
 		return Object.values(this._config.content).map((config) => this._resolvePossibleFunction(config)).filter(Boolean);
@@ -14487,8 +15106,7 @@ var TemplateFactory = class extends Config {
 	}
 	_putElementInTemplate(element, templateElement) {
 		if (this._config.html) {
-			templateElement.innerHTML = "";
-			templateElement.append(element);
+			templateElement.replaceChildren(element);
 			return;
 		}
 		templateElement.textContent = element.textContent;
@@ -14496,22 +15114,10 @@ var TemplateFactory = class extends Config {
 };
 //#endregion
 //#region js/src/tooltip.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI tooltip.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's tooltip.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$16 = "tooltip";
+const NAME$17 = "tooltip";
 const ESCAPE_KEY = "Escape";
 const CLASS_NAME_MODAL = "modal";
-const CLASS_NAME_SHOW$8 = "show";
+const CLASS_NAME_SHOW$6 = "show";
 const SELECTOR_TOOLTIP_INNER = ".tooltip-inner";
 const SELECTOR_MODAL = `.${CLASS_NAME_MODAL}`;
 const SELECTOR_DATA_TOGGLE$4 = "[data-coreui-toggle=\"tooltip\"]";
@@ -14525,12 +15131,14 @@ const EVENT_HIDDEN$3 = "hidden";
 const EVENT_SHOW$3 = "show";
 const EVENT_SHOWN$3 = "shown";
 const EVENT_INSERTED = "inserted";
-const EVENT_CLICK$4 = "click";
+const EVENT_CLICK$5 = "click";
 const EVENT_FOCUSIN$4 = "focusin";
 const EVENT_FOCUSOUT$3 = "focusout";
 const EVENT_MOUSEENTER$2 = "mouseenter";
 const EVENT_MOUSELEAVE$1 = "mouseleave";
-const EVENT_KEYDOWN$2 = "keydown";
+const EVENT_KEYDOWN$5 = "keydown";
+const EVENT_POINTERCANCEL$1 = "pointercancel";
+const EVENT_POINTERDOWN$1 = "pointerdown";
 const ATTACHMENTS = {
 	AUTO: ["auto", "auto"],
 	TOP: ["top", "top"],
@@ -14564,7 +15172,7 @@ const Default$14 = {
 	title: "",
 	trigger: "hover focus"
 };
-const DefaultType$14 = {
+const DefaultType$13 = {
 	allowList: "object",
 	animation: "boolean",
 	boundary: "(string|element)",
@@ -14583,9 +15191,6 @@ const DefaultType$14 = {
 	title: "(string|element|function)",
 	trigger: "string"
 };
-/**
-* Class definition
-*/
 var Tooltip = class Tooltip extends BaseComponent {
 	constructor(element, config) {
 		if (typeof computePosition === "undefined") throw new TypeError("CoreUI's tooltips require Floating UI (https://floating-ui.com)");
@@ -14597,6 +15202,8 @@ var Tooltip = class Tooltip extends BaseComponent {
 		this._activeTrigger = {};
 		this._floatingCleanup = null;
 		this._keydownHandler = null;
+		this._focusOutsideHandler = null;
+		this._pressedInside = false;
 		this._tipEventOut = null;
 		this._templateFactory = null;
 		this._newContent = null;
@@ -14611,10 +15218,10 @@ var Tooltip = class Tooltip extends BaseComponent {
 		return Default$14;
 	}
 	static get DefaultType() {
-		return DefaultType$14;
+		return DefaultType$13;
 	}
 	static get NAME() {
-		return NAME$16;
+		return NAME$17;
 	}
 	enable() {
 		this._isEnabled = true;
@@ -14632,6 +15239,7 @@ var Tooltip = class Tooltip extends BaseComponent {
 	dispose() {
 		this._clearTimeout();
 		this._removeEscapeListener();
+		this._removeFocusOutsideListener();
 		EventHandler.off(this._element.closest(SELECTOR_MODAL), EVENT_MODAL_HIDE, this._hideModalHandler);
 		if (this._element.getAttribute("data-coreui-original-title")) this._element.setAttribute("title", this._element.getAttribute("data-coreui-original-title"));
 		this._disposeFloating();
@@ -14660,8 +15268,9 @@ var Tooltip = class Tooltip extends BaseComponent {
 			this._setTipListeners(tip);
 		}
 		await this._createFloating(tip);
-		tip.classList.add(CLASS_NAME_SHOW$8);
+		tip.classList.add(CLASS_NAME_SHOW$6);
 		this._setEscapeListener();
+		this._setFocusOutsideListener();
 		if ("ontouchstart" in document.documentElement) for (const element of document.body.children) EventHandler.on(element, "mouseover", noop);
 		const complete = () => {
 			EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SHOWN$3));
@@ -14674,7 +15283,8 @@ var Tooltip = class Tooltip extends BaseComponent {
 		if (!this._isShown()) return;
 		if (EventHandler.trigger(this._element, this.constructor.eventName(EVENT_HIDE$3)).defaultPrevented) return;
 		this._removeEscapeListener();
-		this._getTipElement().classList.remove(CLASS_NAME_SHOW$8);
+		this._removeFocusOutsideListener();
+		this._getTipElement().classList.remove(CLASS_NAME_SHOW$6);
 		if ("ontouchstart" in document.documentElement) for (const element of document.body.children) EventHandler.off(element, "mouseover", noop);
 		this._activeTrigger[TRIGGER_CLICK] = false;
 		this._activeTrigger[TRIGGER_FOCUS] = false;
@@ -14703,7 +15313,7 @@ var Tooltip = class Tooltip extends BaseComponent {
 	}
 	_createTipElement(content) {
 		const tip = this._getTemplateFactory(content).toHtml();
-		tip.classList.remove(CLASS_NAME_SHOW$8);
+		tip.classList.remove(CLASS_NAME_SHOW$6);
 		tip.classList.add(`bs-${this.constructor.NAME}-auto`);
 		const tipId = getUID(this.constructor.NAME).toString();
 		tip.setAttribute("id", tipId);
@@ -14742,7 +15352,7 @@ var Tooltip = class Tooltip extends BaseComponent {
 		return !this.tip?.classList.contains(this._getInstantClassName());
 	}
 	_isShown() {
-		return this.tip && this.tip.classList.contains(CLASS_NAME_SHOW$8);
+		return this.tip && this.tip.classList.contains(CLASS_NAME_SHOW$6);
 	}
 	_getPlacement(tip) {
 		if (this._responsivePlacements) return this._attachment(getResponsivePlacement(this._responsivePlacements, "top"));
@@ -14808,7 +15418,7 @@ var Tooltip = class Tooltip extends BaseComponent {
 			const isVertical = finalPlacement.startsWith("top") || finalPlacement.startsWith("bottom");
 			Object.assign(arrowElement.style, {
 				left: isVertical && arrowX !== void 0 ? `${arrowX}px` : "",
-				top: !isVertical && arrowY !== void 0 ? `${arrowY}px` : "",
+				top: isVertical || arrowY === void 0 ? "" : `${arrowY}px`,
 				right: "",
 				bottom: ""
 			});
@@ -14852,7 +15462,7 @@ var Tooltip = class Tooltip extends BaseComponent {
 	}
 	_setListeners() {
 		const triggers = this._config.trigger.split(" ");
-		for (const trigger of triggers) if (trigger === "click") EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$4), this._config.selector, (event) => {
+		for (const trigger of triggers) if (trigger === "click") EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$5), this._config.selector, (event) => {
 			const context = this._initializeOnDelegatedTarget(event);
 			context._activeTrigger[TRIGGER_CLICK] = !(context._isShown() && context._activeTrigger[TRIGGER_CLICK]);
 			context.toggle();
@@ -14866,6 +15476,7 @@ var Tooltip = class Tooltip extends BaseComponent {
 			});
 			EventHandler.on(this._element, eventOut, this._config.selector, (event) => {
 				const context = this._initializeOnDelegatedTarget(event);
+				if (event.type === "focusout" && context._pressedInside) return;
 				context._activeTrigger[event.type === "focusout" ? TRIGGER_FOCUS : TRIGGER_HOVER] = context._isInside(event.relatedTarget);
 				context._leave();
 			});
@@ -14879,6 +15490,7 @@ var Tooltip = class Tooltip extends BaseComponent {
 		const trigger = this._getTrigger();
 		if (trigger === TRIGGER_MANUAL || trigger.includes(TRIGGER_CLICK)) return;
 		this._tipEventOut = (event) => {
+			if (event.type === "focusout" && this._pressedInside) return;
 			this._activeTrigger[event.type === "focusout" ? TRIGGER_FOCUS : TRIGGER_HOVER] = this._isInside(event.relatedTarget);
 			this._leave();
 		};
@@ -14916,12 +15528,44 @@ var Tooltip = class Tooltip extends BaseComponent {
 			event.stopPropagation();
 			this.hide();
 		};
-		this._element.ownerDocument.addEventListener(EVENT_KEYDOWN$2, this._keydownHandler, true);
+		this._element.ownerDocument.addEventListener(EVENT_KEYDOWN$5, this._keydownHandler, true);
 	}
 	_removeEscapeListener() {
 		if (!this._keydownHandler) return;
-		this._element.ownerDocument.removeEventListener(EVENT_KEYDOWN$2, this._keydownHandler, true);
+		this._element.ownerDocument.removeEventListener(EVENT_KEYDOWN$5, this._keydownHandler, true);
 		this._keydownHandler = null;
+	}
+	_setFocusOutsideListener() {
+		if (this._focusOutsideHandler || !this._getTrigger().split(" ").includes(TRIGGER_FOCUS)) return;
+		this._focusOutsideHandler = (event) => {
+			const inside = event.composedPath().some((node) => node === this._element || node === this.tip || node.getAttribute?.("role") === "tooltip");
+			if (event.type === EVENT_POINTERDOWN$1) {
+				this._pressedInside = inside;
+				return;
+			}
+			const pressedInside = this._pressedInside;
+			this._pressedInside = false;
+			if (inside || event.type === EVENT_POINTERCANCEL$1 || event.type === EVENT_CLICK$5 && pressedInside || !this._activeTrigger[TRIGGER_FOCUS] || [this._element, this.tip].some((element) => containsFocus(element))) return;
+			this._activeTrigger[TRIGGER_FOCUS] = false;
+			this._leave();
+		};
+		for (const type of [
+			EVENT_POINTERDOWN$1,
+			EVENT_POINTERCANCEL$1,
+			EVENT_CLICK$5,
+			EVENT_FOCUSIN$4
+		]) this._element.ownerDocument.addEventListener(type, this._focusOutsideHandler, true);
+	}
+	_removeFocusOutsideListener() {
+		if (!this._focusOutsideHandler) return;
+		for (const type of [
+			EVENT_POINTERDOWN$1,
+			EVENT_POINTERCANCEL$1,
+			EVENT_CLICK$5,
+			EVENT_FOCUSIN$4
+		]) this._element.ownerDocument.removeEventListener(type, this._focusOutsideHandler, true);
+		this._focusOutsideHandler = null;
+		this._pressedInside = false;
 	}
 	_fixTitle() {
 		const title = this._element.getAttribute("title");
@@ -14996,9 +15640,6 @@ var Tooltip = class Tooltip extends BaseComponent {
 		return jQueryDispatch(this, Tooltip, config, args);
 	}
 };
-/**
-* Data API implementation - auto-initialize tooltips
-*/
 const initTooltip = (event) => {
 	const target = event.target.closest(SELECTOR_DATA_TOGGLE$4);
 	if (!target) return;
@@ -15006,29 +15647,14 @@ const initTooltip = (event) => {
 };
 EventHandler.on(document, EVENT_FOCUSIN$4, SELECTOR_DATA_TOGGLE$4, initTooltip);
 EventHandler.on(document, EVENT_MOUSEENTER$2, SELECTOR_DATA_TOGGLE$4, initTooltip);
-/**
-* jQuery
-*/
 defineJQueryPlugin(Tooltip);
 //#endregion
 //#region js/src/popover.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI popover.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's popover.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$15 = "popover";
+const NAME$16 = "popover";
 const SELECTOR_TITLE$1 = ".popover-header";
 const SELECTOR_CONTENT = ".popover-body";
 const SELECTOR_DATA_TOGGLE$3 = "[data-coreui-toggle=\"popover\"]";
-const EVENT_CLICK$3 = "click";
+const EVENT_CLICK$4 = "click";
 const EVENT_FOCUSIN$3 = "focusin";
 const EVENT_MOUSEENTER$1 = "mouseenter";
 const Default$13 = {
@@ -15039,13 +15665,10 @@ const Default$13 = {
 	template: "<div class=\"popover\" role=\"tooltip\"><div class=\"popover-arrow\"></div><h3 class=\"popover-header\"></h3><div class=\"popover-body\"></div></div>",
 	trigger: "click"
 };
-const DefaultType$13 = {
+const DefaultType$12 = {
 	...Tooltip.DefaultType,
 	content: "(null|string|element|function)"
 };
-/**
-* Class definition
-*/
 var Popover = class Popover extends Tooltip {
 	constructor(element, config) {
 		super(element, config);
@@ -15054,10 +15677,10 @@ var Popover = class Popover extends Tooltip {
 		return Default$13;
 	}
 	static get DefaultType() {
-		return DefaultType$13;
+		return DefaultType$12;
 	}
 	static get NAME() {
-		return NAME$15;
+		return NAME$16;
 	}
 	_isWithContent() {
 		return Boolean(this._getTitle() || this._getContent()) || this._hasNewContent();
@@ -15075,34 +15698,19 @@ var Popover = class Popover extends Tooltip {
 		return jQueryDispatch(this, Popover, config, args);
 	}
 };
-/**
-* Data API implementation - auto-initialize popovers
-*/
 const initPopover = (event) => {
 	const target = event.target.closest(SELECTOR_DATA_TOGGLE$3);
 	if (!target) return;
 	if (event.type === "click") event.preventDefault();
 	Popover.getOrCreateInstance(target);
 };
-EventHandler.on(document, EVENT_CLICK$3, SELECTOR_DATA_TOGGLE$3, initPopover);
+EventHandler.on(document, EVENT_CLICK$4, SELECTOR_DATA_TOGGLE$3, initPopover);
 EventHandler.on(document, EVENT_FOCUSIN$3, SELECTOR_DATA_TOGGLE$3, initPopover);
 EventHandler.on(document, EVENT_MOUSEENTER$1, SELECTOR_DATA_TOGGLE$3, initPopover);
-/**
-* jQuery
-*/
 defineJQueryPlugin(Popover);
 //#endregion
 //#region js/src/progress.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO progress.ts
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$14 = "progress";
+const NAME$15 = "progress";
 const EVENT_DOM_CONTENT_LOADED$1 = `DOMContentLoaded.coreui.progress.data-api`;
 const SELECTOR_PROGRESS = ".progress-segmented";
 const SELECTOR_BAR = ".progress-bar";
@@ -15116,47 +15724,38 @@ const PROPERTY_SEGMENTS_FILLED = "--cui-progress-segments-filled";
 const PROPERTY_SEGMENT_GAP = "--cui-progress-segment-gap";
 const PROPERTY_SEGMENT_MIN_WIDTH = "--cui-progress-segment-min-width";
 const PROPERTY_SEGMENT_BORDER_RADIUS = "--cui-progress-segment-border-radius";
-/**
-* Class definition
-*/
 var Progress = class Progress extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
 		if (!this._element) return;
-		this._bar = SelectorEngine.children(this._element, SELECTOR_BAR)[0] ?? null;
-		if (!this._bar) return;
-		this._observer = new MutationObserver(() => this._update());
-		this._observer.observe(this._bar, { attributeFilter: [
-			ATTRIBUTE_VALUE_NOW,
-			ATTRIBUTE_VALUE_MIN,
-			ATTRIBUTE_VALUE_MAX
-		] });
 		this._resizeObserver = new ResizeObserver(() => this._update());
 		this._resizeObserver.observe(this._element);
 		this._update();
 	}
 	static get NAME() {
-		return NAME$14;
+		return NAME$15;
 	}
 	update() {
 		this._update();
 	}
 	dispose() {
-		this._observer?.disconnect();
 		this._resizeObserver?.disconnect();
 		this._element.style.removeProperty(PROPERTY_SEGMENTS_FIT);
 		this._element.style.removeProperty(PROPERTY_SEGMENT_RADIUS_FIT);
-		this._bar?.style.removeProperty(PROPERTY_SEGMENTS_FILLED);
+		this._getBar()?.style.removeProperty(PROPERTY_SEGMENTS_FILLED);
 		super.dispose();
 	}
-	_attribute(name, fallback) {
-		const value = Number.parseFloat(this._bar.getAttribute(name) ?? "");
+	_getBar() {
+		return SelectorEngine.children(this._element, SELECTOR_BAR)[0];
+	}
+	_attribute(bar, name, fallback) {
+		const value = Number.parseFloat(bar.getAttribute(name) ?? "");
 		return Number.isNaN(value) ? fallback : value;
 	}
-	_ratio() {
-		const min = this._attribute(ATTRIBUTE_VALUE_MIN, 0);
-		const span = this._attribute(ATTRIBUTE_VALUE_MAX, 100) - min;
-		return span > 0 ? Math.min(Math.max((this._attribute(ATTRIBUTE_VALUE_NOW, min) - min) / span, 0), 1) : 0;
+	_ratio(bar) {
+		const min = this._attribute(bar, ATTRIBUTE_VALUE_MIN, 0);
+		const span = this._attribute(bar, ATTRIBUTE_VALUE_MAX, 100) - min;
+		return span > 0 ? Math.min(Math.max((this._attribute(bar, ATTRIBUTE_VALUE_NOW, min) - min) / span, 0), 1) : 0;
 	}
 	_length(value) {
 		const number = Number.parseFloat(value);
@@ -15183,246 +15782,354 @@ var Progress = class Progress extends BaseComponent {
 		return Math.round(Math.max(0, Math.min(radius, segmentWidth / 2, height / 2)) * 1e3) / 1e3;
 	}
 	_update() {
+		const bar = this._getBar();
+		if (!bar) return;
 		const segments = this._segmentsThatFit();
 		if (!Number.isFinite(segments)) {
 			this._element.style.removeProperty(PROPERTY_SEGMENTS_FIT);
 			this._element.style.removeProperty(PROPERTY_SEGMENT_RADIUS_FIT);
-			this._bar.style.removeProperty(PROPERTY_SEGMENTS_FILLED);
+			bar.style.removeProperty(PROPERTY_SEGMENTS_FILLED);
 			return;
 		}
 		this._element.style.setProperty(PROPERTY_SEGMENTS_FIT, `${segments}`);
 		this._element.style.setProperty(PROPERTY_SEGMENT_RADIUS_FIT, `${this._radiusThatFits(segments)}px`);
-		if (!this._bar.hasAttribute(ATTRIBUTE_VALUE_NOW)) return;
-		this._bar.style.setProperty(PROPERTY_SEGMENTS_FILLED, `${Math.floor(this._ratio() * segments)}`);
+		if (!bar.hasAttribute(ATTRIBUTE_VALUE_NOW)) return;
+		bar.style.setProperty(PROPERTY_SEGMENTS_FILLED, `${Math.floor(this._ratio(bar) * segments)}`);
 	}
 	static jQueryInterface(config) {
 		return jQueryDispatch(this, Progress, config, (element) => [element]);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, EVENT_DOM_CONTENT_LOADED$1, () => {
 	for (const element of SelectorEngine.find(SELECTOR_PROGRESS)) Progress.getOrCreateInstance(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Progress);
 //#endregion
+//#region js/src/util/range.ts
+const TOLERANCE = 1e-9;
+const getBound = (input, name) => input[name] === "" ? name === "min" ? 0 : 100 : Number.parseFloat(input[name]);
+const constrainInput = (input, previous, next, distance) => {
+	if (previous && Number(input.value) < Number(previous.value) + distance - TOLERANCE) {
+		setInputValue(input, Number(previous.value) + distance);
+		if (Number(input.value) < Number(previous.value) + distance - TOLERANCE && input.step !== "any") input.stepUp();
+	}
+	if (next && Number(input.value) > Number(next.value) - distance + TOLERANCE) {
+		setInputValue(input, Number(next.value) - distance);
+		if (Number(input.value) > Number(next.value) - distance + TOLERANCE && input.step !== "any") input.stepDown();
+	}
+};
+const createTicks = (points, vertical) => {
+	const ticks = document.createElement("div");
+	ticks.className = "form-range-ticks";
+	ticks.setAttribute("aria-hidden", "true");
+	const stops = [
+		0,
+		...points.map((point) => point.ratio),
+		1
+	];
+	const tracks = stops.slice(1).map((stop, index) => `${stop - stops[index]}fr`);
+	if (vertical) ticks.style.gridTemplateRows = tracks.toReversed().join(" ");
+	else ticks.style.gridTemplateColumns = tracks.join(" ");
+	for (const [index, point] of points.entries()) {
+		const tick = document.createElement("span");
+		tick.className = "form-range-tick";
+		tick.classList.toggle("form-range-tick-start", point.ratio === 0);
+		tick.classList.toggle("form-range-tick-end", point.ratio === 1);
+		tick.setAttribute("data-coreui-value", `${point.value}`);
+		if (vertical) tick.style.gridRowStart = `${points.length - index + 1}`;
+		else tick.style.gridColumnStart = `${index + 2}`;
+		if (point.class) tick.classList.add(...[point.class].flat().flatMap((name) => name.split(" ")).filter(Boolean));
+		if (point.style && typeof point.style === "object") Object.assign(tick.style, point.style);
+		if (point.label) {
+			const label = document.createElement("span");
+			label.className = "form-range-tick-label";
+			label.textContent = point.label;
+			tick.append(label);
+		}
+		ticks.append(tick);
+	}
+	return ticks;
+};
+const createTooltip = (placement, tooltipClass, always) => {
+	const tooltip = document.createElement("div");
+	tooltip.className = `form-range-tooltip tooltip ${placement}`;
+	tooltip.classList.toggle("show", always);
+	tooltip.classList.add(...tooltipClass.split(" ").filter(Boolean));
+	tooltip.setAttribute("aria-hidden", "true");
+	const arrow = document.createElement("div");
+	arrow.className = "tooltip-arrow";
+	const inner = document.createElement("div");
+	inner.className = "tooltip-inner";
+	tooltip.append(arrow, inner);
+	return tooltip;
+};
+const getNearestInput = (inputs, ratio) => {
+	const enabled = inputs.filter((input) => !input.matches(":disabled"));
+	if (enabled.length === 0) return null;
+	const ratios = enabled.map((input) => getRatio(input));
+	if (ratio <= ratios[0]) return enabled[0];
+	if (ratio >= ratios.at(-1)) return enabled.at(-1);
+	const distances = ratios.map((value) => Math.abs(value - ratio));
+	const closest = Math.min(...distances);
+	const first = distances.indexOf(closest);
+	return enabled[ratio < ratios[first] ? first : distances.lastIndexOf(closest)];
+};
+const getRatio = (input) => {
+	const min = getBound(input, "min");
+	const span = getBound(input, "max") - min;
+	return span > 0 ? (Number.parseFloat(input.value) - min) / span : 0;
+};
+const getRatioAt = (point, rect, thumb, vertical, rtl) => {
+	const length = (vertical ? rect.height : rect.width) - thumb;
+	const offset = vertical ? rect.bottom - point.clientY : rtl ? rect.right - point.clientX : point.clientX - rect.left;
+	return length > 0 ? Math.min(Math.max((offset - thumb / 2) / length, 0), 1) : 0;
+};
+const getStackOrder = (ratio, index, total) => ratio > .5 ? total - index : index + 1;
+const getStep = (input) => {
+	if (input.step === "any") return (getBound(input, "max") - getBound(input, "min")) / 100;
+	const step = Number.parseFloat(input.step);
+	return step > 0 ? step : 1;
+};
+const getThumbSize = (element) => {
+	const probe = document.createElement("div");
+	probe.style.cssText = "position: absolute; visibility: hidden; width: var(--cui-range-thumb-width);";
+	element.append(probe);
+	const { width } = probe.getBoundingClientRect();
+	probe.remove();
+	return width;
+};
+const getTickLabel = (points, value, step) => points.find((point) => point.label && Math.abs(point.value - value) < step / 2 + TOLERANCE)?.label ?? null;
+const getTickPoints = (input, ticks, list) => {
+	const min = getBound(input, "min");
+	const max = getBound(input, "max");
+	const points = [];
+	if (Array.isArray(ticks)) for (const { index, ratio, value } of getTickPositions(min, max, ticks)) {
+		const tick = ticks[index];
+		const options = typeof tick === "object" && tick !== null ? tick : void 0;
+		points.push({
+			class: options?.class,
+			label: typeof tick === "string" ? tick : options?.label ?? "",
+			ratio,
+			style: options?.style,
+			value
+		});
+	}
+	const listId = list ?? input.getAttribute("list");
+	const datalist = listId ? document.getElementById(listId) : null;
+	if (datalist) {
+		const options = [...datalist.querySelectorAll("option")];
+		for (const { index, ratio, value } of getTickPositions(min, max, options.map((option) => Number.parseFloat(option.value)))) points.push({
+			label: options[index].label,
+			ratio,
+			value
+		});
+	}
+	return points.toSorted((a, b) => a.ratio - b.ratio);
+};
+const getTickPositions = (min, max, ticks) => {
+	const span = max - min || 1;
+	return ticks.map((tick, index) => {
+		const own = tick !== null && typeof tick === "object" ? tick.value : void 0;
+		const value = typeof tick === "number" ? tick : own === void 0 || own === null ? min + (ticks.length === 1 ? 0 : index / (ticks.length - 1) * span) : Number(own);
+		return {
+			index,
+			ratio: Math.min(Math.max((value - min) / span, 0), 1),
+			value
+		};
+	}).filter((position) => Number.isFinite(position.value)).toSorted((a, b) => a.ratio - b.ratio);
+};
+const getValueText = (value, label, html) => {
+	if (html === null) return label === null ? null : `${value}, ${label}`;
+	const template = document.createElement("template");
+	template.innerHTML = html;
+	for (const lineBreak of template.content.querySelectorAll("br")) lineBreak.replaceWith(" ");
+	const text = (template.content.textContent ?? "").replaceAll(/\s+/g, " ").trim();
+	return label === null || label === text ? text : `${text}, ${label}`;
+};
+const setInputValue = (input, value) => {
+	Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(input, `${value}`);
+};
+//#endregion
 //#region js/src/range.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI range.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's range.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$13 = "range";
+const NAME$14 = "range";
 const EVENT_KEY$11 = `.coreui.range`;
 const DATA_API_KEY$6 = ".data-api";
+const DATA_KEY_RANGE_SLIDER = "coreui.range-slider";
 const EVENT_CHANGE$3 = `change${EVENT_KEY$11}`;
 const EVENT_CHANGED = `changed${EVENT_KEY$11}`;
-const EVENT_INPUT$3 = `input${EVENT_KEY$11}`;
+const EVENT_INPUT$4 = `input${EVENT_KEY$11}`;
+const EVENT_RESET$1 = `reset${EVENT_KEY$11}`;
 const EVENT_DOM_CONTENT_LOADED = `DOMContentLoaded${EVENT_KEY$11}${DATA_API_KEY$6}`;
 const SELECTOR_RANGE = ".form-range:has(> .form-range-input)";
-const SELECTOR_INPUT = ".form-range-input";
-const CLASS_NAME_SHOW$7 = "show";
-const CLASS_NAME_TOOLTIP$1 = "form-range-tooltip";
-const CLASS_NAME_TICKS = "form-range-ticks";
-const CLASS_NAME_TICK = "form-range-tick";
-const CLASS_NAME_TICK_LABEL = "form-range-tick-label";
-const PROPERTY_FILL = "--cui-range-fill";
+const SELECTOR_INPUT$1 = ".form-range-input";
+const CLASS_NAME_TOOLTIP_TOP$1 = "bs-tooltip-top";
+const PROPERTY_FILL$1 = "--cui-range-fill";
 const Default$12 = {
+	allowList: DefaultAllowlist,
+	list: null,
+	sanitize: true,
+	sanitizeFn: null,
+	ticks: false,
+	tooltipClass: "",
 	tooltips: false,
-	tooltipsFormat: null
+	tooltipsFormat: null,
+	track: "fill"
 };
-const DefaultType$12 = {
+const DefaultType$11 = {
+	allowList: "object",
+	list: "(string|null)",
+	sanitize: "boolean",
+	sanitizeFn: "(null|function)",
+	ticks: "(array|boolean|string)",
+	tooltipClass: "string",
 	tooltips: "(boolean|string|null)",
-	tooltipsFormat: "(function|null)"
+	tooltipsFormat: "(function|null)",
+	track: "(boolean|string)"
 };
-/**
-* Class definition
-*/
 var Range = class Range extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
 		if (!this._element) return;
-		this._input = SelectorEngine.findOne(SELECTOR_INPUT, this._element);
-		if (!this._input) return;
-		this._tooltip = null;
-		this._tooltipText = null;
+		this._input = SelectorEngine.children(this._element, SELECTOR_INPUT$1)[0] ?? null;
+		this._form = this._input?.form ?? null;
+		this._resetTimeout = null;
+		this._tickPoints = [];
 		this._ticks = null;
-		this._updateHandler = () => this._update();
-		if (this._config.tooltips) this._createTooltip();
-		this._createTicks();
+		this._tooltip = null;
+		this._valueText = this._input?.getAttribute("aria-valuetext") ?? null;
+		this._valueTextSet = false;
+		this._onChange = (event) => {
+			if (event.target === this._input) this._update();
+		};
+		this._onReset = () => {
+			clearTimeout(this._resetTimeout);
+			this._resetTimeout = setTimeout(() => this._update());
+		};
+		if (!this._input) return;
+		if (this._config.tooltips) {
+			this._tooltip = createTooltip(CLASS_NAME_TOOLTIP_TOP$1, this._config.tooltipClass, this._config.tooltips === "always");
+			this._input.after(this._tooltip);
+		}
+		this._tickPoints = getTickPoints(this._input, this._config.ticks, this._config.list);
+		if (this._tickPoints.length > 0) {
+			this._ticks = createTicks(this._tickPoints, false);
+			this._element.append(this._ticks);
+		}
 		this._addEventListeners();
+		this._shownValue = this._input.value;
 		this._update();
 	}
 	static get Default() {
 		return Default$12;
 	}
 	static get DefaultType() {
-		return DefaultType$12;
+		return DefaultType$11;
 	}
 	static get NAME() {
-		return NAME$13;
+		return NAME$14;
 	}
 	update() {
-		this._update();
+		if (this._input) this._update();
 	}
 	dispose() {
-		EventHandler.off(this._input, EVENT_INPUT$3, this._updateHandler);
-		EventHandler.off(this._input, EVENT_CHANGE$3, this._updateHandler);
+		clearTimeout(this._resetTimeout);
+		EventHandler.off(this._element, EVENT_INPUT$4, SELECTOR_INPUT$1, this._onChange);
+		EventHandler.off(this._element, EVENT_CHANGE$3, SELECTOR_INPUT$1, this._onChange);
+		if (this._form) EventHandler.off(this._form, EVENT_RESET$1, this._onReset);
+		this._restoreValueText();
 		this._tooltip?.remove();
 		this._ticks?.remove();
+		if (this._config.track && this._input) this._element.style.removeProperty(PROPERTY_FILL$1);
 		super.dispose();
 	}
 	_configAfterMerge(config) {
 		if (config.tooltips === null) config.tooltips = true;
+		if (typeof config.ticks === "number") config.ticks = String(config.ticks);
+		if (typeof config.ticks === "string") config.ticks = config.ticks.split(/,\s*/);
 		return config;
 	}
 	_addEventListeners() {
-		EventHandler.on(this._input, EVENT_INPUT$3, this._updateHandler);
-		EventHandler.on(this._input, EVENT_CHANGE$3, this._updateHandler);
-	}
-	_min() {
-		return this._input.min === "" ? 0 : Number.parseFloat(this._input.min);
-	}
-	_max() {
-		return this._input.max === "" ? 100 : Number.parseFloat(this._input.max);
-	}
-	_value() {
-		return Number.parseFloat(this._input.value);
-	}
-	_ratio() {
-		const span = this._max() - this._min();
-		return span > 0 ? (this._value() - this._min()) / span : 0;
+		EventHandler.on(this._element, EVENT_INPUT$4, SELECTOR_INPUT$1, this._onChange);
+		EventHandler.on(this._element, EVENT_CHANGE$3, SELECTOR_INPUT$1, this._onChange);
+		if (this._form) EventHandler.on(this._form, EVENT_RESET$1, this._onReset);
 	}
 	_update() {
-		this._element.style.setProperty(PROPERTY_FILL, `${this._ratio()}`);
-		if (this._tooltipText) this._tooltipText.textContent = this._format(this._value());
-		EventHandler.trigger(this._input, EVENT_CHANGED, { value: this._value() });
+		const input = this._input;
+		const ratio = getRatio(input);
+		const value = Number.parseFloat(input.value);
+		if (this._config.track) this._element.style.setProperty(PROPERTY_FILL$1, `${ratio}`);
+		const html = sanitizeByConfig(this._format(value), this._config);
+		if (this._tooltip) {
+			this._tooltip.style.setProperty(PROPERTY_FILL$1, `${ratio}`);
+			this._tooltip.lastElementChild.innerHTML = html;
+		}
+		this._updateValueText(value, typeof this._config.tooltipsFormat === "function" ? html : null);
+		if (input.value !== this._shownValue) {
+			this._shownValue = input.value;
+			EventHandler.trigger(input, EVENT_CHANGED, { value });
+		}
 	}
 	_format(value) {
 		return typeof this._config.tooltipsFormat === "function" ? this._config.tooltipsFormat(value) : String(value);
 	}
-	_createTooltip() {
-		this._tooltip = document.createElement("output");
-		this._tooltip.className = `${CLASS_NAME_TOOLTIP$1} tooltip bs-tooltip-top`;
-		this._tooltip.classList.toggle(CLASS_NAME_SHOW$7, this._config.tooltips === "always");
-		this._tooltip.setAttribute("aria-hidden", "true");
-		const arrow = document.createElement("div");
-		arrow.className = "tooltip-arrow";
-		this._tooltipText = document.createElement("div");
-		this._tooltipText.className = "tooltip-inner";
-		this._tooltip.append(arrow, this._tooltipText);
-		this._input.insertAdjacentElement("afterend", this._tooltip);
+	_updateValueText(value, html) {
+		const label = getTickLabel(this._tickPoints, value, getStep(this._input));
+		const text = getValueText(value, label, html);
+		if (text === null) {
+			this._restoreValueText();
+			return;
+		}
+		this._input.setAttribute("aria-valuetext", text);
+		this._valueTextSet = true;
 	}
-	_createTicks() {
-		const listId = this._input.getAttribute("list");
-		const datalist = listId ? document.getElementById(listId) : null;
-		if (!datalist) return;
-		const min = this._min();
-		const span = this._max() - min || 1;
-		const points = [];
-		for (const option of SelectorEngine.find("option", datalist)) {
-			const value = Number.parseFloat(option.value);
-			if (!Number.isNaN(value)) {
-				const ratio = Math.min(Math.max((value - min) / span, 0), 1);
-				points.push({
-					ratio,
-					label: option.label
-				});
-			}
-		}
-		if (points.length === 0) return;
-		points.sort((a, b) => a.ratio - b.ratio);
-		this._ticks = document.createElement("div");
-		this._ticks.className = CLASS_NAME_TICKS;
-		this._ticks.setAttribute("aria-hidden", "true");
-		const stops = [
-			0,
-			...points.map((point) => point.ratio),
-			1
-		];
-		this._ticks.style.gridTemplateColumns = stops.slice(1).map((stop, index) => `${stop - stops[index]}fr`).join(" ");
-		for (const [index, point] of points.entries()) {
-			const tick = document.createElement("span");
-			tick.className = CLASS_NAME_TICK;
-			tick.style.gridColumnStart = `${index + 2}`;
-			if (point.label) {
-				const label = document.createElement("span");
-				label.className = CLASS_NAME_TICK_LABEL;
-				label.textContent = point.label;
-				tick.append(label);
-			}
-			this._ticks.append(tick);
-		}
-		this._element.append(this._ticks);
+	_restoreValueText() {
+		if (!this._valueTextSet) return;
+		if (this._valueText === null) this._input.removeAttribute("aria-valuetext");
+		else this._input.setAttribute("aria-valuetext", this._valueText);
+		this._valueTextSet = false;
 	}
 	static jQueryInterface(config) {
 		return jQueryDispatch(this, Range, config, (element) => [element]);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, EVENT_DOM_CONTENT_LOADED, () => {
-	for (const element of SelectorEngine.find(SELECTOR_RANGE)) Range.getOrCreateInstance(element);
+	for (const element of SelectorEngine.find(SELECTOR_RANGE)) if (!data_default.get(element.parentElement, DATA_KEY_RANGE_SLIDER)) Range.getOrCreateInstance(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Range);
 //#endregion
 //#region js/src/range-slider.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO range-slider.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$12 = "range-slider";
+const NAME$13 = "range-slider";
 const EVENT_KEY$10 = `.coreui.range-slider`;
 const DATA_API_KEY$5 = ".data-api";
 const EVENT_CHANGE$2 = `change${EVENT_KEY$10}`;
-const EVENT_INPUT$2 = `input${EVENT_KEY$10}`;
+const EVENT_INPUT$3 = `input${EVENT_KEY$10}`;
+const EVENT_KEYDOWN$4 = `keydown${EVENT_KEY$10}`;
+const EVENT_POINTERCANCEL = `pointercancel${EVENT_KEY$10}`;
+const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$10}`;
+const EVENT_POINTERMOVE = `pointermove${EVENT_KEY$10}`;
+const EVENT_POINTERUP = `pointerup${EVENT_KEY$10}`;
 const EVENT_LOAD_DATA_API$7 = `load${EVENT_KEY$10}${DATA_API_KEY$5}`;
-const EVENT_MOUSEDOWN$1 = `mousedown${EVENT_KEY$10}`;
-const EVENT_MOUSEMOVE = `mousemove${EVENT_KEY$10}`;
-const EVENT_MOUSEUP = `mouseup${EVENT_KEY$10}`;
-const CLASS_NAME_CLICKABLE = "clickable";
-const CLASS_NAME_DISABLED$2 = "disabled";
-const CLASS_NAME_RANGE_SLIDER = "range-slider";
-const CLASS_NAME_RANGE_SLIDER_INPUT = "range-slider-input";
-const CLASS_NAME_RANGE_SLIDER_INPUTS_CONTAINER = "range-slider-inputs-container";
-const CLASS_NAME_RANGE_SLIDER_TICK = "range-slider-tick";
-const CLASS_NAME_RANGE_SLIDER_TICKS = "range-slider-ticks";
-const CLASS_NAME_RANGE_SLIDER_TOOLTIP = "range-slider-tooltip";
-const CLASS_NAME_TOOLTIP = "tooltip";
-const CLASS_NAME_TOOLTIP_ARROW = "tooltip-arrow";
-const CLASS_NAME_TOOLTIP_INNER = "tooltip-inner";
+const ATTRIBUTE_INVALID_FEEDBACK = "data-coreui-invalid-feedback";
+const HOST_ATTRIBUTES = [
+	"aria-label",
+	"aria-labelledby",
+	ATTRIBUTE_INVALID_FEEDBACK
+];
+const CLASS_NAME_FORM_RANGE = "form-range";
+const CLASS_NAME_FORM_RANGE_INPUT = "form-range-input";
+const CLASS_NAME_FORM_RANGE_VERTICAL = "form-range-vertical";
+const CLASS_NAME_TICKS_CLICKABLE = "form-range-ticks-clickable";
+const CLASS_NAME_TOOLTIP_END = "bs-tooltip-end";
 const CLASS_NAME_TOOLTIP_START = "bs-tooltip-start";
 const CLASS_NAME_TOOLTIP_TOP = "bs-tooltip-top";
-const CLASS_NAME_RANGE_SLIDER_TRACK = "range-slider-track";
-const CLASS_NAME_RANGE_SLIDER_VERTICAL = "range-slider-vertical";
-const CLASS_NAME_SHOW$6 = "show";
+const PROPERTY_FILL = "--cui-range-fill";
+const PROPERTY_FILL_START = "--cui-range-fill-start";
 const SELECTOR_DATA_RANGE_SLIDER = "[data-coreui-range-slider]";
-const SELECTOR_RANGE_SLIDER_INPUT = ".range-slider-input";
-const SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER = ".range-slider-inputs-container";
-const SELECTOR_RANGE_SLIDER_TICK = ".range-slider-tick";
+const SELECTOR_INPUT = ".form-range-input";
+const SELECTOR_TICK = ".form-range-tick";
 const Default$11 = {
 	allowList: DefaultAllowlist,
-	ariaLabels: null,
+	ariaLabel: null,
 	clickableTicks: true,
 	disabled: false,
 	distance: 0,
@@ -15438,12 +16145,13 @@ const Default$11 = {
 	tooltips: true,
 	tooltipsFormat: null,
 	track: "fill",
+	validationState: null,
 	value: 0,
 	vertical: false
 };
-const DefaultType$11 = {
+const DefaultType$10 = {
 	allowList: "object",
-	ariaLabels: "(array|null)",
+	ariaLabel: "(array|function|string|null)",
 	clickableTicks: "boolean",
 	disabled: "boolean",
 	distance: "number",
@@ -15459,332 +16167,329 @@ const DefaultType$11 = {
 	tooltips: "(boolean|string)",
 	tooltipsFormat: "(function|null)",
 	track: "(boolean|string)",
+	validationState: "(string|null|undefined)",
 	value: "(array|number)",
 	vertical: "boolean"
 };
-/**
-* Class definition
-*/
 var RangeSlider = class RangeSlider extends BaseComponent {
 	constructor(element, config) {
-		super(element);
-		this._config = this._getConfig(config);
-		this._currentValue = this._config.value;
-		this._dragIndex = 0;
+		super(element, config);
+		if (!this._element) return;
+		this._disabled = this._config.disabled;
 		this._inputs = [];
-		this._isDragging = false;
-		this._sliderTrack = null;
+		this._press = null;
+		this._shownValues = [];
+		this._startValues = [...this._config.value];
+		this._tickPoints = [];
+		this._ticks = null;
 		this._tooltips = [];
-		this._onDocumentMouseMove = (event) => {
-			if (!this._isDragging) return;
-			this._updateValue(this._calculateMoveValue(event), this._dragIndex);
+		this._validation = new FieldValidation(this._element, {
+			blockers: () => this._inputs.slice(0, 1),
+			canBlock: () => !this._disabled,
+			config: () => this._config,
+			fields: () => this._inputs,
+			frames: () => [this._element, ...this._inputs],
+			invalidTargets: () => this._inputs,
+			pageDescribed: () => this._inputs,
+			restore: () => this._restoreValue()
+		});
+		this._wrapper = null;
+		this._hostAttributes = /* @__PURE__ */ new Map();
+		this._readHostAttributes();
+		this._element.setAttribute("role", "group");
+		this._onInput = (event) => {
+			const input = event.target;
+			if (this._inputs.includes(input)) {
+				this._constrain(input);
+				if (input.value !== this._shownValues[this._inputs.indexOf(input)]) this._validation.dismiss();
+				this._update();
+				EventHandler.trigger(this._element, EVENT_INPUT$3, { value: this._values() });
+			}
 		};
-		this._onDocumentMouseUp = () => {
-			this._isDragging = false;
+		this._onChange = (event) => {
+			if (this._inputs.includes(event.target)) {
+				this._update();
+				EventHandler.trigger(this._element, EVENT_CHANGE$2, { value: this._values() });
+			}
 		};
-		this._initializeRangeSlider();
+		this._onKeydown = (event) => this._keydown(event);
+		this._onPointerDown = (event) => this._pointerDown(event);
+		this._onPointerMove = (event) => this._pointerMove(event);
+		this._onPointerUp = (event) => this._pointerUp(event);
+		this._build(this._config.value);
 	}
 	static get Default() {
 		return Default$11;
 	}
 	static get DefaultType() {
-		return DefaultType$11;
+		return DefaultType$10;
 	}
 	static get NAME() {
-		return NAME$12;
+		return NAME$13;
 	}
-	setConfig(config) {
+	disable() {
+		this._setDisabled(true);
+	}
+	enable() {
+		this._setDisabled(false);
+	}
+	setValidationState(validationState) {
 		this._config = this._getConfig({
 			...this._config,
-			...config
+			validationState
 		});
-		this._currentValue = this._config.value;
-		this._element.innerHTML = "";
-		this._initializeRangeSlider();
+		this._validation.configure({ validationState });
+	}
+	setValue(value) {
+		const values = this._normalizeValue(value);
+		this._typeCheckConfig({ value: values }, { value: DefaultType$10.value });
+		if (values.length !== this._inputs.length) {
+			const focused = this._inputs.findIndex((input) => containsFocus(input));
+			this._startValues = values.map((value, index) => this._startValues[index] ?? value);
+			this._teardown();
+			this._build(values);
+			this._inputs[Math.min(focused, this._inputs.length - 1)]?.focus();
+			return;
+		}
+		for (const [index, input] of this._inputs.entries()) input.value = `${values[index]}`;
+		if (this._press) this._press.start = this._press.input.value;
+		this._update();
 	}
 	dispose() {
-		EventHandler.off(document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove);
-		EventHandler.off(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp);
+		if (!this._element) return;
+		this._validation.dispose();
+		this._teardown();
 		super.dispose();
 	}
-	_addEventListeners() {
-		if (this._config.disabled) return;
-		EventHandler.on(this._element, EVENT_INPUT$2, SELECTOR_RANGE_SLIDER_INPUT, (event) => {
-			const { target } = event;
-			this._isDragging = false;
-			const children = SelectorEngine.children(target.parentElement, SELECTOR_RANGE_SLIDER_INPUT);
-			const index = Array.from(children).indexOf(target);
-			this._updateValue(target.value, index);
-			EventHandler.trigger(this._element, EVENT_INPUT$2, { value: [...this._currentValue] });
-		});
-		EventHandler.on(this._element, EVENT_CHANGE$2, SELECTOR_RANGE_SLIDER_INPUT, () => {
-			EventHandler.trigger(this._element, EVENT_CHANGE$2, { value: [...this._currentValue] });
-		});
-		EventHandler.on(this._element, EVENT_MOUSEDOWN$1, SELECTOR_RANGE_SLIDER_TICK, (event) => {
-			if (!this._config.clickableTicks || event.button !== 0) return;
-			const value = Manipulator.getDataAttribute(event.target, "value");
-			this._updateNearestValue(value);
-		});
-		EventHandler.on(this._element, EVENT_MOUSEDOWN$1, SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER, (event) => {
-			if (event.button !== 0) return;
-			if (!(event.target instanceof HTMLInputElement) && !event.target.className.includes(CLASS_NAME_RANGE_SLIDER_TRACK)) return;
-			this._isDragging = true;
-			const clickValue = this._calculateClickValue(event);
-			this._dragIndex = this._getNearestValueIndex(clickValue);
-			this._updateNearestValue(clickValue);
-			EventHandler.trigger(this._element, EVENT_CHANGE$2, { value: [...this._currentValue] });
-			EventHandler.trigger(this._element, EVENT_INPUT$2, { value: [...this._currentValue] });
-		});
-		EventHandler.on(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp);
-		EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove);
+	_setDisabled(disabled) {
+		if (disabled === this._disabled) return;
+		this._disabled = disabled;
+		if (disabled) this._releasePress();
+		for (const input of this._inputs) input.disabled = disabled;
+		this._updateClickableTicks();
+		this._validation.update();
 	}
-	_initializeRangeSlider() {
-		this._element.classList.add(CLASS_NAME_RANGE_SLIDER);
-		if (this._config.vertical) this._element.classList.add(CLASS_NAME_RANGE_SLIDER_VERTICAL);
-		if (this._config.disabled) this._element.classList.add(CLASS_NAME_DISABLED$2);
-		this._sliderTrack = this._createSliderTrack();
-		this._createInputs();
-		this._createTicks();
-		this._createTooltips();
-		this._updateGradient();
-		this._addEventListeners();
-	}
-	_createSliderTrack() {
-		return this._createElement("div", CLASS_NAME_RANGE_SLIDER_TRACK);
-	}
-	_createInputs() {
-		const container = this._createElement("div", CLASS_NAME_RANGE_SLIDER_INPUTS_CONTAINER);
-		for (const [index, value] of this._currentValue.entries()) {
-			const inputElement = this._createInput(index, value);
-			container.append(inputElement);
-			this._inputs[index] = inputElement;
+	_build(values) {
+		const { tooltipClass, tooltips, vertical } = this._config;
+		this._wrapper = document.createElement("div");
+		this._wrapper.className = CLASS_NAME_FORM_RANGE;
+		this._wrapper.classList.toggle(CLASS_NAME_FORM_RANGE_VERTICAL, vertical);
+		this._inputs = values.map((value, index) => this._createInput(index, value));
+		for (const [index, input] of this._inputs.entries()) this._nameInput(input, index);
+		this._wrapper.append(...this._inputs);
+		this._element.append(this._wrapper);
+		if (tooltips) {
+			const placement = vertical ? isRTL(this._wrapper) ? CLASS_NAME_TOOLTIP_END : CLASS_NAME_TOOLTIP_START : CLASS_NAME_TOOLTIP_TOP;
+			for (const input of this._inputs) {
+				const tooltip = createTooltip(placement, tooltipClass, tooltips === "always");
+				input.after(tooltip);
+				this._tooltips.push(tooltip);
+			}
 		}
-		container.append(this._sliderTrack);
-		this._element.append(container);
+		this._tickPoints = this._inputs.length > 0 ? getTickPoints(this._inputs[0], this._config.ticks, this._config.list) : [];
+		if (this._tickPoints.length > 0) {
+			this._ticks = createTicks(this._tickPoints, vertical);
+			this._updateClickableTicks();
+			this._wrapper.append(this._ticks);
+		}
+		this._addEventListeners();
+		this._update();
+		this._validation.refresh();
+	}
+	_teardown() {
+		this._releasePress();
+		if (this._wrapper) {
+			EventHandler.off(this._wrapper, EVENT_INPUT$3, SELECTOR_INPUT, this._onInput);
+			EventHandler.off(this._wrapper, EVENT_CHANGE$2, SELECTOR_INPUT, this._onChange);
+			EventHandler.off(this._wrapper, EVENT_KEYDOWN$4, SELECTOR_INPUT, this._onKeydown);
+			EventHandler.off(this._wrapper, EVENT_POINTERDOWN, this._onPointerDown);
+		}
+		this._wrapper?.remove();
+		this._inputs = [];
+		this._tickPoints = [];
+		this._ticks = null;
+		this._tooltips = [];
+		this._wrapper = null;
+	}
+	_addEventListeners() {
+		const wrapper = this._wrapper;
+		EventHandler.on(wrapper, EVENT_INPUT$3, SELECTOR_INPUT, this._onInput);
+		EventHandler.on(wrapper, EVENT_CHANGE$2, SELECTOR_INPUT, this._onChange);
+		EventHandler.on(wrapper, EVENT_KEYDOWN$4, SELECTOR_INPUT, this._onKeydown);
+		EventHandler.on(wrapper, EVENT_POINTERDOWN, this._onPointerDown);
 	}
 	_createInput(index, value) {
-		const inputElement = this._createElement("input", CLASS_NAME_RANGE_SLIDER_INPUT);
-		inputElement.type = "range";
-		inputElement.min = this._config.min;
-		inputElement.max = this._config.max;
-		inputElement.step = this._config.step;
-		inputElement.value = value;
+		const { max, min, step, vertical } = this._config;
+		const input = document.createElement("input");
+		input.type = "range";
+		input.className = CLASS_NAME_FORM_RANGE_INPUT;
+		input.min = `${min}`;
+		input.max = `${max}`;
+		input.step = `${step}`;
+		input.defaultValue = `${this._startValues[index] ?? value}`;
+		input.value = `${value}`;
+		input.disabled = this._disabled;
 		const name = Array.isArray(this._config.name) ? this._config.name[index] : this._config.name && `${this._config.name}-${index}`;
-		if (name !== void 0 && name !== null && name !== "" && name !== false) inputElement.name = String(name);
-		inputElement.disabled = this._config.disabled;
-		inputElement.setAttribute("role", "slider");
-		inputElement.setAttribute("aria-valuemin", this._config.min);
-		inputElement.setAttribute("aria-valuemax", this._config.max);
-		inputElement.setAttribute("aria-valuenow", value);
-		inputElement.setAttribute("aria-orientation", this._config.vertical ? "vertical" : "horizontal");
-		const ariaLabel = this._getAriaLabel(index);
-		if (ariaLabel !== null) inputElement.setAttribute("aria-label", ariaLabel);
-		const valueText = this._getValueText(value);
-		if (valueText !== null) inputElement.setAttribute("aria-valuetext", valueText);
-		return inputElement;
+		if (name !== void 0 && name !== null && name !== "") input.name = String(name);
+		if (vertical) input.setAttribute("aria-orientation", "vertical");
+		const invalidFeedback = this._hostAttributes.get(ATTRIBUTE_INVALID_FEEDBACK);
+		if (invalidFeedback) input.setAttribute(ATTRIBUTE_INVALID_FEEDBACK, invalidFeedback);
+		return input;
 	}
-	_getAriaLabel(index) {
-		if (Array.isArray(this._config.ariaLabels) && this._config.ariaLabels[index]) return this._config.ariaLabels[index];
-		if (this._currentValue.length === 1) return null;
-		if (this._currentValue.length === 2) return index === 0 ? "Minimum value" : "Maximum value";
+	_readHostAttributes() {
+		for (const name of HOST_ATTRIBUTES) {
+			const value = this._element.getAttribute(name);
+			if (value !== null) this._hostAttributes.set(name, value);
+		}
+	}
+	_nameInput(input, index) {
+		const handleLabel = this._ariaLabel(index);
+		const label = this._hostAttributes.get("aria-label");
+		const labelledBy = this._hostAttributes.get("aria-labelledby");
+		if (this._inputs.length > 1) {
+			if (handleLabel) input.setAttribute("aria-label", handleLabel);
+			return;
+		}
+		if (labelledBy && handleLabel) {
+			input.id = getUID(`${NAME$13}-handle-`);
+			input.setAttribute("aria-labelledby", `${labelledBy} ${input.id}`);
+			input.setAttribute("aria-label", handleLabel);
+			return;
+		}
+		const name = [label, handleLabel].filter(Boolean).join(" ");
+		if (name) input.setAttribute("aria-label", name);
+		if (labelledBy) input.setAttribute("aria-labelledby", labelledBy);
+	}
+	_ariaLabel(index) {
+		const total = this._inputs.length;
+		const { ariaLabel } = this._config;
+		const given = typeof ariaLabel === "function" ? ariaLabel(index, total) : ariaLabel?.[index];
+		if (given) return given;
+		if (total === 1) return null;
+		if (total === 2) return index === 0 ? "Minimum value" : "Maximum value";
 		return `Value ${index + 1}`;
 	}
-	_getValueText(value) {
-		return typeof this._config.tooltipsFormat === "function" ? `${this._config.tooltipsFormat(value)}` : null;
+	_updateClickableTicks() {
+		this._ticks?.classList.toggle(CLASS_NAME_TICKS_CLICKABLE, this._config.clickableTicks && this._inputs.some((input) => !input.matches(":disabled")));
 	}
-	_createTicks() {
-		const points = this._tickPoints();
-		if (points.length === 0) return;
-		const { clickableTicks, disabled, vertical } = this._config;
-		const ticksContainer = this._createElement("div", CLASS_NAME_RANGE_SLIDER_TICKS);
-		const stops = [
-			0,
-			...points.map((point) => point.ratio),
-			1
-		];
-		const tracks = stops.slice(1).map((stop, index) => `${stop - stops[index]}fr`);
-		if (vertical) ticksContainer.style.gridTemplateRows = tracks.toReversed().join(" ");
-		else ticksContainer.style.gridTemplateColumns = tracks.join(" ");
-		for (const [index, point] of points.entries()) {
-			const tickElement = this._createElement("div", CLASS_NAME_RANGE_SLIDER_TICK);
-			if (clickableTicks && !disabled) tickElement.classList.add(CLASS_NAME_CLICKABLE);
-			if (point.class) tickElement.classList.add(...Array.isArray(point.class) ? point.class : [point.class]);
-			if (point.style && typeof point.style === "object") Object.assign(tickElement.style, point.style);
-			Manipulator.setDataAttribute(tickElement, "value", point.value);
-			tickElement.textContent = point.label;
-			if (vertical) tickElement.style.gridRowStart = `${points.length - index + 1}`;
-			else tickElement.style.gridColumnStart = `${index + 2}`;
-			ticksContainer.append(tickElement);
-		}
-		this._element.append(ticksContainer);
+	_values() {
+		return this._inputs.map((input) => Number(input.value));
 	}
-	_tickPoints() {
-		const { list, min, max, ticks } = this._config;
-		const span = max - min || 1;
-		const ratio = (value) => Math.min(Math.max((value - min) / span, 0), 1);
-		const points = [];
-		if (Array.isArray(ticks) && ticks.length > 0) for (const [index, tick] of ticks.entries()) {
-			const value = typeof tick === "number" ? tick : typeof tick === "object" && tick.value !== void 0 ? tick.value : min + (ticks.length === 1 ? 0 : index / (ticks.length - 1) * span);
-			points.push({
-				class: typeof tick === "object" ? tick.class : void 0,
-				label: typeof tick === "number" ? "" : typeof tick === "object" ? tick.label ?? "" : tick,
-				ratio: ratio(value),
-				style: typeof tick === "object" ? tick.style : void 0,
-				value
-			});
-		}
-		const datalist = list ? document.getElementById(list) : null;
-		if (datalist) for (const option of SelectorEngine.find("option", datalist)) {
-			const value = Number.parseFloat(option.value);
-			if (!Number.isNaN(value)) points.push({
-				label: option.label,
-				ratio: ratio(value),
-				value
-			});
-		}
-		return points.toSorted((a, b) => a.ratio - b.ratio);
+	_restoreValue() {
+		const isChanged = this._inputs.some((input, index) => input.value !== this._shownValues[index]);
+		this._update();
+		if (isChanged) EventHandler.trigger(this._element, EVENT_CHANGE$2, { value: this._values() });
 	}
-	_createTooltips() {
-		if (!this._config.tooltips) return;
-		const inputs = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element);
-		for (const input of inputs) {
-			const tooltipElement = this._createElement("output", CLASS_NAME_RANGE_SLIDER_TOOLTIP);
-			tooltipElement.classList.add(CLASS_NAME_TOOLTIP, this._config.vertical ? CLASS_NAME_TOOLTIP_START : CLASS_NAME_TOOLTIP_TOP);
-			tooltipElement.classList.toggle(CLASS_NAME_SHOW$6, this._config.tooltips === "always");
-			if (this._config.tooltipClass) tooltipElement.classList.add(...this._config.tooltipClass.split(" ").filter(Boolean));
-			tooltipElement.setAttribute("aria-hidden", "true");
-			const tooltipArrowElement = this._createElement("span", CLASS_NAME_TOOLTIP_ARROW);
-			const tooltipInnerElement = this._createElement("span", CLASS_NAME_TOOLTIP_INNER);
-			tooltipInnerElement.innerHTML = this._config.tooltipsFormat ? sanitizeByConfig(this._config.tooltipsFormat(input.value), this._config) : input.value;
-			tooltipElement.append(tooltipArrowElement, tooltipInnerElement);
-			input.parentNode.insertBefore(tooltipElement, input.nextSibling);
-			this._positionTooltip(tooltipElement, input);
-			this._tooltips.push(tooltipElement);
+	_update() {
+		const ratios = this._inputs.map((input) => getRatio(input));
+		this._shownValues = this._inputs.map((input) => input.value);
+		if (this._config.track && this._inputs.length > 0) {
+			if (this._inputs.length > 1) this._wrapper.style.setProperty(PROPERTY_FILL_START, `${Math.min(...ratios)}`);
+			this._wrapper.style.setProperty(PROPERTY_FILL, `${Math.max(...ratios)}`);
+		}
+		for (const [index, input] of this._inputs.entries()) {
+			const value = Number.parseFloat(input.value);
+			const tooltip = this._tooltips[index];
+			const html = sanitizeByConfig(this._format(value), this._config);
+			if (tooltip) {
+				tooltip.style.setProperty(PROPERTY_FILL, `${ratios[index]}`);
+				tooltip.lastElementChild.innerHTML = html;
+			}
+			const label = getTickLabel(this._tickPoints, value, getStep(input));
+			const text = getValueText(value, label, typeof this._config.tooltipsFormat === "function" ? html : null);
+			if (text === null) input.removeAttribute("aria-valuetext");
+			else input.setAttribute("aria-valuetext", text);
+			if (this._inputs.length > 1) input.style.zIndex = `${getStackOrder(ratios[index], index, this._inputs.length)}`;
 		}
 	}
-	_positionTooltip(tooltip, input) {
-		const percent = (Number(input.value) - this._config.min) / (this._config.max - this._config.min);
-		tooltip.style.setProperty("--cui-range-slider-tooltip-position", `${percent}`);
+	_format(value) {
+		return typeof this._config.tooltipsFormat === "function" ? this._config.tooltipsFormat(value) : String(value);
 	}
-	_updateTooltip(index, value) {
-		if (!this._config.tooltips) return;
-		if (this._tooltips[index]) {
-			this._tooltips[index].children[1].innerHTML = this._config.tooltipsFormat ? sanitizeByConfig(this._config.tooltipsFormat(value), this._config) : String(value);
-			const input = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element)[index];
-			this._positionTooltip(this._tooltips[index], input);
+	_constrain(input) {
+		const index = this._inputs.indexOf(input);
+		constrainInput(input, this._inputs[index - 1], this._inputs[index + 1], this._config.distance);
+	}
+	_setValue(input, value) {
+		const before = input.value;
+		setInputValue(input, value);
+		this._constrain(input);
+		if (input.value !== before) input.dispatchEvent(new Event("input", { bubbles: true }));
+	}
+	_keydown(event) {
+		const input = event.target;
+		if (!this._config.vertical || this._disabled || !this._inputs.includes(input) || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+		event.preventDefault();
+		const start = input.value;
+		const step = getStep(input);
+		this._setValue(input, Number.parseFloat(input.value) + (event.key === "ArrowRight" ? step : -step));
+		if (input.value !== start) input.dispatchEvent(new Event("change", { bubbles: true }));
+	}
+	_pointerDown(event) {
+		if (event.button !== 0 || this._press || this._inputs.length === 0) return;
+		const rect = this._inputs[0].getBoundingClientRect();
+		const tick = event.target.closest?.(SELECTOR_TICK);
+		if (tick && this._ticks?.contains(tick)) {
+			if (this._ticks.classList.contains(CLASS_NAME_TICKS_CLICKABLE)) {
+				const value = Number(tick.getAttribute("data-coreui-value"));
+				const { max, min } = this._config;
+				this._startPress(event, rect, (value - min) / (max - min || 1), value);
+			}
+			return;
 		}
+		const inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+		if (event.target !== this._wrapper || this._inputs.length < 2 || !inside) return;
+		this._startPress(event, rect);
 	}
-	_calculateClickValue(event) {
-		const clickPosition = this._getClickPosition(event);
-		const value = this._config.min + clickPosition * (this._config.max - this._config.min);
-		return this._roundToStep(value, this._config.step);
+	_startPress(event, rect, ratio, value) {
+		const thumb = getThumbSize(this._wrapper);
+		const at = ratio ?? getRatioAt(event, rect, thumb, this._config.vertical, isRTL(this._wrapper));
+		const input = getNearestInput(this._inputs, at);
+		if (!input) return;
+		event.preventDefault();
+		this._press = {
+			input,
+			pointerId: event.pointerId,
+			rect,
+			start: input.value,
+			thumb
+		};
+		EventHandler.on(document, EVENT_POINTERMOVE, this._onPointerMove);
+		EventHandler.on(document, EVENT_POINTERUP, this._onPointerUp);
+		EventHandler.on(document, EVENT_POINTERCANCEL, this._onPointerUp);
+		input.focus({ preventScroll: true });
+		this._setValue(input, value ?? this._config.min + at * (this._config.max - this._config.min));
 	}
-	_calculateMoveValue(event) {
-		const trackRect = this._sliderTrack.getBoundingClientRect();
-		const position = this._config.vertical ? this._calculateVerticalPosition(event.clientY, trackRect) : this._calculateHorizontalPosition(event.clientX, trackRect);
-		if (typeof position === "string") return this._roundToStep(position === "max" ? this._config.max : this._config.min, this._config.step);
-		const value = this._config.min + position * (this._config.max - this._config.min);
-		return this._roundToStep(value, this._config.step);
+	_pointerMove(event) {
+		if (!this._press || event.pointerId !== this._press.pointerId) return;
+		const { input, rect, thumb } = this._press;
+		const ratio = getRatioAt(event, rect, thumb, this._config.vertical, isRTL(this._wrapper));
+		this._setValue(input, this._config.min + ratio * (this._config.max - this._config.min));
 	}
-	_calculateVerticalPosition(mouseY, rect) {
-		if (mouseY < rect.top) return "max";
-		if (mouseY > rect.bottom) return "min";
-		return Math.min(Math.max((rect.bottom - mouseY) / rect.height, 0), 1);
+	_pointerUp(event) {
+		if (!this._press || event.pointerId !== this._press.pointerId) return;
+		const { input, start } = this._press;
+		this._releasePress();
+		if (input.value !== start) input.dispatchEvent(new Event("change", { bubbles: true }));
 	}
-	_calculateHorizontalPosition(mouseX, rect) {
-		const rtl = isRTL(this._element);
-		if (mouseX < rect.left) return rtl ? "max" : "min";
-		if (mouseX > rect.right) return rtl ? "min" : "max";
-		const relativeX = rtl ? rect.right - mouseX : mouseX - rect.left;
-		return Math.min(Math.max(relativeX / rect.width, 0), 1);
-	}
-	_createElement(tag, className) {
-		const element = document.createElement(tag);
-		element.classList.add(className);
-		return element;
-	}
-	_getClickPosition(event) {
-		const { offsetX, offsetY } = event;
-		const { offsetWidth, offsetHeight } = this._sliderTrack;
-		if (this._config.vertical) return 1 - offsetY / offsetHeight;
-		return isRTL(this._element) ? 1 - offsetX / offsetWidth : offsetX / offsetWidth;
-	}
-	_getNearestValueIndex(value) {
-		const values = this._currentValue;
-		const valuesLength = values.length;
-		if (value < values[0]) return 0;
-		if (value > values[valuesLength - 1]) return valuesLength - 1;
-		const distances = values.map((v) => Math.abs(v - value));
-		const min = Math.min(...distances);
-		const firstIndex = distances.indexOf(min);
-		return value < values[firstIndex] ? firstIndex : distances.lastIndexOf(min);
-	}
-	_updateGradient() {
-		if (!this._config.track) return;
-		const [min, max] = [Math.min(...this._currentValue), Math.max(...this._currentValue)];
-		const span = this._config.max - this._config.min;
-		const ratio = (value) => `${(value - this._config.min) / span}`;
-		if (this._currentValue.length === 1) this._sliderTrack.style.setProperty("--cui-range-slider-track-from-edge", "0");
-		else this._sliderTrack.style.setProperty("--cui-range-slider-track-from", ratio(min));
-		this._sliderTrack.style.setProperty("--cui-range-slider-track-to", ratio(max));
-	}
-	_updateNearestValue(value) {
-		const nearestIndex = this._getNearestValueIndex(value);
-		this._updateValue(value, nearestIndex);
-	}
-	_updateValue(value, index) {
-		const _value = this._validateValue(value, index);
-		this._currentValue[index] = _value;
-		this._updateInput(index, _value);
-		this._updateGradient();
-		this._updateTooltip(index, _value);
-	}
-	_updateInput(index, value) {
-		const input = this._inputs[index];
-		input.value = value;
-		input.setAttribute("aria-valuenow", value);
-		const valueText = this._getValueText(value);
-		if (valueText !== null) input.setAttribute("aria-valuetext", valueText);
-		setTimeout(() => {
-			input.focus();
-		});
-	}
-	_validateValue(value, index) {
-		const { distance } = this._config;
-		const { length } = this._currentValue;
-		if (length === 1) return value;
-		const prevValue = index > 0 ? this._currentValue[index - 1] : void 0;
-		const nextValue = index < length - 1 ? this._currentValue[index + 1] : void 0;
-		if (index === 0 && nextValue !== void 0) return Math.min(value, nextValue - distance);
-		if (index === length - 1 && prevValue !== void 0) return Math.max(value, prevValue + distance);
-		if (prevValue !== void 0 && nextValue !== void 0) {
-			const minVal = prevValue + distance;
-			const maxVal = nextValue - distance;
-			return Math.min(Math.max(value, minVal), maxVal);
-		}
-		return value;
-	}
-	_getDecimals(number) {
-		const [mantissa, exponent = "0"] = `${number}`.split("e");
-		return Math.max(0, (mantissa.split(".")[1] || "").length - Number(exponent));
-	}
-	_roundToStep(number, step) {
-		const { max, min } = this._config;
-		const value = Math.min(Math.max(number, min), max);
-		const _step = Number(step);
-		if (Number.isNaN(_step)) return value;
-		const size = _step === 0 ? 1 : _step;
-		const decimals = Math.max(this._getDecimals(size), this._getDecimals(min));
-		const rounded = Number((min + Math.round((value - min) / size) * size).toFixed(decimals));
-		return rounded > max ? Math.max(min, Number((rounded - size).toFixed(decimals))) : rounded;
+	_releasePress() {
+		this._press = null;
+		EventHandler.off(document, EVENT_POINTERMOVE, this._onPointerMove);
+		EventHandler.off(document, EVENT_POINTERUP, this._onPointerUp);
+		EventHandler.off(document, EVENT_POINTERCANCEL, this._onPointerUp);
 	}
 	_configAfterMerge(config) {
+		if (config.tooltips === null) config.tooltips = true;
+		if (typeof config.ticks === "number") config.ticks = String(config.ticks);
 		if (typeof config.ticks === "string") config.ticks = config.ticks.split(/,\s*/);
+		if (typeof config.ariaLabel === "string") config.ariaLabel = config.ariaLabel.split(/,\s*/);
 		if (typeof config.name === "string" && config.name.includes(",")) config.name = config.name.split(/,\s*/);
-		if (typeof config.value === "number") config.value = [config.value];
-		if (typeof config.value === "string") config.value = config.value.split(/,\s*/).map(Number);
-		else if (Array.isArray(config.value)) config.value = [...config.value];
+		config.value = this._normalizeValue(config.value);
 		return config;
+	}
+	_normalizeValue(value) {
+		if (typeof value === "number") return [value];
+		if (typeof value === "string") return value.split(/,\s*/).map(Number);
+		return Array.isArray(value) ? [...value] : value;
 	}
 	static rangeSliderInterface(element, config, ...args) {
 		const data = RangeSlider.getOrCreateInstance(element, config);
@@ -15797,41 +16502,27 @@ var RangeSlider = class RangeSlider extends BaseComponent {
 		return jQueryDispatch(this, RangeSlider, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(window, EVENT_LOAD_DATA_API$7, () => {
-	const ratings = SelectorEngine.find(SELECTOR_DATA_RANGE_SLIDER);
-	for (let i = 0, len = ratings.length; i < len; i++) RangeSlider.rangeSliderInterface(ratings[i]);
+	for (const element of SelectorEngine.find(SELECTOR_DATA_RANGE_SLIDER)) RangeSlider.rangeSliderInterface(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(RangeSlider);
 //#endregion
 //#region js/src/rating.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO rating.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$11 = "rating";
+const NAME$12 = "rating";
 const EVENT_KEY$9 = `.coreui.rating`;
 const DATA_API_KEY$4 = ".data-api";
 const EVENT_CHANGE$1 = `change${EVENT_KEY$9}`;
-const EVENT_CLICK$2 = `click${EVENT_KEY$9}`;
+const EVENT_CLICK$3 = `click${EVENT_KEY$9}`;
 const EVENT_FOCUSIN$2 = `focusin${EVENT_KEY$9}`;
 const EVENT_FOCUSOUT$2 = `focusout${EVENT_KEY$9}`;
 const EVENT_HOVER = `hover${EVENT_KEY$9}`;
+const EVENT_INPUT$2 = `input${EVENT_KEY$9}`;
+const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$9}`;
 const EVENT_LOAD_DATA_API$6 = `load${EVENT_KEY$9}${DATA_API_KEY$4}`;
 const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY$9}`;
 const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY$9}`;
 const CLASS_NAME_ACTIVE$4 = "active";
-const CLASS_NAME_DISABLED$1 = "disabled";
+const CLASS_NAME_DISABLED$2 = "disabled";
 const CLASS_NAME_RATING = "rating";
 const CLASS_NAME_RATING_ITEM = "rating-item";
 const CLASS_NAME_RATING_ITEM_ICON = "rating-item-icon";
@@ -15840,6 +16531,7 @@ const CLASS_NAME_RATING_ITEM_CUSTOM_ICON_ACTIVE = "rating-item-custom-icon-activ
 const CLASS_NAME_RATING_ITEM_INPUT = "rating-item-input";
 const CLASS_NAME_RATING_ITEM_LABEL = "rating-item-label";
 const CLASS_NAME_READONLY = "readonly";
+const SIZE_CLASS_NAMES = ["rating-lg", "rating-sm"];
 const SELECTOR_DATA_RATING = "[data-coreui-rating]";
 const SELECTOR_RATING_ITEM = ".rating-item";
 const SELECTOR_RATING_ITEM_INPUT = ".rating-item-input";
@@ -15856,13 +16548,15 @@ const Default$10 = {
 	name: null,
 	precision: 1,
 	readonly: false,
+	required: false,
 	sanitize: true,
 	sanitizeFn: null,
 	size: null,
 	tooltips: false,
+	validationState: null,
 	value: null
 };
-const DefaultType$10 = {
+const DefaultType$9 = {
 	activeIcon: "(object|string|null)",
 	allowClear: "boolean",
 	allowList: "object",
@@ -15874,20 +16568,37 @@ const DefaultType$10 = {
 	name: "(string|null)",
 	precision: "number",
 	readonly: "boolean",
+	required: "boolean",
 	sanitize: "boolean",
 	sanitizeFn: "(null|function)",
 	size: "(string|null)",
 	tooltips: "(array|boolean|object)",
+	validationState: "(string|null|undefined)",
 	value: "(number|null)"
 };
-/**
-* Class definition
-*/
 var Rating = class Rating extends BaseComponent {
 	constructor(element, config) {
 		super(element);
+		this._items = [];
+		this._validation = new FieldValidation(this._element, {
+			blockers: () => {
+				const blocked = this._blockedRadio();
+				return blocked ? [blocked] : [];
+			},
+			canBlock: () => !this._disabled && !this._config.readonly,
+			config: () => this._config,
+			describedTargets: () => this._radios(),
+			fields: () => this._radios(),
+			frames: () => [this._element],
+			invalidTargets: () => [this._element],
+			pageDescribed: () => [this._element],
+			restore: () => this._restoreValue()
+		});
+		this._sizeClassName = null;
 		this._config = this._getConfig(config);
 		this._currentValue = this._config.value;
+		this._disabled = this._config.disabled;
+		this._startValue = this._config.value;
 		this._name = this._config.name || getUID(`${this.constructor.NAME}-name-`).toString();
 		this._tooltip = null;
 		this._createRating();
@@ -15897,63 +16608,106 @@ var Rating = class Rating extends BaseComponent {
 		return Default$10;
 	}
 	static get DefaultType() {
-		return DefaultType$10;
+		return DefaultType$9;
 	}
 	static get NAME() {
-		return NAME$11;
+		return NAME$12;
 	}
-	setConfig(config) {
+	disable() {
+		this._setDisabled(true);
+	}
+	enable() {
+		this._setDisabled(false);
+	}
+	setValidationState(validationState) {
 		this._config = this._getConfig({
 			...this._config,
-			...config
+			validationState
 		});
-		this._currentValue = this._config.value;
-		this._disposeTooltips();
-		this._element.innerHTML = "";
-		this._createRating();
+		this._validation.configure({ validationState });
+	}
+	setValue(value) {
+		this._typeCheckConfig({ value }, { value: DefaultType$9.value });
+		this._currentValue = value;
+		this._paintValue();
 	}
 	reset(value = null) {
+		const isChanged = value != this._currentValue;
 		this._currentValue = value;
-		this._disposeTooltips();
-		this._element.innerHTML = "";
-		this._createRating();
-		EventHandler.trigger(this._element, EVENT_CHANGE$1, { value });
+		this._paintValue();
+		if (isChanged) EventHandler.trigger(this._element, EVENT_CHANGE$1, { value });
 	}
 	dispose() {
-		this._disposeTooltips();
+		if (!this._element) return;
+		this._validation.dispose();
+		this._removeRating();
 		super.dispose();
 	}
+	_setDisabled(disabled) {
+		if (disabled === this._disabled) return;
+		this._disabled = disabled;
+		this._element.classList.toggle(CLASS_NAME_DISABLED$2, disabled);
+		for (const radio of this._radios()) radio.disabled = disabled;
+		if (disabled) this._disposeTooltips();
+		this._paintValue();
+	}
+	_paintValue() {
+		let checked = null;
+		for (const radio of this._radios()) {
+			radio.checked = radio.value == this._currentValue;
+			if (radio.checked) checked = radio;
+		}
+		if (!checked) this._currentValue = null;
+		this._highlightLabels(checked);
+		this._updateTabStop();
+		this._validation.update();
+	}
+	_radios() {
+		return SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element);
+	}
+	_blockedRadio() {
+		const radios = this._radios();
+		return radios.find((radio) => radio.checked) ?? radios[0];
+	}
+	_removeRating() {
+		this._disposeTooltips();
+		const anchor = this._items.at(-1)?.nextSibling ?? null;
+		for (const item of this._items) item.remove();
+		this._items = [];
+		return anchor;
+	}
 	_disposeTooltips() {
-		for (const item of SelectorEngine.find(SELECTOR_RATING_ITEM, this._element)) Tooltip.getInstance(item)?.dispose();
+		for (const item of SelectorEngine.find(`${SELECTOR_RATING_ITEM}, ${SELECTOR_RATING_ITEM} > div`, this._element)) Tooltip.getInstance(item)?.dispose();
 		this._tooltip = null;
 	}
 	_addEventListeners() {
-		EventHandler.on(this._element, EVENT_CLICK$2, SELECTOR_RATING_ITEM_INPUT, ({ target }) => {
-			if (this._config.disabled || this._config.readonly) return;
+		EventHandler.on(this._element, EVENT_CLICK$3, SELECTOR_RATING_ITEM_INPUT, (event) => {
+			const { target } = event;
+			if (this._config.readonly) {
+				event.preventDefault();
+				return;
+			}
+			if (this._disabled) return;
 			if (this._config.allowClear && this._currentValue == target.value) {
 				this._currentValue = null;
 				target.checked = false;
 				this._resetLabels();
+				this._validation.dismiss();
+				this._validation.update();
 				EventHandler.trigger(this._element, EVENT_CHANGE$1, { value: null });
 			}
 		});
+		EventHandler.on(this._element, EVENT_INPUT$2, SELECTOR_RATING_ITEM_INPUT, () => {
+			if (!this._disabled && !this._config.readonly) this._validation.dismiss();
+		});
 		EventHandler.on(this._element, EVENT_CHANGE$1, SELECTOR_RATING_ITEM_INPUT, ({ target }) => {
-			if (this._config.disabled || this._config.readonly) return;
+			if (this._disabled || this._config.readonly) return;
 			this._currentValue = target.value;
 			EventHandler.trigger(this._element, EVENT_CHANGE$1, { value: target.value });
-			const inputs = SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element);
-			this._resetLabels();
-			if (this._config.highlightOnlySelected) {
-				SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, target.parentElement).classList.add(CLASS_NAME_ACTIVE$4);
-				return;
-			}
-			for (const input of inputs) {
-				SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, input.parentElement).classList.add(CLASS_NAME_ACTIVE$4);
-				if (input === target) break;
-			}
+			if (target.isConnected) this._highlightLabels(target);
 		});
 		EventHandler.on(this._element, EVENT_MOUSEENTER, SELECTOR_RATING_ITEM_LABEL, ({ target }) => {
-			if (this._config.disabled || this._config.readonly) return;
+			if (this._disabled || this._config.readonly) return;
 			const label = target.closest(SELECTOR_RATING_ITEM_LABEL);
 			const labels = SelectorEngine.find(SELECTOR_RATING_ITEM_LABEL, this._element);
 			this._resetLabels();
@@ -15970,29 +16724,23 @@ var Rating = class Rating extends BaseComponent {
 			}
 		});
 		EventHandler.on(this._element, EVENT_MOUSELEAVE, SELECTOR_RATING_ITEM_LABEL, () => {
-			if (this._config.disabled || this._config.readonly) return;
+			if (this._disabled || this._config.readonly) return;
 			if (this._tooltip) this._tooltip.hide();
 			const checkedInput = SelectorEngine.findOne(`${SELECTOR_RATING_ITEM_INPUT}[value="${this._currentValue}"]`, this._element);
 			this._resetLabels();
 			EventHandler.trigger(this._element, EVENT_HOVER, { value: null });
-			if (checkedInput && this._config.highlightOnlySelected) {
-				SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, checkedInput.parentElement).classList.add(CLASS_NAME_ACTIVE$4);
-				return;
-			}
-			if (checkedInput) {
-				const inputs = SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element);
-				this._resetLabels();
-				for (const input of inputs) {
-					SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, input.parentElement).classList.add(CLASS_NAME_ACTIVE$4);
-					if (input === checkedInput) break;
-				}
-			}
+			this._highlightLabels(checkedInput);
+		});
+		EventHandler.on(this._element, EVENT_KEYDOWN$3, SELECTOR_RATING_ITEM_INPUT, (event) => {
+			if (this._config.readonly && event.key?.startsWith("Arrow")) event.preventDefault();
 		});
 		EventHandler.on(this._element, EVENT_FOCUSIN$2, SELECTOR_RATING_ITEM_INPUT, ({ target }) => {
+			if (this._disabled || this._config.readonly) return;
 			EventHandler.trigger(this._element, EVENT_HOVER, { value: target.value });
 			this._createTooltip(target.parentElement, target.value);
 		});
 		EventHandler.on(this._element, EVENT_FOCUSOUT$2, SELECTOR_RATING_ITEM_INPUT, () => {
+			if (this._disabled || this._config.readonly) return;
 			EventHandler.trigger(this._element, EVENT_HOVER, { value: null });
 			if (this._tooltip) this._tooltip.hide();
 		});
@@ -16014,13 +16762,58 @@ var Rating = class Rating extends BaseComponent {
 		const labels = SelectorEngine.find(SELECTOR_RATING_ITEM_LABEL, this._element);
 		for (const label of labels) label.classList.remove(CLASS_NAME_ACTIVE$4);
 	}
-	_createRating() {
+	_highlightLabels(checkedInput) {
+		this._resetLabels();
+		if (!checkedInput) return;
+		if (this._config.highlightOnlySelected) {
+			SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, checkedInput.parentElement).classList.add(CLASS_NAME_ACTIVE$4);
+			return;
+		}
+		for (const input of SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element)) {
+			SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, input.parentElement).classList.add(CLASS_NAME_ACTIVE$4);
+			if (input === checkedInput) break;
+		}
+	}
+	_createRating(anchor = null) {
 		this._element.classList.add(CLASS_NAME_RATING);
-		if (this._config.size) this._element.classList.add(`rating-${this._config.size}`);
-		if (this._config.disabled) this._element.classList.add(CLASS_NAME_DISABLED$1);
-		if (this._config.readonly) this._element.classList.add(CLASS_NAME_READONLY);
+		this._element.classList.toggle(CLASS_NAME_DISABLED$2, this._disabled);
+		this._element.classList.toggle(CLASS_NAME_READONLY, Boolean(this._config.readonly));
+		this._element.classList.remove(...SIZE_CLASS_NAMES);
+		if (this._sizeClassName) this._element.classList.remove(this._sizeClassName);
+		this._sizeClassName = null;
+		if (this._config.size) {
+			const sizeClassName = `rating-${this._config.size}`;
+			this._element.classList.add(sizeClassName);
+			this._sizeClassName = sizeClassName;
+		}
 		this._element.setAttribute("role", "radiogroup");
-		Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index));
+		writeAttribute(this._element, "aria-readonly", this._config.readonly ? "true" : null);
+		writeAttribute(this._element, "aria-required", this._isRequired() ? "true" : null);
+		this._items = Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index));
+		for (const item of this._items) this._element.insertBefore(item, anchor);
+		if (!this._items.some((item) => item.querySelector(`${SELECTOR_RATING_ITEM_INPUT}:checked`))) {
+			this._currentValue = null;
+			this._resetLabels();
+		}
+		this._updateTabStop();
+		this._validation.refresh();
+	}
+	_isRequired() {
+		return this._config.required && !this._config.readonly;
+	}
+	_updateTabStop() {
+		if (!this._config.readonly) return;
+		const stop = this._blockedRadio();
+		for (const input of this._radios()) input.tabIndex = input === stop ? 0 : -1;
+	}
+	_restoreValue() {
+		const checkedInput = SelectorEngine.findOne(`${SELECTOR_RATING_ITEM_INPUT}:checked`, this._element);
+		const value = checkedInput?.value ?? null;
+		if (value == this._currentValue) return;
+		this._currentValue = value;
+		this._highlightLabels(checkedInput);
+		this._updateTabStop();
+		EventHandler.trigger(this._element, EVENT_CHANGE$1, { value });
 	}
 	_createRatingItem(index) {
 		const ratingItemElement = document.createElement("div");
@@ -16063,10 +16856,13 @@ var Rating = class Rating extends BaseComponent {
 			ratingItemInputElement.id = ratingItemId;
 			ratingItemInputElement.type = "radio";
 			ratingItemInputElement.value = value;
-			ratingItemInputElement.name = this._name;
+			if (!this._config.readonly) ratingItemInputElement.name = this._name;
+			else if (this._config.name) ratingItemInputElement.name = this._config.name;
 			if (typeof this._config.ariaLabel === "function") ratingItemInputElement.setAttribute("aria-label", this._config.ariaLabel(value, this._config.itemCount));
-			if (this._config.disabled || this._config.readonly) ratingItemInputElement.setAttribute("disabled", true);
-			if (this._currentValue === value) ratingItemInputElement.checked = true;
+			if (this._disabled) ratingItemInputElement.disabled = true;
+			ratingItemInputElement.required = this._isRequired();
+			ratingItemInputElement.defaultChecked = this._startValue == value;
+			ratingItemInputElement.checked = this._currentValue == value;
 			if (this._config.precision === 1) {
 				ratingItemElement.append(ratingItemLabelElement);
 				ratingItemElement.append(ratingItemInputElement);
@@ -16077,7 +16873,7 @@ var Rating = class Rating extends BaseComponent {
 				ratingItemElement.append(wrapper);
 			}
 		});
-		this._element.append(ratingItemElement);
+		return ratingItemElement;
 	}
 	static ratingInterface(element, config, ...args) {
 		const data = Rating.getOrCreateInstance(element, config);
@@ -16090,36 +16886,18 @@ var Rating = class Rating extends BaseComponent {
 		return jQueryDispatch(this, Rating, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(window, EVENT_LOAD_DATA_API$6, () => {
 	const ratings = SelectorEngine.find(SELECTOR_DATA_RATING);
-	for (let i = 0, len = ratings.length; i < len; i++) Rating.ratingInterface(ratings[i]);
+	for (const rating of ratings) Rating.ratingInterface(rating);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Rating);
 //#endregion
 //#region js/src/scrollspy.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI scrollspy.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's scrollspy.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$10 = "scrollspy";
+const NAME$11 = "scrollspy";
 const EVENT_KEY$8 = `.coreui.scrollspy`;
 const DATA_API_KEY$3 = ".data-api";
 const EVENT_ACTIVATE = `activate${EVENT_KEY$8}`;
-const EVENT_CLICK$1 = `click${EVENT_KEY$8}`;
+const EVENT_CLICK$2 = `click${EVENT_KEY$8}`;
 const EVENT_SCROLL = `scroll${EVENT_KEY$8}`;
 const EVENT_SCROLLEND = `scrollend${EVENT_KEY$8}`;
 const EVENT_RESIZE$1 = `resize${EVENT_KEY$8}`;
@@ -16144,16 +16922,13 @@ const Default$9 = {
 	threshold: [0],
 	topMargin: "12%"
 };
-const DefaultType$9 = {
+const DefaultType$8 = {
 	rootMargin: "(string|null)",
 	smoothScroll: "boolean",
 	target: "element",
 	threshold: "array",
 	topMargin: "string"
 };
-/**
-* Class definition
-*/
 var ScrollSpy = class ScrollSpy extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
@@ -16180,10 +16955,10 @@ var ScrollSpy = class ScrollSpy extends BaseComponent {
 		return Default$9;
 	}
 	static get DefaultType() {
-		return DefaultType$9;
+		return DefaultType$8;
 	}
 	static get NAME() {
-		return NAME$10;
+		return NAME$11;
 	}
 	refresh() {
 		this._initializeTargetsAndObservables();
@@ -16200,7 +16975,7 @@ var ScrollSpy = class ScrollSpy extends BaseComponent {
 		this._teardownSentinel();
 		this._disarmSettle();
 		this._removeResizeListener();
-		EventHandler.off(this._config.target, EVENT_CLICK$1);
+		EventHandler.off(this._config.target, EVENT_CLICK$2);
 		super.dispose();
 	}
 	_configAfterMerge(config) {
@@ -16309,8 +17084,8 @@ var ScrollSpy = class ScrollSpy extends BaseComponent {
 	}
 	_maybeEnableSmoothScroll() {
 		if (!this._config.smoothScroll) return;
-		EventHandler.off(this._config.target, EVENT_CLICK$1);
-		EventHandler.on(this._config.target, EVENT_CLICK$1, SELECTOR_TARGET_LINKS, (event) => {
+		EventHandler.off(this._config.target, EVENT_CLICK$2);
+		EventHandler.on(this._config.target, EVENT_CLICK$2, SELECTOR_TARGET_LINKS, (event) => {
 			const link = event.target.closest(SELECTOR_TARGET_LINKS);
 			const section = link && this._sectionByLink.get(link);
 			if (!section || !this._element) return;
@@ -16435,28 +17210,13 @@ function decodeFragment(hash) {
 		return hash;
 	}
 }
-/**
-* Data API implementation
-*/
 EventHandler.on(window, EVENT_LOAD_DATA_API$5, () => {
 	for (const spy of SelectorEngine.find(SELECTOR_DATA_SPY)) ScrollSpy.getOrCreateInstance(spy);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(ScrollSpy);
 //#endregion
 //#region js/src/search-button.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI search-button.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$9 = "search-button";
+const NAME$10 = "search-button";
 const EVENT_KEY$7 = `.coreui.search-button`;
 const DATA_API_KEY$2 = ".data-api";
 const EVENT_BLUR_DATA_API = `blur${EVENT_KEY$7}${DATA_API_KEY$2}`;
@@ -16476,7 +17236,7 @@ const Default$8 = {
 	preventDefault: true,
 	shortcut: "meta+/,ctrl+/"
 };
-const DefaultType$8 = {
+const DefaultType$7 = {
 	preventDefault: "boolean",
 	shortcut: "string"
 };
@@ -16503,9 +17263,6 @@ const KEY_LABELS = {
 	shift: "Shift",
 	space: "Space"
 };
-/**
-* Class definition
-*/
 var SearchButton = class SearchButton extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
@@ -16518,13 +17275,19 @@ var SearchButton = class SearchButton extends BaseComponent {
 		return Default$8;
 	}
 	static get DefaultType() {
-		return DefaultType$8;
+		return DefaultType$7;
 	}
 	static get NAME() {
-		return NAME$9;
+		return NAME$10;
 	}
 	trigger() {
 		this._triggerEvent("api");
+	}
+	dispose() {
+		if (!this._element) return;
+		if (this._shortcutKeysContent) this._shortcutKeys.replaceChildren(...this._shortcutKeysContent);
+		else this._shortcutKeys.remove();
+		super.dispose();
 	}
 	_triggerEvent(trigger) {
 		if (this._isDisabled()) return;
@@ -16547,10 +17310,16 @@ var SearchButton = class SearchButton extends BaseComponent {
 	}
 	_ensureShortcutKeys() {
 		const existingShortcutKeys = this._element.querySelector(SELECTOR_SHORTCUT_KEYS);
-		if (existingShortcutKeys) return existingShortcutKeys;
+		if (existingShortcutKeys) {
+			this._shortcutKeys = existingShortcutKeys;
+			this._shortcutKeysContent = [...existingShortcutKeys.childNodes];
+			return existingShortcutKeys;
+		}
 		const shortcutKeys = document.createElement("span");
 		shortcutKeys.className = CLASS_NAME_SHORTCUT_KEYS;
 		shortcutKeys.setAttribute("aria-hidden", "true");
+		this._shortcutKeys = shortcutKeys;
+		this._shortcutKeysContent = null;
 		const placeholder = this._element.querySelector(SELECTOR_PLACEHOLDER);
 		if (placeholder) {
 			placeholder.after(shortcutKeys);
@@ -16673,22 +17442,22 @@ var SearchButton = class SearchButton extends BaseComponent {
 		data._triggerEvent("click");
 	}
 	static _handleDataApiKeydown(event) {
+		if (!event.key) return;
 		for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE$2)) {
-			const data = SearchButton.getOrCreateInstance(button);
+			const data = SearchButton.getInstance(button);
+			if (!data) continue;
 			data._syncActiveKeys(event);
 			if (data._handleShortcut(event)) break;
 		}
 	}
 	static _handleDataApiKeyup(event) {
-		for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE$2)) SearchButton.getOrCreateInstance(button)._syncActiveKeys(event);
+		if (!event.key) return;
+		for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE$2)) SearchButton.getInstance(button)?._syncActiveKeys(event);
 	}
 	static _handleDataApiBlur() {
-		for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE$2)) SearchButton.getOrCreateInstance(button)._clearActiveKeys();
+		for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE$2)) SearchButton.getInstance(button)?._clearActiveKeys();
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$7}${DATA_API_KEY$2}`, () => {
 	SearchButton._initializeDataApi();
 });
@@ -16704,28 +17473,13 @@ EventHandler.on(document, EVENT_KEYUP_DATA_API, (event) => {
 EventHandler.on(window, EVENT_BLUR_DATA_API, () => {
 	SearchButton._handleDataApiBlur();
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(SearchButton);
 //#endregion
 //#region js/src/util/backdrop.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI util/backdrop.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This is a modified version of the Bootstrap's util/backdrop.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$8 = "backdrop";
+const NAME$9 = "backdrop";
 const CLASS_NAME_FADE = "fade";
 const CLASS_NAME_SHOW$5 = "show";
-const EVENT_MOUSEDOWN = `mousedown.coreui.${NAME$8}`;
+const EVENT_MOUSEDOWN = `mousedown.coreui.${NAME$9}`;
 const Default$7 = {
 	className: "modal-backdrop",
 	clickCallback: null,
@@ -16733,16 +17487,13 @@ const Default$7 = {
 	isVisible: true,
 	rootElement: "body"
 };
-const DefaultType$7 = {
+const DefaultType$6 = {
 	className: "string",
 	clickCallback: "(function|null)",
 	isAnimated: "boolean",
 	isVisible: "boolean",
 	rootElement: "(element|string)"
 };
-/**
-* Class definition
-*/
 var Backdrop = class extends Config {
 	constructor(config) {
 		super();
@@ -16754,10 +17505,10 @@ var Backdrop = class extends Config {
 		return Default$7;
 	}
 	static get DefaultType() {
-		return DefaultType$7;
+		return DefaultType$6;
 	}
 	static get NAME() {
-		return NAME$8;
+		return NAME$9;
 	}
 	show(callback) {
 		if (!this._config.isVisible) {
@@ -16817,25 +17568,10 @@ var Backdrop = class extends Config {
 };
 //#endregion
 //#region js/src/util/scrollbar.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI util/scrollBar.js
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This is a modified version of the Bootstrap's util/scrollBar.js
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const SELECTOR_FIXED_CONTENT = ".fixed-top, .fixed-bottom, .is-fixed, .sticky-top";
 const SELECTOR_STICKY_CONTENT = ".sticky-top";
 const PROPERTY_PADDING = "padding-right";
 const PROPERTY_MARGIN = "margin-right";
-/**
-* Class definition
-*/
 var ScrollBarHelper = class {
 	constructor() {
 		this._element = document.body;
@@ -16900,22 +17636,11 @@ var ScrollBarHelper = class {
 };
 //#endregion
 //#region js/src/sidebar.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI sidebar.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* ------------------------------------------------------------------------
-* Constants
-* ------------------------------------------------------------------------
-*/
-const NAME$7 = "sidebar";
+const NAME$8 = "sidebar";
 const EVENT_KEY$6 = `.coreui.sidebar`;
 const DATA_API_KEY$1 = ".data-api";
 const Default$6 = {};
-const DefaultType$6 = {};
+const DefaultType$5 = {};
 const CLASS_NAME_BACKDROP = "sidebar-backdrop";
 const CLASS_NAME_HIDE = "hide";
 const CLASS_NAME_SHOW$4 = "show";
@@ -16932,11 +17657,6 @@ const EVENT_LOAD_DATA_API$4 = `load${EVENT_KEY$6}${DATA_API_KEY$1}`;
 const SELECTOR_DATA_CLOSE = "[data-coreui-close=\"sidebar\"]";
 const SELECTOR_DATA_TOGGLE$1 = "[data-coreui-toggle=\"narrow\"], [data-coreui-toggle=\"unfoldable\"]";
 const SELECTOR_SIDEBAR = ".sidebar";
-/**
-* ------------------------------------------------------------------------
-* Class Definition
-* ------------------------------------------------------------------------
-*/
 var Sidebar = class Sidebar extends BaseComponent {
 	constructor(element, config) {
 		super(element);
@@ -16960,10 +17680,10 @@ var Sidebar = class Sidebar extends BaseComponent {
 		return Default$6;
 	}
 	static get DefaultType() {
-		return DefaultType$6;
+		return DefaultType$5;
 	}
 	static get NAME() {
-		return NAME$7;
+		return NAME$8;
 	}
 	async show() {
 		EventHandler.trigger(this._element, EVENT_SHOW$2);
@@ -17112,32 +17832,13 @@ var Sidebar = class Sidebar extends BaseComponent {
 		return jQueryDispatch(this, Sidebar, config);
 	}
 };
-/**
-* ------------------------------------------------------------------------
-* Data Api implementation
-* ------------------------------------------------------------------------
-*/
 EventHandler.on(window, EVENT_LOAD_DATA_API$4, () => {
 	for (const element of Array.from(document.querySelectorAll(SELECTOR_SIDEBAR))) Sidebar.sidebarInterface(element);
 });
-/**
-* ------------------------------------------------------------------------
-* jQuery
-* ------------------------------------------------------------------------
-*/
 defineJQueryPlugin(Sidebar);
 //#endregion
 //#region js/src/stepper.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO stepper.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$6 = "stepper";
+const NAME$7 = "stepper";
 const EVENT_KEY$5 = `.coreui.stepper`;
 const EVENT_FINISH = `finish${EVENT_KEY$5}`;
 const EVENT_RESET = `reset${EVENT_KEY$5}`;
@@ -17145,19 +17846,16 @@ const EVENT_STEP_CHANGE = `stepChange${EVENT_KEY$5}`;
 const EVENT_STEP_VALIDATION_COMPLETE = `stepValidationComplete${EVENT_KEY$5}`;
 const EVENT_CLICK_DATA_API$1 = `click${EVENT_KEY$5}`;
 const EVENT_INPUT$1 = `input${EVENT_KEY$5}`;
-const EVENT_KEYDOWN$1 = `keydown${EVENT_KEY$5}`;
+const EVENT_KEYDOWN$2 = `keydown${EVENT_KEY$5}`;
 const EVENT_LOAD_DATA_API$3 = `load${EVENT_KEY$5}`;
 const CLASS_NAME_ACTIVE$1 = "active";
 const CLASS_NAME_COMPLETE = "complete";
-const CLASS_NAME_IS_INVALID = "is-invalid";
-const CLASS_NAME_IS_VALID = "is-valid";
 const CLASS_NAME_SHOW$3 = "show";
 const CLASS_NAME_STEPPER_STEP_CONNECTOR = "stepper-step-connector";
 const CLASS_NAME_STEPPER_STEP_INDICATOR_ICON = "stepper-step-indicator-icon";
 const CLASS_NAME_STEPPER_STEP_INDICATOR_TEXT = "stepper-step-indicator-text";
 const CLASS_NAME_STEPPER_VERTICAL = "stepper-vertical";
 const SELECTOR_DATA_STEPPER = "[data-coreui-stepper]";
-const SELECTOR_FORM_VALIDATE_VALID = "[data-coreui-validate~=\"valid\"]";
 const SELECTOR_STEPPER = ".stepper";
 const SELECTOR_STEPPER_ACTION = "[data-coreui-stepper-action]";
 const SELECTOR_STEPPER_STEP = ".stepper-step";
@@ -17167,23 +17865,20 @@ const SELECTOR_STEPPER_STEP_INDICATOR = ".stepper-step-indicator";
 const SELECTOR_STEPPER_STEP_INDICATOR_ICON = ".stepper-step-indicator-icon";
 const SELECTOR_STEPPER_STEPS = ".stepper-steps";
 const SELECTOR_STEPPER_PANE = ".stepper-pane";
-const ARROW_LEFT_KEY$1 = "ArrowLeft";
-const ARROW_RIGHT_KEY$1 = "ArrowRight";
-const ARROW_UP_KEY$1 = "ArrowUp";
-const ARROW_DOWN_KEY$1 = "ArrowDown";
-const HOME_KEY$1 = "Home";
-const END_KEY$1 = "End";
+const ARROW_LEFT_KEY$2 = "ArrowLeft";
+const ARROW_RIGHT_KEY$2 = "ArrowRight";
+const ARROW_UP_KEY$2 = "ArrowUp";
+const ARROW_DOWN_KEY$2 = "ArrowDown";
+const HOME_KEY$2 = "Home";
+const END_KEY$2 = "End";
 const Default$5 = {
 	linear: true,
 	skipValidation: false
 };
-const DefaultType$5 = {
+const DefaultType$4 = {
 	linear: "boolean",
 	skipValidation: "boolean"
 };
-/**
-* Class definition
-*/
 var Stepper = class Stepper extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
@@ -17192,6 +17887,7 @@ var Stepper = class Stepper extends BaseComponent {
 		this._activeStepButton = this._getActiveElem();
 		this._initialStepButton = this._activeStepButton;
 		this._isFinished = false;
+		this._validationMarks = /* @__PURE__ */ new WeakMap();
 		this._validatedForms = /* @__PURE__ */ new Set();
 		this._addStepperConnector();
 		this._resetPanes(this._getTargetPane(this._activeStepButton));
@@ -17199,43 +17895,49 @@ var Stepper = class Stepper extends BaseComponent {
 		this._setInitialComplete();
 		this._updateStepButtonsDisabledState();
 		this._setupAccessibilityAttributes();
-		EventHandler.on(this._element, EVENT_KEYDOWN$1, SELECTOR_STEPPER_STEP_BUTTON, (event) => this._keydown(event));
+		EventHandler.on(this._element, EVENT_KEYDOWN$2, SELECTOR_STEPPER_STEP_BUTTON, (event) => this._keydown(event));
 	}
 	static get Default() {
 		return Default$5;
 	}
 	static get DefaultType() {
-		return DefaultType$5;
+		return DefaultType$4;
 	}
 	static get NAME() {
-		return NAME$6;
+		return NAME$7;
 	}
 	showStep(buttonOrStepNumber) {
 		let button = buttonOrStepNumber;
 		if (typeof buttonOrStepNumber === "number") button = this._stepButtons[buttonOrStepNumber - 1];
 		if (!button) return;
 		const active = this._getActiveElem();
-		if (active && !this._isCurrentStepValid(active)) return;
 		if (this._elemIsActive(button)) return;
+		const isForward = this._stepButtons.indexOf(button) > this._stepButtons.indexOf(active);
+		if (active && isForward && !this._isCurrentStepValid(active)) return;
 		if (this._config.linear) {
 			const steps = this._getEnabledStepButtons();
 			if (steps.indexOf(button) > steps.indexOf(active) + 1) return;
 		}
 		const index = this._stepButtons.indexOf(button) + 1;
 		EventHandler.trigger(this._element, EVENT_STEP_CHANGE, { index });
+		const holdsFocus = this._holdsFocus();
 		this._activeStepButton = button;
 		this._deactivate(active);
 		this._activate(button);
 		this._updateStepButtonsDisabledState();
 		this._complete(button);
+		if (holdsFocus) button.focus();
 	}
 	next() {
 		if (this._isFinished) return;
-		if (!this._isCurrentStepValid(this._getActiveElem())) return;
 		const steps = this._getEnabledStepButtons();
 		const active = this._getActiveElem();
 		const next = steps[steps.indexOf(active) + 1];
-		if (next) this.showStep(next);
+		if (next) {
+			this.showStep(next);
+			return;
+		}
+		this.finish();
 	}
 	prev() {
 		if (this._isFinished) return;
@@ -17246,15 +17948,11 @@ var Stepper = class Stepper extends BaseComponent {
 	}
 	finish() {
 		if (this._isFinished) return;
-		if (!this._isCurrentStepValid(this._getActiveElem())) return;
 		const steps = this._getEnabledStepButtons();
 		const active = this._getActiveElem();
-		const index = steps.indexOf(active);
-		if (index !== steps.length - 1) {
-			const next = steps[index + 1];
-			if (next) this.showStep(next);
-			return;
-		}
+		if (steps.indexOf(active) !== steps.length - 1) return;
+		if (!this._isCurrentStepValid(active)) return;
+		this._isFinished = true;
 		const finishHandler = () => {
 			active.classList.remove(CLASS_NAME_ACTIVE$1);
 			this._markAsComplete(active);
@@ -17272,6 +17970,7 @@ var Stepper = class Stepper extends BaseComponent {
 	}
 	reset() {
 		if (!this._stepButtons.length) return;
+		const holdsFocus = this._holdsFocus();
 		for (const pane of SelectorEngine.find(SELECTOR_STEPPER_PANE, this._element)) {
 			pane.classList.remove(CLASS_NAME_ACTIVE$1, CLASS_NAME_SHOW$3);
 			pane.setAttribute("aria-hidden", "true");
@@ -17285,7 +17984,7 @@ var Stepper = class Stepper extends BaseComponent {
 			this._removeIndicatorIcon(btn);
 		}
 		for (const form of this._element.querySelectorAll(`${SELECTOR_STEPPER_PANE} form, ${SELECTOR_STEPPER_STEP_CONTENT} form`)) form.reset();
-		for (const form of this._validatedForms) for (const control of form.elements) control.classList.remove(CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID);
+		for (const form of this._validatedForms) this._untrackValidatedForm(form);
 		const firstStep = this._initialStepButton || this._stepButtons[0];
 		firstStep.classList.add(CLASS_NAME_ACTIVE$1);
 		const pane = this._getTargetPane(firstStep);
@@ -17303,10 +18002,12 @@ var Stepper = class Stepper extends BaseComponent {
 		this._activeStepButton = firstStep;
 		this._isFinished = false;
 		this._updateStepButtonsDisabledState();
+		this._setupAccessibilityAttributes();
+		if (holdsFocus) firstStep.focus();
 		EventHandler.trigger(this._element, EVENT_RESET);
 	}
 	dispose() {
-		for (const form of this._validatedForms) EventHandler.off(form, EVENT_INPUT$1);
+		for (const form of this._validatedForms) this._untrackValidatedForm(form);
 		super.dispose();
 	}
 	_getStepButtons() {
@@ -17324,39 +18025,52 @@ var Stepper = class Stepper extends BaseComponent {
 	_elemIsActive(elem) {
 		return elem.classList.contains(CLASS_NAME_ACTIVE$1);
 	}
+	_getFocusedElement() {
+		return this._element.getRootNode().activeElement;
+	}
+	_holdsFocus() {
+		return this._element.contains(this._getFocusedElement());
+	}
 	_isCurrentStepValid(element) {
 		if (this._config.skipValidation) return true;
 		const target = this._getTargetPane(element) ?? element.parentNode.querySelector(SELECTOR_STEPPER_STEP_CONTENT);
 		if (!target) return true;
 		const form = target.querySelector("form");
 		if (!form) return true;
-		const isValid = form.checkValidity();
-		EventHandler.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, {
-			stepIndex: this._stepButtons.indexOf(element) + 1,
-			isValid
-		});
-		if (!isValid) {
-			if (form.noValidate) this._showValidationState(form);
-			else form.reportValidity();
-			return false;
+		const stepIndex = this._stepButtons.indexOf(element) + 1;
+		if (!form.noValidate) {
+			EventHandler.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, {
+				stepIndex,
+				isValid: isFormValid(form)
+			});
+			return form.reportValidity();
 		}
-		return true;
+		const { isValid } = validateForm(form, this._validationMarks, (isValid) => {
+			EventHandler.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, {
+				stepIndex,
+				isValid
+			});
+			return false;
+		});
+		this._trackValidatedForm(form);
+		return isValid;
 	}
-	_showValidationState(form) {
-		for (const control of form.elements) this._updateControlValidationState(control, form);
+	_trackValidatedForm(form) {
 		if (!this._validatedForms.has(form)) {
 			this._validatedForms.add(form);
-			EventHandler.on(form, EVENT_INPUT$1, (event) => this._updateControlValidationState(event.target, form));
+			EventHandler.on(form, EVENT_INPUT$1, () => updateValidationState(form, this._validationMarks));
+			EventHandler.on(form, EVENT_RESET, (event) => {
+				setTimeout(() => {
+					if (this._element && !event.defaultPrevented && this._validatedForms.has(form)) this._untrackValidatedForm(form);
+				});
+			});
 		}
 	}
-	_updateControlValidationState(control, form) {
-		if (!control.willValidate || [
-			"button",
-			"reset",
-			"submit"
-		].includes(control.type)) return;
-		control.classList.toggle(CLASS_NAME_IS_INVALID, !control.validity.valid);
-		control.classList.toggle(CLASS_NAME_IS_VALID, control.validity.valid && form.matches(SELECTOR_FORM_VALIDATE_VALID));
+	_untrackValidatedForm(form) {
+		EventHandler.off(form, EVENT_INPUT$1);
+		EventHandler.off(form, EVENT_RESET);
+		clearValidationState(form, this._validationMarks);
+		this._validatedForms.delete(form);
 	}
 	_activate(element) {
 		if (!element) return;
@@ -17500,7 +18214,6 @@ var Stepper = class Stepper extends BaseComponent {
 				stepButton.setAttribute("aria-controls", pane.id);
 				if (this._tabPattern) pane.setAttribute("role", "tabpanel");
 				pane.setAttribute("aria-labelledby", stepButton.id);
-				pane.setAttribute("aria-live", "polite");
 				pane.setAttribute("aria-hidden", !this._elemIsActive(stepButton));
 			}
 			if (this._elemIsActive(stepButton)) {
@@ -17514,30 +18227,30 @@ var Stepper = class Stepper extends BaseComponent {
 	}
 	_keydown(event) {
 		if (![
-			ARROW_LEFT_KEY$1,
-			ARROW_RIGHT_KEY$1,
-			ARROW_UP_KEY$1,
-			ARROW_DOWN_KEY$1,
-			HOME_KEY$1,
-			END_KEY$1
+			ARROW_LEFT_KEY$2,
+			ARROW_RIGHT_KEY$2,
+			ARROW_UP_KEY$2,
+			ARROW_DOWN_KEY$2,
+			HOME_KEY$2,
+			END_KEY$2
 		].includes(event.key)) return;
 		event.stopPropagation();
 		event.preventDefault();
 		const children = this._getEnabledStepButtons();
 		let nextActiveElement;
 		switch (event.key) {
-			case HOME_KEY$1:
+			case HOME_KEY$2:
 				nextActiveElement = children[0];
 				break;
-			case END_KEY$1:
+			case END_KEY$2:
 				nextActiveElement = children[children.length - 1];
 				break;
-			case ARROW_RIGHT_KEY$1:
-			case ARROW_DOWN_KEY$1:
+			case ARROW_RIGHT_KEY$2:
+			case ARROW_DOWN_KEY$2:
 				nextActiveElement = getNextActiveElement(children, event.delegateTarget, true, true);
 				break;
-			case ARROW_LEFT_KEY$1:
-			case ARROW_UP_KEY$1: nextActiveElement = getNextActiveElement(children, event.delegateTarget, false, true);
+			case ARROW_LEFT_KEY$2:
+			case ARROW_UP_KEY$2: nextActiveElement = getNextActiveElement(children, event.delegateTarget, false, true);
 		}
 		nextActiveElement?.focus({ preventScroll: true });
 	}
@@ -17545,9 +18258,6 @@ var Stepper = class Stepper extends BaseComponent {
 		return jQueryDispatch(this, Stepper, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, EVENT_CLICK_DATA_API$1, SELECTOR_STEPPER_STEP_BUTTON, function(event) {
 	if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
 	if (isDisabled(this)) return;
@@ -17565,39 +18275,24 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$1, SELECTOR_STEPPER_ACTION, funct
 EventHandler.on(window, EVENT_LOAD_DATA_API$3, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_STEPPER)) Stepper.getOrCreateInstance(element);
 });
-/**
-* jQuery integration
-*/
 defineJQueryPlugin(Stepper);
 //#endregion
 //#region js/src/tab.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI tab.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's tab.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$5 = "tab";
+const NAME$6 = "tab";
 const EVENT_KEY$4 = `.coreui.tab`;
 const EVENT_HIDE$1 = `hide${EVENT_KEY$4}`;
 const EVENT_HIDDEN$1 = `hidden${EVENT_KEY$4}`;
 const EVENT_SHOW$1 = `show${EVENT_KEY$4}`;
 const EVENT_SHOWN$1 = `shown${EVENT_KEY$4}`;
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY$4}`;
-const EVENT_KEYDOWN = `keydown${EVENT_KEY$4}`;
+const EVENT_KEYDOWN$1 = `keydown${EVENT_KEY$4}`;
 const EVENT_LOAD_DATA_API$2 = `load${EVENT_KEY$4}`;
-const ARROW_LEFT_KEY = "ArrowLeft";
-const ARROW_RIGHT_KEY = "ArrowRight";
-const ARROW_UP_KEY = "ArrowUp";
-const ARROW_DOWN_KEY = "ArrowDown";
-const HOME_KEY = "Home";
-const END_KEY = "End";
+const ARROW_LEFT_KEY$1 = "ArrowLeft";
+const ARROW_RIGHT_KEY$1 = "ArrowRight";
+const ARROW_UP_KEY$1 = "ArrowUp";
+const ARROW_DOWN_KEY$1 = "ArrowDown";
+const HOME_KEY$1 = "Home";
+const END_KEY$1 = "End";
 const CLASS_NAME_ACTIVE = "active";
 const CLASS_NAME_SHOW$2 = "show";
 const SELECTOR_DROPDOWN_TOGGLE = ".dropdown-toggle";
@@ -17609,19 +18304,17 @@ const SELECTOR_INNER = `.nav-link${NOT_SELECTOR_DROPDOWN_TOGGLE}, .list-group-it
 const SELECTOR_DATA_TOGGLE = "[data-coreui-toggle=\"tab\"], [data-coreui-toggle=\"pill\"], [data-coreui-toggle=\"list\"]";
 const SELECTOR_INNER_ELEM = `${SELECTOR_INNER}, ${SELECTOR_DATA_TOGGLE}`;
 const SELECTOR_DATA_TOGGLE_ACTIVE = `.${CLASS_NAME_ACTIVE}[data-coreui-toggle="tab"], .${CLASS_NAME_ACTIVE}[data-coreui-toggle="pill"], .${CLASS_NAME_ACTIVE}[data-coreui-toggle="list"]`;
-/**
-* Class definition
-*/
+const activationIds = /* @__PURE__ */ new WeakMap();
 var Tab = class Tab extends BaseComponent {
 	constructor(element) {
 		super(element);
 		this._parent = this._element.closest(SELECTOR_TAB_PANEL);
 		if (!this._parent) throw new TypeError(`${this._element.outerHTML} has not a valid parent ${SELECTOR_INNER_ELEM}`);
 		this._setInitialAttributes(this._parent, this._getChildren());
-		EventHandler.on(this._element, EVENT_KEYDOWN, (event) => this._keydown(event));
+		EventHandler.on(this._element, EVENT_KEYDOWN$1, (event) => this._keydown(event));
 	}
 	static get NAME() {
-		return NAME$5;
+		return NAME$6;
 	}
 	async show() {
 		const innerElem = this._element;
@@ -17629,10 +18322,12 @@ var Tab = class Tab extends BaseComponent {
 		const active = this._getActiveElem();
 		const hideEvent = active ? EventHandler.trigger(active, EVENT_HIDE$1, { relatedTarget: innerElem }) : null;
 		if (EventHandler.trigger(innerElem, EVENT_SHOW$1, { relatedTarget: active }).defaultPrevented || hideEvent && hideEvent.defaultPrevented) return;
+		const activationId = (activationIds.get(this._parent) || 0) + 1;
+		activationIds.set(this._parent, activationId);
 		this._deactivate(active, innerElem);
-		await this._activate(innerElem, active);
+		await this._activate(innerElem, active, activationId);
 	}
-	async _activate(element, relatedElem) {
+	async _activate(element, relatedElem, activationId) {
 		if (!element) return;
 		element.classList.add(CLASS_NAME_ACTIVE);
 		if (element.getAttribute("role") !== "tab") {
@@ -17642,6 +18337,7 @@ var Tab = class Tab extends BaseComponent {
 		const pane = SelectorEngine.getElementFromSelector(element);
 		this._activate(pane);
 		const complete = () => {
+			if (activationId !== void 0 && activationId !== activationIds.get(this._parent) || !element.classList.contains(CLASS_NAME_ACTIVE)) return;
 			element.removeAttribute("tabindex");
 			setAriaAttribute(element, "aria-selected", true);
 			this._toggleDropDown(element, true);
@@ -17668,21 +18364,21 @@ var Tab = class Tab extends BaseComponent {
 	}
 	_keydown(event) {
 		if (![
-			ARROW_LEFT_KEY,
-			ARROW_RIGHT_KEY,
-			ARROW_UP_KEY,
-			ARROW_DOWN_KEY,
-			HOME_KEY,
-			END_KEY
+			ARROW_LEFT_KEY$1,
+			ARROW_RIGHT_KEY$1,
+			ARROW_UP_KEY$1,
+			ARROW_DOWN_KEY$1,
+			HOME_KEY$1,
+			END_KEY$1
 		].includes(event.key)) return;
 		if (event.altKey || event.ctrlKey || event.metaKey) return;
 		event.stopPropagation();
 		event.preventDefault();
 		const children = this._getChildren().filter((element) => !isDisabled(element));
 		let nextActiveElement;
-		if ([HOME_KEY, END_KEY].includes(event.key)) nextActiveElement = children[event.key === HOME_KEY ? 0 : children.length - 1];
+		if ([HOME_KEY$1, END_KEY$1].includes(event.key)) nextActiveElement = children[event.key === HOME_KEY$1 ? 0 : children.length - 1];
 		else {
-			const isNext = [ARROW_RIGHT_KEY, ARROW_DOWN_KEY].includes(event.key);
+			const isNext = [ARROW_RIGHT_KEY$1, ARROW_DOWN_KEY$1].includes(event.key);
 			nextActiveElement = getNextActiveElement(children, event.target, isNext, true);
 		}
 		if (nextActiveElement) {
@@ -17741,117 +18437,188 @@ var Tab = class Tab extends BaseComponent {
 		return jQueryDispatch(this, Tab, config);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function(event) {
 	if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
 	if (isDisabled(this)) return;
 	Tab.getOrCreateInstance(this).show();
 });
-/**
-* Initialize on focus
-*/
 EventHandler.on(window, EVENT_LOAD_DATA_API$2, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE_ACTIVE)) Tab.getOrCreateInstance(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Tab);
 //#endregion
 //#region js/src/time-input.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO time-input.js
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
-const NAME$4 = "time-input";
+const NAME$5 = "time-input";
 const EVENT_LOAD_DATA_API$1 = `load.coreui.time-input.data-api`;
 const SELECTOR_DATA_TIME_INPUT = "[data-coreui-time-input]";
 const Default$4 = {
-	...SectionInput.Default,
+	...DateInput.Default,
 	ariaLabel: "Time input",
-	seconds: false
+	type: "time"
 };
-const DefaultType$4 = {
-	...SectionInput.DefaultType,
-	seconds: "boolean"
-};
-/**
-* Class definition
-*/
-var TimeInput = class TimeInput extends SectionInput {
+var TimeInput = class TimeInput extends DateInput {
 	static get Default() {
 		return Default$4;
 	}
-	static get DefaultType() {
-		return DefaultType$4;
-	}
 	static get NAME() {
-		return NAME$4;
+		return NAME$5;
 	}
 	static get CHANGE_EVENT_NAME() {
 		return "timeChange";
 	}
-	_convertDate(value) {
-		if (typeof value === "string") {
-			const match = /^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(am|pm))?$/i.exec(value.trim());
-			if (match) {
-				const [, hour, minute, second, meridiem] = match;
-				const hours = meridiem ? convert12hTo24h(meridiem.toLowerCase(), Number.parseInt(hour, 10)) : Number.parseInt(hour, 10);
-				return new Date(1970, 0, 1, hours, Number.parseInt(minute, 10), second ? Number.parseInt(second, 10) : 0);
-			}
-		}
-		return convertToDateObject(value, "day", this._config.locale, true);
+	_configAfterMerge(config) {
+		return {
+			...config,
+			type: "time"
+		};
 	}
-	_getDefaultSections(locale) {
-		return getTimeSectionsFromLocale(locale, this._config.seconds);
+	_getAriaLabel() {
+		return this._config.ariaLabel || this.constructor.Default.ariaLabel;
 	}
 	static jQueryInterface(config, ...args) {
 		return jQueryDispatch(this, TimeInput, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(window, EVENT_LOAD_DATA_API$1, () => {
-	for (const timeInput of SelectorEngine.find(SELECTOR_DATA_TIME_INPUT)) TimeInput.componentInterface(timeInput);
+	for (const timeInput of SelectorEngine.find(SELECTOR_DATA_TIME_INPUT)) TimeInput.getOrCreateInstance(timeInput);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(TimeInput);
 //#endregion
+//#region js/src/time-selection/roll.ts
+const NAME$4 = "time-roll";
+const CLASS_NAME_CELL = "time-picker-cell";
+const CLASS_NAME_COL = "time-picker-col";
+const CLASS_NAME_DISABLED$1 = "disabled";
+const CLASS_NAME_SELECTED = "selected";
+const ARROW_DOWN_KEY = "ArrowDown";
+const ARROW_LEFT_KEY = "ArrowLeft";
+const ARROW_RIGHT_KEY = "ArrowRight";
+const ARROW_UP_KEY = "ArrowUp";
+const END_KEY = "End";
+const ENTER_KEY = "Enter";
+const HOME_KEY = "Home";
+const SPACE_KEY = "Space";
+const EVENT_KEYDOWN = `keydown.coreui.time-selection`;
+const SELECTOR_CELL = `.${CLASS_NAME_CELL}`;
+const SELECTOR_CELL_SELECTED = `.${CLASS_NAME_CELL}.${CLASS_NAME_SELECTED}`;
+const SELECTOR_COL = `.${CLASS_NAME_COL}`;
+var TimeRoll = class extends TimeSelection {
+	static get NAME() {
+		return NAME$4;
+	}
+	_renderBody() {
+		this._renderColumns();
+		this._addKeyboardNavigation();
+	}
+	_stops() {
+		return SelectorEngine.find(SELECTOR_CELL, this._element);
+	}
+	_entryStop(list) {
+		const [column] = SelectorEngine.find(SELECTOR_COL, this._element);
+		return column ? this._entryCell(column) : list[0] ?? null;
+	}
+	_markPart(part, value, instant) {
+		for (const cell of SelectorEngine.find(`[data-coreui-${part}]`, this._element)) {
+			const isSelected = String(Manipulator.getDataAttribute(cell, part)) === String(value);
+			cell.classList.toggle(CLASS_NAME_SELECTED, isSelected);
+			cell.setAttribute("aria-selected", isSelected ? "true" : "false");
+			if (isSelected && cell.parentElement) this._scrollToSelected(cell.parentElement, cell, instant);
+		}
+	}
+	_markDisabled() {
+		for (const part of this._parts()) for (const option of part.options) {
+			const cell = SelectorEngine.findOne(`[data-coreui-${part.name}="${option.value}"]`, this._element);
+			cell?.classList.toggle(CLASS_NAME_DISABLED$1, option.disabled);
+			cell?.setAttribute("aria-disabled", option.disabled ? "true" : "false");
+		}
+	}
+	_renderColumns() {
+		for (const part of this._parts()) {
+			const column = document.createElement("div");
+			column.classList.add(CLASS_NAME_COL);
+			column.setAttribute("role", "listbox");
+			column.setAttribute("aria-label", part.ariaLabel);
+			for (const option of part.options) {
+				const cell = document.createElement("div");
+				cell.classList.add(CLASS_NAME_CELL);
+				cell.setAttribute("role", "option");
+				cell.setAttribute("aria-label", option.label.toString());
+				cell.setAttribute("aria-selected", "false");
+				cell.tabIndex = -1;
+				cell.textContent = option.label;
+				Manipulator.setDataAttribute(cell, part.name, option.value);
+				cell.addEventListener("click", () => {
+					if (!cell.classList.contains(CLASS_NAME_DISABLED$1)) {
+						this._change(part.name, option.value);
+						this._moveFocusToColumn(cell, 0);
+					}
+				});
+				cell.addEventListener("keydown", (event) => {
+					if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
+						event.preventDefault();
+						if (cell.classList.contains(CLASS_NAME_DISABLED$1)) return;
+						this._change(part.name, option.value);
+						this._moveFocusToColumn(cell, cell.parentElement?.nextElementSibling ? 1 : 0);
+					}
+				});
+				column.append(cell);
+			}
+			this._element.append(column);
+		}
+	}
+	_addKeyboardNavigation() {
+		EventHandler.off(this._element, EVENT_KEYDOWN);
+		EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_CELL, (event) => {
+			const target = event.target;
+			if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
+				event.preventDefault();
+				const items = SelectorEngine.find(SELECTOR_CELL, target.parentElement);
+				if (items.length === 0) return;
+				getNextActiveElement(items, target, event.key === ARROW_DOWN_KEY, !items.includes(target))?.focus();
+				return;
+			}
+			if (event.key === HOME_KEY || event.key === END_KEY) {
+				event.preventDefault();
+				const items = SelectorEngine.find(SELECTOR_CELL, target.parentElement);
+				if (items.length === 0) return;
+				items[event.key === HOME_KEY ? 0 : items.length - 1].focus();
+				return;
+			}
+			if (event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY) {
+				event.preventDefault();
+				const rtl = isRTL(target);
+				const goLeft = event.key === ARROW_LEFT_KEY && !rtl || event.key === ARROW_RIGHT_KEY && rtl;
+				this._moveFocusToColumn(target, goLeft ? -1 : 1);
+			}
+		});
+	}
+	_moveFocusToColumn(cell, offset) {
+		const columns = SelectorEngine.find(SELECTOR_COL, this._element);
+		const index = columns.indexOf(cell.parentElement) + offset;
+		if (index < 0 || index > columns.length - 1) return;
+		this._entryCell(columns[index])?.focus();
+	}
+	_entryCell(column) {
+		return SelectorEngine.findOne(SELECTOR_CELL_SELECTED, column) ?? SelectorEngine.findOne(`${SELECTOR_CELL}:not(.${CLASS_NAME_DISABLED$1})`, column) ?? SelectorEngine.findOne(SELECTOR_CELL, column);
+	}
+	_scrollToSelected(column, cell, instant) {
+		column.scrollTo({
+			behavior: instant ? "instant" : "smooth",
+			top: cell.offsetTop
+		});
+	}
+};
+//#endregion
 //#region js/src/time-picker.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO time-picker.js
-* License (https://coreui.io/pro/license/)
-*
-* Composed from a TimeInput section field, the TimeSelection popup body and the
-* Popup primitive.
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const NAME$3 = "time-picker";
 const EVENT_KEY$3 = `.coreui.time-picker`;
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY$3}.data-api`;
 const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY$3}`;
 const CLASS_NAME_BODY = "time-picker-body";
-const CLASS_NAME_DROPDOWN = "time-picker-popup";
-const CLASS_NAME_FOOTER = "time-picker-footer";
 const CLASS_NAME_CLEANER = "form-control-cleaner";
 const CLASS_NAME_INDICATOR = "form-control-action";
 const CLASS_NAME_INPUT_GROUP = "form-control-group";
 const CLASS_NAME_PICKER = "picker";
-const CLASS_NAME_POPUP = "popup";
 const CLASS_NAME_TIME_PICKER = "time-picker";
 const SELECTOR_ACTION_NOW = "[data-coreui-picker-action=\"now\"]";
 const SELECTOR_DATA_TIME_PICKER = "[data-coreui-time-picker]";
@@ -17859,12 +18626,14 @@ const Default$3 = {
 	allowList: SVGAllowlist,
 	ariaCleanerLabel: "Clear time",
 	ariaPickerLabel: "Toggle time selection",
+	ariaPopupLabel: "Time selection",
 	cleaner: true,
 	cleanerIcon: CLEANER_ICON,
 	container: false,
 	disabled: false,
 	floatingLabel: null,
 	inputOptions: {},
+	invalid: false,
 	locale: navigator.language,
 	name: null,
 	pickerIcon: true,
@@ -17874,18 +18643,22 @@ const Default$3 = {
 	selectionOptions: {},
 	size: null,
 	time: null,
-	variant: "roll"
+	valid: false,
+	validationState: null
 };
+const ORIGINAL_DEFAULT = { ...Default$3 };
 const DefaultType$3 = {
 	allowList: "object",
 	ariaCleanerLabel: "string",
 	ariaPickerLabel: "string",
+	ariaPopupLabel: "string",
 	cleaner: "boolean",
 	cleanerIcon: "string",
 	container: "(string|element|boolean)",
 	disabled: "boolean",
 	floatingLabel: "(string|null)",
 	inputOptions: "object",
+	invalid: "boolean",
 	locale: "string",
 	name: "(string|null)",
 	pickerIcon: "(string|boolean)",
@@ -17895,20 +18668,17 @@ const DefaultType$3 = {
 	selectionOptions: "object",
 	size: "(string|null)",
 	time: "(date|string|null)",
-	variant: "string"
+	valid: "boolean",
+	validationState: "(string|null|undefined)"
 };
-/**
-* Class definition
-*/
 var TimePicker = class TimePicker extends PickerBase {
 	constructor(element, config) {
 		super(element, config);
 		this._initialTime = config?.time ?? this._config.time;
 		this._input = null;
 		this._selection = null;
-		this._syncingFromPanel = false;
 		this._selectionElement = null;
-		this._hostClasses = captureHostClasses(this._element, this._managedClassNames());
+		this._source = null;
 		this._createTimePicker();
 		this._createPopup();
 		this._addEventListeners();
@@ -17923,27 +18693,27 @@ var TimePicker = class TimePicker extends PickerBase {
 		return NAME$3;
 	}
 	getTime() {
-		return this._input.getDate();
+		return this._input?.getDate() ?? null;
 	}
 	setTime(time) {
-		this._input.setConfig({ date: time });
-		EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time });
+		this._typeCheckConfig({ time }, { time: DefaultType$3.time });
+		this._write(time, "code", false);
 	}
 	now() {
-		this.setTime(/* @__PURE__ */ new Date());
+		this._write(/* @__PURE__ */ new Date());
 	}
 	clear() {
-		this._input.clear();
+		this._write(null);
 	}
 	reset() {
-		this.setTime(this._initialTime);
+		this._write(this._initialTime);
 	}
 	getContext() {
 		return {
 			...this._baseContext(),
 			isTimeSelectable: (time) => this._input.isDateSelectable(time),
-			now: () => this.now(),
-			setTime: (time) => this.setTime(time),
+			now: () => this._runAsUser(() => this.now()),
+			setTime: (time) => this._runAsUser(() => this._write(time)),
 			time: this.getTime()
 		};
 	}
@@ -17954,13 +18724,8 @@ var TimePicker = class TimePicker extends PickerBase {
 		this._cleanerElement?.remove();
 		this._toggleElement?.remove();
 	}
-	_managedClassNames() {
-		return [
-			CLASS_NAME_TIME_PICKER,
-			CLASS_NAME_PICKER,
-			CLASS_NAME_INPUT_GROUP,
-			...managedSizeClassNames(this._config.size)
-		].filter(Boolean);
+	_originalDefault() {
+		return ORIGINAL_DEFAULT;
 	}
 	_createTimePicker() {
 		this._element.classList.add(CLASS_NAME_TIME_PICKER, CLASS_NAME_PICKER);
@@ -17969,22 +18734,15 @@ var TimePicker = class TimePicker extends PickerBase {
 		applyControlGroupSize(inputGroup, this._config.size);
 		const inputEl = document.createElement("div");
 		this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`);
-		const action = (className, icon, label) => createControlGroupAction({
-			className,
-			disabled: this._config.disabled,
-			icon,
-			label,
-			sanitizeIcon: (value) => sanitizeByConfig(value, this._config)
-		});
+		this._moveAriaToField(inputEl);
 		if (this._config.cleaner) {
-			this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel);
+			this._cleanerElement = this._createAction(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel);
 			inputGroup.append(this._cleanerElement);
 		}
 		this._toggleElement = null;
 		if (this._config.pickerIcon) {
-			const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CLOCK_ICON : this._config.pickerIcon, this._config.ariaPickerLabel);
-			inputGroup.append(indicator);
-			this._toggleElement = indicator;
+			this._toggleElement = this._createAction(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CLOCK_ICON : this._config.pickerIcon, this._config.ariaPickerLabel);
+			inputGroup.append(this._toggleElement);
 		}
 		this._input = new TimeInput(inputEl, this._forwardConfig(TimeInput, {
 			date: this._config.time,
@@ -17994,46 +18752,61 @@ var TimePicker = class TimePicker extends PickerBase {
 			seconds: Boolean(this._config.seconds)
 		}, {
 			...this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {},
-			...this._config.inputOptions
+			...this._config.inputOptions,
+			validationState: null
 		}));
+		this._validation.adopt(this._input._validation);
 		EventHandler.on(inputEl, TimeInput.eventName(TimeInput.CHANGE_EVENT_NAME), (event) => {
-			if (!this._syncingFromPanel) {
-				this._selection?.setConfig({ time: event.date });
-				EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: event.date });
-			}
+			this._onFieldChange(event.date);
 		});
-		this._menu = document.createElement("div");
-		this._menu.id = getUID(`${this.constructor.NAME}-popup-`);
-		this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN);
-		this._writeToggleAttribute("aria-expanded", "false");
-		this._writeToggleAttribute("aria-haspopup", "dialog");
 		this._selectionElement = document.createElement("div");
 		this._selectionElement.classList.add(CLASS_NAME_BODY);
-		this._menu.append(this._selectionElement);
-		if (this._footerTemplate) {
-			const footer = document.createElement("div");
-			footer.classList.add(CLASS_NAME_FOOTER);
-			footer.append(this._footerTemplate.content.cloneNode(true));
-			this._disableUnselectableActions(SELECTOR_ACTION_NOW, footer);
-			this._menu.append(footer);
-		}
+		this._createMenu(CLASS_NAME_TIME_PICKER, this._selectionElement, SELECTOR_ACTION_NOW);
 	}
 	_isNowSelectable() {
 		return this._input.isDateSelectable(/* @__PURE__ */ new Date());
 	}
 	_ensureSelection() {
 		if (this._selection) return;
-		this._selection = new TimeSelection(this._selectionElement, this._forwardConfig(TimeSelection, {
+		const { locale, maxDate: max, minDate: min } = this._input._config;
+		const [minDate, maxDate] = [min, max].map((limit) => getDateWithin(this._input._sections, convertValue(limit, "time", locale)));
+		const hourCycle = getHourCycle(this._input._sections);
+		this._selection = new TimeRoll(this._selectionElement, this._forwardConfig(TimeRoll, {
 			locale: this._config.locale,
-			onChange: (time) => {
-				this._syncingFromPanel = true;
-				this._input.setConfig({ date: time });
-				this._syncingFromPanel = false;
-				EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time });
-			},
-			time: this.getTime(),
-			variant: this._config.variant
-		}, this._config.selectionOptions));
+			maxDate: maxDate ?? (minDate && createDate(1970)),
+			minDate
+		}, {
+			...this._config.selectionOptions,
+			...hourCycle && { hourCycle },
+			onChange: (time) => this._runAsUser(() => this._applyTime(time && constrainDateTime(time, minDate, maxDate), time)),
+			time: this.getTime()
+		}));
+	}
+	_applyTime(time, picked) {
+		this._write(time, "selection");
+		if (this._element && isSameInstantAs(this._selection.getTime(), picked)) this._selection.setTime(this.getTime() ?? time);
+	}
+	_write(time, source = "code", triggerChange = true) {
+		const previous = this._source;
+		this._source = source;
+		try {
+			this._input.setDate(time, triggerChange);
+			if (this._element && this._source === source) this._syncParts();
+		} finally {
+			this._source = previous;
+		}
+	}
+	_onFieldChange(time) {
+		this._syncParts();
+		EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time });
+	}
+	_syncParts() {
+		const source = this._source;
+		this._source = null;
+		if (source !== "selection") this._showTime(this.getTime());
+	}
+	_showTime(time) {
+		if (this._selection && !isSameInstantAs(this._selection.getTime(), time)) this._selection.setConfig({ time });
 	}
 	_onPopupShow() {
 		this._ensureSelection();
@@ -18042,30 +18815,12 @@ var TimePicker = class TimePicker extends PickerBase {
 		return jQueryDispatch(this, TimePicker, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_TIME_PICKER)) TimePicker.getOrCreateInstance(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(TimePicker);
 //#endregion
 //#region js/src/toast.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI toast.ts
-* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-*
-* This component is a modified version of the Bootstrap's toast.ts
-* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const NAME$2 = "toast";
 const EVENT_KEY$2 = `.coreui.toast`;
 const EVENT_MOUSEOVER$1 = `mouseover${EVENT_KEY$2}`;
@@ -18086,9 +18841,6 @@ const Default$2 = {
 	autohide: true,
 	delay: 5e3
 };
-/**
-* Class definition
-*/
 var Toast = class Toast extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
@@ -18174,28 +18926,14 @@ var Toast = class Toast extends BaseComponent {
 		return jQueryDispatch(this, Toast, config, (element) => [element]);
 	}
 };
-/**
-* Data API implementation
-*/
 enableDismissTrigger(Toast);
-/**
-* jQuery
-*/
 defineJQueryPlugin(Toast);
 //#endregion
 //#region js/src/toaster.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI PRO toaster.ts
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const NAME$1 = "toaster";
 const EVENT_KEY$1 = `.coreui.toaster`;
 const EVENT_ADD = `add${EVENT_KEY$1}`;
+const EVENT_CLICK$1 = `click${EVENT_KEY$1}`;
 const EVENT_MOUSEOVER = `mouseover${EVENT_KEY$1}`;
 const EVENT_MOUSEOUT = `mouseout${EVENT_KEY$1}`;
 const EVENT_FOCUSIN = `focusin${EVENT_KEY$1}`;
@@ -18205,7 +18943,6 @@ const EVENT_HIDE_TOAST = "hide.coreui.toast";
 const EVENT_HIDDEN_TOAST = "hidden.coreui.toast";
 const CLASS_NAME_CONTAINER = "toast-container";
 const CLASS_NAME_STACK = "toast-container-stack";
-const CLASS_NAME_ANNOUNCER$1 = "toast-announcer";
 const CLASS_NAME_INSTANT = "toast-instant";
 const CLASS_NAME_SHOW = "show";
 const CLASS_NAME_TRANSLUCENT = "toast-translucent";
@@ -18251,17 +18988,18 @@ const TEMPLATE = [
 	"<div class=\"toast\">",
 	"  <div class=\"toast-header\">",
 	"    <strong class=\"toast-title\"></strong>",
-	"    <button type=\"button\" class=\"btn-close\" data-coreui-dismiss=\"toast\" aria-label=\"Close\"></button>",
+	"    <button type=\"button\" class=\"btn-close\" data-coreui-dismiss=\"toast\"></button>",
 	"  </div>",
 	"  <div class=\"toast-body\">",
 	"    <div class=\"toast-description\"></div>",
 	"    <button type=\"button\" class=\"btn btn-sm toast-action\"></button>",
-	"    <button type=\"button\" class=\"btn-close\" data-coreui-dismiss=\"toast\" aria-label=\"Close\"></button>",
+	"    <button type=\"button\" class=\"btn-close\" data-coreui-dismiss=\"toast\"></button>",
 	"  </div>",
 	"</div>"
 ].join("");
 const Default$1 = {
 	allowList: DefaultAllowlist,
+	ariaCloseLabel: "Close",
 	ariaLabel: "Notifications",
 	container: "body",
 	enter: "auto",
@@ -18277,6 +19015,7 @@ const Default$1 = {
 };
 const DefaultType$1 = {
 	allowList: "object",
+	ariaCloseLabel: "string",
 	ariaLabel: "string",
 	container: "(string|element)",
 	enter: "string",
@@ -18292,7 +19031,7 @@ const DefaultType$1 = {
 };
 const ToastDefault = {
 	dismissible: true,
-	priority: "low"
+	priority: "normal"
 };
 const ToastDefaultType = {
 	action: "(object|null|undefined)",
@@ -18310,9 +19049,6 @@ const ToastDefaultType = {
 	title: "(string|element|function|undefined)",
 	translucent: "(boolean|undefined)"
 };
-/**
-* Class definition
-*/
 var Toaster = class Toaster extends BaseComponent {
 	constructor(element, config) {
 		const ownsContainer = !getElement(element);
@@ -18331,10 +19067,7 @@ var Toaster = class Toaster extends BaseComponent {
 		const leave = this._config.leave === "auto" ? this._config.enter : this._config.leave;
 		if (this._config.enter !== "auto") this._element.style.setProperty(PROPERTY_ENTER_TRANSLATE, EDGES[this._config.enter]);
 		if (leave !== "auto") this._element.style.setProperty(PROPERTY_LEAVE_TRANSLATE, EDGES[leave]);
-		this._announcers = {
-			high: this._createAnnouncer("alert", "assertive"),
-			low: this._createAnnouncer("status", "polite")
-		};
+		this._announcements = /* @__PURE__ */ new Map();
 		if (this._config.pauseOnHover) {
 			EventHandler.on(this._element, EVENT_MOUSEOVER, () => this.pause());
 			EventHandler.on(this._element, EVENT_FOCUSIN, () => this.pause());
@@ -18362,9 +19095,13 @@ var Toaster = class Toaster extends BaseComponent {
 			...options
 		}, ToastDefaultType);
 		const existing = options.id ? this._entries.get(options.id) : null;
-		if (existing) {
+		if (existing && !existing.leaving) {
 			this.update(existing.toast.id, options);
 			return existing.toast.id;
+		}
+		if (existing) {
+			this._remove(existing, false);
+			return this.add(options);
 		}
 		const toast = {
 			...ToastDefault,
@@ -18390,12 +19127,12 @@ var Toaster = class Toaster extends BaseComponent {
 		this._entries.set(toast.id, entry);
 		EventHandler.one(toast.element, EVENT_HIDE_TOAST, () => {
 			entry.leaving = true;
-			this._collapse(toast.element);
+			if (!entry.toast.limited) this._collapse(toast.element);
 			this._layoutStack();
 			execute(entry.toast.onClose, [void 0, entry.toast]);
 		});
 		EventHandler.one(toast.element, EVENT_HIDDEN_TOAST, () => this._remove(entry));
-		EventHandler.on(toast.element, "click", SELECTOR_ACTION, (event) => {
+		EventHandler.on(toast.element, EVENT_CLICK$1, SELECTOR_ACTION, (event) => {
 			execute(entry.toast.action?.onClick, [
 				void 0,
 				event,
@@ -18454,15 +19191,7 @@ var Toaster = class Toaster extends BaseComponent {
 			...this._promiseState(options.loading),
 			timeout: 0
 		});
-		promise.then((value) => this.update(id, {
-			theme: "success",
-			timeout: this._config.timeout,
-			...this._promiseState(options.success, value)
-		}), (error) => this.update(id, {
-			theme: "danger",
-			timeout: this._config.timeout,
-			...this._promiseState(options.error, error)
-		}));
+		promise.then((value) => this._settlePromise(id, "success", options.success, value), (error) => this._settlePromise(id, "danger", options.error, error));
 		return promise;
 	}
 	pause() {
@@ -18480,13 +19209,12 @@ var Toaster = class Toaster extends BaseComponent {
 	}
 	dispose() {
 		for (const entry of this._entries.values()) {
+			EventHandler.off(entry.toast.element, EVENT_KEY$1);
 			entry.instance.dispose();
 			entry.toast.element.remove();
 		}
 		this._entries.clear();
 		this._resizeObserver?.disconnect();
-		this._announcers.high.remove();
-		this._announcers.low.remove();
 		if (this._ownsContainer) this._element.remove();
 		super.dispose();
 	}
@@ -18501,12 +19229,13 @@ var Toaster = class Toaster extends BaseComponent {
 		const body = element.querySelector(".toast-body");
 		if (toast.title) body.querySelector(SELECTOR_CLOSE).remove();
 		else header.remove();
-		if (!toast.dismissible) for (const close of element.querySelectorAll(SELECTOR_CLOSE)) close.remove();
+		for (const close of element.querySelectorAll(SELECTOR_CLOSE)) if (toast.dismissible) close.setAttribute("aria-label", this._config.ariaCloseLabel);
+		else close.remove();
 		body.classList.toggle(CLASS_NAME_ROW, body.querySelector(`${SELECTOR_ACTION}, ${SELECTOR_CLOSE}`) !== null);
 		if (toast.theme) element.classList.add(`theme-${toast.theme}`);
 		if (toast.instant) element.classList.add(CLASS_NAME_INSTANT);
 		if (toast.translucent) element.classList.add(CLASS_NAME_TRANSLUCENT);
-		if (toast.class) element.classList.add(...toast.class.split(" "));
+		if (toast.class) element.classList.add(...toast.class.split(/\s+/).filter(Boolean));
 		element.setAttribute(ATTRIBUTE_UPDATE_KEY, String(toast.updateKey));
 		return element;
 	}
@@ -18527,17 +19256,20 @@ var Toaster = class Toaster extends BaseComponent {
 		}
 		target.textContent = resolved;
 	}
-	_remove(entry) {
-		if (!this._entries?.has(entry.toast.id)) return;
+	_remove(entry, release = true) {
+		if (this._entries?.get(entry.toast.id) !== entry) return;
 		this._entries.delete(entry.toast.id);
-		entry.instance.dispose();
+		EventHandler.off(entry.toast.element, EVENT_KEY$1);
+		this._announcements.get(entry.toast.element)?.();
+		this._announcements.delete(entry.toast.element);
+		queueMicrotask(() => entry.instance.dispose());
 		this._resizeObserver?.unobserve(entry.toast.element);
 		const layout = this._layout();
 		entry.toast.element.remove();
 		this._settle(layout);
 		this._layoutStack();
 		execute(entry.toast.onRemove, [void 0, entry.toast]);
-		this._applyLimit();
+		if (release) this._applyLimit();
 		EventHandler.trigger(this._element, EVENT_REMOVE, { id: entry.toast.id });
 	}
 	_applyLimit() {
@@ -18547,7 +19279,7 @@ var Toaster = class Toaster extends BaseComponent {
 		let unlimited = false;
 		for (const [index, entry] of entries.entries()) {
 			const limited = index < overflow;
-			if (limited === entry.toast.limited) continue;
+			if (entry.leaving || limited === entry.toast.limited) continue;
 			entry.toast.limited = limited;
 			entry.toast.element.inert = limited;
 			if (limited) {
@@ -18604,22 +19336,14 @@ var Toaster = class Toaster extends BaseComponent {
 		this._element.style.setProperty(PROPERTY_STACK_FRONT_HEIGHT, `${ordered.length > 0 ? this._naturalHeight(ordered[0]) : 0}px`);
 		this._element.style.setProperty(PROPERTY_STACK_HEIGHTS, `${before}px`);
 	}
-	_createAnnouncer(role, live) {
-		const announcer = document.createElement("div");
-		announcer.className = CLASS_NAME_ANNOUNCER$1;
-		announcer.setAttribute("role", role);
-		announcer.setAttribute("aria-live", live);
-		announcer.setAttribute("aria-atomic", "true");
-		this._element.append(announcer);
-		return announcer;
-	}
 	_announce(toast) {
-		const announcer = this._announcers[toast.priority === "high" ? "high" : "low"];
 		const text = [toast.title, toast.description].map((part) => execute(part, [void 0, this])).map((part) => isElement(part) ? part.textContent : part).filter(Boolean).join(". ");
-		announcer.textContent = "";
-		requestAnimationFrame(() => {
-			announcer.textContent = text;
-		});
+		this._announcements.get(toast.element)?.();
+		this._announcements.delete(toast.element);
+		if (text) this._announcements.set(toast.element, announce(text, {
+			context: this._element,
+			priority: toast.priority
+		}));
 	}
 	_onLeave(event) {
 		const next = event.relatedTarget;
@@ -18686,6 +19410,14 @@ var Toaster = class Toaster extends BaseComponent {
 	_prefersReducedMotion() {
 		return typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 	}
+	_settlePromise(id, theme, state, value) {
+		if (!this._element) return;
+		this.update(id, {
+			theme,
+			timeout: this._config.timeout,
+			...this._promiseState(state, value)
+		});
+	}
 	_promiseState(state, value) {
 		const resolved = execute(state, [void 0, value]);
 		return typeof resolved === "object" && resolved !== null && !(resolved instanceof Element) ? resolved : { description: resolved };
@@ -18694,21 +19426,9 @@ var Toaster = class Toaster extends BaseComponent {
 		return jQueryDispatch(this, Toaster, config, args);
 	}
 };
-/**
-* jQuery
-*/
 defineJQueryPlugin(Toaster);
 //#endregion
 //#region js/src/transfer.ts
-/**
-* --------------------------------------------------------------------------
-* CoreUI transfer.ts
-* License (https://coreui.io/pro/license/)
-* --------------------------------------------------------------------------
-*/
-/**
-* Constants
-*/
 const NAME = "transfer";
 const EVENT_KEY = `.coreui.transfer`;
 const DATA_API_KEY = ".data-api";
@@ -18720,10 +19440,8 @@ const EVENT_CLICK = "click";
 const EVENT_INPUT = "input";
 const EVENT_LIST_BOX_CHANGE = "change.coreui.list-box";
 const EVENT_LIST_BOX_SEARCH = "search.coreui.list-box";
-const CLASS_NAME_ANNOUNCER = "transfer-announcer";
 const CLASS_NAME_DISABLED = "disabled";
 const CLASS_NAME_OPTIONS = "list-box-options";
-const CLASS_NAME_VISUALLY_HIDDEN = "visually-hidden";
 const SELECTOR_DATA_TRANSFER = "[data-coreui-transfer]";
 const SELECTOR_LIST = "[data-coreui-transfer-list]";
 const SELECTOR_MOVE = "[data-coreui-transfer-move]";
@@ -18752,6 +19470,7 @@ const Default = {
 	indicator: "checkbox",
 	items: [],
 	loading: false,
+	loadingLabel: "Loading…",
 	moveAllToSourceIcon: CHEVRON_DOUBLE_LEFT_ICON,
 	moveAllToTargetIcon: CHEVRON_DOUBLE_RIGHT_ICON,
 	moveToSourceIcon: CHEVRON_LEFT_ICON,
@@ -18779,6 +19498,7 @@ const DefaultType = {
 	indicator: "string",
 	items: "array",
 	loading: "boolean",
+	loadingLabel: "string",
 	moveAllToSourceIcon: "string",
 	moveAllToTargetIcon: "string",
 	moveToSourceIcon: "string",
@@ -18794,13 +19514,10 @@ const DefaultType = {
 	typeahead: "boolean",
 	value: "array"
 };
-/**
-* Class definition
-*/
 var Transfer = class Transfer extends BaseComponent {
 	constructor(element, config) {
 		super(element, config);
-		this._announcer = this._createAnnouncer();
+		this._createdNodes = [];
 		this._itemRanks = /* @__PURE__ */ new Map();
 		this._items = this._config.items.length > 0 ? this._config.items : null;
 		this._sides = {
@@ -18873,15 +19590,8 @@ var Transfer = class Transfer extends BaseComponent {
 		this._element.removeEventListener(EVENT_LIST_BOX_SEARCH, this._onListBoxSearch);
 		EventHandler.off(this._element, EVENT_KEY);
 		for (const side of Object.values(this._sides)) side.listBox.dispose();
-		this._announcer.remove();
+		for (const node of this._createdNodes) node.remove();
 		super.dispose();
-	}
-	_createAnnouncer() {
-		const announcer = document.createElement("div");
-		announcer.classList.add(CLASS_NAME_ANNOUNCER, CLASS_NAME_VISUALLY_HIDDEN);
-		announcer.setAttribute("role", "status");
-		this._element.append(announcer);
-		return announcer;
 	}
 	_createSide(name) {
 		const element = SelectorEngine.findOne(`[data-coreui-transfer-list="${name}"]`, this._element);
@@ -18898,6 +19608,8 @@ var Transfer = class Transfer extends BaseComponent {
 				html: this._config.html,
 				indicator: this._config.indicator,
 				loading: this._config.loading,
+				loadingLabel: this._config.loadingLabel,
+				resetSelectionOnItemsChange: true,
 				sanitize: this._config.sanitize,
 				sanitizeFn: this._config.sanitizeFn,
 				search: this._config.search,
@@ -18919,6 +19631,7 @@ var Transfer = class Transfer extends BaseComponent {
 		const options = document.createElement("div");
 		options.classList.add(CLASS_NAME_OPTIONS);
 		element.append(options);
+		this._createdNodes.push(options);
 		return options;
 	}
 	_decorateSide(side) {
@@ -18976,20 +19689,19 @@ var Transfer = class Transfer extends BaseComponent {
 		this._rendered = true;
 	}
 	_forwardItems(entries) {
-		if (!this._rendered) return entries;
 		return entries.map((entry) => {
 			if (Array.isArray(entry.items)) {
 				const group = entry;
 				return {
-					label: group.label,
-					items: group.items.map((item) => this._unmarked(item))
+					...group,
+					items: group.items.map((item) => this._unmarked(item, group.disabled))
 				};
 			}
 			return this._unmarked(entry);
 		});
 	}
-	_unmarked(item) {
-		if (!item.selected) return item;
+	_unmarked(item, disabled = false) {
+		if (!item.selected || !this._rendered && !disabled && !item.disabled) return item;
 		const { selected, ...rest } = item;
 		return rest;
 	}
@@ -19004,17 +19716,24 @@ var Transfer = class Transfer extends BaseComponent {
 			const group = entry;
 			const rest = group.items.filter((item) => !taken.has(this._itemValue(item)));
 			if (rest.length > 0) available.push({
-				label: group.label,
+				...group,
 				items: rest
 			});
 		}
 		return available;
 	}
 	_flatItems(items) {
-		return items.filter((entry) => entry !== null && typeof entry === "object").flatMap((entry) => Array.isArray(entry.items) ? entry.items : [entry]);
+		return items.filter((entry) => entry !== null && typeof entry === "object").flatMap((entry) => {
+			const group = entry;
+			if (!Array.isArray(group.items)) return [entry];
+			return group.disabled ? group.items.map((item) => ({
+				...item,
+				disabled: true
+			})) : group.items;
+		});
 	}
 	_itemValue(item) {
-		return String(item.value ?? item.label ?? "");
+		return getOptionValue(item);
 	}
 	_rankOptions() {
 		if (this._items) return;
@@ -19096,12 +19815,12 @@ var Transfer = class Transfer extends BaseComponent {
 		to.listBox.update();
 		this._refresh();
 		this._restoreFocus(trigger, options[0]);
+		this._announce(moved.length, to.title);
 		EventHandler.trigger(this._element, this.constructor.eventName(EVENT_MOVED), {
 			direction: side,
 			values: moved
 		});
 		this._triggerChange();
-		this._announce(moved.length, to.title);
 	}
 	_restoreFocus(trigger, option) {
 		if (!trigger || !trigger.matches(SELECTOR_MOVE) || !trigger.disabled) return;
@@ -19114,7 +19833,8 @@ var Transfer = class Transfer extends BaseComponent {
 		});
 	}
 	_announce(count, title) {
-		this._announcer.textContent = this._config.ariaMovedAnnouncement.replace("{count}", String(count)).replace("{title}", title);
+		const message = this._config.ariaMovedAnnouncement.replaceAll("{count}", String(count)).replaceAll("{title}", () => title);
+		announce(message, { context: this._element });
 	}
 	_addEventListeners() {
 		EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), SELECTOR_MOVE, (event) => {
@@ -19139,17 +19859,11 @@ var Transfer = class Transfer extends BaseComponent {
 		return jQueryDispatch(this, Transfer, config, args);
 	}
 };
-/**
-* Data API implementation
-*/
 EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
 	for (const element of SelectorEngine.find(SELECTOR_DATA_TRANSFER)) Transfer.getOrCreateInstance(element);
 });
-/**
-* jQuery
-*/
 defineJQueryPlugin(Transfer);
 //#endregion
-export { Accordion, Alert, Autocomplete, Button, Calendar, Carousel, Chip, ChipInput, ChipSet, Collapse, Combobox, ContextMenu, DateInput, DatePicker, DateRangeInput, DateRangePicker, DateTimePicker, Dialog, Drawer, Dropdown, ListBox, LoadingButton, Menu, Modal, MultiSelect, Navigation, NumberInput, OTPInput, Offcanvas, PasswordInput, PasswordStrength, Popover, Progress, Range, RangeSlider, Rating, ScrollSpy, SearchButton, Sidebar, Stepper, Tab, TimeInput, TimePicker, Toast, Toaster, Tooltip, Transfer };
+export { Accordion, Alert, Autocomplete, Button, Calendar, Carousel, Chip, ChipInput, ChipSet, Collapse, Combobox, ContextMenu, DateInput, DatePicker, DateRangeInput, DateRangePicker, Dialog, Drawer, Dropdown, Form, ListBox, LoadingButton, Menu, Modal, MultiSelect, Navigation, NumberInput, OTPInput, Offcanvas, PasswordInput, PasswordStrength, Popover, Progress, Range, RangeSlider, Rating, ScrollSpy, SearchButton, Sidebar, Stepper, Tab, TimeInput, TimePicker, Toast, Toaster, Tooltip, Transfer, announce };
 
 //# sourceMappingURL=coreui.esm.js.map

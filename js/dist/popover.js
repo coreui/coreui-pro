@@ -35,18 +35,6 @@
 	js_src_tooltip_js = __toESM(js_src_tooltip_js);
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	//#region js/src/popover.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI popover.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's popover.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "popover";
 	const SELECTOR_TITLE = ".popover-header";
 	const SELECTOR_CONTENT = ".popover-body";
@@ -66,9 +54,6 @@
 		...js_src_tooltip_js.default.DefaultType,
 		content: "(null|string|element|function)"
 	};
-	/**
-	* Class definition
-	*/
 	var Popover = class Popover extends js_src_tooltip_js.default {
 		constructor(element, config) {
 			super(element, config);
@@ -98,9 +83,6 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Popover, config, args);
 		}
 	};
-	/**
-	* Data API implementation - auto-initialize popovers
-	*/
 	const initPopover = (event) => {
 		const target = event.target.closest(SELECTOR_DATA_TOGGLE);
 		if (!target) return;
@@ -110,9 +92,6 @@
 	js_src_dom_event_handler_js.default.on(document, EVENT_CLICK, SELECTOR_DATA_TOGGLE, initPopover);
 	js_src_dom_event_handler_js.default.on(document, EVENT_FOCUSIN, SELECTOR_DATA_TOGGLE, initPopover);
 	js_src_dom_event_handler_js.default.on(document, EVENT_MOUSEENTER, SELECTOR_DATA_TOGGLE, initPopover);
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Popover);
 	//#endregion
 	return Popover;

@@ -38,17 +38,6 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/navigation.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI navigation.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* ------------------------------------------------------------------------
-	* Constants
-	* ------------------------------------------------------------------------
-	*/
 	const NAME = "navigation";
 	const EVENT_KEY = `.coreui.navigation`;
 	const DATA_API_KEY = ".data-api";
@@ -72,11 +61,6 @@
 	const SELECTOR_NAV_GROUP_TOGGLE = ".nav-group-toggle";
 	const SELECTOR_NAV_LINK = ".nav-link";
 	const SELECTOR_DATA_NAVIGATION = "[data-coreui-navigation]";
-	/**
-	* ------------------------------------------------------------------------
-	* Class Definition
-	* ------------------------------------------------------------------------
-	*/
 	var Navigation = class Navigation extends js_src_base_component_js.default {
 		constructor(element, config) {
 			super(element);
@@ -155,20 +139,9 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Navigation, config);
 		}
 	};
-	/**
-	* ------------------------------------------------------------------------
-	* Data Api implementation
-	* ------------------------------------------------------------------------
-	*/
 	js_src_dom_event_handler_js.default.on(window, EVENT_LOAD_DATA_API, () => {
 		for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_NAVIGATION))) Navigation.navigationInterface(element);
 	});
-	/**
-	* ------------------------------------------------------------------------
-	* jQuery
-	* ------------------------------------------------------------------------
-	* add .Navigation to jQuery only if jQuery is present
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Navigation);
 	//#endregion
 	return Navigation;

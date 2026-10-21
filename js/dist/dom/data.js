@@ -7,18 +7,6 @@
 	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define([], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Data = factory());
 })(this, function() {
 	//#region js/src/dom/data.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI dom/data.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's dom/data.js
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const elementMap = /* @__PURE__ */ new Map();
 	//#endregion
 	return {

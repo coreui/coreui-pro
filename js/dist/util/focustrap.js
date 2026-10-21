@@ -37,18 +37,6 @@
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	js_src_util_config_js = __toESM(js_src_util_config_js);
 	//#region js/src/util/focustrap.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI util/focustrap.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's util/focustrap.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "focustrap";
 	const EVENT_KEY = `.coreui.focustrap`;
 	const EVENT_FOCUSIN = `focusin${EVENT_KEY}`;
@@ -67,9 +55,6 @@
 		trapElement: "element"
 	};
 	const activeTraps = [];
-	/**
-	* Class definition
-	*/
 	var FocusTrap = class extends js_src_util_config_js.default {
 		constructor(config) {
 			super();
@@ -108,8 +93,9 @@
 		}
 		_handleFocusin(event) {
 			const { additionalElement, trapElement } = this._config;
-			if (!this._isTopmost() || event.target === document || event.target === trapElement || trapElement.contains(event.target)) return;
-			if (additionalElement && (event.target === additionalElement || additionalElement.contains(event.target))) return;
+			const target = event.composedPath()[0] ?? event.target;
+			if (!this._isTopmost() || target === document || target === trapElement || trapElement.contains(target)) return;
+			if (additionalElement && (target === additionalElement || additionalElement.contains(target))) return;
 			const elements = js_src_dom_selector_engine_js.default.focusableChildren(trapElement);
 			if (elements.length === 0) trapElement.focus();
 			else if (this._lastTabNavDirection === TAB_NAV_BACKWARD) elements[elements.length - 1].focus();
@@ -140,23 +126,15 @@
 			const target = event.target;
 			const trapIndex = trapElements.indexOf(target);
 			const additionalIndex = additionalElements.indexOf(target);
-			const redirect = (element) => {
+			let destination;
+			if (trapIndex === trapElements.length - 1 && !event.shiftKey) destination = additionalElements[0];
+			else if (trapIndex === 0 && event.shiftKey) destination = additionalElements[additionalElements.length - 1];
+			else if (additionalIndex === additionalElements.length - 1 && !event.shiftKey) destination = trapElements[0];
+			else if (additionalIndex === 0 && event.shiftKey) destination = trapElements[trapElements.length - 1];
+			if (destination) {
 				event.preventDefault();
-				element.focus();
-			};
-			if (trapIndex === trapElements.length - 1 && !event.shiftKey) {
-				redirect(additionalElements[0]);
-				return;
+				destination.focus();
 			}
-			if (trapIndex === 0 && event.shiftKey) {
-				redirect(additionalElements[additionalElements.length - 1]);
-				return;
-			}
-			if (additionalIndex === additionalElements.length - 1 && !event.shiftKey) {
-				redirect(trapElements[0]);
-				return;
-			}
-			if (additionalIndex === 0 && event.shiftKey) redirect(trapElements[trapElements.length - 1]);
 		}
 	};
 	//#endregion

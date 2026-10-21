@@ -37,18 +37,6 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/tab.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI tab.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's tab.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "tab";
 	const EVENT_KEY = `.coreui.tab`;
 	const EVENT_HIDE = `hide${EVENT_KEY}`;
@@ -75,9 +63,7 @@
 	const SELECTOR_DATA_TOGGLE = "[data-coreui-toggle=\"tab\"], [data-coreui-toggle=\"pill\"], [data-coreui-toggle=\"list\"]";
 	const SELECTOR_INNER_ELEM = `${SELECTOR_INNER}, ${SELECTOR_DATA_TOGGLE}`;
 	const SELECTOR_DATA_TOGGLE_ACTIVE = `.${CLASS_NAME_ACTIVE}[data-coreui-toggle="tab"], .${CLASS_NAME_ACTIVE}[data-coreui-toggle="pill"], .${CLASS_NAME_ACTIVE}[data-coreui-toggle="list"]`;
-	/**
-	* Class definition
-	*/
+	const activationIds = /* @__PURE__ */ new WeakMap();
 	var Tab = class Tab extends js_src_base_component_js.default {
 		constructor(element) {
 			super(element);
@@ -95,10 +81,12 @@
 			const active = this._getActiveElem();
 			const hideEvent = active ? js_src_dom_event_handler_js.default.trigger(active, EVENT_HIDE, { relatedTarget: innerElem }) : null;
 			if (js_src_dom_event_handler_js.default.trigger(innerElem, EVENT_SHOW, { relatedTarget: active }).defaultPrevented || hideEvent && hideEvent.defaultPrevented) return;
+			const activationId = (activationIds.get(this._parent) || 0) + 1;
+			activationIds.set(this._parent, activationId);
 			this._deactivate(active, innerElem);
-			await this._activate(innerElem, active);
+			await this._activate(innerElem, active, activationId);
 		}
-		async _activate(element, relatedElem) {
+		async _activate(element, relatedElem, activationId) {
 			if (!element) return;
 			element.classList.add(CLASS_NAME_ACTIVE);
 			if (element.getAttribute("role") !== "tab") {
@@ -108,6 +96,7 @@
 			const pane = js_src_dom_selector_engine_js.default.getElementFromSelector(element);
 			this._activate(pane);
 			const complete = () => {
+				if (activationId !== void 0 && activationId !== activationIds.get(this._parent) || !element.classList.contains(CLASS_NAME_ACTIVE)) return;
 				element.removeAttribute("tabindex");
 				(0, js_src_util_index_js.setAriaAttribute)(element, "aria-selected", true);
 				this._toggleDropDown(element, true);
@@ -207,23 +196,14 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Tab, config);
 		}
 	};
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function(event) {
 		if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
 		if ((0, js_src_util_index_js.isDisabled)(this)) return;
 		Tab.getOrCreateInstance(this).show();
 	});
-	/**
-	* Initialize on focus
-	*/
 	js_src_dom_event_handler_js.default.on(window, EVENT_LOAD_DATA_API, () => {
 		for (const element of js_src_dom_selector_engine_js.default.find(SELECTOR_DATA_TOGGLE_ACTIVE)) Tab.getOrCreateInstance(element);
 	});
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Tab);
 	//#endregion
 	return Tab;

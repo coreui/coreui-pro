@@ -4,20 +4,15 @@
 * License (https://coreui.io/pro/license/)
 */
 (function(global, factory) {
-	typeof exports === "object" && typeof module !== "undefined" ? factory(exports, require("@floating-ui/dom"), require("./dom/event-handler.js"), require("./dom/manipulator.js"), require("./dom/selector-engine.js"), require("./menu.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
-		"exports",
+	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("@floating-ui/dom"), require("./dom/event-handler.js"), require("./dom/manipulator.js"), require("./dom/selector-engine.js"), require("./menu.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
 		"@floating-ui/dom",
 		"./dom/event-handler.js",
 		"./dom/manipulator.js",
 		"./dom/selector-engine.js",
 		"./menu.js",
 		"./util/index.js"
-	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, factory(global.Dropdown = {}, global.FloatingUIDOM, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Menu, global.Index));
-})(this, function(exports, _floating_ui_dom, js_src_dom_event_handler_js, js_src_dom_manipulator_js, js_src_dom_selector_engine_js, js_src_menu_js, js_src_util_index_js) {
-	Object.defineProperties(exports, {
-		__esModule: { value: true },
-		[Symbol.toStringTag]: { value: "Module" }
-	});
+	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Dropdown = factory(global.FloatingUIDOM, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Menu, global.Index));
+})(this, function(_floating_ui_dom, js_src_dom_event_handler_js, js_src_dom_manipulator_js, js_src_dom_selector_engine_js, js_src_menu_js, js_src_util_index_js) {
 	//#region \0rolldown/runtime.js
 	var __create = Object.create;
 	var __defProp = Object.defineProperty;
@@ -45,20 +40,6 @@
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	js_src_menu_js = __toESM(js_src_menu_js);
 	//#region js/src/dropdown.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI dropdown.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* Dropdown is the v5 compatibility surface built on the Menu implementation:
-	* the same engine, keyboard handling and dismissal, with the v5 class names,
-	* events (`*.coreui.dropdown`), class-driven placement and the navbar/static
-	* CSS hook preserved. The acceptance contract is the untouched v5 spec suite.
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "dropdown";
 	const EVENT_KEY = `.coreui.dropdown`;
 	const DATA_API_KEY = ".data-api";
@@ -87,9 +68,6 @@
 		...js_src_menu_js.default.DefaultType,
 		placement: "(null|string)"
 	};
-	/**
-	* Class definition
-	*/
 	var Dropdown = class Dropdown extends js_src_menu_js.default {
 		constructor(element, config) {
 			super(element, config);
@@ -163,26 +141,15 @@
 			return (0, js_src_util_index_js.jQueryDispatch)(this, Dropdown, config);
 		}
 	};
-	/**
-	* Data API implementation
-	*
-	* clearMenus is not re-registered here: Menu's document-level registration
-	* iterates the open-instance registry, which the subclass shares.
-	*/
 	js_src_dom_event_handler_js.default.on(document, EVENT_KEYDOWN_DATA_API, Dropdown.SELECTOR_DATA_TOGGLE, (event) => Dropdown.dataApiKeydownHandler(event));
 	js_src_dom_event_handler_js.default.on(document, EVENT_KEYDOWN_DATA_API, Dropdown.SELECTOR_MENU, (event) => Dropdown.dataApiKeydownHandler(event));
 	js_src_dom_event_handler_js.default.on(document, EVENT_CLICK_DATA_API, Dropdown.SELECTOR_DATA_TOGGLE, function(event) {
 		event.preventDefault();
 		Dropdown.getOrCreateInstance(this).toggle();
 	});
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(Dropdown);
 	//#endregion
-	exports.Default = Default;
-	exports.DefaultType = DefaultType;
-	exports.default = Dropdown;
+	return Dropdown;
 });
 
 //# sourceMappingURL=dropdown.js.map

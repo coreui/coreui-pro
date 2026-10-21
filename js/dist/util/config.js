@@ -30,26 +30,11 @@
 	//#endregion
 	js_src_dom_manipulator_js = __toESM(js_src_dom_manipulator_js);
 	//#region js/src/util/config.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI util/config.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This is a modified version of the Bootstrap's util/config.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const DISALLOWED_ATTRIBUTES = /* @__PURE__ */ new Set([
 		"sanitize",
 		"allowList",
 		"sanitizeFn"
 	]);
-	/**
-	* Class definition
-	*/
 	var Config = class {
 		static get Default() {
 			return {};

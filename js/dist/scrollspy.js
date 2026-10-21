@@ -37,18 +37,6 @@
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
 	//#region js/src/scrollspy.ts
-	/**
-	* --------------------------------------------------------------------------
-	* CoreUI scrollspy.ts
-	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-	*
-	* This component is a modified version of the Bootstrap's scrollspy.ts
-	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-	* --------------------------------------------------------------------------
-	*/
-	/**
-	* Constants
-	*/
 	const NAME = "scrollspy";
 	const EVENT_KEY = `.coreui.scrollspy`;
 	const DATA_API_KEY = ".data-api";
@@ -85,9 +73,6 @@
 		threshold: "array",
 		topMargin: "string"
 	};
-	/**
-	* Class definition
-	*/
 	var ScrollSpy = class ScrollSpy extends js_src_base_component_js.default {
 		constructor(element, config) {
 			super(element, config);
@@ -369,15 +354,9 @@
 			return hash;
 		}
 	}
-	/**
-	* Data API implementation
-	*/
 	js_src_dom_event_handler_js.default.on(window, EVENT_LOAD_DATA_API, () => {
 		for (const spy of js_src_dom_selector_engine_js.default.find(SELECTOR_DATA_SPY)) ScrollSpy.getOrCreateInstance(spy);
 	});
-	/**
-	* jQuery
-	*/
 	(0, js_src_util_index_js.defineJQueryPlugin)(ScrollSpy);
 	//#endregion
 	return ScrollSpy;
