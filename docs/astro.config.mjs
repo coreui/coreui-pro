@@ -7,10 +7,10 @@ import { coreuiDocs } from '@coreui/astro-docs/integration'
 
 // The engine derives Astro's `site` + `base` from `seo.url` in config.yml; a redirect
 // target has to carry the same base, so take it from the same source.
-const base = new URL(
-  readFileSync(new URL('./src/data/config.yml', import.meta.url), 'utf8')
-    .match(/^\s{2}url:\s*(\S+)/m)[1]
-).pathname.replace(/\/$/, '')
+const config = readFileSync(new URL('./src/data/config.yml', import.meta.url), 'utf8')
+const version = process.env.COREUI_DOCS_VERSION || config.match(/^version:\s*(\S+)/m)?.[1]
+const base = new URL(config.match(/^\s{2}url:\s*(\S+)/m)[1]).pathname.replace(/\/$/, '') +
+  (version ? `/${version}` : '')
 
 export default defineConfig({
   // Publish URL (site + base) is config-driven: coreuiDocs({ libraryConfig: 'src/styles/_library-config.scss' }) reads `seo.url` from
