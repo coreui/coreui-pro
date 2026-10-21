@@ -609,7 +609,7 @@ class Tooltip extends BaseComponent {
       // Floating UI reports the unused axis as `undefined`, never `null`
       Object.assign(arrowElement.style, {
         left: isVertical && arrowX !== undefined ? `${arrowX}px` : '',
-        top: !isVertical && arrowY !== undefined ? `${arrowY}px` : '',
+        top: isVertical || arrowY === undefined ? '' : `${arrowY}px`,
         // Reset the other axis to let CSS handle it
         right: '',
         bottom: ''

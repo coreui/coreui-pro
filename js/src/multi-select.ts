@@ -516,7 +516,7 @@ class MultiSelect extends ComboboxBase {
     this._options = this._getOptionsFromConfig(options)
 
     const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
-    const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || !values.isSubsetOf(previous))
+    const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || [...values].some(value => !previous.has(value)))
     const marked = this._markedValues()
     const seeded = this._givenValues ? marked.filter(value => !seen.has(value)) : []
     const selected = this._store.values()

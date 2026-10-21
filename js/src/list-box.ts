@@ -341,7 +341,7 @@ class ListBox extends BaseComponent {
     this._render()
 
     const values = new Set(this._allOptions().map(option => this._optionValue(option)))
-    const reset = this._config.resetSelectionOnItemsChange && (values.size !== previousValues.size || !values.isSubsetOf(previousValues))
+    const reset = this._config.resetSelectionOnItemsChange && (values.size !== previousValues.size || [...values].some(value => !previousValues.has(value)))
     const marked = this._flatItems().filter(item => item.selected).map(item => item.value)
     const { refused, values: filled } = fillSelection(reset ? [] : previous, marked, this._selectionLimit())
 
