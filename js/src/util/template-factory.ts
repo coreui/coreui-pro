@@ -169,8 +169,7 @@ class TemplateFactory extends Config {
 
   _putElementInTemplate(element: Element, templateElement: Element): void {
     if (this._config.html) {
-      templateElement.innerHTML = ''
-      templateElement.append(element)
+      templateElement.replaceChildren(element)
       return
     }
 

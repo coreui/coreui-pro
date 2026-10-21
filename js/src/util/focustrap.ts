@@ -188,28 +188,21 @@ class FocusTrap extends Config {
     const trapIndex = trapElements.indexOf(target)
     const additionalIndex = additionalElements.indexOf(target)
 
-    const redirect = (element: HTMLElement) => {
-      event.preventDefault()
-      element.focus()
-    }
+    let destination: HTMLElement | undefined
 
     if (trapIndex === trapElements.length - 1 && !event.shiftKey) {
-      redirect(additionalElements[0])
-      return
+      destination = additionalElements[0]
+    } else if (trapIndex === 0 && event.shiftKey) {
+      destination = additionalElements[additionalElements.length - 1]
+    } else if (additionalIndex === additionalElements.length - 1 && !event.shiftKey) {
+      destination = trapElements[0]
+    } else if (additionalIndex === 0 && event.shiftKey) {
+      destination = trapElements[trapElements.length - 1]
     }
 
-    if (trapIndex === 0 && event.shiftKey) {
-      redirect(additionalElements[additionalElements.length - 1])
-      return
-    }
-
-    if (additionalIndex === additionalElements.length - 1 && !event.shiftKey) {
-      redirect(trapElements[0])
-      return
-    }
-
-    if (additionalIndex === 0 && event.shiftKey) {
-      redirect(trapElements[trapElements.length - 1])
+    if (destination) {
+      event.preventDefault()
+      destination.focus()
     }
   }
 }

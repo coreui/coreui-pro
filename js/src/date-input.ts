@@ -802,7 +802,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       this._element.setAttribute('aria-label', this._getAriaLabel())
     }
 
-    this._element.innerHTML = ''
+    this._element.replaceChildren()
 
     for (const section of this._sections) {
       const element = document.createElement('span')

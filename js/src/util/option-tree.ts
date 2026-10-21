@@ -144,10 +144,10 @@ export const filterOptionTree = <T extends OptionItem>(options: readonly T[], qu
     if (isOptionGroup(option)) {
       const matched = filter((option as { options: T[] }).options)
 
-      return matched.length > 0 ? [{ ...option as object, options: matched } as unknown as T] : []
+      return matched.length > 0 ? { ...option as object, options: matched } as unknown as T : []
     }
 
-    return normalizeSearchText(getOptionLabel(option), foldAccents).includes(needle) ? [option] : []
+    return normalizeSearchText(getOptionLabel(option), foldAccents).includes(needle) ? option : []
   })
 
   return filter(options)

@@ -638,7 +638,7 @@ class Rating extends BaseComponent {
       }
 
       if (this._disabled) {
-        ratingItemInputElement.setAttribute('disabled', true as any)
+        ratingItemInputElement.disabled = true
       }
 
       ratingItemInputElement.required = this._isRequired()

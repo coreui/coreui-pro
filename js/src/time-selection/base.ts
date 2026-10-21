@@ -138,7 +138,7 @@ class TimeSelection extends Config {
   dispose(): void {
     EventHandler.off(this._element, EVENT_FOCUSIN)
     EventHandler.off(this._element, EVENT_KEYDOWN)
-    this._element!.innerHTML = ''
+    this._element!.replaceChildren()
     this._element = null
   }
 
@@ -162,7 +162,7 @@ class TimeSelection extends Config {
     )
     this._ampm = this._dayPeriod()
 
-    this._element!.innerHTML = ''
+    this._element!.replaceChildren()
     EventHandler.off(this._element, EVENT_KEYDOWN)
     this._renderBody()
 

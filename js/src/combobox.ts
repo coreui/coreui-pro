@@ -596,7 +596,7 @@ class Combobox extends ComboboxBase {
   }
 
   _restoreValue(): void {
-    if (this._listBox && this._listBox.getSelectedValues().join('\u0000') !== this._resetValues.join('\u0000')) {
+    if (this._listBox && this._listBox.getSelectedValues().join('\0') !== this._resetValues.join('\0')) {
       this._applySelection(this._resetValues)
     }
   }

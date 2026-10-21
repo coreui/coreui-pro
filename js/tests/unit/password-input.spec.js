@@ -1,4 +1,3 @@
-
 import PasswordInput from '../../src/password-input.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock

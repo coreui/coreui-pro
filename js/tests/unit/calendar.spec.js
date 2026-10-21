@@ -1,4 +1,3 @@
-
 import { onTestFinished, vi } from 'vitest'
 import { cdp } from 'vitest/browser'
 import Calendar from '../../src/calendar.js'
@@ -938,7 +937,7 @@ describe('Calendar', () => {
         ['quarter', new Date(2026, 6, 1)],
         ['year', new Date(2026, 0, 1)]
       ]) {
-        div.innerHTML = ''
+        div.replaceChildren()
         new Calendar(div, { locale: 'en-US', selectionType, calendarDate }) // eslint-disable-line no-new
 
         const stop = div.querySelector('[tabindex="0"]')
@@ -956,7 +955,7 @@ describe('Calendar', () => {
       expect(div.querySelectorAll('[tabindex="0"]').length).toEqual(1)
 
       for (const button of ['.btn-year', '.btn-month']) {
-        div.innerHTML = ''
+        div.replaceChildren()
         new Calendar(div, { locale: 'en-US', selectionType: 'week', calendarDate: new Date(2026, 8, 22) }) // eslint-disable-line no-new
 
         div.querySelector(button).click()
@@ -1833,7 +1832,7 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div)
 
-      div.querySelector('table').innerHTML = ''
+      div.querySelector('table').replaceChildren()
       calendar.refresh()
 
       expect(div.querySelector('.calendar')).not.toBeNull()

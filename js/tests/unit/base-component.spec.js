@@ -84,7 +84,7 @@ describe('Base Component', () => {
       })
 
       it('should not initialize and add element record to Data (caching), if argument `element` is not an HTML element', () => {
-        fixtureEl.innerHTML = ''
+        fixtureEl.replaceChildren()
 
         const el = fixtureEl.querySelector('#foo')
         const elInstance = new DummyClass(el)

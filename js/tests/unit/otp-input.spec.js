@@ -1,4 +1,3 @@
-
 import { userEvent } from 'vitest/browser'
 import Form from '../../src/form.js'
 import OTPInput from '../../src/otp-input.js'
