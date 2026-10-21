@@ -1,6 +1,6 @@
 # Ignore docs files
 /_site/
-/docs/.astro/
+.astro/
 
 
 # Numerous always-ignore extensions
