@@ -1,3 +1,46 @@
+import selectorParser from 'postcss-selector-parser'
+
+const CONTEXT_PSEUDOS = new Set([':has', ':is', ':not', ':where'])
+
+const countNodes = type => selector => {
+  let count = 0
+  selector.walk(node => {
+    if (node.type === type) {
+      count++
+    }
+  })
+  return count
+}
+
+const exceeds = (selector, count, max) => {
+  const outer = selector.clone()
+  const pseudos = []
+  outer.walkPseudos(pseudo => {
+    if (CONTEXT_PSEUDOS.has(pseudo.value.toLowerCase())) {
+      pseudos.push(pseudo)
+    }
+  })
+  const inner = pseudos.flatMap(pseudo => pseudo.nodes.map(node => node.clone()))
+
+  for (const pseudo of pseudos) {
+    pseudo.removeAll()
+  }
+
+  return count(outer) > max || inner.some(node => exceeds(node, count, max))
+}
+
+// Stylelint 17 counts inside :is(), :not(), :has() and :where(); a selector that only goes over
+// the limit that way is a warning, one that goes over the stylelint 16 count stays an error.
+const outsideContextPseudos = count => (selector, max) => {
+  try {
+    return selectorParser().astSync(selector).nodes.some(node => exceeds(node, count, max)) ? 'error' : 'warning'
+  } catch {
+    return 'error'
+  }
+}
+
+const countCombinators = countNodes('combinator')
+
 /** @type {import('stylelint').Config} */
 export default {
   extends: [
@@ -46,13 +89,13 @@ export default {
     'no-descending-specificity': null,
     'number-max-precision': null,
     'rule-empty-line-before': null,
-    'selector-max-attribute': 6,
-    'selector-max-class': 10,
-    'selector-max-combinators': 7,
-    'selector-max-compound-selectors': 8,
+    'selector-max-attribute': [2, { severity: outsideContextPseudos(countNodes('attribute')) }],
+    'selector-max-class': [4, { severity: outsideContextPseudos(countNodes('class')) }],
+    'selector-max-combinators': [4, { severity: outsideContextPseudos(countCombinators) }],
+    'selector-max-compound-selectors': [4, { severity: outsideContextPseudos(selector => countCombinators(selector) + 1) }],
     'selector-max-id': 0,
     'selector-max-specificity': null,
-    'selector-max-type': 6,
+    'selector-max-type': [2, { severity: outsideContextPseudos(countNodes('tag')) }],
     'selector-max-universal': 1,
     'selector-no-qualifying-type': true,
     '@stylistic/at-rule-name-space-after': 'always',
