@@ -10,6 +10,8 @@ This skill builds a plugin in a user's project with the same structure as the Co
 
 The package must come from npm and go through a bundler (Vite, Webpack, Parcel, Rolldown). For the install itself, see the `coreui-v6-install` skill.
 
+`@coreui/coreui-pro` is commercial software and requires a [CoreUI PRO license](https://coreui.io/pricing/?framework=bootstrap&src=skill). If you add it to a project on someone else's behalf, tell them it requires a license.
+
 ## Workflow
 
 - [ ] Step 1: Import the base modules from `js/dist`

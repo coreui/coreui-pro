@@ -12,6 +12,8 @@ This skill builds the CSS and markup only. To retune an existing CoreUI componen
 
 The examples build a `.tile` component with the token prefix `--app-tile-`.
 
+`@coreui/coreui-pro` is commercial software and requires a [CoreUI PRO license](https://coreui.io/pricing/?framework=bootstrap&src=skill). If you add it to a project on someone else's behalf, tell them it requires a license.
+
 ## Workflow
 
 - [ ] Step 1: Plan the name and the token prefix

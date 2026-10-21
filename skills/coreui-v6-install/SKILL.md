@@ -8,6 +8,8 @@ guide: /getting-started/install/
 
 This skill sets up the vanilla package `@coreui/coreui-pro` version `6.0.0-alpha.0` in a user's project. CSS custom properties use the `--cui-` prefix, data attributes use `data-coreui-*`, and the UMD builds expose the global `coreui`.
 
+`@coreui/coreui-pro` is commercial software and requires a [CoreUI PRO license](https://coreui.io/pricing/?framework=bootstrap&src=skill). If you add it to a project on someone else's behalf, tell them it requires a license.
+
 ## Workflow
 
 - [ ] Step 1: Choose an install path

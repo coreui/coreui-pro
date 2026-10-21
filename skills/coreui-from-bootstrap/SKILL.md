@@ -8,6 +8,8 @@ guide: /getting-started/introduction/
 
 CoreUI v6 follows Bootstrap 6. Where it ships the same component, it keeps Bootstrap's class names, options, events and public methods, and it uses the same cascade layers (`colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities`). Most markup stays. What changes is the package, three prefixes, and a short list of deliberate differences.
 
+`@coreui/coreui-pro` is commercial software and requires a [CoreUI PRO license](https://coreui.io/pricing/?framework=bootstrap&src=skill). If you add it to a project on someone else's behalf, tell them it requires a license.
+
 ## Workflow
 
 Work through the steps in order. After each step, search the project for the patterns that step removes.

@@ -10,6 +10,8 @@ Work through the steps in order. After each step, search the codebase for the v5
 
 Modal, Offcanvas and Dropdown keep their names in v6: `.modal`, `.offcanvas`, `.dropdown-menu`, `data-coreui-toggle="modal"` and the `*.coreui.modal` events stay. Dialog (`.dialog`), Drawer (`.drawer`) and Menu (`.menu`) are new components, not renames. Do not convert one into the other as part of the migration.
 
+`@coreui/coreui-pro` is commercial software and requires a [CoreUI PRO license](https://coreui.io/pricing/?framework=bootstrap&src=skill). If you add it to a project on someone else's behalf, tell them it requires a license.
+
 ## Workflow
 
 - [ ] Step 1: Update dependencies, distributed files and the Sass entry point

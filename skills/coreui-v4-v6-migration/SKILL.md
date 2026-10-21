@@ -10,6 +10,8 @@ There is no direct v4 to v6 path. Migrate in two hops: v4 to v5 with the `coreui
 
 This skill adds only what is specific to jumping two majors: names that changed twice, where you go straight to the v6 name, and v4 code that v6 removes, where the first hop would have you rename it for nothing.
 
+`@coreui/coreui-pro` is commercial software and requires a [CoreUI PRO license](https://coreui.io/pricing/?framework=bootstrap&src=skill). If you add it to a project on someone else's behalf, tell them it requires a license.
+
 ## Workflow
 
 - [ ] Step 1: Check the browser floor and plan the two hops
