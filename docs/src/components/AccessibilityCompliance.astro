@@ -1,6 +1,6 @@
 ---
 import { a11yComponents } from '../../../build/a11y.config.mjs'
-import { a11yStatusDescriptions, a11yStatusLabels, a11yStatuses, wcagAxeRules, wcagCriteria } from '../../../build/wcag.mjs'
+import { a11yStatusDescriptions, a11yStatusLabels, a11yStatuses, wcagCriteria } from '../../../build/wcag.mjs'
 
 const pages = import.meta.glob(['../content/docs/components/*.mdx', '../content/docs/forms/*.mdx'], { query: '?raw', import: 'default', eager: true })
 const base = import.meta.env.BASE_URL.replace(/\/$/, '')
@@ -12,14 +12,6 @@ const nameOf = (path) => {
   }
 
   return source.match(/^name:\s*"?([^"\n]+)"?$/m)?.[1] ?? source.match(/^title:\s*"?([^"\n]+)"?$/m)?.[1]
-}
-
-const checkOf = (component, criterion, status) => {
-  if (status === 'author') return 'Not enforced'
-  const checks = []
-  if (wcagAxeRules[criterion]?.length) checks.push('axe-core')
-  if (component.assertions?.some((assertion) => assertion.criterion === criterion)) checks.push('Scripted')
-  return checks.length > 0 ? checks.join(', ') : 'Manual review'
 }
 
 const components = a11yComponents
@@ -76,7 +68,7 @@ const { part } = Astro.props
     <div class="table-responsive table-docs border">
       <table class="table table-docs">
         <thead>
-          <tr><th>Criterion</th><th>Level</th><th>Status</th><th>Check</th><th>Notes</th></tr>
+          <tr><th>Criterion</th><th>Level</th><th>Status</th><th>Notes</th></tr>
         </thead>
         <tbody>
           {component.criteria.map((item) => (
@@ -84,7 +76,6 @@ const { part } = Astro.props
               <td><a href={wcagCriteria[item.criterion].url}>{item.criterion} {wcagCriteria[item.criterion].title}</a></td>
               <td>{wcagCriteria[item.criterion].level}</td>
               <td>{a11yStatusLabels[item.status]}</td>
-              <td>{checkOf(component, item.criterion, item.status)}</td>
               <td>{item.note?.replaceAll('GAP:', 'Known gap:')}</td>
             </tr>
           ))}
