@@ -1608,8 +1608,7 @@ class MultiSelect extends ComboboxBase {
       Chip.getInstance(chip)?.dispose()
     }
 
-    selection.innerHTML = ''
-    selection.append(placeholder)
+    selection.replaceChildren(placeholder)
   }
 
   _disposeSelection(): void {

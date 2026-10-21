@@ -6511,7 +6511,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       multiSelect._menu.querySelector('[data-coreui-value="b"]').click()
 
-      expect(shown).toEqual([[['B'], 'B ']])
+      expect(shown).toEqual([[['B'], 'B\u{A0}']])
     })
 
     it('should not report the value setValue gives', () => {

@@ -35,11 +35,12 @@ updates:
       - dependency-name: "eslint"
         update-types:
           - "version-update:semver-major"
-      # eslint-config-xo is 0.x, where a minor can change the rule set — only patches update
       - dependency-name: "eslint-config-xo"
         update-types:
           - "version-update:semver-major"
-          - "version-update:semver-minor"
+      - dependency-name: "eslint-plugin-unicorn"
+        update-types:
+          - "version-update:semver-major"
       # legacy / test infra pinned to avoid churn
       - dependency-name: "jquery"
         update-types:

@@ -370,6 +370,44 @@ describe('FocusTrap', () => {
 
       focustrap.deactivate()
     })
+
+    it('should carry focus back across both seams on shift-tab', () => {
+      fixtureEl.innerHTML = [
+        '<div id="trap"><button id="t1">t1</button><button id="t2">t2</button></div>',
+        '<div id="extra"><button id="a1">a1</button><button id="a2">a2</button></div>'
+      ].join('')
+
+      const focustrap = new FocusTrap({
+        additionalElement: fixtureEl.querySelector('#extra'),
+        trapElement: fixtureEl.querySelector('#trap')
+      })
+
+      focustrap.activate()
+
+      const first = fixtureEl.querySelector('#t1')
+      first.focus()
+
+      const fromTrap = createEvent('keydown', { bubbles: true, cancelable: true })
+      fromTrap.key = 'Tab'
+      fromTrap.shiftKey = true
+      first.dispatchEvent(fromTrap)
+
+      expect(fromTrap.defaultPrevented).toBeTrue()
+      expect(document.activeElement.id).toEqual('a2')
+
+      const firstAdditional = fixtureEl.querySelector('#a1')
+      firstAdditional.focus()
+
+      const fromAdditional = createEvent('keydown', { bubbles: true, cancelable: true })
+      fromAdditional.key = 'Tab'
+      fromAdditional.shiftKey = true
+      firstAdditional.dispatchEvent(fromAdditional)
+
+      expect(fromAdditional.defaultPrevented).toBeTrue()
+      expect(document.activeElement.id).toEqual('t2')
+
+      focustrap.deactivate()
+    })
   })
 
   describe('two active traps', () => {

@@ -218,7 +218,20 @@ export default [
       'unicorn/prefer-hoisting-branch-code': 'off',
       'unicorn/prefer-math-constants': 'off',
       'unicorn/prefer-promise-with-resolvers': 'off',
-      'unicorn/prefer-unary-minus': 'off'
+      'unicorn/prefer-unary-minus': 'off',
+      'unicorn/no-asterisk-prefix-in-documentation-comments': 'off',
+      'unicorn/no-unnecessary-parameters': 'off',
+      'unicorn/no-unused-builtin-method-return': 'off',
+      'unicorn/prefer-block-statement-over-iife': 'off',
+      'unicorn/prefer-combined-guards': 'off',
+      'unicorn/prefer-default-parameters': ['error', { checkFallbackExpressions: false }],
+      'unicorn/prefer-dom-node-html-methods': 'off',
+      'unicorn/prefer-iterator-helpers': 'off',
+      'unicorn/prefer-set-methods': 'off',
+      'unicorn/prefer-simple-condition-first': 'off',
+      'unicorn/prefer-then-catch': 'off',
+      'unicorn/prefer-toggle-attribute': 'off',
+      'unicorn/single-line-block-comment-style': 'off'
     }
   },
   {

@@ -938,13 +938,11 @@ class Autocomplete extends ComboboxBase {
     const value = this._givenValue
     let seed
 
-    if (value !== null && value !== undefined && value !== '') {
-      if (!this._valueApplied) {
-        seed = findOptionByValue(options, value)
-        this._valueApplied = Boolean(seed)
-      }
-    } else {
+    if (value === null || value === undefined || value === '') {
       seed = options.find(option => option.selected && !this._seenOptionValues.has(option.value))
+    } else if (!this._valueApplied) {
+      seed = findOptionByValue(options, value)
+      this._valueApplied = Boolean(seed)
     }
 
     for (const option of options) {

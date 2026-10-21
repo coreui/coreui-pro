@@ -20,7 +20,7 @@ export const getFixture = () => {
 export const clearFixture = () => {
   const fixtureElement = getFixture()
 
-  fixtureElement.innerHTML = ''
+  fixtureElement.replaceChildren()
 }
 
 export const createEvent = (eventName, parameters = {}) => {

@@ -348,7 +348,7 @@ class Calendar extends BaseComponent {
       remove()
     }
 
-    this._element.innerHTML = ''
+    this._element.replaceChildren()
 
     super.dispose()
   }
@@ -1087,7 +1087,7 @@ class Calendar extends BaseComponent {
 
       this._updateRovingTabIndex()
     } else {
-      this._element.innerHTML = ''
+      this._element.replaceChildren()
       this._createCalendar()
     }
 
