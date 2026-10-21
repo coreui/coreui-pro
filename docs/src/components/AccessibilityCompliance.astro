@@ -1,0 +1,95 @@
+---
+import { a11yComponents } from '../../../build/a11y.config.mjs'
+import { a11yStatusDescriptions, a11yStatusLabels, a11yStatuses, wcagAxeRules, wcagCriteria } from '../../../build/wcag.mjs'
+
+const pages = import.meta.glob(['../content/docs/components/*.mdx', '../content/docs/forms/*.mdx'], { query: '?raw', import: 'default', eager: true })
+const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+
+const nameOf = (path) => {
+  const source = pages[`../content/docs/${path}.mdx`]
+  if (source === undefined) {
+    throw new Error(`build/a11y.config.mjs: no docs page at ${path}`)
+  }
+
+  return source.match(/^name:\s*"?([^"\n]+)"?$/m)?.[1] ?? source.match(/^title:\s*"?([^"\n]+)"?$/m)?.[1]
+}
+
+const checkOf = (component, criterion, status) => {
+  if (status === 'author') return 'Not enforced'
+  const checks = []
+  if (wcagAxeRules[criterion]?.length) checks.push('axe-core')
+  if (component.assertions?.some((assertion) => assertion.criterion === criterion)) checks.push('Scripted')
+  return checks.length > 0 ? checks.join(', ') : 'Manual review'
+}
+
+const components = a11yComponents
+  .map((component) => ({
+    ...component,
+    name: nameOf(component.component),
+    slug: component.component.split('/').at(-1),
+    criteria: component.criteria.map((item) => ({ ...item, status: item.status ?? 'author' }))
+  }))
+  .sort((first, second) => first.name.localeCompare(second.name))
+
+const countOf = (component, status) => component.criteria.filter((item) => item.status === status).length
+
+const { part } = Astro.props
+---
+
+{part === 'statuses' && (
+  <div class="table-responsive table-docs border">
+    <table class="table table-docs">
+      <thead>
+        <tr><th>Status</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        {a11yStatuses.map((status) => (
+          <tr><td>{a11yStatusLabels[status]}</td><td>{a11yStatusDescriptions[status]}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{part === 'summary' && (
+  <div class="table-responsive table-docs border">
+    <table class="table table-docs">
+      <thead>
+        <tr><th>Component</th>{a11yStatuses.map((status) => <th>{a11yStatusLabels[status]}</th>)}</tr>
+      </thead>
+      <tbody>
+        {components.map((component) => (
+          <tr>
+            <td><a href={`#${component.slug}`}>{component.name}</a></td>
+            {a11yStatuses.map((status) => <td>{countOf(component, status)}</td>)}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{part === 'components' && components.map((component) => (
+  <Fragment>
+    <h3 id={component.slug}>{component.name}</h3>
+    <p><a href={`${base}/${component.component}/`}>{component.name} documentation</a></p>
+    <div class="table-responsive table-docs border">
+      <table class="table table-docs">
+        <thead>
+          <tr><th>Criterion</th><th>Level</th><th>Status</th><th>Check</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          {component.criteria.map((item) => (
+            <tr>
+              <td><a href={wcagCriteria[item.criterion].url}>{item.criterion} {wcagCriteria[item.criterion].title}</a></td>
+              <td>{wcagCriteria[item.criterion].level}</td>
+              <td>{a11yStatusLabels[item.status]}</td>
+              <td>{checkOf(component, item.criterion, item.status)}</td>
+              <td>{item.note?.replaceAll('GAP:', 'Known gap:')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </Fragment>
+))}

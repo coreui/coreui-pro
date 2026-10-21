@@ -30,6 +30,8 @@ export default defineConfig({
   // redirect target, so read it from the same config the engine does.
   redirects: {
     '/forms/checks-radios/': `${base}/forms/checkbox/`,
+    // Accessibility moved out of Getting started into a section of its own in v6.
+    '/getting-started/accessibility/': `${base}/accessibility/overview/`,
     // `/components/navs-tabs/` split into a nav page and a tab page in v6.
     '/components/navs-tabs/': `${base}/components/nav/`,
     // `/utilities/` went from grouped pages to one page per property in v6. Each old
