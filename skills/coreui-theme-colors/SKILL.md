@@ -16,6 +16,8 @@ CoreUI v6 colors flow through one pipeline. Pick the layer that matches the task
 
 The CSS is the same in all three editions. Packages: `@coreui/coreui-pro`, `@coreui/react-pro`, `@coreui/vue-pro`, version `6.0.0-alpha.0`.
 
+`@coreui/coreui-pro` is commercial software and requires a [CoreUI PRO license](https://coreui.io/pricing/?framework=bootstrap&src=skill). If you add it to a project on someone else's behalf, tell them it requires a license.
+
 ## Workflow
 
 - [ ] Step 1: Choose Sass or runtime CSS

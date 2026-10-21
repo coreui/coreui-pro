@@ -10,6 +10,8 @@ v4 and v5 are both built on Bootstrap 5. The grid, utilities, form controls and 
 
 Work through the steps in order. After each step, search the codebase for the v4 patterns that step lists before you move on.
 
+`@coreui/coreui-pro` is commercial software and requires a [CoreUI PRO license](https://coreui.io/pricing/?framework=bootstrap&src=skill). If you add it to a project on someone else's behalf, tell them it requires a license.
+
 ## Workflow
 
 - [ ] Step 1: Update dependencies and distributed files
