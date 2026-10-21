@@ -592,7 +592,8 @@ does have a selection, already fires `change`.
 `announce(message, { context, priority, timeout })` reads a message to screen
 reader users through a visually hidden live region of the page, or of the open
 modal dialog, native or marked with `aria-modal="true"` like the panel of a
-date picker, since a modal dialog leaves the rest of the page inert. Toaster
+date picker, since a modal dialog leaves the rest of the page inert. `priority`
+takes the values of `ariaNotify()`, `'normal'` and `'high'`. Toaster
 announces its toasts through it. See
 [Accessibility](/getting-started/accessibility/#announcing-messages).
 

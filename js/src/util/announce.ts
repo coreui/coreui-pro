@@ -1,4 +1,4 @@
-export type AnnouncePriority = 'assertive' | 'polite'
+export type AnnouncePriority = 'high' | 'normal'
 
 export type AnnounceOptions = {
   context?: Element | null
@@ -20,7 +20,6 @@ const ATTRIBUTE = 'data-coreui-live-announcer'
 const CLASS_NAME_HIDING = 'hiding'
 const CLOSE_DELAY = 500
 const FIRST_MESSAGE_DELAY = 100
-const PRIORITIES: AnnouncePriority[] = ['assertive', 'polite']
 
 const VISUALLY_HIDDEN: Partial<CSSStyleDeclaration> = {
   border: '0',
@@ -110,14 +109,12 @@ const readTime = (times: WeakMap<Element, Moment>, element: Element): number => 
 }
 
 /**
- * Tells when new regions of a host can take a message: 100 ms from now, or later while a dialog
- * that closed less than 500 ms ago holds the host.
+ * Tells when a moment some milliseconds from now comes, on the clock in use now.
  *
- * @param host - `document.body` or an open modal dialog
- * @returns The ready time with the clock it was read from
+ * @param delay - The time (ms) from now
+ * @returns The time with the clock it was read from
  */
-const getReadyTime = (host: HTMLElement): Moment =>
-  [Math.max(performance.now() + FIRST_MESSAGE_DELAY, readTime(holds, host)), performance.now]
+const getMoment = (delay: number): Moment => [performance.now() + delay, performance.now]
 
 /**
  * Returns the live regions a host carries, creating them when it has none. Regions this copy of
@@ -131,7 +128,7 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
 
   if (existing) {
     if (!readyAt.has(existing)) {
-      readyAt.set(existing, getReadyTime(host))
+      readyAt.set(existing, getMoment(FIRST_MESSAGE_DELAY))
     }
 
     return existing
@@ -141,10 +138,10 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
   announcer.setAttribute(ATTRIBUTE, '')
   Object.assign(announcer.style, VISUALLY_HIDDEN)
 
-  for (const priority of PRIORITIES) {
+  for (const live of ['assertive', 'polite']) {
     const region = document.createElement('div')
     region.setAttribute('role', 'log')
-    region.setAttribute('aria-live', priority)
+    region.setAttribute('aria-live', live)
     region.setAttribute('aria-relevant', 'additions')
     announcer.append(region)
   }
@@ -163,7 +160,7 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
     host.addEventListener('close', onClose)
   }
 
-  readyAt.set(announcer, getReadyTime(host))
+  readyAt.set(announcer, getMoment(FIRST_MESSAGE_DELAY))
 
   return announcer
 }
@@ -178,14 +175,7 @@ export const holdAnnouncements = (): void => {
     return
   }
 
-  const host = getModal(null) ?? document.body
-  const until = performance.now() + CLOSE_DELAY
-  const announcer = host.querySelector(`:scope > [${ATTRIBUTE}]`)
-  holds.set(host, [until, performance.now])
-
-  if (announcer && readyAt.has(announcer)) {
-    readyAt.set(announcer, [Math.max(readTime(readyAt, announcer), until), performance.now])
-  }
+  holds.set(getModal(null) ?? document.body, getMoment(CLOSE_DELAY))
 
   if (pending.length > 0) {
     setTimeout(flush, CLOSE_DELAY)
@@ -193,11 +183,13 @@ export const holdAnnouncements = (): void => {
 }
 
 /**
- * Adds the waiting messages to their regions in the order they came in. Each goes to the page or
- * to the modal dialog open at that moment. The queue holds while that dialog, or the dialog holding
- * focus, plays its closing transition, for 500 ms after a dialog component closes its dialog, and
- * while a region is younger than 100 ms. A message that waited for page regions removed since is dropped with them,
- * and the whole queue once there is no document, as when a test environment tears down.
+ * Adds the waiting messages to the regions of the page or of the modal dialog open at that moment,
+ * those with priority `'high'` first and the rest in the order they came in. When one of them is
+ * `'high'`, all the messages for that page or dialog go to its assertive region, since VoiceOver in
+ * Safari read only one of two regions changed together. The queue holds while that dialog, or the
+ * dialog holding focus, plays its closing transition, for 500 ms after a dialog component closes its dialog, and while a region is younger
+ * than 100 ms. A message that waited for page regions removed since is dropped with them, and the
+ * whole queue once there is no document, as when a test environment tears down.
  */
 const flush = (): void => {
   if (typeof document === 'undefined') {
@@ -205,8 +197,10 @@ const flush = (): void => {
     return
   }
 
+  const sent: [Message, HTMLElement][] = []
+
   while (pending.length > 0) {
-    const [{ context, node, page, priority, timeout }] = pending
+    const [{ context, page }] = pending
 
     if (page && !page.isConnected) {
       pending.shift()
@@ -217,19 +211,26 @@ const flush = (): void => {
 
     if (modal?.classList.contains(CLASS_NAME_HIDING) || document.activeElement?.closest(`dialog.${CLASS_NAME_HIDING}`)) {
       setTimeout(flush, CLOSE_DELAY)
-      return
+      break
     }
 
-    const announcer = getAnnouncer(modal ?? document.body)
-    const wait = readTime(readyAt, announcer) - performance.now()
+    const host = modal ?? document.body
+    const announcer = getAnnouncer(host)
+    const wait = Math.max(readTime(holds, host), readTime(readyAt, announcer)) - performance.now()
 
     if (wait > 0) {
       setTimeout(flush, wait)
-      return
+      break
     }
 
-    pending.shift()
-    announcer.querySelector(`[aria-live="${priority}"]`)!.append(node)
+    sent.push([pending.shift()!, announcer])
+  }
+
+  const loud = new Set(sent.filter(([{ priority }]) => priority === 'high').map(([, announcer]) => announcer))
+  sent.sort(([first], [second]) => Number(second.priority === 'high') - Number(first.priority === 'high'))
+
+  for (const [{ node, timeout }, announcer] of sent) {
+    announcer.querySelector(`[aria-live="${loud.has(announcer) ? 'assertive' : 'polite'}"]`)!.append(node)
 
     if (timeout > 0 && Number.isFinite(timeout)) {
       setTimeout(() => node.remove(), timeout)
@@ -240,18 +241,20 @@ const flush = (): void => {
 /**
  * Reads a message to screen reader users. The message goes to a visually hidden live region at
  * the start of the page or, while a modal dialog leaves the rest of the page inert, to one inside
- * that dialog, native or marked with `aria-modal="true"`. The region is picked when the message is added: one task after the call, once a
- * new region is 100 ms old, and 500 ms after a dialog component has closed its dialog. Messages
- * are added in the order of the calls, and each call adds a new one, so the same text is read
- * again.
+ * that dialog, native or marked with `aria-modal="true"`. The region is picked when the message is
+ * added: one task after the call, once a new region is 100 ms old, and 500 ms after a dialog
+ * component has closed its dialog. Messages are added in the order of the calls, those with
+ * priority `'high'` first among the ones the queue adds together, which then all go to the
+ * assertive region, and each call adds a new one, so the same text is read again.
  *
  * @param message - The text to read
- * @param options - `priority` picks the polite (default) or the assertive region, `timeout` how
- *   long (ms) the message stays once added, 7000 by default and `0` to keep it, `context` the
- *   element the message comes from, which tells a modal dialog it sits in
+ * @param options - `priority` is `'normal'` (default, the polite region) or `'high'` (the
+ *   assertive one), as in `ariaNotify()`; `timeout` how long (ms) the message stays once added,
+ *   7000 by default and `0` to keep it; `context` the element the message comes from, which tells
+ *   a modal dialog it sits in
  * @returns A function that removes the message, or cancels it before it is added
  */
-export const announce = (message: string, { context = null, priority = 'polite', timeout = 7000 }: AnnounceOptions = {}): (() => void) => {
+export const announce = (message: string, { context = null, priority = 'normal', timeout = 7000 }: AnnounceOptions = {}): (() => void) => {
   if (typeof document === 'undefined' || !document.body || !message) {
     return () => {}
   }
@@ -263,7 +266,7 @@ export const announce = (message: string, { context = null, priority = 'polite',
   const announcer = getAnnouncer(host)
 
   pending.push({
-    context, node, page: host === document.body ? announcer : null, priority: priority === 'assertive' ? 'assertive' : 'polite', timeout
+    context, node, page: host === document.body ? announcer : null, priority, timeout
   })
   setTimeout(flush, Math.max(0, readTime(readyAt, announcer) - performance.now()))
 

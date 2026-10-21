@@ -8,7 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Toast, { type ToastConfig } from './toast.js'
-import { announce } from './util/announce.js'
+import { announce, type AnnouncePriority } from './util/announce.js'
 import type { TemplateContentEntry } from './util/template-factory.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
@@ -133,7 +133,7 @@ const DefaultType = {
 
 const ToastDefault: ToastOptions = {
   dismissible: true,
-  priority: 'low'
+  priority: 'normal'
 }
 
 const ToastDefaultType = {
@@ -191,7 +191,7 @@ type ToastOptions = {
   instant?: boolean
   onClose?: (toast: ToastObject) => void
   onRemove?: (toast: ToastObject) => void
-  priority?: 'high' | 'low'
+  priority?: AnnouncePriority
   theme?: string
   timeout?: number
   title?: TemplateContentEntry
@@ -659,7 +659,7 @@ class Toaster extends BaseComponent {
     this._announcements.delete(toast.element)
 
     if (text) {
-      this._announcements.set(toast.element, announce(text, { context: this._element, priority: toast.priority === 'high' ? 'assertive' : 'polite' }))
+      this._announcements.set(toast.element, announce(text, { context: this._element, priority: toast.priority }))
     }
   }
 

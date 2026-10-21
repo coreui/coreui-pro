@@ -169,6 +169,7 @@ describe('Toaster', () => {
       toaster = new Toaster(null, { container: fixtureEl })
 
       toaster.add({ title: 'Saved', description: 'Done', instant: true })
+      await announced()
       toaster.add({ description: 'Failed', priority: 'high', instant: true })
       await announced()
 
@@ -187,6 +188,16 @@ describe('Toaster', () => {
       await announced()
 
       expect(messages('polite')).toEqual(['Row 1 saved', 'Row 2 saved', 'Row 3 saved'])
+    })
+
+    it('should give a toast the normal priority by default', () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const onClose = jasmine.createSpy('onClose')
+
+      toaster.add({ description: 'Saved', instant: true, onClose })
+      fixtureEl.querySelector('.btn-close').click()
+
+      expect(onClose).toHaveBeenCalledWith(jasmine.objectContaining({ priority: 'normal' }))
     })
 
     it('should replace the announcement of an updated toast and drop it on removal', async () => {
