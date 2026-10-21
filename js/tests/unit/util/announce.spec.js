@@ -128,7 +128,32 @@ describe('announce', () => {
     vi.advanceTimersByTime(100)
 
     expect(messages(document.body, 'polite')).toEqual([])
-    expect(messages(document.body, 'assertive')).toEqual(['Saved', 'Failed'])
+    expect(messages(document.body, 'assertive')).toEqual(['Failed', 'Saved'])
+  })
+
+  it('should keep the order of the calls among the high messages added together', () => {
+    announce('Failed', { priority: 'high' })
+    announce('Saved')
+    announce('Lost', { priority: 'high' })
+    vi.advanceTimersByTime(100)
+
+    expect(messages(document.body, 'assertive')).toEqual(['Failed', 'Lost', 'Saved'])
+  })
+
+  it('should leave the messages for another modal dialog in its polite region', () => {
+    fixtureEl.innerHTML = [
+      '<div id="first" role="dialog" aria-modal="true"><button type="button">First</button></div>',
+      '<div id="second" role="dialog" aria-modal="true"><button type="button">Second</button></div>'
+    ].join('')
+    const first = fixtureEl.querySelector('#first')
+    const second = fixtureEl.querySelector('#second')
+
+    announce('Picked', { context: first.querySelector('button'), priority: 'high' })
+    announce('Saved', { context: second.querySelector('button') })
+    vi.advanceTimersByTime(100)
+
+    expect(messages(first, 'assertive')).toEqual(['Picked'])
+    expect(messages(second, 'polite')).toEqual(['Saved'])
   })
 
   it('should send the messages a hold releases together to the assertive region when one of them is high', () => {
@@ -143,7 +168,7 @@ describe('announce', () => {
 
     vi.advanceTimersByTime(1)
     expect(messages(document.body, 'polite')).toEqual(['Before'])
-    expect(messages(document.body, 'assertive')).toEqual(['Saved', 'Failed'])
+    expect(messages(document.body, 'assertive')).toEqual(['Failed', 'Saved'])
   })
 
   it('should add the same text again as a new message', () => {

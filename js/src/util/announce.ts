@@ -183,10 +183,11 @@ export const holdAnnouncements = (): void => {
 }
 
 /**
- * Adds the waiting messages to their regions in the order they came in, all to the region of the
- * highest priority among them, since VoiceOver reads only one of two regions changed together. Each
- * goes to the page or to the modal dialog open at that moment. The queue holds while that dialog, or the dialog holding focus, plays its closing
- * transition, for 500 ms after a dialog component closes its dialog, and while a region is younger
+ * Adds the waiting messages to the regions of the page or of the modal dialog open at that moment,
+ * those with priority `'high'` first and the rest in the order they came in. When one of them is
+ * `'high'`, all the messages for that page or dialog go to its assertive region, since VoiceOver in
+ * Safari read only one of two regions changed together. The queue holds while that dialog, or the
+ * dialog holding focus, plays its closing transition, for 500 ms after a dialog component closes its dialog, and while a region is younger
  * than 100 ms. A message that waited for page regions removed since is dropped with them, and the
  * whole queue once there is no document, as when a test environment tears down.
  */
@@ -225,10 +226,11 @@ const flush = (): void => {
     sent.push([pending.shift()!, announcer])
   }
 
-  const live = sent.some(([{ priority }]) => priority === 'high') ? 'assertive' : 'polite'
+  const loud = new Set(sent.filter(([{ priority }]) => priority === 'high').map(([, announcer]) => announcer))
+  sent.sort(([first], [second]) => Number(second.priority === 'high') - Number(first.priority === 'high'))
 
   for (const [{ node, timeout }, announcer] of sent) {
-    announcer.querySelector(`[aria-live="${live}"]`)!.append(node)
+    announcer.querySelector(`[aria-live="${loud.has(announcer) ? 'assertive' : 'polite'}"]`)!.append(node)
 
     if (timeout > 0 && Number.isFinite(timeout)) {
       setTimeout(() => node.remove(), timeout)
@@ -241,9 +243,9 @@ const flush = (): void => {
  * the start of the page or, while a modal dialog leaves the rest of the page inert, to one inside
  * that dialog, native or marked with `aria-modal="true"`. The region is picked when the message is
  * added: one task after the call, once a new region is 100 ms old, and 500 ms after a dialog
- * component has closed its dialog. Messages are added in the order of the calls, those added
- * together to the region of the highest priority among them, and each call adds a new one, so the
- * same text is read again.
+ * component has closed its dialog. Messages are added in the order of the calls, those with
+ * priority `'high'` first among the ones the queue adds together, which then all go to the
+ * assertive region, and each call adds a new one, so the same text is read again.
  *
  * @param message - The text to read
  * @param options - `priority` is `'normal'` (default, the polite region) or `'high'` (the
