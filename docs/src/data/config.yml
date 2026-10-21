@@ -37,3 +37,4 @@ search:
   appId: 5OOVC1SDJS
   apiKey: ab4149e82cfd175c0afe647a937a8d21
   indexName: coreui
+  filterByVersion: true
