@@ -294,7 +294,7 @@
   },
   "devDependencies": {
     "@astrojs/mdx": "^8.1.0",
-    "@coreui/astro-docs": "^0.1.17",
+    "@coreui/astro-docs": "^0.1.18",
     "@eslint/markdown": "^8.0.3",
     "@floating-ui/dom": "^1.8.0",
     "@vitest/browser": "^5.0.5",
