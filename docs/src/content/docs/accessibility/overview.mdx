@@ -15,7 +15,7 @@ Conformance belongs to a page, not to a library: WCAG judges the page a user mee
 
 - **Roles, states and properties.** A component writes its roles and `aria-*` states from its options and keeps them in sync while it runs: `aria-expanded` on a toggle, `aria-selected` on an option, `aria-invalid` on a field in an invalid state.
 - **Keyboard.** Interactive components are operated with the keyboard as well as with a pointer. The [keyboard](/accessibility/keyboard/) page covers the shared conventions and links each component's own key table.
-- **Focus.** Dialogs, menus and pickers move focus in when they open, keep it inside while they are modal, and give it back when they close.
+- **Focus.** Dialogs and pickers move focus in when they open, keep it inside while they are modal, and give it back when they close. A menu leaves focus on its toggle until the arrow keys move it to the items.
 - **Status messages.** Changes the page shows without moving focus, such as a toast, a loading button or a chip being added, reach screen readers through [`announce()`](/accessibility/screen-readers/#announcing-messages).
 - **Motion.** Transitions respect the user's [reduced motion](/accessibility/reduced-motion/) preference.
 
@@ -58,7 +58,7 @@ More in the [visually hidden helper](/helpers/visually-hidden/).
 
 ## How we test
 
-- **Automated conformance suite.** On every change, the documented examples of each tested component are rendered in Chromium against the built stylesheet and scripts. [axe-core](https://github.com/dequelabs/axe-core) checks the success criteria the component claims, and scripted steps check what axe cannot see, such as keyboard operation, focus order and focus return. A regression in a criterion the component claims, fully or in part, fails the build. The [compliance](/accessibility/compliance/) page is generated from the same configuration.
+- **Automated conformance suite.** On every change, the documented examples of each tested component are rendered in Chromium against the built stylesheet and scripts. [axe-core](https://github.com/dequelabs/axe-core) checks the success criteria it has rules for, and scripted steps check some of what axe cannot see, such as keyboard operation, focus order and focus return. A regression in a criterion checked this way fails the build; the rest are reviewed by hand, and the compliance page says which is which. The [compliance](/accessibility/compliance/) page is generated from the same configuration.
 - **Unit tests.** The specs of each component cover its keyboard handling, focus management and the ARIA states it writes.
 - **Screen readers.** We test announcements and component behavior with screen readers by hand. The [screen readers](/accessibility/screen-readers/) page lists what has been measured.
 

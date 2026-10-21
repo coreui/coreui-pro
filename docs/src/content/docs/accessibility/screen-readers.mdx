@@ -11,13 +11,15 @@ Behavior a screen reader decides is measured by hand, with the screen reader run
 
 | Screen reader | Browser | Platform | Measured |
 | --- | --- | --- | --- |
-| VoiceOver | Safari 17.6, Chrome 155, Firefox | macOS 14.8 | Status messages from `announce()`, the Toaster and the dialog components: the cases below |
+| VoiceOver | Safari 17.6 | macOS 14.8 | Status messages from `announce()` and the Toaster: messages sent together, both regions at once, a page still loading, open dialogs and the wait after a dialog closes; the loading button |
+| VoiceOver | Chrome 154 | macOS 14.8 | The same cases |
+| VoiceOver | Firefox 157 | macOS 14.8 | The wait after a dialog closes |
 
 Results for other screen readers are added to this table once measured.
 
 ## Announcing messages
 
-`announce()` reads a short message to screen reader users without moving focus, for a change the page shows but does not focus, such as a saved form or a filtered list. The Toaster announces every toast through it.
+`announce()` reads a short message to screen reader users without moving focus, for a change the page shows but does not focus, such as a saved form or a filtered list. The Toaster announces the text of every toast through it.
 
 ```js
 import { announce } from '@coreui/coreui-pro'

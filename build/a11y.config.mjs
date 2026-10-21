@@ -140,7 +140,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Removing values from the field, with a chip\'s remove button, the clear button or Backspace, is announced in a visually hidden polite live region on the page. Choosing options in the list is conveyed by each option\'s selected state.'
+        note: 'Removing values from the field, with a chip\'s remove button, the clear button or Backspace, is announced in a visually hidden polite live region. Choosing options in the list is conveyed by each option\'s selected state.'
       },
       {
         criterion: '2.1.1',
@@ -208,7 +208,7 @@ export const a11yComponents = [
       {
         criterion: '2.4.3',
         status: 'built-in',
-        note: 'The panel is a modal dialog, so Tab cycles inside it and never lands back on the field. Closing it, with Esc or by picking a day, returns focus to the field.'
+        note: 'The panel is a modal dialog, so Tab cycles inside it and never lands back on the field. Closing it with Esc, or by picking a day when there is no time part, returns focus to where it was when the panel opened: the field or its toggle.'
       }
     ]
   },
@@ -282,7 +282,7 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Enter or ArrowDown opens the list. Arrow keys, Home/End and typing a letter move through it, Enter or Space picks, Esc closes it and Tab moves on. With a search field, Home, End and Space stay with the search text.'
+        note: 'Enter, Space, ArrowDown or ArrowUp opens the list. Arrow keys, Home/End and typing a letter move through it, Enter or Space picks, Esc closes it and Tab moves on. With a search field, Home, End and Space stay with the search text.'
       },
       {
         criterion: '3.3.2',
@@ -307,12 +307,12 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Enter adds a chip. From the start of an empty input, Backspace, Delete or the arrow toward the chips moves to the last chip; arrow keys and Home/End move between chips, and Backspace or Delete removes the focused one.'
+        note: 'Enter adds a chip. Backspace or Delete in an empty input, or the arrow toward the chips with the caret at the start, moves to the last chip; arrow keys and Home/End move between chips, and Backspace or Delete removes the focused one.'
       },
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Adding and removing chips is announced in a visually hidden polite live region on the page.'
+        note: 'Adding and removing chips is announced in a visually hidden polite live region.'
       }
     ],
     html: `<div class="chip-input" id="a11yChipInput" data-coreui-chip-input>
@@ -367,7 +367,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Adding and removing chips is announced in a visually hidden polite live region on the page; the wording comes from ariaAddedAnnouncement and ariaRemovedAnnouncement.'
+        note: 'Adding and removing chips is announced in a visually hidden polite live region; the wording comes from ariaAddedAnnouncement and ariaRemovedAnnouncement.'
       }
     ]
   },
@@ -481,7 +481,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The calendar is a role=grid of role=gridcell cells, so a day, month, quarter or year can be marked selected. Every cell carries an aria-label with its full date, today\'s cell carries aria-current="date", and a week row carries aria-selected when whole weeks are selectable.'
+        note: 'The calendar is a role=grid of role=gridcell cells, so a day, month, quarter or year can be marked selected. Each day cell carries an aria-label with its full date unless a custom renderDayCell is used, month, quarter and year cells are named by their text, today\'s cell carries aria-current="date", and a week row carries aria-selected when whole weeks are selectable.'
       },
       {
         criterion: '1.3.1',
@@ -536,7 +536,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Every move is announced in a visually hidden polite live region on the page, with the number of items and the destination list (ariaMovedAnnouncement).'
+        note: 'Every move is announced in a visually hidden polite live region, with the number of items and the destination list (ariaMovedAnnouncement).'
       }
     ],
     assertions: [
@@ -578,7 +578,7 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'built-in',
-        note: 'Arrow keys move between items, Enter or Space activates one, Home and End jump to the first and last item, Esc closes the menu and returns focus to the toggle, and Tab moves on.'
+        note: 'Arrow keys move between items, Enter activates one (Space too when the item is a button, and both open a submenu), Home and End jump to the first and last item, Esc closes the menu and returns focus to the toggle, and Tab moves on.'
       },
       {
         criterion: '1.4.13',
@@ -628,7 +628,7 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'built-in',
-        note: 'Shift+F10 and the Menu key open the menu at the focused trigger and move focus into it; arrow keys, Enter or Space, Home/End, Esc and Tab operate it.'
+        note: 'Shift+F10 and the Menu key open the menu at the focused trigger and move focus into it; arrow keys, Enter (Space too on button items), Home/End, Esc and Tab operate it.'
       },
       {
         criterion: '2.1.2',
@@ -681,7 +681,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'partial',
-        note: 'The plugin adds role=tablist, tab and tabpanel, aria-selected, aria-labelledby on each panel and a roving tabindex where the markup lacks them. GAP: it does not add aria-controls, so give each tab one that points at its panel.'
+        note: 'The plugin adds role=tablist, tab and tabpanel, aria-selected, a roving tabindex and, when the tab has an id, aria-labelledby on its panel, where the markup lacks them. GAP: it does not add aria-controls, so give each tab one that points at its panel.'
       },
       {
         criterion: '2.4.3',
@@ -706,7 +706,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'When a step fails validation, focus moves to the first invalid field and its error message is added to that field\'s aria-describedby, so it is read with the field; when focus cannot move there, the message is announced in a polite live region on the page. A step change made while focus is inside the stepper moves focus to the new step button.'
+        note: 'When a step form with novalidate fails validation, focus moves to the first invalid field and its error message is added to that field\'s aria-describedby, so it is read with the field; when focus cannot move there, the message is announced in a polite live region. Without novalidate the browser shows its own validation message. A step change made while focus is inside the stepper moves focus to the new step button.'
       }
     ]
   },
@@ -747,12 +747,12 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'partial',
-        note: 'The modal is a native dialog element opened as a modal dialog, so the browser exposes its role and makes the rest of the page inert while it is open. Name it with aria-labelledby pointing at its title and give the dismiss button an accessible name.'
+        note: 'The modal is a native dialog element opened as a modal dialog unless the modal option is false, so the browser exposes its role and makes the rest of the page inert while it is open. Name it with aria-labelledby pointing at its title and give the dismiss button an accessible name.'
       },
       {
         criterion: '2.4.3',
         status: 'built-in',
-        note: 'Opening moves focus into the dialog, and the rest of the page is inert while it is open, so Tab stays within the dialog. Closing it returns focus to the button that opened it.'
+        note: 'Opening moves focus into the dialog, and the rest of the page is inert while it is open, so Tab stays within the dialog. Closing a modal opened from a data-coreui-toggle trigger returns focus to that trigger.'
       },
       {
         criterion: '2.1.1',
@@ -804,7 +804,7 @@ export const a11yComponents = [
       {
         criterion: '2.1.2',
         status: 'built-in',
-        note: 'Esc and the dismiss button close the panel and make the page interactive again, and focus returns to the trigger, so focus is never trapped.'
+        note: 'Esc and the dismiss button close the panel and make the page interactive again, and focus returns to the data-coreui-toggle trigger that opened it, so focus is never trapped.'
       }
     ]
   },
