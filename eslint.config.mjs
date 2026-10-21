@@ -46,6 +46,7 @@ export default [
       'docs/.astro/',
       'docs/scripts/',
       'docs/astro.config.mjs',
+      'docs/**/*.astro',
       'docs/**/*.ts',
       'js/coverage/'
     ]

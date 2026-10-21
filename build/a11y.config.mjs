@@ -66,12 +66,12 @@ export const a11yComponents = [
       {
         criterion: '3.3.8',
         status: 'built-in',
-        note: 'Pasting a full code distributes it across the fields, and autocomplete=\'one-time-code\' on every digit input lets password managers and SMS autofill target it.'
+        note: 'Pasting a full code, or receiving it from SMS autofill or a password manager, fills every field at once. The first field carries autocomplete="one-time-code", so autofill targets the code as one entry.'
       },
       {
         criterion: '1.3.5',
         status: 'built-in',
-        note: 'autocomplete=\'one-time-code\' plus inputmode=\'numeric\' (type: \'number\') identify each field\'s purpose.'
+        note: 'The first field carries autocomplete="one-time-code", and every field gets inputmode="numeric" when the code is numeric, so browsers and autofill know what the input is for.'
       },
       {
         criterion: '3.3.2',
@@ -81,7 +81,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'Each digit input exposes a name, role, and value; keep per-digit aria-labels in sync with the field count so the group reads as one code entry.'
+        note: 'The container is a role=group and each field is a native input with its own name ("Digit N of M" by default), recomputed from the number of fields. Name the group with aria-label or aria-labelledby so it reads as one code entry.'
       },
       {
         criterion: '2.2.1',
@@ -105,18 +105,18 @@ export const a11yComponents = [
       },
       {
         criterion: '4.1.3',
-        status: 'built-in',
-        note: 'The "no results" placeholder is a role=status live region, announced without receiving focus.'
+        status: 'partial',
+        note: 'When searchNoResultsLabel is set, the "no results" message is a role=status region inside the open list, so it is announced without moving focus. Without it, the list closes when nothing matches.'
       },
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Arrow keys, Home/End, Enter, Esc and Tab operate the listbox; verify manually for full conformance.'
+        note: 'Arrow keys move through the options, Enter picks one, Esc closes the list and Tab moves on, or accepts the inline hint when hints are shown. Home, End and Space stay with the text in the input.'
       },
       {
         criterion: '3.3.2',
         status: 'author',
-        note: 'Associate a visible <label> (or aria-label) with the input; default examples rely on a placeholder.'
+        note: 'Give the input a visible label, pointed at it through the id option, or an aria-label; a placeholder is not a label.'
       }
     ]
   },
@@ -135,22 +135,22 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The toggler gets role=combobox named from the associated <label> via aria-labelledby (or the select\'s aria-label), with aria-expanded and aria-haspopup=dialog, plus aria-controls pointing at the role=dialog panel while it is open (the search input points at the list); options render as a role=listbox with aria-multiselectable and role=option items; the replaced native <select> is removed from the accessibility tree (aria-hidden, tabindex=-1).'
+        note: 'The toggler is a role=combobox named from its label, with aria-expanded and aria-haspopup=dialog, and aria-controls pointing at the role=dialog panel while it is open; the search input points at the list. The options are a role=listbox (multiselectable when multiple selection is on) of role=option items, and the native select is hidden from assistive technology.'
       },
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'The selection summary is an aria-live=polite region, so selection changes are announced.'
+        note: 'Removing values from the field, with a chip\'s remove button, the clear button or Backspace, is announced in a visually hidden polite live region. Choosing options in the list is conveyed by each option\'s selected state.'
       },
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Arrow keys, Home/End, Enter, Esc and Tab operate the listbox; verify manually for full conformance.'
+        note: 'Enter or ArrowDown opens the panel; arrow keys and Home/End move through the options, Space or Enter selects, Esc closes the panel and Tab moves on.'
       },
       {
         criterion: '3.3.2',
         status: 'author',
-        note: 'Associate a visible <label> (or aria-label) with the control; default examples rely on a placeholder.'
+        note: 'Name the control with a label pointing at the select, or aria-label or aria-labelledby on the select; a placeholder is not a label.'
       }
     ]
   },
@@ -193,7 +193,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The toggle carries aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open, and the panel answers that promise with role=dialog and aria-modal. The audited instance is the one with the time half, so the open panel holds the calendar grid and the time selects together.'
+        note: 'The toggle carries aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open, and the panel is a role=dialog with aria-modal. With a time part, the dialog holds the calendar and the time controls together.'
       },
       {
         criterion: '1.3.1',
@@ -203,12 +203,12 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Alt+ArrowDown opens the panel, Esc closes it, and the calendar is walked with the arrow keys; verify manually for full conformance.'
+        note: 'Alt+ArrowDown or F4 opens the panel, Esc closes it, and the arrow keys walk the calendar.'
       },
       {
         criterion: '2.4.3',
         status: 'built-in',
-        note: 'The panel is the dialog, so Tab cycles inside it and the field stays out of the cycle; closing hands focus back to the field, whether the panel was dismissed with Esc or a day was picked. Both verified here — the field rebuilds its sections as the value lands, so the target is resolved at close time rather than remembered from before.'
+        note: 'The panel is a modal dialog, so Tab cycles inside it and never lands back on the field. Closing it with Esc, or by picking a day when there is no time part, returns focus to where it was when the panel opened: the field or its toggle.'
       }
     ]
   },
@@ -222,7 +222,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'Both calendars open under one toggle that carries aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open; the range fields and the separator carry their own roles.'
+        note: 'Both calendars open under one toggle that carries aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open. The range is a group of two date fields whose parts are spinbuttons, and the separator icon is hidden from assistive technology.'
       },
       {
         criterion: '1.3.1',
@@ -232,7 +232,7 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Alt+ArrowDown opens the panel, Esc closes it, and both calendars are walked with the arrow keys; verify manually for full conformance.'
+        note: 'Alt+ArrowDown or F4 opens the panel, Esc closes it, and the arrow keys walk both calendars.'
       }
     ]
   },
@@ -246,17 +246,17 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The toggle owns the popup state — aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open — instead of the surrounding div, which has no role to support it.'
+        note: 'The toggle carries aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open, and the panel is a role=dialog.'
       },
       {
         criterion: '1.3.1',
         status: 'built-in',
-        note: 'The open panel holds the hour, minute and second lists.'
+        note: 'The open panel is a group named "Time" holding a labelled list for hours and minutes, for seconds when they are shown, and for AM/PM in 12-hour format.'
       },
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Alt+ArrowDown opens the panel, Esc closes it, and the arrow keys walk each time list; verify manually for full conformance.'
+        note: 'Alt+ArrowDown or F4 opens the panel, Esc closes it, the up and down arrows walk a time list and the left and right arrows move between lists.'
       }
     ]
   },
@@ -272,7 +272,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The toggle is a <button> carrying aria-haspopup=listbox and aria-expanded, so the state lands on an element whose role supports it; the panel is a role=listbox of role=option items with aria-selected, and the replaced native input stays out of the accessibility tree.'
+        note: 'The toggle is a button with aria-haspopup=listbox and aria-expanded that drives the list through aria-activedescendant; the list is a role=listbox of role=option items with aria-selected. The hidden select that submits the value is kept out of the accessibility tree.'
       },
       {
         criterion: '1.3.1',
@@ -282,12 +282,12 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Arrow keys, Home/End, Enter, Esc and Tab operate the panel; verify manually for full conformance.'
+        note: 'Enter, Space, ArrowDown or ArrowUp opens the list. Arrow keys, Home/End and typing a letter move through it, Enter or Space picks, Esc closes it and Tab moves on. With a search field, Home, End and Space stay with the search text.'
       },
       {
         criterion: '3.3.2',
         status: 'author',
-        note: 'Name the toggle with a visible <label> or aria-label; the examples rely on a placeholder.'
+        note: 'Name the toggle with a visible label or aria-label; a placeholder is not a label.'
       }
     ]
   },
@@ -307,12 +307,12 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Enter adds a chip, Backspace/Delete and arrow keys move between input and chips; verify manually for full conformance.'
+        note: 'Enter adds a chip. Backspace or Delete in an empty input, or the arrow toward the chips with the caret at the start, moves to the last chip; arrow keys and Home/End move between chips, and Backspace or Delete removes the focused one.'
       },
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Adding and removing chips is announced through announce(), as a message in the visually hidden polite log region of the page. Verified here: typing a value and pressing Enter adds the message.'
+        note: 'Adding and removing chips is announced in a visually hidden polite live region.'
       }
     ],
     html: `<div class="chip-input" id="a11yChipInput" data-coreui-chip-input>
@@ -352,7 +352,7 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Arrow keys, Home/End move focus across chips; Enter/Space toggle selection; Backspace/Delete remove. Verify manually.'
+        note: 'Arrow keys and Home/End move focus across chips, Enter or Space toggles selection, and Backspace or Delete removes a chip.'
       },
       {
         criterion: '4.1.2',
@@ -367,7 +367,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Adding and removing chips is announced through announce(), as a message in the visually hidden polite log region of the page (labels configurable via ariaAddedAnnouncement/ariaRemovedAnnouncement). Verified here: removing a chip adds the message.'
+        note: 'Adding and removing chips is announced in a visually hidden polite live region; the wording comes from ariaAddedAnnouncement and ariaRemovedAnnouncement.'
       }
     ]
   },
@@ -442,7 +442,7 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Thumbs are native range inputs operable with arrow keys; verify multi-thumb clamping manually.'
+        note: 'Each thumb is a native range input operated with the arrow keys, and a thumb cannot be moved past its neighbour.'
       },
       {
         criterion: '3.3.2',
@@ -462,12 +462,12 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Native radios move with arrow keys; verify the readOnly/disabled variants manually.'
+        note: 'The stars are native radio buttons, so Tab reaches the group and the arrow keys change the value; in read-only mode the arrow keys do nothing.'
       },
       {
         criterion: '1.4.1',
         status: 'author',
-        note: 'The filled/empty stars are also distinguished by shape, but confirm custom icon sets keep a non-color cue.'
+        note: 'Selected and unselected stars have the same shape and differ only in colour. The value is exposed through the checked radio; where sighted users must read the rating, show the value as text or use icons with distinct filled and outline shapes.'
       }
     ]
   },
@@ -481,7 +481,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The table is a role=grid of role=gridcell cells, which is what makes aria-selected legal on a day, month, quarter or year; the selected cell also carries aria-current=date and an aria-label spelling the full date, and a week row carries aria-selected when whole weeks are selectable.'
+        note: 'The calendar is a role=grid of role=gridcell cells, so a day, month, quarter or year can be marked selected. Each day cell carries an aria-label with its full date unless a custom renderDayCell is used, month, quarter and year cells are named by their text, today\'s cell carries aria-current="date", and a week row carries aria-selected when whole weeks are selectable.'
       },
       {
         criterion: '1.3.1',
@@ -491,7 +491,7 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Arrow keys walk the grid, Home/End jump to the row edges, PageUp/PageDown change the period and Enter picks; verify manually for full conformance.'
+        note: 'Arrow keys walk the grid, Home and End jump to the edges of the row, Page Up and Page Down change the period, and Enter picks.'
       }
     ]
   },
@@ -501,17 +501,17 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The options element is a role=listbox with aria-multiselectable, aria-disabled and aria-busy tracking the config; every option is a role=option with aria-selected and aria-disabled; a companion field gets aria-controls and aria-activedescendant while the list is in the document, and the search input is named from ariaSearchLabel.'
+        note: 'The list is a role=listbox with aria-multiselectable, aria-disabled and aria-busy following the options; every option is a role=option with aria-selected unless selection is off. A companion field gets aria-controls and aria-activedescendant while the list is on the page, and the search input is named by ariaSearchLabel.'
       },
       {
         criterion: '1.3.1',
         status: 'author',
-        note: 'GAP: two listbox children break the required-children rule. A sections-selectable section label is written as role=button inside the listbox (js/src/list-box.ts:757), and the .list-box-empty placeholder stays inside the listbox when a filter hides every option, leaving it with no option or group child.'
+        note: 'GAP: two kinds of children break the listbox\'s required-children rule: a group label made selectable with sectionsSelectable is a role=button inside the list, and the empty-state message stays inside the list when a filter hides every option.'
       },
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Arrow keys, Home/End, Space, Shift and Ctrl ranges and Ctrl+A operate the list, and the highlighted option is kept in view; verify manually for full conformance.'
+        note: 'Arrow keys, Home/End, Space, Shift and Ctrl ranges and Ctrl+A operate the list, typing a letter jumps to a matching option, and the highlighted option is kept in view.'
       }
     ]
   },
@@ -521,7 +521,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'Each move button is named from its ariaMoveLabel default and points at the list it fills through aria-controls; each side\'s options element is a role=listbox named from the side title when the author gives it no name of its own.'
+        note: 'Each move button is named by ariaMoveToTargetLabel, ariaMoveToSourceLabel, ariaMoveAllToTargetLabel or ariaMoveAllToSourceLabel unless it already has an aria-label, and points at the list it fills through aria-controls. Each side\'s options are a role=listbox named from the side title when they have no name of their own.'
       },
       {
         criterion: '1.3.1',
@@ -531,12 +531,12 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Each list is operated like a standalone list box, and the move buttons are reachable in tab order between them; verify manually for full conformance.'
+        note: 'Each list is operated like a standalone list box, and the move buttons sit between the lists in the tab order.'
       },
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Every move is announced through announce(), as a new message in the visually hidden polite log region of the page, with ariaMovedAnnouncement. Verified here: selecting an option and moving it right adds a message with the count and the destination title.'
+        note: 'Every move is announced in a visually hidden polite live region, with the number of items and the destination list (ariaMovedAnnouncement).'
       }
     ],
     assertions: [
@@ -578,7 +578,7 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'built-in',
-        note: 'Full keyboard support: arrows to move, Enter/Space to activate, Esc to close, Home/End to jump, Tab to move on. Verified here: ArrowDown moves focus into the menu.'
+        note: 'Arrow keys move between items, Enter activates one (Space too when the item is a button, and both open a submenu), Home and End jump to the first and last item, Esc closes the menu and returns focus to the toggle, and Tab moves on.'
       },
       {
         criterion: '1.4.13',
@@ -588,7 +588,7 @@ export const a11yComponents = [
       {
         criterion: '2.4.7',
         status: 'built-in',
-        note: 'Focused menu items show a visible focus indicator (verify visually).'
+        note: 'A focused menu item gets the same highlighted background as a hovered one.'
       },
       {
         criterion: '4.1.2',
@@ -628,17 +628,17 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'built-in',
-        note: 'Shift+F10 and the Menu key open the menu anchored to the focused trigger; arrows, Enter/Space, Home/End, Esc and Tab operate it. Verified here: Shift+F10 moves focus into the menu and ArrowDown reaches an item.'
+        note: 'Shift+F10 and the Menu key open the menu at the focused trigger and move focus into it; arrow keys, Enter (Space too on button items), Home/End, Esc and Tab operate it.'
       },
       {
         criterion: '2.1.2',
         status: 'built-in',
-        note: 'Esc closes the menu and returns focus to the trigger; Tab leaves and closes it. Verified here.'
+        note: 'Esc closes the menu and returns focus to the trigger; Tab leaves the menu and closes it.'
       },
       {
         criterion: '2.4.7',
         status: 'built-in',
-        note: 'Focused menu items show a visible focus indicator (verify visually).'
+        note: 'A focused menu item gets the same highlighted background as a hovered one.'
       },
       {
         criterion: '4.1.2',
@@ -648,7 +648,7 @@ export const a11yComponents = [
     ]
   },
   {
-    component: 'components/navs-tabs',
+    component: 'components/tab',
     html: `<ul class="nav nav-tabs" id="a11yTab" role="tablist">
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="a11yTabHome" data-coreui-toggle="tab" data-coreui-target="#a11yTabHomePane" type="button" role="tab" aria-controls="a11yTabHomePane" aria-selected="true">Home</button>
@@ -676,17 +676,17 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'built-in',
-        note: 'Arrow/Home/End keys move a roving tabindex across tabs and activate the focused tab. Verified here: ArrowRight advances focus.'
+        note: 'Arrow keys, Home and End move focus across the tabs with a roving tabindex and activate the focused tab.'
       },
       {
         criterion: '4.1.2',
         status: 'partial',
-        note: 'JS sets role=tablist/tab/tabpanel, aria-selected, aria-labelledby, and a roving tabindex (audited here). GAP: it does not set aria-controls (author must) and does not aria-hidden inactive panels.'
+        note: 'The plugin adds role=tablist, tab and tabpanel, aria-selected, a roving tabindex and, when the tab has an id, aria-labelledby on its panel, where the markup lacks them. GAP: it does not add aria-controls, so give each tab one that points at its panel.'
       },
       {
         criterion: '2.4.3',
         status: 'partial',
-        note: 'GAP: `_deactivate()` calls blur() on the outgoing tab, which can momentarily drop focus; verify focus order across panels manually.'
+        note: 'GAP: switching tabs from script while the active tab has focus drops focus to the page, because the outgoing tab is blurred.'
       }
     ]
   },
@@ -696,17 +696,17 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'JS sets role=tab/tabpanel with aria-selected, aria-controls and aria-labelledby across step buttons and panes, and mirrors visibility via aria-hidden.'
+        note: 'With panes below the step list, the steps are a tablist of role=tab buttons with aria-selected, each linked to its role=tabpanel pane through aria-controls and aria-labelledby. When each step holds its own content, the step buttons are disclosure buttons with aria-expanded. Inactive panes carry aria-hidden.'
       },
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Arrow keys move between step triggers; linear mode intentionally blocks skipping ahead. Verify manually.'
+        note: 'Arrow keys, Home and End move between step buttons; in linear mode the steps after the next one are disabled.'
       },
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Panes are aria-live=polite, so a validation message that appears in the open step is announced (VoiceOver, Safari and Chrome). A step change made while focus is inside the stepper moves focus to the new step button instead.'
+        note: 'When a step form with novalidate fails validation, focus moves to the first invalid field and its error message is added to that field\'s aria-describedby, so it is read with the field; when focus cannot move there, the message is announced in a polite live region. Without novalidate the browser shows its own validation message. A step change made while focus is inside the stepper moves focus to the new step button.'
       }
     ]
   },
@@ -747,22 +747,22 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'partial',
-        note: 'JS sets role=dialog and aria-modal while open and manages aria-hidden (audited here in the open state). Author supplies aria-labelledby and the dismiss button label.'
+        note: 'The modal is a native dialog element opened as a modal dialog unless the modal option is false, so the browser exposes its role and makes the rest of the page inert while it is open. Name it with aria-labelledby pointing at its title and give the dismiss button an accessible name.'
       },
       {
         criterion: '2.4.3',
         status: 'built-in',
-        note: 'Opening moves focus into the dialog and the focus trap keeps Tab cycling inside. Verified here.'
+        note: 'Opening moves focus into the dialog, and the rest of the page is inert while it is open, so Tab stays within the dialog. Closing a modal opened from a data-coreui-toggle trigger returns focus to that trigger.'
       },
       {
         criterion: '2.1.1',
         status: 'built-in',
-        note: 'Escape closes the dialog (keyboard: true default). Verified here.'
+        note: 'Esc closes the dialog unless the keyboard option is set to false.'
       },
       {
         criterion: '2.1.2',
         status: 'built-in',
-        note: 'The focus trap releases on hide, so focus is never permanently trapped.'
+        note: 'Esc and the dismiss button close the dialog and make the page interactive again, so focus is never trapped.'
       }
     ]
   },
@@ -794,17 +794,17 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'partial',
-        note: 'JS sets role=dialog and aria-modal while open (audited here in the open state); with backdrop: false they are removed and the page stays interactive. Author supplies aria-labelledby and the dismiss button label.'
+        note: 'The offcanvas is a native dialog element. With a backdrop, or with page scrolling off, it opens as a modal dialog and the rest of the page is inert; with backdrop: false and scroll: true it opens non-modally and the page stays interactive. Name it with aria-labelledby and give the dismiss button an accessible name.'
       },
       {
         criterion: '2.1.1',
         status: 'built-in',
-        note: 'Escape closes the panel (keyboard: true default). Verified here.'
+        note: 'Esc closes the panel unless the keyboard option is set to false.'
       },
       {
         criterion: '2.1.2',
         status: 'built-in',
-        note: 'The focus trap (with backdrop) releases on hide, so focus is never permanently trapped.'
+        note: 'Esc and the dismiss button close the panel and make the page interactive again, and focus returns to the data-coreui-toggle trigger that opened it, so focus is never trapped.'
       }
     ]
   },
@@ -821,17 +821,17 @@ export const a11yComponents = [
       {
         criterion: '1.4.3',
         status: 'built-in',
-        note: 'The label text renders at full opacity — the translucency lives in the surface colour (audited here in the shown state).'
+        note: 'The tooltip text stays fully opaque; only the background is translucent, so the text keeps its contrast.'
       },
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The tip has role=tooltip and the trigger is wired to it via aria-describedby while shown (audited here).'
+        note: 'The tip has role=tooltip, and the trigger points at it through aria-describedby while it is shown.'
       },
       {
         criterion: '1.4.13',
-        status: 'partial',
-        note: 'Shown on hover and focus, dismissed on blur/mouseleave. GAP: the default tip is not itself hoverable — moving the pointer onto it dismisses it.'
+        status: 'built-in',
+        note: 'Shown on hover and focus. The tip stays open while the pointer moves onto it or focus moves into it, and closes once both leave; Esc dismisses it without moving focus.'
       }
     ]
   },
@@ -848,12 +848,12 @@ export const a11yComponents = [
       {
         criterion: '1.4.3',
         status: 'built-in',
-        note: 'Popover header and body text meet the contrast minimum against the popover surface (audited here in the shown state).'
+        note: 'Popover header and body text meet the contrast minimum against the popover surface.'
       },
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The trigger is wired to the tip via aria-describedby while shown (audited here).'
+        note: 'The popover has role=tooltip, and the trigger points at it through aria-describedby while it is shown.'
       },
       {
         criterion: '2.1.1',
@@ -868,12 +868,12 @@ export const a11yComponents = [
       {
         criterion: '1.4.3',
         status: 'built-in',
-        note: 'Toast text meets the contrast minimum against the toast surface (audited on the docs examples).'
+        note: 'Toast text meets the contrast minimum against the toast surface.'
       },
       {
         criterion: '4.1.3',
         status: 'author',
-        note: 'Wrap toasts (or their container) in an aria-live region — role=alert or aria-live=polite — as shown in the docs, so they are announced.'
+        note: 'Put toasts in a live region so they are announced: role="alert" with aria-live="assertive" as in the examples, or role="status" with aria-live="polite" for less urgent messages.'
       },
       {
         criterion: '2.2.1',
@@ -920,17 +920,17 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'built-in',
-        note: 'The header is a <summary>, so Enter/Space toggle its panel and Tab reaches every header without a roving tabindex. Verified here in both directions. APG also lists optional Arrow/Home/End navigation between headers, which we do not implement.'
+        note: 'Each header is a native summary element, so Enter and Space toggle its panel and Tab reaches every header. Arrow, Home and End keys do not move between headers.'
       },
       {
         criterion: '4.1.2',
         status: 'partial',
-        note: 'The browser exposes the disclosure role and the expanded state from <details>/<summary>; nothing is bookkept in ARIA. Chromium reports role DisclosureTriangle (DisclosureTriangleGrouped when items share a name) with expanded=true|false. GAP vs the APG pattern: the header is not role=button, carries no aria-controls, and the panel is not role=region + aria-labelledby.'
+        note: 'The browser exposes each header and its expanded state from the native details and summary elements. GAP: the header is not exposed as a button with aria-controls, and the panel is not a labelled region.'
       },
       {
         criterion: '1.3.1',
         status: 'partial',
-        note: 'A bare <summary> is not a heading. The docs show wrapping the label in <h2>-<h6> inside the summary, which keeps the sections reachable by heading navigation; APG instead wraps the button in the heading. Authors who skip the heading lose that navigation.'
+        note: 'A bare summary element is not a heading. Wrap the label in an h2–h6 inside the summary, as the examples do, so the sections stay reachable by heading navigation.'
       },
       {
         criterion: '2.4.7',
@@ -940,7 +940,7 @@ export const a11yComponents = [
       {
         criterion: '1.4.3',
         status: 'built-in',
-        note: 'Header text meets the contrast minimum in both the resting and the open state (audited on the examples above).'
+        note: 'Header text meets the contrast minimum in both the closed and the open state.'
       }
     ]
   },
@@ -950,7 +950,7 @@ export const a11yComponents = [
       {
         criterion: '1.4.3',
         status: 'built-in',
-        note: 'Alert text meets the contrast minimum against each contextual background (audited on the docs examples).'
+        note: 'Alert text meets the contrast minimum against each contextual background.'
       },
       {
         criterion: '4.1.3',
@@ -960,7 +960,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'partial',
-        note: 'Dismissible alerts get a .btn-close whose accessible name comes from the author\'s aria-label (audited on the docs examples).'
+        note: 'The dismiss button gets its accessible name from the aria-label you give it, as in the examples.'
       }
     ]
   }

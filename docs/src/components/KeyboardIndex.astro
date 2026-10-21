@@ -1,0 +1,26 @@
+---
+const pages = import.meta.glob(['../content/docs/components/*.mdx', '../content/docs/forms/*.mdx'], { query: '?raw', import: 'default', eager: true })
+const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+
+const accessibilityKeys = (source) => {
+  const section = source.split(/^## /m).find((part) => /^Accessibility\s*$/m.test(part.split('\n')[0]))
+  return section && /^\|\s*Key\s*\|/m.test(section) ? 'Accessibility' : undefined
+}
+
+const keyboardPages = Object.entries(pages)
+  .map(([file, source]) => {
+    const heading = source.match(/^#{2,3} (Keyboard (?:behavior|interaction|navigation|shortcuts|support))\s*$/im)?.[1] ?? accessibilityKeys(source)
+    if (!heading) return null
+    const name = source.match(/^name:\s*"?([^"\n]+)"?$/m)?.[1] ?? source.match(/^title:\s*"?([^"\n]+)"?$/m)?.[1]
+    const path = file.replace('../content/docs/', '').replace(/\.mdx$/, '')
+    return { name, href: `${base}/${path}/#${heading.toLowerCase().replaceAll(' ', '-')}` }
+  })
+  .filter(Boolean)
+  .sort((first, second) => first.name.localeCompare(second.name))
+---
+
+<ul>
+  {keyboardPages.map((page) => (
+    <li><a href={page.href}>{page.name}</a></li>
+  ))}
+</ul>

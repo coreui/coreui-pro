@@ -107,4 +107,4 @@ myBtnLoading.addEventListener('stop.coreui.loading-button', () => {
 
 - While the button loads with `disabledOnLoading`, it keeps focus. It gets `aria-disabled="true"` and the `.disabled` class rather than the `disabled` attribute, and activating it does nothing until it stops; a disabled state the page set itself is left alone.
 - While it loads, the spinner is named by `ariaLoadingLabel`, so the button reads as "Loading Save" to anyone who reaches it.
-- When the button has focus, the start of loading is announced through [`announce()`](/getting-started/accessibility/#announcing-messages) as its name followed by `ariaLoadingLabel` ("Save, Loading"), and the end, politely, as its name again. Nothing is announced while focus is elsewhere.
+- When the button has focus, the start of loading is announced through [`announce()`](/accessibility/screen-readers/#announcing-messages) as its name followed by `ariaLoadingLabel` ("Save, Loading"), and the end, politely, as its name again. Nothing is announced while focus is elsewhere.
