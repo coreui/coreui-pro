@@ -5,6 +5,7 @@ framework: JavaScript
 # build, so exclude it from the "other frameworks" list.
 frameworkKey: bootstrap
 gtm: GTM-KX4JH47
+version: "6.x"
 
 header:
   pricing: https://coreui.io/pricing/?src=js-docs&cta=coreui-header-pricing
@@ -36,3 +37,4 @@ search:
   appId: 5OOVC1SDJS
   apiKey: ab4149e82cfd175c0afe647a937a8d21
   indexName: coreui
+  filterByVersion: true

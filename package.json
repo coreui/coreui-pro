@@ -339,6 +339,9 @@
     "vitest": "^5.0.5",
     "vnu-jar": "25.11.25"
   },
+  "overrides": {
+    "@coreui/internal-links": "6.0.0-alpha.0"
+  },
   "files": [
     "dist/{css,js}/**/*.{css,js,map}",
     "dist/css/components/classes.json",
