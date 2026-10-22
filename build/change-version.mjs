@@ -18,8 +18,15 @@ const FILES = [
   'README.md',
   'config.yml',
   'js/src/base-component.ts',
+  'nuget/coreui.nuspec',
+  'nuget/coreui.sass.nuspec',
   'package.js',
-  'scss/_banner.scss'
+  'scss/_banner.scss',
+  'skills/coreui-component/SKILL.md',
+  'skills/coreui-component-js/SKILL.md',
+  'skills/coreui-from-bootstrap/SKILL.md',
+  'skills/coreui-theme-colors/SKILL.md',
+  'skills/coreui-utility-api/SKILL.md'
 ]
 
 // Blame TC39... https://github.com/benjamingr/RegExp.escape/issues/37
