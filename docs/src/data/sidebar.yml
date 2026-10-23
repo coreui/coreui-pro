@@ -127,9 +127,6 @@
       to: /forms/overview/
     - title: Autocomplete
       to: /forms/autocomplete/
-      badge:
-        color: danger
-        text: Pro
     - title: Checkbox
       to: /forms/checkbox/
     - title: Chip input
@@ -138,24 +135,12 @@
       to: /forms/combobox/
     - title: Date Input
       to: /forms/date-input/
-      badge:
-        color: danger
-        text: Pro
     - title: Date Picker
       to: /forms/date-picker/
-      badge:
-        color: danger
-        text: Pro
     - title: Date Range Input
       to: /forms/date-range-input/
-      badge:
-        color: danger
-        text: Pro
     - title: Date Range Picker
       to: /forms/date-range-picker/
-      badge:
-        color: danger
-        text: Pro
     - title: Field
       to: /forms/field/
       badge:
@@ -174,9 +159,6 @@
       to: /forms/input-group/
     - title: Multi Select
       to: /forms/multi-select/
-      badge:
-        color: danger
-        text: Pro
     - title: Number Input
       to: /forms/number-input/
       badge:
@@ -197,35 +179,20 @@
       to: /forms/range/
     - title: Range Slider
       to: /forms/range-slider/
-      badge:
-        color: danger
-        text: Pro
     - title: Rating
       to: /forms/rating/
-      badge:
-        color: danger
-        text: Pro
     - title: Select
       to: /forms/select/
     - title: Stepper
       to: /forms/stepper/
-      badge:
-        color: danger
-        text: Pro
     - title: Switch
       to: /forms/switch/
     - title: Textarea
       to: /forms/textarea/
     - title: Time Input
       to: /forms/time-input/
-      badge:
-        color: danger
-        text: Pro
     - title: Time Picker
       to: /forms/time-picker/
-      badge:
-        color: danger
-        text: Pro
     - title: Layout
       to: /forms/layout/
     - title: Validation
@@ -249,9 +216,6 @@
       to: /components/button-group/
     - title: Calendar
       to: /components/calendar/
-      badge:
-        color: danger
-        text: Pro
     - title: Callout
       to: /components/callout/
     - title: Card
@@ -268,9 +232,6 @@
       to: /components/collapse/
     - title: Context Menu
       to: /components/context-menu/
-      badge:
-        color: danger
-        text: Pro
     - title: Dialog
       to: /components/dialog/
       badge:
@@ -295,9 +256,6 @@
       to: /components/list-group/
     - title: Loading button
       to: /components/loading-buttons/
-      badge:
-        color: danger
-        text: Pro
     - title: Menu
       to: /components/menu/
       badge:
@@ -337,9 +295,6 @@
       to: /components/tooltips/
     - title: Transfer
       to: /components/transfer/
-      badge:
-        color: danger
-        text: Pro
 - title: Data Grid
   icon: <path fill="var(--ci-primary-color, currentColor)" d="M16 64v392h480V64Zm448 360H48V96h416Z" class="ci-primary"/><path fill="var(--ci-primary-color, currentColor)" d="M88 136h88v32H88zm0 72h88v32H88zm0 72h88v32H88zm0 72h88v32H88zm200-216h136v32H288zm0 72h136v32H288zm0 72h136v32H288zm0 72h136v32H288zm-72-216h32v32h-32zm0 72h32v32h-32zm0 72h32v32h-32zm0 72h32v32h-32z" class="ci-primary"/>
   to: https://coreui.io/data-grid/docs/
