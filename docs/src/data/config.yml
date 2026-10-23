@@ -7,6 +7,10 @@ frameworkKey: bootstrap
 gtm: GTM-KX4JH47
 version: "6.x"
 
+proBadge:
+  color: danger
+  text: Pro
+
 header:
   pricing: https://coreui.io/pricing/?src=js-docs&cta=coreui-header-pricing
   github: https://github.com/coreui/coreui/
