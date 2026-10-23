@@ -13,7 +13,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import postcss from 'postcss'
-import { compileString } from 'sass-embedded'
+import { initAsyncCompiler } from 'sass-embedded'
 
 const scssDir = path.join(process.cwd(), 'scss')
 const outDir = path.join(process.cwd(), 'dist/css')
@@ -168,13 +168,26 @@ const loadOrder = (files, seen = new Set()) => {
   return order
 }
 
-const compileCache = new Map()
+const compiled = new Map()
 const compile = source => {
-  if (!compileCache.has(source)) {
-    compileCache.set(source, compileString(source, sassOptions).css.replace(/^@charset "UTF-8";\n/, ''))
+  if (!compiled.has(source)) {
+    throw new Error(`${source} was not compiled up front — add it to the sources of stylesheets()`)
   }
 
-  return compileCache.get(source)
+  return compiled.get(source)
+}
+
+const compileAll = async sources => {
+  const compiler = await initAsyncCompiler()
+
+  try {
+    await Promise.all([...new Set(sources)].map(async source => {
+      const result = await compiler.compileStringAsync(source, sassOptions)
+      compiled.set(source, result.css.replace(/^@charset "UTF-8";\n/, ''))
+    }))
+  } finally {
+    await compiler.dispose()
+  }
 }
 
 const expand = id => {
@@ -222,6 +235,8 @@ const dependsOn = name => {
   return order
 }
 
+const forwardOf = name => groupByName.get(name).modules.map(id => `@forward "${id}";`).join('\n')
+
 const ownCssCache = new Map()
 const ownCss = name => {
   if (ownCssCache.has(name)) {
@@ -229,18 +244,17 @@ const ownCss = name => {
   }
 
   const prefix = dependsOn(name).map(dependency => ownCss(dependency)).filter(Boolean).join('\n')
-  const compiled = compile(groupByName.get(name).modules.map(id => `@forward "${id}";`).join('\n'))
+  const css = compile(forwardOf(name))
 
-  if (prefix && !compiled.startsWith(`${prefix}\n`)) {
+  if (prefix && !css.startsWith(`${prefix}\n`)) {
     throw new Error(`Sass did not emit ${name} after its dependencies — the split cannot be derived safely`)
   }
 
-  const own = prefix ? compiled.slice(prefix.length + 1) : compiled
+  const own = prefix ? css.slice(prefix.length + 1) : css
   ownCssCache.set(name, own)
   return own
 }
 
-const banner = file => compile(`@use "banner" with ($file: "${file}");`).trim()
 const layerOrder = '@layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;'
 
 const label = name => {
@@ -248,11 +262,13 @@ const label = name => {
   return words.charAt(0).toUpperCase() + words.slice(1)
 }
 
+const bannerOf = name => `@use "banner" with ($file: "${label(name)}");`
+
 const render = name => {
   const css = ownCss(name).trimStart()
   const order = css.startsWith(layerOrder) ? '' : `${layerOrder}\n`
 
-  return `@charset "UTF-8";\n${banner(label(name))}\n${order}${css}`
+  return `@charset "UTF-8";\n${compile(bannerOf(name)).trim()}\n${order}${css}`
 }
 
 const closure = name => {
@@ -342,7 +358,17 @@ export const classIndex = sheets => {
   return Object.fromEntries([...index].toSorted(([a], [b]) => a.localeCompare(b)))
 }
 
-export const stylesheets = () => {
+export const stylesheets = async () => {
+  for (const group of allGroups) {
+    dependsOn(group.name)
+  }
+
+  await compileAll([
+    ...allGroups.map(group => forwardOf(group.name)),
+    ...named.map(group => bannerOf(group.name)),
+    ...[...ruleFree].map(file => `@forward "${idOf(file)}";`)
+  ])
+
   const sheets = new Map([['base', render('base')]])
   const manifest = { base: { file: 'base.css', order: 0, requires: [] } }
 
@@ -369,7 +395,7 @@ export const stylesheets = () => {
 }
 
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
-  const { sheets, manifest, classes } = stylesheets()
+  const { sheets, manifest, classes } = await stylesheets()
 
   fs.rmSync(componentsDir, { recursive: true, force: true })
 

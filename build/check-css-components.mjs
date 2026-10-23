@@ -11,7 +11,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import postcss from 'postcss'
-import { compileString } from 'sass-embedded'
+import { compileStringAsync } from 'sass-embedded'
 import { stylesheets } from './css-components.mjs'
 
 const scssDir = path.join(process.cwd(), 'scss')
@@ -70,9 +70,10 @@ const merge = sources => {
   return { counted, preambles }
 }
 
-const { sheets, manifest, tail } = stylesheets()
+const { sheets, manifest, tail } = await stylesheets()
 const split = merge([...sheets.values(), tail])
-const bundle = rules(compileString('@forward "coreui";', { loadPaths: [scssDir], style: 'expanded', quietDeps: true }).css)
+const compiled = await compileStringAsync('@forward "coreui";', { loadPaths: [scssDir], style: 'expanded', quietDeps: true })
+const bundle = rules(compiled.css)
 
 const report = []
 for (const [key, count] of split.counted) {
