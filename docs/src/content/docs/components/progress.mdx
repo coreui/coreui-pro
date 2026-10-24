@@ -76,7 +76,7 @@ We only set a `height` value on the `.progress`, so if you change that value the
 
 ## Backgrounds
 
-Colour a bar with a [`.theme-*` class](/customize/components/#theme-variants). The bar reads both the theme's fill and the contrast colour that reads on it, so a label stays legible whichever colour you pick.
+Color a bar with a [`.theme-*` class](/customize/components/#theme-variants). The bar reads both the theme's fill and the contrast color that reads on it, so a label stays legible whichever color you pick.
 
 <Example code={`<div class="progress">
     <div class="progress-bar theme-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
@@ -97,7 +97,20 @@ The class works one level up as well — put it on the `.progress` and every bar
     <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
   </div>`} />
 
-A [`.bg-*` utility](/utilities/background/) still paints a bar, but it sets the fill alone — the label keeps the default foreground colour rather than the one that reads on the fill.
+A [`.bg-*` utility](/utilities/background/) paints a bar too, but it sets the fill alone, so the label keeps the default foreground color rather than the one that reads on the fill. Put both classes on the bar when you want the utility's fill with the theme's label color.
+
+<Example code={`<div class="progress">
+    <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar bg-warning" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar bg-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>`} />
 
 ## Gradients
 
