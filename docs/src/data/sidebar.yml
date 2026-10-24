@@ -203,7 +203,7 @@
     - title: Accordion
       to: /components/accordion/
     - title: Alert
-      to: /components/alerts/
+      to: /components/alert/
     - title: Avatar
       to: /components/avatar/
     - title: Badge
@@ -211,7 +211,7 @@
     - title: Breadcrumb
       to: /components/breadcrumb/
     - title: Button
-      to: /components/buttons/
+      to: /components/button/
     - title: Button group
       to: /components/button-group/
     - title: Calendar
@@ -243,7 +243,7 @@
         color: success
         text: New
     - title: Dropdown
-      to: /components/dropdowns/
+      to: /components/dropdown/
     - title: Footer
       to: /components/footer/
     - title: Header
@@ -255,7 +255,7 @@
     - title: List group
       to: /components/list-group/
     - title: Loading button
-      to: /components/loading-buttons/
+      to: /components/loading-button/
     - title: Menu
       to: /components/menu/
       badge:
@@ -272,9 +272,9 @@
     - title: Pagination
       to: /components/pagination/
     - title: Placeholder
-      to: /components/placeholders/
+      to: /components/placeholder/
     - title: Popover
-      to: /components/popovers/
+      to: /components/popover/
     - title: Progress
       to: /components/progress/
     - title: Scrollspy
@@ -284,7 +284,7 @@
     - title: Sidebar
       to: /components/sidebar/
     - title: Spinner
-      to: /components/spinners/
+      to: /components/spinner/
     - title: Tab
       to: /components/tab/
     - title: Toast
@@ -292,7 +292,7 @@
     - title: Toaster
       to: /components/toaster/
     - title: Tooltip
-      to: /components/tooltips/
+      to: /components/tooltip/
     - title: Transfer
       to: /components/transfer/
 - title: Data Grid

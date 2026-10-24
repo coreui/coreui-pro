@@ -391,7 +391,7 @@ CoreUI ships these components that Bootstrap does not. Each one uses `data-coreu
 | Lists and moving items between lists | List Box, Transfer | `/components/list-box/`, `/components/transfer/` |
 | Right-click menu | Context Menu | `/components/context-menu/` |
 | Chips | Chip, Chip Set, Chip Input | `/components/chip/`, `/components/chip-set/`, `/forms/chip-input/` |
-| Busy buttons, command search | Loading Button, Search Button | `/components/loading-buttons/`, `/components/search-button/` |
+| Busy buttons, command search | Loading Button, Search Button | `/components/loading-button/`, `/components/search-button/` |
 | Notification stack | Toaster | `/components/toaster/` |
 | Admin layout | Sidebar, Header, Footer, Callout | `/components/sidebar/`, `/components/header/`, `/components/footer/`, `/components/callout/` |
 

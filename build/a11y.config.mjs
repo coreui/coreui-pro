@@ -809,7 +809,7 @@ export const a11yComponents = [
     ]
   },
   {
-    component: 'components/tooltips',
+    component: 'components/tooltip',
     html: `<button type="button" class="btn btn-secondary" id="a11yTooltipTrigger" data-coreui-toggle="tooltip" data-coreui-title="Tooltip text">
     Hover or focus me
   </button>`,
@@ -836,7 +836,7 @@ export const a11yComponents = [
     ]
   },
   {
-    component: 'components/popovers',
+    component: 'components/popover',
     html: `<button type="button" class="btn btn-secondary" id="a11yPopoverTrigger" data-coreui-toggle="popover" data-coreui-title="Popover title" data-coreui-content="Popover body content.">
     Toggle popover
   </button>`,
@@ -945,7 +945,7 @@ export const a11yComponents = [
     ]
   },
   {
-    component: 'components/alerts',
+    component: 'components/alert',
     criteria: [
       {
         criterion: '1.4.3',

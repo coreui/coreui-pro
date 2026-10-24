@@ -14,7 +14,7 @@ import popoverDirections from './snippets/popover-directions.js?raw'
 Things to know when using the popover plugin:
 
 - Popovers rely on the 3rd party library [Floating UI](https://floating-ui.com/) for positioning. You must include [floating-ui.core.umd.min.js](https://cdn.jsdelivr.net/npm/@floating-ui/core@1.8.0/dist/floating-ui.core.umd.min.js) and [floating-ui.dom.umd.min.js](https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.8.0/dist/floating-ui.dom.umd.min.js) (in this order) before coreui.js or use `coreui.bundle.min.js` / `coreui.bundle.js` which contains Floating UI in order for popovers to work!
-- Popovers require the [tooltip plugin](/components/tooltips/) as a dependency.
+- Popovers require the [tooltip plugin](/components/tooltip/) as a dependency.
 - Popovers are opt-in for performance reasons, so **you must initialize them yourself**.
 - Zero-length `title` and `content` values will never show a popover.
 - Specify `container: 'body'` to avoid rendering problems in more complex components (like our input groups, button groups, etc).
@@ -79,7 +79,7 @@ Four options are available: `top`, `end`, `bottom` and `start`.
     Popover at the start
   </button>`} sandboxJs={popoverDirections} />
 
-`start` and `end` are logical: they follow the reading direction, so `end` is the right side in LTR and the left side in RTL. The same names place a [menu](/components/menu/) and a [dropdown](/components/dropdowns/).
+`start` and `end` are logical: they follow the reading direction, so `end` is the right side in LTR and the left side in RTL. The same names place a [menu](/components/menu/) and a [dropdown](/components/dropdown/).
 
 #### Deprecated physical names
 
