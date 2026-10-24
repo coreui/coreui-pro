@@ -340,7 +340,7 @@
     "vnu-jar": "25.11.25"
   },
   "overrides": {
-    "@coreui/internal-links": "6.0.0-alpha.0"
+    "@coreui/internal-links": "6.0.0-alpha.1"
   },
   "files": [
     "dist/{css,js}/**/*.{css,js,map}",
