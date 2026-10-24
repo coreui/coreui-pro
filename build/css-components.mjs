@@ -13,7 +13,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import postcss from 'postcss'
-import { initAsyncCompiler } from 'sass-embedded'
+import { initAsyncCompiler } from 'sass'
 
 const scssDir = path.join(process.cwd(), 'scss')
 const outDir = path.join(process.cwd(), 'dist/css')

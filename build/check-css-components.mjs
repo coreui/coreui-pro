@@ -11,7 +11,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import postcss from 'postcss'
-import { compileStringAsync } from 'sass-embedded'
+import { compileStringAsync } from 'sass'
 import { stylesheets } from './css-components.mjs'
 
 const scssDir = path.join(process.cwd(), 'scss')
