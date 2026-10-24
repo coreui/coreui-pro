@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict'
 import { fileURLToPath } from 'node:url'
 import { describe, it } from 'node:test'
-import { compileStringAsync } from 'sass-embedded'
+import { compileStringAsync } from 'sass'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 
