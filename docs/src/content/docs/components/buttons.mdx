@@ -16,24 +16,24 @@ The `.btn` class sets up the shape of a button — size, spacing, radius, the fo
 
 <Example code={`<button type="button" class="btn">Base class</button>`} />
 
-## Variants
+## Theme variants
 
-A button is a **shape plus a colour**. The shape is the variant — how much ink the button uses — and the colour comes from a theme:
+A button is a **shape plus a color**. The shape is the variant — how much ink the button uses — and the color comes from a theme:
 
 | Variant | Shape |
 | --- | --- |
-| `.btn-solid` | Filled with the theme colour. The default weight for the primary action on a screen. |
-| `.btn-outline` | Border and text in the theme colour, no fill until hover. |
+| `.btn-solid` | Filled with the theme color. The default weight for the primary action on a screen. |
+| `.btn-outline` | Border and text in the theme color, no fill until hover. |
 | `.btn-subtle` | Filled with the theme's tinted background, text in the theme's foreground. |
 | `.btn-ghost` | Text only; the fill appears on hover. |
 
 <Example class="d-flex flex-wrap gap-3" code={[`<button type="button" class="btn-solid theme-primary">Solid</button>`, `<button type="button" class="btn-outline theme-primary">Outline</button>`, `<button type="button" class="btn-subtle theme-primary">Subtle</button>`, `<button type="button" class="btn-ghost theme-primary">Ghost</button>`]} />
 
-The colour is a [`.theme-*` class](/customize/components/#theme-variants), which may sit on the button or on any element above it — theme a toolbar and every button inside follows. Without one, the variant renders in the neutral surface colours.
+The color is a [`.theme-*` class](/customize/components/#theme-variants), which may sit on the button or on any element above it — theme a toolbar and every button inside follows. Without one, the variant renders in the neutral surface colors.
 
 <Example class="d-flex flex-wrap gap-3" code={[`<button type="button" class="btn-solid">Solid</button>`, `<button type="button" class="btn-outline">Outline</button>`, `<button type="button" class="btn-subtle">Subtle</button>`, `<button type="button" class="btn-ghost">Ghost</button>`]} />
 
-Pair the variant with any theme colour. `.btn-link` is the exception — it is a link that behaves like a button, so it takes its colour from the link colour rather than from a theme.
+Pair the variant with any theme color. `.btn-link` is the exception — it is a link that behaves like a button, so it takes its color from the link color rather than from a theme.
 
 <Example code={[...getData('theme-colors').map((c) => `<button type="button" class="btn-solid theme-${c.name}">${c.title}</button>`), ``, `<button type="button" class="btn-link">Link</button>`]} />
 
