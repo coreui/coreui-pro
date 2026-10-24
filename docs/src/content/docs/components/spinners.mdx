@@ -34,9 +34,9 @@ If you don't fancy a border spinner, switch to the grow spinner. While it doesn'
     <span class="visually-hidden">Loading...</span>
   </div>`} />
 
-## Theme variants
+## Colors
 
-Both spinners use `currentColor` for their appearance, so any [text color utility][color] recolors them.
+Both spinners use `currentColor` for their appearance, so any [text color utility][color] recolors them. Without one a spinner takes the text color around it — inside a themed button, the color of its label. A `.theme-*` class does not recolor a spinner; use `.fg-{color}` for a theme color.
 
 <Example code={getData('theme-colors').map((c) => `<div class="spinner-border fg-${c.name}" role="status">
     <span class="visually-hidden">Loading...</span>
