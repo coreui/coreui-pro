@@ -1459,6 +1459,48 @@ describe('ChipInput', () => {
       expect(chipInput._input.value).toEqual('')
     })
 
+    it('should keep the typed text on Enter when the add event is prevented', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+
+      el.addEventListener('add.coreui.chip-input', event => event.preventDefault())
+      chipInput._input.value = 'user@example'
+      chipInput._input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual([])
+      expect(chipInput._input.value).toEqual('user@example')
+    })
+
+    it('should keep the typed text on Enter when maxChips is reached', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el, { maxChips: 1 })
+
+      chipInput.add('JavaScript')
+      chipInput._input.value = 'TypeScript'
+      chipInput._input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual(['JavaScript'])
+      expect(chipInput._input.value).toEqual('TypeScript')
+    })
+
+    it('should keep the typed text on Enter when unique turns down a value already there', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el, { unique: true })
+
+      chipInput.add('JavaScript')
+      chipInput._input.value = 'JavaScript'
+      chipInput._input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual(['JavaScript'])
+      expect(chipInput._input.value).toEqual('JavaScript')
+    })
+
     it('should focus last chip on Backspace when input is empty', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
@@ -1597,6 +1639,20 @@ describe('ChipInput', () => {
       chipInput._input.dispatchEvent(new FocusEvent('blur', { bubbles: true }))
 
       expect(chipInput.getValues()).toEqual(['JavaScript'])
+    })
+
+    it('should keep the typed text on blur when the add event is prevented', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el, { createOnBlur: true })
+
+      el.addEventListener('add.coreui.chip-input', event => event.preventDefault())
+      chipInput._input.value = 'JavaScript'
+      chipInput._input.dispatchEvent(new FocusEvent('blur', { bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual([])
+      expect(chipInput._input.value).toEqual('JavaScript')
     })
 
     it('should not create chip on blur when createOnBlur is false', () => {

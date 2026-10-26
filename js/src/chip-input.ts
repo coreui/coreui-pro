@@ -400,9 +400,15 @@ class ChipInput extends ChipSet {
 
     const value = this._input.value.trim()
     if (value) {
-      this._validation.runAsUser(() => this.add(value))
-      this._input.value = ''
-      this._setInputSize()
+      let chip = null
+      this._validation.runAsUser(() => {
+        chip = this.add(value)
+      })
+
+      if (chip) {
+        this._input.value = ''
+        this._setInputSize()
+      }
     }
   }
 
