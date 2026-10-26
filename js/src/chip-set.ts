@@ -463,7 +463,7 @@ class ChipSet extends BaseComponent {
       removeIcon: this._config.removeIcon,
       selectable: this._config.selectable,
       selectedIcon: this._config.selectedIcon,
-      ...Manipulator.getDataAttributes(chip)
+      ...this._removeDisallowed(Manipulator.getDataAttributes(chip))
     }
   }
 

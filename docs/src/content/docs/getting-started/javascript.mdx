@@ -334,6 +334,8 @@ Every CoreUI for Bootstrap plugin exposes the following methods and static prope
 
 Some plugins render or accept arbitrary HTML in their configuration. To prevent cross-site scripting (XSS) attacks, those options pass through our built-in sanitizer before they reach the page. Sanitization is on by default and covers every plugin that takes HTML — Tooltip and Popover, Rating, the Autocomplete, Combobox and Multi Select option renderers, Chip and Chip Input, Calendar and the Date, Date Range, Date Time and Time pickers, Number Input, Password Input and Range Slider.
 
+The `sanitize`, `allowList` and `sanitizeFn` options are taken only from JavaScript. Markup (`data-coreui-*` attributes and `data-coreui-config`) cannot set them, also not inside the options a picker passes to its parts (`calendarOptions`, `inputOptions`, `selectionOptions`) or on a chip inside a Chip Set.
+
 The default `allowList` value is the following:
 
 ```js
