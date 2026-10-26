@@ -7674,6 +7674,14 @@ describe('MultiSelect', () => {
       expect(hidden).not.toHaveBeenCalled()
     })
 
+    it('should leave closed panels alone when called without an event', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      // eslint-disable-next-line no-new
+      new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }] })
+
+      expect(() => MultiSelect.clearMenus()).not.toThrow()
+    })
+
     it('should not close when clicking inside the panel', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

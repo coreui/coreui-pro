@@ -142,14 +142,12 @@ class ComboboxBase extends BaseComponent {
   }
 
   _hideOnOutside(event: any): void {
-    if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY) || !this._isShown()) {
+    if (!this._isShown() || event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
       return
     }
 
     const composedPath = event.composedPath()
 
-    // The panel mounts outside the frame while open — a click on an option
-    // is very much inside
     if (composedPath.includes(this._getShowTarget()) || composedPath.includes(this._menu)) {
       return
     }

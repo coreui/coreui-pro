@@ -4955,6 +4955,23 @@ describe('Autocomplete', () => {
         expect(autocomplete._inputElement.value).toBe('')
       })
 
+      it('should reset the search when an outside click closes the panel', () => {
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
+        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+        const autocomplete = new Autocomplete(autocompleteEl, {
+          options: [{ label: 'Option 1', value: '1' }]
+        })
+
+        autocomplete.show()
+        autocomplete.search('Opt')
+
+        const event = new MouseEvent('click', { button: 0, bubbles: true })
+        Object.defineProperty(event, 'composedPath', { value: () => [document.body] })
+        Autocomplete.clearMenus(event)
+
+        expect(autocomplete._search).toBe('')
+      })
+
       it('should keep the typed text when the page prevents an outside close', () => {
         fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
