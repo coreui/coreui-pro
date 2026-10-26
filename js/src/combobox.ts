@@ -38,7 +38,6 @@ const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
 const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
-const RIGHT_MOUSE_BUTTON = 2
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
@@ -654,24 +653,8 @@ class Combobox extends ComboboxBase {
 
   // Static
   static clearMenus(event: any): void {
-    if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
-      return
-    }
-
     for (const toggle of SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)) {
-      const context = Combobox.getInstance(toggle) as Combobox | null
-
-      if (!context) {
-        continue
-      }
-
-      const composedPath = event.composedPath()
-
-      if (composedPath.includes(context._element) || composedPath.includes(context._menu)) {
-        continue
-      }
-
-      context.hide()
+      Combobox.getInstance(toggle)?._hideOnOutside(event)
     }
   }
 

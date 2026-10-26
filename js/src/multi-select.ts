@@ -52,7 +52,6 @@ const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
 const TAB_KEY = 'Tab'
-const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
 const SELECTOR_CHIP_REMOVE = '.chip-remove'
 const SELECTOR_CHIP = '.chip'
@@ -68,7 +67,6 @@ const SELECTOR_SELECTION = '.multi-select-selection'
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
-const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
@@ -94,7 +92,6 @@ const CLASS_NAME_SELECTED = 'selected'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_SELECTION = 'multi-select-selection'
 const CLASS_NAME_SELECTION_CHIPS = 'multi-select-selection-chips'
-const CLASS_NAME_SHOW = 'show'
 
 type MultiSelectConfig = {
   allowList: SanitizerAllowList
@@ -1870,33 +1867,8 @@ class MultiSelect extends ComboboxBase {
   }
 
   static clearMenus(event: any): void {
-    if (event && (event.button === RIGHT_MOUSE_BUTTON ||
-      (event.type === 'keyup' && event.key !== TAB_KEY))) {
-      return
-    }
-
-    const selects = SelectorEngine.find(SELECTOR_SELECT)
-
-    for (const select of selects) {
-      const context = Data.get(select, DATA_KEY)
-
-      if (!context) {
-        continue
-      }
-
-      if (!context._wrapperElement.classList.contains(CLASS_NAME_SHOW)) {
-        continue
-      }
-
-      // The panel mounts outside the frame while open — a click on an option
-      // is very much inside
-      if (context._wrapperElement.contains(event.target) || context._menu.contains(event.target)) {
-        continue
-      }
-
-      context.hide()
-
-      EventHandler.trigger(context._element, EVENT_HIDDEN)
+    for (const select of SelectorEngine.find(SELECTOR_SELECT)) {
+      MultiSelect.getInstance(select)?._hideOnOutside(event)
     }
   }
 }

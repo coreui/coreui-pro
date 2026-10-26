@@ -32,6 +32,8 @@ import { executeAfterTransition, getElement } from './util/index.js'
 const ARROW_DOWN_KEY = 'ArrowDown'
 const ESCAPE_KEY = 'Escape'
 const ENTER_KEY = 'Enter'
+const TAB_KEY = 'Tab'
+const RIGHT_MOUSE_BUTTON = 2
 
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_POPUP = 'combobox-popup'
@@ -139,6 +141,26 @@ class ComboboxBase extends BaseComponent {
     }, this._menu)
   }
 
+  _hideOnOutside(event: any): void {
+    if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY) || !this._isShown()) {
+      return
+    }
+
+    const composedPath = event.composedPath()
+
+    // The panel mounts outside the frame while open — a click on an option
+    // is very much inside
+    if (composedPath.includes(this._getShowTarget()) || composedPath.includes(this._menu)) {
+      return
+    }
+
+    this.hide()
+
+    if (!this._isShown()) {
+      this._afterOutsideHide()
+    }
+  }
+
   _isDisabled(): boolean {
     return this._config.disabled
   }
@@ -160,6 +182,8 @@ class ComboboxBase extends BaseComponent {
   _afterHideDispose(): void {}
 
   _onHideEnd(): void {}
+
+  _afterOutsideHide(): void {}
 
   _getShowTarget(): HTMLElement {
     return this._element
