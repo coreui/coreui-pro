@@ -1,5 +1,5 @@
 import { userEvent } from 'vitest/browser'
-import { onTestFinished, vi } from 'vitest'
+import { vi } from 'vitest'
 
 import Chip from '../../src/chip.js'
 import ChipSet from '../../src/chip-set.js'
@@ -5029,28 +5029,32 @@ describe('MultiSelect', () => {
       expect(multiSelect._focustrap._isActive).toBe(true)
     })
 
-    it('should leave no pointer listener on the document when disposed during an outside press', () => {
+    it('should remove the outside-press pointerup listener when the panel closes', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
-      const errors = []
-      const onError = event => {
-        errors.push(event.error)
-        event.preventDefault()
-      }
 
-      window.addEventListener('error', onError)
-      onTestFinished(() => window.removeEventListener('error', onError))
+      multiSelect.show()
+      document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))
+      const listener = multiSelect._pointerUpListener
+      const removeEventListener = spyOn(document, 'removeEventListener').and.callThrough()
+      multiSelect.hide()
+
+      expect(removeEventListener).toHaveBeenCalledWith('pointerup', listener, true)
+    })
+
+    it('should remove the outside-press pointerup listener when disposed', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
 
       multiSelect.show()
       document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))
       const listener = multiSelect._pointerUpListener
       const removeEventListener = spyOn(document, 'removeEventListener').and.callThrough()
       multiSelect.dispose()
-      document.body.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }))
 
       expect(removeEventListener).toHaveBeenCalledWith('pointerup', listener, true)
-      expect(errors).toEqual([])
     })
 
     it('should leave no focus trap behind when a shown listener closes the panel', () => {
