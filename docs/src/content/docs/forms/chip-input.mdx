@@ -272,7 +272,7 @@ chipInput.clear()
 
 | Event | Description |
 | --- | --- |
-| `add.coreui.chip-input` | Fired before a chip is added. Call `event.preventDefault()` to cancel; text the user typed then stays in the field, as it does when `maxChips` or `unique` turns the value down. |
+| `add.coreui.chip-input` | Fired before a chip is added. Call `event.preventDefault()` to cancel; a value confirmed with <kbd>Enter</kbd> or by leaving the field then stays in it, as it does when `maxChips` or `unique` turns the value down. |
 | `change.coreui.chip-input` | Fired after any chip is added or removed; `event.value` is the array of chip values. `clear()` and `removeSelected()` fire it once, after the last chip is gone and only when the chips changed, and the value field sends one native `input` and `change` when its value changed, while `remove.coreui.chip-input` still fires for every chip. |
 | `input.coreui.chip-input` | Fired when the inline input value changes; `event.value` is the typed text, not the chips. Contains `relatedTarget`. |
 | `remove.coreui.chip-input` | Fired before a chip is removed. Call `event.preventDefault()` to cancel. |

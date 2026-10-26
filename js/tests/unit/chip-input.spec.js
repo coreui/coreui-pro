@@ -1453,10 +1453,12 @@ describe('ChipInput', () => {
       const chipInput = new ChipInput(el)
 
       chipInput._input.value = 'JavaScript'
+      chipInput._input.size = 10
       chipInput._input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
 
       expect(chipInput.getValues()).toEqual(['JavaScript'])
       expect(chipInput._input.value).toEqual('')
+      expect(chipInput._input.size).toEqual(1)
     })
 
     it('should keep the typed text on Enter when the add event is prevented', () => {
@@ -1471,6 +1473,25 @@ describe('ChipInput', () => {
 
       expect(chipInput.getValues()).toEqual([])
       expect(chipInput._input.value).toEqual('user@example')
+    })
+
+    it('should clear the typed text on Enter when an add listener adds a value in its place', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+
+      el.addEventListener('add.coreui.chip-input', event => {
+        if (event.value !== event.value.toLowerCase()) {
+          event.preventDefault()
+          chipInput.add(event.value.toLowerCase())
+        }
+      })
+      chipInput._input.value = 'JavaScript'
+      chipInput._input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual(['javascript'])
+      expect(chipInput._input.value).toEqual('')
     })
 
     it('should keep the typed text on Enter when maxChips is reached', () => {
