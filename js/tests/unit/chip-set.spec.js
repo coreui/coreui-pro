@@ -104,6 +104,20 @@ describe('ChipSet', () => {
       expect(chips[0].querySelector('.chip-remove')).not.toBeNull()
       expect(chips[1].querySelector('.chip-remove')).toBeNull()
     })
+
+    it('should keep sanitizing a chip whose data attributes turn the sanitizer off', () => {
+      fixtureEl.innerHTML = [
+        '<div class="chip-set">',
+        '  <span class="chip" data-coreui-sanitize="false" data-coreui-remove-icon=\'<img src="data:," onerror="this.dataset.ran = 1">\'>First</span>',
+        '</div>'
+      ].join('')
+
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      expect(el.querySelector('.chip-remove img').hasAttribute('onerror')).toBeFalse()
+    })
   })
 
   describe('keyboard navigation', () => {

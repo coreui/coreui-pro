@@ -62,6 +62,29 @@ describe('DatePicker', () => {
 
       expect(fixtureEl.querySelector('.date-picker-popup tbody .calendar-cell-week-number').getAttribute('aria-label')).toEqual('Tydz. 36')
     })
+
+    it('should keep sanitizing the calendar when calendarOptions in the markup turn it off', () => {
+      const icon = '<img src="data:," onerror="this.dataset.ran = 1">'
+      const picker = buildPicker({}, `<div id="picker" data-coreui-calendar-options='{"sanitize": false, "navNextIcon": "${icon.replaceAll('"', '\\"')}"}'></div>`)
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup img').hasAttribute('onerror')).toBeFalse()
+    })
+
+    it('should keep the calendar allow list when calendarOptions in data-coreui-config replace it', () => {
+      const config = { calendarOptions: { allowList: { img: ['src', 'onerror'] }, navNextIcon: '<img src="data:," onerror="this.dataset.ran = 1">' } }
+      const picker = buildPicker({}, `<div id="picker" data-coreui-config='${JSON.stringify(config)}'></div>`)
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup img').hasAttribute('onerror')).toBeFalse()
+    })
+
+    it('should let calendarOptions from JavaScript turn the calendar sanitizer off', () => {
+      const picker = buildPicker({ calendarOptions: { navNextIcon: '<img src="data:," loading="lazy">', sanitize: false } })
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup img').getAttribute('loading')).toEqual('lazy')
+    })
   })
 
   // The native <input type="date"> entry contract: opening puts focus on the

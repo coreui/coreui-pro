@@ -115,6 +115,25 @@ describe('Config', () => {
       expect(configResult.sanitizeFn).toBeNull()
     })
 
+    it('should ignore sanitize, allowList and sanitizeFn nested in options coming from the markup', () => {
+      fixtureEl.innerHTML = '<div id="test" data-coreui-part-options=\'{"sanitize": false, "icon": "x"}\' data-coreui-config=\'{"other": {"allowList": {}, "items": [{"sanitizeFn": "x", "label": "a"}]}}\'></div>'
+
+      const instance = new DummyConfigClass()
+      const configResult = instance._mergeConfigObj({}, fixtureEl.querySelector('#test'))
+
+      expect(configResult.partOptions).toEqual({ icon: 'x' })
+      expect(configResult.other).toEqual({ items: [{ label: 'a' }] })
+    })
+
+    it('should let a programmatic config set sanitize nested in options', () => {
+      fixtureEl.innerHTML = '<div id="test"></div>'
+
+      const instance = new DummyConfigClass()
+      const configResult = instance._mergeConfigObj({ partOptions: { allowList: {}, sanitize: false } }, fixtureEl.querySelector('#test'))
+
+      expect(configResult.partOptions).toEqual({ allowList: {}, sanitize: false })
+    })
+
     it('should let a programmatic config set sanitize, allowList and sanitizeFn', () => {
       fixtureEl.innerHTML = '<div id="test" data-coreui-sanitize="true"></div>'
 

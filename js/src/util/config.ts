@@ -66,15 +66,32 @@ class Config {
       ...(isElement(element) ? Manipulator.getDataAttributes(element as HTMLElement) : {})
     }
 
-    for (const key of DISALLOWED_ATTRIBUTES) {
-      delete markupConfig[key]
-    }
-
     return {
       ...this.constructor.Default,
-      ...markupConfig,
+      ...this._removeDisallowed(markupConfig),
       ...(typeof config === 'object' ? config : {})
     }
+  }
+
+  /**
+   * Removes `sanitize`, `allowList` and `sanitizeFn` from a config read from the markup, at
+   * every depth, so the options a composite forwards to its parts cannot carry them either.
+   *
+   * @param config - The config parsed from the markup; changed in place
+   * @returns The same config
+   */
+  _removeDisallowed(config: ComponentConfig): ComponentConfig {
+    for (const key of DISALLOWED_ATTRIBUTES) {
+      delete config[key]
+    }
+
+    for (const value of Object.values(config)) {
+      if (value && typeof value === 'object') {
+        this._removeDisallowed(value)
+      }
+    }
+
+    return config
   }
 
   _typeCheckConfig(config: ComponentConfig, configTypes: ComponentConfig = this.constructor.DefaultType): void {
