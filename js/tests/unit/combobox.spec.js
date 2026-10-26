@@ -1504,6 +1504,34 @@ describe('Combobox', () => {
     })
   })
 
+  describe('clearMenus', () => {
+    it('should close the panel on a click outside the toggle and the panel', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+
+      combobox.show()
+
+      const event = new MouseEvent('click', { button: 0, bubbles: true })
+      Object.defineProperty(event, 'composedPath', { value: () => [document.body] })
+      Combobox.clearMenus(event)
+
+      expect(combobox._isShown()).toBeFalse()
+    })
+
+    it('should keep the panel open on a click inside the panel', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+
+      combobox.show()
+
+      const event = new MouseEvent('click', { button: 0, bubbles: true })
+      Object.defineProperty(event, 'composedPath', { value: () => [menu(combobox)] })
+      Combobox.clearMenus(event)
+
+      expect(combobox._isShown()).toBeTrue()
+    })
+  })
+
   describe('dispose', () => {
     it('should put the panel back and remove the value field', () => {
       const toggle = setMarkup()

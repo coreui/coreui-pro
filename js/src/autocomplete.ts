@@ -42,7 +42,6 @@ const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
 const TAB_KEY = 'Tab'
-const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
 const EVENT_BLUR = `blur${EVENT_KEY}`
 const EVENT_CHANGE = `change${EVENT_KEY}`
@@ -267,6 +266,14 @@ class Autocomplete extends ComboboxBase {
     if (this._inputHintElement) {
       this._inputHintElement.value = ''
     }
+  }
+
+  override _afterOutsideHide(): void {
+    if (this._config.allowOnlyDefinedOptions && this._store.size() === 0) {
+      this._emptyByUser()
+    }
+
+    this.search('')
   }
 
   override _escapeFocusTarget(): HTMLElement | null {
@@ -1011,33 +1018,8 @@ class Autocomplete extends ComboboxBase {
   }
 
   static clearMenus(event: any): void {
-    if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
-      return
-    }
-
-    const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)
-
-    for (const toggle of openToggles) {
-      const context = Autocomplete.getInstance(toggle)
-
-      if (!context) {
-        continue
-      }
-
-      const composedPath = event.composedPath()
-
-      // The panel mounts outside the frame while open — a click on an option
-      // is very much inside
-      if (composedPath.includes(context._element) || composedPath.includes(context._menu)) {
-        continue
-      }
-
-      context.hide()
-      if (context._config.allowOnlyDefinedOptions && context._store.size() === 0) {
-        context._emptyByUser()
-      }
-
-      context.search('')
+    for (const toggle of SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)) {
+      Autocomplete.getInstance(toggle)?._hideOnOutside(event)
     }
   }
 }
