@@ -287,6 +287,7 @@ class MultiSelect extends ComboboxBase {
   protected declare _wrapperElement: any
   protected declare _focustrap: any
   protected declare _pointerDownListener: any
+  protected declare _pointerUpListener: any
   protected declare _refocusOnHide: boolean
   protected declare _nativeFocusHandler: any
   protected declare _nativeKeydownHandler: any
@@ -391,17 +392,13 @@ class MultiSelect extends ComboboxBase {
       }
 
       this._focustrap?.deactivate()
+      document.addEventListener('pointerup', this._pointerUpListener, true)
+    }
 
-      // A right click or a scrollbar drag closes nothing, so the trap comes back.
-      const rearm = () => {
-        document.removeEventListener('pointerup', rearm, true)
-
-        if (this._isShown()) {
-          this._focustrap?.activate()
-        }
-      }
-
-      document.addEventListener('pointerup', rearm, true)
+    // A right click or a scrollbar drag closes nothing, so the trap comes back.
+    this._pointerUpListener = () => {
+      document.removeEventListener('pointerup', this._pointerUpListener, true)
+      this._focustrap?.activate()
     }
 
     document.addEventListener('pointerdown', this._pointerDownListener, true)
@@ -438,6 +435,7 @@ class MultiSelect extends ComboboxBase {
   _releaseFocus(): void {
     if (this._pointerDownListener) {
       document.removeEventListener('pointerdown', this._pointerDownListener, true)
+      document.removeEventListener('pointerup', this._pointerUpListener, true)
       this._pointerDownListener = null
     }
 
