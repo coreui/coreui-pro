@@ -2270,6 +2270,72 @@ describe('Dropdown', () => {
       })
     })
 
+    it('should return focus to the toggle when a menu item is clicked', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+        '  <div class="dropdown-menu"><a class="dropdown-item" href="#">Some Item</a></div>',
+        '</div>'
+      ].join('')
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      const item = fixtureEl.querySelector('.dropdown-item')
+      const dropdown = new Dropdown(toggle)
+
+      await dropdown.show()
+      item.focus()
+      const focusSpy = spyOn(toggle, 'focus').and.callThrough()
+      let expandedOnFocus = null
+      toggle.addEventListener('focus', () => {
+        expandedOnFocus = toggle.getAttribute('aria-expanded')
+      })
+      item.click()
+
+      expect(dropdown._isShown()).toBeFalse()
+      expect(document.activeElement).toEqual(toggle)
+      expect(expandedOnFocus).toEqual('false')
+      expect(focusSpy.calls.mostRecent().args[0]?.preventScroll).toBeFalsy()
+    })
+
+    it('should not return focus to the toggle on a click outside', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+        '  <div class="dropdown-menu"><a class="dropdown-item" href="#">Some Item</a></div>',
+        '</div>',
+        '<p id="outside">text</p>'
+      ].join('')
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      const dropdown = new Dropdown(toggle)
+
+      await dropdown.show()
+      fixtureEl.querySelector('.dropdown-item').focus()
+      const focusSpy = spyOn(toggle, 'focus')
+      fixtureEl.querySelector('#outside').click()
+
+      expect(dropdown._isShown()).toBeFalse()
+      expect(focusSpy).not.toHaveBeenCalled()
+    })
+
+    it('should not move the focus on Escape when the page keeps the menu open', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+        '  <div class="dropdown-menu"><a class="dropdown-item" href="#">Some Item</a></div>',
+        '</div>'
+      ].join('')
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      const item = fixtureEl.querySelector('.dropdown-item')
+      const dropdown = new Dropdown(toggle)
+      toggle.addEventListener('hide.coreui.dropdown', event => event.preventDefault())
+
+      await dropdown.show()
+      item.focus()
+      item.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+
+      expect(dropdown._isShown()).toBeTrue()
+      expect(document.activeElement).toEqual(item)
+    })
+
     it('should close dropdown (only) by clicking inside the dropdown menu when it has data-attribute `data-coreui-auto-close="inside"`', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

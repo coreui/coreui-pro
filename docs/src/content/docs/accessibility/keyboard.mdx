@@ -15,13 +15,17 @@ Interactive components are built to be operated with the keyboard alone. The com
 | <kbd>Arrow</kbd> keys | Move between the items of a composite component: tabs, options, chips, days. In an open menu, move focus to the items and between them. |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Move to the first or last item, where the component has a list of them. |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Activate the focused button, link or item, select an option, or open a popup. |
-| <kbd>Escape</kbd> | Close the open menu, picker panel, tooltip, popover or dialog. Dropdowns, pickers and dialogs return focus to the element that opened them. |
+| <kbd>Escape</kbd> | Close the open menu, picker panel, tooltip, popover or dialog. Menus, pickers and comboboxes return focus as described in [focus after a popup closes](#focus-after-a-popup-closes); dialogs return it to the element that opened them. |
 
 Where a component differs, its own keyboard table says so.
 
 ## Focus in dialogs
 
 A modal dialog, such as the [modal](/components/modal/) or the [offcanvas](/components/offcanvas/), moves focus inside when it opens and keeps <kbd>Tab</kbd> inside while it is open. When it closes, focus returns to the element that opened it. An offcanvas opened with `backdrop: false` and `scroll: true` is not modal: <kbd>Tab</kbd> moves on to the page.
+
+## Focus after a popup closes
+
+When a menu, a picker panel or the panel of an autocomplete, combobox or multi select closes, the focus returns to the component's field (its toggle, input or search box) if it was inside the panel, or on no element at all, at that moment. That covers <kbd>Escape</kbd>, choosing an option, a close button in the panel and a close from your code. A click or tap outside closes the panel and leaves the focus where it lands. Focus that is already on another part of the component, or anywhere else on the page, stays there, and a close the page cancels moves nothing.
 
 ## Visible focus
 

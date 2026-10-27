@@ -44,6 +44,7 @@ import {
   type FloatingOffsetOption,
   type FloatingConfigOption
 } from './util/floating-ui.js'
+import { focusIfUsable, holdsFocusOrNone } from './util/focus.js'
 import { resolvePopupContainer } from './util/popup.js'
 
 /**
@@ -321,11 +322,13 @@ class Menu extends BaseComponent {
     return (wrapper instanceof Element ? wrapper : this._element.parentNode) as HTMLElement
   }
 
-  protected _completeHide(relatedTarget: Record<string, unknown>): void {
+  protected _completeHide(relatedTarget: Record<string, unknown>, returnFocus = true): void {
     const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName('hide'), relatedTarget)
     if (hideEvent.defaultPrevented) {
       return
     }
+
+    const refocus = returnFocus && holdsFocusOrNone(this._menu)
 
     this._closeAllSubmenus()
 
@@ -348,6 +351,11 @@ class Menu extends BaseComponent {
     this._element.setAttribute('aria-expanded', 'false')
     this._removeMenuAttributes()
     Menu._openInstances.delete(this)
+
+    if (refocus) {
+      focusIfUsable(this._element)
+    }
+
     EventHandler.trigger(this._element, this.constructor.eventName('hidden'), relatedTarget)
   }
 
@@ -1048,7 +1056,7 @@ class Menu extends BaseComponent {
         relatedTarget.clickEvent = event
       }
 
-      instance._completeHide(relatedTarget)
+      instance._completeHide(relatedTarget, isMenuTarget && event.type === 'click')
     }
   }
 
@@ -1111,7 +1119,6 @@ class Menu extends BaseComponent {
       }
 
       instance.hide()
-      instance._element.focus()
     }
   }
 

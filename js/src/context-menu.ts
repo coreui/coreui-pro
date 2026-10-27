@@ -9,7 +9,7 @@ import type { ReferenceElement } from '@floating-ui/dom'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
-import { containsFocus } from './util/focus.js'
+import { focusIfUsable, holdsFocusOrNone } from './util/focus.js'
 import {
   defineJQueryPlugin, isDisabled, jQueryDispatch, noop
 } from './util/index.js'
@@ -134,7 +134,7 @@ class ContextMenu extends Menu {
     EventHandler.trigger(this._element, this.constructor.eventName('shown'), relatedTarget)
   }
 
-  protected override _completeHide(relatedTarget: Record<string, unknown>): void {
+  protected override _completeHide(relatedTarget: Record<string, unknown>, returnFocus = true): void {
     const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName('hide'), relatedTarget)
     if (hideEvent.defaultPrevented) {
       return
@@ -148,7 +148,7 @@ class ContextMenu extends Menu {
       }
     }
 
-    const hadFocus = containsFocus(this._menu)
+    const refocus = returnFocus && holdsFocusOrNone(this._menu)
 
     this._unlockScroll()
     this._disposeFloating()
@@ -158,8 +158,8 @@ class ContextMenu extends Menu {
     this._removeMenuAttributes()
     this._point = null
 
-    if (hadFocus) {
-      this._element.focus({ preventScroll: true })
+    if (refocus) {
+      focusIfUsable(this._element, { preventScroll: true })
     }
 
     Menu._openInstances.delete(this)
@@ -264,7 +264,7 @@ class ContextMenu extends Menu {
   protected static _clearContextMenus(): void {
     for (const instance of Menu._openInstances) {
       if (instance instanceof ContextMenu && instance._config.autoClose !== false && instance._config.autoClose !== 'inside') {
-        instance._completeHide({ relatedTarget: instance._element })
+        instance._completeHide({ relatedTarget: instance._element }, false)
       }
     }
   }

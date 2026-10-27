@@ -1680,6 +1680,18 @@ describe('Autocomplete', () => {
       }
     })
 
+    it('should not focus the field it is about to disable', () => {
+      const { autocomplete } = mount()
+
+      autocomplete.show()
+      document.activeElement.blur()
+      const focusSpy = spyOn(autocomplete._inputElement, 'focus')
+      autocomplete.disable()
+
+      expect(autocomplete._isShown()).toBeFalse()
+      expect(focusSpy).not.toHaveBeenCalled()
+    })
+
     it('should close the panel on disable() and write the disabled state', () => {
       const { autocomplete, element } = mount({ pickerIcon: true })
 
@@ -4677,6 +4689,38 @@ describe('Autocomplete', () => {
 
       expect(autocomplete._element.classList.contains('show')).toBe(false)
       expect(document.activeElement).toBe(autocomplete._inputElement)
+    })
+
+    it('should not take the focus back when leaving the field closes the panel', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div><input id="next">'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+      const next = fixtureEl.querySelector('#next')
+
+      autocomplete._inputElement.focus()
+      autocomplete.show()
+      autocomplete._inputElement.value = 'Option 1'
+      next.focus()
+
+      expect(autocomplete._element.classList.contains('show')).toBe(false)
+      expect(document.activeElement).toBe(next)
+    })
+
+    it('should not take the focus back when leaving a field that names its selection closes the panel', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div><input id="next">'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+        options: [{ label: 'Option 1', value: '1' }],
+        value: '1'
+      })
+      const next = fixtureEl.querySelector('#next')
+
+      autocomplete._inputElement.focus()
+      autocomplete.show()
+      next.focus()
+
+      expect(autocomplete._element.classList.contains('show')).toBe(false)
+      expect(document.activeElement).toBe(next)
     })
 
     it('should append dropdown to container element', () => {

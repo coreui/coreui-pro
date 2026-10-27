@@ -1922,6 +1922,28 @@ and after the selection of a Multi Select with `search`, whose chips and search
 box share the cycle. Styles that counted on the panel being the next sibling of
 the field, or scripts that count the children around it, see the guards.
 
+#### Focus after a popup closes
+
+Menus, the picker panels and the panels of Autocomplete, Combobox and Multi Select
+follow one rule when they close: the focus goes back to the component's field when
+it was inside the panel or on no element, and stays where it is otherwise. What
+changes:
+
+- **A click outside never hands the focus back.** The picker panels used to return
+  it to the field on the press, before the browser moved it to what was clicked.
+- **The picker panels close on `click` instead of `pointerdown`**, like the other
+  panels, so they close when the button is released, even when the page stops the
+  propagation of the press, and a right click leaves them open. Only a press that starts
+  outside the panel and its field closes them: one that starts inside and ends outside,
+  as when you select text, and a click that no press started, as from the keyboard or
+  from code, leave them open.
+- **Choosing a menu or dropdown item returns the focus to the toggle.** It used to
+  stay on the hidden item and fall to the page.
+- **A close the page cancels moves nothing.** <kbd>Escape</kbd> used to focus the
+  toggle even when a `hide` listener kept the menu or the panel open.
+- **The picker returns the focus to the element of its field that had it before
+  opening**, or to the first one, never to an element outside the field.
+
 #### `.form-select` is absorbed by `.form-control`
 
 - **A `<select>` takes `.form-control` now**, like every other control. The two

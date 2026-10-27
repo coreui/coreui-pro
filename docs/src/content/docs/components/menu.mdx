@@ -495,7 +495,7 @@ Use `data-coreui-offset` or `data-coreui-reference` to change the location of th
 
 By default, the menu is closed when clicking inside or outside the menu. You can use the `autoClose` option to change this behavior of the menu.
 
-Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is within the menu (its toggle or items) closes the menu and returns focus to the toggle.
+Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is within the menu (its toggle or items) closes the menu and returns focus to the toggle. Choosing an item does the same, while a click outside closes the menu and leaves the focus where it lands. A `hide.coreui.menu` listener that calls `preventDefault()` keeps the menu open and the focus in place.
 
 <Example class="d-flex flex-wrap gap-3" code={`<div class="btn-group">
     <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="true" aria-expanded="false">

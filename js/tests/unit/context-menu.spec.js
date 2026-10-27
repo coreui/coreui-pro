@@ -298,6 +298,24 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should not return focus to the element when a right-click elsewhere closes the menu', () => {
+      fixtureEl.innerHTML = `${markup()}<p id="elsewhere">elsewhere</p>`
+
+      const area = fixtureEl.querySelector('.area')
+      const contextMenu = new ContextMenu(area)
+
+      const done = whenShown(area, () => {
+        const focusSpy = spyOn(area, 'focus')
+        fixtureEl.querySelector('#elsewhere').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }))
+
+        expect(contextMenu._isShown()).toBeFalse()
+        expect(focusSpy).not.toHaveBeenCalled()
+      })
+
+      contextMenu.show({ x: 5, y: 5 })
+      return done
+    })
+
     it('should return focus to the element when the menu lives in a shadow root', async () => {
       fixtureEl.innerHTML = '<div></div>'
 
