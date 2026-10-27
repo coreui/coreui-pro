@@ -252,6 +252,15 @@ describe('FocusTrap', () => {
       expect(document.activeElement).toBe(byId('first'))
     })
 
+    it('should focus an empty trap element from the additional element', () => {
+      mount('<input id="search"><div id="trap" tabindex="-1"></div>', () => ({ additionalElement: byId('search') }))
+      byId('search').focus()
+
+      byId('search').nextElementSibling.focus()
+
+      expect(document.activeElement).toBe(byId('trap'))
+    })
+
     it('should not guard an additional element that sits inside the trap', () => {
       mount(simple, () => ({ additionalElement: byId('first') }))
 

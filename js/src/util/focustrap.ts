@@ -148,9 +148,7 @@ class FocusTrap extends Config {
       }
     }
 
-    if (!this._focus(this._config.trapElement!)) {
-      (event.target as HTMLElement).blur()
-    }
+    (event.target as HTMLElement).blur()
   }
 
   // The additional element can be a container of focusables, or one itself.

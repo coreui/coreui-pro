@@ -2209,6 +2209,23 @@ describe('MultiSelect', () => {
       })
     })
 
+    it('should make a closing panel inert until it opens again', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Option 1' }]
+      })
+
+      multiSelect.show()
+      const menu = multiSelect._menu
+      multiSelect.hide()
+
+      expect(menu.inert).toBeTrue()
+
+      multiSelect.show()
+
+      expect(menu.inert).toBeFalse()
+    })
+
     it('should trigger hide event', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<select></select>'

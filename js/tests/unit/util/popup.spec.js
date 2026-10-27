@@ -668,58 +668,9 @@ describe('Popup', () => {
     })
   })
 
-  describe('a Tab leaving the field', () => {
-    const tab = (element, shiftKey = false) => {
-      element.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Tab', shiftKey }))
-    }
-
-    const buildTwoStops = () => {
-      fixtureEl.innerHTML = [
-        '<div id="anchor"><input id="start"><input id="end"></div>',
-        '<div id="content"><button id="option">option</button></div>',
-        '<button id="outside">outside</button>'
-      ].join('')
-
-      const popup = new Popup({
-        anchor: fixtureEl.querySelector('#anchor'),
-        content: fixtureEl.querySelector('#content'),
-        focusTrap: true
-      })
-
-      popups.push(popup)
-      return popup
-    }
-
-    it('should close the panel on a Tab from the last stop of the field', () => {
-      const popup = buildTwoStops()
-      popup.show()
-
-      tab(fixtureEl.querySelector('#end'))
-
-      expect(popup.isShown).toBeFalse()
-    })
-
-    it('should close the panel on a Shift+Tab from the first stop of the field', () => {
-      const popup = buildTwoStops()
-      popup.show()
-
-      tab(fixtureEl.querySelector('#start'), true)
-
-      expect(popup.isShown).toBeFalse()
-    })
-
-    it('should keep the panel open on a Tab between two stops of the field', () => {
-      const popup = buildTwoStops()
-      popup.show()
-
-      tab(fixtureEl.querySelector('#start'))
-      tab(fixtureEl.querySelector('#end'), true)
-
-      expect(popup.isShown).toBeTrue()
-    })
-
-    it('should make a closing panel inert until it opens again', () => {
-      const popup = buildTwoStops()
+  describe('a closing panel', () => {
+    it('should be inert until it opens again', () => {
+      const popup = buildPopup({ focusTrap: true })
       const content = fixtureEl.querySelector('#content')
 
       popup.show()

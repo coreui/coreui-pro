@@ -29,7 +29,6 @@ const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
 const ESCAPE_KEY = 'Escape'
 const ARROW_DOWN_KEY = 'ArrowDown'
-const TAB_KEY = 'Tab'
 
 type PopupConfig = {
   anchor: HTMLElement | null
@@ -425,11 +424,6 @@ class Popup extends Config {
     }
 
     this._anchorKeydownListener = (event: KeyboardEvent) => {
-      if (event.key === TAB_KEY && this._isShown && this._leavesAnchor(event)) {
-        this.hide()
-        return
-      }
-
       const opensPanel = event.key === 'F4' || (event.altKey && event.key === ARROW_DOWN_KEY)
 
       if (!opensPanel || this._isShown) {
@@ -441,11 +435,6 @@ class Popup extends Config {
     }
 
     EventHandler.on(this._anchor, EVENT_KEYDOWN, this._anchorKeydownListener)
-  }
-
-  _leavesAnchor(event: KeyboardEvent): boolean {
-    const stops = SelectorEngine.focusableChildren(this._anchor!)
-    return event.target === (event.shiftKey ? stops[0] : stops.at(-1))
   }
 
   _focusPanel(): void {

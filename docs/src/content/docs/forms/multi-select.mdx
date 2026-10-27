@@ -647,7 +647,7 @@ myMutliSelect.addEventListener('change.coreui.multi-select', event => {
 
 The control takes its name from the select's `aria-labelledby`, then its `aria-label`, then a `<label>` pointing at the select. A `<label>` that wraps the select is left out, because its text would take in the control's own content and selection, so point the label at the select's `id` instead. The search box keeps a name of its own, `ariaSearchLabel`. When `required` is set, the control that takes the focus, the search box when `search` is on, carries `aria-required`; an `aria-required` on the select does not mark it. The native select itself is hidden from assistive technology.
 
-The options panel is a dialog named like the control. Opening it moves the focus inside — onto the search box when `search` is on, otherwise onto the option the list points at, which is the selection the user left or the first option. The options are focusable one at a time: the arrows move the focus itself rather than a highlight read through `aria-activedescendant`. <kbd>Tab</kbd> cycles through what the panel offers and the search box in the control, and reaches nothing outside them until the panel closes, which <kbd>Escape</kbd> does, returning the focus to the control.
+The options panel is a dialog named like the control. Opening it moves the focus inside — onto the search box when `search` is on, otherwise onto the option the list points at, which is the selection the user left or the first option. The options are focusable one at a time: the arrows move the focus itself rather than a highlight read through `aria-activedescendant`. <kbd>Tab</kbd> and <kbd>Shift</kbd> + <kbd>Tab</kbd> cycle through what the panel offers and, when `search` is on, the chips and the search box in the control, and reach nothing outside them until the panel closes, which <kbd>Escape</kbd> does, returning the focus to the control. A click, a tap or a script still moves the focus wherever it points.
 
 The select stays in the page as an invisible overlay for form validation and is hidden from screen readers, so the control speaks for it. The `aria-describedby` the select has when the component starts goes on the control, the search box when `search` is on, and while the state is invalid the control carries `aria-invalid` and is described by the message that follows it as well. Focus that reaches the select, from validation or from its label, goes on to the control. A change of selection fires `input` and `change` on the select, as a native list does, so a script that clears a field's error on input sees it.
 
@@ -655,7 +655,7 @@ The select stays in the page as an invisible overlay for form validation and is 
 
 | Key | Action |
 | --- | --- |
-| <kbd>Tab</kbd> | Move between the selection, the search box, the select all button and the options list; Tab and Shift+Tab stay in the open panel, while a click or a script can move the focus out of it |
+| <kbd>Tab</kbd> | Move between the select all button and the options list, and with `search` on also the chips and the search box; the focus stays in the open panel |
 | <kbd>Enter</kbd>/<kbd>Space</kbd> | Open the panel from the control, or select the focused option; <kbd>Enter</kbd> in the search box takes the option the list points at |
 | <kbd>Arrow Up</kbd>/<kbd>Arrow Down</kbd> | Move through the options (and the selectable group labels), or enter the list from the search box |
 | <kbd>Shift</kbd> + <kbd>Arrow Up</kbd>/<kbd>Arrow Down</kbd> | Extend the selection while moving (multiple selection) |
