@@ -257,6 +257,7 @@ class Popup extends Config {
       this._returnFocusTarget()?.focus()
     }
 
+    this._content!.inert = true
     this._previouslyFocused = null
 
     this._afterTransition(transition, () => {
@@ -308,6 +309,8 @@ class Popup extends Config {
     if (!this._content) {
       return
     }
+
+    this._content.inert = false
 
     if (this._config.focusTrap) {
       this._content.setAttribute('role', 'dialog')

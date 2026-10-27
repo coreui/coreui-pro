@@ -8,7 +8,6 @@
  * --------------------------------------------------------------------------
  */
 
-import EventHandler, { type CoreUIEvent } from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
 import { isDisabled, isVisible } from './index.js'
@@ -18,14 +17,8 @@ import { isDisabled, isVisible } from './index.js'
  */
 
 const NAME = 'focustrap'
-const DATA_KEY = 'coreui.focustrap'
-const EVENT_KEY = `.${DATA_KEY}`
-const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
-const EVENT_KEYDOWN_TAB = `keydown.tab${EVENT_KEY}`
-
-const TAB_KEY = 'Tab'
-const TAB_NAV_FORWARD = 'forward'
-const TAB_NAV_BACKWARD = 'backward'
+const ATTRIBUTE_GUARD = 'data-coreui-focus-guard'
+const GUARD_STYLE = 'border:0;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:fixed;white-space:nowrap;width:1px;top:0;left:0'
 
 const Default: FocusTrapConfig = {
   additionalElement: null,
@@ -49,10 +42,6 @@ type FocusTrapConfig = {
   trapElement: HTMLElement | null
 }
 
-// Only the most recently activated trap reacts. Two traps over disjoint
-// elements would otherwise throw focus at each other without end.
-const activeTraps: FocusTrap[] = []
-
 /**
  * Class definition
  */
@@ -60,17 +49,15 @@ const activeTraps: FocusTrap[] = []
 class FocusTrap extends Config {
   protected declare _config: FocusTrapConfig
   protected declare _isActive: boolean
-  protected declare _lastTabNavDirection: string | null
-  protected declare _focusinHandler: (event: CoreUIEvent) => void
-  protected declare _keydownHandler: (event: CoreUIEvent) => void
+  protected declare _regions: HTMLElement[]
+  protected declare _guards: HTMLElement[]
 
   constructor(config?: Partial<FocusTrapConfig> | null) {
     super()
     this._config = this._getConfig(config) as FocusTrapConfig
     this._isActive = false
-    this._lastTabNavDirection = null
-    this._focusinHandler = event => this._handleFocusin(event)
-    this._keydownHandler = event => this._handleKeydown(event)
+    this._regions = []
+    this._guards = []
   }
 
   // Getters
@@ -92,14 +79,23 @@ class FocusTrap extends Config {
       return
     }
 
+    const { additionalElement, trapElement } = this._config
+
     if (this._config.autofocus) {
-      this._config.trapElement!.focus()
+      trapElement!.focus()
     }
 
-    EventHandler.on(document, EVENT_FOCUSIN, this._focusinHandler)
-    EventHandler.on(document, EVENT_KEYDOWN_TAB, this._keydownHandler)
+    this._regions = [trapElement!]
 
-    activeTraps.push(this)
+    if (additionalElement && !trapElement!.contains(additionalElement) && !additionalElement.contains(trapElement!)) {
+      this._regions.push(additionalElement)
+    }
+
+    for (const [index, region] of this._regions.entries()) {
+      region.before(this._createGuard(index, false))
+      region.after(this._createGuard(index, true))
+    }
+
     this._isActive = true
   }
 
@@ -109,101 +105,67 @@ class FocusTrap extends Config {
     }
 
     this._isActive = false
-    activeTraps.splice(activeTraps.indexOf(this), 1)
-    EventHandler.off(document, EVENT_FOCUSIN, this._focusinHandler)
-    EventHandler.off(document, EVENT_KEYDOWN_TAB, this._keydownHandler)
+
+    for (const guard of this._guards) {
+      guard.remove()
+    }
+
+    this._guards = []
+    this._regions = []
   }
 
   // Private
-  _isTopmost(): boolean {
-    return activeTraps[activeTraps.length - 1] === this
+  _createGuard(index: number, after: boolean): HTMLElement {
+    const guard = document.createElement('span')
+    guard.tabIndex = 0
+    guard.setAttribute('aria-hidden', 'true')
+    guard.setAttribute(ATTRIBUTE_GUARD, '')
+    guard.style.cssText = GUARD_STYLE
+    guard.addEventListener('focus', event => this._handleGuardFocus(event, index, after))
+    this._guards.push(guard)
+    return guard
   }
 
-  _handleFocusin(event: CoreUIEvent): void {
-    const { additionalElement, trapElement } = this._config
-    const target = (event.composedPath()[0] ?? event.target) as Node
+  // Focus from inside a region, or from nowhere (an iframe), wraps; from the page it enters.
+  _handleGuardFocus(event: FocusEvent, index: number, after: boolean): void {
+    const related = event.relatedTarget as Node | null
+    const regions = this._regions
+    const wraps = !related || regions.some(region => region.contains(related))
+    const forward = after === wraps
+    const step = forward ? 1 : -1
+    let current = wraps ? index + step : index
 
-    if (!this._isTopmost() || target === document || target === trapElement || trapElement!.contains(target)) {
-      return
+    for (let tries = 0; tries < regions.length; tries++, current += step) {
+      const region = regions[(current + regions.length) % regions.length]
+      const elements = this._elements(region)
+
+      if (this._focusFirst(forward ? elements : elements.toReversed())) {
+        return
+      }
+
+      if (region.tabIndex === -1 && this._focus(region)) {
+        return
+      }
     }
 
-    if (additionalElement && (target === additionalElement || additionalElement.contains(target))) {
-      return
-    }
-
-    const elements = SelectorEngine.focusableChildren(trapElement!)
-
-    if (elements.length === 0) {
-      trapElement!.focus()
-    } else if (this._lastTabNavDirection === TAB_NAV_BACKWARD) {
-      elements[elements.length - 1].focus()
-    } else {
-      elements[0].focus()
-    }
+    (event.target as HTMLElement).blur()
   }
 
   // The additional element can be a container of focusables, or one itself.
-  _focusables(element: HTMLElement): HTMLElement[] {
-    const children = SelectorEngine.focusableChildren(element)
-    const itself = element.tabIndex >= 0 && !isDisabled(element) && isVisible(element)
+  _elements(region: HTMLElement): HTMLElement[] {
+    const children = SelectorEngine.focusableChildren(region)
+    const itself = region.tabIndex >= 0 && !isDisabled(region) && isVisible(region)
 
-    return itself ? [element, ...children] : children
+    return itself ? [region, ...children] : children
   }
 
-  _handleKeydown(event: CoreUIEvent): void {
-    if (!this._isTopmost() || event.key !== TAB_KEY) {
-      return
-    }
+  _focusFirst(elements: HTMLElement[]): boolean {
+    return elements.some(element => this._focus(element))
+  }
 
-    this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD
-
-    const { additionalElement, trapElement } = this._config
-    const trapElements = SelectorEngine.focusableChildren(trapElement!)
-    const additionalElements = additionalElement ? this._focusables(additionalElement) : []
-
-    if (trapElements.length === 0) {
-      return
-    }
-
-    if (additionalElements.length === 0) {
-      // Tabbing off the last focusable of a trailing trap fires no focusin.
-      const index = trapElements.indexOf(event.target as HTMLElement)
-
-      if (index === trapElements.length - 1 && !event.shiftKey) {
-        event.preventDefault()
-        trapElements[0].focus()
-      } else if (index === 0 && event.shiftKey) {
-        event.preventDefault()
-        trapElements[trapElements.length - 1].focus()
-      }
-
-      return
-    }
-
-    // Only the four seams between the two groups are ours to redirect. Taking
-    // the event on every Tab would swallow the ones in the middle of a group —
-    // preventDefault with nothing to focus leaves Tab dead, which is what a
-    // calendar's navigation buttons used to run into.
-    const target = event.target as HTMLElement
-    const trapIndex = trapElements.indexOf(target)
-    const additionalIndex = additionalElements.indexOf(target)
-
-    let destination: HTMLElement | undefined
-
-    if (trapIndex === trapElements.length - 1 && !event.shiftKey) {
-      destination = additionalElements[0]
-    } else if (trapIndex === 0 && event.shiftKey) {
-      destination = additionalElements[additionalElements.length - 1]
-    } else if (additionalIndex === additionalElements.length - 1 && !event.shiftKey) {
-      destination = trapElements[0]
-    } else if (additionalIndex === 0 && event.shiftKey) {
-      destination = trapElements[trapElements.length - 1]
-    }
-
-    if (destination) {
-      event.preventDefault()
-      destination.focus()
-    }
+  _focus(element: HTMLElement): boolean {
+    element.focus()
+    return (element.getRootNode() as Document | ShadowRoot).activeElement === element
   }
 }
 

@@ -121,6 +121,7 @@ class ComboboxBase extends BaseComponent {
     this._getShowTarget().classList.remove(CLASS_NAME_SHOW)
     this._getAriaExpandedTarget().setAttribute('aria-expanded', 'false')
     this._menu.classList.remove(CLASS_NAME_SHOW)
+    this._menu.inert = true
 
     // A closed panel has no highlighted option, so reopening starts from the
     // top and the field's activation keys stop reaching a stale one.
@@ -202,6 +203,8 @@ class ComboboxBase extends BaseComponent {
     } else {
       showTarget.after(this._menu)
     }
+
+    this._menu.inert = false
 
     // The frame used to size the panel through CSS (min-width: 100%), which
     // tracked resizes for free; an inline snapshot must follow the frame

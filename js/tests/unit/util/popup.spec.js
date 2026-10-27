@@ -648,13 +648,39 @@ describe('Popup', () => {
       expect(fixtureEl.querySelector('#content').getAttribute('role')).toBeNull()
     })
 
-    it('should keep focus moving out of the panel from reaching the field', () => {
+    it('should wrap Tab from the last element of the panel back into it', () => {
+      const popup = buildPopup({ focusTrap: true })
+
+      popup.show()
+      fixtureEl.querySelector('#option').focus()
+      fixtureEl.querySelector('#content').nextElementSibling.focus()
+
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#option'))
+    })
+
+    it('should leave a focus that code moves out of the panel where it went', () => {
       const popup = buildPopup({ focusTrap: true })
 
       popup.show()
       fixtureEl.querySelector('#outside').focus()
 
-      expect(fixtureEl.querySelector('#content').contains(document.activeElement)).toBeTrue()
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#outside'))
+    })
+  })
+
+  describe('a closing panel', () => {
+    it('should be inert until it opens again', () => {
+      const popup = buildPopup({ focusTrap: true })
+      const content = fixtureEl.querySelector('#content')
+
+      popup.show()
+      popup.hide()
+
+      expect(content.inert).toBeTrue()
+
+      popup.show()
+
+      expect(content.inert).toBeFalse()
     })
   })
 

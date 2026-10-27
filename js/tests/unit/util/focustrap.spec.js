@@ -1,504 +1,297 @@
-import EventHandler from '../../../src/dom/event-handler.js'
-import SelectorEngine from '../../../src/dom/selector-engine.js'
 import FocusTrap from '../../../src/util/focustrap.js'
-import { clearFixture, createEvent, getFixture } from '../../helpers/fixture.js'
+import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('FocusTrap', () => {
   let fixtureEl
+  const traps = []
 
   beforeAll(() => {
     fixtureEl = getFixture()
   })
 
   afterEach(() => {
+    for (const trap of traps) {
+      trap.deactivate()
+    }
+
+    traps.length = 0
     clearFixture()
   })
 
+  const mount = (html, config = () => ({})) => {
+    fixtureEl.innerHTML = html
+    const trap = new FocusTrap({ autofocus: false, trapElement: fixtureEl.querySelector('#trap'), ...config() })
+    traps.push(trap)
+    trap.activate()
+    return trap
+  }
+
+  const guards = () => [...fixtureEl.querySelectorAll('[data-coreui-focus-guard]')]
+  const byId = id => document.getElementById(id)
+
+  const simple = [
+    '<button id="outside">outside</button>',
+    '<div id="trap" tabindex="-1">',
+    '  <button id="first">first</button>',
+    '  <button id="last">last</button>',
+    '</div>',
+    '<button id="after">after</button>'
+  ].join('')
+
   describe('activate', () => {
     it('should autofocus itself by default', () => {
-      fixtureEl.innerHTML = '<div id="focustrap" tabindex="-1"></div>'
+      fixtureEl.innerHTML = simple
+      const trap = new FocusTrap({ trapElement: byId('trap') })
+      traps.push(trap)
+      trap.activate()
 
-      const trapElement = fixtureEl.querySelector('div')
-
-      const spy = spyOn(trapElement, 'focus')
-
-      const focustrap = new FocusTrap({ trapElement })
-      focustrap.activate()
-
-      expect(spy).toHaveBeenCalled()
+      expect(document.activeElement).toBe(byId('trap'))
     })
 
-    it('if configured not to autofocus, should not autofocus itself', () => {
-      fixtureEl.innerHTML = '<div id="focustrap" tabindex="-1"></div>'
+    it('should not autofocus itself when configured not to', () => {
+      mount(simple)
 
-      const trapElement = fixtureEl.querySelector('div')
-
-      const spy = spyOn(trapElement, 'focus')
-
-      const focustrap = new FocusTrap({ trapElement, autofocus: false })
-      focustrap.activate()
-
-      expect(spy).not.toHaveBeenCalled()
+      expect(document.activeElement).not.toBe(byId('trap'))
     })
 
-    it('should force focus inside focus trap if it can', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<a href="#" id="outside">outside</a>',
-          '<div id="focustrap" tabindex="-1">',
-          '  <a href="#" id="inside">inside</a>',
-          '</div>'
-        ].join('')
+    it('should put a guard right before and right after the trap element', () => {
+      mount(simple)
 
-        const trapElement = fixtureEl.querySelector('div')
-        const focustrap = new FocusTrap({ trapElement })
-        focustrap.activate()
+      const [before, after] = guards()
 
-        const inside = document.getElementById('inside')
-
-        const focusInListener = () => {
-          expect(spy).toHaveBeenCalled()
-          document.removeEventListener('focusin', focusInListener)
-          resolve()
-        }
-
-        const spy = spyOn(inside, 'focus')
-        spyOn(SelectorEngine, 'focusableChildren').and.callFake(() => [inside])
-
-        document.addEventListener('focusin', focusInListener)
-
-        document.getElementById('outside').dispatchEvent(createEvent('focusin', { bubbles: true }))
-      })
+      expect(before.nextElementSibling).toBe(byId('trap'))
+      expect(after.previousElementSibling).toBe(byId('trap'))
+      expect(byId('trap').querySelector('[data-coreui-focus-guard]')).toBeNull()
     })
 
-    it('should wrap focus around forward on tab', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<a href="#" id="outside">outside</a>',
-          '<div id="focustrap" tabindex="-1">',
-          '  <a href="#" id="first">first</a>',
-          '  <a href="#" id="inside">inside</a>',
-          '  <a href="#" id="last">last</a>',
-          '</div>'
-        ].join('')
+    it('should make each guard of every region a hidden tab stop without a role', () => {
+      mount('<input id="search"><div id="trap" tabindex="-1"><button>first</button></div>', () => ({ additionalElement: byId('search') }))
 
-        const trapElement = fixtureEl.querySelector('div')
-        const focustrap = new FocusTrap({ trapElement })
-        focustrap.activate()
+      expect(guards().length).toBe(4)
 
-        const first = document.getElementById('first')
-        const inside = document.getElementById('inside')
-        const last = document.getElementById('last')
-        const outside = document.getElementById('outside')
-
-        spyOn(SelectorEngine, 'focusableChildren').and.callFake(() => [first, inside, last])
-        const spy = spyOn(first, 'focus').and.callThrough()
-
-        const focusInListener = () => {
-          expect(spy).toHaveBeenCalled()
-          first.removeEventListener('focusin', focusInListener)
-          resolve()
-        }
-
-        first.addEventListener('focusin', focusInListener)
-
-        const keydown = createEvent('keydown')
-        keydown.key = 'Tab'
-
-        document.dispatchEvent(keydown)
-        outside.focus()
-      })
+      for (const guard of guards()) {
+        expect(guard.tabIndex).toBe(0)
+        expect(guard.getAttribute('aria-hidden')).toBe('true')
+        expect(guard.hasAttribute('role')).toBeFalse()
+        expect(guard.getBoundingClientRect().width).toBeLessThanOrEqual(1)
+      }
     })
 
-    it('should wrap focus around backwards on shift-tab', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<a href="#" id="outside">outside</a>',
-          '<div id="focustrap" tabindex="-1">',
-          '  <a href="#" id="first">first</a>',
-          '  <a href="#" id="inside">inside</a>',
-          '  <a href="#" id="last">last</a>',
-          '</div>'
-        ].join('')
+    it('should listen to nothing on the document', () => {
+      fixtureEl.innerHTML = simple
+      const addEventListener = spyOn(document, 'addEventListener').and.callThrough()
+      const trap = new FocusTrap({ autofocus: false, trapElement: byId('trap') })
+      traps.push(trap)
+      trap.activate()
 
-        const trapElement = fixtureEl.querySelector('div')
-        const focustrap = new FocusTrap({ trapElement })
-        focustrap.activate()
-
-        const first = document.getElementById('first')
-        const inside = document.getElementById('inside')
-        const last = document.getElementById('last')
-        const outside = document.getElementById('outside')
-
-        spyOn(SelectorEngine, 'focusableChildren').and.callFake(() => [first, inside, last])
-        const spy = spyOn(last, 'focus').and.callThrough()
-
-        const focusInListener = () => {
-          expect(spy).toHaveBeenCalled()
-          last.removeEventListener('focusin', focusInListener)
-          resolve()
-        }
-
-        last.addEventListener('focusin', focusInListener)
-
-        const keydown = createEvent('keydown')
-        keydown.key = 'Tab'
-        keydown.shiftKey = true
-
-        document.dispatchEvent(keydown)
-        outside.focus()
-      })
-    })
-
-    it('should force focus on itself if there is no focusable content', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<a href="#" id="outside">outside</a>',
-          '<div id="focustrap" tabindex="-1"></div>'
-        ].join('')
-
-        const trapElement = fixtureEl.querySelector('div')
-        const focustrap = new FocusTrap({ trapElement })
-        focustrap.activate()
-
-        const focusInListener = () => {
-          expect(spy).toHaveBeenCalled()
-          document.removeEventListener('focusin', focusInListener)
-          resolve()
-        }
-
-        const spy = spyOn(focustrap._config.trapElement, 'focus')
-
-        document.addEventListener('focusin', focusInListener)
-
-        document.getElementById('outside').dispatchEvent(createEvent('focusin', { bubbles: true }))
-      })
-    })
-  })
-
-  describe('inside a shadow root', () => {
-    it('should leave the focus on an element of the trap the document sees as the host', () => {
-      fixtureEl.innerHTML = '<a href="#" id="outside">outside</a><div id="host"></div>'
-
-      const shadowRoot = fixtureEl.querySelector('#host').attachShadow({ mode: 'open' })
-      shadowRoot.innerHTML = '<div tabindex="-1"><a href="#" id="first">first</a><a href="#" id="second">second</a></div>'
-
-      const trapElement = shadowRoot.querySelector('div')
-      const focustrap = new FocusTrap({ trapElement })
-      focustrap.activate()
-
-      const second = shadowRoot.getElementById('second')
-      second.focus()
-      second.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
-
-      expect(shadowRoot.activeElement).toEqual(second)
-      focustrap.deactivate()
-    })
-  })
-
-  describe('tabbing inside a trap of its own', () => {
-    it('should wrap the tab order without waiting for a focusin', () => {
-      fixtureEl.innerHTML = [
-        '<button id="outside" type="button">outside</button>',
-        '<div id="trap"><button id="first">first</button><button id="last">last</button></div>'
-      ].join('')
-
-      const first = fixtureEl.querySelector('#first')
-      const last = fixtureEl.querySelector('#last')
-      const focustrap = new FocusTrap({ trapElement: fixtureEl.querySelector('#trap') })
-
-      focustrap.activate()
-      last.focus()
-
-      const forward = createEvent('keydown', { bubbles: true, cancelable: true })
-      forward.key = 'Tab'
-      last.dispatchEvent(forward)
-
-      expect(forward.defaultPrevented).toBeTrue()
-      expect(document.activeElement).toEqual(first)
-
-      const back = createEvent('keydown', { bubbles: true, cancelable: true })
-      back.key = 'Tab'
-      back.shiftKey = true
-      first.dispatchEvent(back)
-
-      expect(back.defaultPrevented).toBeTrue()
-      expect(document.activeElement).toEqual(last)
-
-      focustrap.deactivate()
+      expect(addEventListener).not.toHaveBeenCalled()
     })
   })
 
   describe('deactivate', () => {
-    it('should flag itself as no longer active', () => {
-      const focustrap = new FocusTrap({ trapElement: fixtureEl })
-      focustrap.activate()
-      expect(focustrap._isActive).toBeTrue()
+    it('should remove every guard', () => {
+      const trap = mount(simple)
 
-      focustrap.deactivate()
-      expect(focustrap._isActive).toBeFalse()
+      trap.deactivate()
+
+      expect(guards()).toEqual([])
     })
 
-    it('should remove all event listeners', () => {
-      const focustrap = new FocusTrap({ trapElement: fixtureEl })
-      focustrap.activate()
+    it('should do nothing when it is not active', () => {
+      fixtureEl.innerHTML = simple
+      const trap = new FocusTrap({ trapElement: byId('trap') })
 
-      const spy = spyOn(EventHandler, 'off')
-      focustrap.deactivate()
-
-      expect(spy).toHaveBeenCalled()
-    })
-
-    it('doesn\'t try removing event listeners unless it needs to (in case it hasn\'t been activated)', () => {
-      const focustrap = new FocusTrap({ trapElement: fixtureEl })
-
-      const spy = spyOn(EventHandler, 'off')
-      focustrap.deactivate()
-
-      expect(spy).not.toHaveBeenCalled()
+      expect(() => trap.deactivate()).not.toThrow()
     })
   })
 
-  describe('tabbing between the trap and its additional element', () => {
-    it('should leave a Tab inside a group alone', () => {
-      fixtureEl.innerHTML = [
-        '<div id="trap"><button id="t1">t1</button><button id="t2">t2</button></div>',
-        '<div id="extra"><button id="a1">a1</button><button id="a2">a2</button><button id="a3">a3</button></div>'
-      ].join('')
+  describe('one region', () => {
+    it('should wrap Tab from the last element to the first', () => {
+      mount(simple)
+      byId('last').focus()
 
-      const focustrap = new FocusTrap({
-        additionalElement: fixtureEl.querySelector('#extra'),
-        trapElement: fixtureEl.querySelector('#trap')
-      })
+      guards()[1].focus()
 
-      focustrap.activate()
-
-      // a2 sits in the middle of the additional group, so Tab is the browser's
-      // to handle — taking it here would leave the key doing nothing at all.
-      const middle = fixtureEl.querySelector('#a2')
-      middle.focus()
-
-      const event = createEvent('keydown', { bubbles: true, cancelable: true })
-      event.key = 'Tab'
-      middle.dispatchEvent(event)
-
-      expect(event.defaultPrevented).toBeFalse()
-
-      focustrap.deactivate()
+      expect(document.activeElement).toBe(byId('first'))
     })
 
-    it('should take a focusable additional element as a stop of its own', () => {
-      fixtureEl.innerHTML = [
-        '<div id="trap"><button id="only">only</button></div>',
-        '<input id="field" type="text">'
-      ].join('')
+    it('should wrap Shift+Tab from the first element to the last', () => {
+      mount(simple)
+      byId('first').focus()
 
-      const field = fixtureEl.querySelector('#field')
-      const only = fixtureEl.querySelector('#only')
-      const focustrap = new FocusTrap({
-        additionalElement: field,
-        trapElement: fixtureEl.querySelector('#trap')
-      })
+      guards()[0].focus()
 
-      focustrap.activate()
-      only.focus()
-
-      const forward = createEvent('keydown', { bubbles: true, cancelable: true })
-      forward.key = 'Tab'
-      only.dispatchEvent(forward)
-
-      expect(forward.defaultPrevented).toBeTrue()
-      expect(document.activeElement).toEqual(field)
-
-      const back = createEvent('keydown', { bubbles: true, cancelable: true })
-      back.key = 'Tab'
-      field.dispatchEvent(back)
-
-      expect(back.defaultPrevented).toBeTrue()
-      expect(document.activeElement).toEqual(only)
-
-      focustrap.deactivate()
+      expect(document.activeElement).toBe(byId('last'))
     })
 
-    it('should wrap the tab inside the trap when the additional element cannot take the focus', () => {
-      fixtureEl.innerHTML = [
-        '<div id="trap"><button id="t1">t1</button><button id="t2">t2</button></div>',
-        '<input id="field" type="text" disabled>'
-      ].join('')
+    it('should lead a Tab from the page into the first element', () => {
+      mount(simple)
+      byId('outside').focus()
 
-      const last = fixtureEl.querySelector('#t2')
-      const focustrap = new FocusTrap({
-        additionalElement: fixtureEl.querySelector('#field'),
-        trapElement: fixtureEl.querySelector('#trap')
-      })
+      guards()[0].focus()
 
-      focustrap.activate()
-      last.focus()
-
-      const event = createEvent('keydown', { bubbles: true, cancelable: true })
-      event.key = 'Tab'
-      last.dispatchEvent(event)
-
-      expect(event.defaultPrevented).toBeTrue()
-      expect(document.activeElement).toEqual(fixtureEl.querySelector('#t1'))
-
-      focustrap.deactivate()
+      expect(document.activeElement).toBe(byId('first'))
     })
 
-    it('should carry focus across the seam between the groups', () => {
-      fixtureEl.innerHTML = [
-        '<div id="trap"><button id="t1">t1</button><button id="t2">t2</button></div>',
-        '<div id="extra"><button id="a1">a1</button><button id="a2">a2</button></div>'
-      ].join('')
+    it('should lead a Shift+Tab from the page into the last element', () => {
+      mount(simple)
+      byId('after').focus()
 
-      const focustrap = new FocusTrap({
-        additionalElement: fixtureEl.querySelector('#extra'),
-        trapElement: fixtureEl.querySelector('#trap')
-      })
+      guards()[1].focus()
 
-      focustrap.activate()
-
-      const last = fixtureEl.querySelector('#t2')
-      last.focus()
-
-      const event = createEvent('keydown', { bubbles: true, cancelable: true })
-      event.key = 'Tab'
-      last.dispatchEvent(event)
-
-      expect(event.defaultPrevented).toBeTrue()
-      expect(document.activeElement.id).toEqual('a1')
-
-      focustrap.deactivate()
+      expect(document.activeElement).toBe(byId('last'))
     })
 
-    it('should carry focus back across both seams on shift-tab', () => {
-      fixtureEl.innerHTML = [
-        '<div id="trap"><button id="t1">t1</button><button id="t2">t2</button></div>',
-        '<div id="extra"><button id="a1">a1</button><button id="a2">a2</button></div>'
-      ].join('')
+    it('should wrap when the focus comes from nowhere', () => {
+      mount(simple)
+      document.activeElement?.blur()
 
-      const focustrap = new FocusTrap({
-        additionalElement: fixtureEl.querySelector('#extra'),
-        trapElement: fixtureEl.querySelector('#trap')
-      })
+      guards()[1].focus()
 
-      focustrap.activate()
+      expect(document.activeElement).toBe(byId('first'))
+    })
 
-      const first = fixtureEl.querySelector('#t1')
-      first.focus()
+    it('should leave a focus that code or the pointer moves out where it went', () => {
+      mount(simple)
+      byId('first').focus()
 
-      const fromTrap = createEvent('keydown', { bubbles: true, cancelable: true })
-      fromTrap.key = 'Tab'
-      fromTrap.shiftKey = true
-      first.dispatchEvent(fromTrap)
+      byId('outside').focus()
 
-      expect(fromTrap.defaultPrevented).toBeTrue()
-      expect(document.activeElement.id).toEqual('a2')
+      expect(document.activeElement).toBe(byId('outside'))
+    })
 
-      const firstAdditional = fixtureEl.querySelector('#a1')
-      firstAdditional.focus()
+    it('should focus the trap element when nothing in it can take the focus', () => {
+      mount('<button id="outside">outside</button><div id="trap" tabindex="-1"></div>')
+      byId('outside').focus()
 
-      const fromAdditional = createEvent('keydown', { bubbles: true, cancelable: true })
-      fromAdditional.key = 'Tab'
-      fromAdditional.shiftKey = true
-      firstAdditional.dispatchEvent(fromAdditional)
+      guards()[0].focus()
 
-      expect(fromAdditional.defaultPrevented).toBeTrue()
-      expect(document.activeElement.id).toEqual('t2')
+      expect(document.activeElement).toBe(byId('trap'))
+    })
 
-      focustrap.deactivate()
+    it('should pass over an element that does not take the focus', () => {
+      mount(simple)
+      byId('outside').focus()
+      spyOn(byId('first'), 'focus')
+
+      guards()[0].focus()
+
+      expect(document.activeElement).toBe(byId('last'))
+    })
+
+    it('should never leave the focus on a guard', () => {
+      mount('<button id="outside">outside</button><div id="trap"></div>')
+      byId('outside').focus()
+
+      guards()[0].focus()
+
+      expect(document.activeElement.hasAttribute('data-coreui-focus-guard')).toBeFalse()
     })
   })
 
-  describe('two active traps', () => {
-    it('should keep the other trap listening when one is deactivated', () => {
-      fixtureEl.innerHTML = [
-        '<a href="#" id="outside">outside</a>',
-        '<div id="first" tabindex="-1"><a href="#" id="inside-first">first</a></div>',
-        '<div id="second" tabindex="-1"><a href="#" id="inside-second">second</a></div>'
-      ].join('')
+  describe('with an additional element', () => {
+    const withSearch = [
+      '<button id="outside">outside</button>',
+      '<input id="search">',
+      '<div id="trap" tabindex="-1">',
+      '  <button id="first">first</button>',
+      '  <button id="last">last</button>',
+      '</div>'
+    ].join('')
 
-      const first = new FocusTrap({ trapElement: fixtureEl.querySelector('#first'), autofocus: false })
-      const second = new FocusTrap({ trapElement: fixtureEl.querySelector('#second'), autofocus: false })
-      first.activate()
-      second.activate()
-      first.deactivate()
+    const mountWithSearch = () => mount(withSearch, () => ({ additionalElement: byId('search') }))
 
-      const focusinSpy = spyOn(second, '_handleFocusin').and.callThrough()
-      const keydownSpy = spyOn(second, '_handleKeydown').and.callThrough()
+    it('should guard both regions', () => {
+      mountWithSearch()
 
-      fixtureEl.querySelector('#outside').focus()
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
-
-      expect(focusinSpy).toHaveBeenCalled()
-      expect(keydownSpy).toHaveBeenCalled()
-      expect(document.activeElement).toEqual(fixtureEl.querySelector('#inside-second'))
-
-      second.deactivate()
+      expect(guards().length).toBe(4)
+      expect(byId('search').previousElementSibling.hasAttribute('data-coreui-focus-guard')).toBeTrue()
+      expect(byId('search').nextElementSibling.hasAttribute('data-coreui-focus-guard')).toBeTrue()
     })
 
-    it('should hand control back to the trap underneath when the top one is deactivated', () => {
-      fixtureEl.innerHTML = [
-        '<a href="#" id="outside">outside</a>',
-        '<div id="first" tabindex="-1"><a href="#" id="inside-first">first</a></div>',
-        '<div id="second" tabindex="-1"><a href="#" id="inside-second">second</a></div>'
-      ].join('')
+    it('should take the additional element as a stop of its own and carry Tab from it into the trap', () => {
+      mountWithSearch()
+      byId('search').focus()
 
-      const first = new FocusTrap({ trapElement: fixtureEl.querySelector('#first'), autofocus: false })
-      const second = new FocusTrap({ trapElement: fixtureEl.querySelector('#second'), autofocus: false })
-      first.activate()
-      second.activate()
+      byId('search').nextElementSibling.focus()
 
-      fixtureEl.querySelector('#outside').focus()
-
-      expect(document.activeElement).toEqual(fixtureEl.querySelector('#inside-second'))
-
-      second.deactivate()
-      fixtureEl.querySelector('#outside').focus()
-
-      expect(document.activeElement).toEqual(fixtureEl.querySelector('#inside-first'))
-
-      first.deactivate()
+      expect(document.activeElement).toBe(byId('first'))
     })
 
-    it('should not throw focus back and forth between disjoint trap elements', () => {
+    it('should carry Tab from the last element of the trap to the additional element', () => {
+      mountWithSearch()
+      byId('last').focus()
+
+      byId('trap').nextElementSibling.focus()
+
+      expect(document.activeElement).toBe(byId('search'))
+    })
+
+    it('should carry Shift+Tab from the additional element to the last element of the trap', () => {
+      mountWithSearch()
+      byId('search').focus()
+
+      byId('search').previousElementSibling.focus()
+
+      expect(document.activeElement).toBe(byId('last'))
+    })
+
+    it('should carry Shift+Tab from the first element of the trap to the additional element', () => {
+      mountWithSearch()
+      byId('first').focus()
+
+      byId('trap').previousElementSibling.focus()
+
+      expect(document.activeElement).toBe(byId('search'))
+    })
+
+    it('should go on to the next region when one cannot take the focus', () => {
+      mountWithSearch()
+      byId('search').disabled = true
+      byId('last').focus()
+
+      byId('trap').nextElementSibling.focus()
+
+      expect(document.activeElement).toBe(byId('first'))
+    })
+
+    it('should focus an empty trap element from the additional element', () => {
+      mount('<input id="search"><div id="trap" tabindex="-1"></div>', () => ({ additionalElement: byId('search') }))
+      byId('search').focus()
+
+      byId('search').nextElementSibling.focus()
+
+      expect(document.activeElement).toBe(byId('trap'))
+    })
+
+    it('should not guard an additional element that sits inside the trap', () => {
+      mount(simple, () => ({ additionalElement: byId('first') }))
+
+      expect(guards().length).toBe(2)
+    })
+  })
+
+  describe('two traps', () => {
+    it('should let each trap wrap inside its own elements', () => {
       fixtureEl.innerHTML = [
-        '<a href="#" id="outside">outside</a>',
-        '<div id="first" tabindex="-1"><a href="#" id="inside-first">first</a></div>',
-        '<div id="second" tabindex="-1"><a href="#" id="inside-second">second</a></div>'
+        '<div id="one" tabindex="-1"><button id="one-first">1</button><button id="one-last">1</button></div>',
+        '<div id="two" tabindex="-1"><button id="two-first">2</button><button id="two-last">2</button></div>'
       ].join('')
+      const one = new FocusTrap({ autofocus: false, trapElement: byId('one') })
+      const two = new FocusTrap({ autofocus: false, trapElement: byId('two') })
+      traps.push(one, two)
+      one.activate()
+      two.activate()
 
-      const first = new FocusTrap({ trapElement: fixtureEl.querySelector('#first'), autofocus: false })
-      const second = new FocusTrap({ trapElement: fixtureEl.querySelector('#second'), autofocus: false })
+      byId('two-last').focus()
+      byId('two').nextElementSibling.focus()
 
-      // Cap the recursion: without the topmost check the two handlers hand
-      // focus to each other until the stack gives out.
-      let calls = 0
-      const firstFocusin = first._handleFocusin.bind(first)
-      const secondFocusin = second._handleFocusin.bind(second)
-      first._handleFocusin = event => {
-        calls++
-        if (calls < 50) {
-          firstFocusin(event)
-        }
-      }
+      expect(document.activeElement).toBe(byId('two-first'))
 
-      second._handleFocusin = event => {
-        calls++
-        if (calls < 50) {
-          secondFocusin(event)
-        }
-      }
+      byId('one-last').focus()
+      byId('one').nextElementSibling.focus()
 
-      first.activate()
-      second.activate()
-      fixtureEl.querySelector('#outside').focus()
-
-      expect(calls).toBeLessThan(10)
-      expect(document.activeElement).toEqual(fixtureEl.querySelector('#inside-second'))
-
-      second.deactivate()
-      first.deactivate()
+      expect(document.activeElement).toBe(byId('one-first'))
     })
   })
 })
