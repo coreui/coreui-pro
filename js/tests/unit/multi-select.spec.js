@@ -1548,7 +1548,7 @@ describe('MultiSelect', () => {
 
       // next to the frame, not inside it — the frame is a flex control chrome
       expect(multiSelect._menu.parentElement).not.toBe(multiSelect._wrapperElement)
-      expect(multiSelect._wrapperElement.nextElementSibling).toBe(multiSelect._menu)
+      expect(multiSelect._menu.parentElement).toBe(multiSelect._wrapperElement.parentElement)
 
       multiSelect.hide()
       multiSelect.dispose()
@@ -5027,6 +5027,80 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._isShown()).toBeTrue()
       expect(multiSelect._focustrap._isActive).toBe(true)
+    })
+
+    it('should guard the selection of a searchable panel inside the control', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Option 1' }],
+        search: true
+      })
+
+      multiSelect.show()
+
+      const selection = multiSelect._selectionElement
+      expect(selection.previousElementSibling.hasAttribute('data-coreui-focus-guard')).toBeTrue()
+      expect(selection.nextElementSibling.hasAttribute('data-coreui-focus-guard')).toBeTrue()
+      expect(selection.parentElement).toBe(multiSelect._wrapperElement)
+    })
+
+    it('should carry a Tab from the search field into the panel', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Option 1' }],
+        search: true,
+        selectAll: false
+      })
+
+      multiSelect.show()
+      multiSelect._searchElement.focus()
+      multiSelect._selectionElement.nextElementSibling.focus()
+
+      expect(multiSelect._menu.contains(document.activeElement)).toBeTrue()
+    })
+
+    it('should move the focus to the list when the control of an open panel is clicked', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }] })
+
+      multiSelect.show()
+      multiSelect._wrapperElement.focus()
+      multiSelect._wrapperElement.click()
+
+      expect(multiSelect._isShown()).toBeTrue()
+      expect(multiSelect._menu.contains(document.activeElement)).toBeTrue()
+    })
+
+    it('should keep the focus in an open panel on a key the native select hands over', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      multiSelect.show()
+      selectEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+
+      expect(multiSelect._menu.contains(document.activeElement)).toBeTrue()
+    })
+
+    it('should hand a key on the native select to the toggle while the panel is closed', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      selectEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+
+      expect(multiSelect._isShown()).toBeFalse()
+      expect(document.activeElement).toBe(multiSelect._togglerElement)
+    })
+
+    it('should listen to no pointer events on the document while open', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }] })
+      const addEventListener = spyOn(document, 'addEventListener').and.callThrough()
+
+      multiSelect.show()
+
+      expect(addEventListener.calls.allArgs().map(([type]) => type)).not.toContain('pointerdown')
     })
 
     it('should leave no focus trap behind when a shown listener closes the panel', () => {

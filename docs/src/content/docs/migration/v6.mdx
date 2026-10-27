@@ -1911,6 +1911,18 @@ portal.
 shrinks to its content, and both pickers measure identically without the
 declaration.
 
+#### A focus trap holds Tab only, and a Tab out of a picker field closes the panel
+
+The trap of the picker panels and of the Multi Select panel used to pull back
+every focus that left it, so a click on a field next to an open panel lost its
+focus to the panel. It now keeps Tab and Shift+Tab cycling inside, with two
+hidden `[data-coreui-focus-guard]` elements next to the panel while it is open,
+and leaves the focus where a click, a tap or a script puts it. A Tab that
+leaves the field of a Date Picker, Date Range Picker or Time Picker closes the
+open panel; a Tab between the parts of the field leaves it open. Styles that
+counted on the panel being the next sibling of the field, or scripts that count
+the children around it, see the two guards while the panel is open.
+
 #### `.form-select` is absorbed by `.form-control`
 
 - **A `<select>` takes `.form-control` now**, like every other control. The two

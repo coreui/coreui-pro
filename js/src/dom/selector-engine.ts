@@ -101,7 +101,7 @@ const SelectorEngine = {
       'details',
       '[tabindex]',
       '[contenteditable="true"]'
-    ].map(selector => `${selector}:not([tabindex^="-"])`).join(',')
+    ].map(selector => `${selector}:not([tabindex^="-"]):not([data-coreui-focus-guard])`).join(',')
 
     return this.find(focusables, element).filter(el => !isDisabled(el) && isVisible(el))
   },

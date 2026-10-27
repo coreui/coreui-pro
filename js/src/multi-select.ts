@@ -283,7 +283,6 @@ class MultiSelect extends ComboboxBase {
   protected declare _searchElement: any
   protected declare _wrapperElement: any
   protected declare _focustrap: any
-  protected declare _pointerDownListener: any
   protected declare _refocusOnHide: boolean
   protected declare _nativeFocusHandler: any
   protected declare _nativeKeydownHandler: any
@@ -375,33 +374,11 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._focustrap = new FocusTrap({
-      additionalElement: this._config.search ? this._searchElement : null,
+      additionalElement: this._config.search ? this._selectionElement : null,
       autofocus: false,
       trapElement: this._menu
     })
     this._focustrap.activate()
-
-    // A press outside fires focusin before the click that closes the panel.
-    this._pointerDownListener = (event: any) => {
-      if (this._wrapperElement.contains(event.target) || this._menu.contains(event.target)) {
-        return
-      }
-
-      this._focustrap?.deactivate()
-
-      // A right click or a scrollbar drag closes nothing, so the trap comes back.
-      const rearm = () => {
-        document.removeEventListener('pointerup', rearm, true)
-
-        if (this._isShown()) {
-          this._focustrap?.activate()
-        }
-      }
-
-      document.addEventListener('pointerup', rearm, true)
-    }
-
-    document.addEventListener('pointerdown', this._pointerDownListener, true)
 
     if (this._config.search) {
       this._searchElement.focus()
@@ -433,11 +410,6 @@ class MultiSelect extends ComboboxBase {
   }
 
   _releaseFocus(): void {
-    if (this._pointerDownListener) {
-      document.removeEventListener('pointerdown', this._pointerDownListener, true)
-      this._pointerDownListener = null
-    }
-
     this._focustrap?.deactivate()
     this._focustrap = null
   }
@@ -718,9 +690,16 @@ class MultiSelect extends ComboboxBase {
     })
 
     EventHandler.on(this._wrapperElement, EVENT_CLICK, () => {
-      if (!this._disabled) {
-        this.show()
+      if (this._disabled) {
+        return
       }
+
+      if (this._isShown() && !this._config.search) {
+        this._focusListBox()
+        return
+      }
+
+      this.show()
     })
 
     EventHandler.on(this._wrapperElement, EVENT_KEYDOWN, (event: any) => {
@@ -808,7 +787,7 @@ class MultiSelect extends ComboboxBase {
           this._searchElement.value += event.key
           this._onSearchChange(this._searchElement)
         }
-      } else {
+      } else if (!this._isShown()) {
         this._togglerElement.focus()
       }
     }

@@ -200,6 +200,12 @@ describe('SelectorEngine', () => {
       expect(SelectorEngine.focusableChildren(fixtureEl)).toEqual(expectedElements)
     })
 
+    it('should not return focus guards', () => {
+      fixtureEl.innerHTML = '<span tabindex="0" data-coreui-focus-guard>guard</span><button>lorem</button>'
+
+      expect(SelectorEngine.focusableChildren(fixtureEl)).toEqual([fixtureEl.querySelector('button')])
+    })
+
     it('should return not return elements with negative tab index', () => {
       fixtureEl.innerHTML = '<button tabindex="-1">lorem</button>'
 

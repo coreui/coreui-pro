@@ -648,13 +648,88 @@ describe('Popup', () => {
       expect(fixtureEl.querySelector('#content').getAttribute('role')).toBeNull()
     })
 
-    it('should keep focus moving out of the panel from reaching the field', () => {
+    it('should wrap Tab from the last element of the panel back into it', () => {
+      const popup = buildPopup({ focusTrap: true })
+
+      popup.show()
+      fixtureEl.querySelector('#option').focus()
+      fixtureEl.querySelector('#content').nextElementSibling.focus()
+
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#option'))
+    })
+
+    it('should leave a focus that code moves out of the panel where it went', () => {
       const popup = buildPopup({ focusTrap: true })
 
       popup.show()
       fixtureEl.querySelector('#outside').focus()
 
-      expect(fixtureEl.querySelector('#content').contains(document.activeElement)).toBeTrue()
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#outside'))
+    })
+  })
+
+  describe('a Tab leaving the field', () => {
+    const tab = (element, shiftKey = false) => {
+      element.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Tab', shiftKey }))
+    }
+
+    const buildTwoStops = () => {
+      fixtureEl.innerHTML = [
+        '<div id="anchor"><input id="start"><input id="end"></div>',
+        '<div id="content"><button id="option">option</button></div>',
+        '<button id="outside">outside</button>'
+      ].join('')
+
+      const popup = new Popup({
+        anchor: fixtureEl.querySelector('#anchor'),
+        content: fixtureEl.querySelector('#content'),
+        focusTrap: true
+      })
+
+      popups.push(popup)
+      return popup
+    }
+
+    it('should close the panel on a Tab from the last stop of the field', () => {
+      const popup = buildTwoStops()
+      popup.show()
+
+      tab(fixtureEl.querySelector('#end'))
+
+      expect(popup.isShown).toBeFalse()
+    })
+
+    it('should close the panel on a Shift+Tab from the first stop of the field', () => {
+      const popup = buildTwoStops()
+      popup.show()
+
+      tab(fixtureEl.querySelector('#start'), true)
+
+      expect(popup.isShown).toBeFalse()
+    })
+
+    it('should keep the panel open on a Tab between two stops of the field', () => {
+      const popup = buildTwoStops()
+      popup.show()
+
+      tab(fixtureEl.querySelector('#start'))
+      tab(fixtureEl.querySelector('#end'), true)
+
+      expect(popup.isShown).toBeTrue()
+    })
+
+    it('should make a closing panel inert until it opens again', () => {
+      const popup = buildTwoStops()
+      const content = fixtureEl.querySelector('#content')
+
+      popup.show()
+      popup.hide()
+
+      expect(content.inert).toBeTrue()
+
+      popup.show()
+
+      expect(content.inert).toBeFalse()
     })
   })
 
