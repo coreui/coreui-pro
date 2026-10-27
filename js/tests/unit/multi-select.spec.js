@@ -1070,7 +1070,7 @@ describe('MultiSelect', () => {
       expect(shadowRoot.activeElement).toBe(multiSelect._togglerElement)
     })
 
-    it('should see the focus on its toggler inside a shadow root when it starts to hide', () => {
+    it('should hand the focus back to its toggler inside a shadow root when the panel closes from the list', () => {
       fixtureEl.innerHTML = '<div></div>'
       const shadowRoot = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
       shadowRoot.innerHTML = '<select></select>'
@@ -1079,10 +1079,10 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      multiSelect._togglerElement.focus()
-      multiSelect._onHideStart()
+      multiSelect._menu.focus()
+      multiSelect.hide()
 
-      expect(multiSelect._refocusOnHide).toBeTrue()
+      expect(shadowRoot.activeElement).toBe(multiSelect._togglerElement)
     })
 
     it('should hand a keystroke on the native select to the control once enable() follows disable()', () => {
@@ -1573,6 +1573,63 @@ describe('MultiSelect', () => {
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
       expect(event.defaultPrevented).toBe(true)
       expect(document.activeElement).toBe(multiSelect._togglerElement)
+    })
+
+    it('should not hand the focus back when a click outside closes the panel', () => {
+      fixtureEl.innerHTML = '<select></select><p id="outside">text</p>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      multiSelect.show()
+      multiSelect._menu.focus()
+      const focusSpy = spyOn(multiSelect._togglerElement, 'focus')
+      fixtureEl.querySelector('#outside').click()
+
+      expect(multiSelect._isShown()).toBeFalse()
+      expect(focusSpy).not.toHaveBeenCalled()
+    })
+
+    it('should not move the focus on Escape when the page keeps the panel open', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }], selectAll: true
+      })
+      selectEl.addEventListener('hide.coreui.multi-select', event => event.preventDefault())
+
+      multiSelect.show()
+      multiSelect._selectAllElement.focus()
+      multiSelect._selectAllElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+
+      expect(multiSelect._isShown()).toBeTrue()
+      expect(document.activeElement).toBe(multiSelect._selectAllElement)
+    })
+
+    it('should leave the focus where a hidden listener put it', () => {
+      fixtureEl.innerHTML = '<select></select><input id="next">'
+      const selectEl = fixtureEl.querySelector('select')
+      const next = fixtureEl.querySelector('#next')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Opt 1' }] })
+      selectEl.addEventListener('hidden.coreui.multi-select', () => next.focus())
+
+      multiSelect.show()
+      multiSelect._menu.focus()
+      multiSelect.hide()
+
+      expect(document.activeElement).toBe(next)
+    })
+
+    it('should leave the focus in another field when the code closes the panel', () => {
+      fixtureEl.innerHTML = '<select></select><input id="other">'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Opt 1' }] })
+      const other = fixtureEl.querySelector('#other')
+
+      multiSelect.show()
+      other.focus()
+      multiSelect.hide()
+
+      expect(document.activeElement).toBe(other)
     })
 
     it('should follow the frame width while open', async () => {

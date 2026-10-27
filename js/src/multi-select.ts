@@ -283,7 +283,6 @@ class MultiSelect extends ComboboxBase {
   protected declare _searchElement: any
   protected declare _wrapperElement: any
   protected declare _focustrap: any
-  protected declare _refocusOnHide: boolean
   protected declare _nativeFocusHandler: any
   protected declare _nativeKeydownHandler: any
 
@@ -360,7 +359,7 @@ class MultiSelect extends ComboboxBase {
 
   // Public
 
-  override _escapeFocusTarget(): HTMLElement | null {
+  override _returnFocusTarget(): HTMLElement | null {
     return this._config.search ? this._searchElement : this._togglerElement
   }
 
@@ -416,8 +415,6 @@ class MultiSelect extends ComboboxBase {
 
   override _onHideStart(): void {
     this._releaseFocus()
-
-    this._refocusOnHide = containsFocus(this._wrapperElement) || containsFocus(this._menu)
   }
 
   override _afterHideDispose(): void {
@@ -426,15 +423,6 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._onSearchChange(this._searchElement)
-  }
-
-  override _onHideEnd(): void {
-    if (this._refocusOnHide && !this._disabled) {
-      const refocusTarget = this._config.search ? this._searchElement : this._togglerElement
-      if (refocusTarget) {
-        refocusTarget.focus()
-      }
-    }
   }
 
   override dispose(): void {

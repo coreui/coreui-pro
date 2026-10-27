@@ -582,11 +582,8 @@ class Combobox extends ComboboxBase {
   override _onSelectionChange(): void {
     this._commitValue()
 
-    // One value, one decision: the panel has nothing left to offer, so it
-    // closes and hands the focus back to the control the user came from.
     if (!this._config.multiple && this._isShown()) {
       this.hide()
-      this._element.focus()
     }
   }
 
@@ -609,9 +606,16 @@ class Combobox extends ComboboxBase {
 
     if (this._searchElement) {
       EventHandler.on(this._searchElement, EVENT_KEYDOWN, (event: any) => {
-        if (event.key === TAB_KEY) {
-          this.hide()
+        if (event.key !== TAB_KEY) {
+          return
         }
+
+        if (event.shiftKey) {
+          event.preventDefault()
+          this._element.focus()
+        }
+
+        this.hide()
       })
     }
   }

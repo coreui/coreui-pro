@@ -276,7 +276,7 @@ class Autocomplete extends ComboboxBase {
     this.search('')
   }
 
-  override _escapeFocusTarget(): HTMLElement | null {
+  override _returnFocusTarget(): HTMLElement | null {
     return this._inputElement
   }
 
@@ -491,7 +491,7 @@ class Autocomplete extends ComboboxBase {
       }
 
       if (this._namesSelection(inputValue)) {
-        this.hide()
+        this._hide(false)
         return
       }
 
@@ -499,7 +499,7 @@ class Autocomplete extends ComboboxBase {
       const exactMatches = getSelectableOptions(this._options).filter(option => option.label.trim().toLowerCase() === inputValueLower)
 
       if (exactMatches.length === 1) {
-        this._selectOption(exactMatches[0])
+        this._selectOption(exactMatches[0], false)
         return
       }
 
@@ -812,11 +812,10 @@ class Autocomplete extends ComboboxBase {
 
     if (foundOption && !this._disabled) {
       this._selectOption(foundOption)
-      this._inputElement.focus()
     }
   }
 
-  _selectOption(option: any): void {
+  _selectOption(option: any, returnFocus = true): void {
     if (option.disabled) {
       return
     }
@@ -835,7 +834,7 @@ class Autocomplete extends ComboboxBase {
       this._inputHintElement.value = ''
     }
 
-    this.hide()
+    this._hide(returnFocus)
 
     if (this._config.clearSearchOnSelect) {
       this.search('')

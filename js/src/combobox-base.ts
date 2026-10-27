@@ -11,6 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { createAnchoredPosition } from './util/floating-ui.js'
 import { findOptionByValue, isOptionGroup } from './util/option-tree.js'
+import { focusIfUsable, holdsFocusOrNone } from './util/focus.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { escapeHtml } from './util/sanitizer.js'
 import { type SelectionStore } from './util/selection-state.js'
@@ -103,6 +104,10 @@ class ComboboxBase extends BaseComponent {
   }
 
   hide(): void {
+    this._hide(true)
+  }
+
+  _hide(returnFocus: boolean): void {
     if (!this._isShown()) {
       return
     }
@@ -112,6 +117,8 @@ class ComboboxBase extends BaseComponent {
     if (hideEvent.defaultPrevented) {
       return
     }
+
+    const refocus = returnFocus && !this._isDisabled() && holdsFocusOrNone(this._menu)
 
     this._onHideStart()
 
@@ -128,6 +135,11 @@ class ComboboxBase extends BaseComponent {
     this._listBox?.setActive(null)
 
     this._onHideEnd()
+
+    if (refocus) {
+      focusIfUsable(this._returnFocusTarget())
+    }
+
     this._syncPanelReferences()
     EventHandler.trigger(this._element, this.constructor.eventName('hidden'))
 
@@ -153,7 +165,7 @@ class ComboboxBase extends BaseComponent {
       return
     }
 
-    this.hide()
+    this._hide(false)
 
     if (!this._isShown()) {
       this._afterOutsideHide()
@@ -249,7 +261,7 @@ class ComboboxBase extends BaseComponent {
     return this._togglerElement
   }
 
-  _escapeFocusTarget(): HTMLElement | null {
+  _returnFocusTarget(): HTMLElement | null {
     return this._togglerElement
   }
 
@@ -324,18 +336,15 @@ class ComboboxBase extends BaseComponent {
 
   // The menu mounts outside the component while open, so its keystrokes no
   // longer bubble through the frame — Escape is handled on the panel itself.
-  // Focus goes home before the panel unmounts, or a keyboard user is dropped
-  // on <body>; preventDefault keeps the same press from also closing an
-  // enclosing modal dialog.
+  // preventDefault keeps the same press from also closing an enclosing modal
+  // dialog.
   _addPanelEscapeListener(popup: HTMLElement): void {
     EventHandler.on(popup, this.constructor.eventName('keydown'), (event: any) => {
       if (event.key === ESCAPE_KEY) {
         event.preventDefault()
         event.stopPropagation()
 
-        // Closing first releases whatever holds the focus, so the handover lands.
         this.hide()
-        this._escapeFocusTarget()?.focus()
       }
     })
   }

@@ -1,3 +1,5 @@
+import EventHandler from '../../../src/dom/event-handler.js'
+import { noop } from '../../../src/util/index.js'
 import Popup, { resolvePopupContainer } from '../../../src/util/popup.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -258,16 +260,83 @@ describe('Popup', () => {
       expect(spy).not.toHaveBeenCalled()
     })
 
-    it('should restore focus to the previously focused element', () => {
+    it('should restore focus to the element of the anchor that had it before opening', () => {
       const popup = buildPopup()
-      const outside = fixtureEl.querySelector('#outside')
+      const inside = fixtureEl.querySelector('#inside')
 
-      outside.focus()
+      inside.focus()
       popup.show()
       fixtureEl.querySelector('#option').focus()
       popup.hide()
 
-      expect(document.activeElement).toEqual(outside)
+      expect(document.activeElement).toEqual(inside)
+    })
+
+    it('should hand the focus to the anchor, not to an element outside it that had the focus before opening', () => {
+      const popup = buildPopup()
+
+      fixtureEl.querySelector('#outside').focus()
+      popup.show()
+      fixtureEl.querySelector('#option').focus()
+      popup.hide()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#inside'))
+    })
+
+    it('should hand the focus back from the body', () => {
+      const popup = buildPopup()
+
+      fixtureEl.querySelector('#inside').focus()
+      popup.show()
+      document.activeElement.blur()
+      popup.hide()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#inside'))
+    })
+
+    it('should leave the focus on another element of the anchor', () => {
+      fixtureEl.innerHTML = [
+        '<div id="anchor"><input id="field"><button id="toggle">toggle</button></div>',
+        '<div id="content"><button id="option">option</button></div>'
+      ].join('')
+      const popup = new Popup({ anchor: fixtureEl.querySelector('#anchor'), content: fixtureEl.querySelector('#content'), focusTrap: false })
+      popups.push(popup)
+
+      fixtureEl.querySelector('#field').focus()
+      popup.show()
+      fixtureEl.querySelector('#toggle').focus()
+      popup.hide()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#toggle'))
+    })
+
+    it('should skip a remembered element that is disabled and take the next one of the anchor', () => {
+      fixtureEl.innerHTML = [
+        '<div id="anchor"><input id="field"><button id="toggle">toggle</button></div>',
+        '<div id="content"><button id="option">option</button></div>'
+      ].join('')
+      const popup = new Popup({ anchor: fixtureEl.querySelector('#anchor'), content: fixtureEl.querySelector('#content'), focusTrap: false })
+      popups.push(popup)
+
+      fixtureEl.querySelector('#field').focus()
+      popup.show()
+      fixtureEl.querySelector('#option').focus()
+      fixtureEl.querySelector('#field').disabled = true
+      popup.hide()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#toggle'))
+    })
+
+    it('should not move the focus when dispose() closes the panel', () => {
+      const popup = buildPopup()
+
+      fixtureEl.querySelector('#inside').focus()
+      popup.show()
+      fixtureEl.querySelector('#option').focus()
+      popup.dispose()
+      popups.splice(popups.indexOf(popup), 1)
+
+      expect(document.activeElement).not.toEqual(fixtureEl.querySelector('#inside'))
     })
 
     it('should fall back to the anchor when the element it remembered is gone', () => {
@@ -685,19 +754,194 @@ describe('Popup', () => {
   })
 
   describe('dismissal', () => {
-    // The press closes the panel, not the click that follows it: the focus has
-    // to be free before the browser moves it onto whatever was pressed.
-    const press = element => {
+    const pointerdown = element => {
       element.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
     }
 
-    it('should hide on an outside press', () => {
+    const release = element => {
+      element.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    }
+
+    const press = element => {
+      pointerdown(element)
+      release(element)
+    }
+
+    it('should hide on an outside click', () => {
       const popup = buildPopup()
       popup.show()
 
       press(fixtureEl.querySelector('#outside'))
 
       expect(popup.isShown).toBeFalse()
+    })
+
+    it('should not hide on an outside pointerdown', () => {
+      const popup = buildPopup()
+      popup.show()
+
+      pointerdown(fixtureEl.querySelector('#outside'))
+
+      expect(popup.isShown).toBeTrue()
+    })
+
+    it('should stay open on a click outside that no press started, as a keyboard click', () => {
+      const popup = buildPopup()
+      popup.show()
+
+      release(fixtureEl.querySelector('#outside'))
+
+      expect(popup.isShown).toBeTrue()
+    })
+
+    it('should stay open on a keyboard click after a press that brought no click', () => {
+      const popup = buildPopup()
+      const outside = fixtureEl.querySelector('#outside')
+      popup.show()
+
+      outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 2 }))
+      release(outside)
+
+      expect(popup.isShown).toBeTrue()
+
+      pointerdown(outside)
+      outside.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+      release(outside)
+
+      expect(popup.isShown).toBeTrue()
+    })
+
+    it('should hide on an outside press whose handlers stop the events', () => {
+      const popup = buildPopup()
+      const outside = fixtureEl.querySelector('#outside')
+      outside.addEventListener('pointerdown', event => event.stopPropagation())
+      outside.addEventListener('click', event => event.stopPropagation())
+      popup.show()
+
+      press(outside)
+
+      expect(popup.isShown).toBeFalse()
+    })
+
+    it('should make the page clickable for touch while it is shown, with a listener of its own', () => {
+      const defaultValueOnTouchStart = document.documentElement.ontouchstart
+      document.documentElement.ontouchstart = noop
+      const popup = buildPopup()
+      const child = document.body.firstElementChild
+      EventHandler.on(child, 'mouseover', noop)
+      const add = spyOn(child, 'addEventListener').and.callThrough()
+      const remove = spyOn(child, 'removeEventListener').and.callThrough()
+
+      popup.show()
+      const [, listener] = add.calls.allArgs().find(([type]) => type === 'mouseover')
+      expect(listener).not.toBe(noop)
+
+      popup.hide()
+      expect(remove).toHaveBeenCalledWith('mouseover', listener)
+      expect(remove.calls.allArgs().filter(([type]) => type === 'mouseover').length).toEqual(1)
+      EventHandler.off(child, 'mouseover', noop)
+      document.documentElement.ontouchstart = defaultValueOnTouchStart
+    })
+
+    it('should still hide on an outside click while a modifier key repeats', () => {
+      const popup = buildPopup()
+      const outside = fixtureEl.querySelector('#outside')
+      popup.show()
+
+      pointerdown(outside)
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Control', repeat: true, bubbles: true }))
+      release(outside)
+
+      expect(popup.isShown).toBeFalse()
+    })
+
+    it('should forget a press outside when the panel closes before the click', () => {
+      const popup = buildPopup()
+      const outside = fixtureEl.querySelector('#outside')
+      popup.show()
+
+      pointerdown(outside)
+      popup.hide()
+      popup.show()
+      release(outside)
+
+      expect(popup.isShown).toBeTrue()
+    })
+
+    it('should stay open on a click from code after a press that was cancelled', () => {
+      const popup = buildPopup()
+      const outside = fixtureEl.querySelector('#outside')
+      popup.show()
+
+      pointerdown(outside)
+      outside.dispatchEvent(new PointerEvent('pointercancel', { bubbles: true, composed: true }))
+      outside.click()
+
+      expect(popup.isShown).toBeTrue()
+
+      pointerdown(outside)
+      outside.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, composed: true }))
+      outside.click()
+
+      expect(popup.isShown).toBeTrue()
+    })
+
+    it('should not hand the focus back on an outside click', () => {
+      const popup = buildPopup()
+      const inside = fixtureEl.querySelector('#inside')
+
+      inside.focus()
+      popup.show()
+      fixtureEl.querySelector('#option').focus()
+      const focusSpy = spyOn(inside, 'focus')
+      press(fixtureEl.querySelector('#outside'))
+
+      expect(popup.isShown).toBeFalse()
+      expect(focusSpy).not.toHaveBeenCalled()
+    })
+
+    it('should stay open after a press inside that is released outside', () => {
+      const popup = buildPopup()
+      popup.show()
+
+      pointerdown(fixtureEl.querySelector('#option'))
+      release(fixtureEl.querySelector('#outside'))
+
+      expect(popup.isShown).toBeTrue()
+
+      press(fixtureEl.querySelector('#outside'))
+
+      expect(popup.isShown).toBeFalse()
+    })
+
+    it('should ignore the click that opened the panel', () => {
+      const popup = buildPopup()
+      const outside = fixtureEl.querySelector('#outside')
+      outside.addEventListener('click', () => popup.show())
+
+      press(outside)
+
+      expect(popup.isShown).toBeTrue()
+    })
+
+    it('should not close on an outside click that onBeforeHide refuses', () => {
+      const popup = buildPopup({ onBeforeHide: () => false })
+      popup.show()
+
+      press(fixtureEl.querySelector('#outside'))
+
+      expect(popup.isShown).toBeTrue()
+    })
+
+    it('should leave an Escape another panel already handled', () => {
+      const popup = buildPopup()
+      popup.show()
+
+      const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+      event.preventDefault()
+      document.dispatchEvent(event)
+
+      expect(popup.isShown).toBeTrue()
     })
 
     it('should not hide on a press inside the anchor or content', () => {

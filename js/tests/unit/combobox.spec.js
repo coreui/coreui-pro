@@ -1371,6 +1371,44 @@ describe('Combobox', () => {
       expect(document.activeElement).toEqual(toggle)
     })
 
+    it('should hand the focus to the toggle on Tab from the search field, and keep it there on Shift+Tab', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { search: true })
+
+      combobox.show()
+      searchField(combobox).focus()
+      const tab = keydown(searchField(combobox), 'Tab')
+
+      expect(toggle.classList.contains('show')).toBeFalse()
+      expect(document.activeElement).toEqual(toggle)
+      expect(tab.defaultPrevented).toBeFalse()
+
+      combobox.show()
+      searchField(combobox).focus()
+      const shiftTab = new KeyboardEvent('keydown', {
+        key: 'Tab', shiftKey: true, bubbles: true, cancelable: true
+      })
+      searchField(combobox).dispatchEvent(shiftTab)
+
+      expect(document.activeElement).toEqual(toggle)
+      expect(shiftTab.defaultPrevented).toBeTrue()
+    })
+
+    it('should move the focus to the toggle on Shift+Tab from the search field when the page keeps the panel open', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { search: true })
+      toggle.addEventListener('hide.coreui.combobox', event => event.preventDefault())
+
+      combobox.show()
+      searchField(combobox).focus()
+      searchField(combobox).dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Tab', shiftKey: true, bubbles: true, cancelable: true
+      }))
+
+      expect(toggle.classList.contains('show')).toBeTrue()
+      expect(document.activeElement).toEqual(toggle)
+    })
+
     it('should close the panel on Tab', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle)

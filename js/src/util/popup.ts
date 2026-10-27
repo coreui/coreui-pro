@@ -11,6 +11,7 @@ import {
 import EventHandler from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
+import { focusIfUsable, holdsFocusOrNone } from './focus.js'
 import FocusTrap from './focustrap.js'
 import {
   execute, getElement, getTransitionDurationFromElement
@@ -24,11 +25,13 @@ const NAME = 'popup'
 const DATA_KEY = 'coreui.popup'
 const EVENT_KEY = `.${DATA_KEY}`
 
-const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
+const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
+const SPACE_KEY = ' '
 const ARROW_DOWN_KEY = 'ArrowDown'
+const PRESS_RESET_EVENTS = ['contextmenu', 'pointercancel']
 
 type PopupConfig = {
   anchor: HTMLElement | null
@@ -141,7 +144,11 @@ class Popup extends Config {
   protected declare _transition: number
   protected declare _hiding: boolean
   protected declare _previouslyFocused: HTMLElement | null
+  protected declare _clickListener: any
   protected declare _pointerdownListener: any
+  protected declare _resetPressListener: any
+  protected declare _touchListener: any
+  protected declare _pressedOutside: boolean
   protected declare _keydownListener: any
   protected declare _contentKeydownListener: any
   protected declare _anchorKeydownListener: any
@@ -160,7 +167,29 @@ class Popup extends Config {
     this._transition = 0
     this._hiding = false
     this._previouslyFocused = null
-    this._pointerdownListener = null
+    this._pressedOutside = false
+    this._pointerdownListener = (event: PointerEvent) => {
+      this._pressedOutside = event.button === 0 && !this._isInside(event)
+    }
+
+    this._clickListener = (event: Event) => {
+      const pressedOutside = this._pressedOutside
+      this._pressedOutside = false
+
+      if (!pressedOutside || this._isInside(event)) {
+        return
+      }
+
+      if (execute(this._config.onBeforeHide) !== false) {
+        this._hide(false)
+      }
+    }
+
+    this._resetPressListener = () => {
+      this._pressedOutside = false
+    }
+
+    this._touchListener = () => {}
     this._keydownListener = null
     this._contentKeydownListener = null
     this._anchorKeydownListener = null
@@ -240,7 +269,7 @@ class Popup extends Config {
     this._hide()
   }
 
-  _hide(): void {
+  _hide(returnFocus = true): void {
     execute(this._config.onHide)
     this._isShown = false
     this._revealPending = false
@@ -253,8 +282,8 @@ class Popup extends Config {
       this._focustrap.deactivate()
     }
 
-    if (this._config.returnFocus && this._holdsFocus()) {
-      this._returnFocusTarget()?.focus()
+    if (returnFocus && this._config.returnFocus && holdsFocusOrNone(this._content)) {
+      this._returnFocus()
     }
 
     this._content!.inert = true
@@ -281,7 +310,7 @@ class Popup extends Config {
     const owesHidden = this._isShown || this._hiding
 
     if (this._isShown) {
-      this._hide()
+      this._hide(false)
     }
 
     this._transition++
@@ -327,17 +356,14 @@ class Popup extends Config {
     this._anchor?.after(this._content)
   }
 
-  _holdsFocus(): boolean {
-    const active = document.activeElement
-    return Boolean(active && (active === document.body || this._content?.contains(active)))
-  }
+  _returnFocus(): void {
+    const recorded = this._previouslyFocused
 
-  _returnFocusTarget(): HTMLElement | null {
-    if (this._previouslyFocused?.isConnected) {
-      return this._previouslyFocused
+    if (recorded && this._anchor?.contains(recorded) && focusIfUsable(recorded)) {
+      return
     }
 
-    return this._anchor ? SelectorEngine.focusableChildren(this._anchor)[0] ?? null : null
+    focusIfUsable(this._anchor ? SelectorEngine.focusableChildren(this._anchor)[0] : null)
   }
 
   _afterTransition(transition: number, callback: () => void): void {
@@ -470,17 +496,12 @@ class Popup extends Config {
   }
 
   _addDismissListeners(): void {
-    this._pointerdownListener = (event: Event) => {
-      const path = event.composedPath()
-      if (path.includes(this._anchor!) || path.includes(this._content!)) {
-        return
+    this._keydownListener = (event: KeyboardEvent) => {
+      if (event.key === ENTER_KEY || event.key === SPACE_KEY) {
+        this._resetPressListener()
       }
 
-      this.hide()
-    }
-
-    this._keydownListener = (event: KeyboardEvent) => {
-      if (event.key === ESCAPE_KEY) {
+      if (event.key === ESCAPE_KEY && !event.defaultPrevented) {
         this.hide()
       }
     }
@@ -493,20 +514,41 @@ class Popup extends Config {
       }
     }
 
-    EventHandler.on(document, EVENT_POINTERDOWN, this._pointerdownListener)
+    this._listenOutside(true)
     EventHandler.on(document, EVENT_KEYDOWN, this._keydownListener)
     EventHandler.on(this._content!, EVENT_KEYDOWN, this._contentKeydownListener)
     EventHandler.on(this._anchor!, EVENT_KEYDOWN, this._contentKeydownListener)
   }
 
   _removeDismissListeners(): void {
-    EventHandler.off(document, EVENT_POINTERDOWN, this._pointerdownListener)
+    this._listenOutside(false)
     EventHandler.off(document, EVENT_KEYDOWN, this._keydownListener)
     EventHandler.off(this._content, EVENT_KEYDOWN, this._contentKeydownListener)
     EventHandler.off(this._anchor, EVENT_KEYDOWN, this._contentKeydownListener)
-    this._pointerdownListener = null
+    this._pressedOutside = false
     this._keydownListener = null
     this._contentKeydownListener = null
+  }
+
+  _listenOutside(on: boolean): void {
+    const method = on ? 'addEventListener' : 'removeEventListener'
+    document[method]('pointerdown', this._pointerdownListener, true)
+    document[method]('click', this._clickListener, true)
+
+    for (const type of PRESS_RESET_EVENTS) {
+      document[method](type, this._resetPressListener, true)
+    }
+
+    if ('ontouchstart' in document.documentElement) {
+      for (const element of document.body.children) {
+        element[method]('mouseover', this._touchListener)
+      }
+    }
+  }
+
+  _isInside(event: Event): boolean {
+    const path = event.composedPath()
+    return path.includes(this._anchor!) || path.includes(this._content!)
   }
 }
 
