@@ -64,13 +64,15 @@ describe('FocusTrap', () => {
       expect(byId('trap').querySelector('[data-coreui-focus-guard]')).toBeNull()
     })
 
-    it('should make each guard an empty, visually hidden tab stop', () => {
-      mount(simple)
+    it('should make each guard of every region a hidden tab stop without a role', () => {
+      mount('<input id="search"><div id="trap" tabindex="-1"><button>first</button></div>', () => ({ additionalElement: byId('search') }))
+
+      expect(guards().length).toBe(4)
 
       for (const guard of guards()) {
         expect(guard.tabIndex).toBe(0)
-        expect(guard.hasAttribute('aria-hidden')).toBeFalse()
-        expect(guard.textContent).toBe('')
+        expect(guard.getAttribute('aria-hidden')).toBe('true')
+        expect(guard.hasAttribute('role')).toBeFalse()
         expect(guard.getBoundingClientRect().width).toBeLessThanOrEqual(1)
       }
     })

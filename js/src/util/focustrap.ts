@@ -118,6 +118,7 @@ class FocusTrap extends Config {
   _createGuard(index: number, after: boolean): HTMLElement {
     const guard = document.createElement('span')
     guard.tabIndex = 0
+    guard.setAttribute('aria-hidden', 'true')
     guard.setAttribute(ATTRIBUTE_GUARD, '')
     guard.style.cssText = GUARD_STYLE
     guard.addEventListener('focus', event => this._handleGuardFocus(event, index, after))
