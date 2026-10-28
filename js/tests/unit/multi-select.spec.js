@@ -4791,6 +4791,23 @@ describe('MultiSelect', () => {
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
+    it('should move the focus into the open list on an arrow key on the toggler without search', () => {
+      for (const key of ['ArrowDown', 'ArrowUp']) {
+        fixtureEl.innerHTML = '<select></select>'
+        const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+          options: [{ value: '1', text: 'Option 1' }],
+          search: false
+        })
+
+        multiSelect.show()
+        multiSelect._togglerElement.focus()
+        multiSelect._togglerElement.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+
+        expect(multiSelect._menu.contains(document.activeElement)).toBe(true)
+        multiSelect.dispose()
+      }
+    })
+
     it('should navigate to menu item on ArrowDown when already open', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -5167,7 +5184,7 @@ describe('MultiSelect', () => {
       expect(document.activeElement).toBe(multiSelect._togglerElement)
     })
 
-    it('should listen to no pointer events on the document while open', () => {
+    it('should add no pointer listener to the document when it opens', () => {
       fixtureEl.innerHTML = '<select></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }] })
       const addEventListener = spyOn(document, 'addEventListener').and.callThrough()
@@ -7765,6 +7782,26 @@ describe('MultiSelect', () => {
   })
 
   describe('clearMenus', () => {
+    it('should keep the panel open when the press of an outside click started in the panel or the field', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Option 1' }]
+      })
+
+      for (const start of [multiSelect._menu, multiSelect._wrapperElement]) {
+        multiSelect.show()
+        start.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+
+        expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
+      }
+
+      document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
+    })
+
     it('should close open menus on outside click', () => {
       fixtureEl.innerHTML = '<select></select><div id="outside"></div>'
       const selectEl = fixtureEl.querySelector('select')

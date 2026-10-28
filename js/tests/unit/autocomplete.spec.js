@@ -4897,6 +4897,26 @@ describe('Autocomplete', () => {
     })
 
     describe('clearMenus', () => {
+      it('should keep the panel open when the press of an outside click started in the panel or the field', () => {
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
+        const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+          options: [{ label: 'Option 1', value: '1' }]
+        })
+
+        for (const start of [autocomplete._menu, autocomplete._getShowTarget()]) {
+          autocomplete.show()
+          start.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+          document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+
+          expect(autocomplete._isShown()).toBe(true)
+        }
+
+        document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+
+        expect(autocomplete._isShown()).toBe(false)
+      })
+
       it('should ignore right mouse button click', () => {
         fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')

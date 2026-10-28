@@ -13,6 +13,7 @@ import { createAnchoredPosition } from './util/floating-ui.js'
 import { findOptionByValue, isOptionGroup } from './util/option-tree.js'
 import { focusIfUsable, holdsFocusOrNone } from './util/focus.js'
 import { resolvePopupContainer } from './util/popup.js'
+import { pressPathOf } from './util/press.js'
 import { escapeHtml } from './util/sanitizer.js'
 import { type SelectionStore } from './util/selection-state.js'
 import { executeAfterTransition, getElement } from './util/index.js'
@@ -159,10 +160,10 @@ class ComboboxBase extends BaseComponent {
       return
     }
 
-    const composedPath = event.composedPath()
-
-    if (composedPath.includes(this._getShowTarget()) || composedPath.includes(this._menu)) {
-      return
+    for (const path of [event.composedPath(), pressPathOf(event) ?? []]) {
+      if (path.includes(this._getShowTarget()) || path.includes(this._menu)) {
+        return
+      }
     }
 
     this._hide(false)

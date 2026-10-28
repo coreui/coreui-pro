@@ -2055,6 +2055,29 @@ describe('Dropdown', () => {
       })
     })
 
+    it('should stay open when a press that started in the dropdown menu ends outside it', () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+        '  <div class="dropdown-menu"><input type="search"></div>',
+        '</div>',
+        '<button id="outside">Outside</button>'
+      ].join('')
+
+      const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      const dropdown = new Dropdown(btnDropdown)
+      const outside = fixtureEl.querySelector('#outside')
+
+      dropdown.show()
+      fixtureEl.querySelector('input').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+      expect(btnDropdown).toHaveClass('show')
+
+      outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      outside.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+      expect(btnDropdown).not.toHaveClass('show')
+    })
+
     it('should close the dropdown if the user clicks on a text field that is not contained within dropdown-menu', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

@@ -1543,6 +1543,38 @@ describe('Combobox', () => {
   })
 
   describe('clearMenus', () => {
+    it('should close on a click outside that does not land on the path of an earlier press in the panel', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+      const outside = document.createElement('button')
+      document.body.append(outside)
+
+      combobox.show()
+      combobox._menu.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      outside.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+      outside.remove()
+
+      expect(combobox._isShown()).toBeFalse()
+    })
+
+    it('should keep the panel open when the press of an outside click started in the panel or the field', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+
+      for (const start of [combobox._menu, combobox._getShowTarget()]) {
+        combobox.show()
+        start.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+
+        expect(combobox._isShown()).toBeTrue()
+      }
+
+      document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+
+      expect(combobox._isShown()).toBeFalse()
+    })
+
     it('should close the panel on a click outside the toggle and the panel', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle)

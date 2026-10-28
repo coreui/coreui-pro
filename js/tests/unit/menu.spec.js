@@ -2516,6 +2516,93 @@ describe('Menu', () => {
       })
     })
 
+    it('should stay open when a press that started in the menu or on the toggle ends outside it', () => {
+      for (const autoClose of [true, 'outside']) {
+        fixtureEl.innerHTML = [
+          '<button class="btn" data-coreui-toggle="menu">Menu toggle</button>',
+          '<div class="menu"><input type="search"><a class="menu-item" href="#">Menu item</a></div>',
+          '<button id="outside">Outside</button>'
+        ].join('')
+
+        const menuToggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menu = new Menu(menuToggle, { autoClose })
+        const outside = fixtureEl.querySelector('#outside')
+
+        for (const start of [fixtureEl.querySelector('input'), fixtureEl.querySelector('.menu-item'), menuToggle]) {
+          menu.show()
+          start.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+          document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+
+          expect(menuToggle).toHaveClass('show')
+        }
+
+        outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        outside.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+
+        expect(menuToggle).not.toHaveClass('show')
+        menu.dispose()
+      }
+    })
+
+    it('should close on a click with its own press on an item', () => {
+      for (const autoClose of [true, 'inside']) {
+        fixtureEl.innerHTML = [
+          '<button class="btn" data-coreui-toggle="menu">Menu toggle</button>',
+          '<div class="menu"><a class="menu-item" href="#">Menu item</a></div>'
+        ].join('')
+
+        const menuToggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menu = new Menu(menuToggle, { autoClose })
+        const item = fixtureEl.querySelector('.menu-item')
+
+        menu.show()
+        item.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        item.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+
+        expect(menuToggle).not.toHaveClass('show')
+        menu.dispose()
+      }
+    })
+
+    it('should close on a click outside that does not land on the path of an earlier press in the menu', () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" data-coreui-toggle="menu">Menu toggle</button>',
+        '<div class="menu"><input type="search"></div>',
+        '<button id="outside">Outside</button>'
+      ].join('')
+
+      const menuToggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const menu = new Menu(menuToggle)
+
+      menu.show()
+      fixtureEl.querySelector('input').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      fixtureEl.querySelector('#outside').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true, detail: 1 }))
+
+      expect(menuToggle).not.toHaveClass('show')
+    })
+
+    it('should close on a click outside without a press of its own, after an earlier press in the menu', () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" data-coreui-toggle="menu">Menu toggle</button>',
+        '<div class="menu"><input type="search"></div>',
+        '<button id="outside">Outside</button>'
+      ].join('')
+
+      const menuToggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const menu = new Menu(menuToggle)
+      const outside = fixtureEl.querySelector('#outside')
+      const input = fixtureEl.querySelector('input')
+
+      menu.show()
+      input.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      input.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+      expect(menuToggle).toHaveClass('show')
+
+      outside.click()
+
+      expect(menuToggle).not.toHaveClass('show')
+    })
+
     it('should be able to identify clicked menu, no matter the markup order', () => {
       fixtureEl.innerHTML = [
         '<div class="menu">',
