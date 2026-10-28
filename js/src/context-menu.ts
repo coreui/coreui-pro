@@ -9,9 +9,9 @@ import type { ReferenceElement } from '@floating-ui/dom'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
-import { focusIfUsable, holdsFocusOrNone } from './util/focus.js'
+import { focusIfUsable } from './util/focus.js'
 import {
-  defineJQueryPlugin, isDisabled, jQueryDispatch, noop
+  defineJQueryPlugin, isDisabled, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -31,8 +31,6 @@ const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY}${DATA_API_KEY}`
 
 const SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
 const SCROLL_KEYS = new Set([' ', 'PageUp', 'PageDown'])
-
-const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="context-menu"]'
 
@@ -95,7 +93,7 @@ class ContextMenu extends Menu {
   }
 
   override async show(point?: Point): Promise<void> {
-    this._show(point, { relatedTarget: this._element })
+    this._showAt(point, { relatedTarget: this._element })
   }
 
   override dispose(): void {
@@ -104,66 +102,26 @@ class ContextMenu extends Menu {
   }
 
   // Private
-  protected _show(point: Point | undefined, relatedTarget: Record<string, unknown>): void {
-    if (isDisabled(this._element) || this._isShown()) {
-      return
+  protected _showAt(point: Point | undefined, relatedTarget: Record<string, unknown>): void {
+    if (!this._isShown()) {
+      this._point = point ?? null
     }
 
-    const showEvent = EventHandler.trigger(this._element, this.constructor.eventName('show'), relatedTarget)
-
-    if (showEvent.defaultPrevented) {
-      return
-    }
-
-    this._point = point ?? null
-
-    this._moveMenuToContainer()
-    this._createFloating()
-    this._lockScroll()
-
-    if ('ontouchstart' in document.documentElement) {
-      for (const element of document.body.children) {
-        EventHandler.on(element, 'mouseover', noop)
-      }
-    }
-
-    this._menu.classList.add(CLASS_NAME_SHOW)
-    this._menu.focus({ preventScroll: true })
-
-    Menu._openInstances.add(this)
-    EventHandler.trigger(this._element, this.constructor.eventName('shown'), relatedTarget)
+    this._show(relatedTarget)
   }
 
-  protected override _completeHide(relatedTarget: Record<string, unknown>, returnFocus = true): void {
-    const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName('hide'), relatedTarget)
-    if (hideEvent.defaultPrevented) {
-      return
+  protected override _setShown(shown: boolean): void {
+    if (shown) {
+      this._lockScroll()
+      this._menu.focus({ preventScroll: true })
+    } else {
+      this._unlockScroll()
+      this._point = null
     }
+  }
 
-    this._closeAllSubmenus()
-
-    if ('ontouchstart' in document.documentElement) {
-      for (const element of document.body.children) {
-        EventHandler.off(element, 'mouseover', noop)
-      }
-    }
-
-    const refocus = returnFocus && holdsFocusOrNone(this._menu)
-
-    this._unlockScroll()
-    this._disposeFloating()
-    this._restoreMenuToOriginalParent()
-
-    this._menu.classList.remove(CLASS_NAME_SHOW)
-    this._removeMenuAttributes()
-    this._point = null
-
-    if (refocus) {
-      focusIfUsable(this._element, { preventScroll: true })
-    }
-
-    Menu._openInstances.delete(this)
-    EventHandler.trigger(this._element, this.constructor.eventName('hidden'), relatedTarget)
+  protected override _returnFocus(): void {
+    focusIfUsable(this._element, { preventScroll: true })
   }
 
   // The trigger is an area, not a button: a click anywhere outside the menu
@@ -256,7 +214,7 @@ class ContextMenu extends Menu {
     // A keyboard-invoked event (Shift+F10, the Menu key) reports no coordinates
     // in some browsers; the menu then anchors to the element itself.
     const point = event.clientX || event.clientY ? { x: event.clientX, y: event.clientY } : undefined
-    instance._show(point, { relatedTarget: toggle, contextmenuEvent: event })
+    instance._showAt(point, { relatedTarget: toggle, contextmenuEvent: event })
   }
 
   // A right-click outside every open context menu dismisses them, while the
@@ -290,7 +248,7 @@ class ContextMenu extends Menu {
     }
 
     Menu.clearMenus(event)
-    instance._show(undefined, { relatedTarget: this })
+    instance._showAt(undefined, { relatedTarget: this })
   }
 
   static jQueryInterface(this: any, config: any, ...args: any[]): void {

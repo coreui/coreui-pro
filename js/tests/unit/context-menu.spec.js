@@ -1,5 +1,7 @@
 import ContextMenu from '../../src/context-menu.js'
+import EventHandler from '../../src/dom/event-handler.js'
 import Menu from '../../src/menu.js'
+import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -246,6 +248,21 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should keep the point when shown again while open', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const contextMenu = new ContextMenu(area)
+
+      const done = whenShown(area, () => {
+        contextMenu.show({ x: 5, y: 5 })
+        expect(contextMenu._point).toEqual({ x: 120, y: 80 })
+      })
+
+      contextMenu.show({ x: 120, y: 80 })
+      return done
+    })
+
     it('should not show if the show event is prevented', () => {
       fixtureEl.innerHTML = markup()
 
@@ -265,6 +282,31 @@ describe('ContextMenu', () => {
   })
 
   describe('hide', () => {
+    it('should focus the menu and return the focus to the element without scrolling', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const contextMenu = new ContextMenu(area)
+      const menuFocus = spyOn(menu, 'focus').and.callThrough()
+      const areaFocus = spyOn(area, 'focus').and.callThrough()
+
+      const done = new Promise(resolve => {
+        area.addEventListener('hidden.coreui.context-menu', () => {
+          expect(areaFocus.calls.mostRecent().args[0]).toEqual(jasmine.objectContaining({ preventScroll: true }))
+          resolve()
+        })
+      })
+
+      whenShown(area, () => {
+        expect(menuFocus).toHaveBeenCalledWith({ preventScroll: true })
+        contextMenu.hide()
+      })
+
+      contextMenu.show({ x: 5, y: 5 })
+      return done
+    })
+
     it('should hide the menu and return focus to the element', () => {
       fixtureEl.innerHTML = markup()
 
@@ -426,15 +468,19 @@ describe('ContextMenu', () => {
       })
 
       defineOnTouchStart(() => {})
+      const onSpy = spyOn(EventHandler, 'on').and.callThrough()
+      const offSpy = spyOn(EventHandler, 'off').and.callThrough()
 
       const done = new Promise(resolve => {
         area.addEventListener('hidden.coreui.context-menu', () => {
+          expect(offSpy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', noop)
           delete document.documentElement.ontouchstart
           resolve()
         })
       })
 
       whenShown(area, () => {
+        expect(onSpy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', noop)
         contextMenu.hide()
       })
 

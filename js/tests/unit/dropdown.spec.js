@@ -857,10 +857,17 @@ describe('Dropdown', () => {
         ].join('')
 
         const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+        const wrapper = fixtureEl.querySelector('.dropdown')
         const dropdown = new Dropdown(btnDropdown)
 
         btnDropdown.addEventListener('shown.coreui.dropdown', () => {
           expect(btnDropdown).toHaveClass('show')
+          expect(wrapper).toHaveClass('show')
+          dropdown.hide()
+        })
+
+        btnDropdown.addEventListener('hidden.coreui.dropdown', () => {
+          expect(wrapper).not.toHaveClass('show')
           resolve()
         })
 

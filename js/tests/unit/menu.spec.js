@@ -685,6 +685,8 @@ describe('Menu', () => {
 
         btnMenu.addEventListener('shown.coreui.menu', () => {
           expect(btnMenu).toHaveClass('show')
+          expect(btnMenu.getAttribute('aria-expanded')).toEqual('true')
+          expect(document.activeElement).toEqual(btnMenu)
           resolve()
         })
 

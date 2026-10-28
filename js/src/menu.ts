@@ -229,12 +229,12 @@ class Menu extends BaseComponent {
   }
 
   async show(): Promise<void> {
+    this._show({ relatedTarget: this._element })
+  }
+
+  protected _show(relatedTarget: Record<string, unknown>): void {
     if (isDisabled(this._element) || this._isShown()) {
       return
-    }
-
-    const relatedTarget = {
-      relatedTarget: this._element
     }
 
     const showEvent = EventHandler.trigger(this._element, this.constructor.eventName('show'), relatedTarget)
@@ -246,21 +246,14 @@ class Menu extends BaseComponent {
     this._moveMenuToContainer()
     this._createFloating()
 
-    if ('ontouchstart' in document.documentElement && !this._parent.closest(SELECTOR_NAVBAR_NAV)) {
+    if ('ontouchstart' in document.documentElement && !this._parent.closest?.(SELECTOR_NAVBAR_NAV)) {
       for (const element of document.body.children) {
         EventHandler.on(element, 'mouseover', noop)
       }
     }
 
-    this._element.focus({ focusVisible: false } as FocusOptions)
-    this._element.setAttribute('aria-expanded', 'true')
-
     this._menu.classList.add(CLASS_NAME_SHOW)
-    this._element.classList.add(CLASS_NAME_SHOW)
-
-    if (this._parent) {
-      this._parent.classList.add(CLASS_NAME_SHOW)
-    }
+    this._setShown(true)
 
     Menu._openInstances.add(this)
     EventHandler.trigger(this._element, this.constructor.eventName('shown'), relatedTarget)
@@ -342,21 +335,29 @@ class Menu extends BaseComponent {
     this._restoreMenuToOriginalParent()
 
     this._menu.classList.remove(CLASS_NAME_SHOW)
-    this._element.classList.remove(CLASS_NAME_SHOW)
-
-    if (this._parent) {
-      this._parent.classList.remove(CLASS_NAME_SHOW)
-    }
-
-    this._element.setAttribute('aria-expanded', 'false')
+    this._setShown(false)
     this._removeMenuAttributes()
     Menu._openInstances.delete(this)
 
     if (refocus) {
-      focusIfUsable(this._element)
+      this._returnFocus()
     }
 
     EventHandler.trigger(this._element, this.constructor.eventName('hidden'), relatedTarget)
+  }
+
+  protected _setShown(shown: boolean): void {
+    if (shown) {
+      this._element.focus({ focusVisible: false } as FocusOptions)
+    }
+
+    this._element.setAttribute('aria-expanded', String(shown))
+    this._element.classList.toggle(CLASS_NAME_SHOW, shown)
+    this._parent?.classList.toggle(CLASS_NAME_SHOW, shown)
+  }
+
+  protected _returnFocus(): void {
+    focusIfUsable(this._element)
   }
 
   // Everything the engine stamped on the menu; Dropdown extends this with its
