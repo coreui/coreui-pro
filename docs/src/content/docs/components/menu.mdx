@@ -493,7 +493,7 @@ Use `data-coreui-offset` or `data-coreui-reference` to change the location of th
 
 ### Auto close behavior
 
-By default, the menu is closed when clicking inside or outside the menu. You can use the `autoClose` option to change this behavior of the menu.
+By default, the menu is closed when clicking inside or outside the menu. You can use the `autoClose` option to change this behavior of the menu. A press that starts inside the menu or on its toggle and ends outside, as when you select text in a field of the menu, is not a click outside.
 
 Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is within the menu (its toggle or items) closes the menu and returns focus to the toggle. Choosing an item does the same, while a click outside closes the menu and leaves the focus where it lands. A `hide.coreui.menu` listener that calls `preventDefault()` keeps the menu open and the focus in place.
 

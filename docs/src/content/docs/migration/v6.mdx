@@ -1937,6 +1937,11 @@ changes:
   outside the panel and its field closes them: one that starts inside and ends outside,
   as when you select text, and a click that no press started, as from the keyboard or
   from code, leave them open.
+- **Menus, dropdowns, context menus and the panels of Autocomplete, Combobox and
+  Multi Select stay open when a press that starts inside them ends outside**, as when
+  you select text in a field of the panel; for a menu, a dropdown and the combobox family
+  a press on the toggle or the field counts as inside too. A click outside that no
+  press started, as from the keyboard or from code, still closes them.
 - **Choosing a menu or dropdown item returns the focus to the toggle.** It used to
   stay on the hidden item and fall to the page.
 - **A close the page cancels moves nothing.** <kbd>Escape</kbd> used to focus the

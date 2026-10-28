@@ -752,6 +752,48 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should stay open when a press that started in the menu ends outside it', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+
+      const done = whenShown(area, () => {
+        menu.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+        expect(menu).toHaveClass('show')
+
+        document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+        expect(menu).not.toHaveClass('show')
+      })
+
+      rightClick(area)
+      return done
+    })
+
+    it('should close on a click in the trigger area whose press started there', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+
+      const done = new Promise(resolve => {
+        area.addEventListener('hidden.coreui.context-menu', () => {
+          expect(menu).not.toHaveClass('show')
+          resolve()
+        })
+      })
+
+      whenShown(area, () => {
+        area.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        area.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+      })
+
+      rightClick(area)
+      return done
+    })
+
     it('should block wheel and touch scrolling outside the menu while open', () => {
       fixtureEl.innerHTML = markup()
 

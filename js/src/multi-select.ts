@@ -21,6 +21,7 @@ import { type ValidationState } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { getRemovalNeighbor, isTypingKey } from './util/list-navigation.js'
 import { flattenOptions, isOptionGroup } from './util/option-tree.js'
+import { trackPress } from './util/press.js'
 import {
   type CountLabel, createSelectionStore, fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit,
   resolveCountLabel, type SelectionState
@@ -701,29 +702,29 @@ class MultiSelect extends ComboboxBase {
         return
       }
 
-      if (this._isShown() && event.target === this._searchElement) {
-        if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
+      const isField = event.target === this._searchElement || (!this._config.search && event.target === this._togglerElement)
+
+      if (this._isShown() && isField && !event.defaultPrevented && (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY)) {
+        event.preventDefault()
+
+        if (event.key === ARROW_UP_KEY && this._listBox?.getActive() === null) {
+          this._listBox.last()
+          return
+        }
+
+        this._focusListBox()
+        return
+      }
+
+      if (this._isShown() && event.target === this._searchElement && event.key === ENTER_KEY) {
+        const stop = SelectorEngine.findOne(`${SELECTOR_OPTION}[tabindex="0"]`, this._menu)
+
+        if (stop?.dataset.coreuiValue) {
           event.preventDefault()
-
-          if (event.key === ARROW_UP_KEY && this._listBox?.getActive() === null) {
-            this._listBox.last()
-            return
-          }
-
-          this._focusListBox()
-          return
+          this._listBox?.toggle(stop.dataset.coreuiValue)
         }
 
-        if (event.key === ENTER_KEY) {
-          const stop = SelectorEngine.findOne(`${SELECTOR_OPTION}[tabindex="0"]`, this._menu)
-
-          if (stop?.dataset.coreuiValue) {
-            event.preventDefault()
-            this._listBox?.toggle(stop.dataset.coreuiValue)
-          }
-
-          return
-        }
+        return
       }
 
       if (
@@ -1849,6 +1850,7 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
     MultiSelect.multiSelectInterface(multiSelect)
   }
 })
+trackPress()
 EventHandler.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus)
 EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus)
 

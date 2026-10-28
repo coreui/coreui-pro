@@ -13,6 +13,7 @@ import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
 import { focusIfUsable, holdsFocusOrNone } from './focus.js'
 import FocusTrap from './focustrap.js'
+import { forgetPress, pressPathOf, trackPress } from './press.js'
 import {
   execute, getElement, getTransitionDurationFromElement
 } from './index.js'
@@ -27,11 +28,8 @@ const EVENT_KEY = `.${DATA_KEY}`
 
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
-const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
-const SPACE_KEY = ' '
 const ARROW_DOWN_KEY = 'ArrowDown'
-const PRESS_RESET_EVENTS = ['contextmenu', 'pointercancel']
 
 type PopupConfig = {
   anchor: HTMLElement | null
@@ -145,10 +143,7 @@ class Popup extends Config {
   protected declare _hiding: boolean
   protected declare _previouslyFocused: HTMLElement | null
   protected declare _clickListener: any
-  protected declare _pointerdownListener: any
-  protected declare _resetPressListener: any
   protected declare _touchListener: any
-  protected declare _pressedOutside: boolean
   protected declare _keydownListener: any
   protected declare _contentKeydownListener: any
   protected declare _anchorKeydownListener: any
@@ -167,26 +162,16 @@ class Popup extends Config {
     this._transition = 0
     this._hiding = false
     this._previouslyFocused = null
-    this._pressedOutside = false
-    this._pointerdownListener = (event: PointerEvent) => {
-      this._pressedOutside = event.button === 0 && !this._isInside(event)
-    }
-
     this._clickListener = (event: Event) => {
-      const pressedOutside = this._pressedOutside
-      this._pressedOutside = false
+      const pressPath = pressPathOf(event)
 
-      if (!pressedOutside || this._isInside(event)) {
+      if (!pressPath || this._isInside(pressPath)) {
         return
       }
 
       if (execute(this._config.onBeforeHide) !== false) {
         this._hide(false)
       }
-    }
-
-    this._resetPressListener = () => {
-      this._pressedOutside = false
     }
 
     this._touchListener = () => {}
@@ -497,10 +482,6 @@ class Popup extends Config {
 
   _addDismissListeners(): void {
     this._keydownListener = (event: KeyboardEvent) => {
-      if (event.key === ENTER_KEY || event.key === SPACE_KEY) {
-        this._resetPressListener()
-      }
-
       if (event.key === ESCAPE_KEY && !event.defaultPrevented) {
         this.hide()
       }
@@ -525,19 +506,18 @@ class Popup extends Config {
     EventHandler.off(document, EVENT_KEYDOWN, this._keydownListener)
     EventHandler.off(this._content, EVENT_KEYDOWN, this._contentKeydownListener)
     EventHandler.off(this._anchor, EVENT_KEYDOWN, this._contentKeydownListener)
-    this._pressedOutside = false
     this._keydownListener = null
     this._contentKeydownListener = null
   }
 
   _listenOutside(on: boolean): void {
     const method = on ? 'addEventListener' : 'removeEventListener'
-    document[method]('pointerdown', this._pointerdownListener, true)
-    document[method]('click', this._clickListener, true)
-
-    for (const type of PRESS_RESET_EVENTS) {
-      document[method](type, this._resetPressListener, true)
+    if (on) {
+      trackPress()
+      forgetPress()
     }
+
+    document[method]('click', this._clickListener, true)
 
     if ('ontouchstart' in document.documentElement) {
       for (const element of document.body.children) {
@@ -546,8 +526,7 @@ class Popup extends Config {
     }
   }
 
-  _isInside(event: Event): boolean {
-    const path = event.composedPath()
+  _isInside(path: EventTarget[]): boolean {
     return path.includes(this._anchor!) || path.includes(this._content!)
   }
 }

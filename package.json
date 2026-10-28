@@ -227,6 +227,16 @@
         "default": "./js/dist/util/option-tree.js"
       }
     },
+    "./utils/press": {
+      "import": {
+        "types": "./js/dist/util/press.d.mts",
+        "default": "./js/dist/util/press.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/press.d.ts",
+        "default": "./js/dist/util/press.js"
+      }
+    },
     "./utils/range": {
       "import": {
         "types": "./js/dist/util/range.d.mts",

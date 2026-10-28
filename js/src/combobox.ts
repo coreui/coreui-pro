@@ -15,6 +15,7 @@ import {
   alignValueField, configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
 } from './util/form-validation.js'
 import { CARET_ICON } from './util/icons.js'
+import { trackPress } from './util/press.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
@@ -682,6 +683,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
   Combobox.getOrCreateInstance(this).toggle()
 })
 
+trackPress()
 EventHandler.on(document, EVENT_CLICK_DATA_API, Combobox.clearMenus)
 EventHandler.on(document, EVENT_KEYUP_DATA_API, Combobox.clearMenus)
 

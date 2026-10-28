@@ -46,6 +46,7 @@ import {
 } from './util/floating-ui.js'
 import { focusIfUsable, holdsFocusOrNone } from './util/focus.js'
 import { resolvePopupContainer } from './util/popup.js'
+import { pressPathOf, trackPress } from './util/press.js'
 
 /**
  * Constants
@@ -1034,8 +1035,10 @@ class Menu extends BaseComponent {
 
       const composedPath = event.composedPath()
       const isMenuTarget = composedPath.includes(instance._menu)
+      const pressPath = isMenuTarget ? null : pressPathOf(event)
       if (
         instance._isToggleTarget(composedPath) ||
+        (pressPath && (pressPath.includes(instance._menu) || instance._isToggleTarget(pressPath))) ||
         (instance._config.autoClose === 'inside' && !isMenuTarget) ||
         (instance._config.autoClose === 'outside' && isMenuTarget)
       ) {
@@ -1153,6 +1156,7 @@ class Menu extends BaseComponent {
 
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API, Menu.SELECTOR_DATA_TOGGLE, event => Menu.dataApiKeydownHandler(event))
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API, Menu.SELECTOR_MENU, event => Menu.dataApiKeydownHandler(event))
+trackPress()
 EventHandler.on(document, EVENT_CLICK_DATA_API, Menu.clearMenus)
 EventHandler.on(document, EVENT_KEYUP_DATA_API, Menu.clearMenus)
 EventHandler.on(document, EVENT_CLICK_DATA_API, Menu.SELECTOR_DATA_TOGGLE, function (event) {

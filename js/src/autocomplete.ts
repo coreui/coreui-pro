@@ -20,6 +20,7 @@ import { isTypingKey } from './util/list-navigation.js'
 import {
   filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, highlightMatches, isOptionGroup
 } from './util/option-tree.js'
+import { trackPress } from './util/press.js'
 import { createSelectionStore } from './util/selection-state.js'
 import {
   defineJQueryPlugin, getUID, jQueryDispatch, writeAttribute
@@ -1032,6 +1033,7 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
     Autocomplete.autocompleteInterface(autocomplete)
   }
 })
+trackPress()
 EventHandler.on(document, EVENT_CLICK_DATA_API, Autocomplete.clearMenus)
 EventHandler.on(document, EVENT_KEYUP_DATA_API, Autocomplete.clearMenus)
 
