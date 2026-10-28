@@ -145,6 +145,7 @@ class Menu extends BaseComponent {
   protected declare _responsivePlacements: ResponsivePlacements | null
   protected declare _parent: HTMLElement
   protected declare _openSubmenus: Map<HTMLElement, () => void>
+  protected declare _hoverOpenedSubmenus: Set<HTMLElement>
   protected declare _submenuCloseTimeouts: Map<HTMLElement, number>
   protected declare _submenuListeners: Array<[string, string | null, EventCallable]>
   protected declare _hoverIntentData: { x: number, y: number, timestamp: number } | null
@@ -165,6 +166,7 @@ class Menu extends BaseComponent {
     this._responsivePlacements = null
     this._parent = this._element.parentNode as HTMLElement // menu wrapper
     this._openSubmenus = new Map()
+    this._hoverOpenedSubmenus = new Set()
     this._submenuCloseTimeouts = new Map()
     this._submenuListeners = []
     this._hoverIntentData = null
@@ -654,6 +656,12 @@ class Menu extends BaseComponent {
       this._listenOnMenu('click', this.constructor.SELECTOR_SUBMENU_TOGGLE, event => {
         this._onSubmenuTriggerClick(event)
       })
+
+      this._listenOnMenu('pointerdown', this.constructor.SELECTOR_SUBMENU_TOGGLE, event => {
+        if ((event as unknown as PointerEvent).pointerType !== 'mouse') {
+          this._hoverOpenedSubmenus.clear()
+        }
+      })
     }
   }
 
@@ -677,6 +685,10 @@ class Menu extends BaseComponent {
     const submenu = SelectorEngine.findOne(this.constructor.SELECTOR_MENU, submenuWrapper)
     if (!submenu) {
       return
+    }
+
+    if (!this._openSubmenus.has(submenu)) {
+      this._hoverOpenedSubmenus.add(submenu)
     }
 
     this._cancelSubmenuCloseTimeout(submenu)
@@ -710,6 +722,10 @@ class Menu extends BaseComponent {
     const submenuWrapper = trigger.closest(this.constructor.SELECTOR_SUBMENU)!
     const submenu = SelectorEngine.findOne(this.constructor.SELECTOR_MENU, submenuWrapper)
     if (!submenu) {
+      return
+    }
+
+    if (this._hoverOpenedSubmenus.delete(submenu)) {
       return
     }
 
@@ -769,6 +785,7 @@ class Menu extends BaseComponent {
     }
 
     this._openSubmenus.delete(submenu)
+    this._hoverOpenedSubmenus.delete(submenu)
 
     if (trigger) {
       trigger.setAttribute('aria-expanded', 'false')

@@ -399,7 +399,7 @@ You can also use the `.menu-scrollable` class to make the menu scrollable. This 
 
 ## Submenus
 
-Create nested menus with the `.submenu` wrapper class. Submenus support hover and click activation, keyboard navigation, and viewport-aware positioning. On small screens (below `576px`), submenus stack over the parent menu with a back button instead of flying out to the side.
+Create nested menus with the `.submenu` wrapper class. Submenus support hover and click activation, keyboard navigation, and viewport-aware positioning. The first click on a trigger after a hover opened its submenu keeps it open, so pointing at a trigger and clicking it opens the submenu; the next click closes it. On a touch screen a tap opens the submenu and the next tap closes it.
 
 Wrap a `.menu-item` trigger and a nested `.menu` inside a `.submenu` element.
 
@@ -625,7 +625,7 @@ menu.toggle()
 | `reference` | string, element, object | `'toggle'` | Reference element of the menu. Accepts the values of `'toggle'`, `'parent'`, an HTMLElement reference or an object providing `getBoundingClientRect`. For more information refer to Floating UI’s [virtual elements docs](https://floating-ui.com/docs/virtual-elements). |
 | `strategy` | string | `'absolute'` | Positioning strategy for the menu. Use `'absolute'` for default positioning, or `'fixed'` to escape containers with `overflow: hidden`. For more information refer to Floating UI’s [strategy docs](https://floating-ui.com/docs/computePosition#strategy). |
 | `submenuDelay` | number | `100` | Delay in milliseconds before closing a submenu when the mouse leaves. Provides a grace period for diagonal mouse movement toward the submenu. |
-| `submenuTrigger` | string | `'both'` | How submenus are triggered. Use `'click'` for click only, `'hover'` for hover only, or `'both'` for both click and hover activation. |
+| `submenuTrigger` | string | `'both'` | How submenus are triggered. Use `'click'` for click only, `'hover'` for hover only, or `'both'` for both click and hover activation; with `'both'`, the first click after a hover opened the submenu keeps it open. |
 
 #### Using function with `floatingConfig`
 

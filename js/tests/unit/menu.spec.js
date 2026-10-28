@@ -3005,6 +3005,151 @@ describe('Menu', () => {
       })
     })
 
+    it('should keep a submenu opened by hover open on the next click and close it on the click after', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '      <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+
+      new Menu(btnMenu).show()
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      expect(submenu).toHaveClass('show')
+
+      submenuTrigger.click()
+      expect(submenu).toHaveClass('show')
+      expect(submenuTrigger.getAttribute('aria-expanded')).toEqual('true')
+
+      submenuTrigger.click()
+      expect(submenu).not.toHaveClass('show')
+    })
+
+    it('should open on click a submenu that a hover opened and the menu closed since', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '      <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+
+      const menu = new Menu(btnMenu)
+      menu.show()
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      menu.hide()
+      menu.show()
+      submenuTrigger.click()
+
+      expect(submenu).toHaveClass('show')
+    })
+
+    it('should close on a second tap a submenu that the first tap opened by hover', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '        <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+
+      new Menu(btnMenu).show()
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' }))
+      submenuTrigger.click()
+
+      expect(submenu).not.toHaveClass('show')
+    })
+
+    it('should open on click a submenu that a hover opened and the pointer left since', async () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '        <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+
+      new Menu(btnMenu).show()
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      fixtureEl.querySelector('.submenu').dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: btnMenu }))
+      await new Promise(resolve => {
+        setTimeout(resolve, 150)
+      })
+      expect(submenu).not.toHaveClass('show')
+
+      submenuTrigger.click()
+      expect(submenu).toHaveClass('show')
+    })
+
+    it('should toggle on click a submenu that a hover did not open', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '      <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+
+      new Menu(btnMenu).show()
+      submenuTrigger.click()
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.click()
+
+      expect(submenu).not.toHaveClass('show')
+    })
+
     it('should close sibling submenus when opening a new one', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
