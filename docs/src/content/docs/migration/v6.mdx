@@ -2176,6 +2176,13 @@ moves to the next chip, else the previous one, and only reaches the text field
 once no chip is left, the same rule Chip Set follows, so several chips can be
 removed in a row from the keyboard.
 
+#### Chip Input keeps a value it could not add
+
+A value confirmed with <kbd>Enter</kbd> or by leaving the field used to clear the
+field even when no chip came of it: an `add.coreui.chip-input` listener that
+called `preventDefault()`, `maxChips` or `unique`. The text now stays, so the user
+can correct it, the way Chip Input already behaves in React and Vue.
+
 #### Chip Input is submitted only once you name it
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
