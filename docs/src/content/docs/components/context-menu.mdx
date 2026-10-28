@@ -223,7 +223,7 @@ The context menu accepts every [Menu option](/components/menu/#options). Two def
 | `reference` | string, element, object | `'pointer'` | What the menu is positioned against. `'pointer'` opens it at the right-click point (falling back to the trigger for keyboard invocation); `'toggle'` and `'parent'` anchor it to the trigger element or its parent regardless of the pointer; an HTMLElement or an object providing `getBoundingClientRect` anchors it elsewhere. For more information refer to Floating UI's [virtual elements docs](https://floating-ui.com/docs/virtual-elements). |
 | `strategy` | string | `'fixed'` | Positioning strategy for the menu. `'fixed'` places it in viewport coordinates, which is what the pointer position is; use `'absolute'` only when anchoring to an element inside a scrolling container. For more information refer to Floating UI's [strategy docs](https://floating-ui.com/docs/computePosition#strategy). |
 | `submenuDelay` | number | `100` | Delay in milliseconds before closing a submenu when the mouse leaves. Provides a grace period for diagonal mouse movement toward the submenu. |
-| `submenuTrigger` | string | `'both'` | How submenus are triggered. Use `'click'` for click only, `'hover'` for hover only, or `'both'` for both click and hover activation. |
+| `submenuTrigger` | string | `'both'` | How submenus are triggered. Use `'click'` for click only, `'hover'` for hover only, or `'both'` for both click and hover activation; with `'both'`, the first click after a hover opened the submenu keeps it open. |
 
 ### Methods
 

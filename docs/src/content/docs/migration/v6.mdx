@@ -1200,6 +1200,11 @@ check, radio, carousel and toggler icons already work:
 
 #### Menu (new) and Dropdown
 
+- **The first click on a submenu trigger after a hover opened its submenu keeps it open.** With the
+  default `submenuTrigger: 'both'` the hover opened the submenu and the click closed it again, and a
+  tap could do the same where the browser sends the tap's click after its emulated hover. The next
+  click or tap closes it, a click that no hover preceded, as from a screen reader, still toggles, and
+  Enter and Space keep opening it.
 - **New component: Menu** — contextual overlays with submenus, container
   teleport, responsive placement and logical (`start`/`end`) placements,
   ported from Bootstrap v6 with CoreUI's class conventions. See the
