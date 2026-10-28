@@ -924,6 +924,29 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should move from the last item to the first and back with loopFocus', () => {
+      fixtureEl.innerHTML = markup('data-coreui-loop-focus="true"')
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const items = menu.querySelectorAll('.menu-item')
+
+      const done = whenShown(area, () => {
+        const keydown = createEvent('keydown', { bubbles: true })
+        items[1].focus()
+        keydown.key = 'ArrowDown'
+        items[1].dispatchEvent(keydown)
+        expect(document.activeElement).toEqual(items[0])
+
+        keydown.key = 'ArrowUp'
+        items[0].dispatchEvent(keydown)
+        expect(document.activeElement).toEqual(items[1])
+      })
+
+      rightClick(area)
+      return done
+    })
+
     it('should close on Escape and return focus to the trigger', () => {
       fixtureEl.innerHTML = markup()
 

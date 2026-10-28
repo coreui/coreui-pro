@@ -93,6 +93,7 @@ type MenuConfig = {
   container: string | Element | boolean
   display: 'dynamic' | 'static'
   floatingConfig: FloatingConfigOption
+  loopFocus: boolean
   menu: Element | null
   offset: FloatingOffsetOption
   placement: string | null
@@ -108,6 +109,7 @@ const Default: MenuConfig = {
   container: false,
   display: 'dynamic',
   floatingConfig: null,
+  loopFocus: false,
   menu: null,
   offset: [0, 2],
   placement: DEFAULT_PLACEMENT,
@@ -123,6 +125,7 @@ const DefaultType = {
   container: '(string|element|boolean)',
   display: 'string',
   floatingConfig: '(null|object|function)',
+  loopFocus: 'boolean',
   menu: '(null|element)',
   offset: '(array|string|function)',
   placement: 'string',
@@ -928,15 +931,19 @@ class Menu extends BaseComponent {
     ).filter(element => isVisible(element))
   }
 
+  protected _getLevelMenu(target: Element): Element {
+    return (this._menu.contains(target) && target.closest(this.constructor.SELECTOR_MENU)) || this._menu
+  }
+
   protected _selectMenuItem({ key, target }: CoreUIEvent): void {
-    const currentMenu = (target as Element).closest(this.constructor.SELECTOR_MENU) || this._menu
+    const currentMenu = this._getLevelMenu(target as Element)
     const items = this._getItemsInMenu(currentMenu)
 
     if (!items.length) {
       return
     }
 
-    const nextItem = getNextActiveElement(items, target as HTMLElement, key === ARROW_DOWN_KEY, !items.includes(target as HTMLElement))
+    const nextItem = getNextActiveElement(items, target as HTMLElement, key === ARROW_DOWN_KEY, this._config.loopFocus || !items.includes(target as HTMLElement))
     nextItem.focus()
     this._closeUnrelatedSubmenus(currentMenu, nextItem)
   }
@@ -1008,7 +1015,7 @@ class Menu extends BaseComponent {
       event.preventDefault()
       event.stopPropagation()
 
-      const currentMenu = (target as Element).closest(this.constructor.SELECTOR_MENU) || this._menu
+      const currentMenu = this._getLevelMenu(target as Element)
       const items = this._getItemsInMenu(currentMenu)
 
       if (items.length) {
