@@ -495,7 +495,7 @@ Use `data-coreui-offset` or `data-coreui-reference` to change the location of th
 
 By default, the menu is closed when clicking inside or outside the menu. You can use the `autoClose` option to change this behavior of the menu. A press that starts inside the menu or on its toggle and ends outside, as when you select text in a field of the menu, is not a click outside.
 
-Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is within the menu (its toggle or items) closes the menu and returns focus to the toggle. Choosing an item does the same, while a click outside closes the menu and leaves the focus where it lands. A `hide.coreui.menu` listener that calls `preventDefault()` keeps the menu open and the focus in place.
+Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is within the menu (its toggle or items) closes the menu and returns focus to the toggle, and inside a submenu it closes only that submenu and returns focus to its trigger. Choosing an item closes the menu and returns focus to the toggle, while a click outside closes the menu and leaves the focus where it lands. A `hide.coreui.menu` listener that calls `preventDefault()` keeps the menu open and the focus in place.
 
 <Example class="d-flex flex-wrap gap-3" code={`<div class="btn-group">
     <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="true" aria-expanded="false">
@@ -557,9 +557,11 @@ Menus include built-in keyboard support for navigating menu items.
 | `→` | Enter submenu (or `←` in RTL) |
 | `←` | Exit submenu and return to parent (or `→` in RTL) |
 | `Enter` / `Space` | Activate focused item or open submenu |
-| `Esc` | Close the menu |
+| `Esc` | Close the submenu, or the menu |
 | `Home` / `End` | Jump to first/last menu item |
 | `Tab` | Move focus and close the menu |
+
+Arrow keys, `Home` and `End` pressed in a field inside the menu stay with the field.
 
 ## Usage
 

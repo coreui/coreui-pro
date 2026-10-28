@@ -957,34 +957,17 @@ class Menu extends BaseComponent {
 
   protected _handleSubmenuKeydown(event: CoreUIEvent): boolean {
     const { key, target } = event
-    const isRtl = isRTL(target as Element)
+    const submenuWrapper = (target as Element).closest(this.constructor.SELECTOR_SUBMENU)
+    const isRtl = isRTL(submenuWrapper ?? target as Element)
 
     const enterKey = isRtl ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY
     const exitKey = isRtl ? ARROW_RIGHT_KEY : ARROW_LEFT_KEY
 
-    const submenuWrapper = (target as Element).closest(this.constructor.SELECTOR_SUBMENU)
     const isSubmenuToggle = (target as Element).matches(this.constructor.SELECTOR_SUBMENU_TOGGLE)
 
-    if ((key === ENTER_KEY || key === SPACE_KEY) && submenuWrapper && isSubmenuToggle) {
-      event.preventDefault()
-      event.stopPropagation()
+    const isOpenKey = key === ENTER_KEY || key === SPACE_KEY || key === enterKey
 
-      const submenu = SelectorEngine.findOne(this.constructor.SELECTOR_MENU, submenuWrapper)
-      if (submenu) {
-        this._closeSiblingSubmenus(submenuWrapper)
-        this._openSubmenu(target as HTMLElement, submenu, submenuWrapper)
-        requestAnimationFrame(() => {
-          const firstItem = SelectorEngine.findOne(this.constructor.SELECTOR_VISIBLE_ITEMS, submenu)
-          if (firstItem) {
-            firstItem.focus()
-          }
-        })
-      }
-
-      return true
-    }
-
-    if (key === enterKey && submenuWrapper && isSubmenuToggle) {
+    if (isOpenKey && submenuWrapper && isSubmenuToggle) {
       event.preventDefault()
       event.stopPropagation()
 
@@ -1021,11 +1004,11 @@ class Menu extends BaseComponent {
       }
     }
 
-    if (key === HOME_KEY || key === END_KEY) {
+    if ((key === HOME_KEY || key === END_KEY) && this._isShown()) {
       event.preventDefault()
       event.stopPropagation()
 
-      const currentMenu = (target as Element).closest(this.constructor.SELECTOR_MENU)!
+      const currentMenu = (target as Element).closest(this.constructor.SELECTOR_MENU) || this._menu
       const items = this._getItemsInMenu(currentMenu)
 
       if (items.length) {
@@ -1086,7 +1069,7 @@ class Menu extends BaseComponent {
 
     // Treat contenteditable hosts (e.g. rich-text editors) like inputs so the
     // menu doesn't hijack their arrow keys.
-    const isInput = /input|textarea/i.test((event.target as HTMLElement).tagName) || (event.target as HTMLElement).isContentEditable
+    const isInput = /input|select|textarea/i.test((event.target as HTMLElement).tagName) || (event.target as HTMLElement).isContentEditable
     const isEscapeEvent = event.key === ESCAPE_KEY
     const isUpOrDownEvent = [ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)
     const isLeftOrRightEvent = [ARROW_LEFT_KEY, ARROW_RIGHT_KEY].includes(event.key)

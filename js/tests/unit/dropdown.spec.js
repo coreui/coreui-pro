@@ -2702,4 +2702,43 @@ describe('Dropdown', () => {
       childElement.click()
     })
   })
+
+  describe('Home and End', () => {
+    it('should focus the first and the last item of `<li>` markup', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div class="dropdown">',
+          '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+          '  <ul class="dropdown-menu">',
+          '    <li><a id="first" class="dropdown-item" href="#">First</a></li>',
+          '    <li><a id="middle" class="dropdown-item" href="#">Middle</a></li>',
+          '    <li><a id="last" class="dropdown-item" href="#">Last</a></li>',
+          '  </ul>',
+          '</div>'
+        ].join('')
+
+        const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+        const firstItem = fixtureEl.querySelector('#first')
+        const lastItem = fixtureEl.querySelector('#last')
+        const dropdown = new Dropdown(btnDropdown)
+
+        btnDropdown.addEventListener('shown.coreui.dropdown', () => {
+          firstItem.focus()
+
+          const endEvent = createEvent('keydown')
+          endEvent.key = 'End'
+          firstItem.dispatchEvent(endEvent)
+          expect(document.activeElement).toEqual(lastItem)
+
+          const homeEvent = createEvent('keydown')
+          homeEvent.key = 'Home'
+          lastItem.dispatchEvent(homeEvent)
+          expect(document.activeElement).toEqual(firstItem)
+          resolve()
+        })
+
+        dropdown.show()
+      })
+    })
+  })
 })

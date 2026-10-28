@@ -175,9 +175,13 @@ class Dropdown extends Menu {
 
   // The v5 markup wraps items in `<li>`, so item discovery is descendant-based
   // rather than Menu's direct-child (`:scope >`) lookup.
-  protected override _selectMenuItem({ key, target }: any): void {
-    const items = SelectorEngine.find(this.constructor.SELECTOR_VISIBLE_ITEMS, this._menu)
+  protected override _getItemsInMenu(menu: Element): HTMLElement[] {
+    return SelectorEngine.find(this.constructor.SELECTOR_VISIBLE_ITEMS, menu)
       .filter(element => isVisible(element))
+  }
+
+  protected override _selectMenuItem({ key, target }: any): void {
+    const items = this._getItemsInMenu(this._menu)
 
     if (!items.length) {
       return

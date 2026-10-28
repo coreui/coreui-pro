@@ -4837,6 +4837,179 @@ describe('Menu', () => {
         menu.show()
       })
     })
+
+    it('should move focus into the menu on Home and End from the toggle of an open menu', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a id="first" class="menu-item" href="#">First</a>',
+          '    <a id="last" class="menu-item" href="#">Last</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const firstItem = fixtureEl.querySelector('#first')
+        const lastItem = fixtureEl.querySelector('#last')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          btnMenu.focus()
+
+          const endEvent = createEvent('keydown')
+          endEvent.key = 'End'
+          btnMenu.dispatchEvent(endEvent)
+          expect(document.activeElement).toEqual(lastItem)
+
+          btnMenu.focus()
+
+          const homeEvent = createEvent('keydown')
+          homeEvent.key = 'Home'
+          btnMenu.dispatchEvent(homeEvent)
+          expect(document.activeElement).toEqual(firstItem)
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+  })
+
+  describe('fields in the panel', () => {
+    it('should leave the arrow keys to a select in the panel', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a id="item" class="menu-item" href="#">Item</a>',
+          '    <select id="sort"><option>Name</option><option>Date</option></select>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const select = fixtureEl.querySelector('#sort')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          select.focus()
+
+          const downEvent = createEvent('keydown')
+          downEvent.key = 'ArrowDown'
+          select.dispatchEvent(downEvent)
+
+          expect(downEvent.defaultPrevented).toBeFalse()
+          expect(document.activeElement).toEqual(select)
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+  })
+
+  describe('keys a field in the panel handles', () => {
+    it('should leave Home, End and the side arrows to an input in the panel', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a id="item" class="menu-item" href="#">Item</a>',
+          '    <input id="filter" type="text">',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const input = fixtureEl.querySelector('#filter')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          input.focus()
+
+          for (const key of ['Home', 'End', 'ArrowLeft', 'ArrowRight']) {
+            const event = createEvent('keydown', { bubbles: true, cancelable: true })
+            event.key = key
+            input.dispatchEvent(event)
+
+            expect(event.defaultPrevented).toBeFalse()
+            expect(document.activeElement).toEqual(input)
+          }
+
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+  })
+
+  describe('Home and End on a closed menu', () => {
+    it('should leave Home and End to the page while the menu is closed', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <div class="menu">',
+        '    <a class="menu-item" href="#">Item</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      new Menu(btnMenu) // eslint-disable-line no-new
+      btnMenu.focus()
+
+      const event = createEvent('keydown', { bubbles: true, cancelable: true })
+      event.key = 'Home'
+      btnMenu.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeFalse()
+    })
+  })
+
+  describe('direction of the submenu keys', () => {
+    it('should read the exit key from the submenu, not from an item with its own direction', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div dir="rtl">',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <div class="submenu">',
+          '      <button id="trigger" class="menu-item" type="button">Sub</button>',
+          '      <div class="menu">',
+          '        <a id="item" class="menu-item" dir="ltr" href="#">Edit</a>',
+          '      </div>',
+          '    </div>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const trigger = fixtureEl.querySelector('#trigger')
+        const item = fixtureEl.querySelector('#item')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          trigger.focus()
+          trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }))
+
+          setTimeout(() => {
+            item.focus()
+            item.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }))
+
+            expect(item.closest('.menu')).not.toHaveClass('show')
+            expect(document.activeElement).toEqual(trigger)
+            resolve()
+          }, 20)
+        })
+
+        menu.show()
+      })
+    })
   })
 
   describe('ArrowLeft to close submenu', () => {
