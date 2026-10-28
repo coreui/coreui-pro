@@ -317,13 +317,13 @@ class ChipInput extends ChipSet {
       // The arrow key past the last chip moves focus into the text field, which
       // sits after the chips (mirrors the input's "go to last chip" key). The
       // direction is mirrored in RTL.
-      if (event.key === (isRTL(this._element) ? 'ArrowLeft' : 'ArrowRight')) {
-        const chips = this._getFocusableChips()
-        if (chips.length > 0 && chips[chips.length - 1].contains(event.target as Node)) {
-          event.preventDefault()
-          this._input.focus()
-          return
-        }
+      if (
+        event.key === (isRTL(this._element) ? 'ArrowLeft' : 'ArrowRight') &&
+        this._getFocusableChips().at(-1)?.contains(event.target as Node)
+      ) {
+        event.preventDefault()
+        this._input.focus()
+        return
       }
 
       if (event.key?.length === 1) {
@@ -434,11 +434,7 @@ class ChipInput extends ChipSet {
       case 'Delete': {
         if (this._input.value === '') {
           event.preventDefault()
-          const chips = this._getChipElements()
-
-          if (chips.length > 0) {
-            chips[chips.length - 1].focus()
-          }
+          this._getChipElements().at(-1)?.focus()
         }
 
         break
@@ -455,11 +451,7 @@ class ChipInput extends ChipSet {
           this._input.selectionEnd === 0
         ) {
           event.preventDefault()
-          const chips = this._getChipElements()
-
-          if (chips.length > 0) {
-            chips[chips.length - 1].focus()
-          }
+          this._getChipElements().at(-1)?.focus()
         }
 
         break
@@ -502,11 +494,7 @@ class ChipInput extends ChipSet {
   }
 
   _handlePaste(event: any): void {
-    if (!this._canModify()) {
-      return
-    }
-
-    if (!this._config.create || !this._config.separator) {
+    if (!this._canModify() || !this._config.create || !this._config.separator) {
       return
     }
 

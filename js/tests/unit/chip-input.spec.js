@@ -1529,10 +1529,11 @@ describe('ChipInput', () => {
       const chipInput = new ChipInput(el)
 
       chipInput.add('JavaScript')
+      chipInput.add('TypeScript')
       chipInput._input.value = ''
       chipInput._input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
 
-      const lastChip = el.querySelectorAll('.chip')[0]
+      const lastChip = el.querySelectorAll('.chip')[1]
       expect(document.activeElement).toEqual(lastChip)
     })
 
@@ -1556,11 +1557,12 @@ describe('ChipInput', () => {
       const chipInput = new ChipInput(el)
 
       chipInput.add('JavaScript')
+      chipInput.add('TypeScript')
       chipInput._input.value = ''
       chipInput._input.setSelectionRange(0, 0)
       chipInput._input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
 
-      expect(document.activeElement).toEqual(el.querySelector('.chip'))
+      expect(document.activeElement).toEqual(el.querySelectorAll('.chip')[1])
     })
 
     it('should clear input and blur on Escape key', () => {
@@ -1644,7 +1646,7 @@ describe('ChipInput', () => {
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { separator: null })
 
-      expect(() => chipInput._input.dispatchEvent(new ClipboardEvent('paste', { bubbles: true }))).not.toThrow()
+      expect(() => chipInput._handlePaste(new ClipboardEvent('paste', { bubbles: true }))).not.toThrow()
       expect(chipInput.getValues()).toEqual([])
     })
   })
@@ -1919,6 +1921,22 @@ describe('ChipInput', () => {
       expect(chipInput.getValues()).toEqual([])
     })
 
+    it('should not split a paste into chips', () => {
+      fixtureEl.innerHTML = '<div id="ci"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false })
+      const pasteEvent = new ClipboardEvent('paste', {
+        bubbles: true,
+        cancelable: true,
+        clipboardData: new DataTransfer()
+      })
+      pasteEvent.clipboardData.setData('text/plain', 'a,b')
+
+      fixtureEl.querySelector('input[type="text"]').dispatchEvent(pasteEvent)
+
+      expect(chipInput.getValues()).toEqual([])
+      expect(pasteEvent.defaultPrevented).toBeFalse()
+    })
+
     it('should not render a value field', () => {
       fixtureEl.innerHTML = '<div id="ci"></div>'
       const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false }) // eslint-disable-line no-unused-vars
@@ -1938,6 +1956,23 @@ describe('ChipInput', () => {
   })
 
   describe('keyboard navigation', () => {
+    it('should keep focus on the chips on ArrowRight from a chip that is not the last', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+
+      chipInput.add('React')
+      chipInput.add('Vue')
+
+      const [firstChip] = el.querySelectorAll('.chip')
+      firstChip.focus()
+
+      firstChip.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+
+      expect(document.activeElement).not.toEqual(el.querySelector('input.chip-input-field'))
+    })
+
     it('should move focus to the input on ArrowRight from the last chip', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
