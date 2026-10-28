@@ -16,7 +16,7 @@ import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, isRTL, isVisible, jQueryDispatch
+  defineJQueryPlugin, isRTL, isVisible, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -27,8 +27,6 @@ const NAME = 'dropdown'
 const DATA_KEY = 'coreui.dropdown'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
-
-const ARROW_DOWN_KEY = 'ArrowDown'
 
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY}${DATA_API_KEY}`
@@ -175,17 +173,13 @@ class Dropdown extends Menu {
 
   // The v5 markup wraps items in `<li>`, so item discovery is descendant-based
   // rather than Menu's direct-child (`:scope >`) lookup.
-  protected override _selectMenuItem({ key, target }: any): void {
-    const items = SelectorEngine.find(this.constructor.SELECTOR_VISIBLE_ITEMS, this._menu)
+  protected override _getItemsInMenu(menu: Element): HTMLElement[] {
+    return SelectorEngine.find(this.constructor.SELECTOR_VISIBLE_ITEMS, menu)
       .filter(element => isVisible(element))
+  }
 
-    if (!items.length) {
-      return
-    }
-
-    // if target isn't included in items (e.g. when expanding the dropdown)
-    // allow cycling to get the last item in case key equals ARROW_UP_KEY
-    getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus()
+  protected override _getLevelMenu(): Element {
+    return this._menu
   }
 
   _detectNavbar(): boolean {

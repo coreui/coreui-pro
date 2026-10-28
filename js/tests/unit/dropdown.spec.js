@@ -1999,6 +1999,106 @@ describe('Dropdown', () => {
       })
     })
 
+    it('should stop at the last item on ArrowDown by default', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div class="dropdown">',
+          '  <button class="btn" data-coreui-toggle="dropdown">Dropdown</button>',
+          '  <div class="dropdown-menu">',
+          '    <a id="item1" class="dropdown-item" href="#">A link</a>',
+          '    <a id="item2" class="dropdown-item" href="#">Another link</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+        const lastItem = fixtureEl.querySelector('#item2')
+        const instance = new Dropdown(trigger)
+
+        trigger.addEventListener('shown.coreui.dropdown', () => {
+          lastItem.focus()
+          const keydown = createEvent('keydown')
+          keydown.key = 'ArrowDown'
+          lastItem.dispatchEvent(keydown)
+
+          expect(document.activeElement).toEqual(lastItem)
+          resolve()
+        })
+
+        instance.show()
+      })
+    })
+
+    it('should move from the last item to the first on ArrowDown with loopFocus', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div class="dropdown">',
+          '  <button class="btn" data-coreui-toggle="dropdown" data-coreui-loop-focus="true">Dropdown</button>',
+          '  <div class="dropdown-menu">',
+          '    <a id="item1" class="dropdown-item" href="#">A link</a>',
+          '    <a id="item2" class="dropdown-item" href="#">Another link</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+        const firstItem = fixtureEl.querySelector('#item1')
+        const lastItem = fixtureEl.querySelector('#item2')
+        const instance = new Dropdown(trigger)
+
+        trigger.addEventListener('shown.coreui.dropdown', () => {
+          lastItem.focus()
+          const keydown = createEvent('keydown')
+          keydown.key = 'ArrowDown'
+          lastItem.dispatchEvent(keydown)
+          expect(document.activeElement).toEqual(firstItem)
+
+          keydown.key = 'ArrowUp'
+          firstItem.dispatchEvent(keydown)
+          expect(document.activeElement).toEqual(lastItem)
+          resolve()
+        })
+
+        instance.show()
+      })
+    })
+
+    it('should walk the items of its own menu from an item of a nested dropdown menu', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div class="dropdown">',
+          '  <button class="btn" data-coreui-toggle="dropdown">Dropdown</button>',
+          '  <ul class="dropdown-menu">',
+          '    <li><a id="item1" class="dropdown-item" href="#">A link</a></li>',
+          '    <li>',
+          '      <div class="dropdown-menu show position-static">',
+          '        <a id="nested" class="dropdown-item" href="#">Nested link</a>',
+          '      </div>',
+          '    </li>',
+          '    <li><a id="item2" class="dropdown-item" href="#">Another link</a></li>',
+          '  </ul>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+        const nestedItem = fixtureEl.querySelector('#nested')
+        const lastItem = fixtureEl.querySelector('#item2')
+        const instance = new Dropdown(trigger)
+
+        trigger.addEventListener('shown.coreui.dropdown', () => {
+          nestedItem.focus()
+          const keydown = createEvent('keydown')
+          keydown.key = 'ArrowDown'
+          nestedItem.dispatchEvent(keydown)
+
+          expect(document.activeElement).toEqual(lastItem)
+          resolve()
+        })
+
+        instance.show()
+      })
+    })
+
     it('should not close the dropdown if the user clicks on a text field within dropdown-menu', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
@@ -2700,6 +2800,45 @@ describe('Dropdown', () => {
       }))
 
       childElement.click()
+    })
+  })
+
+  describe('Home and End', () => {
+    it('should focus the first and the last item of `<li>` markup', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div class="dropdown">',
+          '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+          '  <ul class="dropdown-menu">',
+          '    <li><a id="first" class="dropdown-item" href="#">First</a></li>',
+          '    <li><a id="middle" class="dropdown-item" href="#">Middle</a></li>',
+          '    <li><a id="last" class="dropdown-item" href="#">Last</a></li>',
+          '  </ul>',
+          '</div>'
+        ].join('')
+
+        const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+        const firstItem = fixtureEl.querySelector('#first')
+        const lastItem = fixtureEl.querySelector('#last')
+        const dropdown = new Dropdown(btnDropdown)
+
+        btnDropdown.addEventListener('shown.coreui.dropdown', () => {
+          firstItem.focus()
+
+          const endEvent = createEvent('keydown')
+          endEvent.key = 'End'
+          firstItem.dispatchEvent(endEvent)
+          expect(document.activeElement).toEqual(lastItem)
+
+          const homeEvent = createEvent('keydown')
+          homeEvent.key = 'Home'
+          lastItem.dispatchEvent(homeEvent)
+          expect(document.activeElement).toEqual(firstItem)
+          resolve()
+        })
+
+        dropdown.show()
+      })
     })
   })
 })

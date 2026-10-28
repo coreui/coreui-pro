@@ -2108,6 +2108,178 @@ describe('Menu', () => {
       })
     })
 
+    it('should stop at the last item on ArrowDown by default', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a id="item1" class="menu-item" href="#">A link</a>',
+          '    <a id="item2" class="menu-item" href="#">Another link</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const lastItem = fixtureEl.querySelector('#item2')
+        const instance = new Menu(trigger)
+
+        trigger.addEventListener('shown.coreui.menu', () => {
+          lastItem.focus()
+          const keydown = createEvent('keydown')
+          keydown.key = 'ArrowDown'
+          lastItem.dispatchEvent(keydown)
+
+          expect(document.activeElement).toEqual(lastItem)
+          resolve()
+        })
+
+        instance.show()
+      })
+    })
+
+    it('should move from the last item to the first on ArrowDown with loopFocus', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu" data-coreui-loop-focus="true">Menu</button>',
+          '  <div class="menu">',
+          '    <a id="item1" class="menu-item" href="#">A link</a>',
+          '    <a id="item2" class="menu-item" href="#">Another link</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const firstItem = fixtureEl.querySelector('#item1')
+        const lastItem = fixtureEl.querySelector('#item2')
+        const instance = new Menu(trigger)
+
+        trigger.addEventListener('shown.coreui.menu', () => {
+          lastItem.focus()
+          const keydown = createEvent('keydown')
+          keydown.key = 'ArrowDown'
+          lastItem.dispatchEvent(keydown)
+          expect(document.activeElement).toEqual(firstItem)
+
+          keydown.key = 'ArrowUp'
+          firstItem.dispatchEvent(keydown)
+          expect(document.activeElement).toEqual(lastItem)
+          resolve()
+        })
+
+        instance.show()
+      })
+    })
+
+    it('should move from the last item of a submenu to its first on ArrowDown with loopFocus', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu" data-coreui-loop-focus="true">Menu</button>',
+          '  <div class="menu">',
+          '    <a class="menu-item" href="#">A link</a>',
+          '    <div class="submenu">',
+          '      <button class="menu-item" type="button">More</button>',
+          '      <div class="menu">',
+          '        <a id="sub1" class="menu-item" href="#">Sub 1</a>',
+          '        <a id="sub2" class="menu-item" href="#">Sub 2</a>',
+          '      </div>',
+          '    </div>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+        const firstSubItem = fixtureEl.querySelector('#sub1')
+        const lastSubItem = fixtureEl.querySelector('#sub2')
+        const instance = new Menu(trigger)
+
+        trigger.addEventListener('shown.coreui.menu', () => {
+          submenuTrigger.focus()
+          const keydown = createEvent('keydown')
+          keydown.key = 'ArrowRight'
+          submenuTrigger.dispatchEvent(keydown)
+
+          setTimeout(() => {
+            lastSubItem.focus()
+            keydown.key = 'ArrowDown'
+            lastSubItem.dispatchEvent(keydown)
+
+            expect(document.activeElement).toEqual(firstSubItem)
+            resolve()
+          }, 20)
+        })
+
+        instance.show()
+      })
+    })
+
+    it('should move into its own menu on ArrowDown from a toggle that sits in another menu', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div class="menu" id="outer">',
+          '  <a id="outerItem" class="menu-item" href="#">Outer link</a>',
+          '  <div>',
+          '    <button class="btn menu-item" id="innerToggle" data-coreui-toggle="menu">Menu</button>',
+          '    <div class="menu">',
+          '      <a id="innerItem" class="menu-item" href="#">Inner link</a>',
+          '    </div>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('#innerToggle')
+        const innerItem = fixtureEl.querySelector('#innerItem')
+
+        trigger.addEventListener('shown.coreui.menu', () => {
+          setTimeout(() => {
+            expect(document.activeElement).toEqual(innerItem)
+            resolve()
+          })
+        })
+
+        trigger.focus()
+        const keydown = createEvent('keydown')
+        keydown.key = 'ArrowDown'
+        trigger.dispatchEvent(keydown)
+      })
+    })
+
+    it('should move into its own menu on End from a toggle that sits in another menu', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div class="menu" id="outer">',
+          '  <a id="outerItem" class="menu-item" href="#">Outer link</a>',
+          '  <div>',
+          '    <button class="btn menu-item" id="innerToggle" data-coreui-toggle="menu">Menu</button>',
+          '    <div class="menu">',
+          '      <a id="innerFirst" class="menu-item" href="#">Inner link</a>',
+          '      <a id="innerLast" class="menu-item" href="#">Another inner link</a>',
+          '    </div>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('#innerToggle')
+        const innerLast = fixtureEl.querySelector('#innerLast')
+        const instance = new Menu(trigger)
+
+        trigger.addEventListener('shown.coreui.menu', () => {
+          trigger.focus()
+          const keydown = createEvent('keydown')
+          keydown.key = 'End'
+          trigger.dispatchEvent(keydown)
+
+          expect(document.activeElement).toEqual(innerLast)
+          resolve()
+        })
+
+        instance.show()
+      })
+    })
+
     it('should not close the menu if the user clicks on a text field within menu', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
@@ -4830,6 +5002,179 @@ describe('Menu', () => {
 
           setTimeout(() => {
             expect(document.activeElement).toEqual(lastItem)
+            resolve()
+          }, 20)
+        })
+
+        menu.show()
+      })
+    })
+
+    it('should move focus into the menu on Home and End from the toggle of an open menu', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a id="first" class="menu-item" href="#">First</a>',
+          '    <a id="last" class="menu-item" href="#">Last</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const firstItem = fixtureEl.querySelector('#first')
+        const lastItem = fixtureEl.querySelector('#last')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          btnMenu.focus()
+
+          const endEvent = createEvent('keydown')
+          endEvent.key = 'End'
+          btnMenu.dispatchEvent(endEvent)
+          expect(document.activeElement).toEqual(lastItem)
+
+          btnMenu.focus()
+
+          const homeEvent = createEvent('keydown')
+          homeEvent.key = 'Home'
+          btnMenu.dispatchEvent(homeEvent)
+          expect(document.activeElement).toEqual(firstItem)
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+  })
+
+  describe('fields in the panel', () => {
+    it('should leave the arrow keys to a select in the panel', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a id="item" class="menu-item" href="#">Item</a>',
+          '    <select id="sort"><option>Name</option><option>Date</option></select>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const select = fixtureEl.querySelector('#sort')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          select.focus()
+
+          const downEvent = createEvent('keydown')
+          downEvent.key = 'ArrowDown'
+          select.dispatchEvent(downEvent)
+
+          expect(downEvent.defaultPrevented).toBeFalse()
+          expect(document.activeElement).toEqual(select)
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+  })
+
+  describe('keys a field in the panel handles', () => {
+    it('should leave Home, End and the side arrows to an input in the panel', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a id="item" class="menu-item" href="#">Item</a>',
+          '    <input id="filter" type="text">',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const input = fixtureEl.querySelector('#filter')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          input.focus()
+
+          for (const key of ['Home', 'End', 'ArrowLeft', 'ArrowRight']) {
+            const event = createEvent('keydown', { bubbles: true, cancelable: true })
+            event.key = key
+            input.dispatchEvent(event)
+
+            expect(event.defaultPrevented).toBeFalse()
+            expect(document.activeElement).toEqual(input)
+          }
+
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+  })
+
+  describe('Home and End on a closed menu', () => {
+    it('should leave Home and End to the page while the menu is closed', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <div class="menu">',
+        '    <a class="menu-item" href="#">Item</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      new Menu(btnMenu) // eslint-disable-line no-new
+      btnMenu.focus()
+
+      const event = createEvent('keydown', { bubbles: true, cancelable: true })
+      event.key = 'Home'
+      btnMenu.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeFalse()
+    })
+  })
+
+  describe('direction of the submenu keys', () => {
+    it('should read the exit key from the submenu, not from an item with its own direction', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div dir="rtl">',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <div class="submenu">',
+          '      <button id="trigger" class="menu-item" type="button">Sub</button>',
+          '      <div class="menu">',
+          '        <a id="item" class="menu-item" dir="ltr" href="#">Edit</a>',
+          '      </div>',
+          '    </div>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const trigger = fixtureEl.querySelector('#trigger')
+        const item = fixtureEl.querySelector('#item')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          trigger.focus()
+          trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }))
+
+          setTimeout(() => {
+            item.focus()
+            item.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }))
+
+            expect(item.closest('.menu')).not.toHaveClass('show')
+            expect(document.activeElement).toEqual(trigger)
             resolve()
           }, 20)
         })
