@@ -1,3 +1,4 @@
+import { userEvent } from 'vitest/browser'
 import EventHandler from '../../src/dom/event-handler.js'
 import Dropdown from '../../src/dropdown.js'
 import { noop } from '../../src/util/index.js'
@@ -2839,6 +2840,52 @@ describe('Dropdown', () => {
 
         dropdown.show()
       })
+    })
+  })
+
+  describe('role="menu" on the panel', () => {
+    it('should give the v5 list markup its menu roles', () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn" type="button" data-coreui-toggle="dropdown">Dropdown</button>',
+        '  <ul class="dropdown-menu" role="menu">',
+        '    <li class="header-wrap"><h6 class="dropdown-header">Header</h6></li>',
+        '    <li><a class="dropdown-item" href="#">Action</a></li>',
+        '    <li><a class="dropdown-item disabled" href="#">Disabled</a></li>',
+        '    <li class="divider-wrap"><hr class="dropdown-divider"></li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      new Dropdown(toggle).show()
+
+      const [action, disabled] = fixtureEl.querySelectorAll('.dropdown-item')
+      expect(toggle.getAttribute('aria-haspopup')).toEqual('menu')
+      expect(action.getAttribute('role')).toEqual('menuitem')
+      expect(disabled.getAttribute('role')).toEqual('menuitem')
+      expect(disabled.getAttribute('tabindex')).toEqual('-1')
+      expect(disabled.getAttribute('aria-disabled')).toEqual('true')
+      expect(fixtureEl.querySelector('.dropdown-header').getAttribute('role')).toEqual('none')
+      expect(fixtureEl.querySelector('.header-wrap').getAttribute('role')).toEqual('none')
+      expect(fixtureEl.querySelector('.divider-wrap').getAttribute('role')).toEqual('none')
+    })
+
+    it('should open on the first item from the keyboard and close with Tab', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn" type="button" data-coreui-toggle="dropdown">Dropdown</button>',
+        '  <ul class="dropdown-menu" role="menu"><li><a class="dropdown-item" href="#">Action</a></li></ul>',
+        '</div>',
+        '<button id="after" type="button">After</button>'
+      ].join('')
+
+      fixtureEl.querySelector('[data-coreui-toggle="dropdown"]').click()
+      expect(document.activeElement.textContent).toEqual('Action')
+
+      await userEvent.keyboard('{Tab}')
+      expect(fixtureEl.querySelector('.dropdown-menu')).not.toHaveClass('show')
+      expect(document.activeElement.id).toEqual('after')
     })
   })
 })

@@ -176,7 +176,7 @@ Give the button an accessible name: `…` on its own tells a screen reader nothi
 <Callout color="info">
 ##### Keep it a disclosure, not a menu
 
-The hidden steps are navigation links, so leave them as links inside a plain list. Do not add `role="menu"` and `role="menuitem"`: those describe an application menu of commands, and applying them makes a screen reader announce a menu, expect arrow-key navigation, and stop presenting the steps as links. Our menu deliberately adds no `role` of its own, so the markup above is already a disclosure — the button carries `aria-expanded`, and that is what a user needs to hear.
+The hidden steps are navigation links, so leave them as links inside a plain list. Do not add `role="menu"` and `role="menuitem"`: those describe an application menu of commands, and applying them makes a screen reader announce a menu, expect arrow-key navigation, and stop presenting the steps as links. Without `role="menu"` on the panel our menu adds no `role` of its own, so the markup above is already a disclosure — the button carries `aria-expanded`, and that is what a user needs to hear.
 </Callout>
 
 ## Accessibility

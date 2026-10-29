@@ -585,6 +585,34 @@ describe('ContextMenu', () => {
       expect(fixtureEl.querySelector('.menu-item').getAttribute('aria-disabled')).toEqual('true')
     })
 
+    it('should leave the roles of a dropdown inside the panel alone', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" data-coreui-toggle="context-menu">Right click here</div>',
+        '<div class="menu">',
+        '  <button class="menu-item" type="button">Copy</button>',
+        '  <div class="dropdown"><ul class="dropdown-menu" role="menu"><li class="inner"><a class="dropdown-item" href="#">Inner</a></li></ul></div>',
+        '</div>'
+      ].join('')
+
+      new ContextMenu(fixtureEl.querySelector('.area')).show()
+
+      expect(fixtureEl.querySelector('.dropdown-menu').getAttribute('role')).toEqual('menu')
+      expect(fixtureEl.querySelector('.inner').hasAttribute('role')).toBeFalse()
+    })
+
+    it('should move the focus into the menu opened from an editable area', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" contenteditable="true" data-coreui-toggle="context-menu">Edit here</div>',
+        '<div class="menu"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      area.focus()
+      new ContextMenu(area).show()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('.menu'))
+    })
+
     it('should keep the group and separator roles the page gave to list wrappers', () => {
       fixtureEl.innerHTML = [
         '<div class="area" data-coreui-toggle="context-menu">Right click here</div>',

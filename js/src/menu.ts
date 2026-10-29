@@ -31,7 +31,7 @@ import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import {
-  defineJQueryPlugin, execute, getElement, getNextActiveElement, isDisabled, isElement, isRTL, isVisible, jQueryDispatch, noop
+  defineJQueryPlugin, execute, getElement, getNextActiveElement, getUID, isDisabled, isElement, isRTL, isVisible, jQueryDispatch, noop
 } from './util/index.js'
 import {
   parseResponsivePlacement,
@@ -44,7 +44,7 @@ import {
   type FloatingOffsetOption,
   type FloatingConfigOption
 } from './util/floating-ui.js'
-import { focusIfUsable, holdsFocusOrNone } from './util/focus.js'
+import { containsFocus, focusIfUsable, holdsFocusOrNone } from './util/focus.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { pressPathOf, trackPress } from './util/press.js'
 
@@ -77,6 +77,7 @@ const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_SHOW = 'show'
 
+const SELECTOR_MENU_FAMILY = '.menu, .dropdown-menu'
 const SELECTOR_NAVBAR_NAV = '.navbar-nav'
 
 const DEFAULT_PLACEMENT = 'bottom-start'
@@ -142,7 +143,9 @@ const DefaultType = {
 class Menu extends BaseComponent {
   declare ['constructor']: typeof Menu
   static _openInstances: Set<Menu> = new Set<Menu>()
+  static _engineMenus: WeakSet<Element> = new WeakSet<Element>()
   protected declare _config: MenuConfig
+  protected declare _disabledItems: WeakSet<Element>
   protected declare _floatingCleanup: (() => void) | null
   protected declare _mediaQueryListeners: BreakpointListener[]
   protected declare _responsivePlacements: ResponsivePlacements | null
@@ -153,9 +156,11 @@ class Menu extends BaseComponent {
   protected declare _submenuListeners: Array<[string, string | null, EventCallable]>
   protected declare _hoverIntentData: { x: number, y: number, timestamp: number } | null
   protected declare _menu: HTMLElement
+  protected declare _isMenu: boolean
   protected declare _isSubmenu: boolean
   protected declare _menuOriginalParent: ParentNode | null
   protected declare _menuDirection: string | null
+  protected declare _openedBy: 'key' | 'pointer' | null
 
   constructor(element?: string | Element | null, config?: Partial<MenuConfig> | null) {
     if (typeof computePosition === 'undefined') {
@@ -173,6 +178,8 @@ class Menu extends BaseComponent {
     this._submenuCloseTimeouts = new Map()
     this._submenuListeners = []
     this._hoverIntentData = null
+    this._disabledItems = new WeakSet()
+    this._openedBy = null
 
     this._menu = (this._config.menu || this._findMenu()) as HTMLElement
 
@@ -188,10 +195,19 @@ class Menu extends BaseComponent {
 
     this._menuOriginalParent = this._menu?.parentNode
     this._menuDirection = null
+    this._isMenu = this._isMenuPanel()
 
     this._parseResponsivePlacements()
     this._setupSubmenuListeners()
     this._initSubmenuTriggers()
+
+    if (this._isMenu) {
+      this._announceMenu()
+      this._listenOnMenu('click', `${this.constructor.SELECTOR_ITEM}.disabled`, event => {
+        event.preventDefault()
+        event.stopPropagation()
+      })
+    }
   }
 
   // Getters
@@ -200,6 +216,14 @@ class Menu extends BaseComponent {
   // them to keep the v5 markup working on this implementation.
   static get SELECTOR_DATA_TOGGLE(): string {
     return '[data-coreui-toggle="menu"]:not(.disabled):not(:disabled)'
+  }
+
+  static get SELECTOR_HEADER(): string {
+    return '.menu-header'
+  }
+
+  static get SELECTOR_ITEM(): string {
+    return '.menu-item'
   }
 
   static get SELECTOR_MENU(): string {
@@ -298,6 +322,10 @@ class Menu extends BaseComponent {
   }
 
   update(): void {
+    if (this._isMenu && this._isShown()) {
+      this._setRoles()
+    }
+
     if (this._floatingCleanup) {
       this._updateFloatingPosition()
     }
@@ -355,7 +383,11 @@ class Menu extends BaseComponent {
 
   protected _setShown(shown: boolean): void {
     if (shown) {
-      this._element.focus({ focusVisible: false } as FocusOptions)
+      if (this._isMenu) {
+        this._setRoles()
+      }
+
+      this._focusOnShow()
     }
 
     this._element.setAttribute('aria-expanded', String(shown))
@@ -363,8 +395,92 @@ class Menu extends BaseComponent {
     this._parent?.classList.toggle(CLASS_NAME_SHOW, shown)
   }
 
+  protected _focusOnShow(): void {
+    const openedBy = this._openedBy ?? (containsFocus(this._element) ? 'key' : null)
+
+    if (!this._isMenu || !openedBy || this._keepsFocus()) {
+      this._element.focus({ focusVisible: false } as FocusOptions)
+      return
+    }
+
+    if (openedBy === 'pointer' || !this._getItemsInMenu(this._menu).some(item => focusIfUsable(item, { preventScroll: true }))) {
+      this._menu.focus({ preventScroll: true })
+    }
+  }
+
   protected _returnFocus(): void {
     focusIfUsable(this._element)
+  }
+
+  protected _keepsFocus(): boolean {
+    return this._element.matches('input, select, textarea') || this._element.isContentEditable
+  }
+
+  protected _isMenuPanel(): boolean {
+    return this._menu?.getAttribute('role') === 'menu' && !Menu._engineMenus.has(this._menu)
+  }
+
+  protected _announceMenu(): void {
+    const { NAME } = this.constructor
+    this._element.id ||= getUID(NAME)
+    this._menu.id ||= getUID(NAME)
+    this._element.setAttribute('aria-haspopup', 'menu')
+    this._element.setAttribute('aria-controls', this._menu.id)
+    this._menu.setAttribute('tabindex', '-1')
+
+    if (!this._menu.hasAttribute('aria-label') && !this._menu.hasAttribute('aria-labelledby')) {
+      this._menu.setAttribute('aria-labelledby', this._element.getAttribute('aria-labelledby') || this._element.id)
+    }
+  }
+
+  protected _setRoles(): void {
+    this._initSubmenuTriggers()
+
+    const { SELECTOR_HEADER, SELECTOR_ITEM, SELECTOR_MENU, SELECTOR_SUBMENU, SELECTOR_SUBMENU_TOGGLE } = this.constructor
+    for (const element of SelectorEngine.find(`${SELECTOR_ITEM}, ${SELECTOR_HEADER}, ${SELECTOR_SUBMENU}, ul, ol, li`, this._menu).filter(element => this._ownsElement(element))) {
+      if (element.matches(SELECTOR_MENU_FAMILY) || (!element.matches(SELECTOR_ITEM) && element.closest(SELECTOR_ITEM))) {
+        continue
+      }
+
+      if (!element.matches(SELECTOR_ITEM)) {
+        if (!['group', 'separator'].includes(element.getAttribute('role')!)) {
+          element.setAttribute('role', 'none')
+        }
+
+        continue
+      }
+
+      if (!element.getAttribute('role')?.startsWith('menuitem')) {
+        element.setAttribute('role', 'menuitem')
+      }
+
+      element.setAttribute('tabindex', '-1')
+
+      if (element.classList.contains('disabled')) {
+        element.setAttribute('aria-disabled', 'true')
+        this._disabledItems.add(element)
+      } else if (this._disabledItems.delete(element)) {
+        element.removeAttribute('aria-disabled')
+      }
+
+      const [submenu] = element.matches(SELECTOR_SUBMENU_TOGGLE) ? SelectorEngine.children(element.parentElement!, SELECTOR_MENU) : []
+      if (submenu) {
+        element.id ||= getUID(this.constructor.NAME)
+        submenu.setAttribute('role', 'menu')
+        submenu.setAttribute('aria-labelledby', element.id)
+      }
+    }
+  }
+
+  protected _ownsElement(element: Element): boolean {
+    let level = element.parentElement?.closest(SELECTOR_MENU_FAMILY)
+
+    while (level && level !== this._menu) {
+      const wrapper = level.parentElement
+      level = wrapper?.matches(this.constructor.SELECTOR_SUBMENU) ? wrapper.parentElement?.closest(SELECTOR_MENU_FAMILY) : null
+    }
+
+    return level === this._menu
   }
 
   // Everything the engine stamped on the menu; Dropdown extends this with its
@@ -716,7 +832,7 @@ class Menu extends BaseComponent {
 
   protected _onSubmenuTriggerClick(event: CoreUIEvent): void {
     const trigger = (event.target as Element).closest<HTMLElement>(this.constructor.SELECTOR_SUBMENU_TOGGLE)
-    if (!trigger) {
+    if (!trigger || isDisabled(trigger)) {
       return
     }
 
@@ -749,12 +865,13 @@ class Menu extends BaseComponent {
     }
 
     for (const trigger of SelectorEngine.find(this.constructor.SELECTOR_SUBMENU_TOGGLE, this._menu)) {
-      if (!SelectorEngine.findOne(this.constructor.SELECTOR_MENU, trigger.parentElement!)) {
+      const submenu = SelectorEngine.findOne(this.constructor.SELECTOR_MENU, trigger.parentElement!)
+      if (!submenu) {
         continue
       }
 
       trigger.setAttribute('aria-haspopup', 'menu')
-      trigger.setAttribute('aria-expanded', 'false')
+      trigger.setAttribute('aria-expanded', String(this._openSubmenus.has(submenu)))
     }
   }
 
@@ -943,8 +1060,9 @@ class Menu extends BaseComponent {
   // Items sit either directly in `.menu`, or as a submenu trigger one level deeper
   // (`.menu > .submenu > .menu-item`). Both are navigable at the same level.
   protected _getItemsInMenu(menu: Element): HTMLElement[] {
+    const { SELECTOR_SUBMENU, SELECTOR_VISIBLE_ITEMS } = this.constructor
     return SelectorEngine.find(
-      `:scope > ${this.constructor.SELECTOR_VISIBLE_ITEMS}, :scope > ${this.constructor.SELECTOR_SUBMENU} > ${this.constructor.SELECTOR_VISIBLE_ITEMS}`,
+      [':scope', ':scope > [role="group"]', ':scope > [role="group"] > *'].flatMap(level => [`${level} > ${SELECTOR_VISIBLE_ITEMS}`, `${level} > ${SELECTOR_SUBMENU} > ${SELECTOR_VISIBLE_ITEMS}`]).join(', '),
       menu
     ).filter(element => isVisible(element))
   }
@@ -982,6 +1100,59 @@ class Menu extends BaseComponent {
 
   protected _onTabInside(target: HTMLElement): void {
     this._closeUnrelatedSubmenus(this._getLevelMenu(target), target)
+  }
+
+  protected _handleTab(event: CoreUIEvent): void {
+    const fromToggle = this._element.contains(event.target as Node)
+
+    if (!this._isMenu) {
+      this._tabThroughContainer(event, fromToggle)
+      return
+    }
+
+    this._completeHide({ relatedTarget: this._element }, false)
+
+    if (fromToggle) {
+      return
+    }
+
+    if (this._isShown() || event.shiftKey) {
+      event.preventDefault()
+    }
+
+    if (!this._isShown()) {
+      this._element.focus({ preventScroll: true })
+    }
+  }
+
+  protected _tabThroughContainer(event: CoreUIEvent, fromToggle: boolean): void {
+    if (!this._getContainer()) {
+      return
+    }
+
+    const focusables = SelectorEngine.focusableChildren(this._menu)
+
+    if (fromToggle) {
+      if (!event.shiftKey && focusables.length) {
+        event.preventDefault()
+        focusables[0].focus()
+      }
+
+      return
+    }
+
+    if (event.shiftKey ? event.target === focusables[0] : event.target === focusables.at(-1)) {
+      if (event.shiftKey) {
+        event.preventDefault()
+      } else {
+        this._menu.inert = true
+        setTimeout(() => {
+          this._menu.inert = false
+        })
+      }
+
+      this._element.focus({ preventScroll: true })
+    }
   }
 
   protected _handleSubmenuKeydown(event: CoreUIEvent): boolean {
@@ -1110,13 +1281,23 @@ class Menu extends BaseComponent {
     const isEnterOrSpaceEvent = [ENTER_KEY, SPACE_KEY].includes(event.key)
 
     const isSubmenuTrigger = (event.target as Element).matches(this.SELECTOR_SUBMENU_TOGGLE)
+    const isSpaceOnLinkToggle = event.key === SPACE_KEY && delegateTarget === event.target && delegateTarget.matches(`a${this.SELECTOR_DATA_TOGGLE}`)
 
     if (!isUpOrDownEvent && !isEscapeEvent && !isLeftOrRightEvent && !isHomeOrEndEvent &&
-        !(isEnterOrSpaceEvent && isSubmenuTrigger)) {
+        !(isEnterOrSpaceEvent && isSubmenuTrigger) && !isSpaceOnLinkToggle) {
       return
     }
 
-    if (isInput && !isEscapeEvent) {
+    if ((isInput && !isEscapeEvent) || (delegateTarget.matches(SELECTOR_MENU_FAMILY) && (event.target as Element).closest(SELECTOR_MENU_FAMILY) !== delegateTarget)) {
+      return
+    }
+
+    if (isSpaceOnLinkToggle) {
+      if (this.getOrCreateInstance(delegateTarget)._isMenu) {
+        event.preventDefault()
+        delegateTarget.click()
+      }
+
       return
     }
 
@@ -1163,10 +1344,9 @@ class Menu extends BaseComponent {
   // it, whatever its class and wherever `container` moved the menu; only a
   // closed menu is resolved through the toggle next to it.
   protected static _getKeyboardInstance(delegateTarget: HTMLElement): Menu | null {
-    for (const instance of Menu._openInstances) {
-      if (instance._menu.contains(delegateTarget)) {
-        return instance
-      }
+    const owner = Menu._getOpenInstance(delegateTarget)
+    if (owner) {
+      return owner
     }
 
     const toggle = delegateTarget.matches(this.SELECTOR_DATA_TOGGLE) ?
@@ -1176,6 +1356,37 @@ class Menu extends BaseComponent {
         SelectorEngine.findOne(this.SELECTOR_DATA_TOGGLE, delegateTarget.parentNode ?? undefined))
 
     return toggle ? this.getOrCreateInstance(toggle) : null
+  }
+
+  protected static _getOpenInstance(target: Element): Menu | null {
+    let owner: Menu | null = null
+
+    for (const instance of Menu._openInstances) {
+      if (instance._element === target) {
+        return instance
+      }
+
+      if (instance._menu.contains(target) && (!owner || owner._menu.contains(instance._menu))) {
+        owner = instance
+      }
+    }
+
+    return owner
+  }
+
+  static dataApiClickHandler(event: CoreUIEvent): void {
+    event.preventDefault()
+
+    const instance = this.getOrCreateInstance(event.delegateTarget as HTMLElement) as Menu
+    instance._openedBy = pressPathOf(event) ? 'pointer' : 'key'
+    instance.toggle()
+    instance._openedBy = null
+  }
+
+  static dataApiTabHandler(event: CoreUIEvent): void {
+    if (event.key === TAB_KEY) {
+      Menu._getOpenInstance(event.target as Element)?._handleTab(event)
+    }
   }
 
   static jQueryInterface(this: any, config: any): void {
@@ -1191,11 +1402,9 @@ EventHandler.on(document, EVENT_KEYDOWN_DATA_API, Menu.SELECTOR_DATA_TOGGLE, eve
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API, Menu.SELECTOR_MENU, event => Menu.dataApiKeydownHandler(event))
 trackPress()
 EventHandler.on(document, EVENT_CLICK_DATA_API, Menu.clearMenus)
+EventHandler.on(document, EVENT_KEYDOWN_DATA_API, Menu.dataApiTabHandler)
 EventHandler.on(document, EVENT_KEYUP_DATA_API, Menu.clearMenus)
-EventHandler.on(document, EVENT_CLICK_DATA_API, Menu.SELECTOR_DATA_TOGGLE, function (event) {
-  event.preventDefault()
-  Menu.getOrCreateInstance(this).toggle()
-})
+EventHandler.on(document, EVENT_CLICK_DATA_API, Menu.SELECTOR_DATA_TOGGLE, event => Menu.dataApiClickHandler(event))
 
 /**
  * jQuery

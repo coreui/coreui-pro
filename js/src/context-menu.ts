@@ -11,7 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
 import { focusIfUsable } from './util/focus.js'
 import {
-  defineJQueryPlugin, getUID, isDisabled, jQueryDispatch
+  defineJQueryPlugin, isDisabled, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -35,8 +35,6 @@ const SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
 const SCROLL_KEYS = new Set([' ', 'PageUp', 'PageDown'])
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="context-menu"]'
-const SELECTOR_MENU_HEADER = '.menu-header'
-const SELECTOR_MENU_ITEM = '.menu-item'
 
 type Point = { x: number, y: number }
 
@@ -64,16 +62,12 @@ const DefaultType: Record<string, string> = {
 class ContextMenu extends Menu {
   declare ['constructor']: typeof ContextMenu
   protected declare _config: ContextMenuConfig
-  protected declare _disabledItems: WeakSet<Element>
-  protected declare _focusFirstItem: boolean
   protected declare _point: Point | null
   protected declare _scrollBlocker: ((event: Event) => void) | null
 
   constructor(element?: string | Element | null, config?: Partial<ContextMenuConfig> | null) {
     super(element, config as Partial<MenuConfig>)
 
-    this._disabledItems = new WeakSet()
-    this._focusFirstItem = false
     this._point = null
     this._scrollBlocker = null
   }
@@ -104,14 +98,6 @@ class ContextMenu extends Menu {
     this._showAt(point, { relatedTarget: this._element })
   }
 
-  override update(): void {
-    super.update()
-
-    if (this._isShown()) {
-      this._setRoles()
-    }
-  }
-
   override dispose(): void {
     this._unlockScroll()
     super.dispose()
@@ -123,18 +109,16 @@ class ContextMenu extends Menu {
       this._point = point ?? null
     }
 
-    this._focusFirstItem = fromKeyboard
+    this._openedBy = fromKeyboard ? 'key' : 'pointer'
     this._show(relatedTarget)
+    this._openedBy = null
   }
 
   protected override _setShown(shown: boolean): void {
     if (shown) {
       this._lockScroll()
       this._setRoles()
-
-      if (!this._focusFirstItem || !this._getItemsInMenu(this._menu).some(item => focusIfUsable(item, { preventScroll: true }))) {
-        this._menu.focus({ preventScroll: true })
-      }
+      this._focusOnShow()
     } else {
       this._unlockScroll()
       this._point = null
@@ -153,61 +137,31 @@ class ContextMenu extends Menu {
 
   protected override _onTabInside(): void {}
 
-  protected _setRoles(): void {
-    this._menu.setAttribute('role', 'menu')
+  protected override _handleTab(): void {}
+
+  protected override _keepsFocus(): boolean {
+    return false
+  }
+
+  protected override _isMenuPanel(): boolean {
+    return true
+  }
+
+  protected override _announceMenu(): void {}
+
+  protected override _setRoles(): void {
+    if (this._menu.getAttribute('role') !== 'menu') {
+      Menu._engineMenus.add(this._menu)
+      this._menu.setAttribute('role', 'menu')
+    }
+
     this._menu.setAttribute('tabindex', '-1')
 
     if (this._config.ariaMenuLabel && !this._menu.hasAttribute('aria-label')) {
       this._menu.setAttribute('aria-label', this._config.ariaMenuLabel)
     }
 
-    this._initSubmenuTriggers()
-
-    const selector = `${SELECTOR_MENU_ITEM}, ${SELECTOR_MENU_HEADER}, ${this.constructor.SELECTOR_SUBMENU}, ul, ol, li`
-    for (const element of SelectorEngine.find(selector, this._menu).filter(element => this._ownsElement(element))) {
-      if (element.matches(this.constructor.SELECTOR_MENU) || (!element.matches(SELECTOR_MENU_ITEM) && element.closest(SELECTOR_MENU_ITEM))) {
-        continue
-      }
-
-      if (!element.matches(SELECTOR_MENU_ITEM)) {
-        if (!['group', 'separator'].includes(element.getAttribute('role')!)) {
-          element.setAttribute('role', 'none')
-        }
-
-        continue
-      }
-
-      if (!element.getAttribute('role')?.startsWith('menuitem')) {
-        element.setAttribute('role', 'menuitem')
-      }
-
-      element.setAttribute('tabindex', '-1')
-
-      if (element.classList.contains('disabled')) {
-        element.setAttribute('aria-disabled', 'true')
-        this._disabledItems.add(element)
-      } else if (this._disabledItems.delete(element)) {
-        element.removeAttribute('aria-disabled')
-      }
-
-      const [submenu] = element.matches(this.constructor.SELECTOR_SUBMENU_TOGGLE) ? SelectorEngine.children(element.parentElement!, this.constructor.SELECTOR_MENU) : []
-      if (submenu) {
-        element.id ||= getUID(NAME)
-        submenu.setAttribute('role', 'menu')
-        submenu.setAttribute('aria-labelledby', element.id)
-      }
-    }
-  }
-
-  protected _ownsElement(element: Element): boolean {
-    let level = element.parentElement?.closest(this.constructor.SELECTOR_MENU)
-
-    while (level && level !== this._menu) {
-      const wrapper = level.parentElement
-      level = wrapper?.matches(this.constructor.SELECTOR_SUBMENU) ? wrapper.parentElement?.closest(this.constructor.SELECTOR_MENU) : null
-    }
-
-    return level === this._menu
+    super._setRoles()
   }
 
   // Wheel and touch listeners on the document are passive by default, so the
