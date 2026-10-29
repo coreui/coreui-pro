@@ -10,13 +10,13 @@ description: "The Menu component toggles contextual overlays with submenus, cont
 
 Toggle menus with buttons whenever possible. Here’s an example using a CoreUI button:
 
-<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="menu" aria-expanded="false">
+<Example code={`<button class="btn-solid theme-primary" type="button" id="menuOverviewToggle" data-coreui-toggle="menu" aria-haspopup="menu" aria-expanded="false">
     Toggle menu
   </button>
-  <div class="menu">
-    <a class="menu-item" href="#">Menu item 1</a>
-    <a class="menu-item" href="#">Menu item 2</a>
-    <a class="menu-item" href="#">Menu item 3</a>
+  <div class="menu" role="menu" aria-labelledby="menuOverviewToggle">
+    <button class="menu-item" type="button" role="menuitem">Menu item 1</button>
+    <button class="menu-item" type="button" role="menuitem">Menu item 2</button>
+    <button class="menu-item" type="button" role="menuitem">Menu item 3</button>
   </div>`} />
 
 Menus are toggleable, contextual overlays for displaying lists of links and more. They’re made interactive with the included CoreUI menu JavaScript plugin. They’re toggled by clicking, not by hovering; this is [an intentional design decision](https://markdotto.com/blog/bootstrap-explained-dropdowns/).
@@ -29,27 +29,27 @@ While `<button>` is the recommended control for a menu toggle, there might be si
 
 Use [button groups](/components/button-group/) to create split button menus where the menu is displayed when a secondary button is clicked. Give that second button `.menu-toggle-split`, which narrows its padding so the pair reads as one control.
 
-<Example code={`<a class="btn-solid theme-primary" href="#" role="button" data-coreui-toggle="menu" aria-expanded="false">
+<Example code={`<a class="btn-solid theme-primary" href="#" role="button" id="menuLinkToggle" data-coreui-toggle="menu" aria-haspopup="menu" aria-expanded="false">
     Toggle menu
   </a>
-  <div class="menu">
-    <a class="menu-item" href="#">Menu item 1</a>
-    <a class="menu-item" href="#">Menu item 2</a>
-    <a class="menu-item" href="#">Menu item 3</a>
+  <div class="menu" role="menu" aria-labelledby="menuLinkToggle">
+    <button class="menu-item" type="button" role="menuitem">Menu item 1</button>
+    <button class="menu-item" type="button" role="menuitem">Menu item 2</button>
+    <button class="menu-item" type="button" role="menuitem">Menu item 3</button>
   </div>
 
   <div class="btn-group">
     <button type="button" class="btn-solid theme-secondary">Split</button>
-    <button type="button" class="btn-solid theme-secondary menu-toggle-split" data-coreui-toggle="menu" aria-expanded="false">
+    <button type="button" class="btn-solid theme-secondary menu-toggle-split" id="menuSplitToggle" data-coreui-toggle="menu" aria-haspopup="menu" aria-expanded="false">
       <svg class="icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 144a64 64 0 1 0-64-64 64.07 64.07 0 0 0 64 64m0-96a32 32 0 1 1-32 32 32.036 32.036 0 0 1 32-32m0 320a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32m0-272a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32"></path></svg>
-      <span class="visually-hidden">Toggle menu</span>
+      <span class="visually-hidden">More actions</span>
     </button>
-    <div class="menu">
-      <a class="menu-item" href="#">Action</a>
-      <a class="menu-item" href="#">Another action</a>
-      <a class="menu-item" href="#">Something else here</a>
+    <div class="menu" role="menu" aria-labelledby="menuSplitToggle">
+      <button class="menu-item" type="button" role="menuitem">Action</button>
+      <button class="menu-item" type="button" role="menuitem">Another action</button>
+      <button class="menu-item" type="button" role="menuitem">Something else here</button>
       <hr class="menu-divider">
-      <a class="menu-item" href="#">Separated link</a>
+      <button class="menu-item" type="button" role="menuitem">Separated action</button>
     </div>
   </div>`} />
 
@@ -62,7 +62,7 @@ Opt into darker menus to match a dark navbar or custom style by adding `data-cor
       Menu button
     </button>
     <div class="menu">
-      <a class="menu-item active" href="#">Action</a>
+      <a class="menu-item active" href="#" aria-current="true">Action</a>
       <a class="menu-item" href="#">Another action</a>
       <a class="menu-item" href="#">Something else here</a>
       <hr class="menu-divider">
@@ -98,7 +98,7 @@ Blur and saturate the background of menus to create a translucent effect with `.
     Menu button
   </button>
   <div class="menu menu-translucent">
-    <a class="menu-item active" href="#">Active menu item</a>
+    <a class="menu-item active" href="#" aria-current="true">Active menu item</a>
     <a class="menu-item" href="#">Menu item</a>
     <a class="menu-item" href="#">Menu item</a>
     <a class="menu-item" href="#">Menu item</a>
@@ -117,21 +117,21 @@ Use `data-coreui-placement` on the toggle element to control where the menu appe
 All placements support `-start` and `-end` alignment modifiers (e.g., `bottom-start`, `end-end`).
 
 <Example code={`<div class="btn-group">
-    <button type="button" class="btn-solid theme-secondary" data-coreui-toggle="menu" data-coreui-placement="top-start" aria-expanded="false">
+    <button type="button" class="btn-solid theme-secondary" id="menuTopStartToggle" data-coreui-toggle="menu" data-coreui-placement="top-start" aria-haspopup="menu" aria-expanded="false">
       Top start
     </button>
-    <div class="menu">
-      <a class="menu-item" href="#">Menu item 1</a>
-      <a class="menu-item" href="#">Menu item 2</a>
+    <div class="menu" role="menu" aria-labelledby="menuTopStartToggle">
+      <button class="menu-item" type="button" role="menuitem">Menu item 1</button>
+      <button class="menu-item" type="button" role="menuitem">Menu item 2</button>
     </div>
   </div>
   <div class="btn-group">
-    <button type="button" class="btn-solid theme-secondary" data-coreui-toggle="menu" data-coreui-placement="end" aria-expanded="false">
+    <button type="button" class="btn-solid theme-secondary" id="menuEndToggle" data-coreui-toggle="menu" data-coreui-placement="end" aria-haspopup="menu" aria-expanded="false">
       End (logical)
     </button>
-    <div class="menu">
-      <a class="menu-item" href="#">Menu item 1</a>
-      <a class="menu-item" href="#">Menu item 2</a>
+    <div class="menu" role="menu" aria-labelledby="menuEndToggle">
+      <button class="menu-item" type="button" role="menuitem">Menu item 1</button>
+      <button class="menu-item" type="button" role="menuitem">Menu item 2</button>
     </div>
   </div>`} />
 
@@ -145,28 +145,28 @@ For example, `data-coreui-placement="bottom-start md:bottom-end lg:end-start"` w
 - Switch to `bottom-end` at the `md` breakpoint
 - Switch to `right-start` at the `lg` breakpoint
 
-<Example class="d-flex flex-column flex-lg-row gap-3" code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="bottom-start md:bottom-end" aria-expanded="false">
+<Example class="d-flex flex-column flex-lg-row gap-3" code={`<button class="btn-solid theme-secondary" type="button" id="menuResponsiveToggle1" data-coreui-toggle="menu" data-coreui-placement="bottom-start md:bottom-end" aria-haspopup="menu" aria-expanded="false">
     Bottom start → md:bottom-end
   </button>
-  <div class="menu">
-    <a class="menu-item" href="#">Action</a>
-    <a class="menu-item" href="#">Another action</a>
+  <div class="menu" role="menu" aria-labelledby="menuResponsiveToggle1">
+    <button class="menu-item" type="button" role="menuitem">Action</button>
+    <button class="menu-item" type="button" role="menuitem">Another action</button>
   </div>
 
-  <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="bottom lg:right" aria-expanded="false">
+  <button class="btn-solid theme-secondary" type="button" id="menuResponsiveToggle2" data-coreui-toggle="menu" data-coreui-placement="bottom lg:right" aria-haspopup="menu" aria-expanded="false">
     Bottom → lg:right
   </button>
-  <div class="menu">
-    <a class="menu-item" href="#">Action</a>
-    <a class="menu-item" href="#">Another action</a>
+  <div class="menu" role="menu" aria-labelledby="menuResponsiveToggle2">
+    <button class="menu-item" type="button" role="menuitem">Action</button>
+    <button class="menu-item" type="button" role="menuitem">Another action</button>
   </div>
 
-  <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="top-end md:right-start xl:bottom-start" aria-expanded="false">
+  <button class="btn-solid theme-secondary" type="button" id="menuResponsiveToggle3" data-coreui-toggle="menu" data-coreui-placement="top-end md:right-start xl:bottom-start" aria-haspopup="menu" aria-expanded="false">
     Multi-breakpoint
   </button>
-  <div class="menu">
-    <a class="menu-item" href="#">Action</a>
-    <a class="menu-item" href="#">Another action</a>
+  <div class="menu" role="menu" aria-labelledby="menuResponsiveToggle3">
+    <button class="menu-item" type="button" role="menuitem">Action</button>
+    <button class="menu-item" type="button" role="menuitem">Another action</button>
   </div>`} />
 
 Resize your browser window to see the placement change at different breakpoints.
@@ -189,9 +189,9 @@ You can also create non-interactive menu items with `.menu-text`. Feel free to s
 
 <Example code={`<div class="menu show position-static">
     <span class="menu-text">Menu item text</span>
-    <a class="menu-item" href="#">Action</a>
-    <a class="menu-item" href="#">Another action</a>
-    <a class="menu-item" href="#">Something else here</a>
+    <button class="menu-item" type="button">Action</button>
+    <button class="menu-item" type="button">Another action</button>
+    <button class="menu-item" type="button">Something else here</button>
   </div>`} />
 
 ### Active
@@ -278,7 +278,7 @@ Use `.menu-item-content` for a flex column layout and `.menu-item-description` f
 
 ### Selected
 
-Add `.selected` to a `.menu-item` to indicate the current selection.
+Add `.selected` to a `.menu-item` to indicate the current selection. The class only changes how the item looks; it does not convey the selection to assistive technologies.
 
 <Example code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">Select status</button>
   <div class="menu">
@@ -321,10 +321,10 @@ Add `.selected` to a `.menu-item` to indicate the current selection.
 Add a header to label sections of actions in any menu.
 
 <Example code={`<div class="menu show position-static">
-    <a class="menu-item" href="#">Action</a>
-    <a class="menu-item" href="#">Action</a>
+    <button class="menu-item" type="button">Action</button>
+    <button class="menu-item" type="button">Action</button>
     <h6 class="menu-header">Menu header</h6>
-    <a class="menu-item" href="#">Another action</a>
+    <button class="menu-item" type="button">Another action</button>
   </div>`} />
 
 ### Dividers
@@ -332,11 +332,11 @@ Add a header to label sections of actions in any menu.
 Separate groups of related menu items with a divider.
 
 <Example code={`<div class="menu show position-static">
-    <a class="menu-item" href="#">Action</a>
-    <a class="menu-item" href="#">Another action</a>
-    <a class="menu-item" href="#">Something else here</a>
+    <button class="menu-item" type="button">Action</button>
+    <button class="menu-item" type="button">Another action</button>
+    <button class="menu-item" type="button">Something else here</button>
     <hr class="menu-divider">
-    <a class="menu-item" href="#">Separated link</a>
+    <button class="menu-item" type="button">Separated action</button>
   </div>`} />
 
 ### Text
@@ -403,61 +403,61 @@ Create nested menus with the `.submenu` wrapper class. Submenus support hover an
 
 Wrap a `.menu-item` trigger and a nested `.menu` inside a `.submenu` element.
 
-<Example code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">
+<Example code={`<button class="btn-solid theme-secondary" type="button" id="menuSubmenusToggle" data-coreui-toggle="menu" aria-haspopup="menu" aria-expanded="false">
     Submenus
   </button>
-  <div class="menu">
-    <div class="submenu">
-      <button class="menu-item" type="button">File</button>
-      <div class="menu">
-        <a class="menu-item" href="#">New</a>
-        <a class="menu-item" href="#">Open</a>
-        <a class="menu-item" href="#">Save</a>
+  <div class="menu" role="menu" aria-labelledby="menuSubmenusToggle">
+    <div class="submenu" role="none">
+      <button class="menu-item" type="button" id="menuSubmenusFile" role="menuitem">File</button>
+      <div class="menu" role="menu" aria-labelledby="menuSubmenusFile">
+        <button class="menu-item" type="button" role="menuitem">New</button>
+        <button class="menu-item" type="button" role="menuitem">Open</button>
+        <button class="menu-item" type="button" role="menuitem">Save</button>
       </div>
     </div>
-    <div class="submenu">
-      <button class="menu-item" type="button">Edit</button>
-      <div class="menu">
-        <a class="menu-item" href="#">Cut</a>
-        <a class="menu-item" href="#">Copy</a>
-        <a class="menu-item" href="#">Paste</a>
+    <div class="submenu" role="none">
+      <button class="menu-item" type="button" id="menuSubmenusEdit" role="menuitem">Edit</button>
+      <div class="menu" role="menu" aria-labelledby="menuSubmenusEdit">
+        <button class="menu-item" type="button" role="menuitem">Cut</button>
+        <button class="menu-item" type="button" role="menuitem">Copy</button>
+        <button class="menu-item" type="button" role="menuitem">Paste</button>
       </div>
     </div>
-    <div class="submenu">
-      <button class="menu-item" type="button">View</button>
-      <div class="menu">
-        <a class="menu-item" href="#">Zoom In</a>
-        <a class="menu-item" href="#">Zoom Out</a>
+    <div class="submenu" role="none">
+      <button class="menu-item" type="button" id="menuSubmenusView" role="menuitem">View</button>
+      <div class="menu" role="menu" aria-labelledby="menuSubmenusView">
+        <button class="menu-item" type="button" role="menuitem">Zoom In</button>
+        <button class="menu-item" type="button" role="menuitem">Zoom Out</button>
       </div>
     </div>
     <hr class="menu-divider">
-    <a class="menu-item" href="#">Preferences</a>
+    <button class="menu-item" type="button" role="menuitem">Preferences</button>
   </div>`} />
 
 ### Nested
 
 Submenus can be nested to multiple levels. Each level opens to the side and flips direction when there’s not enough viewport space.
 
-<Example code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">
+<Example code={`<button class="btn-solid theme-secondary" type="button" id="menuNestedToggle" data-coreui-toggle="menu" aria-haspopup="menu" aria-expanded="false">
     Multi-level menu
   </button>
-  <div class="menu">
-    <a class="menu-item" href="#">Level 1 action</a>
-    <div class="submenu">
-      <button class="menu-item" type="button">Level 1 submenu</button>
-      <div class="menu">
-        <a class="menu-item" href="#">Level 2 action</a>
-        <div class="submenu">
-          <button class="menu-item" type="button">Level 2 submenu</button>
-          <div class="menu">
-            <a class="menu-item" href="#">Level 3 action A</a>
-            <a class="menu-item" href="#">Level 3 action B</a>
+  <div class="menu" role="menu" aria-labelledby="menuNestedToggle">
+    <button class="menu-item" type="button" role="menuitem">Level 1 action</button>
+    <div class="submenu" role="none">
+      <button class="menu-item" type="button" id="menuNestedLevel1Submenu" role="menuitem">Level 1 submenu</button>
+      <div class="menu" role="menu" aria-labelledby="menuNestedLevel1Submenu">
+        <button class="menu-item" type="button" role="menuitem">Level 2 action</button>
+        <div class="submenu" role="none">
+          <button class="menu-item" type="button" id="menuNestedLevel2Submenu" role="menuitem">Level 2 submenu</button>
+          <div class="menu" role="menu" aria-labelledby="menuNestedLevel2Submenu">
+            <button class="menu-item" type="button" role="menuitem">Level 3 action A</button>
+            <button class="menu-item" type="button" role="menuitem">Level 3 action B</button>
           </div>
         </div>
-        <a class="menu-item" href="#">Another level 2</a>
+        <button class="menu-item" type="button" role="menuitem">Another level 2</button>
       </div>
     </div>
-    <a class="menu-item" href="#">Another level 1</a>
+    <button class="menu-item" type="button" role="menuitem">Another level 1</button>
   </div>`} />
 
 ## Menu options
@@ -466,27 +466,27 @@ Use `data-coreui-offset` or `data-coreui-reference` to change the location of th
 
 <Example code={`<div class="d-flex">
     <div class="me-1">
-      <button type="button" class="btn-solid theme-secondary" data-coreui-toggle="menu" aria-expanded="false" data-coreui-offset="10,20">
+      <button type="button" class="btn-solid theme-secondary" id="menuOffsetToggle" data-coreui-toggle="menu" aria-haspopup="menu" aria-expanded="false" data-coreui-offset="10,20">
         Offset
       </button>
-      <div class="menu">
-        <a class="menu-item" href="#">Action</a>
-        <a class="menu-item" href="#">Another action</a>
-        <a class="menu-item" href="#">Something else here</a>
+      <div class="menu" role="menu" aria-labelledby="menuOffsetToggle">
+        <button class="menu-item" type="button" role="menuitem">Action</button>
+        <button class="menu-item" type="button" role="menuitem">Another action</button>
+        <button class="menu-item" type="button" role="menuitem">Something else here</button>
       </div>
     </div>
     <div class="btn-group">
       <button type="button" class="btn-solid theme-secondary">Reference</button>
-      <button type="button" class="btn-solid theme-secondary menu-toggle-split" data-coreui-toggle="menu" aria-expanded="false" data-coreui-reference="parent">
+      <button type="button" class="btn-solid theme-secondary menu-toggle-split" id="menuReferenceToggle" data-coreui-toggle="menu" aria-haspopup="menu" aria-expanded="false" data-coreui-reference="parent">
         <svg class="icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 144a64 64 0 1 0-64-64 64.07 64.07 0 0 0 64 64m0-96a32 32 0 1 1-32 32 32.036 32.036 0 0 1 32-32m0 320a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32m0-272a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32"></path></svg>
-        <span class="visually-hidden">Toggle Menu</span>
+        <span class="visually-hidden">More actions</span>
       </button>
-      <div class="menu">
-        <a class="menu-item" href="#">Action</a>
-        <a class="menu-item" href="#">Another action</a>
-        <a class="menu-item" href="#">Something else here</a>
+      <div class="menu" role="menu" aria-labelledby="menuReferenceToggle">
+        <button class="menu-item" type="button" role="menuitem">Action</button>
+        <button class="menu-item" type="button" role="menuitem">Another action</button>
+        <button class="menu-item" type="button" role="menuitem">Something else here</button>
         <hr class="menu-divider">
-        <a class="menu-item" href="#">Separated link</a>
+        <button class="menu-item" type="button" role="menuitem">Separated action</button>
       </div>
     </div>
   </div>`} />
@@ -498,54 +498,82 @@ By default, the menu is closed when clicking inside or outside the menu. You can
 Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is within the menu (its toggle or items) closes the menu and returns focus to the toggle, and inside a submenu it closes only that submenu and returns focus to its trigger. Choosing an item closes the menu and returns focus to the toggle, while a click outside closes the menu and leaves the focus where it lands. A `hide.coreui.menu` listener that calls `preventDefault()` keeps the menu open and the focus in place.
 
 <Example class="d-flex flex-wrap gap-3" code={`<div class="btn-group">
-    <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="true" aria-expanded="false">
+    <button class="btn-solid theme-secondary" type="button" id="menuAutoCloseTrueToggle" data-coreui-toggle="menu" data-coreui-auto-close="true" aria-haspopup="menu" aria-expanded="false">
       Default menu
     </button>
-    <div class="menu">
-      <a class="menu-item" href="#">Menu item</a>
-      <a class="menu-item" href="#">Menu item</a>
-      <a class="menu-item" href="#">Menu item</a>
+    <div class="menu" role="menu" aria-labelledby="menuAutoCloseTrueToggle">
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
     </div>
   </div>
 
   <div class="btn-group">
-    <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="inside" aria-expanded="false">
+    <button class="btn-solid theme-secondary" type="button" id="menuAutoCloseInsideToggle" data-coreui-toggle="menu" data-coreui-auto-close="inside" aria-haspopup="menu" aria-expanded="false">
       Clickable inside
     </button>
-    <div class="menu">
-      <a class="menu-item" href="#">Menu item</a>
-      <a class="menu-item" href="#">Menu item</a>
-      <a class="menu-item" href="#">Menu item</a>
+    <div class="menu" role="menu" aria-labelledby="menuAutoCloseInsideToggle">
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
     </div>
   </div>
 
   <div class="btn-group">
-    <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="outside" aria-expanded="false">
+    <button class="btn-solid theme-secondary" type="button" id="menuAutoCloseOutsideToggle" data-coreui-toggle="menu" data-coreui-auto-close="outside" aria-haspopup="menu" aria-expanded="false">
       Clickable outside
     </button>
-    <div class="menu">
-      <a class="menu-item" href="#">Menu item</a>
-      <a class="menu-item" href="#">Menu item</a>
-      <a class="menu-item" href="#">Menu item</a>
+    <div class="menu" role="menu" aria-labelledby="menuAutoCloseOutsideToggle">
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
     </div>
   </div>
 
   <div class="btn-group">
-    <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="false" aria-expanded="false">
+    <button class="btn-solid theme-secondary" type="button" id="menuAutoCloseFalseToggle" data-coreui-toggle="menu" data-coreui-auto-close="false" aria-haspopup="menu" aria-expanded="false">
       Manual close
     </button>
-    <div class="menu">
-      <a class="menu-item" href="#">Menu item</a>
-      <a class="menu-item" href="#">Menu item</a>
-      <a class="menu-item" href="#">Menu item</a>
+    <div class="menu" role="menu" aria-labelledby="menuAutoCloseFalseToggle">
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
+      <button class="menu-item" type="button" role="menuitem">Menu item</button>
     </div>
   </div>`} />
 
 ## Accessibility
 
-The [<abbr title="Web Accessibility Initiative">WAI</abbr> <abbr title="Accessible Rich Internet Applications">ARIA</abbr>](https://www.w3.org/TR/wai-aria/) standard defines an actual [`role="menu"` widget](https://www.w3.org/TR/wai-aria/#menu), but this is specific to application-like menus which trigger actions or functions. <abbr title="Accessible Rich Internet Applications">ARIA</abbr> menus can only contain menu items, checkbox menu items, radio button menu items, radio button groups, and sub-menus.
+The [<abbr title="Web Accessibility Initiative">WAI</abbr> <abbr title="Accessible Rich Internet Applications">ARIA</abbr>](https://www.w3.org/TR/wai-aria/) [`role="menu"` widget](https://www.w3.org/TR/wai-aria/#menu) is for menus of commands. It can only contain menu items, checkbox and radio menu items, groups and submenus, and screen readers move through it item by item.
 
-CoreUI’s menus, on the other hand, are designed to be generic and applicable to a variety of situations and markup structures. For instance, it is possible to create menus that contain additional inputs and form controls, such as search fields or login forms. For this reason, CoreUI does not expect (nor automatically add) any of the `role` and `aria-` attributes required for true <abbr title="Accessible Rich Internet Applications">ARIA</abbr> menus. Authors will have to include these more specific attributes themselves.
+CoreUI does not add menu roles to Menu, because a `.menu` panel is just as often a list of links, a block of text or a form. When the panel is a menu of commands, add these attributes yourself:
+
+- on the toggle: an `id` and `aria-haspopup="menu"`;
+- on the panel: `role="menu"`, an `id`, and `aria-labelledby` with the toggle's `id`;
+- on each item: `role="menuitem"`, on a `<button type="button">`;
+- on each `.submenu` wrapper, each `.menu-header`, and every `<li>` between a `<ul>` panel and its content, including the ones around dividers, headers and text: `role="none"`;
+- on a submenu trigger: `role="menuitem"` and an `id`, and on its nested `.menu`: `role="menu"` with `aria-labelledby` pointing at the trigger.
+
+<Example code={`<button class="btn-solid theme-secondary" type="button" id="menuA11yToggle" data-coreui-toggle="menu" aria-haspopup="menu" aria-expanded="false">
+    Document
+  </button>
+  <div class="menu" id="menuA11yPanel" role="menu" aria-labelledby="menuA11yToggle">
+    <h6 class="menu-header" role="none">Edit</h6>
+    <button class="menu-item" type="button" role="menuitem">Copy</button>
+    <button class="menu-item" type="button" role="menuitem">Paste</button>
+    <div class="submenu" role="none">
+      <button class="menu-item" type="button" id="menuA11yExport" role="menuitem">Export</button>
+      <div class="menu" role="menu" aria-labelledby="menuA11yExport">
+        <button class="menu-item" type="button" role="menuitem">PDF</button>
+        <button class="menu-item" type="button" role="menuitem">Word document</button>
+      </div>
+    </div>
+    <hr class="menu-divider">
+    <button class="menu-item theme-danger" type="button" role="menuitem">Delete</button>
+  </div>`} />
+
+Leave lists of links, text and forms without these roles. A list of links is navigation, not a menu of commands, and a `role="menu"` panel may hold only menu items, so form fields in it make the markup invalid and the arrow keys skip them. Inside a `role="menu"` panel, headers and `.menu-text` are decoration for screen readers, which move from item to item; put anything a user needs into the item names.
+
+The plugin writes the state attributes: `aria-expanded` on the toggle, and `aria-haspopup="menu"` and `aria-expanded` on every submenu trigger from the moment the menu is initialized. It writes no roles.
 
 ### Keyboard navigation
 
@@ -557,9 +585,9 @@ Menus include built-in keyboard support for navigating menu items.
 | `→` | Enter submenu (or `←` in RTL) |
 | `←` | Exit submenu and return to parent (or `→` in RTL) |
 | `Enter` / `Space` | Activate focused item or open submenu |
-| `Esc` | Close the submenu, or the menu |
+| `Esc` | In a submenu, close only that submenu and return focus to its trigger; elsewhere, close the menu and return focus to the toggle |
 | `Home` / `End` | Jump to first/last menu item |
-| `Tab` | Move focus and close the menu |
+| `Tab` / `Shift`+`Tab` | Move to the next or previous element. Moving within the menu closes the submenu the focus leaves; leaving the menu closes it when `autoClose` is `true` or `'outside'`. `Shift`+`Tab` back onto the toggle keeps the menu open |
 
 Arrow keys, `Home` and `End` pressed in a field inside the menu stay with the field.
 

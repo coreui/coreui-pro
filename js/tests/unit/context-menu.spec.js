@@ -90,28 +90,17 @@ describe('ContextMenu', () => {
       expect(byElement._element).toEqual(area)
     })
 
-    it('should make the menu focusable', () => {
-      fixtureEl.innerHTML = markup()
-
-      const area = fixtureEl.querySelector('.area')
-      const menu = fixtureEl.querySelector('.menu')
-
-      // eslint-disable-next-line no-new
-      new ContextMenu(area)
-
-      expect(menu.getAttribute('tabindex')).toEqual('-1')
-    })
-
-    it('should keep an explicit tabindex on the menu', () => {
+    it('should make the menu focusable by script only when it opens, whatever tabindex the markup gives', () => {
       fixtureEl.innerHTML = markup().replace('class="menu"', 'class="menu" tabindex="0"')
 
       const area = fixtureEl.querySelector('.area')
       const menu = fixtureEl.querySelector('.menu')
 
-      // eslint-disable-next-line no-new
-      new ContextMenu(area)
-
+      const contextMenu = new ContextMenu(area)
       expect(menu.getAttribute('tabindex')).toEqual('0')
+
+      contextMenu.show()
+      expect(menu.getAttribute('tabindex')).toEqual('-1')
     })
 
     it('should resolve the menu from data-coreui-target', () => {
@@ -452,6 +441,240 @@ describe('ContextMenu', () => {
 
       contextMenu.toggle({ x: 5, y: 5 })
       return done
+    })
+  })
+
+  describe('roles', () => {
+    const treeMarkup = [
+      '<div class="area" tabindex="0" data-coreui-toggle="context-menu">Right click here</div>',
+      '<div class="menu">',
+      '  <h6 class="menu-header">Edit</h6>',
+      '  <button class="menu-item" type="button">Copy</button>',
+      '  <a class="menu-item disabled" href="#">Paste</a>',
+      '  <button class="menu-item" type="button" disabled>Cut</button>',
+      '  <hr class="menu-divider">',
+      '  <div class="menu-text">Plain text</div>',
+      '  <div class="submenu">',
+      '    <button class="menu-item" type="button">More</button>',
+      '    <div class="menu">',
+      '      <button class="menu-item" type="button">Deep</button>',
+      '    </div>',
+      '  </div>',
+      '  <div class="foreign">',
+      '    <div class="menu"><button class="menu-item" type="button">Foreign</button></div>',
+      '  </div>',
+      '</div>'
+    ].join('')
+
+    it('should write menu roles on the panel and every element of its tree when it opens', () => {
+      fixtureEl.innerHTML = treeMarkup
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const [copy, paste, cut, more, deep] = fixtureEl.querySelectorAll('.menu-item')
+      const submenuPanel = fixtureEl.querySelector('.submenu > .menu')
+
+      const contextMenu = new ContextMenu(area)
+      expect(menu.getAttribute('role')).toBeNull()
+      expect(copy.getAttribute('role')).toBeNull()
+
+      contextMenu.show()
+
+      expect(menu.getAttribute('role')).toEqual('menu')
+      expect(menu.getAttribute('aria-label')).toBeNull()
+
+      for (const item of [copy, paste, cut, more, deep]) {
+        expect(item.getAttribute('role')).toEqual('menuitem')
+        expect(item.getAttribute('tabindex')).toEqual('-1')
+      }
+
+      expect(paste.getAttribute('aria-disabled')).toEqual('true')
+      expect(copy.getAttribute('aria-disabled')).toBeNull()
+      expect(fixtureEl.querySelector('.menu-header').getAttribute('role')).toEqual('none')
+      expect(fixtureEl.querySelector('.submenu').getAttribute('role')).toEqual('none')
+      expect(fixtureEl.querySelector('.menu-divider').getAttribute('role')).toBeNull()
+      expect(fixtureEl.querySelector('.menu-text').getAttribute('role')).toBeNull()
+      expect(submenuPanel.getAttribute('role')).toEqual('menu')
+      expect(more.id).not.toEqual('')
+      expect(submenuPanel.getAttribute('aria-labelledby')).toEqual(more.id)
+      expect(more.getAttribute('aria-haspopup')).toEqual('menu')
+      expect(more.getAttribute('aria-expanded')).toEqual('false')
+    })
+
+    it('should leave a menu nested outside its submenus and the trigger area alone', () => {
+      fixtureEl.innerHTML = treeMarkup
+
+      const area = fixtureEl.querySelector('.area')
+      const foreignMenu = fixtureEl.querySelector('.foreign .menu')
+      const foreignItem = foreignMenu.querySelector('.menu-item')
+
+      new ContextMenu(area).show()
+
+      expect(foreignMenu.getAttribute('role')).toBeNull()
+      expect(foreignItem.getAttribute('role')).toBeNull()
+      expect(area.getAttribute('role')).toBeNull()
+      expect(area.getAttribute('aria-expanded')).toBeNull()
+      expect(area.getAttribute('aria-haspopup')).toBeNull()
+    })
+
+    it('should name the panel from ariaMenuLabel only while it has no name', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area-one" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu" data-coreui-aria-menu-label="Row actions">One</div>',
+        '<div class="area-two" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu">Two</div>',
+        '<div class="menu" id="sharedMenu"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      const menu = fixtureEl.querySelector('.menu')
+      const one = new ContextMenu(fixtureEl.querySelector('.area-one'))
+      const two = new ContextMenu(fixtureEl.querySelector('.area-two'))
+
+      two.show()
+      expect(menu.getAttribute('aria-label')).toBeNull()
+      two.hide()
+
+      one.show()
+      expect(menu.getAttribute('aria-label')).toEqual('Row actions')
+      one.hide()
+
+      menu.setAttribute('aria-label', 'Page name')
+      one.show()
+      expect(menu.getAttribute('aria-label')).toEqual('Page name')
+    })
+
+    it('should keep a menuitemcheckbox or menuitemradio role the page gave an item', () => {
+      fixtureEl.innerHTML = markup().replace('<a class="menu-item" href="#">Item 1</a>', '<button class="menu-item" type="button" role="menuitemradio" aria-checked="true">Item 1</button>')
+
+      const area = fixtureEl.querySelector('.area')
+      const [radio, link] = fixtureEl.querySelectorAll('.menu-item')
+
+      new ContextMenu(area).show()
+
+      expect(radio.getAttribute('role')).toEqual('menuitemradio')
+      expect(link.getAttribute('role')).toEqual('menuitem')
+    })
+
+    it('should drop aria-disabled from an item enabled between two openings', () => {
+      fixtureEl.innerHTML = treeMarkup
+
+      const area = fixtureEl.querySelector('.area')
+      const paste = fixtureEl.querySelectorAll('.menu-item')[1]
+      const contextMenu = new ContextMenu(area)
+
+      contextMenu.show()
+      expect(paste.getAttribute('aria-disabled')).toEqual('true')
+      contextMenu.hide()
+
+      paste.classList.remove('disabled')
+      contextMenu.show()
+      expect(paste.getAttribute('aria-disabled')).toBeNull()
+    })
+
+    it('should give list wrappers of the panel role="none"', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" data-coreui-toggle="context-menu">Right click here</div>',
+        '<ul class="menu">',
+        '  <li><button class="menu-item" type="button">Copy</button></li>',
+        '  <li><hr class="menu-divider"></li>',
+        '  <li><button class="menu-item" type="button">Paste <ul class="inner"><li>Note</li></ul></button></li>',
+        '</ul>'
+      ].join('')
+
+      new ContextMenu(fixtureEl.querySelector('.area')).show()
+
+      for (const item of fixtureEl.querySelectorAll('.menu > li')) {
+        expect(item.getAttribute('role')).toEqual('none')
+      }
+
+      expect(fixtureEl.querySelector('.inner li').getAttribute('role')).toBeNull()
+    })
+
+    it('should give lists inside a div panel role="none" and leave lists inside items alone', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" data-coreui-toggle="context-menu">Right click here</div>',
+        '<div class="menu">',
+        '  <ul class="group"><li class="wrap"><button class="menu-item" type="button">Copy <ol class="inner"><li>Note</li></ol></button></li></ul>',
+        '</div>'
+      ].join('')
+
+      new ContextMenu(fixtureEl.querySelector('.area')).show()
+
+      expect(fixtureEl.querySelector('.group').getAttribute('role')).toEqual('none')
+      expect(fixtureEl.querySelector('.wrap').getAttribute('role')).toEqual('none')
+      expect(fixtureEl.querySelector('.inner').getAttribute('role')).toBeNull()
+      expect(fixtureEl.querySelector('.menu-item').getAttribute('role')).toEqual('menuitem')
+    })
+
+    it('should leave a menu that is not a direct child of a submenu wrapper without roles', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" data-coreui-toggle="context-menu">Right click here</div>',
+        '<div class="menu">',
+        '  <div class="submenu">',
+        '    <button class="menu-item" type="button">More</button>',
+        '    <div class="wrap"><div class="menu"><button class="menu-item deep" type="button">Deep</button></div></div>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      new ContextMenu(fixtureEl.querySelector('.area')).show()
+
+      expect(fixtureEl.querySelector('.wrap .menu').getAttribute('role')).toBeNull()
+      expect(fixtureEl.querySelector('.deep').getAttribute('role')).toBeNull()
+    })
+
+    it('should announce a submenu added in the show event as a menu popup', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+
+      area.addEventListener('show.coreui.context-menu', () => {
+        menu.insertAdjacentHTML('beforeend', '<div class="submenu"><button class="menu-item added" type="button">More</button><div class="menu"><button class="menu-item" type="button">Deep</button></div></div>')
+      })
+
+      new ContextMenu(area).show()
+
+      const added = menu.querySelector('.added')
+      expect(added.getAttribute('aria-haspopup')).toEqual('menu')
+      expect(added.getAttribute('aria-expanded')).toEqual('false')
+    })
+
+    it('should give items added while the menu is open their roles on update', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const contextMenu = new ContextMenu(area)
+
+      contextMenu.show()
+      menu.insertAdjacentHTML('beforeend', '<button class="menu-item later" type="button">Later</button>')
+      expect(menu.querySelector('.later').getAttribute('role')).toBeNull()
+
+      contextMenu.update()
+      expect(menu.querySelector('.later').getAttribute('role')).toEqual('menuitem')
+    })
+
+    it('should not touch the panel tabindex before it opens', () => {
+      fixtureEl.innerHTML = markup()
+
+      // eslint-disable-next-line no-new
+      new ContextMenu(fixtureEl.querySelector('.area'))
+
+      expect(fixtureEl.querySelector('.menu').hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should give items added in the show event their roles in the same opening', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+
+      area.addEventListener('show.coreui.context-menu', () => {
+        menu.insertAdjacentHTML('beforeend', '<button class="menu-item added" type="button">Added</button>')
+      })
+
+      new ContextMenu(area).show()
+
+      expect(menu.querySelector('.added').getAttribute('role')).toEqual('menuitem')
     })
   })
 
@@ -971,6 +1194,169 @@ describe('ContextMenu', () => {
 
       rightClick(area)
       return done
+    })
+
+    it('should focus the first item when the keyboard opens the menu and the panel on a right-click', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const [first] = menu.querySelectorAll('.menu-item')
+
+      area.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: 'F10',
+        shiftKey: true
+      }))
+      expect(document.activeElement).toEqual(first)
+
+      ContextMenu.getInstance(area).hide()
+      rightClick(area)
+      expect(document.activeElement).toEqual(menu)
+    })
+
+    it('should keep Tab in the open menu and leave Tab elsewhere alone', () => {
+      fixtureEl.innerHTML = [
+        markup(),
+        '<button type="button" class="outside">Outside</button>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const [first] = menu.querySelectorAll('.menu-item')
+      const outside = fixtureEl.querySelector('.outside')
+
+      new ContextMenu(area, { autoClose: false }).show()
+
+      const tabInMenu = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Tab' })
+      first.dispatchEvent(tabInMenu)
+      expect(tabInMenu.defaultPrevented).toBeTrue()
+
+      const shiftTabInMenu = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: 'Tab',
+        shiftKey: true
+      })
+      menu.dispatchEvent(shiftTabInMenu)
+      expect(shiftTabInMenu.defaultPrevented).toBeTrue()
+
+      const tabOutside = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Tab' })
+      outside.dispatchEvent(tabOutside)
+      expect(tabOutside.defaultPrevented).toBeFalse()
+      expect(menu).toHaveClass('show')
+    })
+
+    it('should keep a submenu opened by hover when Tab is pressed in the menu', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" tabindex="0" data-coreui-toggle="context-menu">Right click here</div>',
+        '<div class="menu">',
+        '  <div class="submenu">',
+        '    <button class="menu-item" type="button">More</button>',
+        '    <div class="menu"><button class="menu-item" type="button">Deep</button></div>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const trigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+
+      rightClick(area)
+      trigger.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+      trigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      expect(submenu).toHaveClass('show')
+
+      const keyup = new KeyboardEvent('keyup', { bubbles: true, key: 'Tab' })
+      menu.dispatchEvent(keyup)
+
+      expect(submenu).toHaveClass('show')
+    })
+
+    it('should close on Escape with the focus on the area and leave a submenu Escape to the submenu', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" tabindex="0" data-coreui-toggle="context-menu">',
+        '  Right click here',
+        '  <div class="menu">',
+        '    <div class="submenu">',
+        '      <button class="menu-item" type="button">More</button>',
+        '      <div class="menu"><button class="menu-item" type="button">Deep</button></div>',
+        '    </div>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.area > .menu')
+      const trigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+      const deep = submenu.querySelector('.menu-item')
+
+      rightClick(area)
+      trigger.click()
+      expect(submenu).toHaveClass('show')
+
+      deep.focus()
+      deep.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
+      expect(submenu).not.toHaveClass('show')
+      expect(menu).toHaveClass('show')
+
+      area.focus()
+      area.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
+      expect(menu).not.toHaveClass('show')
+    })
+
+    it('should keep Escape on the area from reaching an enclosing dialog', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      new ContextMenu(area, { autoClose: 'inside' }).show()
+
+      area.focus()
+      const escape = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+      area.dispatchEvent(escape)
+
+      expect(escape.defaultPrevented).toBeTrue()
+      expect(menu).not.toHaveClass('show')
+    })
+
+    it('should close a shared panel through the instance that opened it on Escape from another area', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area-one" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu">One</div>',
+        '<div class="area-two" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu">Two</div>',
+        '<div class="menu" id="sharedMenu"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      const areaTwo = fixtureEl.querySelector('.area-two')
+      const one = new ContextMenu(fixtureEl.querySelector('.area-one'), { autoClose: 'inside' })
+      // eslint-disable-next-line no-new
+      new ContextMenu(areaTwo, { autoClose: 'inside' })
+
+      one.show()
+      areaTwo.focus()
+      areaTwo.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
+
+      expect(Menu._openInstances.has(one)).toBeFalse()
+    })
+
+    it('should close a shared panel on Escape from an area that never opened it', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area-one" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu">One</div>',
+        '<div class="area-two" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu">Two</div>',
+        '<div class="menu" id="sharedMenu"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      const areaTwo = fixtureEl.querySelector('.area-two')
+      const one = new ContextMenu(fixtureEl.querySelector('.area-one'), { autoClose: 'inside' })
+
+      one.show()
+      areaTwo.focus()
+      areaTwo.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
+
+      expect(Menu._openInstances.has(one)).toBeFalse()
     })
 
     it('should open anchored to the trigger on Shift+F10 and on the Menu key', () => {

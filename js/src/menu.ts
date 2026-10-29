@@ -191,6 +191,7 @@ class Menu extends BaseComponent {
 
     this._parseResponsivePlacements()
     this._setupSubmenuListeners()
+    this._initSubmenuTriggers()
   }
 
   // Getters
@@ -740,13 +741,30 @@ class Menu extends BaseComponent {
     }
   }
 
+  // Announce every submenu trigger up front. Waiting until the submenu opens hides
+  // the popup from assistive technology until a user has already found it.
+  protected _initSubmenuTriggers(): void {
+    if (!this._menu) {
+      return
+    }
+
+    for (const trigger of SelectorEngine.find(this.constructor.SELECTOR_SUBMENU_TOGGLE, this._menu)) {
+      if (!SelectorEngine.findOne(this.constructor.SELECTOR_MENU, trigger.parentElement!)) {
+        continue
+      }
+
+      trigger.setAttribute('aria-haspopup', 'menu')
+      trigger.setAttribute('aria-expanded', 'false')
+    }
+  }
+
   protected _openSubmenu(trigger: HTMLElement, submenu: HTMLElement, submenuWrapper: Element): void {
     if (this._openSubmenus.has(submenu)) {
       return
     }
 
     trigger.setAttribute('aria-expanded', 'true')
-    trigger.setAttribute('aria-haspopup', 'true')
+    trigger.setAttribute('aria-haspopup', 'menu')
 
     // Keep the submenu transparent until Floating UI applies the first position, so
     // it doesn't flash at its CSS fallback position (top: 0, over the parent menu)
@@ -962,6 +980,10 @@ class Menu extends BaseComponent {
     }
   }
 
+  protected _onTabInside(target: HTMLElement): void {
+    this._closeUnrelatedSubmenus(this._getLevelMenu(target), target)
+  }
+
   protected _handleSubmenuKeydown(event: CoreUIEvent): boolean {
     const { key, target } = event
     const submenuWrapper = (target as Element).closest(this.constructor.SELECTOR_SUBMENU)
@@ -1036,6 +1058,10 @@ class Menu extends BaseComponent {
     }
 
     for (const instance of Menu._openInstances) {
+      if (event.type === 'keyup' && instance._menu.contains(event.target as Node)) {
+        instance._onTabInside(event.target as HTMLElement)
+      }
+
       if (instance._config.autoClose === false) {
         continue
       }
