@@ -3102,6 +3102,146 @@ describe('Menu', () => {
   })
 
   describe('submenu', () => {
+    const nestedMarkup = [
+      '<div>',
+      '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+      '  <div class="menu">',
+      '    <a id="root" class="menu-item" href="#">Root</a>',
+      '    <div class="submenu">',
+      '      <button id="l1" class="menu-item" type="button">Level 1</button>',
+      '      <div class="menu">',
+      '        <a id="l1a" class="menu-item" href="#">L1 A</a>',
+      '        <div class="submenu">',
+      '          <button id="l2" class="menu-item" type="button">Level 2</button>',
+      '          <div class="menu">',
+      '            <a id="l2a" class="menu-item" href="#">L2 A</a>',
+      '          </div>',
+      '        </div>',
+      '      </div>',
+      '    </div>',
+      '  </div>',
+      '</div>'
+    ].join('')
+
+    const keyupTab = (target, shiftKey = false) => {
+      target.focus()
+      target.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Tab', shiftKey }))
+    }
+
+    it('should announce every submenu trigger as a menu popup before it opens', () => {
+      fixtureEl.innerHTML = nestedMarkup
+
+      const trigger = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const levelOne = fixtureEl.querySelector('#l1')
+      const levelTwo = fixtureEl.querySelector('#l2')
+
+      // eslint-disable-next-line no-new
+      new Menu(trigger)
+
+      for (const submenuTrigger of [levelOne, levelTwo]) {
+        expect(submenuTrigger.getAttribute('aria-haspopup')).toEqual('menu')
+        expect(submenuTrigger.getAttribute('aria-expanded')).toEqual('false')
+      }
+
+      expect(fixtureEl.querySelector('#root').getAttribute('aria-haspopup')).toBeNull()
+    })
+
+    it('should leave a submenu wrapper without a nested menu alone and write the expanded state itself', () => {
+      fixtureEl.innerHTML = nestedMarkup.replace('<a id="root"', '<div class="submenu"><button id="lone" class="menu-item" type="button">Lone</button></div><a id="root"').replace('<button id="l2" class="menu-item" type="button">', '<button id="l2" class="menu-item" type="button" aria-expanded="true">')
+
+      // eslint-disable-next-line no-new
+      new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]'))
+
+      expect(fixtureEl.querySelector('#lone').getAttribute('aria-haspopup')).toBeNull()
+      expect(fixtureEl.querySelector('#l2').getAttribute('aria-expanded')).toEqual('false')
+    })
+
+    it('should keep the menu popup value when a submenu opens and closes', () => {
+      fixtureEl.innerHTML = nestedMarkup
+
+      const trigger = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const levelOne = fixtureEl.querySelector('#l1')
+      const instance = new Menu(trigger)
+
+      instance.show()
+      levelOne.click()
+      expect(levelOne.getAttribute('aria-haspopup')).toEqual('menu')
+      expect(levelOne.getAttribute('aria-expanded')).toEqual('true')
+
+      levelOne.click()
+      expect(levelOne.getAttribute('aria-haspopup')).toEqual('menu')
+      expect(levelOne.getAttribute('aria-expanded')).toEqual('false')
+    })
+
+    it('should close the submenu Tab leaves for its parent level', () => {
+      fixtureEl.innerHTML = nestedMarkup
+
+      const trigger = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const levelOne = fixtureEl.querySelector('#l1')
+      const levelOnePanel = levelOne.nextElementSibling
+      const instance = new Menu(trigger)
+
+      instance.show()
+      levelOne.click()
+      expect(levelOnePanel).toHaveClass('show')
+
+      keyupTab(fixtureEl.querySelector('#root'))
+
+      expect(levelOnePanel).not.toHaveClass('show')
+      expect(levelOne.getAttribute('aria-expanded')).toEqual('false')
+    })
+
+    it('should close only the deeper submenu when Tab moves up one level', () => {
+      fixtureEl.innerHTML = nestedMarkup
+
+      const trigger = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const levelOne = fixtureEl.querySelector('#l1')
+      const levelTwo = fixtureEl.querySelector('#l2')
+      const instance = new Menu(trigger)
+
+      instance.show()
+      levelOne.click()
+      levelTwo.click()
+      expect(levelTwo.nextElementSibling).toHaveClass('show')
+
+      keyupTab(fixtureEl.querySelector('#l1a'))
+
+      expect(levelTwo.nextElementSibling).not.toHaveClass('show')
+      expect(levelOne.nextElementSibling).toHaveClass('show')
+    })
+
+    it('should keep the submenu open when Shift+Tab returns to its own trigger', () => {
+      fixtureEl.innerHTML = nestedMarkup
+
+      const trigger = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const levelOne = fixtureEl.querySelector('#l1')
+      const instance = new Menu(trigger)
+
+      instance.show()
+      levelOne.click()
+
+      keyupTab(levelOne, true)
+
+      expect(levelOne.nextElementSibling).toHaveClass('show')
+    })
+
+    it('should close the submenu Tab leaves whatever autoClose says', () => {
+      for (const autoClose of [false, 'inside', 'outside']) {
+        fixtureEl.innerHTML = nestedMarkup
+
+        const trigger = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const levelOne = fixtureEl.querySelector('#l1')
+        const instance = new Menu(trigger, { autoClose })
+
+        instance.show()
+        levelOne.click()
+        keyupTab(fixtureEl.querySelector('#root'))
+
+        expect(levelOne.nextElementSibling).not.toHaveClass('show')
+        instance.dispose()
+      }
+    })
+
     it('should open submenu on click', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

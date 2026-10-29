@@ -554,13 +554,13 @@ export const a11yComponents = [
   },
   {
     component: 'components/menu',
-    html: `<button class="btn btn-primary" type="button" id="a11yMenuToggle" data-coreui-toggle="menu" aria-expanded="false">
+    html: `<button class="btn btn-primary" type="button" id="a11yMenuToggle" data-coreui-toggle="menu" aria-expanded="false" aria-haspopup="menu">
     Toggle menu
   </button>
-  <div class="menu">
-    <a class="menu-item" href="#">Menu item 1</a>
-    <a class="menu-item" href="#">Menu item 2</a>
-    <a class="menu-item" href="#">Menu item 3</a>
+  <div class="menu" role="menu" aria-labelledby="a11yMenuToggle">
+    <button class="menu-item" type="button" role="menuitem">Menu item 1</button>
+    <button class="menu-item" type="button" role="menuitem">Menu item 2</button>
+    <button class="menu-item" type="button" role="menuitem">Menu item 3</button>
   </div>`,
     interactions: [
       { click: '#a11yMenuToggle' },
@@ -578,7 +578,7 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'built-in',
-        note: 'Arrow keys move between items, Enter activates one (Space too when the item is a button, and both open a submenu), Home and End jump to the first and last item, Esc closes the menu and returns focus to the toggle, and Tab moves on.'
+        note: 'Arrow keys move between items, Enter activates one (Space too when the item is a button, and both open a submenu), Home and End jump to the first and last item, Esc closes the menu (or only the submenu focus is in) and returns focus to the toggle, and Tab moves on, closing the submenus the focus leaves.'
       },
       {
         criterion: '1.4.13',
@@ -593,13 +593,13 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'author',
-        note: 'Menus are intentionally generic — add role=\'menu\'/\'menuitem\' and aria-* yourself when building a true ARIA menu widget.'
+        note: 'Menus are generic and get no menu roles from the plugin; for a menu of commands add role=\'menu\' to the panel, role=\'menuitem\' to the items and role=\'none\' to wrappers and headers, as the docs show. The plugin writes aria-expanded on the toggle and aria-haspopup=\'menu\'/aria-expanded on submenu triggers.'
       }
     ]
   },
   {
     component: 'components/context-menu',
-    html: `<div id="a11yContextMenuArea" tabindex="0" data-coreui-toggle="context-menu">Right-click here</div>
+    html: `<div id="a11yContextMenuArea" tabindex="0" role="region" aria-label="Document" data-coreui-toggle="context-menu">Right-click here</div>
   <div class="menu">
     <a class="menu-item" href="#">Menu item 1</a>
     <a class="menu-item" href="#">Menu item 2</a>
@@ -607,15 +607,15 @@ export const a11yComponents = [
     assertions: [
       {
         criterion: '2.1.1',
-        label: 'Shift+F10 on the focused trigger opens the menu and moves focus into it',
+        label: 'Shift+F10 on the focused trigger opens the menu with focus on its first item',
         steps: [{ focus: '#a11yContextMenuArea' }, { press: 'Shift+F10' }, { wait: 100 }],
-        run: 'return !!(document.activeElement && document.activeElement.classList.contains(\'menu\'))'
+        run: 'return !!(document.activeElement && document.activeElement.classList.contains(\'menu-item\') && document.activeElement.getAttribute(\'role\') === \'menuitem\')'
       },
       {
         criterion: '2.1.1',
-        label: 'ArrowDown in the open menu moves focus to a menu item',
+        label: 'ArrowDown in the open menu moves focus to the next item',
         steps: [{ press: 'ArrowDown' }, { wait: 100 }],
-        run: 'return !!(document.activeElement && document.activeElement.classList.contains(\'menu-item\'))'
+        run: 'return document.activeElement === document.querySelectorAll(\'.menu .menu-item\')[1]'
       },
       {
         criterion: '2.1.2',
@@ -628,12 +628,12 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'built-in',
-        note: 'Shift+F10 and the Menu key open the menu at the focused trigger and move focus into it; arrow keys, Enter (Space too on button items), Home/End, Esc and Tab operate it.'
+        note: 'Shift+F10 and the Menu key open the menu at the focused trigger with focus on the first item; arrow keys, Enter (Space too on button items), Home/End and Esc operate it. Tab does nothing in the open menu, as in a native context menu.'
       },
       {
         criterion: '2.1.2',
         status: 'built-in',
-        note: 'Esc closes the menu and returns focus to the trigger; Tab leaves the menu and closes it.'
+        note: 'Esc closes the menu and returns focus to the trigger, also with focus on the trigger area.'
       },
       {
         criterion: '2.4.7',
@@ -642,8 +642,8 @@ export const a11yComponents = [
       },
       {
         criterion: '4.1.2',
-        status: 'author',
-        note: 'Give a non-interactive trigger tabindex="0" and a nearby hint that a context menu exists; add role=\'menu\'/\'menuitem\' yourself for a true ARIA menu widget.'
+        status: 'partial',
+        note: 'The plugin writes role=\'menu\'/\'menuitem\' itself and names the panel from ariaMenuLabel. Give a non-interactive trigger tabindex="0", a role and a name, and a nearby hint that a context menu exists.'
       }
     ]
   },

@@ -1205,6 +1205,26 @@ check, radio, carousel and toggler icons already work:
   tap could do the same where the browser sends the tap's click after its emulated hover. The next
   click or tap closes it, a click that no hover preceded, as from a screen reader, still toggles, and
   Enter and Space keep opening it.
+- **Submenu triggers announce their submenu from the start.** The plugin writes
+  `aria-haspopup="menu"` and `aria-expanded="false"` on every submenu trigger when the menu is
+  initialized. Before, a trigger got `aria-haspopup="true"` and `aria-expanded` only once its
+  submenu had opened.
+- **<kbd>Tab</kbd> closes the submenus it leaves.** Moving focus with <kbd>Tab</kbd> inside an
+  open menu closes every open submenu that does not hold the new focus.
+- **The docs examples show menu roles for menus of commands.** Menu and Dropdown still add no
+  roles. Examples whose items are commands now use `<button type="button" role="menuitem">` items
+  in a `role="menu"` panel labelled by its toggle, with `aria-haspopup="menu"` on the toggle and
+  `role="none"` on the `<li>`, header and `.submenu` wrappers; lists of links, text and forms stay
+  without roles. See [Menu accessibility](/components/menu/#accessibility).
+- **Context Menu sets its menu roles itself.** Each opening writes `role="menu"` and
+  `tabindex="-1"` on the panel, `role="menuitem"` and `tabindex="-1"` on the items (a
+  `menuitemcheckbox` or `menuitemradio` role you set stays), and `role="none"` on headers, list
+  wrappers and `.submenu` wrappers; your markup no longer needs them. The new `ariaMenuLabel` option
+  names the panel when it has no `aria-label` of its own. Opening with <kbd>Shift</kbd>+<kbd>F10</kbd> or the
+  <kbd>Menu</kbd> key now moves focus to the first item instead of the panel, <kbd>Tab</kbd> does
+  nothing while focus is in the open menu instead of closing it, and <kbd>Esc</kbd> also closes the
+  menu while focus is on the trigger. See
+  [Context Menu accessibility](/components/context-menu/#accessibility).
 - **New component: Menu** — contextual overlays with submenus, container
   teleport, responsive placement and logical (`start`/`end`) placements,
   ported from Bootstrap v6 with CoreUI's class conventions. See the

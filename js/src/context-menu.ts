@@ -11,7 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
 import { focusIfUsable } from './util/focus.js'
 import {
-  defineJQueryPlugin, isDisabled, jQueryDispatch
+  defineJQueryPlugin, getUID, isDisabled, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -24,7 +24,9 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const CONTEXT_MENU_KEY = 'ContextMenu'
+const ESCAPE_KEY = 'Escape'
 const F10_KEY = 'F10'
+const TAB_KEY = 'Tab'
 
 const EVENT_CONTEXTMENU_DATA_API = `contextmenu${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY}${DATA_API_KEY}`
@@ -33,21 +35,26 @@ const SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
 const SCROLL_KEYS = new Set([' ', 'PageUp', 'PageDown'])
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="context-menu"]'
+const SELECTOR_MENU_HEADER = '.menu-header'
+const SELECTOR_MENU_ITEM = '.menu-item'
 
 type Point = { x: number, y: number }
 
 type ContextMenuConfig = Omit<MenuConfig, 'placement'> & {
+  ariaMenuLabel: string | null
   placement: string
 }
 
 const Default = {
   ...Menu.Default,
+  ariaMenuLabel: null,
   reference: 'pointer',
   strategy: 'fixed'
 } as ContextMenuConfig
 
 const DefaultType: Record<string, string> = {
-  ...Menu.DefaultType
+  ...Menu.DefaultType,
+  ariaMenuLabel: '(null|string)'
 }
 
 /**
@@ -56,18 +63,19 @@ const DefaultType: Record<string, string> = {
 
 class ContextMenu extends Menu {
   declare ['constructor']: typeof ContextMenu
+  protected declare _config: ContextMenuConfig
+  protected declare _disabledItems: WeakSet<Element>
+  protected declare _focusFirstItem: boolean
   protected declare _point: Point | null
   protected declare _scrollBlocker: ((event: Event) => void) | null
 
   constructor(element?: string | Element | null, config?: Partial<ContextMenuConfig> | null) {
-    super(element, config)
+    super(element, config as Partial<MenuConfig>)
 
+    this._disabledItems = new WeakSet()
+    this._focusFirstItem = false
     this._point = null
     this._scrollBlocker = null
-
-    if (this._menu && !this._menu.hasAttribute('tabindex')) {
-      this._menu.setAttribute('tabindex', '-1')
-    }
   }
 
   // Getters
@@ -96,24 +104,37 @@ class ContextMenu extends Menu {
     this._showAt(point, { relatedTarget: this._element })
   }
 
+  override update(): void {
+    super.update()
+
+    if (this._isShown()) {
+      this._setRoles()
+    }
+  }
+
   override dispose(): void {
     this._unlockScroll()
     super.dispose()
   }
 
   // Private
-  protected _showAt(point: Point | undefined, relatedTarget: Record<string, unknown>): void {
+  protected _showAt(point: Point | undefined, relatedTarget: Record<string, unknown>, fromKeyboard = false): void {
     if (!this._isShown()) {
       this._point = point ?? null
     }
 
+    this._focusFirstItem = fromKeyboard
     this._show(relatedTarget)
   }
 
   protected override _setShown(shown: boolean): void {
     if (shown) {
       this._lockScroll()
-      this._menu.focus({ preventScroll: true })
+      this._setRoles()
+
+      if (!this._focusFirstItem || !this._getItemsInMenu(this._menu).some(item => focusIfUsable(item, { preventScroll: true }))) {
+        this._menu.focus({ preventScroll: true })
+      }
     } else {
       this._unlockScroll()
       this._point = null
@@ -130,6 +151,65 @@ class ContextMenu extends Menu {
     return false
   }
 
+  protected override _onTabInside(): void {}
+
+  protected _setRoles(): void {
+    this._menu.setAttribute('role', 'menu')
+    this._menu.setAttribute('tabindex', '-1')
+
+    if (this._config.ariaMenuLabel && !this._menu.hasAttribute('aria-label')) {
+      this._menu.setAttribute('aria-label', this._config.ariaMenuLabel)
+    }
+
+    this._initSubmenuTriggers()
+
+    const selector = `${SELECTOR_MENU_ITEM}, ${SELECTOR_MENU_HEADER}, ${this.constructor.SELECTOR_SUBMENU}, ul, ol, li`
+    for (const element of SelectorEngine.find(selector, this._menu).filter(element => this._ownsElement(element))) {
+      if (element.matches(this.constructor.SELECTOR_MENU) || (!element.matches(SELECTOR_MENU_ITEM) && element.closest(SELECTOR_MENU_ITEM))) {
+        continue
+      }
+
+      if (!element.matches(SELECTOR_MENU_ITEM)) {
+        if (!['group', 'separator'].includes(element.getAttribute('role')!)) {
+          element.setAttribute('role', 'none')
+        }
+
+        continue
+      }
+
+      if (!element.getAttribute('role')?.startsWith('menuitem')) {
+        element.setAttribute('role', 'menuitem')
+      }
+
+      element.setAttribute('tabindex', '-1')
+
+      if (element.classList.contains('disabled')) {
+        element.setAttribute('aria-disabled', 'true')
+        this._disabledItems.add(element)
+      } else if (this._disabledItems.delete(element)) {
+        element.removeAttribute('aria-disabled')
+      }
+
+      const [submenu] = element.matches(this.constructor.SELECTOR_SUBMENU_TOGGLE) ? SelectorEngine.children(element.parentElement!, this.constructor.SELECTOR_MENU) : []
+      if (submenu) {
+        element.id ||= getUID(NAME)
+        submenu.setAttribute('role', 'menu')
+        submenu.setAttribute('aria-labelledby', element.id)
+      }
+    }
+  }
+
+  protected _ownsElement(element: Element): boolean {
+    let level = element.parentElement?.closest(this.constructor.SELECTOR_MENU)
+
+    while (level && level !== this._menu) {
+      const wrapper = level.parentElement
+      level = wrapper?.matches(this.constructor.SELECTOR_SUBMENU) ? wrapper.parentElement?.closest(this.constructor.SELECTOR_MENU) : null
+    }
+
+    return level === this._menu
+  }
+
   // Wheel and touch listeners on the document are passive by default, so the
   // blocker goes through the native API to be allowed to prevent the scroll.
   protected _lockScroll(): void {
@@ -138,6 +218,11 @@ class ContextMenu extends Menu {
     }
 
     this._scrollBlocker = (event: Event) => {
+      if (event.type === 'keydown' && (event as KeyboardEvent).key === TAB_KEY && this._menu.contains(event.target as Node)) {
+        event.preventDefault()
+        return
+      }
+
       if (event.type === 'keydown' && !SCROLL_KEYS.has((event as KeyboardEvent).key)) {
         return
       }
@@ -231,6 +316,19 @@ class ContextMenu extends Menu {
   // event (macOS never does), so the keys open the menu on their own; on the
   // platforms that do, the prevented keydown keeps the native event away.
   static dataApiKeydownHandler(this: HTMLElement, event: CoreUIEvent): void {
+    if (event.key === ESCAPE_KEY) {
+      const menu = ContextMenu.getOrCreateInstance(this)._menu
+      for (const instance of Menu._openInstances) {
+        if (instance instanceof ContextMenu && instance._menu === menu && !menu.contains(event.target as Node)) {
+          event.preventDefault()
+          event.stopPropagation()
+          instance.hide()
+        }
+      }
+
+      return
+    }
+
     if (event.key !== CONTEXT_MENU_KEY && !(event.key === F10_KEY && event.shiftKey)) {
       return
     }
@@ -248,7 +346,7 @@ class ContextMenu extends Menu {
     }
 
     Menu.clearMenus(event)
-    instance._showAt(undefined, { relatedTarget: this })
+    instance._showAt(undefined, { relatedTarget: this }, true)
   }
 
   static jQueryInterface(this: any, config: any, ...args: any[]): void {
