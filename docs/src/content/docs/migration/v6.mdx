@@ -1211,11 +1211,21 @@ check, radio, carousel and toggler icons already work:
   submenu had opened.
 - **<kbd>Tab</kbd> closes the submenus it leaves.** Moving focus with <kbd>Tab</kbd> inside an
   open menu closes every open submenu that does not hold the new focus.
-- **The docs examples show menu roles for menus of commands.** Menu and Dropdown still add no
-  roles. Examples whose items are commands now use `<button type="button" role="menuitem">` items
-  in a `role="menu"` panel labelled by its toggle, with `aria-haspopup="menu"` on the toggle and
-  `role="none"` on the `<li>`, header and `.submenu` wrappers; lists of links, text and forms stay
-  without roles. See [Menu accessibility](/components/menu/#accessibility).
+- **`role="menu"` on the panel makes Menu and Dropdown a menu of commands.** The plugin reads the
+  panel's role once, when it starts, and from `role="menu"` writes the rest: `id`,
+  `aria-haspopup="menu"` and `aria-controls` on the toggle, `tabindex="-1"` and a name from the
+  toggle on the panel, and at every opening `role="menuitem"` and `tabindex="-1"` on the items,
+  `aria-disabled` on `.disabled` items and `role="none"` on headers, list and `.submenu` wrappers.
+  Roles, `aria-disabled`, groups and separators you wrote stay. The panel becomes one stop in the
+  <kbd>Tab</kbd> order: opening from the keyboard focuses the first item, a pointer click the
+  panel, and <kbd>Tab</kbd> closes the menu whatever `autoClose` says, moving on after the toggle
+  (<kbd>Shift</kbd>+<kbd>Tab</kbd> to the toggle). Pages that put `role="menu"` on a panel, as the
+  earlier v6 docs did, get this behaviour; a panel of links, text or fields should not carry
+  the role. The docs examples keep `aria-haspopup="menu"` and `aria-expanded="false"` on the toggle
+  and `role="menu"` with `aria-labelledby` on the panel, and drop the item and wrapper roles. With
+  `container`, <kbd>Tab</kbd> from the toggle of a panel without the role enters the panel, and
+  <kbd>Tab</kbd> from its last element moves on after the toggle. See
+  [Menu accessibility](/components/menu/#accessibility).
 - **Context Menu sets its menu roles itself.** Each opening writes `role="menu"` and
   `tabindex="-1"` on the panel, `role="menuitem"` and `tabindex="-1"` on the items (a
   `menuitemcheckbox` or `menuitemradio` role you set stays), and `role="none"` on headers, list

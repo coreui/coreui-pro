@@ -1,3 +1,6 @@
+import { userEvent } from 'vitest/browser'
+import ContextMenu from '../../src/context-menu.js'
+import Dropdown from '../../src/dropdown.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Menu from '../../src/menu.js'
 import { noop } from '../../src/util/index.js'
@@ -5774,6 +5777,683 @@ describe('Menu', () => {
         const menu = new Menu(btnMenu)
         btnMenu.click()
       })
+    })
+  })
+
+  describe('role="menu" on the panel', () => {
+    const menuMarkup = [
+      '<button id="before" type="button">Before</button>',
+      '<div class="wrapper">',
+      '  <button class="btn" type="button" data-coreui-toggle="menu">Actions</button>',
+      '  <div class="menu" role="menu">',
+      '    <h6 class="menu-header">Edit</h6>',
+      '    <button class="menu-item" type="button">Copy</button>',
+      '    <a class="menu-item disabled" href="#paste">Paste</a>',
+      '    <div class="submenu">',
+      '      <button class="menu-item" type="button">More</button>',
+      '      <div class="menu"><button class="menu-item" type="button" id="deep">Deep</button></div>',
+      '    </div>',
+      '  </div>',
+      '</div>',
+      '<button id="after" type="button">After</button>'
+    ].join('')
+
+    const press = target => {
+      target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0 }))
+      target.click()
+    }
+
+    it('should announce the menu on the toggle and name the panel from it when the instance is created', () => {
+      fixtureEl.innerHTML = menuMarkup
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const panel = fixtureEl.querySelector('.menu')
+      new Menu(toggle) // eslint-disable-line no-new
+
+      expect(toggle.getAttribute('aria-haspopup')).toEqual('menu')
+      expect(toggle.id).not.toEqual('')
+      expect(panel.id).not.toEqual('')
+      expect(toggle.getAttribute('aria-controls')).toEqual(panel.id)
+      expect(panel.getAttribute('tabindex')).toEqual('-1')
+      expect(panel.getAttribute('aria-labelledby')).toEqual(toggle.id)
+    })
+
+    it('should keep the ids and the name the page gave and take the name the toggle points at', () => {
+      fixtureEl.innerHTML = [
+        '<span id="label">File actions</span>',
+        '<button class="btn" id="kebab" type="button" aria-labelledby="label" data-coreui-toggle="menu"></button>',
+        '<div class="menu" id="actions" role="menu"><button class="menu-item" type="button">Copy</button></div>',
+        '<button class="btn" type="button" data-coreui-toggle="menu">Other</button>',
+        '<div class="menu" role="menu" aria-label="Other actions"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      const [kebab, other] = fixtureEl.querySelectorAll('[data-coreui-toggle="menu"]')
+      const [actions, otherPanel] = fixtureEl.querySelectorAll('.menu')
+      new Menu(kebab) // eslint-disable-line no-new
+      new Menu(other) // eslint-disable-line no-new
+
+      expect(kebab.id).toEqual('kebab')
+      expect(actions.id).toEqual('actions')
+      expect(actions.getAttribute('aria-labelledby')).toEqual('label')
+      expect(otherPanel.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should write nothing of a menu for a panel without role="menu" or with another role', () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Plain</button>',
+        '<div class="menu"><button class="menu-item" type="button">Copy</button></div>',
+        '<button class="btn" type="button" data-coreui-toggle="menu">Dialog</button>',
+        '<div class="menu" role="dialog"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      for (const toggle of fixtureEl.querySelectorAll('[data-coreui-toggle="menu"]')) {
+        const menu = new Menu(toggle)
+        menu.show()
+
+        const panel = toggle.nextElementSibling
+        expect(toggle.hasAttribute('aria-haspopup')).toBeFalse()
+        expect(panel.hasAttribute('tabindex')).toBeFalse()
+        expect(panel.querySelector('.menu-item').hasAttribute('role')).toBeFalse()
+        expect(panel.querySelector('.menu-item').hasAttribute('tabindex')).toBeFalse()
+        expect(document.activeElement).toEqual(toggle)
+      }
+    })
+
+    it('should read the role once, when the instance is created', () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Added</button>',
+        '<div class="menu"><button class="menu-item" type="button">Copy</button></div>',
+        '<button class="btn" type="button" data-coreui-toggle="menu">Removed</button>',
+        '<div class="menu" role="menu"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      const [added, removed] = [...fixtureEl.querySelectorAll('[data-coreui-toggle="menu"]')].map(toggle => new Menu(toggle))
+      const [addedPanel, removedPanel] = fixtureEl.querySelectorAll('.menu')
+      addedPanel.setAttribute('role', 'menu')
+      removedPanel.removeAttribute('role')
+
+      added.show()
+      removed.show()
+
+      expect(addedPanel.querySelector('.menu-item').hasAttribute('role')).toBeFalse()
+      expect(removedPanel.querySelector('.menu-item').getAttribute('role')).toEqual('menuitem')
+    })
+
+    it('should give the items, wrappers, headers and submenus their roles when the menu opens', () => {
+      fixtureEl.innerHTML = menuMarkup
+
+      const menu = new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]'))
+      menu.show()
+
+      const [copy, paste, more, deep] = fixtureEl.querySelectorAll('.menu-item')
+      for (const item of [copy, paste, more, deep]) {
+        expect(item.getAttribute('role')).toEqual('menuitem')
+        expect(item.getAttribute('tabindex')).toEqual('-1')
+      }
+
+      expect(paste.getAttribute('aria-disabled')).toEqual('true')
+      expect(copy.hasAttribute('aria-disabled')).toBeFalse()
+      expect(fixtureEl.querySelector('.menu-header').getAttribute('role')).toEqual('none')
+      expect(fixtureEl.querySelector('.submenu').getAttribute('role')).toEqual('none')
+      expect(more.getAttribute('aria-haspopup')).toEqual('menu')
+      expect(fixtureEl.querySelector('.submenu > .menu').getAttribute('role')).toEqual('menu')
+      expect(fixtureEl.querySelector('.submenu > .menu').getAttribute('aria-labelledby')).toEqual(more.id)
+    })
+
+    it('should keep the group, separator, item role and aria-disabled the page wrote', () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Sort</button>',
+        '<div class="menu" role="menu">',
+        '  <ul class="group" role="group" aria-label="Sort by">',
+        '    <li><button class="menu-item" type="button" role="menuitemradio" aria-checked="true">Name</button></li>',
+        '    <li><button class="menu-item" type="button" role="menuitemradio" aria-checked="false">Date</button></li>',
+        '  </ul>',
+        '  <ul class="list"><li class="divider" role="separator"></li></ul>',
+        '  <button class="menu-item" type="button" aria-disabled="true" id="author-disabled">Reset</button>',
+        '</div>'
+      ].join('')
+
+      const menu = new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]'))
+      menu.show()
+      menu.update()
+
+      expect(fixtureEl.querySelector('.group').getAttribute('role')).toEqual('group')
+      expect(fixtureEl.querySelector('.divider').getAttribute('role')).toEqual('separator')
+      expect(fixtureEl.querySelector('.list').getAttribute('role')).toEqual('none')
+      expect(fixtureEl.querySelector('.menu-item').getAttribute('role')).toEqual('menuitemradio')
+      expect(fixtureEl.querySelector('#author-disabled').getAttribute('aria-disabled')).toEqual('true')
+    })
+
+    it('should move between the items of a group with the arrow keys', () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Sort</button>',
+        '<div class="menu" role="menu">',
+        '  <ul role="group" aria-label="Sort by">',
+        '    <li><button class="menu-item" type="button" id="name">Name</button></li>',
+        '    <li><button class="menu-item" type="button" id="date">Date</button></li>',
+        '  </ul>',
+        '  <button class="menu-item" type="button" id="reset">Reset</button>',
+        '</div>'
+      ].join('')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      new Menu(toggle).show()
+
+      const down = target => target.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+      down(document.activeElement)
+      expect(document.activeElement.id).toEqual('name')
+      down(document.activeElement)
+      expect(document.activeElement.id).toEqual('date')
+      down(document.activeElement)
+      expect(document.activeElement.id).toEqual('reset')
+    })
+
+    it('should give roles to items the page adds while the menu opens and on update()', () => {
+      fixtureEl.innerHTML = menuMarkup
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const panel = fixtureEl.querySelector('.menu')
+      toggle.addEventListener('show.coreui.menu', () => {
+        panel.insertAdjacentHTML('beforeend', '<button class="menu-item" type="button" id="added">Added</button>')
+      })
+
+      const menu = new Menu(toggle)
+      menu.show()
+      expect(fixtureEl.querySelector('#added').getAttribute('role')).toEqual('menuitem')
+
+      panel.insertAdjacentHTML('beforeend', '<button class="menu-item" type="button" id="later">Later</button>')
+      menu.update()
+      expect(fixtureEl.querySelector('#later').getAttribute('tabindex')).toEqual('-1')
+    })
+
+    it('should stop a click on a disabled item from following its link and closing the menu', () => {
+      fixtureEl.innerHTML = menuMarkup
+
+      const menu = new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]'))
+      menu.show()
+
+      const click = new MouseEvent('click', { bubbles: true, cancelable: true })
+      fixtureEl.querySelector('.menu-item.disabled').dispatchEvent(click)
+
+      expect(click.defaultPrevented).toBeTrue()
+      expect(fixtureEl.querySelector('.menu')).toHaveClass('show')
+    })
+
+    it('should leave the roles of another menu inside the panel alone', () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Outer</button>',
+        '<div class="menu" role="menu">',
+        '  <button class="menu-item" type="button">Copy</button>',
+        '  <div class="dropdown">',
+        '    <ul class="dropdown-menu" role="menu"><li class="inner"><a class="dropdown-item" href="#">Inner</a></li></ul>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]')).show()
+
+      expect(fixtureEl.querySelector('.dropdown-menu').getAttribute('role')).toEqual('menu')
+      expect(fixtureEl.querySelector('.inner').hasAttribute('role')).toBeFalse()
+    })
+
+    it('should not take the role a context menu wrote on a shared panel for a declaration', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" data-coreui-toggle="context-menu" data-coreui-target="#shared">Area</div>',
+        '<button class="btn" type="button" id="kebab">Actions</button>',
+        '<div class="menu" id="shared"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      const panel = fixtureEl.querySelector('#shared')
+      const contextMenu = new ContextMenu(fixtureEl.querySelector('.area'))
+      contextMenu.show()
+      contextMenu.hide()
+      expect(panel.getAttribute('role')).toEqual('menu')
+
+      const kebab = fixtureEl.querySelector('#kebab')
+      new Menu(kebab, { menu: panel }) // eslint-disable-line no-new
+      expect(kebab.hasAttribute('aria-haspopup')).toBeFalse()
+    })
+
+    it('should keep a role the page wrote on a panel it shares with a context menu', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" data-coreui-toggle="context-menu" data-coreui-target="#shared">Area</div>',
+        '<button class="btn" type="button" id="kebab">Actions</button>',
+        '<div class="menu" id="shared" role="menu"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      const panel = fixtureEl.querySelector('#shared')
+      const contextMenu = new ContextMenu(fixtureEl.querySelector('.area'))
+      contextMenu.show()
+      contextMenu.hide()
+
+      const kebab = fixtureEl.querySelector('#kebab')
+      new Menu(kebab, { menu: panel }) // eslint-disable-line no-new
+      expect(kebab.getAttribute('aria-haspopup')).toEqual('menu')
+    })
+
+    it('should keep the name the page gave the panel with aria-labelledby', () => {
+      fixtureEl.innerHTML = [
+        '<h6 id="heading">File</h6>',
+        '<button class="btn" type="button" data-coreui-toggle="menu">Toggle</button>',
+        '<div class="menu" role="menu" aria-labelledby="heading"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]')) // eslint-disable-line no-new
+
+      expect(fixtureEl.querySelector('.menu').getAttribute('aria-labelledby')).toEqual('heading')
+    })
+
+    it('should write no roles on update() for a panel without role="menu"', () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Toggle</button>',
+        '<div class="menu"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      const menu = new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]'))
+      menu.show()
+      menu.update()
+
+      expect(fixtureEl.querySelector('.menu-item').hasAttribute('role')).toBeFalse()
+    })
+
+    it('should keep aria-expanded on the trigger of an open submenu on update()', () => {
+      fixtureEl.innerHTML = menuMarkup
+
+      const menu = new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]'))
+      menu.show()
+      const trigger = fixtureEl.querySelector('.submenu > .menu-item')
+      trigger.click()
+      menu.update()
+
+      expect(trigger.getAttribute('aria-expanded')).toEqual('true')
+    })
+
+    it('should reach items directly inside a role="group" with the arrow keys', () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Sort</button>',
+        '<div class="menu" role="menu">',
+        '  <div role="group" aria-label="Sort by"><button class="menu-item" type="button" id="name">Name</button></div>',
+        '</div>'
+      ].join('')
+
+      new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]')).show()
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+
+      expect(document.activeElement.id).toEqual('name')
+    })
+
+    it('should not open a disabled submenu trigger on click', () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Toggle</button>',
+        '<div class="menu" role="menu">',
+        '  <div class="submenu"><button class="menu-item disabled" type="button">More</button><div class="menu" id="sub"><button class="menu-item" type="button">Deep</button></div></div>',
+        '</div>'
+      ].join('')
+
+      new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]')).show()
+      fixtureEl.querySelector('.submenu > .menu-item').click()
+
+      expect(fixtureEl.querySelector('#sub')).not.toHaveClass('show')
+    })
+
+    describe('focus on open', () => {
+      it('should focus the panel when a pointer opens the menu', () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        press(fixtureEl.querySelector('[data-coreui-toggle="menu"]'))
+
+        expect(document.activeElement).toEqual(fixtureEl.querySelector('.menu'))
+      })
+
+      it('should focus the first item when a click without a press opens the menu', () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        fixtureEl.querySelector('[data-coreui-toggle="menu"]').click()
+
+        expect(document.activeElement.textContent).toEqual('Copy')
+      })
+
+      it('should focus the panel when no item takes the focus', () => {
+        fixtureEl.innerHTML = [
+          '<button class="btn" type="button" data-coreui-toggle="menu">Empty</button>',
+          '<div class="menu" role="menu"><button class="menu-item" type="button" disabled>Copy</button></div>'
+        ].join('')
+
+        fixtureEl.querySelector('[data-coreui-toggle="menu"]').click()
+
+        expect(document.activeElement).toEqual(fixtureEl.querySelector('.menu'))
+      })
+
+      it('should focus the first item on show() while the toggle has the focus, and the toggle otherwise', () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menu = new Menu(toggle)
+
+        fixtureEl.querySelector('#before').focus()
+        menu.show()
+        expect(document.activeElement).toEqual(toggle)
+        menu.hide()
+
+        toggle.focus()
+        menu.show()
+        expect(document.activeElement.textContent).toEqual('Copy')
+      })
+
+      it('should focus without scrolling the page', () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        const copy = fixtureEl.querySelector('.menu-item')
+        const spy = spyOn(copy, 'focus').and.callThrough()
+        fixtureEl.querySelector('[data-coreui-toggle="menu"]').click()
+
+        expect(spy).toHaveBeenCalledWith({ preventScroll: true })
+      })
+
+      it('should focus the panel without scrolling when a pointer opens the menu', () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        const panel = fixtureEl.querySelector('.menu')
+        const spy = spyOn(panel, 'focus').and.callThrough()
+        press(fixtureEl.querySelector('[data-coreui-toggle="menu"]'))
+
+        expect(spy).toHaveBeenCalledWith({ preventScroll: true })
+      })
+
+      it('should leave the focus in a field toggle a pointer opens the menu from', () => {
+        fixtureEl.innerHTML = [
+          '<input class="form-control" data-coreui-toggle="menu" aria-label="Search">',
+          '<div class="menu" role="menu"><button class="menu-item" type="button">Copy</button></div>'
+        ].join('')
+
+        const field = fixtureEl.querySelector('input')
+        field.focus()
+        press(field)
+
+        expect(document.activeElement).toEqual(field)
+      })
+
+      it('should open with Space on a link toggle inside another open menu', () => {
+        fixtureEl.innerHTML = [
+          '<button class="btn" type="button" data-coreui-toggle="menu" id="outer">Outer</button>',
+          '<div class="menu">',
+          '  <a class="btn" href="#" role="button" data-coreui-toggle="menu" id="inner">Inner</a>',
+          '  <div class="menu" role="menu" id="inner-panel"><button class="menu-item" type="button">Copy</button></div>',
+          '</div>'
+        ].join('')
+
+        new Menu(fixtureEl.querySelector('#outer')).show()
+        const inner = fixtureEl.querySelector('#inner')
+        inner.focus()
+        inner.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: ' ' }))
+
+        expect(fixtureEl.querySelector('#inner-panel')).toHaveClass('show')
+      })
+
+      it('should open on the last item with ArrowUp', () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        new Menu(toggle) // eslint-disable-line no-new
+        toggle.focus()
+        toggle.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowUp' }))
+
+        expect(document.activeElement.textContent).toEqual('More')
+      })
+
+      it('should open with Space on a link toggle instead of scrolling the page', () => {
+        fixtureEl.innerHTML = [
+          '<a class="btn" href="#" role="button" data-coreui-toggle="menu">Actions</a>',
+          '<div class="menu" role="menu"><button class="menu-item" type="button">Copy</button></div>',
+          '<a class="btn" href="#" role="button" data-coreui-toggle="menu">Links</a>',
+          '<div class="menu"><a class="menu-item" href="#">Docs</a></div>'
+        ].join('')
+
+        const [actions, links] = fixtureEl.querySelectorAll('[data-coreui-toggle="menu"]')
+        const space = target => {
+          const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: ' ' })
+          target.dispatchEvent(event)
+          return event
+        }
+
+        expect(space(actions).defaultPrevented).toBeTrue()
+        expect(actions.nextElementSibling).toHaveClass('show')
+        expect(document.activeElement.textContent).toEqual('Copy')
+
+        expect(space(links).defaultPrevented).toBeFalse()
+        expect(links.nextElementSibling).not.toHaveClass('show')
+      })
+    })
+
+    describe('Tab', () => {
+      const openWithKeyboard = () => {
+        const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        toggle.click()
+        return toggle
+      }
+
+      it('should close the menu and move on from the toggle', async () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        openWithKeyboard()
+        let prevented = null
+        document.addEventListener('keydown', event => {
+          prevented = event.defaultPrevented
+        }, { once: true })
+        await userEvent.keyboard('{Tab}')
+
+        expect(fixtureEl.querySelector('.menu')).not.toHaveClass('show')
+        expect(document.activeElement.id).toEqual('after')
+        expect(prevented).toBeFalse()
+      })
+
+      it('should close the menu and focus the toggle with Shift+Tab', async () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        const toggle = openWithKeyboard()
+        await userEvent.keyboard('{Shift>}{Tab}{/Shift}')
+
+        expect(fixtureEl.querySelector('.menu')).not.toHaveClass('show')
+        expect(document.activeElement).toEqual(toggle)
+      })
+
+      it('should close the whole menu from a submenu, whatever autoClose says', async () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        new Menu(toggle, { autoClose: false }) // eslint-disable-line no-new
+        toggle.click()
+        fixtureEl.querySelector('.submenu > .menu-item').click()
+        fixtureEl.querySelector('#deep').focus()
+        await userEvent.keyboard('{Tab}')
+
+        expect(fixtureEl.querySelector('.menu')).not.toHaveClass('show')
+        expect(fixtureEl.querySelector('.submenu > .menu')).not.toHaveClass('show')
+        expect(document.activeElement.id).toEqual('after')
+      })
+
+      it('should keep the focus on the item when the page keeps the menu open', async () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        const toggle = openWithKeyboard()
+        toggle.addEventListener('hide.coreui.menu', event => event.preventDefault())
+        await userEvent.keyboard('{Tab}')
+
+        expect(fixtureEl.querySelector('.menu')).toHaveClass('show')
+        expect(document.activeElement.textContent).toEqual('Copy')
+      })
+
+      it('should close the menu when Tab leaves its toggle', async () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menu = new Menu(toggle, { autoClose: 'inside' })
+        fixtureEl.querySelector('#before').focus()
+        menu.show()
+        await userEvent.keyboard('{Tab}')
+
+        expect(fixtureEl.querySelector('.menu')).not.toHaveClass('show')
+        expect(document.activeElement.id).toEqual('after')
+      })
+
+      it('should move on from the toggle when the panel sits in a container', async () => {
+        fixtureEl.innerHTML = menuMarkup
+
+        const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        new Menu(toggle, { container: true }) // eslint-disable-line no-new
+        toggle.click()
+        await userEvent.keyboard('{Tab}')
+
+        expect(document.activeElement.id).toEqual('after')
+        expect(fixtureEl.querySelector('.wrapper .menu')).not.toBeNull()
+      })
+
+      it('should close the menu from a field in the panel', async () => {
+        fixtureEl.innerHTML = [
+          '<style>.menu:not(.show) { display: none; }</style>',
+          '<button class="btn" type="button" data-coreui-toggle="menu">Actions</button>',
+          '<div class="menu" role="menu"><input class="search" aria-label="Search"></div>',
+          '<button id="after" type="button">After</button>'
+        ].join('')
+
+        const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        new Menu(toggle).show()
+        fixtureEl.querySelector('.search').focus()
+        await userEvent.keyboard('{Tab}')
+
+        expect(fixtureEl.querySelector('.menu')).not.toHaveClass('show')
+        expect(document.activeElement.id).toEqual('after')
+      })
+
+      it('should leave Tab inside a menu without a role in the panel of a menu with one to that inner menu', async () => {
+        fixtureEl.innerHTML = [
+          '<button class="btn" type="button" data-coreui-toggle="menu" id="outer">Outer</button>',
+          '<div class="menu" role="menu" id="outer-panel">',
+          '  <button class="menu-item" type="button">Copy</button>',
+          '  <div>',
+          '    <button class="btn" type="button" data-coreui-toggle="menu" id="inner">Inner</button>',
+          '    <div class="menu" id="inner-panel"><a href="#one" id="one">One</a><a href="#two" id="two">Two</a></div>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        new Menu(fixtureEl.querySelector('#outer')).show()
+        new Menu(fixtureEl.querySelector('#inner')).show()
+        fixtureEl.querySelector('#one').focus()
+        await userEvent.keyboard('{Tab}')
+
+        expect(fixtureEl.querySelector('#outer-panel')).toHaveClass('show')
+        expect(document.activeElement.id).toEqual('two')
+      })
+    })
+  })
+
+  describe('a Menu nested in a Dropdown', () => {
+    it('should keep the arrow keys and Escape with the inner menu', () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn" type="button" data-coreui-toggle="dropdown" id="outer">Outer</button>',
+        '  <div class="dropdown-menu">',
+        '    <a class="dropdown-item" href="#" id="o1">O1</a>',
+        '    <div><button class="btn" type="button" data-coreui-toggle="menu" id="inner">Inner</button>',
+        '    <div class="menu" id="inner-panel"><button class="menu-item" type="button" id="i1">I1</button><button class="menu-item" type="button" id="i2">I2</button></div></div>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      new Dropdown(fixtureEl.querySelector('#outer'), { autoClose: 'outside' }).show()
+      new Menu(fixtureEl.querySelector('#inner')).show()
+      const i1 = fixtureEl.querySelector('#i1')
+      i1.focus()
+
+      i1.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+      expect(document.activeElement.id).toEqual('i2')
+
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+      expect(fixtureEl.querySelector('#inner-panel')).not.toHaveClass('show')
+      expect(fixtureEl.querySelector('.dropdown-menu')).toHaveClass('show')
+    })
+  })
+
+  describe('Tab with the panel in a container', () => {
+    const markup = [
+      '<button class="btn" type="button" data-coreui-toggle="menu">Filters</button>',
+      '<div class="menu"><input id="first" aria-label="Name"><button type="button" id="last">Apply</button></div>',
+      '<button id="after" type="button">After</button>'
+    ].join('')
+
+    it('should enter the panel from the toggle and leave it for the stop after the toggle', async () => {
+      fixtureEl.innerHTML = markup
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      new Menu(toggle, { container: true }).show()
+      toggle.focus()
+
+      await userEvent.keyboard('{Tab}')
+      expect(document.activeElement.id).toEqual('first')
+
+      await userEvent.keyboard('{Tab}{Tab}')
+      expect(document.activeElement.id).toEqual('after')
+      expect(document.querySelector('.menu')).not.toHaveClass('show')
+    })
+
+    it('should leave the panel when the toggle is the last stop before it', async () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Filters</button>',
+        '<div class="menu"><input id="first" aria-label="Name"><button type="button" id="last">Apply</button></div>'
+      ].join('')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      new Menu(toggle, { container: true }).show()
+      document.querySelector('#last').focus()
+
+      await userEvent.keyboard('{Tab}')
+      expect(document.querySelector('.menu').contains(document.activeElement)).toBeFalse()
+    })
+
+    it('should leave Shift+Tab from the toggle to the browser', async () => {
+      fixtureEl.innerHTML = markup
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      new Menu(toggle, { container: true }).show()
+      toggle.focus()
+
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true, cancelable: true, key: 'Tab', shiftKey: true
+      })
+      toggle.dispatchEvent(event)
+      expect(event.defaultPrevented).toBeFalse()
+    })
+
+    it('should enter the moved panel from a toggle inside another open menu', async () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu" id="outer">Outer</button>',
+        '<div class="menu">',
+        '  <button class="btn" type="button" data-coreui-toggle="menu" id="inner">Inner</button>',
+        '  <div class="menu"><button type="button" id="i1">I1</button></div>',
+        '  <button type="button" id="z">Z</button>',
+        '</div>'
+      ].join('')
+
+      new Menu(fixtureEl.querySelector('#outer'), { autoClose: 'outside' }).show()
+      const inner = fixtureEl.querySelector('#inner')
+      new Menu(inner, { container: true }).show()
+      inner.focus()
+
+      await userEvent.keyboard('{Tab}')
+      expect(document.activeElement.id).toEqual('i1')
+    })
+
+    it('should go back to the toggle with Shift+Tab from the first stop and keep the menu open', async () => {
+      fixtureEl.innerHTML = markup
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      new Menu(toggle, { container: true }).show()
+      document.querySelector('#first').focus()
+
+      await userEvent.keyboard('{Shift>}{Tab}{/Shift}')
+      expect(document.activeElement).toEqual(toggle)
+      expect(document.querySelector('.menu')).toHaveClass('show')
     })
   })
 })

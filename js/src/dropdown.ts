@@ -79,6 +79,14 @@ class Dropdown extends Menu {
     return '[data-coreui-toggle="dropdown"]:not(.disabled):not(:disabled)'
   }
 
+  static override get SELECTOR_HEADER(): string {
+    return '.dropdown-header'
+  }
+
+  static override get SELECTOR_ITEM(): string {
+    return '.dropdown-item'
+  }
+
   static override get SELECTOR_MENU(): string {
     return '.dropdown-menu'
   }
@@ -201,10 +209,7 @@ class Dropdown extends Menu {
 
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API, Dropdown.SELECTOR_DATA_TOGGLE, event => Dropdown.dataApiKeydownHandler(event))
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API, Dropdown.SELECTOR_MENU, event => Dropdown.dataApiKeydownHandler(event))
-EventHandler.on(document, EVENT_CLICK_DATA_API, Dropdown.SELECTOR_DATA_TOGGLE, function (event) {
-  event.preventDefault()
-  Dropdown.getOrCreateInstance(this).toggle()
-})
+EventHandler.on(document, EVENT_CLICK_DATA_API, Dropdown.SELECTOR_DATA_TOGGLE, event => Dropdown.dataApiClickHandler(event))
 
 /**
  * jQuery
