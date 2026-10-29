@@ -45,6 +45,7 @@ import {
   type FloatingConfigOption
 } from './util/floating-ui.js'
 import { containsFocus, focusIfUsable, holdsFocusOrNone } from './util/focus.js'
+import { isFromPanelControl, isFromPanelWidget } from './util/panel-control.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { pressPathOf, trackPress } from './util/press.js'
 
@@ -1249,12 +1250,8 @@ class Menu extends BaseComponent {
         continue
       }
 
-      // Don't auto-close when interacting with a form inside the menu — clicks
-      // on a form's labels, buttons, etc. (not just inputs) should keep it open.
-      const formAncestor = (event.target as HTMLElement).closest?.('form')
-      const isInsideMenuForm = Boolean(formAncestor) && instance._menu.contains(formAncestor!)
-      if (instance._menu.contains(event.target as HTMLElement) && ((event.type === 'keyup' && event.key === TAB_KEY) ||
-          /input|select|option|textarea|form/i.test((event.target as HTMLElement).tagName) || isInsideMenuForm)) {
+      if ((event.type === 'keyup' && event.key === TAB_KEY && instance._menu.contains(event.target as HTMLElement)) ||
+          isFromPanelControl(event, instance._menu, instance.constructor.SELECTOR_ITEM)) {
         continue
       }
 
@@ -1282,13 +1279,25 @@ class Menu extends BaseComponent {
 
     const isSubmenuTrigger = (event.target as Element).matches(this.SELECTOR_SUBMENU_TOGGLE)
     const isSpaceOnLinkToggle = event.key === SPACE_KEY && delegateTarget === event.target && delegateTarget.matches(`a${this.SELECTOR_DATA_TOGGLE}`)
+    const isSpaceOnLinkItem = event.key === SPACE_KEY && !isSubmenuTrigger && (event.target as Element).matches(`a${this.SELECTOR_ITEM}:not(${this.SELECTOR_DATA_TOGGLE})`) &&
+      Boolean((event.target as Element).closest(SELECTOR_MENU_FAMILY)?.matches('[role="menu"]'))
 
     if (!isUpOrDownEvent && !isEscapeEvent && !isLeftOrRightEvent && !isHomeOrEndEvent &&
-        !(isEnterOrSpaceEvent && isSubmenuTrigger) && !isSpaceOnLinkToggle) {
+        !(isEnterOrSpaceEvent && isSubmenuTrigger) && !isSpaceOnLinkToggle && !isSpaceOnLinkItem) {
       return
     }
 
-    if ((isInput && !isEscapeEvent) || (delegateTarget.matches(SELECTOR_MENU_FAMILY) && (event.target as Element).closest(SELECTOR_MENU_FAMILY) !== delegateTarget)) {
+    const panel = (event.target as Element).closest(SELECTOR_MENU_FAMILY)
+
+    if ((isInput && !isEscapeEvent) || (delegateTarget.matches(SELECTOR_MENU_FAMILY) && panel !== delegateTarget) ||
+        (!isEscapeEvent && panel && isFromPanelWidget(event, panel, this.SELECTOR_ITEM))) {
+      return
+    }
+
+    if (isSpaceOnLinkItem) {
+      const item = event.target as HTMLElement
+      event.preventDefault()
+      item.click()
       return
     }
 

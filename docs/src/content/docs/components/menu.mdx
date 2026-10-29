@@ -493,7 +493,7 @@ Use `data-coreui-offset` or `data-coreui-reference` to change the location of th
 
 ### Auto close behavior
 
-By default, the menu is closed when clicking inside or outside the menu. You can use the `autoClose` option to change this behavior of the menu. A press that starts inside the menu or on its toggle and ends outside, as when you select text in a field of the menu, is not a click outside.
+By default, the menu is closed when clicking inside or outside the menu. You can use the `autoClose` option to change this behavior of the menu. A press that starts inside the menu or on its toggle and ends outside, as when you select text in a field of the menu, is not a click outside. A click inside the menu on a form field, a `<label>`, an element with the `checkbox`, `combobox`, `radio`, `slider`, `spinbutton`, `switch` or `textbox` role, or anything in a `<form>` other than a menu item leaves the menu open. A click on a menu item, or on an option of a grid, list box or tree in the menu, closes it as usual.
 
 In a `role="menu"` panel <kbd>Tab</kbd> closes the menu whatever the setting. Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is within the menu (its toggle or items) closes the menu and returns focus to the toggle, and inside a submenu it closes only that submenu and returns focus to its trigger. Choosing an item closes the menu and returns focus to the toggle, while a click outside closes the menu and leaves the focus where it lands. A `hide.coreui.menu` listener that calls `preventDefault()` keeps the menu open and the focus in place.
 
@@ -584,12 +584,12 @@ Menus include built-in keyboard support for navigating menu items.
 | `↓` / `↑` | Navigate to next/previous menu item, stopping at the ends of the list unless `loopFocus` is set |
 | `→` | Enter submenu (or `←` in RTL) |
 | `←` | Exit submenu and return to parent (or `→` in RTL) |
-| `Enter` / `Space` | On a button toggle, open the menu; with `role="menu"` the focus moves to the first item. On an item, activate it or open its submenu. `Space` opens a menu with `role="menu"` from a link toggle (`<a role="button">`) too; on a link toggle without the role it does nothing, use `Enter` |
+| `Enter` / `Space` | On a button toggle, open the menu; with `role="menu"` the focus moves to the first item. On an item, activate it or open its submenu. `Space` opens a menu with `role="menu"` from a link toggle (`<a role="button">`) and activates a link item in a `role="menu"` panel; on a link toggle or item without the role it does not activate it, use `Enter` |
 | `Esc` | In a submenu, close only that submenu and return focus to its trigger; elsewhere, close the menu and return focus to the toggle |
 | `Home` / `End` | Jump to first/last menu item |
 | `Tab` / `Shift`+`Tab` | With `role="menu"`, close the menu whatever `autoClose` says: `Tab` moves on to the element after the toggle, `Shift`+`Tab` to the toggle. A `hide.coreui.menu` listener that calls `preventDefault()` keeps the menu open and the focus on the item. Without `role="menu"`, move to the next or previous element: moving within the menu closes the submenu the focus leaves, leaving the menu closes it when `autoClose` is `true` or `'outside'`, and `Shift`+`Tab` back onto the toggle keeps it open. With `container`, `Tab` from the toggle enters the panel and `Tab` from its last element moves on after the toggle |
 
-Arrow keys, `Home` and `End` pressed in a field inside the menu stay with the field.
+Arrow keys, `Home` and `End` pressed in a field, an editable region or a widget with its own keys inside the menu (a slider, a list box, a radio group, a toolbar) stay with that control.
 
 ## Usage
 
@@ -644,7 +644,7 @@ menu.toggle()
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `autoClose` | boolean, string | `true` | Configure the auto close behavior of the menu: <ul class="my-3"><li>`true` - the menu will be closed by clicking outside or inside the menu.</li><li>`false` - the menu will be closed by clicking the toggle button and manually calling `hide` or `toggle` method. (Also will not be closed by pressing <kbd>Esc</kbd> key)</li><li>`'inside'` - the menu will be closed (only) by clicking inside the menu.</li> <li>`'outside'` - the menu will be closed (only) by clicking outside the menu.</li></ul> Note: the menu can always be closed with the <kbd>Esc</kbd> key, and a menu with `role="menu"` with <kbd>Tab</kbd>. |
+| `autoClose` | boolean, string | `true` | Configure the auto close behavior of the menu: <ul class="my-3"><li>`true` - the menu will be closed by clicking outside or inside the menu.</li><li>`false` - the menu will be closed by clicking the toggle button and manually calling `hide` or `toggle` method. <kbd>Esc</kbd> still closes it.</li><li>`'inside'` - the menu will be closed (only) by clicking inside the menu.</li> <li>`'outside'` - the menu will be closed (only) by clicking outside the menu.</li></ul> Note: the menu can always be closed with the <kbd>Esc</kbd> key, and a menu with `role="menu"` with <kbd>Tab</kbd>. |
 | `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the menu (applies only to the shift middleware). By default it’s `clippingParents` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI’s [shift docs](https://floating-ui.com/docs/shift). |
 | `container` | string, element, boolean | `false` | Appends the menu to a specific element when shown. Use `'body'` or `true` to append to the document body, which helps escape containers with `overflow: hidden`. The menu is moved back to its original position when hidden. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. |

@@ -1131,8 +1131,28 @@ describe('ContextMenu', () => {
         expect(press(menu, ' ')).toBeTrue()
         expect(press(menu, 'PageDown')).toBeTrue()
         expect(press(document.body, 'PageUp')).toBeTrue()
-        expect(press(item, ' ')).toBeFalse()
+        expect(press(item, 'PageDown')).toBeFalse()
         expect(press(menu, 'a')).toBeFalse()
+      })
+
+      rightClick(area)
+      return done
+    })
+
+    it('should activate a link item with Space', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const item = fixtureEl.querySelector('.menu-item')
+      const onClick = jasmine.createSpy('click').and.callFake(event => event.preventDefault())
+      item.addEventListener('click', onClick)
+
+      const done = whenShown(area, () => {
+        const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: ' ' })
+        item.dispatchEvent(event)
+
+        expect(event.defaultPrevented).toBeTrue()
+        expect(onClick).toHaveBeenCalledTimes(1)
       })
 
       rightClick(area)

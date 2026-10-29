@@ -227,6 +227,16 @@
         "default": "./js/dist/util/option-tree.js"
       }
     },
+    "./utils/panel-control": {
+      "import": {
+        "types": "./js/dist/util/panel-control.d.mts",
+        "default": "./js/dist/util/panel-control.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/panel-control.d.ts",
+        "default": "./js/dist/util/panel-control.js"
+      }
+    },
     "./utils/press": {
       "import": {
         "types": "./js/dist/util/press.d.mts",
