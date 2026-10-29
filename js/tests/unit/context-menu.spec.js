@@ -569,6 +569,41 @@ describe('ContextMenu', () => {
       expect(paste.getAttribute('aria-disabled')).toBeNull()
     })
 
+    it('should keep aria-disabled the page wrote on an item without the disabled class', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" data-coreui-toggle="context-menu">Right click here</div>',
+        '<div class="menu">',
+        '  <button class="menu-item" type="button" aria-disabled="true">Delete</button>',
+        '</div>'
+      ].join('')
+
+      const contextMenu = new ContextMenu(fixtureEl.querySelector('.area'))
+
+      contextMenu.show()
+      contextMenu.update()
+
+      expect(fixtureEl.querySelector('.menu-item').getAttribute('aria-disabled')).toEqual('true')
+    })
+
+    it('should keep the group and separator roles the page gave to list wrappers', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" data-coreui-toggle="context-menu">Right click here</div>',
+        '<div class="menu">',
+        '  <ul class="group" role="group" aria-label="Sort by">',
+        '    <li class="wrap"><button class="menu-item" type="button" role="menuitemradio" aria-checked="true">Name</button></li>',
+        '  </ul>',
+        '  <ul class="list"><li class="divider" role="separator"></li></ul>',
+        '</div>'
+      ].join('')
+
+      new ContextMenu(fixtureEl.querySelector('.area')).show()
+
+      expect(fixtureEl.querySelector('.group').getAttribute('role')).toEqual('group')
+      expect(fixtureEl.querySelector('.divider').getAttribute('role')).toEqual('separator')
+      expect(fixtureEl.querySelector('.wrap').getAttribute('role')).toEqual('none')
+      expect(fixtureEl.querySelector('.list').getAttribute('role')).toEqual('none')
+    })
+
     it('should give list wrappers of the panel role="none"', () => {
       fixtureEl.innerHTML = [
         '<div class="area" data-coreui-toggle="context-menu">Right click here</div>',

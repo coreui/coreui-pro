@@ -64,6 +64,7 @@ const DefaultType: Record<string, string> = {
 class ContextMenu extends Menu {
   declare ['constructor']: typeof ContextMenu
   protected declare _config: ContextMenuConfig
+  protected declare _disabledItems: WeakSet<Element>
   protected declare _focusFirstItem: boolean
   protected declare _point: Point | null
   protected declare _scrollBlocker: ((event: Event) => void) | null
@@ -71,6 +72,7 @@ class ContextMenu extends Menu {
   constructor(element?: string | Element | null, config?: Partial<ContextMenuConfig> | null) {
     super(element, config as Partial<MenuConfig>)
 
+    this._disabledItems = new WeakSet()
     this._focusFirstItem = false
     this._point = null
     this._scrollBlocker = null
@@ -168,7 +170,10 @@ class ContextMenu extends Menu {
       }
 
       if (!element.matches(SELECTOR_MENU_ITEM)) {
-        element.setAttribute('role', 'none')
+        if (!['group', 'separator'].includes(element.getAttribute('role')!)) {
+          element.setAttribute('role', 'none')
+        }
+
         continue
       }
 
@@ -180,7 +185,8 @@ class ContextMenu extends Menu {
 
       if (element.classList.contains('disabled')) {
         element.setAttribute('aria-disabled', 'true')
-      } else {
+        this._disabledItems.add(element)
+      } else if (this._disabledItems.delete(element)) {
         element.removeAttribute('aria-disabled')
       }
 
