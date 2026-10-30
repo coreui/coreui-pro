@@ -15,7 +15,6 @@ import {
   alignValueField, configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
 } from './util/form-validation.js'
 import { CARET_ICON } from './util/icons.js'
-import { trackPress } from './util/press.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
@@ -45,7 +44,6 @@ const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
 const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const EVENT_LIST_BOX = '.coreui.list-box'
@@ -67,7 +65,6 @@ const CLASS_NAME_VALUE = 'combobox-value'
 
 const SELECTOR_CARET = '.combobox-caret'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="combobox"]'
-const SELECTOR_DATA_TOGGLE_SHOWN = `.${CLASS_NAME_TOGGLE}.${CLASS_NAME_SHOW}`
 const SELECTOR_LIST_BOX = '.list-box'
 const SELECTOR_OPTION = '.list-box-option'
 const SELECTOR_OPTION_LABEL = '.list-box-option-label'
@@ -255,6 +252,7 @@ class Combobox extends ComboboxBase {
       return
     }
 
+    this._disposeLayer()
     this._validation.dispose()
     this._disposeFloating()
     this._disposeListBox()
@@ -657,12 +655,6 @@ class Combobox extends ComboboxBase {
   }
 
   // Static
-  static clearMenus(event: any): void {
-    for (const toggle of SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)) {
-      Combobox.getInstance(toggle)?._hideOnOutside(event)
-    }
-  }
-
   static jQueryInterface(this: any, config: any, ...args: any[]): any {
     return jQueryDispatch(this, Combobox, config, args)
   }
@@ -682,10 +674,6 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
   event.preventDefault()
   Combobox.getOrCreateInstance(this).toggle()
 })
-
-trackPress()
-EventHandler.on(document, EVENT_CLICK_DATA_API, Combobox.clearMenus)
-EventHandler.on(document, EVENT_KEYUP_DATA_API, Combobox.clearMenus)
 
 /**
  * jQuery

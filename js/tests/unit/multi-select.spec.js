@@ -7781,7 +7781,7 @@ describe('MultiSelect', () => {
     })
   })
 
-  describe('clearMenus', () => {
+  describe('outside click and Tab', () => {
     it('should keep the panel open when the press of an outside click started in the panel or the field', () => {
       fixtureEl.innerHTML = '<select></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
@@ -7812,11 +7812,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
 
-      const outsideEl = fixtureEl.querySelector('#outside')
-      const clickEvent = new Event('click', { bubbles: true })
-      Object.defineProperty(clickEvent, 'composedPath', { value: () => [outsideEl] })
-
-      MultiSelect.clearMenus(clickEvent)
+      fixtureEl.querySelector('#outside').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
@@ -7832,9 +7828,7 @@ describe('MultiSelect', () => {
       selectEl.addEventListener('hidden.coreui.multi-select', hidden)
       multiSelect.show()
 
-      const clickEvent = new Event('click', { bubbles: true })
-      Object.defineProperty(clickEvent, 'composedPath', { value: () => [fixtureEl.querySelector('#outside')] })
-      MultiSelect.clearMenus(clickEvent)
+      fixtureEl.querySelector('#outside').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
       expect(hidden).toHaveBeenCalledTimes(1)
     })
@@ -7851,20 +7845,10 @@ describe('MultiSelect', () => {
       selectEl.addEventListener('hidden.coreui.multi-select', hidden)
       multiSelect.show()
 
-      const clickEvent = new Event('click', { bubbles: true })
-      Object.defineProperty(clickEvent, 'composedPath', { value: () => [fixtureEl.querySelector('#outside')] })
-      MultiSelect.clearMenus(clickEvent)
+      fixtureEl.querySelector('#outside').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
       expect(multiSelect._isShown()).toBeTrue()
       expect(hidden).not.toHaveBeenCalled()
-    })
-
-    it('should leave closed panels alone when called without an event', () => {
-      fixtureEl.innerHTML = '<select></select>'
-      // eslint-disable-next-line no-new
-      new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }] })
-
-      expect(() => MultiSelect.clearMenus()).not.toThrow()
     })
 
     it('should not close when clicking inside the panel', () => {
@@ -7876,9 +7860,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const clickEvent = new Event('click', { bubbles: true })
-      Object.defineProperty(clickEvent, 'composedPath', { value: () => [multiSelect._menu] })
-      MultiSelect.clearMenus(clickEvent)
+      multiSelect._menu.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
       expect(multiSelect._isShown()).toBeTrue()
     })
@@ -7892,10 +7874,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const event = new Event('click', { bubbles: true })
-      Object.defineProperty(event, 'button', { value: 2 })
-
-      MultiSelect.clearMenus(event)
+      fixtureEl.querySelector('#outside').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, button: 2 }))
 
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
@@ -7909,10 +7888,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const event = new Event('keyup', { bubbles: true })
-      Object.defineProperty(event, 'key', { value: 'a' })
-
-      MultiSelect.clearMenus(event)
+      document.body.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'a' }))
 
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
@@ -7926,12 +7902,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const outsideEl = fixtureEl.querySelector('#outside')
-      const event = new Event('keyup', { bubbles: true })
-      Object.defineProperty(event, 'key', { value: 'Tab' })
-      Object.defineProperty(event, 'composedPath', { value: () => [outsideEl] })
-
-      MultiSelect.clearMenus(event)
+      fixtureEl.querySelector('#outside').dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Tab' }))
 
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
@@ -7945,10 +7916,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const clickEvent = new Event('click', { bubbles: true })
-      Object.defineProperty(clickEvent, 'composedPath', { value: () => [multiSelect._wrapperElement] })
-
-      MultiSelect.clearMenus(clickEvent)
+      multiSelect._wrapperElement.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })

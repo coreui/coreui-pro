@@ -21,7 +21,6 @@ import { type ValidationState } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { getRemovalNeighbor, isTypingKey } from './util/list-navigation.js'
 import { flattenOptions, isOptionGroup } from './util/option-tree.js'
-import { trackPress } from './util/press.js'
 import {
   type CountLabel, createSelectionStore, fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit,
   resolveCountLabel, type SelectionState
@@ -62,7 +61,6 @@ const SELECTOR_SEARCH = '.multi-select-search'
 const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
 const SELECTOR_TEXT_ENTRY = 'input, textarea, select, [contenteditable=""], [contenteditable="true"]'
 const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
-const SELECTOR_SELECT = 'select.multi-select'
 const SELECTOR_SELECTION = '.multi-select-selection'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
@@ -72,8 +70,6 @@ const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
 const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY}`
-const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_CHIP_REMOVE = 'remove.coreui.chip'
 
@@ -427,6 +423,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   override dispose(): void {
+    this._disposeLayer()
     this._validation.dispose()
     this._destroySelect()
 
@@ -1833,12 +1830,6 @@ class MultiSelect extends ComboboxBase {
   static jQueryInterface(this: any, config: any, ...args: any[]): any {
     return jQueryDispatch(this, MultiSelect, config, args)
   }
-
-  static clearMenus(event: any): void {
-    for (const select of SelectorEngine.find(SELECTOR_SELECT)) {
-      MultiSelect.getInstance(select)?._hideOnOutside(event)
-    }
-  }
 }
 
 /**
@@ -1850,9 +1841,6 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
     MultiSelect.multiSelectInterface(multiSelect)
   }
 })
-trackPress()
-EventHandler.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus)
-EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus)
 
 /**
  * jQuery
