@@ -553,6 +553,13 @@ describe('layers', () => {
 
     expect(escape(el('#inner')).defaultPrevented).toBeTrue()
     expect(e.open).toBeFalse()
+
+    const anchored = layer('anchored', { anchor: el('#inner'), parts: [el('#d-panel')], refuses: ['sibling'] })
+    registerLayer(anchored)
+    el('#inner').addEventListener('keydown', event => handleEscape(event, anchored))
+
+    expect(escape(el('#inner')).defaultPrevented).toBeTrue()
+    expect(anchored.open).toBeFalse()
     el('#n').close()
   })
 

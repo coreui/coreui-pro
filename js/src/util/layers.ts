@@ -415,7 +415,7 @@ export const handleEscape = (event: KeyboardEvent, entry: LayerEntry): boolean =
   const dialog = (event.composedPath()[0] as Element | undefined)?.closest?.('dialog[open]')
 
   if (event.key !== 'Escape' || event.defaultPrevented || !record || !entry.isOpen() ||
-      (dialog && !entry.parts().some(part => part && dialog.contains(part)))) {
+      (dialog && ![entry.anchor(), ...entry.parts()].some(node => node && dialog.contains(node)))) {
     return false
   }
 
