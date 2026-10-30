@@ -341,28 +341,30 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
  *
  * @param event - The keydown
  * @param entry - The layer the listener belongs to
+ * @returns `true` when the Escape stops here, so a framework can stop its own propagation too
  */
-export const handleEscape = (event: KeyboardEvent, entry: LayerEntry): void => {
+export const handleEscape = (event: KeyboardEvent, entry: LayerEntry): boolean => {
   const record = recordOf(entry)
 
   if (event.key !== 'Escape' || event.defaultPrevented || !record || !entry.isOpen()) {
-    return
+    return false
   }
 
   event.stopPropagation()
 
   if (event.repeat) {
     event.preventDefault()
-    return
+    return true
   }
 
   // eslint-disable-next-line unicorn/prefer-keyboard-event-key -- Safari reports an IME composition only as keyCode 229
   if (event.isComposing || event.keyCode === 229) {
-    return
+    return true
   }
 
   event.preventDefault()
   request(record, 'escape', event, true)
+  return true
 }
 
 /**

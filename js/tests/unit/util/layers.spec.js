@@ -301,6 +301,8 @@ describe('layers', () => {
     const refused = escape(el('#k-item'))
 
     expect(refused.defaultPrevented).toBeTrue()
+    expect(handleEscape(new KeyboardEvent('keydown', { key: 'Escape' }), k)).toBeTrue()
+    expect(handleEscape(new KeyboardEvent('keydown', { key: 'Enter' }), k)).toBeFalse()
     expect(k.open).toBeTrue()
 
     const accepted = escape(el('#item'))
