@@ -401,6 +401,16 @@ export const closeLayersIn = (container: Element): void => {
 }
 
 /**
+ * Returns the anchor of the deepest open layer that holds an element, so a dialog opened from an
+ * item of a menu that closes on the way can hand the focus to the menu's toggle afterwards.
+ *
+ * @param element - The element, typically the trigger of a dialog
+ * @returns The anchor, or `null` when no open layer holds the element
+ */
+export const getLayerAnchorFor = (element: Element): Element | null =>
+  getState().stack.findLast(record => inParts(record, element))?.entry.anchor() ?? null
+
+/**
  * Returns the parent of a registered layer.
  *
  * @param entry - The layer

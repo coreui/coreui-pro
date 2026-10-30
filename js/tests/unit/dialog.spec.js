@@ -1724,6 +1724,37 @@ describe('Dialog', () => {
     })
   })
 
+  describe('layers', () => {
+    it('should close the dropdown it opens from and hand the focus to the dropdown toggle after it hides', async () => {
+      fixtureEl.innerHTML = [
+        '<style>.dropdown-menu:not(.show) { display: none; }</style>',
+        '<div class="dropdown"><button type="button" id="dd" data-coreui-toggle="dropdown" data-coreui-auto-close="outside">D</button>',
+        '<div class="dropdown-menu"><button type="button" class="dropdown-item" id="item" data-coreui-toggle="dialog" data-coreui-target="#d">Open</button></div></div>',
+        '<dialog class="dialog dialog-instant" id="d"></dialog>'
+      ].join('')
+
+      const dialogEl = fixtureEl.querySelector('#d')
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dd'))
+      const once = type => new Promise(resolve => {
+        dialogEl.addEventListener(type, resolve, { once: true })
+      })
+
+      dropdown.show()
+      fixtureEl.querySelector('#item').focus()
+      const shown = once('shown.coreui.dialog')
+      fixtureEl.querySelector('#item').click()
+      await shown
+
+      expect(dropdown._isShown()).toBeFalse()
+
+      const hidden = once('hidden.coreui.dialog')
+      Dialog.getInstance(dialogEl).hide()
+      await hidden
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#dd'))
+    })
+  })
+
   describe('jQueryInterface', () => {
     it('should create a dialog', () => {
       fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'

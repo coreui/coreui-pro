@@ -1,5 +1,5 @@
 import {
-  closeLayersIn, getParentLayer, handleEscape, isInDescendantParts, registerLayer, unregisterLayer
+  closeLayersIn, getLayerAnchorFor, getParentLayer, handleEscape, isInDescendantParts, registerLayer, unregisterLayer
 } from '../../../src/util/layers.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -372,6 +372,17 @@ describe('layers', () => {
 
     expect(calls.map(call => [call.name, call.reason])).toEqual([['inside', 'parent']])
     expect(outside.open).toBeTrue()
+  })
+
+  it('should give the anchor of the deepest open layer holding an element', () => {
+    fixtureEl.innerHTML = '<button id="d"></button><div id="d-panel"><button id="item"></button><input id="l"></div><div id="l-panel"><button id="option"></button></div><button id="free"></button>'
+
+    registerLayer(layer('d', { anchor: el('#d'), parts: [el('#d'), el('#d-panel')] }))
+    registerLayer(layer('l', { anchor: el('#l'), parts: [el('#l'), el('#l-panel')] }))
+
+    expect(getLayerAnchorFor(el('#item'))).toBe(el('#d'))
+    expect(getLayerAnchorFor(el('#option'))).toBe(el('#l'))
+    expect(getLayerAnchorFor(el('#free'))).toBeNull()
   })
 
   it('should ask a layer once per task even when several rules reach it', () => {

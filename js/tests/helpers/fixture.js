@@ -23,6 +23,17 @@ export const clearFixture = () => {
   fixtureElement.replaceChildren()
 }
 
+export const waitUntil = async (check, timeout = 1000) => {
+  const deadline = Date.now() + timeout
+
+  while (!check() && Date.now() < deadline) {
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise(resolve => {
+      setTimeout(resolve, 10)
+    })
+  }
+}
+
 export const createEvent = (eventName, parameters = {}) => {
   return new Event(eventName, parameters)
 }

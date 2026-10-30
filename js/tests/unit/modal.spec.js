@@ -1,10 +1,11 @@
 import { vi } from 'vitest'
 import Data from '../../src/dom/data.js'
 import EventHandler from '../../src/dom/event-handler.js'
+import Dropdown from '../../src/dropdown.js'
 import Modal from '../../src/modal.js'
 import { announce } from '../../src/util/announce.js'
 import {
-  clearBodyAndDocument, clearFixture, createEvent, getFixture, jQueryMock
+  clearBodyAndDocument, clearFixture, createEvent, getFixture, jQueryMock, waitUntil
 } from '../helpers/fixture.js'
 
 describe('Modal', () => {
@@ -670,6 +671,89 @@ describe('Modal', () => {
 
         trigger.click()
       })
+    })
+  })
+
+  describe('layers', () => {
+    const once = (element, type) => new Promise(resolve => {
+      element.addEventListener(type, resolve, { once: true })
+    })
+
+    const dropdownMarkup = '<div class="dropdown"><button type="button" id="dd" data-coreui-toggle="dropdown">D</button><div class="dropdown-menu"><button type="button" class="dropdown-item" id="item">I</button></div></div>'
+
+    it('should close a dropdown inside it when it hides, also when the dialog closes natively', async () => {
+      fixtureEl.innerHTML = `<dialog class="modal modal-instant">${dropdownMarkup}</dialog>`
+
+      const dialogEl = fixtureEl.querySelector('.modal')
+      const modal = new Modal(dialogEl)
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dd'))
+
+      const shown = once(dialogEl, 'shown.coreui.modal')
+      modal.show()
+      await shown
+      dropdown.show()
+      const hidden = once(dialogEl, 'hidden.coreui.modal')
+      modal.hide()
+
+      expect(dropdown._isShown()).toBeFalse()
+
+      await hidden
+
+      const shownAgain = once(dialogEl, 'shown.coreui.modal')
+      modal.show()
+      await shownAgain
+      dropdown.show()
+      const closed = once(dialogEl, 'close')
+      dialogEl.close()
+      await closed
+      await waitUntil(() => !dropdown._isShown())
+
+      expect(dropdown._isShown()).toBeFalse()
+    })
+
+    it('should close only a dropdown inside it on Escape in the dropdown', async () => {
+      fixtureEl.innerHTML = `<dialog class="modal modal-instant">${dropdownMarkup}</dialog>`
+
+      const dialogEl = fixtureEl.querySelector('.modal')
+      const modal = new Modal(dialogEl)
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dd'))
+
+      const shown = once(dialogEl, 'shown.coreui.modal')
+      modal.show()
+      await shown
+      dropdown.show()
+      fixtureEl.querySelector('#item').focus()
+      const escape = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+      fixtureEl.querySelector('#item').dispatchEvent(escape)
+
+      expect(escape.defaultPrevented).toBeTrue()
+      expect(dropdown._isShown()).toBeFalse()
+      expect(dialogEl.open).toBeTrue()
+    })
+
+    it('should close the dropdown it opens from and hand the focus to the dropdown toggle after it hides', async () => {
+      fixtureEl.innerHTML = [
+        '<style>.dropdown-menu:not(.show) { display: none; }</style>',
+        '<div class="dropdown"><button type="button" id="dd" data-coreui-toggle="dropdown" data-coreui-auto-close="outside">D</button>',
+        '<div class="dropdown-menu"><button type="button" class="dropdown-item" id="item" data-coreui-toggle="modal" data-coreui-target="#m">Open</button></div></div>',
+        '<dialog class="modal modal-instant" id="m"></dialog>'
+      ].join('')
+
+      const dialogEl = fixtureEl.querySelector('#m')
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dd'))
+      dropdown.show()
+      fixtureEl.querySelector('#item').focus()
+      const shown = once(dialogEl, 'shown.coreui.modal')
+      fixtureEl.querySelector('#item').click()
+      await shown
+
+      expect(dropdown._isShown()).toBeFalse()
+
+      const hidden = once(dialogEl, 'hidden.coreui.modal')
+      Modal.getInstance(dialogEl).hide()
+      await hidden
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#dd'))
     })
   })
 
