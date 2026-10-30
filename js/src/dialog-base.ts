@@ -14,6 +14,7 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { holdAnnouncements } from './util/announce.js'
+import { registerLayer, unregisterLayer, type LayerEntry } from './util/layers.js'
 import { unwrapLegacyShell } from './util/legacy-markup.js'
 
 /**
@@ -24,18 +25,6 @@ const CLASS_NAME_OPEN = 'dialog-open'
 const CLASS_NAME_HIDING = 'hiding'
 
 const SELECTOR_NAVBAR_EXPAND = '.navbar[class*="navbar-expand"]'
-
-const POPUP_DATA_KEYS = [
-  'coreui.autocomplete',
-  'coreui.combobox',
-  'coreui.context-menu',
-  'coreui.date-picker',
-  'coreui.date-range-picker',
-  'coreui.dropdown',
-  'coreui.menu',
-  'coreui.multi-select',
-  'coreui.time-picker'
-]
 
 /**
  * Class definition
@@ -57,6 +46,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   protected declare _closeHandler: (event: Event) => void
   protected declare _resizeObserver: ResizeObserver | null
   protected declare _resizeFrame: number | null
+  protected declare _layer: LayerEntry
 
   constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
@@ -67,6 +57,22 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._hiddenByComponent = !this._element?.open
     this._resizeObserver = null
     this._resizeFrame = null
+    this._layer = {
+      anchor: () => null,
+      closesOn: reason => reason === 'parent',
+      closesSiblings: () => !this._element.open && this._getShowOptions().modal,
+      dismiss: () => {
+        this.hide()
+      },
+      isOpen: () => this._element.open,
+      kind: 'dialog',
+      parts: () => [this._element]
+    }
+
+    if (this._element?.open) {
+      registerLayer(this._layer)
+    }
+
     this._addDialogListeners()
   }
 
@@ -120,6 +126,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._onBeforeShow()
 
     const { modal, preventBodyScroll } = this._getShowOptions()
+    registerLayer(this._layer)
     this._showElement({ modal, preventBodyScroll })
 
     await this._queueCallback(() => {
@@ -168,6 +175,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     // mid-navigation): close the native <dialog> and restore body scroll, or
     // `dialog-open` (overflow: hidden) stays stuck on the root element.
     if (this._element.open) {
+      unregisterLayer(this._layer, 'parent')
       this._closeAndCleanup()
     }
 
@@ -233,6 +241,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   }
 
   protected _hideElement(): void {
+    unregisterLayer(this._layer, 'parent')
     this._hideChildComponents()
 
     // .hiding must be present before close() so CSS exit transitions play.
@@ -289,15 +298,6 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
       const instance = Data.get(element, 'coreui.tooltip') ?? Data.get(element, 'coreui.popover')
       if (instance && typeof instance.hide === 'function') {
         instance.hide()
-      }
-    }
-
-    for (const element of SelectorEngine.find('*', this._element)) {
-      for (const key of POPUP_DATA_KEYS) {
-        const instance = Data.get(element, key)
-        if (instance && typeof instance.hide === 'function') {
-          instance.hide()
-        }
       }
     }
 
@@ -377,6 +377,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
         return
       }
 
+      unregisterLayer(this._layer, 'parent')
       this._hideChildComponents()
       this._closeAndCleanup()
       this._finishHide()

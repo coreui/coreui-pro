@@ -11,11 +11,13 @@ import {
 import EventHandler from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
-import { focusIfUsable, holdsFocusOrNone } from './focus.js'
+import { containsFocus, focusIfUsable } from './focus.js'
 import FocusTrap from './focustrap.js'
-import { forgetPress, pressPathOf, trackPress } from './press.js'
 import {
-  execute, getElement, getTransitionDurationFromElement
+  handleEscape, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
+} from './layers.js'
+import {
+  execute, getElement, getTransitionDurationFromElement, isDisabled, isVisible
 } from './index.js'
 
 /**
@@ -28,7 +30,6 @@ const EVENT_KEY = `.${DATA_KEY}`
 
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
-const ESCAPE_KEY = 'Escape'
 const ARROW_DOWN_KEY = 'ArrowDown'
 
 type PopupConfig = {
@@ -142,9 +143,8 @@ class Popup extends Config {
   protected declare _transition: number
   protected declare _hiding: boolean
   protected declare _previouslyFocused: HTMLElement | null
-  protected declare _clickListener: any
+  protected declare _layer: LayerEntry
   protected declare _touchListener: any
-  protected declare _keydownListener: any
   protected declare _contentKeydownListener: any
   protected declare _anchorKeydownListener: any
   protected declare _focustrap: FocusTrap | null
@@ -162,20 +162,21 @@ class Popup extends Config {
     this._transition = 0
     this._hiding = false
     this._previouslyFocused = null
-    this._clickListener = (event: Event) => {
-      const pressPath = pressPathOf(event)
-
-      if (!pressPath || this._isInside(pressPath)) {
-        return
-      }
-
-      if (execute(this._config.onBeforeHide) !== false) {
-        this._hide(false)
-      }
+    this._layer = {
+      anchor: () => this._anchor,
+      closesOn: () => true,
+      dismiss: reason => {
+        if (execute(this._config.onBeforeHide) !== false) {
+          this._hide(reason)
+        }
+      },
+      focusTarget: () => this._returnFocusTarget(),
+      isOpen: () => this._isShown,
+      kind: 'popup',
+      parts: () => [this._anchor, this._content]
     }
 
     this._touchListener = () => {}
-    this._keydownListener = null
     this._contentKeydownListener = null
     this._anchorKeydownListener = null
     this._revealPending = false
@@ -216,6 +217,7 @@ class Popup extends Config {
       return
     }
 
+    registerLayer(this._layer)
     this._isShown = true
     this._hiding = false
     const transition = ++this._transition
@@ -254,7 +256,8 @@ class Popup extends Config {
     this._hide()
   }
 
-  _hide(returnFocus = true): void {
+  _hide(reason?: LayerReason): void {
+    const { returnFocus } = unregisterLayer(this._layer, reason)
     execute(this._config.onHide)
     this._isShown = false
     this._revealPending = false
@@ -267,7 +270,7 @@ class Popup extends Config {
       this._focustrap.deactivate()
     }
 
-    if (returnFocus && this._config.returnFocus && holdsFocusOrNone(this._content)) {
+    if (returnFocus && this._config.returnFocus && !containsFocus(this._anchor)) {
       this._returnFocus()
     }
 
@@ -295,7 +298,7 @@ class Popup extends Config {
     const owesHidden = this._isShown || this._hiding
 
     if (this._isShown) {
-      this._hide(false)
+      this._hide('parent')
     }
 
     this._transition++
@@ -342,13 +345,17 @@ class Popup extends Config {
   }
 
   _returnFocus(): void {
+    focusIfUsable(this._returnFocusTarget())
+  }
+
+  _returnFocusTarget(): HTMLElement | null {
     const recorded = this._previouslyFocused
 
-    if (recorded && this._anchor?.contains(recorded) && focusIfUsable(recorded)) {
-      return
+    if (recorded?.isConnected && this._anchor?.contains(recorded) && !isDisabled(recorded) && isVisible(recorded)) {
+      return recorded
     }
 
-    focusIfUsable(this._anchor ? SelectorEngine.focusableChildren(this._anchor)[0] : null)
+    return (this._anchor && SelectorEngine.focusableChildren(this._anchor)[0]) ?? null
   }
 
   _afterTransition(transition: number, callback: () => void): void {
@@ -481,53 +488,27 @@ class Popup extends Config {
   }
 
   _addDismissListeners(): void {
-    this._keydownListener = (event: KeyboardEvent) => {
-      if (event.key === ESCAPE_KEY && !event.defaultPrevented) {
-        this.hide()
-      }
-    }
-
-    this._contentKeydownListener = (event: KeyboardEvent) => {
-      if (event.key === ESCAPE_KEY) {
-        event.preventDefault()
-        event.stopPropagation()
-        this.hide()
-      }
-    }
-
-    this._listenOutside(true)
-    EventHandler.on(document, EVENT_KEYDOWN, this._keydownListener)
+    this._contentKeydownListener = (event: KeyboardEvent) => handleEscape(event, this._layer)
+    this._listenTouch(true)
     EventHandler.on(this._content!, EVENT_KEYDOWN, this._contentKeydownListener)
     EventHandler.on(this._anchor!, EVENT_KEYDOWN, this._contentKeydownListener)
   }
 
   _removeDismissListeners(): void {
-    this._listenOutside(false)
-    EventHandler.off(document, EVENT_KEYDOWN, this._keydownListener)
+    this._listenTouch(false)
     EventHandler.off(this._content, EVENT_KEYDOWN, this._contentKeydownListener)
     EventHandler.off(this._anchor, EVENT_KEYDOWN, this._contentKeydownListener)
-    this._keydownListener = null
     this._contentKeydownListener = null
   }
 
-  _listenOutside(on: boolean): void {
+  _listenTouch(on: boolean): void {
     const method = on ? 'addEventListener' : 'removeEventListener'
-    if (on) {
-      trackPress()
-      forgetPress()
-    }
-
-    document[method]('click', this._clickListener, true)
 
     if ('ontouchstart' in document.documentElement) {
       for (const element of document.body.children) {
         element[method]('mouseover', this._touchListener)
       }
     }
-  }
-
-  _isInside(path: EventTarget[]): boolean {
-    return path.includes(this._anchor!) || path.includes(this._content!)
   }
 }
 

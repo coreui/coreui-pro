@@ -16,11 +16,11 @@ import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
+import { settleClick } from './util/layers.js'
 import { isTypingKey } from './util/list-navigation.js'
 import {
   filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, highlightMatches, isOptionGroup
 } from './util/option-tree.js'
-import { trackPress } from './util/press.js'
 import { createSelectionStore } from './util/selection-state.js'
 import {
   defineJQueryPlugin, getUID, jQueryDispatch, writeAttribute
@@ -51,8 +51,6 @@ const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
-const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_AUTOCOMPLETE = 'autocomplete'
@@ -76,7 +74,6 @@ const HOST_FIELD_ATTRIBUTES = new Set([
 ])
 
 const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]'
-const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete.${CLASS_NAME_SHOW}`
 const SELECTOR_INDICATOR = '.form-control-action'
 
 type AutocompleteConfig = {
@@ -286,6 +283,7 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
+    this._disposeLayer()
     this._validation.dispose()
     this._disposeFloating()
     this._disposeListBox()
@@ -577,6 +575,7 @@ class Autocomplete extends ComboboxBase {
     EventHandler.on(this._cleanerElement, EVENT_CLICK, (event: any) => {
       if (!this._disabled) {
         event.preventDefault()
+        settleClick(event)
         event.stopPropagation()
         this._clearByUser()
       }
@@ -1016,12 +1015,6 @@ class Autocomplete extends ComboboxBase {
   static jQueryInterface(this: any, config: any, ...args: any[]): any {
     return jQueryDispatch(this, Autocomplete, config, args)
   }
-
-  static clearMenus(event: any): void {
-    for (const toggle of SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)) {
-      Autocomplete.getInstance(toggle)?._hideOnOutside(event)
-    }
-  }
 }
 
 /**
@@ -1033,9 +1026,6 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
     Autocomplete.autocompleteInterface(autocomplete)
   }
 })
-trackPress()
-EventHandler.on(document, EVENT_CLICK_DATA_API, Autocomplete.clearMenus)
-EventHandler.on(document, EVENT_KEYUP_DATA_API, Autocomplete.clearMenus)
 
 /**
  * jQuery

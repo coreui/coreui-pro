@@ -1,4 +1,5 @@
 import Combobox from '../../src/combobox.js'
+import Dropdown from '../../src/dropdown.js'
 import { updateValidationState } from '../../src/util/form-validation.js'
 import { CARET_ICON } from '../../src/util/icons.js'
 import { DefaultAllowlist } from '../../src/util/sanitizer.js'
@@ -1542,7 +1543,87 @@ describe('Combobox', () => {
     })
   })
 
-  describe('clearMenus', () => {
+  describe('layers', () => {
+    const setMarkupInDropdown = () => {
+      const toggle = setMarkup()
+      const dropdown = document.createElement('div')
+      dropdown.className = 'dropdown'
+      dropdown.innerHTML = '<button class="btn" type="button" id="dd-toggle" data-coreui-toggle="dropdown">D</button><div class="dropdown-menu" id="dd-menu"></div>'
+      dropdown.querySelector('#dd-menu').append(...fixtureEl.childNodes)
+      fixtureEl.append(dropdown)
+      return { dropdown: new Dropdown(fixtureEl.querySelector('#dd-toggle')), toggle }
+    }
+
+    it('should stay open when Tab moves the focus into a menu opened from its panel', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+      combobox.show()
+      const holder = document.createElement('div')
+      holder.className = 'dropdown'
+      holder.innerHTML = '<button class="btn" type="button" id="nested" data-coreui-toggle="dropdown">N</button><div class="dropdown-menu"><button type="button" id="nested-item">I</button></div>'
+      menu(combobox).append(holder)
+      const nested = new Dropdown(holder.querySelector('#nested'), { container: true })
+      nested.show()
+      const item = document.querySelector('#nested-item')
+
+      expect(menu(combobox).contains(item)).toBeFalse()
+
+      item.focus()
+      item.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Tab' }))
+
+      expect(combobox._isShown()).toBeTrue()
+      expect(nested._isShown()).toBeTrue()
+      nested.dispose()
+    })
+
+    it('should keep the dropdown open on a choice in the combobox inside it', () => {
+      const { dropdown, toggle } = setMarkupInDropdown()
+      const combobox = new Combobox(toggle)
+      dropdown.show()
+      combobox.show()
+      option(combobox, 'uk').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+
+      expect(combobox._isShown()).toBeFalse()
+      expect(dropdown._isShown()).toBeTrue()
+    })
+
+    it('should close the combobox with the dropdown and hand the focus to the dropdown toggle', () => {
+      const { dropdown, toggle } = setMarkupInDropdown()
+      const combobox = new Combobox(toggle)
+      dropdown.show()
+      combobox.show()
+      option(combobox, 'uk').focus()
+      dropdown.hide()
+
+      expect(combobox._isShown()).toBeFalse()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#dd-toggle'))
+    })
+
+    it('should close only the combobox on Escape in its list', () => {
+      const { dropdown, toggle } = setMarkupInDropdown()
+      const combobox = new Combobox(toggle)
+      dropdown.show()
+      combobox.show()
+      menu(combobox).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
+
+      expect(combobox._isShown()).toBeFalse()
+      expect(dropdown._isShown()).toBeTrue()
+    })
+
+    it('should close an open dropdown elsewhere when it opens', () => {
+      const toggle = setMarkup()
+      fixtureEl.insertAdjacentHTML('beforeend', '<div class="dropdown"><button type="button" id="other" data-coreui-toggle="dropdown">O</button><div class="dropdown-menu"></div></div>')
+      const other = new Dropdown(fixtureEl.querySelector('#other'))
+      const combobox = new Combobox(toggle)
+      other.show()
+      combobox.show()
+
+      expect(other._isShown()).toBeFalse()
+      expect(combobox._isShown()).toBeTrue()
+    })
+  })
+
+  describe('outside click and Tab', () => {
     it('should close on a click outside that does not land on the path of an earlier press in the panel', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle)
@@ -1575,30 +1656,32 @@ describe('Combobox', () => {
       expect(combobox._isShown()).toBeFalse()
     })
 
-    it('should close the panel on a click outside the toggle and the panel', () => {
+    it('should close the panel on a click outside the toggle and the panel, and keep it on one inside the panel', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle)
 
       combobox.show()
+      menu(combobox).dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
-      const event = new MouseEvent('click', { button: 0, bubbles: true })
-      Object.defineProperty(event, 'composedPath', { value: () => [document.body] })
-      Combobox.clearMenus(event)
+      expect(combobox._isShown()).toBeTrue()
+
+      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
       expect(combobox._isShown()).toBeFalse()
     })
 
-    it('should keep the panel open on a click inside the panel', () => {
+    it('should close on Tab keyup outside the field and the panel, but not on another key', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle)
 
       combobox.show()
-
-      const event = new MouseEvent('click', { button: 0, bubbles: true })
-      Object.defineProperty(event, 'composedPath', { value: () => [menu(combobox)] })
-      Combobox.clearMenus(event)
+      document.body.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'a' }))
 
       expect(combobox._isShown()).toBeTrue()
+
+      document.body.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Tab' }))
+
+      expect(combobox._isShown()).toBeFalse()
     })
   })
 

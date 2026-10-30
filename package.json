@@ -207,6 +207,16 @@
         "default": "./js/dist/util/form-validation.js"
       }
     },
+    "./utils/layers": {
+      "import": {
+        "types": "./js/dist/util/layers.d.mts",
+        "default": "./js/dist/util/layers.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/layers.d.ts",
+        "default": "./js/dist/util/layers.js"
+      }
+    },
     "./utils/list-navigation": {
       "import": {
         "types": "./js/dist/util/list-navigation.d.mts",

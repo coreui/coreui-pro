@@ -1,6 +1,13 @@
 import { userEvent } from 'vitest/browser'
+import Autocomplete from '../../src/autocomplete.js'
+import Chip from '../../src/chip.js'
+import DatePicker from '../../src/date-picker.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Dropdown from '../../src/dropdown.js'
+import Menu from '../../src/menu.js'
+import Modal from '../../src/modal.js'
+import MultiSelect from '../../src/multi-select.js'
+import { getLayerFocusTargetFor, registerLayer, unregisterLayer } from '../../src/util/layers.js'
 import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
@@ -1019,6 +1026,134 @@ describe('Dropdown', () => {
     })
   })
 
+  describe('layers', () => {
+    const stoppedClicks = [
+      ['the cleaner of a date picker', host => {
+        host.innerHTML = '<div id="dp"></div>'
+        DatePicker.getOrCreateInstance(host.querySelector('#dp'), { date: new Date(2026, 7, 23) })
+        return host.querySelector('.form-control-cleaner')
+      }],
+      ['the cleaner of an autocomplete', host => {
+        host.innerHTML = '<div id="ac"></div>'
+        Autocomplete.getOrCreateInstance(host.querySelector('#ac'), { cleaner: true, options: ['One'], value: 'One' })
+        return host.querySelector('.form-control-cleaner')
+      }],
+      ['the remove button of a chip', host => {
+        host.innerHTML = '<span class="chip" id="chip">One</span>'
+        Chip.getOrCreateInstance(host.querySelector('#chip'), { removable: true })
+        return host.querySelector('.chip-remove')
+      }],
+      ['a disabled item of a menu that stays open', host => {
+        host.innerHTML = '<div><button id="m" data-coreui-toggle="menu" data-coreui-auto-close="inside">M</button><div class="menu" role="menu"><button class="menu-item disabled" id="off">Off</button></div></div>'
+        new Menu(host.querySelector('#m')).show()
+        return host.querySelector('#off')
+      }],
+      ['a submenu trigger of a menu that stays open', host => {
+        host.innerHTML = '<div><button id="m" data-coreui-toggle="menu" data-coreui-auto-close="inside">M</button><div class="menu"><div class="submenu"><button class="menu-item" id="sub">Sub</button><div class="menu"><button class="menu-item">Deep</button></div></div></div></div>'
+        new Menu(host.querySelector('#m')).show()
+        return host.querySelector('#sub')
+      }]
+    ]
+
+    for (const [name, build] of stoppedClicks) {
+      it(`should close on a click on ${name}, which the component stops`, () => {
+        const host = document.createElement('div')
+        fixtureEl.append(host)
+        const target = build(host)
+        const holder = document.createElement('div')
+        holder.className = 'dropdown'
+        holder.innerHTML = '<button id="dd" data-coreui-toggle="dropdown">D</button><div class="dropdown-menu"><button class="dropdown-item">Item</button></div>'
+        fixtureEl.append(holder)
+        const dropdown = new Dropdown(holder.querySelector('#dd'))
+        dropdown.show()
+        target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        target.click()
+
+        expect(dropdown._isShown()).toBeFalse()
+      })
+    }
+
+    it('should give the field the user works in as the focus target of a combobox or picker panel', () => {
+      fixtureEl.innerHTML = [
+        '<div id="ac"></div>',
+        '<select id="ms" multiple><option value="1" selected>One</option><option value="2">Two</option></select>',
+        '<div id="dp"></div>'
+      ].join('')
+
+      const autocomplete = Autocomplete.getOrCreateInstance(fixtureEl.querySelector('#ac'), { options: ['One'] })
+      autocomplete.show()
+
+      expect(getLayerFocusTargetFor(autocomplete._menu)).toEqual(fixtureEl.querySelector('#ac input'))
+
+      const multiSelect = MultiSelect.getOrCreateInstance(fixtureEl.querySelector('#ms'), { search: true, selectionType: 'chips' })
+      multiSelect.show()
+
+      expect(getLayerFocusTargetFor(multiSelect._menu)).toEqual(multiSelect._searchElement)
+
+      const picker = DatePicker.getOrCreateInstance(fixtureEl.querySelector('#dp'), { date: new Date(2026, 7, 23) })
+      const toggle = fixtureEl.querySelector('#dp [aria-haspopup]')
+      toggle.focus()
+      picker.show()
+
+      expect(getLayerFocusTargetFor(document.querySelector('.date-picker-popup'))).toEqual(toggle)
+    })
+
+    it('should hand the focus back to the field of a combobox panel that a layer opening from code closes', () => {
+      fixtureEl.innerHTML = '<div id="ac"></div><div id="other"></div>'
+
+      const autocomplete = Autocomplete.getOrCreateInstance(fixtureEl.querySelector('#ac'), { options: ['One', 'Two'] })
+      autocomplete.show()
+      const inside = document.createElement('button')
+      autocomplete._menu.append(inside)
+      inside.focus()
+      const other = {
+        anchor: () => null,
+        closesOn: () => true,
+        dismiss: () => unregisterLayer(other),
+        isOpen: () => true,
+        kind: 'popup',
+        parts: () => [fixtureEl.querySelector('#other')]
+      }
+      registerLayer(other)
+      unregisterLayer(other)
+
+      expect(autocomplete._isShown()).toBeFalse()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#ac input'))
+    })
+
+    it('should leave an open dropdown alone when a dialog open in its markup starts', () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown"><button id="dd" data-coreui-toggle="dropdown">D</button><div class="dropdown-menu"><button class="dropdown-item">Item</button></div></div>',
+        '<dialog class="modal" id="m" open></dialog>'
+      ].join('')
+
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dd'))
+      dropdown.show()
+      Modal.getOrCreateInstance(fixtureEl.querySelector('#m'))
+
+      expect(dropdown._isShown()).toBeTrue()
+    })
+
+    it('should close an open menu when it opens, and the reverse', () => {
+      fixtureEl.innerHTML = [
+        '<div><button id="menu-toggle" data-coreui-toggle="menu">Menu</button><div class="menu"><button class="menu-item">Item</button></div></div>',
+        '<div class="dropdown"><button id="dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button><div class="dropdown-menu"><button class="dropdown-item">Item</button></div></div>'
+      ].join('')
+
+      const menu = new Menu(fixtureEl.querySelector('#menu-toggle'))
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dropdown-toggle'))
+      menu.show()
+      dropdown.show()
+
+      expect(menu._isShown()).toBeFalse()
+      expect(dropdown._isShown()).toBeTrue()
+
+      menu.show()
+
+      expect(dropdown._isShown()).toBeFalse()
+    })
+  })
+
   describe('hide', () => {
     it('should hide a dropdown', () => {
       return new Promise(resolve => {
@@ -1558,55 +1693,43 @@ describe('Dropdown', () => {
     })
 
     it('should remove "show" class if body is clicked, with multiple dropdowns', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<div class="nav">',
-          '  <div class="dropdown" id="testmenu">',
-          '    <a class="dropdown-toggle" data-coreui-toggle="dropdown" href="#testmenu">Test menu</a>',
-          '    <div class="dropdown-menu">',
-          '      <a class="dropdown-item" href="#sub1">Submenu 1</a>',
-          '    </div>',
-          '  </div>',
-          '</div>',
-          '<div class="btn-group">',
-          '  <button class="btn">Actions</button>',
-          '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown"></button>',
-          '  <div class="dropdown-menu">',
-          '    <a class="dropdown-item" href="#">Action 1</a>',
-          '  </div>',
-          '</div>'
-        ].join('')
+      fixtureEl.innerHTML = [
+        '<div class="nav">',
+        '  <div class="dropdown" id="testmenu">',
+        '    <a class="dropdown-toggle" data-coreui-toggle="dropdown" href="#testmenu">Test menu</a>',
+        '    <div class="dropdown-menu">',
+        '      <a class="dropdown-item" href="#sub1">Submenu 1</a>',
+        '    </div>',
+        '  </div>',
+        '</div>',
+        '<div class="btn-group">',
+        '  <button class="btn">Actions</button>',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown"></button>',
+        '  <div class="dropdown-menu">',
+        '    <a class="dropdown-item" href="#">Action 1</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
 
-        const triggerDropdownList = fixtureEl.querySelectorAll('[data-coreui-toggle="dropdown"]')
+      const [triggerFirst, triggerLast] = fixtureEl.querySelectorAll('[data-coreui-toggle="dropdown"]')
 
-        expect(triggerDropdownList).toHaveSize(2)
+      triggerFirst.click()
 
-        const [triggerDropdownFirst, triggerDropdownLast] = triggerDropdownList
+      expect(triggerFirst).toHaveClass('show')
+      expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(1)
 
-        triggerDropdownFirst.addEventListener('shown.coreui.dropdown', () => {
-          expect(triggerDropdownFirst).toHaveClass('show')
-          expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(1)
-          document.body.click()
-        })
+      document.body.click()
 
-        triggerDropdownFirst.addEventListener('hidden.coreui.dropdown', () => {
-          expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(0)
-          triggerDropdownLast.click()
-        })
+      expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(0)
 
-        triggerDropdownLast.addEventListener('shown.coreui.dropdown', () => {
-          expect(triggerDropdownLast).toHaveClass('show')
-          expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(1)
-          document.body.click()
-        })
+      triggerLast.click()
 
-        triggerDropdownLast.addEventListener('hidden.coreui.dropdown', () => {
-          expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(0)
-          resolve()
-        })
+      expect(triggerLast).toHaveClass('show')
+      expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(1)
 
-        triggerDropdownFirst.click()
-      })
+      document.body.click()
+
+      expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(0)
     })
 
     it('should remove "show" class if body if tabbing outside of menu, with multiple dropdowns', () => {
@@ -2233,8 +2356,7 @@ describe('Dropdown', () => {
           expect(document.activeElement).toEqual(elementToDispatch, `${elementToDispatch.tagName} still focused`)
         }
 
-        const keydownEscape = createEvent('keydown')
-        keydownEscape.key = 'Escape'
+        const keydownEscape = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
 
         triggerDropdown.addEventListener('shown.coreui.dropdown', () => {
           // Key Space
@@ -2289,8 +2411,7 @@ describe('Dropdown', () => {
         // Key escape
         button.focus()
         // Key escape
-        const keydownEscape = createEvent('keydown')
-        keydownEscape.key = 'Escape'
+        const keydownEscape = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
         button.dispatchEvent(keydownEscape)
 
         setTimeout(() => {

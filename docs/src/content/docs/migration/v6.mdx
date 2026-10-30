@@ -1967,11 +1967,9 @@ changes:
 - **A click outside never hands the focus back.** The picker panels used to return
   it to the field on the press, before the browser moved it to what was clicked.
 - **The picker panels close on `click` instead of `pointerdown`**, like the other
-  panels, so they close when the button is released, even when the page stops the
-  propagation of the press, and a right click leaves them open. Only a press that starts
-  outside the panel and its field closes them: one that starts inside and ends outside,
-  as when you select text, and a click that no press started, as from the keyboard or
-  from code, leave them open.
+  panels, so they close when the button is released, and a right click leaves them open.
+  A press that starts inside the panel or its field and ends outside, as when you select
+  text, leaves them open.
 - **Menus, dropdowns, context menus and the panels of Autocomplete, Combobox and
   Multi Select stay open when a press that starts inside them ends outside**, as when
   you select text in a field of the panel; for a menu, a dropdown and the combobox family
@@ -1983,6 +1981,43 @@ changes:
   toggle even when a `hide` listener kept the menu or the panel open.
 - **The picker returns the focus to the element of its field that had it before
   opening**, or to the first one, never to an element outside the field.
+
+#### Open panels share one stack
+
+Menus, dropdowns, context menus, the picker panels and the panels of Autocomplete,
+Combobox and Multi Select now share one stack of open panels, with Modal, Offcanvas,
+Drawer and Dialog as the parents of what opens in them. What changes:
+
+- **Opening a panel closes the open panels it does not sit in.** A menu opened from the
+  keyboard or from code used to leave an open picker or combobox panel open, and a picker opened
+  that way left the menus open. A panel opened
+  from inside another one, as a date picker in a dropdown or a menu in a submenu, stays
+  open together with it. A menu with `autoClose: false` or `'inside'` stays open as before.
+- **A panel closes with the panel or dialog it was opened from.** Closing a dropdown closes
+  the picker or menu opened from it and, when the focus was in either, hands it to the
+  dropdown toggle. Closing a modal, offcanvas, drawer or dialog closes the panels open in
+  it, also when it closes natively (`<form method="dialog">`, `dialog.close()`), and a
+  submenu that closes closes the panels opened from it.
+- **A click outside closes every open panel it lands outside of, at once**, and a click in
+  a panel opened from another one counts as a click inside both. A click outside that no
+  press started, as from the keyboard, assistive technology or code, now closes the picker
+  panels too, and a click the page stops before it reaches the window keeps every panel
+  open.
+- **<kbd>Escape</kbd> closes the panel that holds the focus, together with the panels
+  opened from it, and goes no further**, so it never closes the dialog around the panel.
+  With the focus on no element it closes the topmost panel; with the focus in an unrelated
+  element of the page it closes nothing. A picker panel used to close on
+  <kbd>Escape</kbd> pressed anywhere on the page.
+- **A modal or dialog opened from an item of a menu that the opening closes hands the focus
+  to that menu's toggle when it hides**, since the item is hidden by then.
+- **A modal, offcanvas, drawer or dialog never closes because a panel opened or on a click
+  in one.** Opening it as a modal closes the panels open on the page under it; one that leaves the
+  page interactive leaves them open.
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+  **The `clearMenus()` statics of Combobox, Autocomplete and Multi Select are removed**;
+  the stack closes their panels. `Menu.clearMenus()` and `Dropdown.clearMenus()` stay and
+  handle a click inside a menu and <kbd>Tab</kbd> out of it; a click outside no longer
+  goes through them.
 
 #### `.form-select` is absorbed by `.form-control`
 

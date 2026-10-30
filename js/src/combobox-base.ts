@@ -11,9 +11,11 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { createAnchoredPosition } from './util/floating-ui.js'
 import { findOptionByValue, isOptionGroup } from './util/option-tree.js'
-import { focusIfUsable, holdsFocusOrNone } from './util/focus.js'
+import { focusIfUsable } from './util/focus.js'
+import {
+  handleEscape, isInDescendantParts, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
+} from './util/layers.js'
 import { resolvePopupContainer } from './util/popup.js'
-import { pressPathOf } from './util/press.js'
 import { escapeHtml } from './util/sanitizer.js'
 import { type SelectionStore } from './util/selection-state.js'
 import { executeAfterTransition, getElement } from './util/index.js'
@@ -32,10 +34,8 @@ import { executeAfterTransition, getElement } from './util/index.js'
  */
 
 const ARROW_DOWN_KEY = 'ArrowDown'
-const ESCAPE_KEY = 'Escape'
 const ENTER_KEY = 'Enter'
 const TAB_KEY = 'Tab'
-const RIGHT_MOUSE_BUTTON = 2
 
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_POPUP = 'combobox-popup'
@@ -67,6 +67,8 @@ class ComboboxBase extends BaseComponent {
   protected declare _floatingCleanup: (() => void) | null
   protected declare _widthObserver: ResizeObserver | null
   protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
+  protected declare _layerEntry: LayerEntry | undefined
+  protected declare _tabOutListener: ((event: any) => void) | undefined
 
   // Show / hide lifecycle — one event contract for every combobox surface.
   // Subclasses adjust behavior through the hooks below, never by overriding
@@ -86,6 +88,10 @@ class ComboboxBase extends BaseComponent {
     if (showEvent.defaultPrevented) {
       return
     }
+
+    registerLayer(this._getLayer())
+    this._tabOutListener ??= (event: any) => this._hideOnTabOut(event)
+    EventHandler.on(document, 'keyup', this._tabOutListener)
 
     const showTarget = this._getShowTarget()
     this._mountMenu()
@@ -108,7 +114,7 @@ class ComboboxBase extends BaseComponent {
     this._hide(true)
   }
 
-  _hide(returnFocus: boolean): void {
+  _hide(returnFocus: boolean, reason?: LayerReason): void {
     if (!this._isShown()) {
       return
     }
@@ -119,7 +125,8 @@ class ComboboxBase extends BaseComponent {
       return
     }
 
-    const refocus = returnFocus && !this._isDisabled() && holdsFocusOrNone(this._menu)
+    const refocus = unregisterLayer(this._getLayer(), reason).returnFocus && returnFocus && !this._isDisabled()
+    EventHandler.off(document, 'keyup', this._tabOutListener)
 
     this._onHideStart()
 
@@ -155,22 +162,45 @@ class ComboboxBase extends BaseComponent {
     }, this._menu)
   }
 
-  _hideOnOutside(event: any): void {
-    if (!this._isShown() || event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
+  _getLayer(): LayerEntry {
+    this._layerEntry ??= {
+      anchor: () => this._getShowTarget(),
+      closesOn: () => true,
+      dismiss: reason => this._hideFromLayer(reason),
+      focusTarget: () => this._returnFocusTarget(),
+      isOpen: () => Boolean(this._element) && this._isShown(),
+      kind: 'popup',
+      parts: () => [this._getShowTarget(), this._menu]
+    }
+
+    return this._layerEntry
+  }
+
+  _hideFromLayer(reason: LayerReason): void {
+    this._hide(true, reason)
+
+    if (reason !== 'escape' && !this._isShown()) {
+      this._afterOutsideHide()
+    }
+  }
+
+  _hideOnTabOut(event: any): void {
+    const path = event.composedPath()
+
+    if (!this._isShown() || event.key !== TAB_KEY || path.includes(this._getShowTarget()) || path.includes(this._menu) ||
+        isInDescendantParts(event, this._getLayer())) {
       return
     }
 
-    for (const path of [event.composedPath(), pressPathOf(event) ?? []]) {
-      if (path.includes(this._getShowTarget()) || path.includes(this._menu)) {
-        return
-      }
+    this._hideFromLayer('outside')
+  }
+
+  _disposeLayer(): void {
+    if (this._layerEntry && this._isShown()) {
+      unregisterLayer(this._layerEntry, 'parent')
     }
 
-    this._hide(false)
-
-    if (!this._isShown()) {
-      this._afterOutsideHide()
-    }
+    EventHandler.off(document, 'keyup', this._tabOutListener)
   }
 
   _isDisabled(): boolean {
@@ -340,14 +370,7 @@ class ComboboxBase extends BaseComponent {
   // preventDefault keeps the same press from also closing an enclosing modal
   // dialog.
   _addPanelEscapeListener(popup: HTMLElement): void {
-    EventHandler.on(popup, this.constructor.eventName('keydown'), (event: any) => {
-      if (event.key === ESCAPE_KEY) {
-        event.preventDefault()
-        event.stopPropagation()
-
-        this.hide()
-      }
-    })
+    EventHandler.on(popup, this.constructor.eventName('keydown'), (event: any) => handleEscape(event, this._getLayer()))
   }
 
   // Hooks: dropdown header (MultiSelect select-all / header template),

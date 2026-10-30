@@ -4896,7 +4896,7 @@ describe('Autocomplete', () => {
       })
     })
 
-    describe('clearMenus', () => {
+    describe('outside click and Tab', () => {
       it('should keep the panel open when the press of an outside click started in the panel or the field', () => {
         fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
@@ -4926,9 +4926,7 @@ describe('Autocomplete', () => {
 
         autocomplete.show()
 
-        const event = new MouseEvent('click', { button: 2, bubbles: true })
-        Object.defineProperty(event, 'composedPath', { value: () => [] })
-        Autocomplete.clearMenus(event)
+        document.body.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, button: 2 }))
 
         expect(autocomplete._isShown()).toBe(true)
       })
@@ -4942,9 +4940,7 @@ describe('Autocomplete', () => {
 
         autocomplete.show()
 
-        const event = new KeyboardEvent('keyup', { key: 'a', bubbles: true })
-        Object.defineProperty(event, 'composedPath', { value: () => [] })
-        Autocomplete.clearMenus(event)
+        document.body.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'a' }))
 
         expect(autocomplete._isShown()).toBe(true)
       })
@@ -4959,9 +4955,7 @@ describe('Autocomplete', () => {
         autocomplete.show()
         autocompleteEl.classList.add('show')
 
-        const event = new KeyboardEvent('keyup', { key: 'Tab', bubbles: true })
-        Object.defineProperty(event, 'composedPath', { value: () => [] })
-        Autocomplete.clearMenus(event)
+        document.body.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Tab' }))
 
         expect(autocomplete._isShown()).toBe(false)
       })
@@ -4976,9 +4970,7 @@ describe('Autocomplete', () => {
         autocomplete.show()
         autocompleteEl.classList.add('show')
 
-        const event = new MouseEvent('click', { button: 0, bubbles: true })
-        Object.defineProperty(event, 'composedPath', { value: () => [autocompleteEl] })
-        Autocomplete.clearMenus(event)
+        autocompleteEl.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
         expect(autocomplete._isShown()).toBe(true)
       })
@@ -4993,9 +4985,7 @@ describe('Autocomplete', () => {
         autocomplete.show()
         autocompleteEl.classList.add('show')
 
-        const event = new MouseEvent('click', { button: 0, bubbles: true })
-        Object.defineProperty(event, 'composedPath', { value: () => [document.body] })
-        Autocomplete.clearMenus(event)
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
         expect(autocomplete._isShown()).toBe(false)
       })
@@ -5012,9 +5002,7 @@ describe('Autocomplete', () => {
         autocompleteEl.classList.add('show')
         autocomplete._inputElement.value = 'test'
 
-        const event = new MouseEvent('click', { button: 0, bubbles: true })
-        Object.defineProperty(event, 'composedPath', { value: () => [document.body] })
-        Autocomplete.clearMenus(event)
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
         expect(autocomplete._inputElement.value).toBe('')
       })
@@ -5029,9 +5017,7 @@ describe('Autocomplete', () => {
         autocomplete.show()
         autocomplete.search('Opt')
 
-        const event = new MouseEvent('click', { button: 0, bubbles: true })
-        Object.defineProperty(event, 'composedPath', { value: () => [document.body] })
-        Autocomplete.clearMenus(event)
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
         expect(autocomplete._search).toBe('')
       })
@@ -5049,9 +5035,7 @@ describe('Autocomplete', () => {
         autocomplete._inputElement.value = 'Opt'
         autocomplete.search('Opt')
 
-        const event = new MouseEvent('click', { button: 0, bubbles: true })
-        Object.defineProperty(event, 'composedPath', { value: () => [document.body] })
-        Autocomplete.clearMenus(event)
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
         expect(autocomplete._isShown()).toBe(true)
         expect(autocomplete._inputElement.value).toBe('Opt')
@@ -5070,9 +5054,7 @@ describe('Autocomplete', () => {
         autocomplete.show()
         autocompleteEl.classList.add('show')
 
-        const event = new MouseEvent('click', { button: 0, bubbles: true })
-        Object.defineProperty(event, 'composedPath', { value: () => [document.body] })
-        Autocomplete.clearMenus(event)
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
         expect(autocomplete._inputElement.value).toBe('Option 1')
       })
@@ -5087,11 +5069,8 @@ describe('Autocomplete', () => {
         autocomplete.show()
         autocompleteEl.classList.add('show')
 
-        const event = new MouseEvent('click', { button: 0, bubbles: true })
-        Object.defineProperty(event, 'composedPath', { value: () => [document.body] })
-        Autocomplete.clearMenus(event)
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
 
-        // Should not throw
         expect(autocomplete._isShown()).toBe(false)
       })
     })

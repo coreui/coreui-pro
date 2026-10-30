@@ -13,6 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { enableDismissTrigger } from './util/component-functions.js'
 import { defineJQueryPlugin, isVisible, jQueryDispatch } from './util/index.js'
+import { getLayerFocusTargetFor } from './util/layers.js'
 import { resolveDialogElement } from './util/legacy-markup.js'
 
 /**
@@ -188,10 +189,14 @@ class Modal extends DialogBase<ModalConfig> {
   }
 
   protected static _registerFocusRestoration(target: Element, trigger: HTMLElement): void {
+    const layerTarget = getLayerFocusTargetFor(trigger)
+
     EventHandler.one(target, EVENT_HIDDEN, () => {
-      if (isVisible(trigger)) {
+      const returnTo = isVisible(trigger) ? trigger : layerTarget
+
+      if (returnTo instanceof HTMLElement && isVisible(returnTo)) {
         // Returning focus must not scroll the page back to the trigger.
-        trigger.focus({ preventScroll: true })
+        returnTo.focus({ preventScroll: true })
       }
     })
   }

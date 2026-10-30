@@ -1,5 +1,6 @@
 import Data from '../../src/dom/data.js'
 import EventHandler from '../../src/dom/event-handler.js'
+import Dropdown from '../../src/dropdown.js'
 import Offcanvas from '../../src/offcanvas.js'
 import { isVisible } from '../../src/util/index.js'
 import {
@@ -945,6 +946,17 @@ describe('Offcanvas', () => {
   })
 
   describe('child component cleanup', () => {
+    it('should close a dropdown inside an offcanvas opened in its markup when it hides', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas offcanvas-instant" open><div class="dropdown"><button type="button" id="dd" data-coreui-toggle="dropdown">D</button><div class="dropdown-menu"><button type="button" class="dropdown-item">I</button></div></div></dialog>'
+
+      const offcanvas = Offcanvas.getOrCreateInstance(fixtureEl.querySelector('.offcanvas'))
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dd'))
+      dropdown.show()
+      offcanvas.hide()
+
+      expect(dropdown._isShown()).toBeFalse()
+    })
+
     it('should hide tooltip instances inside drawer when drawer closes', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

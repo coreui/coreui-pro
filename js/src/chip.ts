@@ -12,6 +12,7 @@ import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/
 import { type ChipRemoveLabel, getChipRemoveLabel } from './util/chip-values.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch, writeAttribute } from './util/index.js'
+import { settleClick } from './util/layers.js'
 
 /**
  * Constants
@@ -227,6 +228,7 @@ class Chip extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_CLICK, SELECTOR_CHIP_REMOVE, event => {
+      settleClick(event)
       event.stopPropagation()
 
       if (this._config.removable && !this._disabled) {

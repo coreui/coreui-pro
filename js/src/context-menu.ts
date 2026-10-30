@@ -13,6 +13,7 @@ import { focusIfUsable } from './util/focus.js'
 import {
   defineJQueryPlugin, isDisabled, jQueryDispatch
 } from './util/index.js'
+import type { LayerEntry } from './util/layers.js'
 
 /**
  * Constants
@@ -64,12 +65,15 @@ class ContextMenu extends Menu {
   protected declare _config: ContextMenuConfig
   protected declare _point: Point | null
   protected declare _scrollBlocker: ((event: Event) => void) | null
+  protected declare _shown: boolean
+  protected static _opening: ContextMenu | null = null
 
   constructor(element?: string | Element | null, config?: Partial<ContextMenuConfig> | null) {
     super(element, config as Partial<MenuConfig>)
 
     this._point = null
     this._scrollBlocker = null
+    this._shown = false
   }
 
   // Getters
@@ -110,11 +114,29 @@ class ContextMenu extends Menu {
     }
 
     this._openedBy = fromKeyboard ? 'key' : 'pointer'
+    ContextMenu._opening = this
     this._show(relatedTarget)
+    ContextMenu._opening = null
     this._openedBy = null
   }
 
+  protected override _isShown(): boolean {
+    return this._shown
+  }
+
+  protected override _createLayer(): LayerEntry {
+    const layer = super._createLayer()
+
+    return {
+      ...layer,
+      closesOn: (reason, event) => (reason === 'sibling' && ContextMenu._opening?._menu === this._menu) || layer.closesOn(reason, event),
+      parts: () => [this._menu]
+    }
+  }
+
   protected override _setShown(shown: boolean): void {
+    this._shown = shown
+
     if (shown) {
       this._lockScroll()
       this._setRoles()
@@ -248,8 +270,6 @@ class ContextMenu extends Menu {
       instance.hide()
     }
 
-    Menu.clearMenus(event)
-
     // A keyboard-invoked event (Shift+F10, the Menu key) reports no coordinates
     // in some browsers; the menu then anchors to the element itself.
     const point = event.clientX || event.clientY ? { x: event.clientX, y: event.clientY } : undefined
@@ -261,7 +281,7 @@ class ContextMenu extends Menu {
   protected static _clearContextMenus(): void {
     for (const instance of Menu._openInstances) {
       if (instance instanceof ContextMenu && instance._config.autoClose !== false && instance._config.autoClose !== 'inside') {
-        instance._completeHide({ relatedTarget: instance._element }, false)
+        instance._completeHide({ relatedTarget: instance._element }, 'outside')
       }
     }
   }
@@ -299,7 +319,6 @@ class ContextMenu extends Menu {
       instance.hide()
     }
 
-    Menu.clearMenus(event)
     instance._showAt(undefined, { relatedTarget: this }, true)
   }
 

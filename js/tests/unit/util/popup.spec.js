@@ -1,3 +1,4 @@
+import Dropdown from '../../../src/dropdown.js'
 import EventHandler from '../../../src/dom/event-handler.js'
 import { noop } from '../../../src/util/index.js'
 import Popup, { resolvePopupContainer } from '../../../src/util/popup.js'
@@ -785,42 +786,32 @@ describe('Popup', () => {
       expect(popup.isShown).toBeTrue()
     })
 
-    it('should stay open on a click outside that no press started, as a keyboard click', () => {
-      const popup = buildPopup()
-      popup.show()
-
-      release(fixtureEl.querySelector('#outside'))
-
-      expect(popup.isShown).toBeTrue()
-    })
-
-    it('should stay open on a keyboard click after a press that brought no click', () => {
+    it('should hide on an outside click that no press of its own produced (keyboard, assistive technology, code)', () => {
       const popup = buildPopup()
       const outside = fixtureEl.querySelector('#outside')
-      popup.show()
 
-      outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 2 }))
-      release(outside)
+      for (const before of [
+        () => {},
+        () => outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 2 })),
+        () => outside.dispatchEvent(new PointerEvent('pointercancel', { bubbles: true, composed: true }))
+      ]) {
+        popup.show()
+        before()
+        outside.click()
 
-      expect(popup.isShown).toBeTrue()
-
-      pointerdown(outside)
-      outside.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
-      release(outside)
-
-      expect(popup.isShown).toBeTrue()
+        expect(popup.isShown).toBeFalse()
+      }
     })
 
-    it('should hide on an outside press whose handlers stop the events', () => {
+    it('should stay open when the page stops the outside click before it reaches the window', () => {
       const popup = buildPopup()
       const outside = fixtureEl.querySelector('#outside')
-      outside.addEventListener('pointerdown', event => event.stopPropagation())
       outside.addEventListener('click', event => event.stopPropagation())
       popup.show()
 
       press(outside)
 
-      expect(popup.isShown).toBeFalse()
+      expect(popup.isShown).toBeTrue()
     })
 
     it('should make the page clickable for touch while it is shown, with a listener of its own', () => {
@@ -855,37 +846,6 @@ describe('Popup', () => {
       expect(popup.isShown).toBeFalse()
     })
 
-    it('should forget a press outside when the panel closes before the click', () => {
-      const popup = buildPopup()
-      const outside = fixtureEl.querySelector('#outside')
-      popup.show()
-
-      pointerdown(outside)
-      popup.hide()
-      popup.show()
-      release(outside)
-
-      expect(popup.isShown).toBeTrue()
-    })
-
-    it('should stay open on a click from code after a press that was cancelled', () => {
-      const popup = buildPopup()
-      const outside = fixtureEl.querySelector('#outside')
-      popup.show()
-
-      pointerdown(outside)
-      outside.dispatchEvent(new PointerEvent('pointercancel', { bubbles: true, composed: true }))
-      outside.click()
-
-      expect(popup.isShown).toBeTrue()
-
-      pointerdown(outside)
-      outside.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, composed: true }))
-      outside.click()
-
-      expect(popup.isShown).toBeTrue()
-    })
-
     it('should not hand the focus back on an outside click', () => {
       const popup = buildPopup()
       const inside = fixtureEl.querySelector('#inside')
@@ -905,7 +865,7 @@ describe('Popup', () => {
       popup.show()
 
       pointerdown(fixtureEl.querySelector('#option'))
-      release(fixtureEl.querySelector('#outside'))
+      release(fixtureEl)
 
       expect(popup.isShown).toBeTrue()
 
@@ -983,32 +943,73 @@ describe('Popup', () => {
       expect(reachedDocument).not.toHaveBeenCalled()
     })
 
-    it('should hide on Escape', () => {
+    it('should hide on Escape from the panel, and from the page when the focus is on no element', () => {
       const popup = buildPopup()
       popup.show()
 
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+
+      expect(popup.isShown).toBeFalse()
+
+      popup.show()
+      document.activeElement.blur()
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
 
       expect(popup.isShown).toBeFalse()
     })
 
-    it('should not dismiss a sibling popup instance', () => {
+    it('should close an open popup when another one opens, and only the one Escape comes from', () => {
       const popupA = buildPopup()
       const contentB = document.createElement('div')
       const anchorB = document.createElement('div')
+      contentB.innerHTML = '<button type="button">B</button>'
       document.body.append(contentB, anchorB)
       const popupB = new Popup({ anchor: anchorB, content: contentB, focusTrap: false })
       popups.push(popupB)
 
       popupA.show()
       popupB.show()
-      popupA.hide()
 
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      expect(popupA.isShown).toBeFalse()
+      expect(popupB.isShown).toBeTrue()
+
+      contentB.querySelector('button').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
 
       expect(popupB.isShown).toBeFalse()
       contentB.remove()
       anchorB.remove()
+    })
+  })
+
+  describe('layers', () => {
+    it('should stay with a dropdown it opens from, and close with it', () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown"><button type="button" id="dd-toggle" data-coreui-toggle="dropdown">D</button>',
+        '<div class="dropdown-menu"><div id="anchor"><button id="inside">field</button></div></div></div>'
+      ].join('')
+
+      const content = document.createElement('div')
+      content.innerHTML = '<button type="button" id="day">1</button>'
+      document.body.append(content)
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dd-toggle'))
+      const popup = new Popup({
+        anchor: fixtureEl.querySelector('#anchor'), content, focusTrap: false, mobileBreakpoint: 0
+      })
+      popups.push(popup)
+
+      dropdown.show()
+      popup.show()
+      content.querySelector('#day').click()
+
+      expect(dropdown._isShown()).toBeTrue()
+      expect(popup.isShown).toBeTrue()
+
+      content.querySelector('#day').focus()
+      dropdown.hide()
+
+      expect(popup.isShown).toBeFalse()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#dd-toggle'))
+      content.remove()
     })
   })
 
