@@ -489,19 +489,19 @@ class Popup extends Config {
 
   _addDismissListeners(): void {
     this._contentKeydownListener = (event: KeyboardEvent) => handleEscape(event, this._layer)
-    this._listenOutside(true)
+    this._listenTouch(true)
     EventHandler.on(this._content!, EVENT_KEYDOWN, this._contentKeydownListener)
     EventHandler.on(this._anchor!, EVENT_KEYDOWN, this._contentKeydownListener)
   }
 
   _removeDismissListeners(): void {
-    this._listenOutside(false)
+    this._listenTouch(false)
     EventHandler.off(this._content, EVENT_KEYDOWN, this._contentKeydownListener)
     EventHandler.off(this._anchor, EVENT_KEYDOWN, this._contentKeydownListener)
     this._contentKeydownListener = null
   }
 
-  _listenOutside(on: boolean): void {
+  _listenTouch(on: boolean): void {
     const method = on ? 'addEventListener' : 'removeEventListener'
 
     if ('ontouchstart' in document.documentElement) {

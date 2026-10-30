@@ -214,6 +214,31 @@ describe('layers', () => {
     expect(unregisterLayer(d).returnFocus).toBeFalse()
   })
 
+  it('should take the reason of a close request from this task when the layer leaves without one, and not from an earlier task', async () => {
+    fixtureEl.innerHTML = '<div id="d-panel"><button id="item"></button></div><button id="outside"></button>'
+
+    const open = () => {
+      const d = layer('d', { parts: [el('#d-panel')] })
+      d.dismiss = () => {}
+      registerLayer(d)
+      return d
+    }
+
+    el('#item').focus()
+    let d = open()
+    el('#outside').click()
+
+    expect(unregisterLayer(d).returnFocus).toBeFalse()
+
+    d = open()
+    el('#outside').click()
+    await new Promise(resolve => {
+      setTimeout(resolve)
+    })
+
+    expect(unregisterLayer(d).returnFocus).toBeTrue()
+  })
+
   it('should move a descendant that stays open to the parent of the closing layer', () => {
     fixtureEl.innerHTML = '<div id="m"><button id="d"></button><div id="d-panel"><input id="l"></div></div>'
 

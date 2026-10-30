@@ -29,7 +29,7 @@ interface LayerState {
   closed: LayerRecord[]
   listening: WeakSet<Window>
   pressed: LayerRecord[] | null
-  requested: Set<LayerRecord>
+  requested: Map<LayerRecord, LayerReason>
   snapshots: WeakMap<Event, ClickSnapshot>
   stack: LayerRecord[]
 }
@@ -47,7 +47,7 @@ const getState = (): LayerState => {
     closed: [],
     listening: new WeakSet(),
     pressed: null,
-    requested: new Set(),
+    requested: new Map(),
     snapshots: new WeakMap(),
     stack: []
   }
@@ -160,7 +160,7 @@ const request = (record: LayerRecord, reason: LayerReason, event?: Event): void 
   }
 
   forgetAtTaskEnd(state)
-  state.requested.add(record)
+  state.requested.set(record, reason)
   record.entry.dismiss(reason, event)
 }
 
@@ -360,7 +360,8 @@ export const registerLayer = (entry: LayerEntry): void => {
  * an outside click or its parent closes it.
  *
  * @param entry - The layer
- * @param reason - Why it closes; none for a close from code or a choice in the layer
+ * @param reason - Why it closes; when left out, the reason the engine asked the layer to close with
+ *   in this task, otherwise none (a close from code or a choice in the layer)
  * @returns Whether the layer hands the focus back
  */
 export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { returnFocus: boolean } => {
@@ -372,6 +373,7 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
     return { returnFocus: false }
   }
 
+  const why = reason ?? state.requested.get(record)
   record.closing = true
   const descendants = descendantsOf(record, stack)
   const closedBelow = closed.filter(other => isAncestor(record, other))
@@ -393,11 +395,11 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
     }
   }
 
-  if (reason === 'outside' || reason === 'parent') {
+  if (why === 'outside' || why === 'parent') {
     return { returnFocus: false }
   }
 
-  return { returnFocus: focusInParts || (reason !== 'sibling' && focusNowhere) }
+  return { returnFocus: focusInParts || (why !== 'sibling' && focusNowhere) }
 }
 
 /**
