@@ -271,6 +271,21 @@ describe('ContextMenu', () => {
   })
 
   describe('hide', () => {
+    it('should leave the instance that shares the panel open when the other area does not open', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" id="a1" data-coreui-toggle="context-menu" data-coreui-target="#shared">A1</div>',
+        '<div class="area" id="a2" data-coreui-toggle="context-menu" data-coreui-target="#shared">A2</div>',
+        '<div class="menu" id="shared"><a class="menu-item" href="#">Item</a></div>'
+      ].join('')
+
+      const first = ContextMenu.getOrCreateInstance(fixtureEl.querySelector('#a1'))
+      fixtureEl.querySelector('#a2').addEventListener('show.coreui.context-menu', event => event.preventDefault())
+      rightClick(fixtureEl.querySelector('#a1'))
+      rightClick(fixtureEl.querySelector('#a2'))
+
+      expect(first._isShown()).toBeTrue()
+    })
+
     it('should close the instance whose area shares the panel when another area opens it, even one that stays open on clicks', () => {
       fixtureEl.innerHTML = [
         '<div class="area" id="a1" data-coreui-toggle="context-menu" data-coreui-target="#shared" data-coreui-auto-close="inside">A1</div>',

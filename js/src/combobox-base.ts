@@ -167,6 +167,7 @@ class ComboboxBase extends BaseComponent {
       anchor: () => this._getShowTarget(),
       closesOn: () => true,
       dismiss: reason => this._hideFromLayer(reason),
+      focusTarget: () => this._returnFocusTarget(),
       isOpen: () => Boolean(this._element) && this._isShown(),
       kind: 'popup',
       parts: () => [this._getShowTarget(), this._menu]

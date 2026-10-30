@@ -1,6 +1,8 @@
 import {
-  closeLayersIn, getLayerAnchorFor, getParentLayer, handleEscape, isInDescendantParts, registerLayer, settleClick, unregisterLayer
+  closeLayersIn, getLayerAnchorFor, getLayerFocusTargetFor, getParentLayer, handleEscape, isInDescendantParts, registerLayer, settleClick,
+  unregisterLayer
 } from '../../../src/util/layers.js'
+import { trackPress } from '../../../src/util/press.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('layers', () => {
@@ -246,7 +248,7 @@ describe('layers', () => {
     expect(calls.map(call => [call.name, call.reason])).toEqual([['d', 'outside']])
   })
 
-  it('should decide a click on the document, so a listener there that stops it keeps nothing open', () => {
+  it('should keep the layers open on a click the page stops on the document', () => {
     fixtureEl.innerHTML = '<div id="d-panel"></div><button id="outside"></button>'
 
     const stop = event => event.stopPropagation()
@@ -256,7 +258,7 @@ describe('layers', () => {
     el('#outside').click()
     document.removeEventListener('click', stop)
 
-    expect(d.open).toBeFalse()
+    expect(d.open).toBeTrue()
   })
 
   it('should leave a layer that opened during the press of the click, and close one open before the press', () => {
@@ -271,6 +273,37 @@ describe('layers', () => {
 
     expect(calls.map(call => [call.name, call.reason])).toEqual([['a', 'outside']])
     expect(b.open).toBeTrue()
+  })
+
+  it('should leave the first layer of a window that opens during the press of the click', () => {
+    const iframe = document.createElement('iframe')
+    fixtureEl.append(iframe)
+    const doc = iframe.contentDocument
+    doc.body.innerHTML = '<div id="panel"></div><button id="opener"></button>'
+    trackPress(doc)
+    state().pressed = null
+
+    const d = layer('d', { parts: [doc.querySelector('#panel')] })
+    const opener = doc.querySelector('#opener')
+    opener.addEventListener('pointerdown', () => registerLayer(d))
+    opener.dispatchEvent(new iframe.contentWindow.PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+    opener.dispatchEvent(new iframe.contentWindow.MouseEvent('click', { bubbles: true, composed: true }))
+
+    expect(d.open).toBeTrue()
+  })
+
+  it('should give the focus target of the deepest open layer holding an element, or its anchor', () => {
+    fixtureEl.innerHTML = '<button id="d"></button><div id="d-panel"><input id="l"><input id="l-field"></div><div id="l-panel"><span id="in-l"></span></div>'
+
+    const d = layer('d', { anchor: el('#d'), parts: [el('#d'), el('#d-panel')] })
+    const l = layer('l', { anchor: el('#l'), parts: [el('#l'), el('#l-panel')] })
+    l.focusTarget = () => el('#l-field')
+    registerLayer(d)
+    registerLayer(l)
+
+    expect(getLayerFocusTargetFor(el('#in-l'))).toEqual(el('#l-field'))
+    expect(getLayerFocusTargetFor(el('#d-panel'))).toEqual(el('#d'))
+    expect(getLayerFocusTargetFor(document.body)).toBeNull()
   })
 
   it('should record the presses of the document a layer opens in', () => {
@@ -493,24 +526,34 @@ describe('layers', () => {
     const composing = escape(el('#field'), { isComposing: true })
 
     expect(repeated.defaultPrevented).toBeTrue()
-    expect(composing.defaultPrevented).toBeTrue()
+    expect(composing.defaultPrevented).toBeFalse()
     expect(reached).toHaveBeenCalledTimes(1)
     expect(d.open).toBeTrue()
   })
 
-  it('should let an Escape from a dialog the layer does not sit in pass to the dialog, whatever opened first', () => {
-    fixtureEl.innerHTML = '<div id="d-panel"><div id="m"><input id="field"></div></div>'
+  it('should let an Escape from an open dialog the layer does not sit in pass to the dialog, and handle one from a dialog it sits in', () => {
+    fixtureEl.innerHTML = '<div id="d-panel"><dialog id="m"><input id="field"></dialog></div><dialog id="n"><div id="e-panel"><input id="inner"></div></dialog>'
 
     const d = layer('d', { parts: [el('#d-panel')] })
-    const m = layer('m', { kind: 'dialog', parts: [el('#m')], refuses: ['sibling'] })
-    registerLayer(m)
     registerLayer(d)
+    el('#m').showModal()
     el('#d-panel').addEventListener('keydown', event => handleEscape(event, d))
     el('#field').focus()
     const event = escape(el('#field'))
 
     expect(event.defaultPrevented).toBeFalse()
     expect(d.open).toBeTrue()
+
+    el('#m').close()
+    el('#n').show()
+    const e = layer('e', { parts: [el('#e-panel')], refuses: ['sibling'] })
+    registerLayer(e)
+    el('#e-panel').addEventListener('keydown', event => handleEscape(event, e))
+    el('#inner').focus()
+
+    expect(escape(el('#inner')).defaultPrevented).toBeTrue()
+    expect(e.open).toBeFalse()
+    el('#n').close()
   })
 
   it('should send an Escape with the focus on no element to the top layer, but not to a dialog, and not from a page field', () => {

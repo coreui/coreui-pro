@@ -5,7 +5,9 @@ import DatePicker from '../../src/date-picker.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Dropdown from '../../src/dropdown.js'
 import Menu from '../../src/menu.js'
+import Modal from '../../src/modal.js'
 import MultiSelect from '../../src/multi-select.js'
+import { getLayerFocusTargetFor } from '../../src/util/layers.js'
 import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
@@ -1031,11 +1033,6 @@ describe('Dropdown', () => {
         DatePicker.getOrCreateInstance(host.querySelector('#dp'), { date: new Date(2026, 7, 23) })
         return host.querySelector('.form-control-cleaner')
       }],
-      ['the cleaner of a multi select', host => {
-        host.innerHTML = '<select id="ms" multiple><option value="1" selected>One</option></select>'
-        MultiSelect.getOrCreateInstance(host.querySelector('#ms'))
-        return host.querySelector('.form-control-cleaner')
-      }],
       ['the cleaner of an autocomplete', host => {
         host.innerHTML = '<div id="ac"></div>'
         Autocomplete.getOrCreateInstance(host.querySelector('#ac'), { cleaner: true, options: ['One'], value: 'One' })
@@ -1075,6 +1072,44 @@ describe('Dropdown', () => {
         expect(dropdown._isShown()).toBeFalse()
       })
     }
+
+    it('should give the field the user works in as the focus target of a combobox or picker panel', () => {
+      fixtureEl.innerHTML = [
+        '<div id="ac"></div>',
+        '<select id="ms" multiple><option value="1" selected>One</option><option value="2">Two</option></select>',
+        '<div id="dp"></div>'
+      ].join('')
+
+      const autocomplete = Autocomplete.getOrCreateInstance(fixtureEl.querySelector('#ac'), { options: ['One'] })
+      autocomplete.show()
+
+      expect(getLayerFocusTargetFor(autocomplete._menu)).toEqual(fixtureEl.querySelector('#ac input'))
+
+      const multiSelect = MultiSelect.getOrCreateInstance(fixtureEl.querySelector('#ms'), { search: true, selectionType: 'chips' })
+      multiSelect.show()
+
+      expect(getLayerFocusTargetFor(multiSelect._menu)).toEqual(multiSelect._searchElement)
+
+      const picker = DatePicker.getOrCreateInstance(fixtureEl.querySelector('#dp'), { date: new Date(2026, 7, 23) })
+      const toggle = fixtureEl.querySelector('#dp [aria-haspopup]')
+      toggle.focus()
+      picker.show()
+
+      expect(getLayerFocusTargetFor(document.querySelector('.date-picker-popup'))).toEqual(toggle)
+    })
+
+    it('should leave an open dropdown alone when a dialog open in its markup starts', () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown"><button id="dd" data-coreui-toggle="dropdown">D</button><div class="dropdown-menu"><button class="dropdown-item">Item</button></div></div>',
+        '<dialog class="modal" id="m" open></dialog>'
+      ].join('')
+
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dd'))
+      dropdown.show()
+      Modal.getOrCreateInstance(fixtureEl.querySelector('#m'))
+
+      expect(dropdown._isShown()).toBeTrue()
+    })
 
     it('should close an open menu when it opens, and the reverse', () => {
       fixtureEl.innerHTML = [

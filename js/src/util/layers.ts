@@ -7,6 +7,7 @@ export interface LayerEntry {
   closesOn: (reason: LayerReason, event?: Event) => boolean
   closesSiblings?: () => boolean
   dismiss: (reason: LayerReason, event: Event | undefined, options: { returnFocus: boolean }) => void
+  focusTarget?: () => Element | null | undefined
   isOpen: () => boolean
   kind: 'dialog' | 'popup'
   parts: () => Array<Element | null | undefined>
@@ -287,9 +288,9 @@ const prune = ({ stack }: LayerState): void => {
 }
 
 /**
- * Attaches the engine's listeners to a window and its document once; they stay for the page. The
- * click is decided on the document, so a listener there that stops it does not keep the layers
- * open, and a press remembers the layers open when it began.
+ * Attaches the engine's listeners to a window once; they stay for the page. A press remembers the
+ * layers open when it began; before the first press seen, none count as open, since the layer
+ * that starts the listening may be opening during a press.
  *
  * @param doc - The document a layer opened in
  */
@@ -302,11 +303,12 @@ const listen = (doc: Document): void => {
   }
 
   state.listening.add(view)
+  state.pressed = []
   view.addEventListener('pointerdown', event => {
     state.pressed = event.button === 0 ? [...state.stack] : null
   }, true)
   view.addEventListener('click', snapshotClick, true)
-  doc.addEventListener('click', decideClick)
+  view.addEventListener('click', decideClick)
   view.addEventListener('keydown', fallbackEscape)
 }
 
@@ -401,29 +403,33 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
 
 /**
  * Handles Escape on a layer's parts and anchor. An Escape that something inside already handled,
- * or that comes from a dialog the layer does not sit in, passes; one that ends an IME composition, repeats, or comes from an open native select closes
- * nothing and goes no further; any other closes the layer when it accepts Escape, and goes no
- * further even when the layer refuses.
+ * or that comes from an open dialog the layer does not sit in, passes; one that ends an IME
+ * composition, repeats, or comes from an open native select closes nothing and goes no further; any
+ * other closes the layer when it accepts Escape, and goes no further even when the layer refuses.
  *
  * @param event - The keydown
  * @param entry - The layer the listener belongs to
  * @returns `true` when the Escape stops here, so a framework can stop its own propagation too
  */
 export const handleEscape = (event: KeyboardEvent, entry: LayerEntry): boolean => {
-  const { stack } = getState()
   const record = recordOf(entry)
-  const origin = event.composedPath()[0] as Node
+  const dialog = (event.composedPath()[0] as Element | undefined)?.closest?.('dialog[open]')
 
   if (event.key !== 'Escape' || event.defaultPrevented || !record || !entry.isOpen() ||
-      stack.some(other => other !== record && other.entry.kind === 'dialog' && !isAncestor(other, record) && inParts(other, origin))) {
+      (dialog && !entry.parts().some(part => part && dialog.contains(part)))) {
     return false
   }
 
   event.stopPropagation()
-  event.preventDefault()
 
   // eslint-disable-next-line unicorn/prefer-keyboard-event-key -- Safari reports an IME composition only as keyCode 229
-  if (!event.repeat && !event.isComposing && event.keyCode !== 229) {
+  if (event.isComposing || event.keyCode === 229) {
+    return true
+  }
+
+  event.preventDefault()
+
+  if (!event.repeat) {
     request(record, 'escape', event, true)
   }
 
@@ -476,14 +482,27 @@ export const closeLayersIn = (container: Element): void => {
 }
 
 /**
- * Returns the anchor of the deepest open layer that holds an element, so a dialog opened from an
- * item of a menu that closes on the way can hand the focus to the menu's toggle afterwards.
+ * Returns the anchor of the deepest open layer that holds an element, so a panel can tell that the
+ * focus moved into a layer opened from it.
  *
- * @param element - The element, typically the trigger of a dialog
+ * @param element - The element, typically the one that has the focus
  * @returns The anchor, or `null` when no open layer holds the element
  */
 export const getLayerAnchorFor = (element: Element): Element | null =>
   getState().stack.findLast(record => inParts(record, element))?.entry.anchor() ?? null
+
+/**
+ * Returns where the focus goes back to for the deepest open layer that holds an element: the
+ * layer's own `focusTarget()`, otherwise its anchor. A dialog opened from inside a layer that closes
+ * on the way hands the focus there once it hides.
+ *
+ * @param element - The element, typically the trigger of a dialog
+ * @returns The target, or `null` when no open layer holds the element
+ */
+export const getLayerFocusTargetFor = (element: Element): Element | null => {
+  const entry = getState().stack.findLast(record => inParts(record, element))?.entry
+  return (entry?.focusTarget?.() ?? entry?.anchor()) || null
+}
 
 /**
  * Returns the parent of a registered layer.

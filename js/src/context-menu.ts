@@ -66,6 +66,7 @@ class ContextMenu extends Menu {
   protected declare _point: Point | null
   protected declare _scrollBlocker: ((event: Event) => void) | null
   protected declare _shown: boolean
+  protected static _opening: ContextMenu | null = null
 
   constructor(element?: string | Element | null, config?: Partial<ContextMenuConfig> | null) {
     super(element, config as Partial<MenuConfig>)
@@ -112,14 +113,10 @@ class ContextMenu extends Menu {
       this._point = point ?? null
     }
 
-    for (const instance of Menu._openInstances) {
-      if (instance !== this && instance instanceof ContextMenu && instance._menu === this._menu) {
-        instance._completeHide({ relatedTarget: instance._element }, 'sibling', false)
-      }
-    }
-
     this._openedBy = fromKeyboard ? 'key' : 'pointer'
+    ContextMenu._opening = this
     this._show(relatedTarget)
+    ContextMenu._opening = null
     this._openedBy = null
   }
 
@@ -128,7 +125,13 @@ class ContextMenu extends Menu {
   }
 
   protected override _createLayer(): LayerEntry {
-    return { ...super._createLayer(), parts: () => [this._menu] }
+    const layer = super._createLayer()
+
+    return {
+      ...layer,
+      closesOn: (reason, event) => (reason === 'sibling' && ContextMenu._opening?._menu === this._menu) || layer.closesOn(reason, event),
+      parts: () => [this._menu]
+    }
   }
 
   protected override _setShown(shown: boolean): void {

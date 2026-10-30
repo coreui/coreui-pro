@@ -19,7 +19,6 @@ import { containsFocus } from './util/focus.js'
 import FocusTrap from './util/focustrap.js'
 import { type ValidationState } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
-import { settleClick } from './util/layers.js'
 import { getRemovalNeighbor, isTypingKey } from './util/list-navigation.js'
 import { flattenOptions, isOptionGroup } from './util/option-tree.js'
 import {
@@ -671,7 +670,6 @@ class MultiSelect extends ComboboxBase {
     EventHandler.on(this._togglerElement, EVENT_CLICK, SELECTOR_CLEANER, (event: any) => {
       if (!this._disabled) {
         event.preventDefault()
-        settleClick(event)
         event.stopPropagation()
         this._removeAsUser(() => this.deselectAll())
       }

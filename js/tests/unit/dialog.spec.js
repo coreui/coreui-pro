@@ -1780,7 +1780,7 @@ describe('Dialog', () => {
       expect(dialogEl.open).toBeTrue()
     })
 
-    it('should hand the focus to the first field of a layer it opened from when the layer\'s anchor cannot take it', async () => {
+    it('should hand the focus to the focus target of a layer it opened from, which closed on the way', async () => {
       fixtureEl.innerHTML = [
         '<div id="anchor"><input id="field"></div>',
         '<div id="panel"><button type="button" id="open" data-coreui-toggle="dialog" data-coreui-target="#d">Open</button></div>',
@@ -1795,6 +1795,7 @@ describe('Dialog', () => {
           panel.hidden = true
           unregisterLayer(entry)
         },
+        focusTarget: () => fixtureEl.querySelector('#field'),
         isOpen: () => !panel.hidden,
         kind: 'popup',
         parts: () => [fixtureEl.querySelector('#anchor'), panel]

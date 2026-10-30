@@ -17,7 +17,7 @@ import {
   handleEscape, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
 } from './layers.js'
 import {
-  execute, getElement, getTransitionDurationFromElement
+  execute, getElement, getTransitionDurationFromElement, isDisabled, isVisible
 } from './index.js'
 
 /**
@@ -170,6 +170,7 @@ class Popup extends Config {
           this._hide(reason)
         }
       },
+      focusTarget: () => this._returnFocusTarget(),
       isOpen: () => this._isShown,
       kind: 'popup',
       parts: () => [this._anchor, this._content]
@@ -344,13 +345,17 @@ class Popup extends Config {
   }
 
   _returnFocus(): void {
+    focusIfUsable(this._returnFocusTarget())
+  }
+
+  _returnFocusTarget(): HTMLElement | null {
     const recorded = this._previouslyFocused
 
-    if (recorded && this._anchor?.contains(recorded) && focusIfUsable(recorded)) {
-      return
+    if (recorded?.isConnected && this._anchor?.contains(recorded) && !isDisabled(recorded) && isVisible(recorded)) {
+      return recorded
     }
 
-    focusIfUsable(this._anchor ? SelectorEngine.focusableChildren(this._anchor)[0] : null)
+    return (this._anchor && SelectorEngine.focusableChildren(this._anchor)[0]) ?? null
   }
 
   _afterTransition(transition: number, callback: () => void): void {
