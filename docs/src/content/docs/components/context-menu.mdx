@@ -169,7 +169,7 @@ Opening from the keyboard moves focus to the first item; a right-click moves it 
 
 ## Usage
 
-The plugin listens on the document: a `contextmenu` event (a right-click, or a long-press on touch devices that dispatch it) or a <kbd>Shift</kbd>+<kbd>F10</kbd> / <kbd>Menu</kbd> keydown inside an element with `data-coreui-toggle="context-menu"` opens its `.menu` and suppresses the browser menu. A right-click inside the open menu keeps it open; one elsewhere closes it, and so do a left-click anywhere outside the menu (the trigger area included) and <kbd>Esc</kbd>. While the menu is open the page does not scroll - wheel, touch and the scroll keys are held, as with the native menu - but a `.menu-scrollable` still scrolls inside.
+The plugin listens on the document: a `contextmenu` event (a right-click, or a long-press on touch devices that dispatch it) or a <kbd>Shift</kbd>+<kbd>F10</kbd> / <kbd>Menu</kbd> keydown inside an element with `data-coreui-toggle="context-menu"` opens its `.menu` and suppresses the browser menu. A right-click inside the open menu keeps it open; one elsewhere closes it, and so do a left-click anywhere outside the menu (the trigger area included) and <kbd>Esc</kbd>. Opening it closes the other open menus, pickers and combobox panels, as [opening a menu](/components/menu/#auto-close-behavior) does. While the menu is open the page does not scroll - wheel, touch and the scroll keys are held, as with the native menu - but a `.menu-scrollable` still scrolls inside.
 
 <Callout>
 iOS Safari does not dispatch `contextmenu` for a long-press. Call `show()` yourself from a `touchstart`/`pointerdown` timer when the gesture matters on iOS.

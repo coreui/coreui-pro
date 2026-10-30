@@ -17,6 +17,7 @@ Key features of the native dialog:
 - **Modal or non-modal** via `showModal()` / `show()` — `modal: true` (default) promotes the dialog to the browser's top layer with a backdrop and focus trapping; `modal: false` renders it non-modally, leaving the page interactive.
 - **Built-in backdrop** using the `::backdrop` pseudo-element, with a blur effect; set `backdrop: "static"` to lock clicks outside, or `backdrop: false` to visually suppress it.
 - **Escape key handling** closes the dialog by default; set `keyboard: false` to disable.
+- **Panels inside it** — Menus, pickers and combobox panels open in the dialog close when it hides, and opening the dialog closes the ones open on the page. A click in such a panel or <kbd>Esc</kbd> pressed in it never closes the dialog.
 - **Accessibility** — focus is trapped inside modal dialogs and returned to the trigger on close, with native `<dialog>` ARIA semantics: no `role`, `aria-modal`, `aria-hidden`, or `tabindex` attributes in the markup.
 - **Animated open and close** — the exit transition (including the `::backdrop` fade) plays in every browser, because the plugin keeps the dialog in the top layer until the transition ends.
 
