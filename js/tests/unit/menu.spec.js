@@ -1150,6 +1150,18 @@ describe('Menu', () => {
       expect(document.activeElement).toEqual(fixtureEl.querySelector('#outer'))
     })
 
+    it('should close the menus opened from it when it is disposed open', () => {
+      fixtureEl.innerHTML = menuMarkup('outer', 'true', menuMarkup('inner', 'outside'))
+
+      const outer = new Menu(fixtureEl.querySelector('#outer'))
+      const inner = new Menu(fixtureEl.querySelector('#inner'), { container: true })
+      outer.show()
+      inner.show()
+      outer.dispose()
+
+      expect(inner._isShown()).toBeFalse()
+    })
+
     it('should close a menu opened from a submenu when the submenu closes, and keep the outer menu', () => {
       fixtureEl.innerHTML = menuMarkup('outer', 'true', [
         '<div class="submenu" id="wrapper"><button class="menu-item" id="trigger" type="button">More</button>',

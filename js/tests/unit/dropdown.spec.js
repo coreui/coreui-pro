@@ -1,7 +1,11 @@
 import { userEvent } from 'vitest/browser'
+import Autocomplete from '../../src/autocomplete.js'
+import Chip from '../../src/chip.js'
+import DatePicker from '../../src/date-picker.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Dropdown from '../../src/dropdown.js'
 import Menu from '../../src/menu.js'
+import MultiSelect from '../../src/multi-select.js'
 import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
@@ -1021,6 +1025,57 @@ describe('Dropdown', () => {
   })
 
   describe('layers', () => {
+    const stoppedClicks = [
+      ['the cleaner of a date picker', host => {
+        host.innerHTML = '<div id="dp"></div>'
+        DatePicker.getOrCreateInstance(host.querySelector('#dp'), { date: new Date(2026, 7, 23) })
+        return host.querySelector('.form-control-cleaner')
+      }],
+      ['the cleaner of a multi select', host => {
+        host.innerHTML = '<select id="ms" multiple><option value="1" selected>One</option></select>'
+        MultiSelect.getOrCreateInstance(host.querySelector('#ms'))
+        return host.querySelector('.form-control-cleaner')
+      }],
+      ['the cleaner of an autocomplete', host => {
+        host.innerHTML = '<div id="ac"></div>'
+        Autocomplete.getOrCreateInstance(host.querySelector('#ac'), { cleaner: true, options: ['One'], value: 'One' })
+        return host.querySelector('.form-control-cleaner')
+      }],
+      ['the remove button of a chip', host => {
+        host.innerHTML = '<span class="chip" id="chip">One</span>'
+        Chip.getOrCreateInstance(host.querySelector('#chip'), { removable: true })
+        return host.querySelector('.chip-remove')
+      }],
+      ['a disabled item of a menu that stays open', host => {
+        host.innerHTML = '<div><button id="m" data-coreui-toggle="menu" data-coreui-auto-close="inside">M</button><div class="menu" role="menu"><button class="menu-item disabled" id="off">Off</button></div></div>'
+        new Menu(host.querySelector('#m')).show()
+        return host.querySelector('#off')
+      }],
+      ['a submenu trigger of a menu that stays open', host => {
+        host.innerHTML = '<div><button id="m" data-coreui-toggle="menu" data-coreui-auto-close="inside">M</button><div class="menu"><div class="submenu"><button class="menu-item" id="sub">Sub</button><div class="menu"><button class="menu-item">Deep</button></div></div></div></div>'
+        new Menu(host.querySelector('#m')).show()
+        return host.querySelector('#sub')
+      }]
+    ]
+
+    for (const [name, build] of stoppedClicks) {
+      it(`should close on a click on ${name}, which the component stops`, () => {
+        const host = document.createElement('div')
+        fixtureEl.append(host)
+        const target = build(host)
+        const holder = document.createElement('div')
+        holder.className = 'dropdown'
+        holder.innerHTML = '<button id="dd" data-coreui-toggle="dropdown">D</button><div class="dropdown-menu"><button class="dropdown-item">Item</button></div>'
+        fixtureEl.append(holder)
+        const dropdown = new Dropdown(holder.querySelector('#dd'))
+        dropdown.show()
+        target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        target.click()
+
+        expect(dropdown._isShown()).toBeFalse()
+      })
+    }
+
     it('should close an open menu when it opens, and the reverse', () => {
       fixtureEl.innerHTML = [
         '<div><button id="menu-toggle" data-coreui-toggle="menu">Menu</button><div class="menu"><button class="menu-item">Item</button></div></div>',

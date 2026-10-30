@@ -12,6 +12,7 @@ import DialogBase from './dialog-base.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { enableDismissTrigger } from './util/component-functions.js'
+import { containsFocus } from './util/focus.js'
 import { defineJQueryPlugin, isVisible, jQueryDispatch } from './util/index.js'
 import { getLayerAnchorFor } from './util/layers.js'
 
@@ -192,6 +193,10 @@ class Dialog extends DialogBase<DialogConfig> {
       if (returnTo instanceof HTMLElement && isVisible(returnTo)) {
         // Returning focus must not scroll the page back to the trigger.
         returnTo.focus({ preventScroll: true })
+
+        if (returnTo === layerAnchor && !containsFocus(returnTo)) {
+          SelectorEngine.focusableChildren(returnTo)[0]?.focus({ preventScroll: true })
+        }
       }
     })
   }

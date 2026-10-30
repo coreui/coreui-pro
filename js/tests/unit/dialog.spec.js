@@ -5,6 +5,7 @@ import EventHandler from '../../src/dom/event-handler.js'
 import Dialog from '../../src/dialog.js'
 import Dropdown from '../../src/dropdown.js'
 import MultiSelect from '../../src/multi-select.js'
+import { registerLayer, unregisterLayer } from '../../src/util/layers.js'
 import {
   clearBodyAndDocument, clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -1740,7 +1741,7 @@ describe('Dialog', () => {
       })
 
       dropdown.show()
-      fixtureEl.querySelector('#item').focus()
+      document.activeElement.blur()
       const shown = once('shown.coreui.dialog')
       fixtureEl.querySelector('#item').click()
       await shown
@@ -1752,6 +1753,69 @@ describe('Dialog', () => {
       await hidden
 
       expect(document.activeElement).toEqual(fixtureEl.querySelector('#dd'))
+    })
+
+    it('should leave an open dropdown alone when it opens without being modal, and stay open on a click outside and when a dropdown opens beside it', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown"><button type="button" id="dd" data-coreui-toggle="dropdown">D</button><div class="dropdown-menu"><button type="button" class="dropdown-item">I</button></div></div>',
+        '<dialog class="dialog dialog-instant" id="d"><button type="button">Inside</button></dialog>',
+        '<button type="button" id="outside">Outside</button>'
+      ].join('')
+
+      const dialogEl = fixtureEl.querySelector('#d')
+      const dialog = new Dialog(dialogEl, { modal: false })
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dd'))
+      dropdown.show()
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.dialog', resolve, { once: true })
+      })
+      dialog.show()
+      await shown
+
+      expect(dropdown._isShown()).toBeTrue()
+
+      fixtureEl.querySelector('#outside').click()
+      dropdown.show()
+
+      expect(dialogEl.open).toBeTrue()
+    })
+
+    it('should hand the focus to the first field of a layer it opened from when the layer\'s anchor cannot take it', async () => {
+      fixtureEl.innerHTML = [
+        '<div id="anchor"><input id="field"></div>',
+        '<div id="panel"><button type="button" id="open" data-coreui-toggle="dialog" data-coreui-target="#d">Open</button></div>',
+        '<dialog class="dialog dialog-instant" id="d"></dialog>'
+      ].join('')
+
+      const panel = fixtureEl.querySelector('#panel')
+      const entry = {
+        anchor: () => fixtureEl.querySelector('#anchor'),
+        closesOn: () => true,
+        dismiss() {
+          panel.hidden = true
+          unregisterLayer(entry)
+        },
+        isOpen: () => !panel.hidden,
+        kind: 'popup',
+        parts: () => [fixtureEl.querySelector('#anchor'), panel]
+      }
+      registerLayer(entry)
+      const dialogEl = fixtureEl.querySelector('#d')
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.dialog', resolve, { once: true })
+      })
+      fixtureEl.querySelector('#open').click()
+      await shown
+
+      expect(panel.hidden).toBeTrue()
+
+      const hidden = new Promise(resolve => {
+        dialogEl.addEventListener('hidden.coreui.dialog', resolve, { once: true })
+      })
+      Dialog.getInstance(dialogEl).hide()
+      await hidden
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#field'))
     })
   })
 

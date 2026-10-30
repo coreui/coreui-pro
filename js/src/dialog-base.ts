@@ -60,6 +60,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._layer = {
       anchor: () => null,
       closesOn: reason => reason === 'parent',
+      closesSiblings: () => this._getShowOptions().modal,
       dismiss: () => {
         this.hide()
       },
@@ -67,6 +68,11 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
       kind: 'dialog',
       parts: () => [this._element]
     }
+
+    if (this._element?.open) {
+      registerLayer(this._layer)
+    }
+
     this._addDialogListeners()
   }
 

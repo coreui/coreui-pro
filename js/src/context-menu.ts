@@ -112,6 +112,12 @@ class ContextMenu extends Menu {
       this._point = point ?? null
     }
 
+    for (const instance of Menu._openInstances) {
+      if (instance !== this && instance instanceof ContextMenu && instance._menu === this._menu) {
+        instance._completeHide({ relatedTarget: instance._element }, 'sibling', false)
+      }
+    }
+
     this._openedBy = fromKeyboard ? 'key' : 'pointer'
     this._show(relatedTarget)
     this._openedBy = null

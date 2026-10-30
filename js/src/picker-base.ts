@@ -14,6 +14,7 @@ import FieldValidation from './util/field-validation.js'
 import { createControlGroupAction } from './util/form-control-group.js'
 import { type ValidationState } from './util/form-validation.js'
 import { getUID } from './util/index.js'
+import { settleClick } from './util/layers.js'
 import Popup from './util/popup.js'
 import { sanitizeByConfig } from './util/sanitizer.js'
 
@@ -135,6 +136,7 @@ abstract class PickerBase extends BaseComponent {
 
     if (this._cleanerElement) {
       EventHandler.on(this._cleanerElement, eventName, (event: any) => {
+        settleClick(event)
         event.stopPropagation()
         this._runAsUser(() => this.clear())
 

@@ -16,6 +16,7 @@ import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
+import { settleClick } from './util/layers.js'
 import { isTypingKey } from './util/list-navigation.js'
 import {
   filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, highlightMatches, isOptionGroup
@@ -574,6 +575,7 @@ class Autocomplete extends ComboboxBase {
     EventHandler.on(this._cleanerElement, EVENT_CLICK, (event: any) => {
       if (!this._disabled) {
         event.preventDefault()
+        settleClick(event)
         event.stopPropagation()
         this._clearByUser()
       }

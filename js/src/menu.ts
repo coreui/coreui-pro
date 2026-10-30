@@ -46,7 +46,7 @@ import {
 } from './util/floating-ui.js'
 import { containsFocus, focusIfUsable } from './util/focus.js'
 import {
-  closeLayersIn, handleEscape, isInDescendantParts, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
+  closeLayersIn, handleEscape, isInDescendantParts, registerLayer, settleClick, unregisterLayer, type LayerEntry, type LayerReason
 } from './util/layers.js'
 import { isFromPanelControl, isFromPanelWidget } from './util/panel-control.js'
 import { resolvePopupContainer } from './util/popup.js'
@@ -213,6 +213,7 @@ class Menu extends BaseComponent {
       this._announceMenu()
       this._listenOnMenu('click', `${this.constructor.SELECTOR_ITEM}.disabled`, event => {
         event.preventDefault()
+        settleClick(event)
         event.stopPropagation()
       })
     }
@@ -880,6 +881,7 @@ class Menu extends BaseComponent {
     }
 
     event.preventDefault()
+    settleClick(event)
     event.stopPropagation()
 
     const submenuWrapper = trigger.closest(this.constructor.SELECTOR_SUBMENU)!
