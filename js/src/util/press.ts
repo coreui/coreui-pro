@@ -1,4 +1,4 @@
-let listening = false
+const listening = new WeakSet<Document>()
 let pressPath: EventTarget[] | null = null
 const clickPresses = new WeakMap<Event, EventTarget[]>()
 
@@ -10,32 +10,35 @@ export const forgetPress = (): void => {
 }
 
 /**
- * Starts recording where left-button presses begin, so that a later `click` can tell where its own
- * press started. Recording starts on the first call and stays on for the page.
+ * Starts recording where left-button presses begin in a document, so that a later `click` can tell
+ * where its own press started. Recording starts on the first call for a document and stays on for
+ * the page.
+ *
+ * @param doc - The document to record in, the page's own by default
  */
-export const trackPress = (): void => {
-  if (listening) {
+export const trackPress = (doc: Document = document): void => {
+  if (listening.has(doc)) {
     return
   }
 
-  listening = true
-  document.addEventListener('pointerdown', event => {
+  listening.add(doc)
+  doc.addEventListener('pointerdown', event => {
     pressPath = event.button === 0 ? event.composedPath() : null
   }, true)
-  document.addEventListener('click', event => {
+  doc.addEventListener('click', event => {
     if (pressPath?.includes(event.composedPath()[0])) {
       clickPresses.set(event, pressPath)
     }
 
     pressPath = null
   }, true)
-  document.addEventListener('keydown', event => {
+  doc.addEventListener('keydown', event => {
     if (event.key === 'Enter' || event.key === ' ') {
       forgetPress()
     }
   }, true)
-  document.addEventListener('contextmenu', forgetPress, true)
-  document.addEventListener('pointercancel', forgetPress, true)
+  doc.addEventListener('contextmenu', forgetPress, true)
+  doc.addEventListener('pointercancel', forgetPress, true)
 }
 
 /**

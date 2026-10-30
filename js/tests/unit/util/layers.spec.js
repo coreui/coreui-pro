@@ -1,5 +1,5 @@
 import {
-  closeLayersIn, getLayerAnchorFor, getParentLayer, handleEscape, isInDescendantParts, registerLayer, unregisterLayer
+  closeLayersIn, getLayerAnchorFor, getParentLayer, handleEscape, isInDescendantParts, registerLayer, settleClick, unregisterLayer
 } from '../../../src/util/layers.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -227,6 +227,136 @@ describe('layers', () => {
     expect(getParentLayer(l)).toBe(m)
   })
 
+  it('should decide a click at once for a component that stops it, and leave alone a click the page stops before the document', () => {
+    fixtureEl.innerHTML = '<div id="d-panel"></div><button id="own"></button><button id="page"></button>'
+
+    const d = layer('d', { parts: [el('#d-panel')] })
+    registerLayer(d)
+    el('#page').addEventListener('click', event => event.stopPropagation())
+    el('#page').click()
+
+    expect(d.open).toBeTrue()
+
+    el('#own').addEventListener('click', event => {
+      settleClick(event)
+      event.stopPropagation()
+    })
+    el('#own').click()
+
+    expect(calls.map(call => [call.name, call.reason])).toEqual([['d', 'outside']])
+  })
+
+  it('should decide a click on the document, so a listener there that stops it keeps nothing open', () => {
+    fixtureEl.innerHTML = '<div id="d-panel"></div><button id="outside"></button>'
+
+    const stop = event => event.stopPropagation()
+    const d = layer('d', { parts: [el('#d-panel')] })
+    registerLayer(d)
+    document.addEventListener('click', stop)
+    el('#outside').click()
+    document.removeEventListener('click', stop)
+
+    expect(d.open).toBeFalse()
+  })
+
+  it('should leave a layer that opened during the press of the click, and close one open before the press', () => {
+    fixtureEl.innerHTML = '<div id="a-panel"></div><div id="b-panel"></div><button id="opener"></button>'
+
+    const a = layer('a', { parts: [el('#a-panel')], refuses: ['sibling'] })
+    const b = layer('b', { parts: [el('#b-panel')] })
+    registerLayer(a)
+    el('#opener').addEventListener('pointerdown', () => registerLayer(b))
+    el('#opener').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+    el('#opener').click()
+
+    expect(calls.map(call => [call.name, call.reason])).toEqual([['a', 'outside']])
+    expect(b.open).toBeTrue()
+  })
+
+  it('should record the presses of the document a layer opens in', () => {
+    const iframe = document.createElement('iframe')
+    fixtureEl.append(iframe)
+    const doc = iframe.contentDocument
+    doc.body.innerHTML = '<div id="panel"><button id="inside"></button></div>'
+
+    const d = layer('d', { parts: [doc.querySelector('#panel')] })
+    registerLayer(d)
+    doc.querySelector('#inside').dispatchEvent(new iframe.contentWindow.PointerEvent('pointerdown', {
+      bubbles: true, composed: true, button: 0
+    }))
+    doc.body.dispatchEvent(new iframe.contentWindow.MouseEvent('click', { bubbles: true, composed: true }))
+
+    expect(d.open).toBeTrue()
+  })
+
+  it('should take off the stack a layer whose parts left the document', () => {
+    fixtureEl.innerHTML = '<div id="d-panel"></div>'
+
+    const d = layer('d', { parts: [el('#d-panel')] })
+    registerLayer(d)
+    el('#d-panel').remove()
+    document.activeElement.blur()
+    const event = escape(document.body)
+
+    expect(event.defaultPrevented).toBeFalse()
+    expect(calls).toEqual([])
+    expect(state().stack).toEqual([])
+  })
+
+  it('should keep a layer whose parts are not rendered, and move the children of a dropped layer to its parent', () => {
+    fixtureEl.innerHTML = [
+      '<div id="g"><button id="p-anchor"></button></div>',
+      '<div id="p-panel"><button id="c-anchor"></button></div>',
+      '<div id="c-panel"></div><div id="e-panel"></div>'
+    ].join('')
+
+    const unrendered = layer('u', { parts: [null] })
+    const g = layer('g', { parts: [el('#g')] })
+    const p = layer('p', { anchor: el('#p-anchor'), parts: [el('#p-panel')] })
+    const c = layer('c', { anchor: el('#c-anchor'), parts: [el('#c-panel')] })
+    const e = layer('e', { parts: [el('#e-panel')] })
+    e.closesSiblings = () => false
+    unrendered.closesOn = () => false
+    registerLayer(unrendered)
+    registerLayer(g)
+    registerLayer(p)
+    registerLayer(c)
+    el('#p-panel').remove()
+    registerLayer(e)
+
+    expect(state().stack.map(record => record.entry)).toEqual([unrendered, g, c, e])
+    expect(getParentLayer(c)).toBe(g)
+  })
+
+  it('should drop a layer whose parts left the document when another one opens', () => {
+    fixtureEl.innerHTML = '<div id="d-panel"></div><div id="e-panel"></div>'
+
+    const d = layer('d', { parts: [el('#d-panel')] })
+    const e = layer('e', { parts: [el('#e-panel')] })
+    d.closesOn = () => false
+    registerLayer(d)
+    el('#d-panel').remove()
+    registerLayer(e)
+
+    expect(state().stack.map(record => record.entry)).toEqual([e])
+  })
+
+  it('should leave the open layers alone when a layer that does not close its siblings opens', () => {
+    fixtureEl.innerHTML = '<div id="a-panel"></div><div id="b-panel"></div><div id="c-panel"></div>'
+
+    const a = layer('a', { parts: [el('#a-panel')] })
+    const b = layer('b', { parts: [el('#b-panel')] })
+    b.closesSiblings = () => false
+    registerLayer(a)
+    registerLayer(b)
+
+    expect(a.open).toBeTrue()
+
+    registerLayer(layer('c', { parts: [el('#c-panel')] }))
+
+    expect(calls.map(call => [call.name, call.reason])).toEqual([['a', 'sibling'], ['b', 'sibling']])
+  })
+
   it('should close every layer a click lands outside of, from the top, and leave the ones it touched', () => {
     fixtureEl.innerHTML = [
       '<button id="d"></button><div id="d-panel"><input id="l"><span id="in-d"></span></div>',
@@ -360,10 +490,26 @@ describe('layers', () => {
     expect(reached).toHaveBeenCalledTimes(1)
 
     const repeated = escape(el('#field'), { repeat: true })
-    escape(el('#field'), { isComposing: true })
+    const composing = escape(el('#field'), { isComposing: true })
 
     expect(repeated.defaultPrevented).toBeTrue()
+    expect(composing.defaultPrevented).toBeTrue()
     expect(reached).toHaveBeenCalledTimes(1)
+    expect(d.open).toBeTrue()
+  })
+
+  it('should let an Escape from a dialog the layer does not sit in pass to the dialog, whatever opened first', () => {
+    fixtureEl.innerHTML = '<div id="d-panel"><div id="m"><input id="field"></div></div>'
+
+    const d = layer('d', { parts: [el('#d-panel')] })
+    const m = layer('m', { kind: 'dialog', parts: [el('#m')], refuses: ['sibling'] })
+    registerLayer(m)
+    registerLayer(d)
+    el('#d-panel').addEventListener('keydown', event => handleEscape(event, d))
+    el('#field').focus()
+    const event = escape(el('#field'))
+
+    expect(event.defaultPrevented).toBeFalse()
     expect(d.open).toBeTrue()
   })
 

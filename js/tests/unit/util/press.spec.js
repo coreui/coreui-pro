@@ -146,5 +146,26 @@ describe('Press utilities', () => {
 
       expect(spy).not.toHaveBeenCalled()
     })
+
+    it('should record presses in the document it is given, once', () => {
+      const iframe = document.createElement('iframe')
+      fixtureEl.append(iframe)
+      const doc = iframe.contentDocument
+      doc.body.innerHTML = '<div id="panel"><button id="inside"></button></div>'
+      const spy = spyOn(doc, 'addEventListener').and.callThrough()
+
+      trackPress(doc)
+      const listeners = spy.calls.count()
+      trackPress(doc)
+      doc.querySelector('#inside').dispatchEvent(new iframe.contentWindow.PointerEvent('pointerdown', {
+        bubbles: true, composed: true, button: 0
+      }))
+      const event = new iframe.contentWindow.MouseEvent('click', { bubbles: true, composed: true })
+      doc.body.dispatchEvent(event)
+
+      expect(listeners).toBeGreaterThan(0)
+      expect(spy.calls.count()).toEqual(listeners)
+      expect(pressPathOf(event)).toContain(doc.querySelector('#panel'))
+    })
   })
 })

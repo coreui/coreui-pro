@@ -5,6 +5,7 @@ export type LayerReason = 'escape' | 'outside' | 'parent' | 'sibling'
 export interface LayerEntry {
   anchor: () => Element | null | undefined
   closesOn: (reason: LayerReason, event?: Event) => boolean
+  closesSiblings?: () => boolean
   dismiss: (reason: LayerReason, event: Event | undefined, options: { returnFocus: boolean }) => void
   isOpen: () => boolean
   kind: 'dialog' | 'popup'
@@ -26,6 +27,7 @@ interface ClickSnapshot {
 interface LayerState {
   closed: LayerRecord[]
   listening: WeakSet<Window>
+  pressed: LayerRecord[] | null
   requested: Set<LayerRecord>
   snapshots: WeakMap<Event, ClickSnapshot>
   stack: LayerRecord[]
@@ -43,6 +45,7 @@ const getState = (): LayerState => {
   scope[STATE_KEY] ??= {
     closed: [],
     listening: new WeakSet(),
+    pressed: null,
     requested: new Set(),
     snapshots: new WeakMap(),
     stack: []
@@ -210,7 +213,8 @@ const snapshotClick = (event: Event): void => {
  * @param event - The click
  */
 const decideClick = (event: Event): void => {
-  const snapshot = getState().snapshots.get(event)
+  const { pressed, snapshots } = getState()
+  const snapshot = snapshots.get(event)
 
   if (!snapshot) {
     return
@@ -219,6 +223,10 @@ const decideClick = (event: Event): void => {
   const pressPath = pressPathOf(event)
 
   for (const record of snapshot.stack.toReversed()) {
+    if (pressPath && pressed && !pressed.includes(record)) {
+      continue
+    }
+
     if (!touched(record, snapshot, pressPath, true)) {
       request(record, 'outside', event, false)
     }
@@ -242,7 +250,9 @@ const fallbackEscape = (event: KeyboardEvent): void => {
     return
   }
 
-  const top = getState().stack.findLast(record => record.doc === doc)
+  const state = getState()
+  prune(state)
+  const top = state.stack.findLast(record => record.doc === doc)
 
   if (!top || top.entry.kind === 'dialog' || !top.entry.closesOn('escape', event)) {
     return
@@ -253,34 +263,65 @@ const fallbackEscape = (event: KeyboardEvent): void => {
 }
 
 /**
- * Attaches the engine's listeners to a window once; they stay for the page.
+ * Takes off the stack the layers whose rendered parts have all left the document, as when a page
+ * removes an open component without disposing of it; a part that is not rendered does not count.
+ * Their children move to their parents.
+ *
+ * @param state - The engine state
+ */
+const prune = ({ stack }: LayerState): void => {
+  const removed = stack.filter(record => {
+    const parts = record.entry.parts().filter(Boolean) as Element[]
+    return parts.length > 0 && parts.every(part => !part.isConnected)
+  })
+
+  for (const record of removed) {
+    stack.splice(stack.indexOf(record), 1)
+
+    for (const other of stack) {
+      if (other.parent === record) {
+        other.parent = record.parent
+      }
+    }
+  }
+}
+
+/**
+ * Attaches the engine's listeners to a window and its document once; they stay for the page. The
+ * click is decided on the document, so a listener there that stops it does not keep the layers
+ * open, and a press remembers the layers open when it began.
  *
  * @param doc - The document a layer opened in
  */
 const listen = (doc: Document): void => {
   const view = doc.defaultView
-  const { listening } = getState()
+  const state = getState()
 
-  if (!view || listening.has(view)) {
+  if (!view || state.listening.has(view)) {
     return
   }
 
-  listening.add(view)
-  trackPress()
+  state.listening.add(view)
+  view.addEventListener('pointerdown', event => {
+    state.pressed = event.button === 0 ? [...state.stack] : null
+  }, true)
   view.addEventListener('click', snapshotClick, true)
-  view.addEventListener('click', decideClick)
+  doc.addEventListener('click', decideClick)
   view.addEventListener('keydown', fallbackEscape)
 }
 
 /**
  * Puts an open layer on the stack. Its parent is the deepest open layer whose parts hold its
  * anchor; open layers anchored in its own parts become its children. Every other open layer that
- * accepts it is asked to close as a sibling. Registering a layer twice changes nothing.
+ * accepts it is asked to close as a sibling, unless the layer's `closesSiblings()` says `false`, as
+ * a dialog that leaves the page interactive does. Registering a layer twice changes nothing.
  *
  * @param entry - The layer
  */
 export const registerLayer = (entry: LayerEntry): void => {
-  const { stack } = getState()
+  const state = getState()
+  const { stack } = state
+  prune(state)
 
   if (recordOf(entry)) {
     return
@@ -288,6 +329,7 @@ export const registerLayer = (entry: LayerEntry): void => {
 
   const anchor = entry.anchor()
   const doc = anchor?.ownerDocument ?? entry.parts().find(Boolean)?.ownerDocument ?? document
+  trackPress(doc)
   const candidates = stack.filter(record => record.doc === doc && inParts(record, anchor))
   const parent = candidates.find(record => candidates.every(other => other === record || !inParts(record, other.entry.parts().find(Boolean)))) ?? null
   const record: LayerRecord = {
@@ -300,7 +342,7 @@ export const registerLayer = (entry: LayerEntry): void => {
     }
   }
 
-  const siblings = stack.filter(other => other.doc === doc && !isAncestor(other, record) && !isAncestor(record, other))
+  const siblings = entry.closesSiblings?.() === false ? [] : stack.filter(other => other.doc === doc && !isAncestor(other, record) && !isAncestor(record, other))
   stack.push(record)
   listen(doc)
 
@@ -358,8 +400,8 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
 }
 
 /**
- * Handles Escape on a layer's parts and anchor. An Escape that something inside already handled
- * passes; one that ends an IME composition, repeats, or comes from an open native select closes
+ * Handles Escape on a layer's parts and anchor. An Escape that something inside already handled,
+ * or that comes from a dialog the layer does not sit in, passes; one that ends an IME composition, repeats, or comes from an open native select closes
  * nothing and goes no further; any other closes the layer when it accepts Escape, and goes no
  * further even when the layer refuses.
  *
@@ -368,27 +410,34 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
  * @returns `true` when the Escape stops here, so a framework can stop its own propagation too
  */
 export const handleEscape = (event: KeyboardEvent, entry: LayerEntry): boolean => {
+  const { stack } = getState()
   const record = recordOf(entry)
+  const origin = event.composedPath()[0] as Node
 
-  if (event.key !== 'Escape' || event.defaultPrevented || !record || !entry.isOpen()) {
+  if (event.key !== 'Escape' || event.defaultPrevented || !record || !entry.isOpen() ||
+      stack.some(other => other !== record && other.entry.kind === 'dialog' && !isAncestor(other, record) && inParts(other, origin))) {
     return false
   }
 
   event.stopPropagation()
-
-  if (event.repeat) {
-    event.preventDefault()
-    return true
-  }
+  event.preventDefault()
 
   // eslint-disable-next-line unicorn/prefer-keyboard-event-key -- Safari reports an IME composition only as keyCode 229
-  if (event.isComposing || event.keyCode === 229) {
-    return true
+  if (!event.repeat && !event.isComposing && event.keyCode !== 229) {
+    request(record, 'escape', event, true)
   }
 
-  event.preventDefault()
-  request(record, 'escape', event, true)
   return true
+}
+
+/**
+ * Decides a click at once, for a component that stops its propagation before the document: every
+ * layer the click landed outside of is asked to close, as when the click reaches the document.
+ *
+ * @param event - The click
+ */
+export const settleClick = (event: Event): void => {
+  decideClick(event)
 }
 
 /**
