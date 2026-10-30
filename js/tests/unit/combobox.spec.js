@@ -1554,6 +1554,28 @@ describe('Combobox', () => {
       return { dropdown: new Dropdown(fixtureEl.querySelector('#dd-toggle')), toggle }
     }
 
+    it('should stay open when Tab moves the focus into a menu opened from its panel', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+      combobox.show()
+      const holder = document.createElement('div')
+      holder.className = 'dropdown'
+      holder.innerHTML = '<button class="btn" type="button" id="nested" data-coreui-toggle="dropdown">N</button><div class="dropdown-menu"><button type="button" id="nested-item">I</button></div>'
+      menu(combobox).append(holder)
+      const nested = new Dropdown(holder.querySelector('#nested'), { container: true })
+      nested.show()
+      const item = document.querySelector('#nested-item')
+
+      expect(menu(combobox).contains(item)).toBeFalse()
+
+      item.focus()
+      item.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Tab' }))
+
+      expect(combobox._isShown()).toBeTrue()
+      expect(nested._isShown()).toBeTrue()
+      nested.dispose()
+    })
+
     it('should keep the dropdown open on a choice in the combobox inside it', () => {
       const { dropdown, toggle } = setMarkupInDropdown()
       const combobox = new Combobox(toggle)
