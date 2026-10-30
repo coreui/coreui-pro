@@ -47,6 +47,7 @@ describe('layers', () => {
   afterEach(() => {
     state()?.stack.splice(0)
     state()?.requested.clear()
+    state()?.closed.splice(0)
     clearFixture()
   })
 
@@ -183,6 +184,32 @@ describe('layers', () => {
 
     expect(unregisterLayer(open()).returnFocus).toBeTrue()
     expect(unregisterLayer(open(), 'sibling').returnFocus).toBeFalse()
+  })
+
+  it('should hand the focus back from a descendant that closed earlier in the same task, but not in a later one', async () => {
+    fixtureEl.innerHTML = [
+      '<button id="d"></button><div id="d-panel"><input id="l"></div>',
+      '<div id="l-panel"><button id="day">1</button></div>'
+    ].join('')
+
+    const open = () => {
+      const d = layer('d', { anchor: el('#d'), parts: [el('#d'), el('#d-panel')] })
+      const l = layer('l', { anchor: el('#l'), parts: [el('#l'), el('#l-panel')] })
+      registerLayer(d)
+      registerLayer(l)
+      el('#day').focus()
+      expect(unregisterLayer(l, 'outside').returnFocus).toBeFalse()
+      return d
+    }
+
+    expect(unregisterLayer(open()).returnFocus).toBeTrue()
+
+    const d = open()
+    await new Promise(resolve => {
+      setTimeout(resolve)
+    })
+
+    expect(unregisterLayer(d).returnFocus).toBeFalse()
   })
 
   it('should move a descendant that stays open to the parent of the closing layer', () => {

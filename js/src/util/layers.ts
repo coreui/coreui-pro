@@ -24,6 +24,7 @@ interface ClickSnapshot {
 }
 
 interface LayerState {
+  closed: LayerRecord[]
   listening: WeakSet<Window>
   requested: Set<LayerRecord>
   snapshots: WeakMap<Event, ClickSnapshot>
@@ -40,6 +41,7 @@ const STATE_KEY = Symbol.for('coreui.layers')
 const getState = (): LayerState => {
   const scope = globalThis as unknown as Record<symbol, LayerState | undefined>
   scope[STATE_KEY] ??= {
+    closed: [],
     listening: new WeakSet(),
     requested: new Set(),
     snapshots: new WeakMap(),
@@ -124,6 +126,22 @@ const descendantsOf = (record: LayerRecord, stack: LayerRecord[]): LayerRecord[]
   stack.filter(other => isAncestor(record, other)).toReversed()
 
 /**
+ * Makes the engine forget, when the current task ends, the requests sent and the layers closed in it.
+ *
+ * @param state - The engine state, before anything is added for this task
+ */
+const forgetAtTaskEnd = (state: LayerState): void => {
+  if (state.requested.size > 0 || state.closed.length > 0) {
+    return
+  }
+
+  setTimeout(() => {
+    state.requested.clear()
+    state.closed.length = 0
+  })
+}
+
+/**
  * Sends a layer a close request once per task, so one user action never asks a layer twice.
  *
  * @param record - The layer
@@ -132,17 +150,14 @@ const descendantsOf = (record: LayerRecord, stack: LayerRecord[]): LayerRecord[]
  * @param returnFocus - Whether the layer hands the focus back
  */
 const request = (record: LayerRecord, reason: LayerReason, event: Event | undefined, returnFocus: boolean): void => {
-  const { requested } = getState()
+  const state = getState()
 
-  if (requested.has(record) || record.closing || !record.entry.isOpen() || !record.entry.closesOn(reason, event)) {
+  if (state.requested.has(record) || record.closing || !record.entry.isOpen() || !record.entry.closesOn(reason, event)) {
     return
   }
 
-  if (requested.size === 0) {
-    setTimeout(() => requested.clear())
-  }
-
-  requested.add(record)
+  forgetAtTaskEnd(state)
+  state.requested.add(record)
   record.entry.dismiss(reason, event, { returnFocus })
 }
 
@@ -297,15 +312,17 @@ export const registerLayer = (entry: LayerEntry): void => {
 /**
  * Takes a layer off the stack at the start of its closing. Its descendants are asked to close
  * first, deepest first and without taking the focus; a descendant that stays open moves to the
- * layer's parent. The layer hands the focus back when the focus was in it or in a descendant, or on
- * no element unless a sibling closes it; never when an outside click or its parent closes it.
+ * layer's parent. The layer hands the focus back when the focus was in it or in a descendant, also
+ * one that closed earlier in the same task, or on no element unless a sibling closes it; never when
+ * an outside click or its parent closes it.
  *
  * @param entry - The layer
  * @param reason - Why it closes; none for a close from code or a choice in the layer
  * @returns Whether the layer hands the focus back
  */
 export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { returnFocus: boolean } => {
-  const { stack } = getState()
+  const state = getState()
+  const { closed, stack } = state
   const record = recordOf(entry)
 
   if (!record) {
@@ -314,8 +331,9 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
 
   record.closing = true
   const descendants = descendantsOf(record, stack)
+  const closedBelow = closed.filter(other => isAncestor(record, other))
   const active = deepActiveElement(record.doc)
-  const focusInParts = [record, ...descendants].some(layer => inParts(layer, active))
+  const focusInParts = [record, ...descendants, ...closedBelow].some(layer => inParts(layer, active))
   const focusNowhere = !active || active === record.doc.body
 
   for (const descendant of descendants) {
@@ -323,6 +341,8 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
   }
 
   stack.splice(stack.indexOf(record), 1)
+  forgetAtTaskEnd(state)
+  closed.push(record)
 
   for (const other of stack) {
     if (other.parent === record) {
