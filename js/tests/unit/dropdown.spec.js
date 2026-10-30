@@ -1,6 +1,7 @@
 import { userEvent } from 'vitest/browser'
 import EventHandler from '../../src/dom/event-handler.js'
 import Dropdown from '../../src/dropdown.js'
+import Menu from '../../src/menu.js'
 import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
@@ -1019,6 +1020,27 @@ describe('Dropdown', () => {
     })
   })
 
+  describe('layers', () => {
+    it('should close an open menu when it opens, and the reverse', () => {
+      fixtureEl.innerHTML = [
+        '<div><button id="menu-toggle" data-coreui-toggle="menu">Menu</button><div class="menu"><button class="menu-item">Item</button></div></div>',
+        '<div class="dropdown"><button id="dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button><div class="dropdown-menu"><button class="dropdown-item">Item</button></div></div>'
+      ].join('')
+
+      const menu = new Menu(fixtureEl.querySelector('#menu-toggle'))
+      const dropdown = new Dropdown(fixtureEl.querySelector('#dropdown-toggle'))
+      menu.show()
+      dropdown.show()
+
+      expect(menu._isShown()).toBeFalse()
+      expect(dropdown._isShown()).toBeTrue()
+
+      menu.show()
+
+      expect(dropdown._isShown()).toBeFalse()
+    })
+  })
+
   describe('hide', () => {
     it('should hide a dropdown', () => {
       return new Promise(resolve => {
@@ -1558,55 +1580,43 @@ describe('Dropdown', () => {
     })
 
     it('should remove "show" class if body is clicked, with multiple dropdowns', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<div class="nav">',
-          '  <div class="dropdown" id="testmenu">',
-          '    <a class="dropdown-toggle" data-coreui-toggle="dropdown" href="#testmenu">Test menu</a>',
-          '    <div class="dropdown-menu">',
-          '      <a class="dropdown-item" href="#sub1">Submenu 1</a>',
-          '    </div>',
-          '  </div>',
-          '</div>',
-          '<div class="btn-group">',
-          '  <button class="btn">Actions</button>',
-          '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown"></button>',
-          '  <div class="dropdown-menu">',
-          '    <a class="dropdown-item" href="#">Action 1</a>',
-          '  </div>',
-          '</div>'
-        ].join('')
+      fixtureEl.innerHTML = [
+        '<div class="nav">',
+        '  <div class="dropdown" id="testmenu">',
+        '    <a class="dropdown-toggle" data-coreui-toggle="dropdown" href="#testmenu">Test menu</a>',
+        '    <div class="dropdown-menu">',
+        '      <a class="dropdown-item" href="#sub1">Submenu 1</a>',
+        '    </div>',
+        '  </div>',
+        '</div>',
+        '<div class="btn-group">',
+        '  <button class="btn">Actions</button>',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown"></button>',
+        '  <div class="dropdown-menu">',
+        '    <a class="dropdown-item" href="#">Action 1</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
 
-        const triggerDropdownList = fixtureEl.querySelectorAll('[data-coreui-toggle="dropdown"]')
+      const [triggerFirst, triggerLast] = fixtureEl.querySelectorAll('[data-coreui-toggle="dropdown"]')
 
-        expect(triggerDropdownList).toHaveSize(2)
+      triggerFirst.click()
 
-        const [triggerDropdownFirst, triggerDropdownLast] = triggerDropdownList
+      expect(triggerFirst).toHaveClass('show')
+      expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(1)
 
-        triggerDropdownFirst.addEventListener('shown.coreui.dropdown', () => {
-          expect(triggerDropdownFirst).toHaveClass('show')
-          expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(1)
-          document.body.click()
-        })
+      document.body.click()
 
-        triggerDropdownFirst.addEventListener('hidden.coreui.dropdown', () => {
-          expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(0)
-          triggerDropdownLast.click()
-        })
+      expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(0)
 
-        triggerDropdownLast.addEventListener('shown.coreui.dropdown', () => {
-          expect(triggerDropdownLast).toHaveClass('show')
-          expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(1)
-          document.body.click()
-        })
+      triggerLast.click()
 
-        triggerDropdownLast.addEventListener('hidden.coreui.dropdown', () => {
-          expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(0)
-          resolve()
-        })
+      expect(triggerLast).toHaveClass('show')
+      expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(1)
 
-        triggerDropdownFirst.click()
-      })
+      document.body.click()
+
+      expect(fixtureEl.querySelectorAll('.dropdown-menu.show')).toHaveSize(0)
     })
 
     it('should remove "show" class if body if tabbing outside of menu, with multiple dropdowns', () => {
@@ -2233,8 +2243,7 @@ describe('Dropdown', () => {
           expect(document.activeElement).toEqual(elementToDispatch, `${elementToDispatch.tagName} still focused`)
         }
 
-        const keydownEscape = createEvent('keydown')
-        keydownEscape.key = 'Escape'
+        const keydownEscape = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
 
         triggerDropdown.addEventListener('shown.coreui.dropdown', () => {
           // Key Space
@@ -2289,8 +2298,7 @@ describe('Dropdown', () => {
         // Key escape
         button.focus()
         // Key escape
-        const keydownEscape = createEvent('keydown')
-        keydownEscape.key = 'Escape'
+        const keydownEscape = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
         button.dispatchEvent(keydownEscape)
 
         setTimeout(() => {

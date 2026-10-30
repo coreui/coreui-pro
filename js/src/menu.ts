@@ -44,7 +44,10 @@ import {
   type FloatingOffsetOption,
   type FloatingConfigOption
 } from './util/floating-ui.js'
-import { containsFocus, focusIfUsable, holdsFocusOrNone } from './util/focus.js'
+import { containsFocus, focusIfUsable } from './util/focus.js'
+import {
+  closeLayersIn, handleEscape, isInDescendantParts, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
+} from './util/layers.js'
 import { isFromPanelControl, isFromPanelWidget } from './util/panel-control.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { pressPathOf, trackPress } from './util/press.js'
@@ -162,6 +165,8 @@ class Menu extends BaseComponent {
   protected declare _menuOriginalParent: ParentNode | null
   protected declare _menuDirection: string | null
   protected declare _openedBy: 'key' | 'pointer' | null
+  protected declare _layer: LayerEntry
+  protected declare _escapeListener: EventCallable
 
   constructor(element?: string | Element | null, config?: Partial<MenuConfig> | null) {
     if (typeof computePosition === 'undefined') {
@@ -201,6 +206,8 @@ class Menu extends BaseComponent {
     this._parseResponsivePlacements()
     this._setupSubmenuListeners()
     this._initSubmenuTriggers()
+    this._layer = this._createLayer()
+    this._escapeListener = event => handleEscape(event as unknown as KeyboardEvent, this._layer)
 
     if (this._isMenu) {
       this._announceMenu()
@@ -275,6 +282,8 @@ class Menu extends BaseComponent {
       return
     }
 
+    registerLayer(this._layer)
+    this._toggleEscapeListeners(true)
     this._moveMenuToContainer()
     this._createFloating()
 
@@ -304,6 +313,11 @@ class Menu extends BaseComponent {
   }
 
   override dispose(): void {
+    if (this._isShown()) {
+      unregisterLayer(this._layer, 'parent')
+      this._toggleEscapeListeners(false)
+    }
+
     this._disposeFloating()
     this._restoreMenuToOriginalParent()
     this._disposeMediaQueryListeners()
@@ -351,13 +365,14 @@ class Menu extends BaseComponent {
     return (wrapper instanceof Element ? wrapper : this._element.parentNode) as HTMLElement
   }
 
-  protected _completeHide(relatedTarget: Record<string, unknown>, returnFocus = true): void {
+  protected _completeHide(relatedTarget: Record<string, unknown>, reason?: LayerReason, returnFocus = true): void {
     const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName('hide'), relatedTarget)
     if (hideEvent.defaultPrevented) {
       return
     }
 
-    const refocus = returnFocus && holdsFocusOrNone(this._menu)
+    const refocus = unregisterLayer(this._layer, reason).returnFocus && returnFocus
+    this._toggleEscapeListeners(false)
 
     this._closeAllSubmenus()
 
@@ -380,6 +395,33 @@ class Menu extends BaseComponent {
     }
 
     EventHandler.trigger(this._element, this.constructor.eventName('hidden'), relatedTarget)
+  }
+
+  protected _createLayer(): LayerEntry {
+    return {
+      anchor: () => this._element,
+      closesOn: reason => reason === 'escape' || reason === 'parent' || this._config.autoClose === true || this._config.autoClose === 'outside',
+      dismiss: (reason, event) => {
+        const relatedTarget: Record<string, unknown> = { relatedTarget: this._element }
+
+        if (event?.type === 'click') {
+          relatedTarget.clickEvent = event
+        }
+
+        this._completeHide(relatedTarget, reason)
+      },
+      isOpen: () => this._isShown(),
+      kind: 'popup',
+      parts: () => [this._element, this._menu]
+    }
+  }
+
+  protected _toggleEscapeListeners(listen: boolean): void {
+    for (const element of new Set([this._layer.anchor(), ...this._layer.parts()])) {
+      if (element) {
+        (listen ? EventHandler.on : EventHandler.off)(element, 'keydown', this._escapeListener)
+      }
+    }
   }
 
   protected _setShown(shown: boolean): void {
@@ -925,6 +967,7 @@ class Menu extends BaseComponent {
 
     this._openSubmenus.delete(submenu)
     this._hoverOpenedSubmenus.delete(submenu)
+    closeLayersIn(submenu)
 
     if (trigger) {
       trigger.setAttribute('aria-expanded', 'false')
@@ -1111,7 +1154,7 @@ class Menu extends BaseComponent {
       return
     }
 
-    this._completeHide({ relatedTarget: this._element }, false)
+    this._completeHide({ relatedTarget: this._element }, undefined, false)
 
     if (fromToggle) {
       return
@@ -1240,6 +1283,11 @@ class Menu extends BaseComponent {
 
       const composedPath = event.composedPath()
       const isMenuTarget = composedPath.includes(instance._menu)
+
+      if (event.type === 'click' && (!isMenuTarget || isInDescendantParts(event, instance._layer))) {
+        continue
+      }
+
       const pressPath = isMenuTarget ? null : pressPathOf(event)
       if (
         instance._isToggleTarget(composedPath) ||
@@ -1250,7 +1298,7 @@ class Menu extends BaseComponent {
         continue
       }
 
-      if ((event.type === 'keyup' && event.key === TAB_KEY && instance._menu.contains(event.target as HTMLElement)) ||
+      if ((event.type === 'keyup' && event.key === TAB_KEY && (instance._menu.contains(event.target as HTMLElement) || isInDescendantParts(event, instance._layer))) ||
           isFromPanelControl(event, instance._menu, instance.constructor.SELECTOR_ITEM)) {
         continue
       }
@@ -1261,7 +1309,7 @@ class Menu extends BaseComponent {
         relatedTarget.clickEvent = event
       }
 
-      instance._completeHide(relatedTarget, isMenuTarget && event.type === 'click')
+      instance._completeHide(relatedTarget, event.type === 'click' ? undefined : 'outside')
     }
   }
 
@@ -1329,23 +1377,18 @@ class Menu extends BaseComponent {
     }
 
     if (isEscapeEvent && instance._isShown()) {
-      event.preventDefault()
-      event.stopPropagation()
-
       const currentMenu = (event.target as Element).closest(this.SELECTOR_MENU)
       const parentSubmenuWrapper = currentMenu?.closest(this.SELECTOR_SUBMENU)
 
       if (parentSubmenuWrapper && instance._openSubmenus.size > 0) {
+        event.preventDefault()
+        event.stopPropagation()
         const parentTrigger = SelectorEngine.findOne(this.SELECTOR_SUBMENU_TOGGLE, parentSubmenuWrapper)
         instance._closeSubmenu(currentMenu as HTMLElement, parentSubmenuWrapper)
         if (parentTrigger) {
           parentTrigger.focus()
         }
-
-        return
       }
-
-      instance.hide()
     }
   }
 

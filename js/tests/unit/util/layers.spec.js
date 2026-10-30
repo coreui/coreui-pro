@@ -1,5 +1,5 @@
 import {
-  getParentLayer, handleEscape, isInDescendantParts, registerLayer, unregisterLayer
+  closeLayersIn, getParentLayer, handleEscape, isInDescendantParts, registerLayer, unregisterLayer
 } from '../../../src/util/layers.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -275,6 +275,15 @@ describe('layers', () => {
     el('#in-d').click()
 
     expect(answers).toEqual([true, false])
+
+    const keyup = new KeyboardEvent('keyup', { bubbles: true, key: 'Tab' })
+    let answer = null
+    el('#l-panel').addEventListener('keyup', event => {
+      answer = isInDescendantParts(event, d)
+    })
+    el('#l-panel').dispatchEvent(keyup)
+
+    expect(answer).toBeTrue()
   })
 
   it('should close the layer an Escape comes from and stop it, also when the layer refuses', () => {
@@ -350,6 +359,19 @@ describe('layers', () => {
 
     expect(event.defaultPrevented).toBeTrue()
     expect(d.open).toBeFalse()
+  })
+
+  it('should close the layers anchored inside an element that hides', () => {
+    fixtureEl.innerHTML = '<div id="submenu"><input id="field"></div><button id="other"></button>'
+
+    const inside = layer('inside', { anchor: el('#field'), parts: [el('#field')], refuses: ['sibling'] })
+    const outside = layer('outside', { anchor: el('#other'), parts: [el('#other')], refuses: ['sibling'] })
+    registerLayer(inside)
+    registerLayer(outside)
+    closeLayersIn(el('#submenu'))
+
+    expect(calls.map(call => [call.name, call.reason])).toEqual([['inside', 'parent']])
+    expect(outside.open).toBeTrue()
   })
 
   it('should ask a layer once per task even when several rules reach it', () => {

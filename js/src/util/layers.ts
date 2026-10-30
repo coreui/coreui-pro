@@ -71,6 +71,22 @@ const containsAcross = (container: Element, node: Node | null | undefined): bool
 }
 
 /**
+ * Returns the focused element of a document, looking into open shadow roots.
+ *
+ * @param doc - The document
+ * @returns The deepest focused element, or `null`
+ */
+const deepActiveElement = (doc: Document): Element | null => {
+  let active = doc.activeElement
+
+  while (active?.shadowRoot?.activeElement) {
+    active = active.shadowRoot.activeElement
+  }
+
+  return active
+}
+
+/**
  * Tells whether a node lies inside any of a layer's parts.
  *
  * @param record - The layer
@@ -298,7 +314,7 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
 
   record.closing = true
   const descendants = descendantsOf(record, stack)
-  const active = record.doc.activeElement
+  const active = deepActiveElement(record.doc)
   const focusInside = !active || active === record.doc.body ||
     [record, ...descendants].some(layer => inParts(layer, active))
 
@@ -350,17 +366,38 @@ export const handleEscape = (event: KeyboardEvent, entry: LayerEntry): void => {
 }
 
 /**
- * Tells whether a click landed in the parts of one of a layer's descendants, as they were when the
- * click began. A component asks this before it treats a click as one inside its own panel.
+ * Tells whether an event landed in the parts of one of a layer's descendants: the descendants as
+ * they were when a click began, and the ones open now (a child the click itself opened, a key event
+ * that has no snapshot). A component asks this before it treats a click or a focus move as one
+ * inside its own panel.
  *
- * @param event - The click
+ * @param event - The click or key event
  * @param entry - The layer
- * @returns `true` when the click or its press touched a descendant
+ * @returns `true` when the event or its press touched a descendant
  */
 export const isInDescendantParts = (event: Event, entry: LayerEntry): boolean => {
-  const snapshot = getState().snapshots.get(event)
-  const record = snapshot?.stack.find(layer => layer.entry === entry)
-  return Boolean(snapshot && record && touched(record, snapshot, pressPathOf(event), false))
+  const { snapshots, stack } = getState()
+  const snapshot = snapshots.get(event)
+  const snapped = snapshot?.stack.find(layer => layer.entry === entry)
+  const record = recordOf(entry)
+  const path = event.composedPath()
+
+  return Boolean(snapshot && snapped && touched(snapped, snapshot, pressPathOf(event), false)) ||
+    Boolean(record && descendantsOf(record, stack).some(descendant => path.some(node => inParts(descendant, node as Node))))
+}
+
+/**
+ * Asks every open layer anchored inside an element to close as if its parent closed. A part of a
+ * component that is not a layer itself (a submenu) calls this when it hides.
+ *
+ * @param container - The element that hides
+ */
+export const closeLayersIn = (container: Element): void => {
+  for (const record of getState().stack.toReversed()) {
+    if (containsAcross(container, record.entry.anchor())) {
+      request(record, 'parent', undefined, false)
+    }
+  }
 }
 
 /**

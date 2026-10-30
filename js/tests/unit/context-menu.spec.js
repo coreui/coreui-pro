@@ -1406,6 +1406,23 @@ describe('ContextMenu', () => {
       expect(menu).not.toHaveClass('show')
     })
 
+    it('should move a shared panel to the area right-clicked next', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area-one" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu">One</div>',
+        '<div class="area-two" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu">Two</div>',
+        '<div class="menu" id="sharedMenu"><button class="menu-item" type="button">Copy</button></div>'
+      ].join('')
+
+      const areaOne = fixtureEl.querySelector('.area-one')
+      const areaTwo = fixtureEl.querySelector('.area-two')
+      rightClick(areaOne)
+      rightClick(areaTwo)
+
+      expect(ContextMenu.getInstance(areaOne)._isShown()).toBeFalse()
+      expect(ContextMenu.getInstance(areaTwo)._isShown()).toBeTrue()
+      expect(fixtureEl.querySelector('#sharedMenu')).toHaveClass('show')
+    })
+
     it('should close a shared panel through the instance that opened it on Escape from another area', () => {
       fixtureEl.innerHTML = [
         '<div class="area-one" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu">One</div>',
@@ -1440,6 +1457,31 @@ describe('ContextMenu', () => {
       areaTwo.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
 
       expect(Menu._openInstances.has(one)).toBeFalse()
+    })
+
+    it('should close an open menu when it opens from a right-click or from Shift+F10', () => {
+      fixtureEl.innerHTML = [
+        markup(),
+        '<div><button id="toggle" data-coreui-toggle="menu">Menu</button><div class="menu" id="other"><button class="menu-item">Other</button></div></div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const other = new Menu(fixtureEl.querySelector('#toggle'))
+
+      other.show()
+      rightClick(area)
+
+      expect(other._isShown()).toBeFalse()
+
+      ContextMenu.getInstance(area).hide()
+      other.show()
+      area.focus()
+      area.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true, cancelable: true, key: 'F10', shiftKey: true
+      }))
+
+      expect(other._isShown()).toBeFalse()
+      expect(ContextMenu.getInstance(area)._isShown()).toBeTrue()
     })
 
     it('should open anchored to the trigger on Shift+F10 and on the Menu key', () => {

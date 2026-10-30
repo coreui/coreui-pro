@@ -1034,6 +1034,139 @@ describe('Menu', () => {
     })
   })
 
+  describe('layers', () => {
+    const menuMarkup = (id, autoClose = 'true', inner = '') => [
+      '<div>',
+      `  <button class="btn" id="${id}" data-coreui-toggle="menu" data-coreui-auto-close="${autoClose}">${id}</button>`,
+      `  <div class="menu"><button class="menu-item" id="${id}-item">${id} item</button>${inner}</div>`,
+      '</div>'
+    ].join('')
+
+    const escape = target => {
+      const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+      target.dispatchEvent(event)
+      return event
+    }
+
+    it('should close other open menus when one opens from code', () => {
+      fixtureEl.innerHTML = menuMarkup('a') + menuMarkup('b')
+
+      const a = new Menu(fixtureEl.querySelector('#a'))
+      const b = new Menu(fixtureEl.querySelector('#b'))
+      a.show()
+      b.show()
+
+      expect(a._isShown()).toBeFalse()
+      expect(b._isShown()).toBeTrue()
+    })
+
+    it('should close an open menu when another opens with the arrow key and leave the focus in the new one', () => {
+      fixtureEl.innerHTML = menuMarkup('a') + menuMarkup('b')
+
+      const a = new Menu(fixtureEl.querySelector('#a'))
+      const toggleB = fixtureEl.querySelector('#b')
+      a.show()
+      toggleB.focus()
+      toggleB.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowDown' }))
+
+      expect(a._isShown()).toBeFalse()
+      expect(Menu.getInstance(toggleB)._isShown()).toBeTrue()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#b-item'))
+    })
+
+    it('should keep a menu with autoClose false or inside, and the menu that holds the toggle of the one that opens', () => {
+      fixtureEl.innerHTML = menuMarkup('b', 'false') + menuMarkup('c', 'inside') + menuMarkup('d', 'true', menuMarkup('e'))
+
+      const menus = ['b', 'c', 'd', 'e'].map(id => new Menu(fixtureEl.querySelector(`#${id}`)))
+
+      for (const menu of menus) {
+        menu.show()
+      }
+
+      for (const menu of menus) {
+        expect(menu._isShown()).toBeTrue()
+      }
+    })
+
+    it('should keep a menu whose hide event is prevented, and open nothing when the show event is prevented', () => {
+      fixtureEl.innerHTML = menuMarkup('a') + menuMarkup('b') + menuMarkup('c')
+
+      const toggleA = fixtureEl.querySelector('#a')
+      const toggleC = fixtureEl.querySelector('#c')
+      const [a, b, c] = [toggleA, fixtureEl.querySelector('#b'), toggleC].map(toggle => new Menu(toggle))
+      toggleA.addEventListener('hide.coreui.menu', event => event.preventDefault())
+      toggleC.addEventListener('show.coreui.menu', event => event.preventDefault())
+      a.show()
+      b.show()
+
+      expect(a._isShown()).toBeTrue()
+
+      c.show()
+
+      expect(b._isShown()).toBeTrue()
+      expect(c._isShown()).toBeFalse()
+    })
+
+    it('should close only the inner menu on Escape in it, and the outer one on the next Escape', () => {
+      fixtureEl.innerHTML = menuMarkup('outer', 'true', menuMarkup('inner'))
+
+      const outer = new Menu(fixtureEl.querySelector('#outer'))
+      const inner = new Menu(fixtureEl.querySelector('#inner'))
+      outer.show()
+      inner.show()
+      fixtureEl.querySelector('#inner-item').focus()
+
+      expect(escape(fixtureEl.querySelector('#inner-item')).defaultPrevented).toBeTrue()
+      expect(inner._isShown()).toBeFalse()
+      expect(outer._isShown()).toBeTrue()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#inner'))
+
+      escape(document.activeElement)
+
+      expect(outer._isShown()).toBeFalse()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#outer'))
+    })
+
+    it('should keep the outer menu on a click in the moved panel of an inner one, and close both from the outer toggle with the focus back on it', () => {
+      fixtureEl.innerHTML = menuMarkup('outer', 'true', menuMarkup('inner', 'outside'))
+
+      const outer = new Menu(fixtureEl.querySelector('#outer'))
+      const inner = new Menu(fixtureEl.querySelector('#inner'), { container: true })
+      outer.show()
+      inner.show()
+      const innerItem = document.querySelector('#inner-item')
+
+      expect(innerItem.closest('.menu').parentNode).toEqual(document.body)
+
+      innerItem.focus()
+      document.querySelector('#inner-item').closest('.menu').click()
+
+      expect(outer._isShown()).toBeTrue()
+      expect(inner._isShown()).toBeTrue()
+
+      outer.hide()
+
+      expect(inner._isShown()).toBeFalse()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#outer'))
+    })
+
+    it('should close the top menu on Escape when the focus is on no element, but not from a page field', () => {
+      fixtureEl.innerHTML = `${menuMarkup('a')}<input id="field">`
+
+      const a = new Menu(fixtureEl.querySelector('#a'))
+      a.show()
+      fixtureEl.querySelector('#field').focus()
+      escape(fixtureEl.querySelector('#field'))
+
+      expect(a._isShown()).toBeTrue()
+
+      fixtureEl.querySelector('#field').blur()
+      escape(document.body)
+
+      expect(a._isShown()).toBeFalse()
+    })
+  })
+
   describe('hide', () => {
     it('should hide a menu', () => {
       return new Promise(resolve => {
@@ -1639,55 +1772,43 @@ describe('Menu', () => {
     })
 
     it('should remove "show" class if body is clicked, with multiple menus', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<div class="nav">',
-          '  <div id="testmenu">',
-          '    <a class="btn" href="#testmenu" role="button" data-coreui-toggle="menu" aria-expanded="false">Test menu</a>',
-          '    <div class="menu">',
-          '      <a class="menu-item" href="#sub1">Submenu 1</a>',
-          '    </div>',
-          '  </div>',
-          '</div>',
-          '<div class="btn-group">',
-          '  <button class="btn">Actions</button>',
-          '  <button class="btn" data-coreui-toggle="menu"></button>',
-          '  <div class="menu">',
-          '    <a class="menu-item" href="#">Action 1</a>',
-          '  </div>',
-          '</div>'
-        ].join('')
+      fixtureEl.innerHTML = [
+        '<div class="nav">',
+        '  <div id="testmenu">',
+        '    <a class="btn" href="#testmenu" role="button" data-coreui-toggle="menu" aria-expanded="false">Test menu</a>',
+        '    <div class="menu">',
+        '      <a class="menu-item" href="#sub1">Submenu 1</a>',
+        '    </div>',
+        '  </div>',
+        '</div>',
+        '<div class="btn-group">',
+        '  <button class="btn">Actions</button>',
+        '  <button class="btn" data-coreui-toggle="menu"></button>',
+        '  <div class="menu">',
+        '    <a class="menu-item" href="#">Action 1</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
 
-        const triggerMenuList = fixtureEl.querySelectorAll('[data-coreui-toggle="menu"]')
+      const [triggerFirst, triggerLast] = fixtureEl.querySelectorAll('[data-coreui-toggle="menu"]')
 
-        expect(triggerMenuList).toHaveSize(2)
+      triggerFirst.click()
 
-        const [triggerMenuFirst, triggerMenuLast] = triggerMenuList
+      expect(triggerFirst).toHaveClass('show')
+      expect(fixtureEl.querySelectorAll('.menu.show')).toHaveSize(1)
 
-        triggerMenuFirst.addEventListener('shown.coreui.menu', () => {
-          expect(triggerMenuFirst).toHaveClass('show')
-          expect(fixtureEl.querySelectorAll('.menu.show')).toHaveSize(1)
-          document.body.click()
-        })
+      document.body.click()
 
-        triggerMenuFirst.addEventListener('hidden.coreui.menu', () => {
-          expect(fixtureEl.querySelectorAll('.menu.show')).toHaveSize(0)
-          triggerMenuLast.click()
-        })
+      expect(fixtureEl.querySelectorAll('.menu.show')).toHaveSize(0)
 
-        triggerMenuLast.addEventListener('shown.coreui.menu', () => {
-          expect(triggerMenuLast).toHaveClass('show')
-          expect(fixtureEl.querySelectorAll('.menu.show')).toHaveSize(1)
-          document.body.click()
-        })
+      triggerLast.click()
 
-        triggerMenuLast.addEventListener('hidden.coreui.menu', () => {
-          expect(fixtureEl.querySelectorAll('.menu.show')).toHaveSize(0)
-          resolve()
-        })
+      expect(triggerLast).toHaveClass('show')
+      expect(fixtureEl.querySelectorAll('.menu.show')).toHaveSize(1)
 
-        triggerMenuFirst.click()
-      })
+      document.body.click()
+
+      expect(fixtureEl.querySelectorAll('.menu.show')).toHaveSize(0)
     })
 
     it('should remove "show" class if body if tabbing outside of menu, with multiple menus', () => {
@@ -2423,8 +2544,7 @@ describe('Menu', () => {
           expect(document.activeElement).toEqual(elementToDispatch, `${elementToDispatch.tagName} still focused`)
         }
 
-        const keydownEscape = createEvent('keydown')
-        keydownEscape.key = 'Escape'
+        const keydownEscape = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
 
         triggerMenu.addEventListener('shown.coreui.menu', () => {
           // Key Space
@@ -2479,8 +2599,7 @@ describe('Menu', () => {
         // Key escape
         button.focus()
         // Key escape
-        const keydownEscape = createEvent('keydown')
-        keydownEscape.key = 'Escape'
+        const keydownEscape = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
         button.dispatchEvent(keydownEscape)
 
         setTimeout(() => {
@@ -6639,6 +6758,7 @@ describe('Menu', () => {
       fixtureEl.innerHTML = markup
 
       const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const panel = fixtureEl.querySelector('.menu')
       new Menu(toggle, { container: true }).show()
       toggle.focus()
 
@@ -6647,7 +6767,7 @@ describe('Menu', () => {
 
       await userEvent.keyboard('{Tab}{Tab}')
       expect(document.activeElement.id).toEqual('after')
-      expect(document.querySelector('.menu')).not.toHaveClass('show')
+      expect(panel).not.toHaveClass('show')
     })
 
     it('should leave the panel when the toggle is the last stop before it', async () => {
@@ -6657,11 +6777,12 @@ describe('Menu', () => {
       ].join('')
 
       const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const panel = fixtureEl.querySelector('.menu')
       new Menu(toggle, { container: true }).show()
       document.querySelector('#last').focus()
 
       await userEvent.keyboard('{Tab}')
-      expect(document.querySelector('.menu').contains(document.activeElement)).toBeFalse()
+      expect(panel.contains(document.activeElement)).toBeFalse()
     })
 
     it('should leave Shift+Tab from the toggle to the browser', async () => {
@@ -6701,12 +6822,13 @@ describe('Menu', () => {
       fixtureEl.innerHTML = markup
 
       const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const panel = fixtureEl.querySelector('.menu')
       new Menu(toggle, { container: true }).show()
       document.querySelector('#first').focus()
 
       await userEvent.keyboard('{Shift>}{Tab}{/Shift}')
       expect(document.activeElement).toEqual(toggle)
-      expect(document.querySelector('.menu')).toHaveClass('show')
+      expect(panel).toHaveClass('show')
     })
   })
 })
