@@ -1150,6 +1150,26 @@ describe('Menu', () => {
       expect(document.activeElement).toEqual(fixtureEl.querySelector('#outer'))
     })
 
+    it('should close a menu opened from a submenu when the submenu closes, and keep the outer menu', () => {
+      fixtureEl.innerHTML = menuMarkup('outer', 'true', [
+        '<div class="submenu" id="wrapper"><button class="menu-item" id="trigger" type="button">More</button>',
+        `<div class="menu" id="sub">${menuMarkup('inner', 'outside')}</div></div>`
+      ].join(''))
+
+      const outer = new Menu(fixtureEl.querySelector('#outer'))
+      const inner = new Menu(fixtureEl.querySelector('#inner'), { container: true })
+      outer.show()
+      outer._openSubmenu(fixtureEl.querySelector('#trigger'), fixtureEl.querySelector('#sub'), fixtureEl.querySelector('#wrapper'))
+      inner.show()
+
+      expect(inner._isShown()).toBeTrue()
+
+      outer._closeSubmenu(fixtureEl.querySelector('#sub'), fixtureEl.querySelector('#wrapper'))
+
+      expect(inner._isShown()).toBeFalse()
+      expect(outer._isShown()).toBeTrue()
+    })
+
     it('should close the top menu on Escape when the focus is on no element, but not from a page field', () => {
       fixtureEl.innerHTML = `${menuMarkup('a')}<input id="field">`
 
