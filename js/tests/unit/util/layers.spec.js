@@ -157,7 +157,7 @@ describe('layers', () => {
     expect(state().stack).toEqual([])
   })
 
-  it('should not hand the focus back for an outside click, a sibling or a parent, nor when the focus is elsewhere', () => {
+  it('should hand the focus back for a sibling only from inside, never for an outside click or a parent, nor when the focus is elsewhere', () => {
     fixtureEl.innerHTML = '<button id="d"></button><div id="d-panel"><button id="item"></button></div><input id="elsewhere">'
 
     const open = () => {
@@ -168,10 +168,11 @@ describe('layers', () => {
 
     el('#item').focus()
 
-    for (const reason of ['outside', 'sibling', 'parent']) {
+    for (const reason of ['outside', 'parent']) {
       expect(unregisterLayer(open(), reason).returnFocus).toBeFalse()
     }
 
+    expect(unregisterLayer(open(), 'sibling').returnFocus).toBeTrue()
     expect(unregisterLayer(open(), 'escape').returnFocus).toBeTrue()
 
     el('#elsewhere').focus()
@@ -181,6 +182,7 @@ describe('layers', () => {
     el('#elsewhere').blur()
 
     expect(unregisterLayer(open()).returnFocus).toBeTrue()
+    expect(unregisterLayer(open(), 'sibling').returnFocus).toBeFalse()
   })
 
   it('should move a descendant that stays open to the parent of the closing layer', () => {

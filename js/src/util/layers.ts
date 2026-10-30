@@ -297,8 +297,8 @@ export const registerLayer = (entry: LayerEntry): void => {
 /**
  * Takes a layer off the stack at the start of its closing. Its descendants are asked to close
  * first, deepest first and without taking the focus; a descendant that stays open moves to the
- * layer's parent. The layer hands the focus back when the focus was in it, in a descendant or on
- * no element, unless it closes because of an outside click, a sibling or its parent.
+ * layer's parent. The layer hands the focus back when the focus was in it or in a descendant, or on
+ * no element unless a sibling closes it; never when an outside click or its parent closes it.
  *
  * @param entry - The layer
  * @param reason - Why it closes; none for a close from code or a choice in the layer
@@ -315,8 +315,8 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
   record.closing = true
   const descendants = descendantsOf(record, stack)
   const active = deepActiveElement(record.doc)
-  const focusInside = !active || active === record.doc.body ||
-    [record, ...descendants].some(layer => inParts(layer, active))
+  const focusInParts = [record, ...descendants].some(layer => inParts(layer, active))
+  const focusNowhere = !active || active === record.doc.body
 
   for (const descendant of descendants) {
     request(descendant, 'parent', undefined, false)
@@ -330,7 +330,11 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
     }
   }
 
-  return { returnFocus: focusInside && reason !== 'outside' && reason !== 'sibling' && reason !== 'parent' }
+  if (reason === 'outside' || reason === 'parent') {
+    return { returnFocus: false }
+  }
+
+  return { returnFocus: focusInParts || (reason !== 'sibling' && focusNowhere) }
 }
 
 /**
