@@ -1988,8 +1988,9 @@ Menus, dropdowns, context menus, the picker panels and the panels of Autocomplet
 Combobox and Multi Select now share one stack of open panels, with Modal, Offcanvas,
 Drawer and Dialog as the parents of what opens in them. What changes:
 
-- **Opening a panel closes the open panels it does not sit in.** A menu used to leave an
-  open picker or combobox panel open, and a picker left the menus open. A panel opened
+- **Opening a panel closes the open panels it does not sit in.** A menu opened from the
+  keyboard or from code used to leave an open picker or combobox panel open, and a picker opened
+  that way left the menus open. A panel opened
   from inside another one, as a date picker in a dropdown or a menu in a submenu, stays
   open together with it. A menu with `autoClose: false` or `'inside'` stays open as before.
 - **A panel closes with the panel or dialog it was opened from.** Closing a dropdown closes
@@ -2000,7 +2001,7 @@ Drawer and Dialog as the parents of what opens in them. What changes:
 - **A click outside closes every open panel it lands outside of, at once**, and a click in
   a panel opened from another one counts as a click inside both. A click outside that no
   press started, as from the keyboard, assistive technology or code, now closes the picker
-  panels too, and a click the page stops before it reaches the window keeps every panel
+  panels too, and a click the page stops before it reaches the document keeps every panel
   open.
 - **<kbd>Escape</kbd> closes the panel that holds the focus, together with the panels
   opened from it, and goes no further**, so it never closes the dialog around the panel.
@@ -2010,7 +2011,8 @@ Drawer and Dialog as the parents of what opens in them. What changes:
 - **A modal or dialog opened from an item of a menu that the opening closes hands the focus
   to that menu's toggle when it hides**, since the item is hidden by then.
 - **A modal, offcanvas, drawer or dialog never closes because a panel opened or on a click
-  in one.** Opening it closes the panels open on the page under it.
+  in one.** Opening it as a modal closes the panels open on the page under it; one that leaves the
+  page interactive leaves them open.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The `clearMenus()` statics of Combobox, Autocomplete and Multi Select are removed**;
   the stack closes their panels. `Menu.clearMenus()` and `Dropdown.clearMenus()` stay and

@@ -20,7 +20,7 @@ Bootstrap modals are lightweight and multi-purpose popups built on the native `<
 - Focus trapping, background inertness, and the dialog ARIA semantics come from the browser — no `role`, `aria-modal`, `aria-hidden`, or `tabindex` attributes are needed in the markup.
 - The backdrop is the native `::backdrop` pseudo-element. Clicking it closes the modal, and page scroll is blocked while a modal is open.
 - Modals are vertically and horizontally centered by the browser.
-- Menus, pickers and combobox panels open in the modal close when it hides, and opening the modal closes the ones open on the page. A click in such a panel or <kbd>Esc</kbd> pressed in it never closes the modal.
+- Menus, pickers and combobox panels open in the modal close when it hides, and opening the modal as a modal closes the ones open on the page. A click in such a panel or <kbd>Esc</kbd> pressed in it never closes the modal.
 - Due to how HTML5 defines its semantics, [the `autofocus` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-autofocus) has no effect in CoreUI modals. To achieve the same effect, use some custom JavaScript:
 
 ```js
