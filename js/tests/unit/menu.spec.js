@@ -5261,6 +5261,259 @@ describe('Menu', () => {
         menu.show()
       })
     })
+
+    it('should leave the arrows, Home and End to a widget with its own keys in the panel', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a class="menu-item" href="#">Item</a>',
+          '    <div id="slider" role="slider" tabindex="0" aria-valuenow="5">5</div>',
+          '    <div role="radiogroup"><span id="radio" role="radio" tabindex="0" aria-checked="true">A</span></div>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          for (const control of [fixtureEl.querySelector('#slider'), fixtureEl.querySelector('#radio')]) {
+            control.focus()
+
+            for (const key of ['ArrowDown', 'ArrowUp', 'Home', 'End', 'ArrowLeft', 'ArrowRight']) {
+              const event = createEvent('keydown', { bubbles: true, cancelable: true })
+              event.key = key
+              control.dispatchEvent(event)
+
+              expect(event.defaultPrevented).toBeFalse()
+              expect(document.activeElement).toEqual(control)
+            }
+          }
+
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+
+    it('should still open from the arrow keys when the menu sits in a toolbar of the page', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div role="toolbar">',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu"><a id="item" class="menu-item" href="#">Item</a><a id="next" class="menu-item" href="#">Next</a><button id="plain" type="button">Plain</button></div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          setTimeout(() => {
+            const item = fixtureEl.querySelector('#item')
+            expect(document.activeElement).toEqual(item)
+
+            const event = createEvent('keydown', { bubbles: true, cancelable: true })
+            event.key = 'ArrowDown'
+            item.dispatchEvent(event)
+            expect(document.activeElement).toEqual(fixtureEl.querySelector('#next'))
+
+            const plain = fixtureEl.querySelector('#plain')
+            plain.focus()
+            const fromPlain = createEvent('keydown', { bubbles: true, cancelable: true })
+            fromPlain.key = 'ArrowDown'
+            plain.dispatchEvent(fromPlain)
+            expect(fromPlain.defaultPrevented).toBeTrue()
+            resolve()
+          })
+        })
+
+        btnMenu.focus()
+        const event = createEvent('keydown', { bubbles: true, cancelable: true })
+        event.key = 'ArrowDown'
+        btnMenu.dispatchEvent(event)
+      })
+    })
+
+    it('should keep the menu open on a click on a label or a switch in the panel without a form', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <label><input type="checkbox"> <span id="caption">Notify</span></label>',
+          '    <div id="switch" role="switch" tabindex="0" aria-checked="false">Wi-Fi</div>',
+          '    <a id="item" class="menu-item" href="#">Item</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          fixtureEl.querySelector('#caption').dispatchEvent(createEvent('click', { bubbles: true }))
+          expect(btnMenu).toHaveClass('show')
+
+          fixtureEl.querySelector('#switch').dispatchEvent(createEvent('click', { bubbles: true }))
+          expect(btnMenu).toHaveClass('show')
+
+          btnMenu.addEventListener('hidden.coreui.menu', () => {
+            expect().nothing()
+            resolve()
+          })
+          fixtureEl.querySelector('#item').dispatchEvent(createEvent('click', { bubbles: true }))
+        })
+
+        btnMenu.click()
+      })
+    })
+
+    it('should open a link submenu trigger with Space in a role="menu" panel instead of following it', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu" role="menu">',
+          '    <div class="submenu"><a id="trigger" class="menu-item" href="#more">More</a>',
+          '      <div class="menu"><a id="sub" class="menu-item" href="#sub">Sub</a></div>',
+          '    </div>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const trigger = fixtureEl.querySelector('#trigger')
+        const onClick = jasmine.createSpy('click').and.callFake(event => event.preventDefault())
+        trigger.addEventListener('click', onClick)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          trigger.focus()
+          const event = createEvent('keydown', { bubbles: true, cancelable: true })
+          event.key = ' '
+          trigger.dispatchEvent(event)
+
+          setTimeout(() => {
+            expect(event.defaultPrevented).toBeTrue()
+            expect(onClick).not.toHaveBeenCalled()
+            expect(trigger.closest('.submenu')).toHaveClass('show')
+            resolve()
+          }, 20)
+        })
+
+        new Menu(btnMenu).show()
+      })
+    })
+
+    it('should keep the arrow keys for items in a toolbar of the panel and close on an option item', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a id="one" class="menu-item" href="#">One</a>',
+          '    <div role="toolbar"><button id="two" class="menu-item" type="button">Two</button><button id="three" class="menu-item" type="button">Three</button></div>',
+          '    <button id="option" class="menu-item" type="button" role="option">Option</button>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const two = fixtureEl.querySelector('#two')
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          two.focus()
+          const event = createEvent('keydown', { bubbles: true, cancelable: true })
+          event.key = 'ArrowDown'
+          two.dispatchEvent(event)
+          expect(event.defaultPrevented).toBeTrue()
+          expect(document.activeElement).not.toEqual(two)
+
+          btnMenu.addEventListener('hidden.coreui.menu', () => {
+            expect().nothing()
+            resolve()
+          })
+          fixtureEl.querySelector('#option').dispatchEvent(createEvent('click', { bubbles: true }))
+        })
+
+        btnMenu.click()
+      })
+    })
+
+    it('should click a link item that is also a menu toggle once on Space', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu" role="menu">',
+          '    <div><a id="nested" class="menu-item" data-coreui-toggle="menu" role="button" href="#">Nested</a>',
+          '      <div class="menu" role="menu"><a class="menu-item" href="#">Inner</a></div>',
+          '    </div>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const nested = fixtureEl.querySelector('#nested')
+        const onClick = jasmine.createSpy('click')
+        nested.addEventListener('click', onClick)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          nested.focus()
+          const event = createEvent('keydown', { bubbles: true, cancelable: true })
+          event.key = ' '
+          nested.dispatchEvent(event)
+
+          expect(onClick).toHaveBeenCalledTimes(1)
+          resolve()
+        })
+
+        new Menu(btnMenu).show()
+      })
+    })
+
+    it('should activate a link item with Space only in a role="menu" panel', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu" role="menu"><a id="item" class="menu-item" href="#">Item</a></div>',
+          '</div>',
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Plain</button>',
+          '  <div class="menu"><a id="plain" class="menu-item" href="#">Plain item</a></div>',
+          '</div>'
+        ].join('')
+
+        const [btnMenu, btnPlain] = fixtureEl.querySelectorAll('[data-coreui-toggle="menu"]')
+        const item = fixtureEl.querySelector('#item')
+        const plain = fixtureEl.querySelector('#plain')
+        const onClick = jasmine.createSpy('click').and.callFake(event => event.preventDefault())
+        item.addEventListener('click', onClick)
+        plain.addEventListener('click', onClick)
+        const space = target => {
+          const event = createEvent('keydown', { bubbles: true, cancelable: true })
+          event.key = ' '
+          target.dispatchEvent(event)
+          return event.defaultPrevented
+        }
+
+        btnPlain.addEventListener('shown.coreui.menu', () => {
+          expect(space(plain)).toBeFalse()
+          expect(onClick).toHaveBeenCalledTimes(1)
+          resolve()
+        })
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          expect(space(item)).toBeTrue()
+          expect(onClick).toHaveBeenCalledTimes(1)
+          new Menu(btnPlain).show()
+        })
+
+        new Menu(btnMenu).show()
+      })
+    })
   })
 
   describe('Home and End on a closed menu', () => {
