@@ -16,8 +16,8 @@ describe('layers', () => {
       open: true,
       anchor: () => anchor,
       closesOn: reason => !refuses.includes(reason),
-      dismiss(reason, event, options) {
-        calls.push({ name, options, reason })
+      dismiss(reason) {
+        calls.push({ name, reason })
         entry.open = false
         unregisterLayer(entry, reason)
       },
@@ -115,9 +115,9 @@ describe('layers', () => {
 
     registerLayer(b)
 
-    expect(calls.map(call => [call.name, call.reason, call.options.returnFocus])).toEqual([
-      ['a', 'sibling', false],
-      ['c', 'parent', false]
+    expect(calls.map(call => [call.name, call.reason])).toEqual([
+      ['a', 'sibling'],
+      ['c', 'parent']
     ])
     expect(k.open).toBeTrue()
   })
@@ -152,9 +152,9 @@ describe('layers', () => {
 
     const result = unregisterLayer(d)
 
-    expect(calls.map(call => [call.name, call.reason, call.options.returnFocus])).toEqual([
-      ['p', 'parent', false],
-      ['l', 'parent', false]
+    expect(calls.map(call => [call.name, call.reason])).toEqual([
+      ['p', 'parent'],
+      ['l', 'parent']
     ])
     expect(result.returnFocus).toBeTrue()
     expect(state().stack).toEqual([])
@@ -500,7 +500,7 @@ describe('layers', () => {
     const accepted = escape(el('#item'))
 
     expect(accepted.defaultPrevented).toBeTrue()
-    expect(calls.map(call => [call.name, call.reason, call.options.returnFocus])).toEqual([['d', 'escape', true]])
+    expect(calls.map(call => [call.name, call.reason])).toEqual([['d', 'escape']])
     expect(reached).not.toHaveBeenCalled()
   })
 
@@ -609,8 +609,8 @@ describe('layers', () => {
     fixtureEl.innerHTML = '<button id="a"></button><button id="b"></button><button id="outside"></button>'
 
     const a = layer('a', { anchor: el('#a'), parts: [el('#a')], refuses: ['sibling'] })
-    a.dismiss = (reason, event, options) => {
-      calls.push({ name: 'a', options, reason })
+    a.dismiss = reason => {
+      calls.push({ name: 'a', reason })
     }
 
     const b = layer('b', { anchor: el('#b'), parts: [el('#b')] })

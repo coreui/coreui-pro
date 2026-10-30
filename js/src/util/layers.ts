@@ -6,7 +6,7 @@ export interface LayerEntry {
   anchor: () => Element | null | undefined
   closesOn: (reason: LayerReason, event?: Event) => boolean
   closesSiblings?: () => boolean
-  dismiss: (reason: LayerReason, event: Event | undefined, options: { returnFocus: boolean }) => void
+  dismiss: (reason: LayerReason, event?: Event) => void
   focusTarget?: () => Element | null | undefined
   isOpen: () => boolean
   kind: 'dialog' | 'popup'
@@ -151,9 +151,8 @@ const forgetAtTaskEnd = (state: LayerState): void => {
  * @param record - The layer
  * @param reason - Why it should close
  * @param event - The event behind the request
- * @param returnFocus - Whether the layer hands the focus back
  */
-const request = (record: LayerRecord, reason: LayerReason, event: Event | undefined, returnFocus: boolean): void => {
+const request = (record: LayerRecord, reason: LayerReason, event?: Event): void => {
   const state = getState()
 
   if (state.requested.has(record) || record.closing || !record.entry.isOpen() || !record.entry.closesOn(reason, event)) {
@@ -162,7 +161,7 @@ const request = (record: LayerRecord, reason: LayerReason, event: Event | undefi
 
   forgetAtTaskEnd(state)
   state.requested.add(record)
-  record.entry.dismiss(reason, event, { returnFocus })
+  record.entry.dismiss(reason, event)
 }
 
 /**
@@ -229,7 +228,7 @@ const decideClick = (event: Event): void => {
     }
 
     if (!touched(record, snapshot, pressPath, true)) {
-      request(record, 'outside', event, false)
+      request(record, 'outside', event)
     }
   }
 }
@@ -260,7 +259,7 @@ const fallbackEscape = (event: KeyboardEvent): void => {
   }
 
   event.preventDefault()
-  request(top, 'escape', event, true)
+  request(top, 'escape', event)
 }
 
 /**
@@ -349,7 +348,7 @@ export const registerLayer = (entry: LayerEntry): void => {
   listen(doc)
 
   for (const other of siblings) {
-    request(other, 'sibling', undefined, false)
+    request(other, 'sibling')
   }
 }
 
@@ -381,7 +380,7 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
   const focusNowhere = !active || active === record.doc.body
 
   for (const descendant of descendants) {
-    request(descendant, 'parent', undefined, false)
+    request(descendant, 'parent')
   }
 
   stack.splice(stack.indexOf(record), 1)
@@ -430,7 +429,7 @@ export const handleEscape = (event: KeyboardEvent, entry: LayerEntry): boolean =
   event.preventDefault()
 
   if (!event.repeat) {
-    request(record, 'escape', event, true)
+    request(record, 'escape', event)
   }
 
   return true
@@ -476,7 +475,7 @@ export const isInDescendantParts = (event: Event, entry: LayerEntry): boolean =>
 export const closeLayersIn = (container: Element): void => {
   for (const record of getState().stack.toReversed()) {
     if (containsAcross(container, record.entry.anchor())) {
-      request(record, 'parent', undefined, false)
+      request(record, 'parent')
     }
   }
 }

@@ -177,7 +177,7 @@ class ComboboxBase extends BaseComponent {
   }
 
   _hideFromLayer(reason: LayerReason): void {
-    this._hide(reason === 'escape', reason)
+    this._hide(true, reason)
 
     if (reason !== 'escape' && !this._isShown()) {
       this._afterOutsideHide()

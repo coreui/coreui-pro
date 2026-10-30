@@ -7,7 +7,7 @@ import Dropdown from '../../src/dropdown.js'
 import Menu from '../../src/menu.js'
 import Modal from '../../src/modal.js'
 import MultiSelect from '../../src/multi-select.js'
-import { getLayerFocusTargetFor } from '../../src/util/layers.js'
+import { getLayerFocusTargetFor, registerLayer, unregisterLayer } from '../../src/util/layers.js'
 import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
@@ -1096,6 +1096,29 @@ describe('Dropdown', () => {
       picker.show()
 
       expect(getLayerFocusTargetFor(document.querySelector('.date-picker-popup'))).toEqual(toggle)
+    })
+
+    it('should hand the focus back to the field of a combobox panel that a layer opening from code closes', () => {
+      fixtureEl.innerHTML = '<div id="ac"></div><div id="other"></div>'
+
+      const autocomplete = Autocomplete.getOrCreateInstance(fixtureEl.querySelector('#ac'), { options: ['One', 'Two'] })
+      autocomplete.show()
+      const inside = document.createElement('button')
+      autocomplete._menu.append(inside)
+      inside.focus()
+      const other = {
+        anchor: () => null,
+        closesOn: () => true,
+        dismiss: () => unregisterLayer(other),
+        isOpen: () => true,
+        kind: 'popup',
+        parts: () => [fixtureEl.querySelector('#other')]
+      }
+      registerLayer(other)
+      unregisterLayer(other)
+
+      expect(autocomplete._isShown()).toBeFalse()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#ac input'))
     })
 
     it('should leave an open dropdown alone when a dialog open in its markup starts', () => {

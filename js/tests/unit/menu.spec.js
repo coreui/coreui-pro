@@ -1150,6 +1150,24 @@ describe('Menu', () => {
       expect(document.activeElement).toEqual(fixtureEl.querySelector('#outer'))
     })
 
+    it('should close only the open submenu on Escape in it and hand the focus to its trigger', () => {
+      fixtureEl.innerHTML = [
+        '<div><button class="btn" id="m" data-coreui-toggle="menu">M</button>',
+        '<div class="menu"><div class="submenu" id="wrapper"><button class="menu-item" id="trigger" type="button">More</button>',
+        '<div class="menu" id="sub"><button class="menu-item" id="deep" type="button">Deep</button></div></div></div></div>'
+      ].join('')
+
+      const menu = new Menu(fixtureEl.querySelector('#m'))
+      menu.show()
+      menu._openSubmenu(fixtureEl.querySelector('#trigger'), fixtureEl.querySelector('#sub'), fixtureEl.querySelector('#wrapper'))
+      fixtureEl.querySelector('#deep').focus()
+      fixtureEl.querySelector('#deep').dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
+
+      expect(fixtureEl.querySelector('#sub').classList.contains('show')).toBeFalse()
+      expect(menu._isShown()).toBeTrue()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#trigger'))
+    })
+
     it('should close the menus opened from it when it is disposed open', () => {
       fixtureEl.innerHTML = menuMarkup('outer', 'true', menuMarkup('inner', 'outside'))
 
