@@ -2,6 +2,8 @@ import Data from '../../src/dom/data.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Dropdown from '../../src/dropdown.js'
 import Offcanvas from '../../src/offcanvas.js'
+import Popover from '../../src/popover.js'
+import Tooltip from '../../src/tooltip.js'
 import { isVisible } from '../../src/util/index.js'
 import {
   clearBodyAndDocument, clearFixture, createEvent, getFixture, jQueryMock
@@ -957,63 +959,36 @@ describe('Offcanvas', () => {
       expect(dropdown._isShown()).toBeFalse()
     })
 
-    it('should hide tooltip instances inside drawer when drawer closes', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<dialog class="offcanvas">',
-          '  <button data-coreui-toggle="tooltip" title="tip">Hover</button>',
-          '</dialog>'
-        ].join('')
+    for (const [name, Tip] of [['tooltip', Tooltip], ['popover', Popover]]) {
+      it(`should hide a ${name} created from code inside the drawer when the drawer closes`, () => {
+        return new Promise(resolve => {
+          fixtureEl.innerHTML = '<dialog class="offcanvas"><button type="button" title="Tip" data-coreui-content="Body">Hover</button></dialog>'
 
-        const drawerEl = fixtureEl.querySelector('.offcanvas')
-        const tooltipTrigger = fixtureEl.querySelector('[data-coreui-toggle="tooltip"]')
-        const drawer = new Offcanvas(drawerEl)
+          const dialogEl = fixtureEl.querySelector('.offcanvas')
+          const trigger = dialogEl.querySelector('button')
+          const dialog = new Offcanvas(dialogEl)
+          const tip = new Tip(trigger, { animation: false })
+          let tipHidden = false
 
-        const fakeTooltip = { hide: jasmine.createSpy('tooltipHide') }
-        Data.set(tooltipTrigger, 'coreui.tooltip', fakeTooltip)
+          trigger.addEventListener(`hidden.coreui.${name}`, () => {
+            tipHidden = true
+          })
 
-        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
-          drawer.hide()
+          dialogEl.addEventListener('shown.coreui.offcanvas', () => {
+            trigger.addEventListener(`shown.coreui.${name}`, () => dialog.hide(), { once: true })
+            tip.show()
+          })
+
+          dialogEl.addEventListener('hidden.coreui.offcanvas', () => {
+            expect(tipHidden).toBeTrue()
+            tip.dispose()
+            resolve()
+          })
+
+          dialog.show()
         })
-
-        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
-          expect(fakeTooltip.hide).toHaveBeenCalled()
-          Data.remove(tooltipTrigger, 'coreui.tooltip')
-          resolve()
-        })
-
-        drawer.show()
       })
-    })
-
-    it('should hide popover instances inside drawer when drawer closes', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<dialog class="offcanvas">',
-          '  <button data-coreui-toggle="popover" title="pop">Click</button>',
-          '</dialog>'
-        ].join('')
-
-        const drawerEl = fixtureEl.querySelector('.offcanvas')
-        const popoverTrigger = fixtureEl.querySelector('[data-coreui-toggle="popover"]')
-        const drawer = new Offcanvas(drawerEl)
-
-        const fakePopover = { hide: jasmine.createSpy('popoverHide') }
-        Data.set(popoverTrigger, 'coreui.popover', fakePopover)
-
-        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
-          drawer.hide()
-        })
-
-        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
-          expect(fakePopover.hide).toHaveBeenCalled()
-          Data.remove(popoverTrigger, 'coreui.popover')
-          resolve()
-        })
-
-        drawer.show()
-      })
-    })
+    }
 
     it('should hide toast instances inside drawer when drawer closes', () => {
       return new Promise(resolve => {

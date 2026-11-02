@@ -123,7 +123,7 @@ You can customize the appearance of popovers using [CSS variables](#css-variable
 
 Use the `focus` trigger to dismiss popovers on the user's next click of a different element than the toggle element. A press inside the popover itself does not dismiss it, so users can select its text or use the controls in it.
 
-A shown popover can also be dismissed by pressing the <kbd>Escape</kbd> key. As with dropdown menus, a popover shown inside a dialog is dismissed on its own: the first <kbd>Escape</kbd> closes the popover and a subsequent one closes the dialog. When a popover hides while focus is on a control inside it, focus returns to its trigger, so keyboard users do not land at the start of the page.
+A shown popover can also be dismissed by pressing the <kbd>Escape</kbd> key. As with dropdown menus, a popover shown inside a dialog is dismissed on its own: the first <kbd>Escape</kbd> closes the popover and a subsequent one closes the dialog. Closing the dialog, drawer or dropdown menu that holds the popover hides the popover with it; the focus then goes where the container sends it, not to the popover's trigger. When a popover hides while focus is on a control inside it, focus returns to its trigger, so keyboard users do not land at the start of the page.
 
 <Callout color="danger">
 #### Specific markup required for dismiss-on-next-click

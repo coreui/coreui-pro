@@ -11,11 +11,12 @@ describe('layers', () => {
 
   const state = () => globalThis[Symbol.for('coreui.layers')]
 
-  const layer = (name, { anchor, kind = 'popup', parts, refuses = [] } = {}) => {
+  const layer = (name, { anchor, kind = 'popup', parts, refuses = [], tip = false } = {}) => {
     const entry = {
       open: true,
       anchor: () => anchor,
-      closesOn: reason => !refuses.includes(reason),
+      escapeAnywhere: () => tip,
+      closesOn: reason => !refuses.includes(reason) && !(tip && (reason === 'outside' || reason === 'sibling')),
       dismiss(reason) {
         calls.push({ name, reason })
         entry.open = false
@@ -652,5 +653,252 @@ describe('layers', () => {
     el('#outside').click()
 
     expect(calls.map(call => call.reason)).toEqual(['sibling'])
+  })
+
+  describe('tips', () => {
+    it('should not make a layer the parent of a layer that shares its anchor', () => {
+      fixtureEl.innerHTML = '<button id="toggle"></button><div id="panel"></div><div id="tip"></div>'
+
+      const d = layer('d', { anchor: el('#toggle'), parts: [el('#toggle'), el('#panel')] })
+      const t = layer('t', { anchor: el('#toggle'), parts: [el('#tip')], tip: true })
+      registerLayer(d)
+      registerLayer(t)
+
+      expect(getParentLayer(t)).toBeNull()
+      expect(getParentLayer(d)).toBeNull()
+    })
+
+    it('should not adopt a tip that shares its anchor when the tip opens first', () => {
+      fixtureEl.innerHTML = '<button id="toggle"></button><div id="panel"></div><div id="tip"></div>'
+
+      const t = layer('t', { anchor: el('#toggle'), parts: [el('#tip')], tip: true })
+      const d = layer('d', { anchor: el('#toggle'), parts: [el('#toggle'), el('#panel')] })
+      registerLayer(t)
+      registerLayer(d)
+
+      expect(getParentLayer(t)).toBeNull()
+
+      unregisterLayer(d)
+
+      expect(calls).toEqual([])
+    })
+
+    it('should not let two layers anchored in each other become each other\'s parent', () => {
+      fixtureEl.innerHTML = [
+        '<div id="a-panel"><button id="b-anchor"></button></div>',
+        '<div id="b-panel"><button id="a-anchor"></button></div>'
+      ].join('')
+
+      const a = layer('a', { anchor: el('#a-anchor'), parts: [el('#a-anchor'), el('#a-panel')] })
+      const b = layer('b', { anchor: el('#b-anchor'), parts: [el('#b-anchor'), el('#b-panel')] })
+      registerLayer(a)
+      registerLayer(b)
+
+      expect(getParentLayer(b)).toBe(a)
+      expect(getParentLayer(a)).toBeNull()
+    })
+
+    it('should report a focus inside the layer apart from a focus on no element', () => {
+      fixtureEl.innerHTML = '<div id="panel"><input id="field"></div>'
+
+      const p = layer('p', { anchor: null, parts: [el('#panel')] })
+      registerLayer(p)
+      el('#field').focus()
+
+      expect(unregisterLayer(p)).toEqual({ focusInside: true, returnFocus: true })
+
+      registerLayer(p)
+      el('#field').blur()
+
+      expect(unregisterLayer(p)).toEqual({ focusInside: false, returnFocus: true })
+    })
+
+    it('should send an Escape to a tip above the layer that holds the focus, and close nothing else', () => {
+      fixtureEl.innerHTML = '<div id="m"><input id="field"><button id="trigger"></button></div><div id="tip"></div>'
+
+      const m = layer('m', { kind: 'dialog', parts: [el('#m')] })
+      const t = layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      registerLayer(m)
+      registerLayer(t)
+      el('#field').focus()
+
+      const event = escape(el('#field'))
+
+      expect(calls).toEqual([{ name: 't', reason: 'escape' }])
+      expect(event.defaultPrevented).toBeTrue()
+    })
+
+    it('should leave an Escape inside the tip to the tip\'s own listener', () => {
+      fixtureEl.innerHTML = '<button id="trigger"></button><div id="tip"><button id="inside"></button></div>'
+
+      const t = layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      registerLayer(t)
+      el('#inside').focus()
+
+      const event = escape(el('#inside'))
+
+      expect(calls).toEqual([])
+      expect(event.defaultPrevented).toBeFalse()
+    })
+
+    it('should send an Escape with the focus on no element to the top layer when it is not the tip', () => {
+      fixtureEl.innerHTML = '<button id="trigger"></button><div id="tip"></div><div id="panel"></div>'
+
+      const t = layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      const p = layer('p', { anchor: null, parts: [el('#panel')] })
+      registerLayer(t)
+      registerLayer(p)
+      document.activeElement.blur()
+
+      escape(document.body)
+
+      expect(calls).toEqual([{ name: 'p', reason: 'escape' }])
+    })
+
+    it('should not send a repeated or composing Escape to a tip', () => {
+      fixtureEl.innerHTML = '<input id="field"><button id="trigger"></button><div id="tip"></div>'
+
+      const t = layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      registerLayer(t)
+      el('#field').focus()
+
+      escape(el('#field'), { repeat: true })
+      escape(el('#field'), { isComposing: true })
+      escape(el('#field'), { keyCode: 229 })
+
+      expect(calls).toEqual([])
+    })
+
+    it('should not send an Escape something already handled to a tip', () => {
+      fixtureEl.innerHTML = '<input id="field"><button id="trigger"></button><div id="tip"></div>'
+
+      const t = layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      registerLayer(t)
+      el('#field').focus()
+      const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+      event.preventDefault()
+
+      el('#field').dispatchEvent(event)
+
+      expect(calls).toEqual([])
+    })
+
+    it('should send an Escape from a dialog that leaves the page interactive to a tip outside it', () => {
+      fixtureEl.innerHTML = '<button id="trigger"></button><div id="tip"></div><dialog id="panel"><input id="field"></dialog>'
+
+      const t = layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      registerLayer(t)
+      el('#panel').show()
+      el('#field').focus()
+
+      escape(el('#field'))
+      el('#panel').close()
+
+      expect(calls).toEqual([{ name: 't', reason: 'escape' }])
+    })
+
+    it('should leave an Escape from an open modal dialog the tip is not in to that dialog', () => {
+      fixtureEl.innerHTML = '<button id="trigger"></button><div id="tip"></div><dialog id="modal"><input id="field"></dialog>'
+
+      const t = layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      registerLayer(t)
+      el('#modal').showModal()
+      el('#field').focus()
+
+      escape(el('#field'))
+      el('#modal').close()
+
+      expect(calls).toEqual([])
+    })
+
+    it('should send an Escape from an open modal dialog to the tip in it when a tip outside opened later', () => {
+      fixtureEl.innerHTML = '<dialog id="modal"><input id="field"><div id="inner-tip"></div></dialog><button id="trigger"></button><div id="tip"></div>'
+
+      const inner = layer('inner', { anchor: el('#field'), parts: [el('#inner-tip')], tip: true })
+      const outer = layer('outer', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      el('#modal').showModal()
+      registerLayer(inner)
+      registerLayer(outer)
+      el('#field').focus()
+
+      escape(el('#field'))
+      el('#modal').close()
+
+      expect(calls).toEqual([{ name: 'inner', reason: 'escape' }])
+    })
+
+    it('should ask the layers anchored in a dialog that is not a layer to close when it closes', async () => {
+      fixtureEl.innerHTML = '<dialog id="page"><button id="trigger"></button></dialog><div id="tip"></div>'
+
+      const t = layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      el('#page').showModal()
+      registerLayer(t)
+      const closed = new Promise(resolve => {
+        el('#page').addEventListener('close', resolve, { once: true })
+      })
+
+      el('#page').close()
+      await closed
+
+      expect(calls).toEqual([{ name: 't', reason: 'parent' }])
+    })
+
+    it('should leave the layers alone when a dialog that is not a layer opens again before its close arrives', async () => {
+      fixtureEl.innerHTML = '<dialog id="page"><button id="trigger"></button></dialog><div id="tip"></div>'
+
+      const t = layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      el('#page').showModal()
+      const closed = new Promise(resolve => {
+        el('#page').addEventListener('close', resolve, { once: true })
+      })
+
+      el('#page').close()
+      el('#page').showModal()
+      registerLayer(t)
+      await closed
+      el('#page').close()
+
+      expect(calls).toEqual([])
+    })
+
+    it('should leave the layers in a dialog layer to that layer when its dialog closes', async () => {
+      fixtureEl.innerHTML = '<dialog id="page"><button id="trigger"></button></dialog><div id="tip"></div>'
+
+      const m = layer('m', { kind: 'dialog', parts: [el('#page')] })
+      const t = {
+        ...layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true }),
+        dismiss(reason) {
+          calls.push({ name: 't', reason })
+        }
+      }
+      el('#page').showModal()
+      registerLayer(m)
+      registerLayer(t)
+      const closed = new Promise(resolve => {
+        el('#page').addEventListener('close', resolve, { once: true })
+      })
+
+      unregisterLayer(m)
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      el('#page').close()
+      await closed
+
+      expect(calls).toEqual([{ name: 't', reason: 'parent' }])
+    })
+
+    it('should give an element in a tip the focus target of the layer the tip opens from', () => {
+      fixtureEl.innerHTML = '<button id="toggle"></button><div id="panel"><button id="trigger"></button></div><div id="tip"><button id="inside"></button></div>'
+
+      const d = layer('d', { anchor: el('#toggle'), parts: [el('#toggle'), el('#panel')] })
+      const t = layer('t', { anchor: el('#trigger'), parts: [el('#tip')], tip: true })
+      registerLayer(d)
+      registerLayer(t)
+
+      expect(getParentLayer(t)).toBe(d)
+      expect(getLayerFocusTargetFor(el('#inside'))).toBe(el('#toggle'))
+      expect(getLayerAnchorFor(el('#inside'))).toBe(el('#toggle'))
+    })
   })
 })

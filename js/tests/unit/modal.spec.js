@@ -3,6 +3,8 @@ import Data from '../../src/dom/data.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Dropdown from '../../src/dropdown.js'
 import Modal from '../../src/modal.js'
+import Popover from '../../src/popover.js'
+import Tooltip from '../../src/tooltip.js'
 import { announce } from '../../src/util/announce.js'
 import { registerLayer, unregisterLayer } from '../../src/util/layers.js'
 import {
@@ -1349,63 +1351,36 @@ describe('Modal', () => {
   })
 
   describe('child component cleanup', () => {
-    it('should hide tooltip instances inside dialog when dialog closes', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<dialog class="modal">',
-          '  <button data-coreui-toggle="tooltip" title="tip">Hover</button>',
-          '</dialog>'
-        ].join('')
+    for (const [name, Tip] of [['tooltip', Tooltip], ['popover', Popover]]) {
+      it(`should hide a ${name} created from code inside the dialog when the dialog closes`, () => {
+        return new Promise(resolve => {
+          fixtureEl.innerHTML = '<dialog class="modal"><button type="button" title="Tip" data-coreui-content="Body">Hover</button></dialog>'
 
-        const dialogEl = fixtureEl.querySelector('.modal')
-        const tooltipTrigger = fixtureEl.querySelector('[data-coreui-toggle="tooltip"]')
-        const dialog = new Modal(dialogEl)
+          const dialogEl = fixtureEl.querySelector('.modal')
+          const trigger = dialogEl.querySelector('button')
+          const dialog = new Modal(dialogEl)
+          const tip = new Tip(trigger, { animation: false })
+          let tipHidden = false
 
-        const fakeTooltip = { hide: jasmine.createSpy('tooltipHide') }
-        Data.set(tooltipTrigger, 'coreui.tooltip', fakeTooltip)
+          trigger.addEventListener(`hidden.coreui.${name}`, () => {
+            tipHidden = true
+          })
 
-        dialogEl.addEventListener('shown.coreui.modal', () => {
-          dialog.hide()
+          dialogEl.addEventListener('shown.coreui.modal', () => {
+            trigger.addEventListener(`shown.coreui.${name}`, () => dialog.hide(), { once: true })
+            tip.show()
+          })
+
+          dialogEl.addEventListener('hidden.coreui.modal', () => {
+            expect(tipHidden).toBeTrue()
+            tip.dispose()
+            resolve()
+          })
+
+          dialog.show()
         })
-
-        dialogEl.addEventListener('hidden.coreui.modal', () => {
-          expect(fakeTooltip.hide).toHaveBeenCalled()
-          Data.remove(tooltipTrigger, 'coreui.tooltip')
-          resolve()
-        })
-
-        dialog.show()
       })
-    })
-
-    it('should hide popover instances inside dialog when dialog closes', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<dialog class="modal">',
-          '  <button data-coreui-toggle="popover" title="pop">Click</button>',
-          '</dialog>'
-        ].join('')
-
-        const dialogEl = fixtureEl.querySelector('.modal')
-        const popoverTrigger = fixtureEl.querySelector('[data-coreui-toggle="popover"]')
-        const dialog = new Modal(dialogEl)
-
-        const fakePopover = { hide: jasmine.createSpy('popoverHide') }
-        Data.set(popoverTrigger, 'coreui.popover', fakePopover)
-
-        dialogEl.addEventListener('shown.coreui.modal', () => {
-          dialog.hide()
-        })
-
-        dialogEl.addEventListener('hidden.coreui.modal', () => {
-          expect(fakePopover.hide).toHaveBeenCalled()
-          Data.remove(popoverTrigger, 'coreui.popover')
-          resolve()
-        })
-
-        dialog.show()
-      })
-    })
+    }
 
     it('should hide toast instances inside dialog when dialog closes', () => {
       return new Promise(resolve => {

@@ -7,6 +7,7 @@ export interface LayerEntry {
   closesOn: (reason: LayerReason, event?: Event) => boolean
   closesSiblings?: () => boolean
   dismiss: (reason: LayerReason, event?: Event) => void
+  escapeAnywhere?: () => boolean
   focusTarget?: () => Element | null | undefined
   isOpen: () => boolean
   kind: 'dialog' | 'popup'
@@ -27,6 +28,7 @@ interface ClickSnapshot {
 
 interface LayerState {
   closed: LayerRecord[]
+  dialogs: WeakSet<Element>
   listening: WeakSet<Window>
   pressed: LayerRecord[] | null
   requested: Map<LayerRecord, LayerReason>
@@ -45,6 +47,7 @@ const getState = (): LayerState => {
   const scope = globalThis as unknown as Record<symbol, LayerState | undefined>
   scope[STATE_KEY] ??= {
     closed: [],
+    dialogs: new WeakSet(),
     listening: new WeakSet(),
     pressed: null,
     requested: new Map(),
@@ -101,6 +104,43 @@ const deepActiveElement = (doc: Document): Element | null => {
  */
 const inParts = (record: LayerRecord, node: Node | null | undefined): boolean =>
   record.entry.parts().some(part => part && containsAcross(part, node))
+
+/**
+ * Tells whether a node lies inside a layer's panel, that is its parts other than the anchor itself;
+ * a layer is the parent of the layers anchored in its panel, never of those sharing its anchor.
+ *
+ * @param record - The layer
+ * @param node - The node
+ * @returns `true` when one of the parts other than the anchor contains the node
+ */
+const inPanel = (record: LayerRecord, node: Node | null | undefined): boolean => {
+  const anchor = record.entry.anchor()
+  return record.entry.parts().some(part => part && part !== anchor && containsAcross(part, node))
+}
+
+/**
+ * Tells whether a layer is a tip: a tooltip or popover that Escape reaches from anywhere.
+ *
+ * @param record - The layer
+ * @returns `true` for a tip
+ */
+const isTip = (record: LayerRecord): boolean => record.entry.escapeAnywhere?.() === true
+
+/**
+ * Walks up from a layer past the tips, which leave the focus to the layer they open from.
+ *
+ * @param record - The layer
+ * @returns The layer itself, or its nearest ancestor that is not a tip
+ */
+const throughTips = (record: LayerRecord | null | undefined): LayerRecord | null => {
+  let current = record ?? null
+
+  while (current && isTip(current)) {
+    current = current.parent
+  }
+
+  return current
+}
 
 /**
  * Tells whether a layer is an ancestor of another one.
@@ -263,6 +303,48 @@ const fallbackEscape = (event: KeyboardEvent): void => {
 }
 
 /**
+ * Sends an Escape to the top open tip before any element handles it, when the tip sits above every
+ * layer that holds the focus (or the focus is on its trigger), so it closes alone. With the focus on
+ * no element the tip has to be the top layer. An Escape inside the tip itself, from an open modal
+ * dialog the tip is not in, already handled, ending an IME composition or repeating is left alone.
+ *
+ * @param event - The keydown
+ */
+const routeEscape = (event: KeyboardEvent): void => {
+  // eslint-disable-next-line unicorn/prefer-keyboard-event-key -- Safari reports an IME composition only as keyCode 229
+  if (event.key !== 'Escape' || event.defaultPrevented || event.repeat || event.isComposing || event.keyCode === 229) {
+    return
+  }
+
+  const doc = (event.target as Node | null)?.ownerDocument ?? document
+  const state = getState()
+  prune(state)
+  const stack = state.stack.filter(record => record.doc === doc)
+  const dialog = (event.composedPath()[0] as Element | undefined)?.closest?.('dialog[open]')
+  const modal = dialog?.matches(':modal') ? dialog : null
+  const tip = stack.findLast(record => isTip(record) && record.entry.isOpen() &&
+    (!modal || record.entry.parts().some(part => part && containsAcross(modal, part))))
+
+  if (!tip) {
+    return
+  }
+
+  const active = deepActiveElement(doc)
+  const anchor = tip.entry.anchor()
+  const onTrigger = Boolean(anchor && containsAcross(anchor, active))
+  const focused = stack.findLastIndex(record => inParts(record, active))
+  const nowhere = !active || active === doc.body
+
+  if (inParts(tip, active) || (nowhere ? stack.at(-1) !== tip : !onTrigger && stack.indexOf(tip) < focused)) {
+    return
+  }
+
+  event.stopPropagation()
+  event.preventDefault()
+  request(tip, 'escape', event)
+}
+
+/**
  * Takes off the stack the layers whose rendered parts have all left the document, as when a page
  * removes an open component without disposing of it; a part that is not rendered does not count.
  * Their children move to their parents.
@@ -289,7 +371,8 @@ const prune = ({ stack }: LayerState): void => {
 /**
  * Attaches the engine's listeners to a window once; they stay for the page. A press remembers the
  * layers open when it began; before the first press seen, none count as open, since the layer
- * that starts the listening may be opening during a press.
+ * that starts the listening may be opening during a press. A `<dialog>` that closes without being
+ * a layer asks the layers anchored in it to close as if their parent closed.
  *
  * @param doc - The document a layer opened in
  */
@@ -308,12 +391,19 @@ const listen = (doc: Document): void => {
   }, true)
   view.addEventListener('click', snapshotClick, true)
   view.addEventListener('click', decideClick)
+  view.addEventListener('keydown', routeEscape, true)
   view.addEventListener('keydown', fallbackEscape)
+  view.addEventListener('close', event => {
+    if (event.target instanceof Element && !(event.target as HTMLDialogElement).open && !state.dialogs.has(event.target)) {
+      closeLayersIn(event.target)
+    }
+  }, true)
 }
 
 /**
- * Puts an open layer on the stack. Its parent is the deepest open layer whose parts hold its
- * anchor; open layers anchored in its own parts become its children. Every other open layer that
+ * Puts an open layer on the stack. Its parent is the deepest open layer whose parts other than its
+ * own anchor hold the new layer's anchor; open layers anchored in the new layer's parts other than
+ * its anchor become its children, unless that would make a cycle. Every other open layer that
  * accepts it is asked to close as a sibling, unless the layer's `closesSiblings()` says `false`, as
  * a dialog that leaves the page interactive does. Registering a layer twice changes nothing.
  *
@@ -331,14 +421,14 @@ export const registerLayer = (entry: LayerEntry): void => {
   const anchor = entry.anchor()
   const doc = anchor?.ownerDocument ?? entry.parts().find(Boolean)?.ownerDocument ?? document
   trackPress(doc)
-  const candidates = stack.filter(record => record.doc === doc && inParts(record, anchor))
+  const candidates = stack.filter(record => record.doc === doc && inPanel(record, anchor))
   const parent = candidates.find(record => candidates.every(other => other === record || !inParts(record, other.entry.parts().find(Boolean)))) ?? null
   const record: LayerRecord = {
     closing: false, doc, entry, parent
   }
 
   for (const other of stack) {
-    if (other.doc === doc && (!other.parent || isAncestor(other.parent, record)) && inParts(record, other.entry.anchor())) {
+    if (other.doc === doc && other !== parent && !isAncestor(other, record) && (!other.parent || isAncestor(other.parent, record)) && inPanel(record, other.entry.anchor())) {
       other.parent = record
     }
   }
@@ -346,6 +436,14 @@ export const registerLayer = (entry: LayerEntry): void => {
   const siblings = entry.closesSiblings?.() === false ? [] : stack.filter(other => other.doc === doc && !isAncestor(other, record) && !isAncestor(record, other))
   stack.push(record)
   listen(doc)
+
+  if (entry.kind === 'dialog') {
+    for (const part of entry.parts()) {
+      if (part) {
+        state.dialogs.add(part)
+      }
+    }
+  }
 
   for (const other of siblings) {
     request(other, 'sibling')
@@ -362,15 +460,16 @@ export const registerLayer = (entry: LayerEntry): void => {
  * @param entry - The layer
  * @param reason - Why it closes; when left out, the reason the engine asked the layer to close with
  *   in this task, otherwise none (a close from code or a choice in the layer)
- * @returns Whether the layer hands the focus back
+ * @returns `focusInside`: whether the focus was in the layer or a descendant (never for an outside
+ *   click or a parent close); `returnFocus`: whether the layer hands the focus back
  */
-export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { returnFocus: boolean } => {
+export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { focusInside: boolean, returnFocus: boolean } => {
   const state = getState()
   const { closed, stack } = state
   const record = recordOf(entry)
 
   if (!record) {
-    return { returnFocus: false }
+    return { focusInside: false, returnFocus: false }
   }
 
   const why = reason ?? state.requested.get(record)
@@ -396,10 +495,10 @@ export const unregisterLayer = (entry: LayerEntry, reason?: LayerReason): { retu
   }
 
   if (why === 'outside' || why === 'parent') {
-    return { returnFocus: false }
+    return { focusInside: false, returnFocus: false }
   }
 
-  return { returnFocus: focusInParts || (why !== 'sibling' && focusNowhere) }
+  return { focusInside: focusInParts, returnFocus: focusInParts || (why !== 'sibling' && focusNowhere) }
 }
 
 /**
@@ -484,24 +583,26 @@ export const closeLayersIn = (container: Element): void => {
 
 /**
  * Returns the anchor of the deepest open layer that holds an element, so a panel can tell that the
- * focus moved into a layer opened from it.
+ * focus moved into a layer opened from it. A layer that takes Escape from anywhere (a tooltip or
+ * popover) passes the question to its nearest ancestor that does not.
  *
  * @param element - The element, typically the one that has the focus
  * @returns The anchor, or `null` when no open layer holds the element
  */
 export const getLayerAnchorFor = (element: Element): Element | null =>
-  getState().stack.findLast(record => inParts(record, element))?.entry.anchor() ?? null
+  throughTips(getState().stack.findLast(record => inParts(record, element)))?.entry.anchor() ?? null
 
 /**
  * Returns where the focus goes back to for the deepest open layer that holds an element: the
- * layer's own `focusTarget()`, otherwise its anchor. A dialog opened from inside a layer that closes
+ * layer's own `focusTarget()`, otherwise its anchor. A layer that takes Escape from anywhere (a
+ * tooltip or popover) passes the question to its nearest ancestor that does not. A dialog opened from inside a layer that closes
  * on the way hands the focus there once it hides.
  *
  * @param element - The element, typically the trigger of a dialog
  * @returns The target, or `null` when no open layer holds the element
  */
 export const getLayerFocusTargetFor = (element: Element): Element | null => {
-  const entry = getState().stack.findLast(record => inParts(record, element))?.entry
+  const entry = throughTips(getState().stack.findLast(record => inParts(record, element)))?.entry
   return (entry?.focusTarget?.() ?? entry?.anchor()) || null
 }
 

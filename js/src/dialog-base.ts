@@ -288,19 +288,8 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     }, this._element)
   }
 
-  // Hide tooltips, popovers, and toasts inside the dialog before closing.
-  // These components append to the dialog (for top-layer rendering) and would
-  // otherwise persist visibly after close().
+  // Toasts append to the dialog for the top layer and would stay visible after close().
   protected _hideChildComponents(): void {
-    const selector = '[data-coreui-toggle="tooltip"], [data-coreui-toggle="popover"]'
-
-    for (const element of SelectorEngine.find(selector, this._element)) {
-      const instance = Data.get(element, 'coreui.tooltip') ?? Data.get(element, 'coreui.popover')
-      if (instance && typeof instance.hide === 'function') {
-        instance.hide()
-      }
-    }
-
     for (const element of SelectorEngine.find('.toast.show', this._element)) {
       const instance = Data.get(element, 'coreui.toast')
       if (instance && typeof instance.hide === 'function') {
@@ -387,7 +376,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
     // Escape for non-modal dialogs — native cancel doesn't fire for show()
     EventHandler.on(this._element, `keydown${eventKey}`, event => {
-      if (event.key !== 'Escape' || this._openedAsModal) {
+      if (event.key !== 'Escape' || event.isComposing || event.keyCode === 229 || this._openedAsModal) {
         return
       }
 

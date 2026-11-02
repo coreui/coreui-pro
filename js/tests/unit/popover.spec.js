@@ -1,5 +1,8 @@
 import EventHandler from '../../src/dom/event-handler.js'
+import Dropdown from '../../src/dropdown.js'
+import Modal from '../../src/modal.js'
 import Popover from '../../src/popover.js'
+import Tooltip from '../../src/tooltip.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -379,6 +382,257 @@ describe('Popover', () => {
 
         popover.show()
       })
+    })
+  })
+
+  describe('layer stack', () => {
+    const wait = (ms = 50) => new Promise(resolve => {
+      setTimeout(resolve, ms)
+    })
+
+    const pressEscape = target => {
+      const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+      target.dispatchEvent(event)
+      return event
+    }
+
+    const dropdownMarkup = item => [
+      '<div class="dropdown">',
+      '  <button type="button" class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+      `  <div class="dropdown-menu">${item}</div>`,
+      '</div>'
+    ].join('')
+
+    afterEach(() => {
+      for (const element of document.querySelectorAll('.tooltip')) {
+        element.remove()
+      }
+    })
+
+    it('should close only the tooltip on a control inside a popover with the first Escape', async () => {
+      fixtureEl.innerHTML = '<button type="button" class="open">Open</button>'
+
+      const popover = new Popover(fixtureEl.querySelector('.open'), {
+        animation: false, html: true, sanitize: false, trigger: 'click',
+        content: '<button type="button" class="inner" title="Delete">X</button>'
+      })
+      popover.show()
+      await wait()
+      const inner = document.querySelector('.popover .inner')
+      const tooltip = new Tooltip(inner, { animation: false })
+      inner.focus()
+      tooltip.show()
+      await wait()
+
+      pressEscape(inner)
+      await wait()
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      expect(document.querySelector('.popover.show')).not.toBeNull()
+
+      pressEscape(document.activeElement)
+      await wait()
+
+      expect(document.querySelector('.popover')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should close a hover tooltip and keep the modal open when the focus is in another field', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"><input class="field"><button type="button" class="tip" title="Tip">T</button></dialog>'
+
+      const dialogEl = fixtureEl.querySelector('.modal')
+      const modal = new Modal(dialogEl)
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.modal', resolve, { once: true })
+      })
+      modal.show()
+      await shown
+      const tooltip = new Tooltip(dialogEl.querySelector('.tip'), { animation: false, trigger: 'hover' })
+      dialogEl.querySelector('.field').focus()
+      tooltip.show()
+      await wait()
+
+      const event = pressEscape(dialogEl.querySelector('.field'))
+      await wait()
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(dialogEl.open).toBeTrue()
+      expect(document.querySelector('.tooltip')).toBeNull()
+      tooltip.dispose()
+      modal.dispose()
+    })
+
+    it('should close the menu when its item with a shown tooltip is clicked', async () => {
+      fixtureEl.innerHTML = dropdownMarkup('<button type="button" class="dropdown-item" title="Tip">Item</button>')
+
+      const dropdown = new Dropdown(fixtureEl.querySelector('[data-coreui-toggle="dropdown"]'))
+      dropdown.show()
+      await wait()
+      const item = fixtureEl.querySelector('.dropdown-item')
+      const tooltip = new Tooltip(item, { animation: false })
+      tooltip.show()
+      await wait()
+
+      item.click()
+      await wait()
+
+      expect(fixtureEl.querySelector('.dropdown-menu')).not.toHaveClass('show')
+      tooltip.dispose()
+    })
+
+    it('should hide a tooltip in the menu when the dropdown closes', async () => {
+      fixtureEl.innerHTML = dropdownMarkup('<button type="button" class="dropdown-item" title="Tip">Item</button>')
+
+      const dropdown = new Dropdown(fixtureEl.querySelector('[data-coreui-toggle="dropdown"]'))
+      dropdown.show()
+      await wait()
+      const tooltip = new Tooltip(fixtureEl.querySelector('.dropdown-item'), { animation: false })
+      tooltip.show()
+      await wait()
+
+      dropdown.hide()
+      await wait()
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should close a popover from inside after its content is replaced, and keep the modal open', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"><button type="button" class="open">Open</button></dialog>'
+
+      const dialogEl = fixtureEl.querySelector('.modal')
+      const modal = new Modal(dialogEl)
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.modal', resolve, { once: true })
+      })
+      modal.show()
+      await shown
+      const popover = new Popover(dialogEl.querySelector('.open'), {
+        animation: false, html: true, sanitize: false, trigger: 'click',
+        content: '<button type="button" class="inner">X</button>'
+      })
+      dialogEl.querySelector('.open').click()
+      await wait()
+      popover.setContent({ '.popover-body': '<a href="#" class="replaced">Y</a>' })
+      await wait()
+      document.querySelector('.popover .replaced').focus()
+
+      const event = pressEscape(document.activeElement)
+      await wait()
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(document.querySelector('.popover')).toBeNull()
+      expect(dialogEl.open).toBeTrue()
+      popover.dispose()
+      modal.dispose()
+    })
+
+    it('should keep a shown tooltip and an open dropdown open when the other one opens', async () => {
+      fixtureEl.innerHTML = `<button type="button" class="tip" title="Tip">T</button>${dropdownMarkup('<a class="dropdown-item" href="#">Item</a>')}`
+
+      const tooltip = new Tooltip(fixtureEl.querySelector('.tip'), { animation: false, trigger: 'manual' })
+      const dropdown = new Dropdown(fixtureEl.querySelector('[data-coreui-toggle="dropdown"]'))
+      tooltip.show()
+      await wait()
+      dropdown.show()
+      await wait()
+
+      expect(document.querySelector('.tooltip.show')).not.toBeNull()
+
+      tooltip.hide()
+      await wait()
+      tooltip.show()
+      await wait()
+
+      expect(fixtureEl.querySelector('.dropdown-menu')).toHaveClass('show')
+      tooltip.dispose()
+    })
+
+    it('should close the tooltip on a dropdown toggle before the dropdown', async () => {
+      fixtureEl.innerHTML = dropdownMarkup('<a class="dropdown-item" href="#">Item</a>')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      toggle.setAttribute('title', 'Tip')
+      const dropdown = new Dropdown(toggle)
+      dropdown.show()
+      await wait()
+      const tooltip = new Tooltip(toggle, { animation: false, trigger: 'manual' })
+      tooltip.show()
+      await wait()
+      toggle.focus()
+
+      pressEscape(toggle)
+      await wait()
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      expect(fixtureEl.querySelector('.dropdown-menu')).toHaveClass('show')
+      tooltip.dispose()
+    })
+
+    it('should close the tooltip on a dropdown toggle first also when the dropdown opens after it', async () => {
+      fixtureEl.innerHTML = dropdownMarkup('<a class="dropdown-item" href="#">Item</a>')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      toggle.setAttribute('title', 'Tip')
+      const tooltip = new Tooltip(toggle, { animation: false, trigger: 'manual' })
+      const dropdown = new Dropdown(toggle)
+      tooltip.show()
+      await wait()
+      dropdown.show()
+      await wait()
+      toggle.focus()
+
+      pressEscape(toggle)
+      await wait()
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      expect(fixtureEl.querySelector('.dropdown-menu')).toHaveClass('show')
+      tooltip.dispose()
+    })
+
+    it('should not move the focus to its trigger when the dialog it is in closes', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"><button type="button" class="open">Open</button></dialog>'
+
+      const dialogEl = fixtureEl.querySelector('.modal')
+      const modal = new Modal(dialogEl)
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.modal', resolve, { once: true })
+      })
+      modal.show()
+      await shown
+      const trigger = dialogEl.querySelector('.open')
+      const popover = new Popover(trigger, {
+        animation: false, html: true, sanitize: false, trigger: 'click',
+        content: '<button type="button" class="inner">X</button>'
+      })
+      popover.show()
+      await wait()
+      document.querySelector('.popover .inner').focus()
+      const focus = spyOn(trigger, 'focus').and.callThrough()
+
+      modal.hide()
+      await wait(400)
+
+      expect(document.querySelector('.popover')).toBeNull()
+      expect(focus).not.toHaveBeenCalled()
+      popover.dispose()
+      modal.dispose()
+    })
+
+    it('should leave the layer stack when disposed while shown', async () => {
+      fixtureEl.innerHTML = '<button type="button" class="tip" title="Tip">T</button>'
+
+      const { stack } = globalThis[Symbol.for('coreui.layers')]
+      const before = stack.length
+      const tooltip = new Tooltip(fixtureEl.querySelector('.tip'), { animation: false })
+      tooltip.show()
+      await wait()
+
+      expect(stack.length).toBe(before + 1)
+
+      tooltip.dispose()
+
+      expect(stack.length).toBe(before)
     })
   })
 
