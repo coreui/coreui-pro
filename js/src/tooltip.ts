@@ -25,6 +25,9 @@ import Manipulator from './dom/manipulator.js'
 import type { ComponentConfig } from './util/config.js'
 import { containsFocus, focusIfUsable } from './util/focus.js'
 import {
+  handleEscape, registerLayer, unregisterLayer, type LayerEntry
+} from './util/layers.js'
+import {
   defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop
 } from './util/index.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
@@ -47,16 +50,10 @@ import {
 
 const NAME = 'tooltip'
 
-const ESCAPE_KEY = 'Escape'
-
-const CLASS_NAME_MODAL = 'modal'
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_TOOLTIP_INNER = '.tooltip-inner'
-const SELECTOR_MODAL = `.${CLASS_NAME_MODAL}`
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="tooltip"]'
-
-const EVENT_MODAL_HIDE = 'hide.coreui.modal'
 
 const TRIGGER_HOVER = 'hover'
 const TRIGGER_FOCUS = 'focus'
@@ -175,7 +172,7 @@ class Tooltip extends BaseComponent {
   protected declare _newContent: Record<string, TemplateContentEntry> | null
   protected declare _mediaQueryListeners: BreakpointListener[]
   protected declare _responsivePlacements: ResponsivePlacements | null
-  protected declare _hideModalHandler: () => void
+  protected declare _layer: LayerEntry
   declare tip: HTMLElement | null
 
   constructor(element?: string | Element | null, config?: Partial<TooltipConfig> | null) {
@@ -194,6 +191,18 @@ class Tooltip extends BaseComponent {
     this._floatingCleanup = null
     this._keydownHandler = null
     this._focusOutsideHandler = null
+    this._layer = {
+      anchor: () => this._element,
+      closesOn: reason => reason === 'escape' || reason === 'parent',
+      closesSiblings: () => false,
+      dismiss: () => {
+        this.hide()
+      },
+      escapeAnywhere: () => true,
+      isOpen: () => Boolean(this._isShown()),
+      kind: 'popup',
+      parts: () => [this.tip]
+    }
     this._pressedInside = false
     this._tipEventOut = null
     this._templateFactory = null
@@ -251,8 +260,7 @@ class Tooltip extends BaseComponent {
 
     this._removeEscapeListener()
     this._removeFocusOutsideListener()
-
-    EventHandler.off(this._element.closest(SELECTOR_MODAL), EVENT_MODAL_HIDE, this._hideModalHandler)
+    unregisterLayer(this._layer, 'parent')
 
     if (this._element.getAttribute('data-coreui-original-title')) {
       this._element.setAttribute('title', this._element.getAttribute('data-coreui-original-title')!)
@@ -313,6 +321,7 @@ class Tooltip extends BaseComponent {
     await this._createFloating(tip)
 
     tip.classList.add(CLASS_NAME_SHOW)
+    registerLayer(this._layer)
 
     // Allow dismissing the tooltip with the Escape key (WCAG 1.4.13)
     this._setEscapeListener()
@@ -355,8 +364,9 @@ class Tooltip extends BaseComponent {
     this._removeFocusOutsideListener()
 
     const tip = this._getTipElement()
+    const { focusInside } = unregisterLayer(this._layer)
 
-    if (containsFocus(tip) && this._element.ownerDocument.hasFocus()) {
+    if (focusInside && this._element.ownerDocument.hasFocus()) {
       this._element.removeAttribute('aria-describedby')
       focusIfUsable(this._element)
     }
@@ -717,14 +727,6 @@ class Tooltip extends BaseComponent {
         })
       }
     }
-
-    this._hideModalHandler = () => {
-      if (this._element) {
-        this.hide()
-      }
-    }
-
-    EventHandler.on(this._element.closest(SELECTOR_MODAL), EVENT_MODAL_HIDE, this._hideModalHandler)
   }
 
   // Keep the tooltip open while the pointer or focus moves onto the tip
@@ -800,24 +802,10 @@ class Tooltip extends BaseComponent {
     }
 
     this._keydownHandler = event => {
-      if (event.key !== ESCAPE_KEY || !this._isShown() || !this.tip!.isConnected) {
-        return
-      }
-
-      // Dismiss the tooltip and consume the keystroke so it doesn't reach
-      // ancestor components (e.g. a parent dialog). This way the first Escape
-      // only closes the tooltip, and a subsequent one can close the dialog —
-      // matching the behavior of the dropdown menu.
-      event.preventDefault()
-      event.stopPropagation()
-      this.hide()
+      handleEscape(event, this._layer)
     }
 
-    // Listen in the capture phase so this runs before the dialog's own keydown
-    // handler, and on the document so it works regardless of where focus is
-    // (e.g. for hover-triggered tooltips). EventHandler only uses the capture
-    // phase for delegated listeners, so attach natively here.
-    this._element.ownerDocument.addEventListener(EVENT_KEYDOWN, this._keydownHandler, true)
+    this.tip!.addEventListener(EVENT_KEYDOWN, this._keydownHandler)
   }
 
   protected _removeEscapeListener(): void {
@@ -825,7 +813,7 @@ class Tooltip extends BaseComponent {
       return
     }
 
-    this._element.ownerDocument.removeEventListener(EVENT_KEYDOWN, this._keydownHandler, true)
+    this.tip?.removeEventListener(EVENT_KEYDOWN, this._keydownHandler)
     this._keydownHandler = null
   }
 
@@ -1002,6 +990,7 @@ class Tooltip extends BaseComponent {
     }
 
     if (this.tip) {
+      this._removeEscapeListener()
       this._removeTipListeners(this.tip)
       this.tip.remove()
       this.tip = null

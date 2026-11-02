@@ -1,6 +1,8 @@
 import Data from '../../src/dom/data.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Drawer from '../../src/drawer.js'
+import Popover from '../../src/popover.js'
+import Tooltip from '../../src/tooltip.js'
 import { isVisible } from '../../src/util/index.js'
 import {
   clearBodyAndDocument, clearFixture, createEvent, getFixture, jQueryMock
@@ -945,63 +947,36 @@ describe('Drawer', () => {
   })
 
   describe('child component cleanup', () => {
-    it('should hide tooltip instances inside drawer when drawer closes', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<dialog class="drawer">',
-          '  <button data-coreui-toggle="tooltip" title="tip">Hover</button>',
-          '</dialog>'
-        ].join('')
+    for (const [name, Tip] of [['tooltip', Tooltip], ['popover', Popover]]) {
+      it(`should hide a ${name} created from code inside the drawer when the drawer closes`, () => {
+        return new Promise(resolve => {
+          fixtureEl.innerHTML = '<dialog class="drawer"><button type="button" title="Tip" data-coreui-content="Body">Hover</button></dialog>'
 
-        const drawerEl = fixtureEl.querySelector('.drawer')
-        const tooltipTrigger = fixtureEl.querySelector('[data-coreui-toggle="tooltip"]')
-        const drawer = new Drawer(drawerEl)
+          const drawerEl = fixtureEl.querySelector('dialog')
+          const trigger = drawerEl.querySelector('button')
+          const drawer = new Drawer(drawerEl)
+          const tip = new Tip(trigger, { animation: false })
+          let tipHidden = false
 
-        const fakeTooltip = { hide: jasmine.createSpy('tooltipHide') }
-        Data.set(tooltipTrigger, 'coreui.tooltip', fakeTooltip)
+          trigger.addEventListener(`hidden.coreui.${name}`, () => {
+            tipHidden = true
+          })
 
-        drawerEl.addEventListener('shown.coreui.drawer', () => {
-          drawer.hide()
+          drawerEl.addEventListener('shown.coreui.drawer', () => {
+            trigger.addEventListener(`shown.coreui.${name}`, () => drawer.hide(), { once: true })
+            tip.show()
+          })
+
+          drawerEl.addEventListener('hidden.coreui.drawer', () => {
+            expect(tipHidden).toBeTrue()
+            tip.dispose()
+            resolve()
+          })
+
+          drawer.show()
         })
-
-        drawerEl.addEventListener('hidden.coreui.drawer', () => {
-          expect(fakeTooltip.hide).toHaveBeenCalled()
-          Data.remove(tooltipTrigger, 'coreui.tooltip')
-          resolve()
-        })
-
-        drawer.show()
       })
-    })
-
-    it('should hide popover instances inside drawer when drawer closes', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<dialog class="drawer">',
-          '  <button data-coreui-toggle="popover" title="pop">Click</button>',
-          '</dialog>'
-        ].join('')
-
-        const drawerEl = fixtureEl.querySelector('.drawer')
-        const popoverTrigger = fixtureEl.querySelector('[data-coreui-toggle="popover"]')
-        const drawer = new Drawer(drawerEl)
-
-        const fakePopover = { hide: jasmine.createSpy('popoverHide') }
-        Data.set(popoverTrigger, 'coreui.popover', fakePopover)
-
-        drawerEl.addEventListener('shown.coreui.drawer', () => {
-          drawer.hide()
-        })
-
-        drawerEl.addEventListener('hidden.coreui.drawer', () => {
-          expect(fakePopover.hide).toHaveBeenCalled()
-          Data.remove(popoverTrigger, 'coreui.popover')
-          resolve()
-        })
-
-        drawer.show()
-      })
-    })
+    }
 
     it('should hide toast instances inside drawer when drawer closes', () => {
       return new Promise(resolve => {
