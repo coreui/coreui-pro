@@ -1347,6 +1347,80 @@ describe('Tooltip', () => {
     })
   })
 
+  describe('description', () => {
+    const shown = (element, tooltip) => new Promise(resolve => {
+      element.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      tooltip.show()
+    })
+
+    const hidden = (element, tooltip) => new Promise(resolve => {
+      element.addEventListener('hidden.coreui.tooltip', resolve, { once: true })
+      tooltip.hide()
+    })
+
+    it('should add its id to the description the trigger has and leave the rest when it hides', async () => {
+      fixtureEl.innerHTML = '<button type="button" title="Tip" aria-describedby="hint">Trigger</button><p id="hint">Hint</p>'
+
+      const trigger = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(trigger, { animation: false })
+      await shown(trigger, tooltip)
+
+      expect(trigger.getAttribute('aria-describedby')).toEqual(`hint ${tooltip.tip.id}`)
+
+      await hidden(trigger, tooltip)
+
+      expect(trigger.getAttribute('aria-describedby')).toEqual('hint')
+    })
+
+    it('should keep a description another component adds while it is shown', async () => {
+      fixtureEl.innerHTML = '<button type="button" title="Tip">Trigger</button><p id="error">Error</p>'
+
+      const trigger = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(trigger, { animation: false })
+      await shown(trigger, tooltip)
+      trigger.setAttribute('aria-describedby', `${trigger.getAttribute('aria-describedby')} error`)
+
+      await hidden(trigger, tooltip)
+
+      expect(trigger.getAttribute('aria-describedby')).toEqual('error')
+    })
+
+    it('should keep only the id of the current tip when its content is replaced while shown', async () => {
+      fixtureEl.innerHTML = '<button type="button" title="Tip" aria-describedby="hint">Trigger</button><p id="hint">Hint</p>'
+
+      const trigger = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(trigger, { animation: false, trigger: 'manual' })
+      await shown(trigger, tooltip)
+      const replaced = new Promise(resolve => {
+        trigger.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      tooltip.setContent({ '.tooltip-inner': 'Copied' })
+      await replaced
+
+      expect(trigger.getAttribute('aria-describedby')).toEqual(`hint ${tooltip.tip.id}`)
+
+      await hidden(trigger, tooltip)
+
+      expect(trigger.getAttribute('aria-describedby')).toEqual('hint')
+    })
+
+    it('should take only its id off the description when it is disposed while shown', async () => {
+      fixtureEl.innerHTML = '<button type="button" title="Tip" aria-describedby="hint">Trigger</button><p id="hint">Hint</p>'
+
+      const trigger = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(trigger, { animation: false })
+      await shown(trigger, tooltip)
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      tooltip.dispose()
+
+      expect(trigger.getAttribute('aria-describedby')).toEqual('hint')
+    })
+  })
+
   describe('update', () => {
     it('should call floating position update', () => {
       return new Promise(resolve => {

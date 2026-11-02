@@ -189,6 +189,14 @@ const writeAttribute = (element: Element, name: string, value: string | null): v
   }
 }
 
+/**
+ * Splits an id reference list, such as the value of `aria-describedby`, into its ids.
+ *
+ * @param value - The attribute value
+ * @returns The ids, without empty entries
+ */
+const splitIds = (value: string | null | undefined): string[] => (value ?? '').split(/\s+/).filter(Boolean)
+
 const findShadowRoot = (element: Node): ShadowRoot | null => {
   if (!document.documentElement.attachShadow) {
     return null
@@ -453,6 +461,7 @@ export {
   parseSelector,
   reflow,
   setAriaAttribute,
+  splitIds,
   triggerTransitionEnd,
   toType,
   writeAttribute

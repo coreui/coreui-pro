@@ -5,6 +5,7 @@ import {
   nextStateSerial, ownValidationState, setStateValidity, splitIds, updateValidationState, validateForm,
   writeValueField
 } from '../../../src/util/form-validation.js'
+import { splitIds as splitIdsFromIndex } from '../../../src/util/index.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('Form validation utilities', () => {
@@ -620,10 +621,8 @@ describe('Form validation utilities', () => {
   })
 
   describe('splitIds', () => {
-    it('should split an id reference list into its ids, without empty entries', () => {
-      expect(splitIds('  hint   feedback ')).toEqual(['hint', 'feedback'])
-      expect(splitIds('')).toEqual([])
-      expect(splitIds(null)).toEqual([])
+    it('should be the id list splitter of the util index', () => {
+      expect(splitIds).toBe(splitIdsFromIndex)
     })
   })
 

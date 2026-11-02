@@ -681,6 +681,21 @@ describe('Popover', () => {
       expect(document.querySelector('.popover')).toBeNull()
     })
 
+    it('should keep the description the trigger was given when it hands the focus back', async () => {
+      const { trigger, tip } = await shownPopover()
+      trigger.setAttribute('aria-describedby', `hint ${trigger.getAttribute('aria-describedby')}`)
+      const describedBy = []
+      trigger.addEventListener('focus', () => describedBy.push(trigger.getAttribute('aria-describedby')))
+
+      tip.querySelector('.inside').focus()
+      const done = hidden(trigger)
+      pressEscape()
+      await done
+
+      expect(describedBy).toEqual(['hint'])
+      expect(trigger.getAttribute('aria-describedby')).toEqual('hint')
+    })
+
     it('should stay hidden when the focus it hands back reaches a focus trigger', async () => {
       const { trigger, tip } = await shownPopover({ trigger: 'focus' })
 
