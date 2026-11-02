@@ -382,6 +382,181 @@ describe('Popover', () => {
     })
   })
 
+  describe('focus return', () => {
+    const shownPopover = async (options = {}) => {
+      fixtureEl.innerHTML = '<button type="button" class="trigger">Trigger</button><button type="button" class="outside">Outside</button>'
+
+      const trigger = fixtureEl.querySelector('.trigger')
+      const popover = new Popover(trigger, {
+        animation: false,
+        content: '<button type="button" class="inside">Inside</button>',
+        html: true,
+        sanitize: false,
+        ...options
+      })
+      const shown = new Promise(resolve => {
+        trigger.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+
+      popover.show()
+      await shown
+
+      return { popover, trigger, tip: document.querySelector('.popover') }
+    }
+
+    const hidden = trigger => new Promise(resolve => {
+      trigger.addEventListener('hidden.coreui.popover', resolve, { once: true })
+    })
+
+    const pressEscape = () => {
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+    }
+
+    it('should hand the focus back to the trigger when it hides with the focus inside', async () => {
+      const { trigger, tip } = await shownPopover()
+      const describedBy = []
+      trigger.addEventListener('focus', () => describedBy.push(trigger.getAttribute('aria-describedby')))
+
+      tip.querySelector('.inside').focus()
+      const done = hidden(trigger)
+      pressEscape()
+      await done
+
+      expect(document.activeElement).toEqual(trigger)
+      expect(describedBy).toEqual([null])
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+
+    it('should stay hidden when the focus it hands back reaches a focus trigger', async () => {
+      const { trigger, tip } = await shownPopover({ trigger: 'focus' })
+
+      tip.querySelector('.inside').focus()
+      const done = hidden(trigger)
+      pressEscape()
+      await done
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(document.activeElement).toEqual(trigger)
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+
+    it('should leave the focus where it is when it is outside the popover', async () => {
+      const { popover, trigger } = await shownPopover()
+      const outside = fixtureEl.querySelector('.outside')
+
+      outside.focus()
+      const done = hidden(trigger)
+      popover.hide()
+      await done
+
+      expect(document.activeElement).toEqual(outside)
+    })
+
+    it('should hand the focus back when the page hides it with the focus inside', async () => {
+      const { popover, trigger, tip } = await shownPopover()
+      const focus = spyOn(trigger, 'focus').and.callThrough()
+
+      tip.querySelector('.inside').focus()
+      const done = hidden(trigger)
+      popover.hide()
+      await done
+
+      expect(document.activeElement).toEqual(trigger)
+      expect(focus).toHaveBeenCalledWith(undefined)
+    })
+
+    it('should keep the focus inside when the page vetoes the hide', async () => {
+      const { popover, trigger, tip } = await shownPopover()
+      const inside = tip.querySelector('.inside')
+      trigger.addEventListener('hide.coreui.popover', event => event.preventDefault())
+
+      inside.focus()
+      popover.hide()
+
+      expect(document.activeElement).toEqual(inside)
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should leave the focus on the body when it is there as the popover hides', async () => {
+      const { popover, trigger, tip } = await shownPopover()
+
+      tip.querySelector('.inside').focus()
+      document.activeElement.blur()
+      const done = hidden(trigger)
+      popover.hide()
+      await done
+
+      expect(document.activeElement).toEqual(document.body)
+    })
+
+    it('should not focus a trigger that is disabled', async () => {
+      const { popover, trigger, tip } = await shownPopover()
+
+      tip.querySelector('.inside').focus()
+      trigger.classList.add('disabled')
+      const done = hidden(trigger)
+      popover.hide()
+      await done
+
+      expect(document.activeElement).not.toEqual(trigger)
+    })
+
+    it('should hand the focus back once the hide delay has passed', async () => {
+      const { trigger, tip } = await shownPopover({ delay: { show: 0, hide: 300 }, trigger: 'hover' })
+      const inside = tip.querySelector('.inside')
+
+      inside.focus()
+      trigger.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: document.body }))
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      expect(document.activeElement).toEqual(inside)
+
+      await hidden(trigger)
+
+      expect(document.activeElement).toEqual(trigger)
+    })
+
+    it('should hand the focus back to an SVG trigger', async () => {
+      fixtureEl.innerHTML = '<svg class="icon" tabindex="0" width="16" height="16"></svg>'
+
+      const trigger = fixtureEl.querySelector('.icon')
+      const popover = new Popover(trigger, {
+        animation: false,
+        content: '<button type="button" class="inside">Inside</button>',
+        html: true,
+        sanitize: false
+      })
+      const shown = new Promise(resolve => {
+        trigger.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+      popover.show()
+      await shown
+
+      document.querySelector('.popover .inside').focus()
+      const done = hidden(trigger)
+      popover.hide()
+      await done
+
+      expect(document.activeElement).toEqual(trigger)
+    })
+
+    it('should leave the focus alone when the document has no focus', async () => {
+      const { popover, trigger, tip } = await shownPopover()
+      const inside = tip.querySelector('.inside')
+
+      inside.focus()
+      spyOn(document, 'hasFocus').and.returnValue(false)
+      const focus = spyOn(trigger, 'focus')
+      popover.hide()
+
+      expect(focus).not.toHaveBeenCalled()
+    })
+  })
+
   describe('dismiss on next click', () => {
     const settle = () => new Promise(resolve => {
       setTimeout(resolve, 20)

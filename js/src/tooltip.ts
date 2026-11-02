@@ -23,7 +23,7 @@ import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import type { ComponentConfig } from './util/config.js'
-import { containsFocus } from './util/focus.js'
+import { containsFocus, focusIfUsable } from './util/focus.js'
 import {
   defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop
 } from './util/index.js'
@@ -355,6 +355,12 @@ class Tooltip extends BaseComponent {
     this._removeFocusOutsideListener()
 
     const tip = this._getTipElement()
+
+    if (containsFocus(tip) && this._element.ownerDocument.hasFocus()) {
+      this._element.removeAttribute('aria-describedby')
+      focusIfUsable(this._element)
+    }
+
     tip.classList.remove(CLASS_NAME_SHOW)
 
     // If this is a touch-enabled device we remove the extra
