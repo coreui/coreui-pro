@@ -123,7 +123,7 @@ You can customize the appearance of popovers using [CSS variables](#css-variable
 
 Use the `focus` trigger to dismiss popovers on the user's next click of a different element than the toggle element. A press inside the popover itself does not dismiss it, so users can select its text or use the controls in it.
 
-A shown popover can also be dismissed by pressing the <kbd>Escape</kbd> key. As with dropdown menus, a popover shown inside a dialog is dismissed on its own: the first <kbd>Escape</kbd> closes the popover and a subsequent one closes the dialog.
+A shown popover can also be dismissed by pressing the <kbd>Escape</kbd> key. As with dropdown menus, a popover shown inside a dialog is dismissed on its own: the first <kbd>Escape</kbd> closes the popover and a subsequent one closes the dialog. When a popover hides while focus is on a control inside it, focus returns to its trigger, so keyboard users do not land at the start of the page.
 
 <Callout color="danger">
 #### Specific markup required for dismiss-on-next-click
@@ -165,7 +165,7 @@ To allow keyboard users to activate your popovers, you should only add them to H
 
 While you can insert rich, structured HTML in popovers with the `html` option, we strongly recommend that you avoid adding an excessive amount of content. The way popovers currently work is that, once displayed, their content is tied to the trigger element with the `aria-describedby` attribute. As a result, the entirety of the popover's content will be announced to assistive technology users as one long, uninterrupted stream.
 
-Additionally, while it is possible to also include interactive controls (such as form elements or links) in your popover (by adding these elements to the `allowList` of allowed attributes and tags), be aware that currently the popover does not manage keyboard focus order. When a keyboard user opens a popover, focus remains on the triggering element, and as the popover usually does not immediately follow the trigger in the document's structure, there is no guarantee that moving forward/pressing <kbd>TAB</kbd> will move a keyboard user into the popover itself. In short, simply adding interactive controls to a popover is likely to make these controls unreachable/unusable for keyboard users and users of assistive technologies, or at the very least make for an illogical overall focus order. In these cases, consider using a modal dialog instead.
+Additionally, while it is possible to also include interactive controls (such as form elements or links) in your popover (by adding these elements to the `allowList` of allowed attributes and tags), be aware that the popover does not move keyboard focus into itself when it opens (it only hands the focus back to the trigger when it hides with the focus inside). When a keyboard user opens a popover, focus remains on the triggering element, and as the popover usually does not immediately follow the trigger in the document's structure, there is no guarantee that moving forward/pressing <kbd>TAB</kbd> will move a keyboard user into the popover itself. In short, simply adding interactive controls to a popover is likely to make these controls unreachable/unusable for keyboard users and users of assistive technologies, or at the very least make for an illogical overall focus order. In these cases, consider using a modal dialog instead.
 </Callout>
 
 ### Options
