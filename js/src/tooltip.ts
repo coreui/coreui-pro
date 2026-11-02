@@ -28,7 +28,7 @@ import {
   handleEscape, registerLayer, unregisterLayer, type LayerEntry
 } from './util/layers.js'
 import {
-  defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop
+  defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop, splitIds, writeAttribute
 } from './util/index.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import TemplateFactory, { type TemplateContentEntry } from './util/template-factory.js'
@@ -297,7 +297,7 @@ class Tooltip extends BaseComponent {
 
     const tip = this._getTipElement()
 
-    this._element.setAttribute('aria-describedby', tip.getAttribute('id')!)
+    this._describe(tip, true)
 
     let { container } = this._config as TooltipConfig & { container: Element }
     const closestDialog = this._element.closest('dialog[open]')
@@ -367,7 +367,7 @@ class Tooltip extends BaseComponent {
     const { focusInside } = unregisterLayer(this._layer)
 
     if (focusInside && this._element.ownerDocument.hasFocus()) {
-      this._element.removeAttribute('aria-describedby')
+      this._describe(tip, false)
       focusIfUsable(this._element)
     }
 
@@ -395,7 +395,7 @@ class Tooltip extends BaseComponent {
         this._disposeFloating()
       }
 
-      this._element.removeAttribute('aria-describedby')
+      this._describe(tip, false)
       EventHandler.trigger(this._element, this.constructor.eventName(EVENT_HIDDEN))
     }
 
@@ -495,6 +495,16 @@ class Tooltip extends BaseComponent {
 
   protected _isShown(): boolean | null {
     return this.tip && this.tip.classList.contains(CLASS_NAME_SHOW)
+  }
+
+  protected _describe(tip: HTMLElement, described: boolean): void {
+    const ids = splitIds(this._element.getAttribute('aria-describedby')).filter(id => id !== tip.id)
+
+    if (described) {
+      ids.push(tip.id)
+    }
+
+    writeAttribute(this._element, 'aria-describedby', ids.join(' ') || null)
   }
 
   protected _getPlacement(tip: HTMLElement): string {
@@ -990,6 +1000,7 @@ class Tooltip extends BaseComponent {
     }
 
     if (this.tip) {
+      this._describe(this.tip, false)
       this._removeEscapeListener()
       this._removeTipListeners(this.tip)
       this.tip.remove()

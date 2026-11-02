@@ -1,5 +1,7 @@
 import { announce } from './announce.js'
-import { getUID } from './index.js'
+import { getUID, splitIds, writeAttribute } from './index.js'
+
+export { splitIds } from './index.js'
 
 export type ValidationMark = {
   ariaInvalid: boolean
@@ -88,14 +90,6 @@ const isValidatable = (control: Element | null): control is FormControl =>
   (control as FormControl | null)?.willValidate === true && !['button', 'image', 'reset', 'submit'].includes((control as FormControl).type)
 
 /**
- * Splits an id reference list, such as the value of `aria-describedby`, into its ids.
- *
- * @param value - The attribute value
- * @returns The ids, without empty entries
- */
-export const splitIds = (value: string | null | undefined): string[] => (value ?? '').split(/\s+/).filter(Boolean)
-
-/**
  * Writes the ids of `aria-describedby`, removing the attribute when no id is left and leaving it
  * untouched when nothing changes.
  *
@@ -103,15 +97,7 @@ export const splitIds = (value: string | null | undefined): string[] => (value ?
  * @param ids - The ids the attribute should hold, in order
  */
 const setDescribedBy = (control: Element, ids: string[]): void => {
-  if (ids.join(' ') === (control.getAttribute('aria-describedby') ?? '')) {
-    return
-  }
-
-  if (ids.length > 0) {
-    control.setAttribute('aria-describedby', ids.join(' '))
-  } else {
-    control.removeAttribute('aria-describedby')
-  }
+  writeAttribute(control, 'aria-describedby', ids.join(' ') || null)
 }
 
 /**

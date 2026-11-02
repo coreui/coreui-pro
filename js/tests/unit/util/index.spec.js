@@ -987,6 +987,14 @@ describe('Util', () => {
     })
   })
 
+  describe('splitIds', () => {
+    it('should split an id reference list into its ids, without empty entries', () => {
+      expect(Util.splitIds('  hint   feedback ')).toEqual(['hint', 'feedback'])
+      expect(Util.splitIds('')).toEqual([])
+      expect(Util.splitIds(null)).toEqual([])
+    })
+  })
+
   describe('writeAttribute', () => {
     it('should set the value, remove the attribute for null and leave an equal value untouched', () => {
       fixtureEl.innerHTML = '<div aria-describedby="hint"></div>'

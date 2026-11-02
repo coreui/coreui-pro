@@ -179,6 +179,8 @@ A shown tooltip can be dismissed by pressing the <kbd>Escape</kbd> key, and a ho
 </div>
 ```
 
+While the tooltip is shown, the plugin adds its `id` to the trigger's `aria-describedby`, after the ids the trigger already has, and takes only that `id` off when the tooltip hides. A hint or a validation message that describes the trigger stays.
+
 ### Disabled elements
 
 Elements that have the `disabled` attribute are non-interactive, which prevents users from focusing, hovering, or clicking on them to display a tooltip (or popover). To address this, consider triggering the tooltip from a surrounding `<div>` or `<span>`, preferably making it keyboard-focusable by using `tabindex="0"`.
