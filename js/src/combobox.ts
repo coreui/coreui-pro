@@ -181,7 +181,7 @@ class Combobox extends ComboboxBase {
       describedTargets: () => [this._element],
       fields: () => [this._valueField],
       frames: () => [this._element],
-      invalidTargets: () => [],
+      invalidTargets: () => [this._element],
       owned: () => [this._valueField, this._searchElement].filter(Boolean) as Element[],
       restore: () => this._restoreValue()
     })
@@ -320,8 +320,15 @@ class Combobox extends ComboboxBase {
   _createCombobox(): void {
     this._element.classList.add(CLASS_NAME_TOGGLE)
     this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
+    this._element.setAttribute('role', 'combobox')
     this._element.setAttribute('aria-haspopup', 'listbox')
     this._element.setAttribute('aria-expanded', 'false')
+
+    if (this._config.required) {
+      this._element.setAttribute('aria-required', 'true')
+    } else {
+      this._element.removeAttribute('aria-required')
+    }
 
     if (this._element instanceof HTMLButtonElement) {
       this._element.type = 'button'

@@ -87,7 +87,7 @@ const ADAPTERS = [
     serverClassElement: t => t.root.querySelector('.combobox-toggle'),
     blockers: t => [t.instance._valueField],
     frames: t => [t.root.querySelector('.combobox-toggle')],
-    invalidTargets: () => [],
+    invalidTargets: t => [t.root.querySelector('.combobox-toggle')],
     describedTargets: t => [t.root.querySelector('.combobox-toggle')],
     changeAsUser(t) {
       t.instance.show()

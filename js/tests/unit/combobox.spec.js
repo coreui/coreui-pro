@@ -129,11 +129,32 @@ describe('Combobox', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle)
 
+      expect(toggle.getAttribute('role')).toEqual('combobox')
       expect(toggle.getAttribute('aria-haspopup')).toEqual('listbox')
       expect(toggle.getAttribute('aria-expanded')).toEqual('false')
       expect(toggle.type).toEqual('button')
       expect(menu(combobox).isConnected).toBeFalse()
       expect(menu(combobox).classList.contains('combobox-popup')).toBeTrue()
+    })
+
+    it('should leave the name to the page and take none from the placeholder', () => {
+      const toggle = setMarkup(' data-coreui-placeholder="Choose a country"')
+      new Combobox(toggle) // eslint-disable-line no-new
+
+      expect(toggle.hasAttribute('aria-label')).toBeFalse()
+      expect(toggle.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should mark the toggle required from the option alone, at every start', () => {
+      const toggle = setMarkup()
+
+      new Combobox(toggle, { required: true }).dispose()
+
+      expect(toggle.getAttribute('aria-required')).toEqual('true')
+
+      new Combobox(toggle) // eslint-disable-line no-new
+
+      expect(toggle.hasAttribute('aria-required')).toBeFalse()
     })
 
     it('should point aria-controls at the list only while the list is in the document', async () => {
@@ -729,7 +750,7 @@ describe('Combobox', () => {
       const combobox = new Combobox(toggle)
 
       expect(toggle.classList.contains('is-invalid')).toBeTrue()
-      expect(toggle.hasAttribute('aria-invalid')).toBeFalse()
+      expect(toggle.getAttribute('aria-invalid')).toBe('true')
       expect(toggle.getAttribute('aria-describedby')).toBe(`hint ${feedback.id}`)
       expect(combobox._valueField.validationMessage).toBe('Pick a country.')
       expect(form.checkValidity()).toBeFalse()
@@ -948,13 +969,14 @@ describe('Combobox', () => {
 
       expect(toggle.classList.contains('is-invalid')).toBeTrue()
       expect(toggle.getAttribute('aria-describedby')).toBe(feedback.id)
-      expect(toggle.hasAttribute('aria-invalid')).toBeFalse()
-      expect(toggle.hasAttribute('aria-required')).toBeFalse()
+      expect(toggle.getAttribute('aria-invalid')).toBe('true')
+      expect(toggle.getAttribute('aria-required')).toBe('true')
 
       combobox.setValue('us')
 
       expect(toggle.classList.contains('is-invalid')).toBeFalse()
       expect(toggle.hasAttribute('aria-describedby')).toBeFalse()
+      expect(toggle.hasAttribute('aria-invalid')).toBeFalse()
     })
 
     it('should link a message named on the toggle', () => {

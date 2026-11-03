@@ -12,7 +12,7 @@ A combobox is a `<button class="form-control combobox-toggle">` followed by a `.
 
 Everything inside the panel is List box markup, so an option is whatever you put in it: plain text, an icon, a two-line label with a description. The plugin never rewrites an option's content.
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Item"
       data-coreui-toggle="combobox"
       data-coreui-name="option"
       data-coreui-placeholder="Select an item…">
@@ -42,7 +42,7 @@ Everything inside the panel is List box markup, so an option is whatever you put
 
 ## Example
 
-The toggle carries `data-coreui-toggle="combobox"`; the panel is the `.popup` right after it. The plugin fills in the parts that are missing: `.combobox-value` for the text, the caret, `type="button"`, `aria-haspopup` and `aria-expanded`, and it takes the panel out of the document until the first open.
+The toggle carries `data-coreui-toggle="combobox"`; the panel is the `.popup` right after it. The plugin fills in the parts that are missing: `.combobox-value` for the text, the caret, `type="button"`, `role="combobox"`, `aria-haspopup` and `aria-expanded`, and it takes the panel out of the document until the first open.
 
 Every option carries its value in `data-coreui-value`, exactly as in a List box; an option without one is worth its text.
 
@@ -50,7 +50,7 @@ Every option carries its value in `data-coreui-value`, exactly as in a List box;
 
 `placeholder` is the text `.combobox-value` shows while nothing is selected. It carries `.combobox-placeholder` while it stands for an empty value, so it can be dimmed without being confused for a choice.
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Country"
       data-coreui-toggle="combobox"
       data-coreui-name="country"
       data-coreui-placeholder="Pick a country…">
@@ -69,7 +69,7 @@ Every option carries its value in `data-coreui-value`, exactly as in a List box;
 
 Set `value` — `data-coreui-value` on the toggle — and that option starts selected: the toggle reads its label from the moment the page loads. It takes an array in `multiple` mode. A `.selected` class on an option in the markup does not select it; the combobox writes that class from its value.
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Role"
       data-coreui-toggle="combobox"
       data-coreui-name="role"
       data-coreui-placeholder="Choose a role…"
@@ -114,7 +114,7 @@ An option is an ordinary element, so it takes whatever markup belongs there. The
 
 ### Icons
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Language"
       data-coreui-toggle="combobox"
       data-coreui-name="language"
       data-coreui-placeholder="Choose a language…">
@@ -142,7 +142,7 @@ An option is an ordinary element, so it takes whatever markup belongs there. The
 
 Wrap the name in `.list-box-option-label` and the second line in `.list-box-option-description`. The toggle shows the label alone.
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Plan"
       data-coreui-toggle="combobox"
       data-coreui-name="plan"
       data-coreui-placeholder="Select a plan…">
@@ -170,7 +170,7 @@ Wrap the name in `.list-box-option-label` and the second line in `.list-box-opti
 
 Nothing marks the selection on its own — `aria-selected` and the `.selected` background carry it. `indicator: "checkbox"` puts a checkbox in front of every option and keeps it in step with the selection. It is a decorative `<span>`, not an input, so it never takes the focus and never announces a second control per option.
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Status"
       data-coreui-toggle="combobox"
       data-coreui-name="status"
       data-coreui-indicator="checkbox"
@@ -197,7 +197,7 @@ Nothing marks the selection on its own — `aria-selected` and the `.selected` b
 
 ### All together
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Priority"
       data-coreui-toggle="combobox"
       data-coreui-name="priority"
       data-coreui-indicator="checkbox"
@@ -226,7 +226,7 @@ Nothing marks the selection on its own — `aria-selected` and the `.selected` b
 
 The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-search`; put one in the panel yourself and it is used as it is, wherever you placed it. `searchPlaceholder` fills its placeholder and `ariaSearchLabel` its accessible name.
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Country"
       data-coreui-toggle="combobox"
       data-coreui-name="country"
       data-coreui-search="true"
@@ -254,7 +254,7 @@ The panel is as tall as its content — cap it where you want a scroll container
 
 `searchNormalize` compares both sides without their diacritics, so `zoe` finds `Zoë` and `oe` finds both. It normalizes to `NFD` and drops the combining diacritics, which leaves the labels themselves untouched — only the comparison changes.
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Name"
       data-coreui-toggle="combobox"
       data-coreui-search="true"
       data-coreui-search-normalize="true"
@@ -280,7 +280,7 @@ The panel is as tall as its content — cap it where you want a scroll container
 
 Group options in a `.list-box-section` and name it with a `.list-box-section-label`. The plugin adds `role="group"`; point `aria-labelledby` at the label so the group is announced with its name. A section whose options are all filtered out is hidden with its label.
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Language"
       data-coreui-toggle="combobox"
       data-coreui-name="language"
       data-coreui-placeholder="Select a language…">
@@ -308,7 +308,7 @@ Group options in a `.list-box-section` and name it with a `.list-box-section-lab
 
 `multiple` toggles options instead of replacing the selection, and the panel stays open so several picks cost one opening. The toggle shows the one label while a single option is selected and `selectedLabel` past that — a function of the count and the number of options, or a string in which `{count}` and `{total}` are replaced. A selected value the list no longer carries, after an external search answer, counts in `{total}` as well, so the total never drops below the count. `selectionLimit` caps how many can be taken at once.
 
-<Example code={`<button class="form-control combobox-toggle" type="button"
+<Example code={`<button class="form-control combobox-toggle" type="button" aria-label="Skills"
       data-coreui-toggle="combobox"
       data-coreui-name="skills"
       data-coreui-multiple="true"
@@ -331,7 +331,7 @@ Group options in a `.list-box-section` and name it with a `.list-box-section-lab
 
 The toggle carries `.form-control`, so `.form-control-sm` and `.form-control-lg` reach it unchanged and it stands exactly as tall as a text input of the same size.
 
-<Example code={`<button class="form-control form-control-sm combobox-toggle mb-4" type="button"
+<Example code={`<button class="form-control form-control-sm combobox-toggle mb-4" type="button" aria-label="Small"
       data-coreui-toggle="combobox"
       data-coreui-placeholder="Small select…">
   </button>
@@ -344,7 +344,7 @@ The toggle carries `.form-control`, so `.form-control-sm` and `.form-control-lg`
     </div>
   </div>
 
-  <button class="form-control combobox-toggle mb-4" type="button"
+  <button class="form-control combobox-toggle mb-4" type="button" aria-label="Default"
       data-coreui-toggle="combobox"
       data-coreui-placeholder="Default select…">
   </button>
@@ -357,7 +357,7 @@ The toggle carries `.form-control`, so `.form-control-sm` and `.form-control-lg`
     </div>
   </div>
 
-  <button class="form-control form-control-lg combobox-toggle" type="button"
+  <button class="form-control form-control-lg combobox-toggle" type="button" aria-label="Large"
       data-coreui-toggle="combobox"
       data-coreui-placeholder="Large select…">
   </button>
@@ -374,7 +374,7 @@ The toggle carries `.form-control`, so `.form-control-sm` and `.form-control-lg`
 
 Set `data-coreui-disabled="true"` (or the `disabled` option) to turn the whole control off: the panel never opens, the list box is disabled with it, and a button toggle gets the `disabled` attribute. A single option opts out with `.disabled` and `aria-disabled="true"`, which takes it out of the keyboard order and out of every selection method.
 
-<Example code={`<button class="form-control combobox-toggle mb-4" type="button"
+<Example code={`<button class="form-control combobox-toggle mb-4" type="button" aria-label="Disabled"
       data-coreui-toggle="combobox"
       data-coreui-placeholder="Cannot interact…" data-coreui-disabled="true">
   </button>
@@ -387,7 +387,7 @@ Set `data-coreui-disabled="true"` (or the `disabled` option) to turn the whole c
     </div>
   </div>
 
-  <button class="form-control combobox-toggle" type="button"
+  <button class="form-control combobox-toggle" type="button" aria-label="Availability"
       data-coreui-toggle="combobox"
       data-coreui-placeholder="Select an option…">
   </button>
@@ -407,7 +407,7 @@ The plugin inserts a hidden `<select class="combobox-select">` right after the t
 
 ```html
 <!-- What you write -->
-<button class="form-control combobox-toggle" type="button"
+<button class="form-control combobox-toggle" type="button" aria-label="Country"
         data-coreui-toggle="combobox"
         data-coreui-name="country">
 </button>
@@ -476,7 +476,7 @@ The state comes from four places, in this order:
 
 A state you give, with the option or with the class, is a verdict on the value it was given for, so the next change of the value the user makes in the list drops it; picking the option a single combobox already holds keeps it. What your code does in a `change.coreui.combobox`, `input` or `change` listener while the pick runs counts as your change, so a state you give there stays, and a change through `setValue()`, `clear()` or `setItems()` keeps the state. To set it again, call `setValidationState()`: it updates the state without rebuilding the combobox, replaces a class written on the toggle, so `setValidationState(null)` withdraws that class. While the given state is `'invalid'`, the select blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled combobox does not block. A native reset of the form puts back the value the combobox started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays. A message placed where the stylesheet does not show it for the toggle can be named in `data-coreui-invalid-feedback` on the toggle.
 
-The toggle is a `<button>`, a role that has neither an invalid nor a required state, so it carries neither `aria-invalid` nor `aria-required`: a screen reader learns what is wrong from the message in its description, and that the field is required only from its label, so say it there, as the first field above does.
+The toggle carries `aria-invalid="true"` while the state is `'invalid'`, and `aria-required="true"` when `required` is set, so a screen reader announces both together with the message in its description.
 
 ## Usage
 
@@ -496,7 +496,7 @@ Add `data-coreui-toggle="combobox"` to the toggle and the plugin initializes it 
 | `data-coreui-indicator="checkbox"` | Puts a checkbox in front of every option. |
 
 ```html
-<button class="form-control combobox-toggle" type="button" data-coreui-toggle="combobox" data-coreui-name="country">
+<button class="form-control combobox-toggle" type="button" aria-label="Country" data-coreui-toggle="combobox" data-coreui-name="country">
 </button>
 <div class="popup combobox-popup">
   <div class="list-box">
@@ -599,7 +599,7 @@ myCombobox.addEventListener('change.coreui.combobox', event => {
 
 ## Accessibility
 
-The toggle is a real `<button>` carrying `aria-haspopup="listbox"` and `aria-expanded`; name it with a `<label for>` or an `aria-label`. The panel is a [List box](/components/list-box/), so `role="listbox"` sits on `.list-box-options` and `role="option"` on every option, with `aria-selected` kept in step with the selection — name the list itself with `aria-label` or `aria-labelledby` on `.list-box-options`.
+The toggle is a `<button>` with `role="combobox"`, `aria-haspopup="listbox"` and `aria-expanded`, so a screen reader announces it as a combobox and reads what the toggle shows as its value: the selected option, the count in `multiple` mode, or the placeholder while nothing is selected. A combobox does not take its name from its text, so name it with a `<label for>`, an `aria-label` or an `aria-labelledby`; without one it has no name. The panel is a [List box](/components/list-box/), so `role="listbox"` sits on `.list-box-options` and `role="option"` on every option, with `aria-selected` kept in step with the selection — name the list itself with `aria-label` or `aria-labelledby` on `.list-box-options`.
 
 The focus never enters the list. It stays on the toggle, or on the search field when there is one, and the highlighted option is reported through `aria-activedescendant` on whichever of the two holds it.
 
