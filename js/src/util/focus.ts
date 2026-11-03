@@ -10,6 +10,23 @@ export const containsFocus = (element: Element | null | undefined): boolean =>
   Boolean(element?.contains((element.getRootNode() as Document | ShadowRoot).activeElement))
 
 /**
+ * Returns the element holding the focus of a document or shadow root, followed into the open shadow
+ * roots it hosts, so a focused button inside a web component is returned instead of its host.
+ *
+ * @param root - The document or shadow root to start from
+ * @returns The deepest focused element, or `null`
+ */
+export const deepActiveElement = (root: Document | ShadowRoot): Element | null => {
+  let active = root.activeElement
+
+  while (active?.shadowRoot?.activeElement) {
+    active = active.shadowRoot.activeElement
+  }
+
+  return active
+}
+
+/**
  * Tells whether the focus of an element's document or shadow root is inside the element, or on no
  * element at all (the body). A panel that closes in either state hands the focus back.
  *
@@ -45,6 +62,18 @@ export const focusIfUsable = (element: HTMLElement | null | undefined, options?:
 
   return activeElement === element || (activeElement !== before && element.contains(activeElement))
 }
+
+/**
+ * Focuses the first of several elements that can take the focus, trying them in order with
+ * `focusIfUsable`.
+ *
+ * @param elements - The candidates in the order to try them; empty entries are skipped
+ * @param options - Passed on to `focus()`, e.g. `{ preventScroll: true }`
+ * @returns The first element that holds the focus afterwards or into which `focus()` moved it, or
+ * `undefined` when none did
+ */
+export const focusFirstUsable = (elements: (HTMLElement | null | undefined)[], options?: FocusOptions): HTMLElement | undefined =>
+  elements.find((element): element is HTMLElement => focusIfUsable(element, options))
 
 /**
  * Focuses an element that need not be focusable. One without a `tabindex` gets `tabindex="-1"`

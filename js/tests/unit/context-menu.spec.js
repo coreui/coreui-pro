@@ -1352,7 +1352,7 @@ describe('ContextMenu', () => {
       return done
     })
 
-    it('should return the focus on Escape to the area when the keyboard opened the menu from a shadow host that takes no focus', async () => {
+    it('should return the focus on Escape to the button inside the shadow host the keyboard opened the menu from', async () => {
       fixtureEl.innerHTML = [
         '<div class="area" tabindex="0" data-coreui-toggle="context-menu">',
         '  <div id="card"><div class="menu"><a class="menu-item" href="#">Item 1</a></div></div>',
@@ -1383,6 +1383,103 @@ describe('ContextMenu', () => {
       }))
       await shown
       expect(menu.contains(document.activeElement)).toBeTrue()
+
+      menu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
+      await hidden
+
+      expect(document.activeElement).toEqual(card)
+      expect(card.shadowRoot.activeElement).toEqual(button)
+    })
+
+    const openFromShadowHost = async (shadowContent, focusedSelector) => {
+      fixtureEl.innerHTML = [
+        '<div class="area" tabindex="0" data-coreui-toggle="context-menu">',
+        '  <div id="card" tabindex="-1"><div class="menu"><a class="menu-item" href="#">Item 1</a></div></div>',
+        '</div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const card = fixtureEl.querySelector('#card')
+      const menu = fixtureEl.querySelector('.menu')
+      card.attachShadow({ mode: 'open' }).innerHTML = `${shadowContent}<slot></slot>`
+      new ContextMenu(area, { menu }) // eslint-disable-line no-new
+
+      const shown = new Promise(resolve => {
+        area.addEventListener('shown.coreui.context-menu', resolve, { once: true })
+      })
+      const focused = card.shadowRoot.querySelector(focusedSelector)
+      focused.focus()
+      focused.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'F10',
+        shiftKey: true
+      }))
+      await shown
+      expect(menu.contains(document.activeElement)).toBeTrue()
+
+      const hidden = new Promise(resolve => {
+        area.addEventListener('hidden.coreui.context-menu', () => setTimeout(resolve), { once: true })
+      })
+
+      return {
+        card, focused, hidden, menu
+      }
+    }
+
+    it('should return the focus on Escape to the shadow host when the button inside it is gone', async () => {
+      const { card, focused, hidden, menu } = await openFromShadowHost('<button>Edit</button>', 'button')
+      focused.remove()
+
+      menu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
+      await hidden
+
+      expect(document.activeElement).toEqual(card)
+      expect(card.shadowRoot.activeElement).toBeNull()
+    })
+
+    it('should return the focus on Escape to the shadow host when the focused element inside it is not an HTML element', async () => {
+      const { card, hidden, menu } = await openFromShadowHost('<svg><a href="#"><text>Edit</text></a></svg>', 'a')
+
+      menu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
+      await hidden
+
+      expect(document.activeElement).toEqual(card)
+    })
+
+    it('should return the focus on Escape to the area when the button is gone and the shadow host around the menu takes no focus', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" tabindex="0" data-coreui-toggle="context-menu">',
+        '  <div id="card"><div class="menu"><a class="menu-item" href="#">Item 1</a></div></div>',
+        '</div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const card = fixtureEl.querySelector('#card')
+      const menu = fixtureEl.querySelector('.menu')
+      card.attachShadow({ mode: 'open' }).innerHTML = '<button>Edit</button><slot></slot>'
+      new ContextMenu(area, { menu }) // eslint-disable-line no-new
+
+      const shown = new Promise(resolve => {
+        area.addEventListener('shown.coreui.context-menu', resolve, { once: true })
+      })
+      const hidden = new Promise(resolve => {
+        area.addEventListener('hidden.coreui.context-menu', () => setTimeout(resolve), { once: true })
+      })
+
+      const button = card.shadowRoot.querySelector('button')
+      button.focus()
+      button.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'F10',
+        shiftKey: true
+      }))
+      await shown
+      expect(menu.contains(document.activeElement)).toBeTrue()
+      button.remove()
 
       menu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
       await hidden

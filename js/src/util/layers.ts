@@ -1,3 +1,4 @@
+import { deepActiveElement } from './focus.js'
 import { pressPathOf, trackPress } from './press.js'
 
 export type LayerReason = 'escape' | 'outside' | 'parent' | 'sibling'
@@ -87,22 +88,6 @@ const containsAcross = (container: Element, node: Node | null | undefined): bool
   }
 
   return false
-}
-
-/**
- * Returns the focused element of a document, looking into open shadow roots.
- *
- * @param doc - The document
- * @returns The deepest focused element, or `null`
- */
-const deepActiveElement = (doc: Document): Element | null => {
-  let active = doc.activeElement
-
-  while (active?.shadowRoot?.activeElement) {
-    active = active.shadowRoot.activeElement
-  }
-
-  return active
 }
 
 /**

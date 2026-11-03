@@ -44,7 +44,7 @@ import {
   type FloatingOffsetOption,
   type FloatingConfigOption
 } from './util/floating-ui.js'
-import { containsFocus, focusIfUsable } from './util/focus.js'
+import { containsFocus, focusFirstUsable, focusIfUsable } from './util/focus.js'
 import {
   closeLayersIn, handleEscape, isInDescendantParts, registerLayer, settleClick, unregisterLayer, type LayerEntry, type LayerReason
 } from './util/layers.js'
@@ -447,7 +447,7 @@ class Menu extends BaseComponent {
       return
     }
 
-    if (openedBy === 'pointer' || !this._focusFirstUsable(this._getItemsInMenu(this._menu), { preventScroll: true })) {
+    if (openedBy === 'pointer' || !focusFirstUsable(this._getItemsInMenu(this._menu), { preventScroll: true })) {
       this._menu.focus({ preventScroll: true })
     }
   }
@@ -1133,15 +1133,11 @@ class Menu extends BaseComponent {
       candidates = [...ordered.slice(position + 1), ...(this._config.loopFocus ? ordered.slice(0, position) : [])]
     }
 
-    const nextItem = this._focusFirstUsable(candidates)
+    const nextItem = focusFirstUsable(candidates)
 
     if (nextItem) {
       this._closeUnrelatedSubmenus(currentMenu, nextItem)
     }
-  }
-
-  protected _focusFirstUsable(items: HTMLElement[], options?: FocusOptions): HTMLElement | undefined {
-    return items.find(item => focusIfUsable(item, options))
   }
 
   // Moving focus along one level closes the submenus focus left behind, matching
@@ -1236,7 +1232,7 @@ class Menu extends BaseComponent {
         this._closeSiblingSubmenus(submenuWrapper)
         this._openSubmenu(target as HTMLElement, submenu, submenuWrapper)
         requestAnimationFrame(() => {
-          this._focusFirstUsable(SelectorEngine.find(this.constructor.SELECTOR_VISIBLE_ITEMS, submenu).filter(item => this._getLevelMenu(item) === submenu))
+          focusFirstUsable(SelectorEngine.find(this.constructor.SELECTOR_VISIBLE_ITEMS, submenu).filter(item => this._getLevelMenu(item) === submenu))
         })
       }
 
@@ -1268,7 +1264,7 @@ class Menu extends BaseComponent {
       const currentMenu = this._getLevelMenu(target as Element)
       const items = this._getItemsInMenu(currentMenu)
 
-      const targetItem = this._focusFirstUsable(key === HOME_KEY ? items : items.toReversed())
+      const targetItem = focusFirstUsable(key === HOME_KEY ? items : items.toReversed())
 
       if (targetItem) {
         this._closeUnrelatedSubmenus(currentMenu, targetItem)

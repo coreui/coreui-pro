@@ -1,5 +1,5 @@
 import {
-  containsFocus, focusIfUsable, focusWithTemporaryTabindex, holdsFocusOrNone
+  containsFocus, deepActiveElement, focusFirstUsable, focusIfUsable, focusWithTemporaryTabindex, holdsFocusOrNone
 } from '../../../src/util/focus.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -38,6 +38,89 @@ describe('Focus utilities', () => {
       shadow.querySelector('button').focus()
 
       expect(containsFocus(shadow.querySelector('#outer'))).toBeTrue()
+    })
+  })
+
+  describe('deepActiveElement', () => {
+    it('should follow the focus into nested open shadow roots', () => {
+      fixtureEl.innerHTML = '<div id="outer"></div><button id="plain"></button>'
+
+      const outer = fixtureEl.querySelector('#outer').attachShadow({ mode: 'open' })
+      outer.innerHTML = '<div id="inner"></div>'
+      const inner = outer.querySelector('#inner').attachShadow({ mode: 'open' })
+      inner.innerHTML = '<button></button>'
+      const button = inner.querySelector('button')
+
+      button.focus()
+      expect(deepActiveElement(document)).toEqual(button)
+      expect(deepActiveElement(outer)).toEqual(button)
+      expect(deepActiveElement(inner)).toEqual(button)
+
+      fixtureEl.querySelector('#plain').focus()
+      expect(deepActiveElement(document)).toEqual(fixtureEl.querySelector('#plain'))
+      expect(deepActiveElement(outer)).toBeNull()
+    })
+
+    it('should stop at the host of a closed shadow root', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+
+      const host = fixtureEl.querySelector('#host')
+      const shadow = host.attachShadow({ mode: 'closed' })
+      shadow.innerHTML = '<button></button>'
+      shadow.querySelector('button').focus()
+
+      expect(deepActiveElement(document)).toEqual(host)
+    })
+  })
+
+  describe('focusFirstUsable', () => {
+    it('should focus the first element that takes the focus and return it', () => {
+      fixtureEl.innerHTML = [
+        '<button id="disabled" disabled></button>',
+        '<button id="hidden" style="display: none"></button>',
+        '<a id="plain">no href</a>',
+        '<a id="marked" class="disabled" href="#">disabled by class</a>',
+        '<button id="first"></button>',
+        '<button id="second"></button>'
+      ].join('')
+
+      const [disabled, hidden, plain, marked, first, second] = ['disabled', 'hidden', 'plain', 'marked', 'first', 'second'].map(id => fixtureEl.querySelector(`#${id}`))
+
+      expect(focusFirstUsable([null, disabled, undefined, hidden, plain, marked, first, second])).toEqual(first)
+      expect(document.activeElement).toEqual(first)
+    })
+
+    it('should return undefined and leave the focus alone when no element takes it', () => {
+      fixtureEl.innerHTML = '<button id="current"></button><button id="disabled" disabled></button>'
+
+      const current = fixtureEl.querySelector('#current')
+      current.focus()
+
+      expect(focusFirstUsable([fixtureEl.querySelector('#disabled'), null])).toBeUndefined()
+      expect(focusFirstUsable([])).toBeUndefined()
+      expect(document.activeElement).toEqual(current)
+    })
+
+    it('should not count an element that only contained the focus already', () => {
+      fixtureEl.innerHTML = '<div id="outer"><button id="inner"></button></div><button id="next"></button>'
+
+      const outer = fixtureEl.querySelector('#outer')
+      const next = fixtureEl.querySelector('#next')
+      fixtureEl.querySelector('#inner').focus()
+
+      expect(focusFirstUsable([outer, next])).toEqual(next)
+      expect(document.activeElement).toEqual(next)
+    })
+
+    it('should pass the options on to focus()', () => {
+      fixtureEl.innerHTML = '<button></button>'
+
+      const button = fixtureEl.querySelector('button')
+      const spy = spyOn(button, 'focus').and.callThrough()
+
+      focusFirstUsable([button], { preventScroll: true })
+
+      expect(spy).toHaveBeenCalledWith({ preventScroll: true })
     })
   })
 
