@@ -1990,6 +1990,31 @@ describe('Dropdown', () => {
       })
     })
 
+    it('should skip an item that cannot take the focus when using keyboard navigation', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+        '  <div class="dropdown-menu">',
+        '    <a class="dropdown-item">Heading</a>',
+        '    <a id="item1" class="dropdown-item" href="#">Link</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const triggerDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      const shown = new Promise(resolve => {
+        triggerDropdown.addEventListener('shown.coreui.dropdown', resolve, { once: true })
+      })
+      triggerDropdown.click()
+      await shown
+
+      const keydown = createEvent('keydown')
+      keydown.key = 'ArrowDown'
+      triggerDropdown.dispatchEvent(keydown)
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#item1'))
+    })
+
     it('should skip hidden element when using keyboard navigation', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

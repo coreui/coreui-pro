@@ -591,7 +591,7 @@ Menus include built-in keyboard support for navigating menu items.
 | `Home` / `End` | Jump to first/last menu item |
 | `Tab` / `Shift`+`Tab` | With `role="menu"`, close the menu whatever `autoClose` says: `Tab` moves on to the element after the toggle, `Shift`+`Tab` to the toggle. A `hide.coreui.menu` listener that calls `preventDefault()` keeps the menu open and the focus on the item. Without `role="menu"`, move to the next or previous element: moving within the menu closes the submenu the focus leaves, leaving the menu closes it when `autoClose` is `true` or `'outside'`, and `Shift`+`Tab` back onto the toggle keeps it open. With `container`, `Tab` from the toggle enters the panel and `Tab` from its last element moves on after the toggle |
 
-Arrow keys, `Home` and `End` pressed in a field, an editable region or a widget with its own keys inside the menu (a slider, a list box, a radio group, a toolbar) stay with that control.
+Arrow keys, `Home` and `End` pressed in a field, an editable region or a widget with its own keys inside the menu (a slider, a list box, a radio group, a toolbar) stay with that control. The arrow keys, `Home` and `End` pass over an item that cannot take the focus, such as a `.menu-item` link without `href` in a panel without `role="menu"`.
 
 ## Usage
 

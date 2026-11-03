@@ -31,7 +31,7 @@ import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import {
-  defineJQueryPlugin, execute, getElement, getNextActiveElement, getUID, isDisabled, isElement, isRTL, isVisible, jQueryDispatch, noop
+  defineJQueryPlugin, execute, getElement, getUID, isDisabled, isElement, isRTL, isVisible, jQueryDispatch, noop
 } from './util/index.js'
 import {
   parseResponsivePlacement,
@@ -447,7 +447,7 @@ class Menu extends BaseComponent {
       return
     }
 
-    if (openedBy === 'pointer' || !this._getItemsInMenu(this._menu).some(item => focusIfUsable(item, { preventScroll: true }))) {
+    if (openedBy === 'pointer' || !this._focusFirstUsable(this._getItemsInMenu(this._menu), { preventScroll: true })) {
       this._menu.focus({ preventScroll: true })
     }
   }
@@ -1125,9 +1125,23 @@ class Menu extends BaseComponent {
       return
     }
 
-    const nextItem = getNextActiveElement(items, target as HTMLElement, key === ARROW_DOWN_KEY, this._config.loopFocus || !items.includes(target as HTMLElement))
-    nextItem.focus()
-    this._closeUnrelatedSubmenus(currentMenu, nextItem)
+    const ordered = key === ARROW_DOWN_KEY ? items : items.toReversed()
+    const position = ordered.indexOf(target as HTMLElement)
+    let candidates = ordered
+
+    if (position !== -1) {
+      candidates = [...ordered.slice(position + 1), ...(this._config.loopFocus ? ordered.slice(0, position) : [])]
+    }
+
+    const nextItem = this._focusFirstUsable(candidates)
+
+    if (nextItem) {
+      this._closeUnrelatedSubmenus(currentMenu, nextItem)
+    }
+  }
+
+  protected _focusFirstUsable(items: HTMLElement[], options?: FocusOptions): HTMLElement | undefined {
+    return items.find(item => focusIfUsable(item, options))
   }
 
   // Moving focus along one level closes the submenus focus left behind, matching
@@ -1222,10 +1236,7 @@ class Menu extends BaseComponent {
         this._closeSiblingSubmenus(submenuWrapper)
         this._openSubmenu(target as HTMLElement, submenu, submenuWrapper)
         requestAnimationFrame(() => {
-          const firstItem = SelectorEngine.findOne(this.constructor.SELECTOR_VISIBLE_ITEMS, submenu)
-          if (firstItem) {
-            firstItem.focus()
-          }
+          this._focusFirstUsable(SelectorEngine.find(this.constructor.SELECTOR_VISIBLE_ITEMS, submenu).filter(item => this._getLevelMenu(item) === submenu))
         })
       }
 
@@ -1257,9 +1268,9 @@ class Menu extends BaseComponent {
       const currentMenu = this._getLevelMenu(target as Element)
       const items = this._getItemsInMenu(currentMenu)
 
-      if (items.length) {
-        const targetItem = key === HOME_KEY ? items[0] : items.at(-1)!
-        targetItem.focus()
+      const targetItem = this._focusFirstUsable(key === HOME_KEY ? items : items.toReversed())
+
+      if (targetItem) {
         this._closeUnrelatedSubmenus(currentMenu, targetItem)
       }
 
