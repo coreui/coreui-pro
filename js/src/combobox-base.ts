@@ -45,6 +45,7 @@ const CLASS_NAME_OPTIONS = 'list-box-options'
 
 const SELECTOR_OPTION = '.list-box-option'
 
+const EVENT_LIST_BOX_ACTION = 'action.coreui.list-box'
 const EVENT_LIST_BOX_CHANGE = 'change.coreui.list-box'
 const EVENT_LIST_BOX_DESELECT = 'deselect.coreui.list-box'
 const EVENT_LIST_BOX_DESELECTED = 'deselected.coreui.list-box'
@@ -473,6 +474,12 @@ class ComboboxBase extends BaseComponent {
         event.preventDefault()
       }
     }
+
+    EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_ACTION, (event: any) => {
+      if (!this._config.multiple && this._listBox?.getSelectedValues().includes(String(event.value))) {
+        this.hide()
+      }
+    })
 
     EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_DESELECT, refuseWhileDisabled)
 

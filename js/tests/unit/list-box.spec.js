@@ -867,11 +867,82 @@ describe('ListBox', () => {
       el.addEventListener('action.coreui.list-box', event => values.push(event.value))
 
       click(item(el, 'lettuce'))
-      listBox.setActive('docs')
-      keydown(list(el), 'Enter')
+      item(el, 'docs').addEventListener('click', event => event.preventDefault())
+      item(el, 'docs').click()
 
       expect(values).toEqual(['lettuce', 'docs'])
       expect(listBox.getSelectedValues()).toEqual([])
+    })
+
+    it('should leave Enter on a focused link to the browser and fire no action from the key', () => {
+      const el = setMarkup('', [
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<a class="list-box-option" href="#docs" data-coreui-value="docs">Docs</a>'
+      ])
+      const listBox = new ListBox(el)
+      const values = []
+
+      el.addEventListener('action.coreui.list-box', event => values.push(event.value))
+      listBox.setActive('docs')
+      const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
+      item(el, 'docs').dispatchEvent(enter)
+
+      expect(enter.defaultPrevented).toBeFalse()
+      expect(values).toEqual([])
+    })
+
+    it('should fire action once when Enter in the field follows a link', () => {
+      const el = setMarkup('', [
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<a class="list-box-option" href="#docs" data-coreui-value="docs">Docs</a>'
+      ])
+      fixtureEl.insertAdjacentHTML('beforeend', '<input id="field">')
+      const field = fixtureEl.querySelector('#field')
+      const listBox = new ListBox(el, { activeDescendant: field })
+      const values = []
+
+      el.addEventListener('action.coreui.list-box', event => values.push(event.value))
+      item(el, 'docs').addEventListener('click', event => event.preventDefault())
+      listBox.setActive('docs')
+      keydown(field, 'Enter')
+
+      expect(values).toEqual(['docs'])
+    })
+    it('should fire action before the selection on every activation, also of the selected option', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el)
+      const events = []
+
+      el.addEventListener('change.coreui.list-box', event => events.push(`change ${event.value}`))
+      el.addEventListener('action.coreui.list-box', event => events.push(`action ${event.value}`))
+
+      click(item(el, 'lettuce'))
+      click(item(el, 'lettuce'))
+      listBox.setActive('lettuce')
+      keydown(list(el), 'Enter')
+      keydown(list(el), ' ')
+
+      expect(events).toEqual(['action lettuce', 'change lettuce', 'action lettuce', 'action lettuce', 'action lettuce'])
+    })
+
+    it('should fire action on a click in multiple mode but not for a range, a ctrl click, select all or the methods', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple"', null, selectAllMarkup)
+      const listBox = new ListBox(el)
+      const values = []
+
+      el.addEventListener('action.coreui.list-box', event => values.push(event.value))
+
+      listBox.setActive('lettuce')
+      click(item(el, 'cheese'), { shiftKey: true })
+      click(item(el, 'tomato'), { ctrlKey: true })
+      el.querySelector('[data-coreui-select-all]').click()
+      keydown(list(el), 'a', { ctrlKey: true })
+      listBox.select('onion')
+      listBox.toggle('onion')
+      expect(values).toEqual([])
+
+      click(item(el, 'onion'))
+      expect(values).toEqual(['onion'])
     })
   })
 

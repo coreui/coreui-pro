@@ -1346,6 +1346,41 @@ describe('Combobox', () => {
   })
 
   describe('keyboard', () => {
+    it('should ask to hide once when a click picks a new option and the page keeps the panel open', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+      const hides = []
+      toggle.addEventListener('hide.coreui.combobox', event => {
+        hides.push(event.type)
+        event.preventDefault()
+      })
+
+      combobox.show()
+      option(combobox, 'uk').click()
+
+      expect(hides).toHaveSize(1)
+      expect(combobox._isShown()).toBeTrue()
+    })
+
+    it('should close without a change when Enter or a click picks the selected option again', () => {
+      const toggle = setMarkup(' data-coreui-value="uk"')
+      const combobox = new Combobox(toggle)
+      const changes = []
+      toggle.addEventListener('change.coreui.combobox', event => changes.push(event.value))
+
+      toggle.focus()
+      keydown(toggle, 'ArrowDown')
+      keydown(toggle, 'Enter')
+      expect(combobox._isShown()).toBeFalse()
+
+      combobox.show()
+      option(combobox, 'uk').click()
+      expect(combobox._isShown()).toBeFalse()
+
+      expect(combobox.getValue()).toEqual('uk')
+      expect(changes).toEqual([])
+    })
+
     it('should open the panel on ArrowDown, ArrowUp, Enter and Space', () => {
       for (const key of ['ArrowDown', 'ArrowUp', 'Enter', ' ']) {
         const toggle = setMarkup()
