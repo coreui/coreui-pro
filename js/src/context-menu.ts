@@ -63,6 +63,7 @@ const DefaultType: Record<string, string> = {
 class ContextMenu extends Menu {
   declare ['constructor']: typeof ContextMenu
   protected declare _config: ContextMenuConfig
+  protected declare _openedFrom: HTMLElement | null
   protected declare _point: Point | null
   protected declare _scrollBlocker: ((event: Event) => void) | null
   protected declare _shown: boolean
@@ -71,6 +72,7 @@ class ContextMenu extends Menu {
   constructor(element?: string | Element | null, config?: Partial<ContextMenuConfig> | null) {
     super(element, config as Partial<MenuConfig>)
 
+    this._openedFrom = null
     this._point = null
     this._scrollBlocker = null
     this._shown = false
@@ -110,6 +112,8 @@ class ContextMenu extends Menu {
   // Private
   protected _showAt(point: Point | undefined, relatedTarget: Record<string, unknown>, fromKeyboard = false): void {
     if (!this._isShown()) {
+      const active = (this._element.getRootNode() as Document | ShadowRoot).activeElement
+      this._openedFrom = fromKeyboard && active instanceof HTMLElement && this._element.contains(active) ? active : null
       this._point = point ?? null
     }
 
@@ -148,7 +152,12 @@ class ContextMenu extends Menu {
   }
 
   protected override _returnFocus(): void {
-    focusIfUsable(this._element, { preventScroll: true })
+    const openedFrom = this._openedFrom
+    this._openedFrom = null
+
+    if (!focusIfUsable(openedFrom, { preventScroll: true })) {
+      focusIfUsable(this._element, { preventScroll: true })
+    }
   }
 
   // The trigger is an area, not a button: a click anywhere outside the menu

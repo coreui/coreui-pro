@@ -1316,6 +1316,117 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should return the focus on Escape to the field the keyboard opened the menu from, in an area that takes no focus', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <div class="area" data-coreui-toggle="context-menu"><input id="field"></div>',
+        '  <div class="menu"><a class="menu-item" href="#">Item 1</a></div>',
+        '</div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const field = fixtureEl.querySelector('#field')
+      const menu = fixtureEl.querySelector('.menu')
+
+      const done = new Promise(resolve => {
+        area.addEventListener('hidden.coreui.context-menu', () => {
+          setTimeout(() => {
+            expect(document.activeElement).toEqual(field)
+            resolve()
+          })
+        })
+      })
+
+      whenShown(area, () => {
+        expect(document.activeElement).not.toEqual(field)
+        menu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }))
+      })
+
+      field.focus()
+      field.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: 'F10',
+        shiftKey: true
+      }))
+      return done
+    })
+
+    it('should return the focus from hide() to the field the Menu key opened the menu from, before the area', async () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <div class="area" tabindex="0" data-coreui-toggle="context-menu"><input id="field"></div>',
+        '  <div class="menu"><a class="menu-item" href="#">Item 1</a></div>',
+        '</div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const field = fixtureEl.querySelector('#field')
+      const shown = whenShown(area, () => {
+        expect(document.activeElement).not.toEqual(field)
+        ContextMenu.getInstance(area).hide()
+      })
+
+      field.focus()
+      field.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ContextMenu' }))
+      await shown
+
+      expect(document.activeElement).toEqual(field)
+    })
+
+    it('should take the field the keyboard opens the menu from again while it is open', async () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <div class="area" data-coreui-toggle="context-menu" data-coreui-auto-close="false"><input id="first"><input id="second"></div>',
+        '  <div class="menu"><a class="menu-item" href="#">Item 1</a></div>',
+        '</div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const first = fixtureEl.querySelector('#first')
+      const second = fixtureEl.querySelector('#second')
+      const item = fixtureEl.querySelector('.menu-item')
+      const shiftF10 = target => target.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true, cancelable: true, key: 'F10', shiftKey: true
+      }))
+
+      const firstShown = whenShown(area, () => {})
+      first.focus()
+      shiftF10(first)
+      await firstShown
+
+      const secondShown = whenShown(area, () => {})
+      second.focus()
+      shiftF10(second)
+      await secondShown
+
+      item.focus()
+      ContextMenu.getInstance(area).hide()
+
+      expect(document.activeElement).toEqual(second)
+    })
+
+    it('should return the focus to the area, not the field that had it, after a right-click opened the menu', async () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <div class="area" tabindex="0" data-coreui-toggle="context-menu"><input id="field"></div>',
+        '  <div class="menu"><a class="menu-item" href="#">Item 1</a></div>',
+        '</div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const field = fixtureEl.querySelector('#field')
+      const shown = whenShown(area, () => {
+        ContextMenu.getInstance(area).hide()
+      })
+
+      field.focus()
+      rightClick(field)
+      await shown
+
+      expect(document.activeElement).toEqual(area)
+    })
+
     it('should focus the first item when the keyboard opens the menu and the panel on a right-click', () => {
       fixtureEl.innerHTML = markup()
 
