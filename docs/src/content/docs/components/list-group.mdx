@@ -403,7 +403,7 @@ tabElms.forEach(tabElm => {
 
 <DeprecatedIn version="6.0.0" />
 
-The v5 spelling — `.list-group-item` with a colour modifier — still works and renders identically. Each colour class is generated from the same theme map as the class it replaces, so `.list-group-item-primary` *is* `.list-group-item.theme-primary`. They are removed in v7.
+The v5 spelling — `.list-group-item` with a color modifier — still works and renders identically. Each color class is generated from the same theme map as the class it replaces, so `.list-group-item-primary` *is* `.list-group-item.theme-primary`. They are removed in v7.
 
 <Example code={[`<ul class="list-group">`, ...getData('theme-colors').map((c) => `    <li class="list-group-item list-group-item-${c.name}">A simple ${c.name} list group item</li>`), `  </ul>`]} />
 
@@ -412,7 +412,7 @@ The v5 spelling — `.list-group-item` with a colour modifier — still works an
 + <li class="list-group-item theme-success">Done</li>
 ```
 
-The rewrite buys two things the modifier cannot. A theme colour set on the `.list-group` reaches every item inside it, and a colour of your own works the moment you define its theme tokens, with no Sass to compile.
+The rewrite buys two things the modifier cannot. A theme color set on the `.list-group` reaches every item inside it, and a color of your own works the moment you define its theme tokens, with no Sass to compile.
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 
@@ -428,7 +428,7 @@ List groups use local CSS variables on `.list-group` for enhanced real-time cust
 
 <DeprecatedIn version="6.0.0" />
 
-Loop that generates the [deprecated colour classes](#deprecated-markup) for
+Loop that generates the [deprecated color classes](#deprecated-markup) for
 `.list-group-item`s. Each class sets the same generic `--cui-theme-*` tokens that
 `.theme-{color}` sets, which is why the two spellings render identically — the item,
 its `.active` state and `.list-group-item-action` all read those tokens directly. The

@@ -85,7 +85,7 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   spellings it carries.**
   <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   `coreui.css` no longer carries the deprecated v5 spellings. They — the
-  colour modifiers (`.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
+  color modifiers (`.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
   `.btn-subtle-{color}`, `.btn-ghost-{color}`, `.callout-{color}`,
   `.chip-{color}`, `.list-group-item-{color}`), the form check markup
   (`.form-check`, `.form-check-input`, `.form-check-label`,
@@ -120,7 +120,7 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 **The minimum supported browsers are now Chrome 123, Edge 123, Firefox 130,
 Safari 18 and iOS 18.** Safari 18 is set by `color-mix()`: a mix in `oklch` with
 an achromatic operand — `transparent`, white, black, the greys, which is how
-every translucent and tinted colour in v6 is made — keeps the other colour's
+every translucent and tinted color in v6 is made — keeps the other color's
 hue only from Safari 18, where WebKit started carrying missing components
 forward as the spec requires; Safari 17.x interpolates the hue towards 0° and
 renders indigo as pink. Apple ships Safari 18 for macOS 13 and 14 as well, so
@@ -130,7 +130,7 @@ Chrome/Edge floor;
 through `details.name`, which reads back undefined below it.
 `@starting-style` and `transition-behavior: allow-discrete` need Firefox 129 (the
 Menu's entry animation) and `@property` needs 128 — its `inherits: false`
-registrations are what stop the colour and opacity utilities leaking into
+registrations are what stop the color and opacity utilities leaking into
 descendants, so an older Firefox does not lose an animation, it gets a bug.
 `:has()` sets a lower bound of Firefox 121, since validation and focus states on Multi Select,
 Autocomplete and the pickers, the sidebar navigation indicators, calendar
@@ -652,7 +652,7 @@ announces its toasts through it. See
   click no longer paints a ring, keyboard focus still does, matching `.btn`.
 - **New CSS variables:** `--cui-accordion-active-border-color` (the open item's
   border and the header's inset shadow, previously stuck on the resting border
-  colour), plus `--cui-accordion-content-duration` and
+  color), plus `--cui-accordion-content-duration` and
   `--cui-accordion-content-easing`, which drive the panel transition and are
   read back by `accordion.js` so both paths animate for the same length of time.
 - **The indicator can be an element instead of a background image.** Put an
@@ -667,9 +667,9 @@ announces its toasts through it. See
   **The open item is neutral, and `.theme-{color}` is what tints it.**
   `--cui-accordion-active-bg` and `--cui-accordion-active-color` were fixed to
   `--cui-primary-bg-subtle` / `--cui-primary-fg-emphasis`, so every accordion
-  turned the brand colour on open whether or not that suited the page. They are
+  turned the brand color on open whether or not that suited the page. They are
   `--cui-bg-2` and `--cui-fg-body` now, and the active tokens resolve
-  through `--cui-theme-fg` / `-bg-subtle` / `-border` first — so the colour is a
+  through `--cui-theme-fg` / `-bg-subtle` / `-border` first — so the color is a
   decision you make per accordion instead of one baked into the component. To
   keep the old look, put `.theme-primary` on the `.accordion`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
@@ -746,17 +746,17 @@ announces its toasts through it. See
 
 #### Avatar
 
-- **The avatar carries its own colours, and `.theme-{color}` tints it.**
+- **The avatar carries its own colors, and `.theme-{color}` tints it.**
   `--cui-avatar-bg` and `--cui-avatar-color` are new: a bare avatar is a
   neutral circle instead of a transparent one, and a `.theme-*` class puts the
-  theme colour behind the letters and the colour that reads on it in front of
+  theme color behind the letters and the color that reads on it in front of
   them. The docs used to reach for `bg-{color}` plus a hand-picked `text-*`,
   which fails WCAG AA on five of the six examples they shipped — measured 1.85
   on `bg-warning text-white`, 2.94 on info, 3.50 on success, 3.69 on danger,
-  and 3.12 on `bg-secondary`, which carried no text colour at all. Every theme
-  colour now lands between 4.56 and 18.03. Background utilities keep working on
+  and 3.12 on `bg-secondary`, which carried no text color at all. Every theme
+  color now lands between 4.56 and 18.03. Background utilities keep working on
   an avatar; they just no longer have to.
-- **New: `.avatar-subtle`**, a tinted avatar that keeps the theme colour in the
+- **New: `.avatar-subtle`**, a tinted avatar that keeps the theme color in the
   letters rather than behind them.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **One size token replaces the width/height pair.** `--cui-avatar-width` and
@@ -789,7 +789,7 @@ announces its toasts through it. See
   uses `transform`, so nothing else shifts. `$avatar-transition` changes from
   `margin .15s` to `transform .15s ease-in-out` accordingly.
 - **Stacked avatars wear a ring and stop pulling what follows them.** Each
-  avatar in a stack gets a border in the page background colour
+  avatar in a stack gets a border in the page background color
   (`--cui-avatar-stack-ring-width` / `-color`), so overlapping photos stay
   separated; the last avatar drops its negative margin, which used to drag
   the content after the stack underneath it. The overlap is a token now —
@@ -830,11 +830,11 @@ announces its toasts through it. See
   **A solid alert is `.alert-solid`, not a pile of utilities.** The docs used to
   say to drop the contextual class and reach for `bg-{color}` plus a `text-*`
   class picked by hand — and the examples hard-coded `text-white`, which fails
-  WCAG AA on five of the eight theme colours: measured 3.50 on success, 3.69 on
+  WCAG AA on five of the eight theme colors: measured 3.50 on success, 3.69 on
   danger, 2.94 on info, 1.85 on warning and 1.10 on light, where white text on a
   near-white background is invisible. `.alert-solid` reads the theme's own
-  contrast token, so every colour lands between 4.56 and 18.03 — including a
-  theme colour you define yourself. Markup using the old recipe still renders;
+  contrast token, so every color lands between 4.56 and 18.03 — including a
+  theme color you define yourself. Markup using the old recipe still renders;
   it is the contrast that was never right.
 
 - **An alert marked `.fade show` fades in when it is added to the page.** The
@@ -854,17 +854,17 @@ announces its toasts through it. See
   laid out by that wrapper like any other content. Move it up to be a direct
   child of the alert to keep it at the trailing edge.
 
-- **An `<hr>` inside an alert takes the alert's border colour.** The alert
-  redeclares `--cui-hr-border-color` from the theme's border colour, falling
+- **An `<hr>` inside an alert takes the alert's border color.** The alert
+  redeclares `--cui-hr-border-color` from the theme's border color, falling
   back to `--cui-alert-border-color`, so a separator in a `.theme-success`
   alert is green rather than the page's neutral grey, and one in an alert whose
-  border you recoloured follows it. A variant such as `.alert-solid` paints its
-  border with the surface colour, so there the separator takes the theme's
-  border colour, or the text colour without one.
+  border you recolored follows it. A variant such as `.alert-solid` paints its
+  border with the surface color, so there the separator takes the theme's
+  border color, or the text color without one.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-alert-border` is gone.** The border is written in the rule from
-  `--cui-alert-border-width` and the border colour, so that a `.theme-*` class
-  can colour it. Set `--cui-alert-border-width` and `--cui-alert-border-color`
+  `--cui-alert-border-width` and the border color, so that a `.theme-*` class
+  can color it. Set `--cui-alert-border-width` and `--cui-alert-border-color`
   instead, and `border-style` on the alert for a dashed or dotted line.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$alert-dismissible-padding-r` is gone; the space for the close button
@@ -882,8 +882,8 @@ announces its toasts through it. See
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
-`.btn-close` used to paint a black glyph baked into its SVG and recolour it for
-dark mode with a filter. The colour now comes from the element, the way the
+`.btn-close` used to paint a black glyph baked into its SVG and recolor it for
+dark mode with a filter. The color now comes from the element, the way the
 check, radio, carousel and toggler icons already work:
 
 ```diff
@@ -894,7 +894,7 @@ check, radio, carousel and toggler icons already work:
 ```
 
 - **`--cui-btn-close-filter` is removed**, together with `$btn-close-filter` and
-  `$btn-close-filter-dark`. Recolour the button with `--cui-btn-close-color`
+  `$btn-close-filter-dark`. Recolor the button with `--cui-btn-close-color`
   instead of inverting the image.
 - **`$btn-close-color` defaults to `inherit`**, so the glyph follows the surface
   it sits on. A close button inside a themed alert or a dark toast no longer
@@ -902,7 +902,7 @@ check, radio, carousel and toggler icons already work:
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.btn-close-white` is gone**, deprecated since v5.0.0, and so is the
   dark-mode rule that forced the glyph white. Both restated what the inherited
-  colour already produces on a surface that paints its own text — a
+  color already produces on a surface that paints its own text — a
   `.text-bg-inverse` toast, a dark navbar's offcanvas, a `.bg-body.text-body`
   section under `data-coreui-theme="dark"`. Delete the class; the button
   renders identically without it. The rule additionally got the mirror case
@@ -919,25 +919,25 @@ check, radio, carousel and toggler icons already work:
   `$btn-close-icon`). It stopped being a background when the glyph moved to a
   mask; the name had been describing the old implementation.
 - The SVG in `--cui-btn-close-icon` carries the shape only. A custom image works
-  the same way — give it any colour, the mask ignores it.
+  the same way — give it any color, the mask ignores it.
 
 #### Badge
 
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **Colour comes from `.theme-*`, and `.badge-*` now names the variant.** A bare
+  **Color comes from `.theme-*`, and `.badge-*` now names the variant.** A bare
   `.badge` used to be white text with no background of its own, so it was
   invisible until a `.text-bg-*` utility supplied both. It renders neutral on
   its own now — `--cui-badge-color` is `inherit` and `--cui-badge-bg` is
-  `--cui-bg-2` — and a `.theme-*` class colours it:
+  `--cui-bg-2` — and a `.theme-*` class colors it:
   `<span class="badge theme-danger">`. The `.badge-*` namespace carries the
   three variants instead: solid (default), `.badge-subtle` and
   `.badge-outline`, each mapping the same theme roles.
 
   `.text-bg-*` still works and still sets both properties, so existing markup
   keeps rendering. Markup that paired `.badge` with a background utility alone
-  (`<span class="badge bg-danger">`) now shows the inherited text colour on
+  (`<span class="badge bg-danger">`) now shows the inherited text color on
   that background instead of white — swap it for `.theme-danger` or add a text
-  colour utility.
+  color utility.
 
 - **The badge lays itself out.** `display` is `inline-flex` with
   `--cui-badge-gap` between children and `--cui-badge-min-height` as the floor,
@@ -994,7 +994,7 @@ check, radio, carousel and toggler icons already work:
   `data-coreui-play-label`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.carousel-dark`, the `carousel-dark()` mixin and `$carousel-dark-*` are
-  gone.** The chrome colours are `light-dark()` pairs resolved on the
+  gone.** The chrome colors are `light-dark()` pairs resolved on the
   carousel itself, so the standard `data-coreui-theme="dark"` attribute is
   the dark variant — and `data-coreui-theme="light"` pins the white chrome
   on a dark page the same way.
@@ -1360,9 +1360,9 @@ check, radio, carousel and toggler icons already work:
 
 - **One backdrop model for both.** `:root` emits `--cui-backdrop-color`,
   `--cui-backdrop-opacity` and `--cui-backdrop-blur`; the dialog's and the
-  drawer's `::backdrop` mix colour and opacity from them, so either can be
+  drawer's `::backdrop` mix color and opacity from them, so either can be
   retuned alone. The looks are unchanged (dialog: black at 50%/65%, drawer:
-  the page colour at 25%), and `.backdrop-scrim`, `.backdrop-translucent` and
+  the page color at 25%), and `.backdrop-scrim`, `.backdrop-translucent` and
   `.backdrop-none` swap them from the markup. `.dialog-no-backdrop` and
   `.drawer-no-backdrop` keep working. The sidebar's backdrop tokens are
   `--cui-sidebar-backdrop-zindex/-bg/-opacity` now (were unprefixed
@@ -1483,9 +1483,9 @@ removed in favour of `$translucent-opacity` and
   `--cui-calendar-cell-selected-adjacent-hover-color`,
   `--cui-calendar-cell-selected-adjacent-hover-bg`).
   Listen to `startDateChange` / `endDateChange` for the picked date.
-- A selected day or week keeps its colour under the pointer, a shade darker
+- A selected day or week keeps its color under the pointer, a shade darker
   (`--cui-calendar-cell-selected-hover-bg`,
-  `--cui-calendar-cell-selected-hover-color`); it used to take the hover colour
+  `--cui-calendar-cell-selected-hover-color`); it used to take the hover color
   until the pointer left.
 - In the years view the navigation names the page it shows, `2020 – 2031`,
   instead of the one year the page is built around, so turning a page is
@@ -1875,7 +1875,7 @@ validation and the arrow between them. Two consequences:
 - **The time row sits under the calendars again, with its clock icon.** v6.0.0-alpha
   put it beside them in a column of its own; `.date-picker-body` is a grid with
   the v5 areas once more, so `.date-picker-timepickers` spans the calendars it
-  belongs to, with its clock icon back as an inline SVG that takes its colour
+  belongs to, with its clock icon back as an inline SVG that takes its color
   from `--cui-date-picker-time-icon-color`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The date picker's time controls carry its own name.** `.time-picker-inline-icon`
@@ -2079,7 +2079,7 @@ Drawer and Dialog as the parents of what opens in them. What changes:
   default.** `$form-label-font-weight` is `var(--cui-font-weight-medium)`
   (was `null` — labels inherited the surrounding weight) and
   `$form-label-color` is `var(--cui-fg-body)` (was `null`), so a label inside
-  a muted or tinted context keeps the page's text colour instead of fading
+  a muted or tinted context keeps the page's text color instead of fading
   with it. Set the knobs back to `null`, or `--cui-label-font-weight` /
   `--cui-label-color` to `inherit`, for the old behaviour.
 
@@ -2094,7 +2094,7 @@ toggles a class anymore, and after an AJAX submission there is nothing to
 remove to reset the form's appearance.
 
 - **Success styling is opt-in.** `data-coreui-validate` alone shows only
-  invalid styling; set `data-coreui-validate="valid"` to also colour the
+  invalid styling; set `data-coreui-validate="valid"` to also color the
   valid fields.
 - **Server-side validation is unchanged** — `.is-invalid` / `.is-valid` keep
   working globally, without the attribute.
@@ -2103,7 +2103,7 @@ remove to reset the form's appearance.
   to the [`.form-field`](/forms/field/) around it.** The field shows it while
   the control carries the state, wherever it sits in the field, for example in
   a `.form-field-content` next to the label, and a check, a radio or a switch
-  colours the label. Feedback right after any other control still follows it.
+  colors the label. Feedback right after any other control still follows it.
 
 ```diff
 - <form class="needs-validation" novalidate>
@@ -2178,7 +2178,7 @@ same as in React and Vue. Call `next()` to move forward.
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 `--cui-stepper-step-indicator-active-bg` is removed. The active step's
-indicator background is a 5% tint mixed on the step from the theme colour, or
+indicator background is a 5% tint mixed on the step from the theme color, or
 from `--cui-stepper-step-indicator-active-color` without one, so a `.theme-*`
 class on the stepper or on a single step button tints it along with the text
 and border. To give the active indicator another background, set
@@ -2305,7 +2305,7 @@ and `.chip-input-sm`/`-lg` switch those tokens instead of private ones. The Sass
 variables that only re-pointed a `--cui-btn-input-*` token (`$chip-input-min-height`,
 `-font-size`, `-bg`, `-color`, `-border-width`, `-transition-*` and the size
 variants of min-height and font-size) are removed; what remains is what the chip
-input sets differently — padding, border colour and radius, and the gap, per
+input sets differently — padding, border color and radius, and the gap, per
 size. The disabled chip's opacity reads `--cui-control-group-disabled-opacity`
 instead of a literal `.65`. Rendered values are unchanged.
 
@@ -2498,7 +2498,7 @@ field behind that kept submitting.
 
 - **Changed.** **A pressed thumb takes `--cui-primary-bg-muted`**, the theme's
   `bg-muted` under a `.theme-*` class, instead of a 30% tint of the primary
-  colour (`$form-range-thumb-active-bg`).
+  color (`$form-range-thumb-active-bg`).
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A Range Slider handle with no name of its own is no longer submitted.** An
   array of names shorter than the handle count gave the leftover handles the
@@ -2512,7 +2512,7 @@ field behind that kept submitting.
   same `tooltips`/`tooltipsFormat` options as the range slider), and a linked `<datalist>` renders tick
   marks laid out on a grid. Every such wrapper initializes itself. The input
   fires `changed.coreui.range` with the numeric `value`. The fill is the
-  theme colour at half strength, a shade lighter than the thumb. **The bare
+  theme color at half strength, a shade lighter than the thumb. **The bare
   `<input class="form-range">` keeps working unchanged** as the CSS-only form of
   the control; it gets no plugin, no fill and no instance. New tokens on
   `.form-range`: `--cui-range-track-fill-bg`, `--cui-range-track-disabled-bg`
@@ -2520,11 +2520,11 @@ field behind that kept submitting.
   ones `-minor-height`).
 - **The range track sits halfway between `--cui-bg-2` and `--cui-bg-3`**
   (`color-mix(in oklch, …)`, was `--cui-bg-3`), in both the native range and
-  the range slider. `--cui-bg-3` and the `secondary` colour
+  the range slider. `--cui-bg-3` and the `secondary` color
   resolve to the same grey in light mode, so a `theme-secondary` thumb and
   fill vanished against the track.
 - **Validation reaches the range.** `.is-invalid`/`.is-valid` on the input
-  (either form) colour the thumb and its focus ring with the state, and a
+  (either form) color the thumb and its focus ring with the state, and a
   feedback element after the wrapper toggles through `:has()`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The range slider renders the markup of the range.** It builds
@@ -2596,7 +2596,7 @@ field behind that kept submitting.
   `$range-slider-vertical-track-*`): tick labels read `--cui-range-tick-label-color` and `-font-size`, the tooltips
   sit like the range's, a vertical slider's height is
   `--cui-range-vertical-height` and its track width `--cui-range-track-height`;
-  the tick label padding has no counterpart. The filled band keeps its half-strength mix of the theme colour, now
+  the tick label padding has no counterpart. The filled band keeps its half-strength mix of the theme color, now
   shared with the range's fill, and a disabled slider greys the band through
   the theme slot on the track.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
@@ -2665,7 +2665,7 @@ field behind that kept submitting.
   its only reader. Set `--cui-sidebar-nav-link-hover-bg` /
   `-active-bg` on `.sidebar-nav` for a different tint.
 - **Theme variants.** `.sidebar.theme-{color}` paints the surface, text,
-  icons and the hover/active links from that colour's slots. `.sidebar-light`
+  icons and the hover/active links from that color's slots. `.sidebar-light`
   joins `.sidebar-dark` as the scheme switch.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.sidebar-body` and `.sidebar-form` are removed.** Neither carried
@@ -2745,12 +2745,12 @@ field behind that kept submitting.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.nav-tabs` draws its line with an inset `box-shadow`, not a border.** The
   links no longer pull themselves over the container's border with a negative
-  `margin-bottom`; each link carries its own bottom border (the line colour at
-  rest, the panel colour when active) and the container paints the line as
+  `margin-bottom`; each link carries its own bottom border (the line color at
+  rest, the panel color when active) and the container paints the line as
   `box-shadow: inset 0 calc(-1 * var(--cui-nav-tabs-border-width)) 0
   var(--cui-nav-tabs-border-color)`. The rendered result is pixel-identical,
   but custom CSS targeting `.nav-tabs`' `border-bottom` or the links' negative
-  margin needs a second look; recolour the line through
+  margin needs a second look; recolor the line through
   `--cui-nav-tabs-border-color`. `.card-header-tabs` compensates with a deeper
   negative margin instead of zeroing the border.
 - **`--cui-nav-gap` is new**, declared on `.nav` and defaulting to `0`, so the
@@ -2760,7 +2760,7 @@ field behind that kept submitting.
 
 #### Tooltip
 
-- **`--cui-tooltip-opacity` now blends into the background colour instead of
+- **`--cui-tooltip-opacity` now blends into the background color instead of
   fading the whole element.** The old element-level `opacity: .9` also faded the
   label text, compositing it below the WCAG 1.4.3 contrast minimum (about
   3.5&#8758;1). The surface and arrow keep the same translucent look; the text
@@ -2779,7 +2779,7 @@ field behind that kept submitting.
 - **Tooltips take theme classes.** The surface and the text read the
   `--cui-theme-bg`/`--cui-theme-contrast` slots, with `--cui-tooltip-bg` and
   `--cui-tooltip-color` as the fallbacks, so a `.theme-{color}` class on the
-  tip (via `customClass`) colours it; the default look is unchanged.
+  tip (via `customClass`) colors it; the default look is unchanged.
 
 #### OTP input
 
@@ -2819,7 +2819,7 @@ field behind that kept submitting.
   message over the group. Once a validation reports the code, the group gets
   `.is-invalid` and every slot carries `aria-invalid="true"` and is described
   by the message after the group while the code stays invalid. The stylesheet
-  colours every slot and shows that message, which it never did for a slot
+  colors every slot and shows that message, which it never did for a slot
   marked invalid. Code that selects `input[type="hidden"]` inside the field
   needs `.form-otp > input:not(.form-otp-control)`, a slot no longer gets
   `required`, and a `data-coreui-invalid-feedback` written on the slots goes
@@ -2827,7 +2827,7 @@ field behind that kept submitting.
 - **The code takes a validation state.** The new `validationState` option, or
   an `.is-invalid`/`.is-valid` class on the `.form-otp` element or on a slot in
   the markup, shows the state on the group and the slots, and `'invalid'` blocks
-  the submit. A class on one slot, which used to colour only that slot, now
+  the submit. A class on one slot, which used to color only that slot, now
   marks the whole code. The user's next change of the code drops it, `setValidationState()` sets it
   again, and a native form reset puts back the
   code the field started with. A change of the code sends `input` and `change`
@@ -2871,7 +2871,7 @@ field behind that kept submitting.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The rating takes a validation state.** The new `validationState` option,
   or `.is-invalid`/`.is-valid` on the rating element read once when it starts,
-  colours the focus ring, and a given `'invalid'` sets
+  colors the focus ring, and a given `'invalid'` sets
   `aria-invalid` on the group and blocks the submit until the user picks or
   clears a star or the form is reset. A class written on the element later is
   not read; set the state with `setValidationState()`. See
@@ -2880,7 +2880,7 @@ field behind that kept submitting.
   gives the group `aria-required="true"`.
 - **Empty stars are `--cui-fg-4`**: gray-500 in the light scheme and gray-600
   in the dark one, the lightest grays that keep 3:1 against the page
-  background. The empty stars of v5 were 38% of the text colour, below 3:1
+  background. The empty stars of v5 were 38% of the text color, below 3:1
   against the page in the light scheme.
 
 #### Search Button
@@ -2988,10 +2988,10 @@ field behind that kept submitting.
   white at 87% opacity, computed at build time — repaint the selected
   background and the text stayed near-white. It defaults to
   `var(--cui-primary-contrast)` now (solid, slightly brighter than before),
-  and a `.theme-*` class supplies its own contrast colour through the slot.
+  and a `.theme-*` class supplies its own contrast color through the slot.
 - **Hovering a themed, unselected chip no longer previews the selected
   look.** The background steps from `bg-subtle` to `bg-muted` and the text
-  colour stays put; only selection paints the solid theme colour. A chip
+  color stays put; only selection paints the solid theme color. A chip
   without a theme class hovers exactly as before.
 
 #### Collapse
@@ -3106,8 +3106,8 @@ field behind that kept submitting.
   second line rather than push the layout out.
 - **`.btn-icon` (new).** A button that holds nothing but an icon: no padding,
   and its width follows its height, so it stays square at every size.
-- **A variant is a shape, the colour is a theme.** `.btn-solid`, `.btn-outline`,
-  `.btn-subtle` (new) and `.btn-ghost` take their colour from a `.theme-*` class
+- **A variant is a shape, the color is a theme.** `.btn-solid`, `.btn-outline`,
+  `.btn-subtle` (new) and `.btn-ghost` take their color from a `.theme-*` class
   on the button or on any element above it, and each carries the base button
   styles on its own — `.btn` is no longer required next to them:
 
@@ -3116,15 +3116,15 @@ field behind that kept submitting.
   + <button class="btn-solid theme-primary">Save</button>
   ```
 
-  **The colour classes keep working** and stay the spelling the docs use:
+  **The color classes keep working** and stay the spelling the docs use:
   `.btn-primary` is `.btn-solid.theme-primary`, `.btn-outline-primary` is
   `.btn-outline.theme-primary`, and `.btn-subtle-*` completes the set. What
-  changes is that one rule per variant now serves every colour, so a theme
-  colour of your own gets the whole set for free.
+  changes is that one rule per variant now serves every color, so a theme
+  color of your own gets the whole set for free.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A bare `.btn` is a neutral button, not an invisible one.** It renders in the
-  surface colours (`--cui-bg-2`, one step darker on hover) instead of
-  being transparent and unstyled. Buttons that carry a variant or a colour class
+  surface colors (`--cui-bg-2`, one step darker on hover) instead of
+  being transparent and unstyled. Buttons that carry a variant or a color class
   are unaffected. For the old behaviour use `.btn-ghost`, which is transparent
   by design.
 - **`.btn-xs` (new).** A fourth size below `.btn-sm`, reading the shared
@@ -3200,10 +3200,10 @@ field behind that kept submitting.
 
 `.check`, `.radio` and `.switch` go on the `<input>` itself. There is no wrapper
 and no second element: `appearance: none` lets the control render a
-pseudo-element, so the mark is drawn on the input, and its colour is a token
+pseudo-element, so the mark is drawn on the input, and its color is a token
 (`--cui-check-mark-color`) rather than a value baked into an SVG. The
 separate dark-mode switch artwork is gone with it — a thumb painted from a token
-follows the colour scheme by itself.
+follows the color scheme by itself.
 
 ```diff
 - <div class="form-check">
@@ -3284,7 +3284,7 @@ tokens now — `--cui-switch-transition-duration` and
 **The switch is redrawn.** The track is 1.25rem tall with a 1.75 aspect ratio
 (was a 2:1, font-relative `em` track), pill-radiused, on the tertiary surface
 with an inset shadow; the thumb is white with a drop shadow and turns
-contrast-coloured when checked. A disabled unchecked switch swaps to the
+contrast-colored when checked. A disabled unchecked switch swaps to the
 disabled surface with a faded thumb instead of dimming wholesale; a checked one
 dims. `--cui-switch-border` splits into `-border-width` and
 `-border-color`, and `$form-switch-color`, `$form-switch-width` and
@@ -3293,7 +3293,7 @@ deprecated `.form-switch-lg` / `-xl` are redrawn with the rest.
 
 **The controls animate on shared knobs.** `:root` carries
 `--cui-control-transition-duration` and `-timing` (an overshoot easing);
-the checkbox tick and the radio dot pop in on them, the boxes' colours animate,
+the checkbox tick and the radio dot pop in on them, the boxes' colors animate,
 and the switch thumb slides on the same pair — the three controls move in sync
 and restyle from one place. Reduced motion disables all of it as usual.
 
@@ -3471,7 +3471,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   `$table-active-bg-factor` and `$table-hover-bg-factor` changed from unit-less
   fractions (`.05`) to percentages (`5%`), because they now ship as the
   `--cui-table-*-bg-factor` variables that `color-mix()` reads at runtime.
-- **The state colours follow `--cui-table-color`.** `--cui-table-striped-color`,
+- **The state colors follow `--cui-table-color`.** `--cui-table-striped-color`,
   `--cui-table-active-color` and `--cui-table-hover-color` default to
   `var(--cui-table-color)`, and the matching backgrounds are mixed from it, so a
   variant only has to set `--cui-table-color`, `--cui-table-bg` and
@@ -3482,8 +3482,8 @@ Multi Select's option indicators moved with it — they render as a decorative
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The source line reads `--cui-secondary-color`.** `.blockquote-footer` was
   painted with `--cui-gray-600`, a fixed value that never flipped with the
-  colour mode: 4.15:1 on the light background and 3.65:1 on the dark one, both
-  under the 4.5:1 minimum. The secondary colour is defined per mode and clears
+  color mode: 4.15:1 on the light background and 3.65:1 on the dark one, both
+  under the 4.5:1 minimum. The secondary color is defined per mode and clears
   the threshold in both.
 - **The quote lays its children out with flex and `gap`.** Spacing inside a
   multi-paragraph quote is `--cui-blockquote-gap` rather than each paragraph's
@@ -3543,7 +3543,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 #### Card
 
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **A card is roomier and framed in the solid border colour.**
+  **A card is roomier and framed in the solid border color.**
   `--cui-card-spacer-y` / `-x` go from `1rem` to `--cui-spacer-6` (`1.25rem`),
   and the image-overlay padding follows them. The header, the footer and a
   list group placed directly in the card take `--cui-card-spacer-x` as their
@@ -3552,16 +3552,16 @@ Multi Select's option indicators moved with it — they render as a decorative
   of `--cui-border-color-translucent`, except on `.card-translucent`, and the
   radius is `--cui-radius-7` (see the radius scale below). A card filled with
   `.text-bg-*` keeps that neutral frame; add the matching `.border-{color}` to
-  frame it in the fill colour. To keep the v5 spacing, set
+  frame it in the fill color. To keep the v5 spacing, set
   `--cui-card-spacer-y` and `-x` to `var(--cui-spacer-5)` on `.card`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.card-header-pills` is gone.** It only pulled the pill row out to the
   header's padding edge, which is wrong for pills — they carry their own
   background, so flush against the header's inner edge they touch the border.
   Drop the class and keep `.nav.nav-pills`.
-- **The footer follows the theme colour like the header does.** A themed card
+- **The footer follows the theme color like the header does.** A themed card
   (`.card.theme-inverse`, say) used to paint the footer's background from the theme
-  while leaving its text at the body colour, so the label sank into the fill.
+  while leaving its text at the body color, so the label sank into the fill.
   The footer now reads `--cui-theme-contrast` with `--cui-card-cap-color` as the
   fallback, the same expression the header already used.
 - **Every card token now carries a real value.** `--cui-card-title-color`,
@@ -3658,7 +3658,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   transition — so it waited out a fade that had not begun, then began it. Both
   classes land in the same frame now, and `shown` waits on the pane, the
   element that actually animates, instead of the tab button, which only
-  transitions its colours.
+  transitions its colors.
 
 #### Modal
 
@@ -3700,9 +3700,9 @@ Multi Select's option indicators moved with it — they render as a decorative
   `$pagination-sizes`; add an entry to it and define the matching
   `--cui-btn-input-<size>-*` values instead of calling the mixin.
 
-- **Keyboard focus keeps the theme colours.** `:focus-visible` read
+- **Keyboard focus keeps the theme colors.** `:focus-visible` read
   `--cui-pagination-focus-color` and `-focus-bg` with no theme slot, so tabbing
-  to a link inside `.theme-success` dropped it back to the plain link colour.
+  to a link inside `.theme-success` dropped it back to the plain link color.
   Both now read `--cui-theme-fg-emphasis` / `--cui-theme-bg-subtle` first, like
   every neighbouring state.
 
@@ -3762,7 +3762,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   `--cui-popover-bg` when there is none.
 
 - **`--cui-popover-header-color` reads `--cui-heading-color`.** It resolved
-  `$headings-color` at build time, so a runtime override of the heading colour
+  `$headings-color` at build time, so a runtime override of the heading color
   skipped the popover header. The default is unchanged.
 
 #### Progress
@@ -3797,14 +3797,14 @@ Multi Select's option indicators moved with it — they render as a decorative
   `--cui-progress-bg`, so nothing could adjust it. It now sets
   `--cui-progress-bg` (translucent white) and `--cui-progress-bar-bg`
   (`--cui-white`) and lets the base rules paint; the bar stays white under a
-  `.theme-*` class, as the variant is meant for dark and brand-coloured
+  `.theme-*` class, as the variant is meant for dark and brand-colored
   surfaces.
 
 - **Gradient bars.** `--cui-progress-bar-bg-image` (default `none`) paints the
-  bar with an image on top of its colour, so a gradient is one variable on the
+  bar with an image on top of its color, so a gradient is one variable on the
   `.progress` or the bar. The stripes moved to their own tokens for the same
   reason: `--cui-progress-bar-stripes` holds the pattern and
-  `--cui-progress-bar-stripe-color` its colour, and `.progress-bar-striped`
+  `--cui-progress-bar-stripe-color` its color, and `.progress-bar-striped`
   layers the pattern over the image. The `progress-bar-stripes` keyframes now
   shift only the first background layer, so the image underneath stays put.
 
@@ -3898,40 +3898,40 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Callout
 
-- **The callout takes its colour from a `.theme-*` class**, on the callout or on
-  any element above it, like the alert does. The class colours the leading edge
+- **The callout takes its color from a `.theme-*` class**, on the callout or on
+  any element above it, like the alert does. The class colors the leading edge
   and tints the border, and because it exposes every slot, `.theme-subtle` next
-  to it fills the callout without naming the colour twice.
+  to it fills the callout without naming the color twice.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Deprecated</span>
   **`.callout-{color}` still works and is removed in v7.** Each modifier is
   generated from `$theme-colors` through the same `theme-tokens()` mixin as the
   theme class, so `.callout-primary` *is* `.callout.theme-primary`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$callout-variants` is gone.** The modifier classes are generated from
-  `$theme-colors`, so adding a theme colour adds its callout class — there is no
+  `$theme-colors`, so adding a theme color adds its callout class — there is no
   separate map to keep in step.
-- **A callout without a colour no longer draws its leading edge in
+- **A callout without a color no longer draws its leading edge in
   `currentColor`.** `--cui-callout-border-left-color` was read but never
   declared: only the modifiers set it, so the declaration was invalid on a bare
   `.callout` and the property fell back to its initial value. It now defaults to
-  the callout's own border colour.
-- **The 1px border of a coloured callout is tinted.** It reads
-  `--cui-theme-border` where it used to stay neutral, so a coloured callout is a
-  coherent block rather than a grey box with a coloured tick. The leading edge
+  the callout's own border color.
+- **The 1px border of a colored callout is tinted.** It reads
+  `--cui-theme-border` where it used to stay neutral, so a colored callout is a
+  coherent block rather than a grey box with a colored tick. The leading edge
   is unchanged.
 
 
-#### The deprecated colour classes are a separate stylesheet
+#### The deprecated color classes are a separate stylesheet
 
 - **`.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
   `.btn-subtle-{color}`, `.btn-ghost-{color}`, `.callout-{color}`,
   `.chip-{color}` and `.list-group-item-{color}` ship in `coreui-legacy.css`.**
   Load it after `coreui.css` and they render exactly as before; leave it out
   once your markup uses the theme classes. They are removed outright in v7.
-- **The buttons carry the colour spelling in two places, not one.** Besides the
-  loop that points each class at a theme colour, a variant's base declarations
-  are repeated for the colour classes — the legacy sheet carries both, so
-  `.btn-primary` moves whole rather than surviving as a rule with no colour.
+- **The buttons carry the color spelling in two places, not one.** Besides the
+  loop that points each class at a theme color, a variant's base declarations
+  are repeated for the color classes — the legacy sheet carries both, so
+  `.btn-primary` moves whole rather than surviving as a rule with no color.
 - **`alert-modifiers` and `btn-variant-loops` each covered two loops, one
   deprecated and one not.** They are split, so the docs can mark the deprecated
   half without mislabelling the other: the alert variants loop is
@@ -3941,9 +3941,9 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 ### Helpers
 
-- **`.link-{color}` is gone; a theme class colours a link.** Reboot resolves a
-  link's colour from `--cui-theme-fg`, which every `.theme-*` class sets, so the
-  colour follows the theme instead of needing its own class:
+- **`.link-{color}` is gone; a theme class colors a link.** Reboot resolves a
+  link's color from `--cui-theme-fg`, which every `.theme-*` class sets, so the
+  color follows the theme instead of needing its own class:
 
   ```html
   <!-- v5 -->
@@ -3954,16 +3954,16 @@ Multi Select's option indicators moved with it — they render as a decorative
   ```
 
   Two things change beyond the class name. The theme slot is a **tone picked for
-  text** rather than the raw brand colour — it darkens on a light background and
-  lightens on a dark one, where `.link-*` gave the same colour in both, so the
+  text** rather than the raw brand color — it darkens on a light background and
+  lightens on a dark one, where `.link-*` gave the same color in both, so the
   link is more readable in dark mode and slightly different in light. And the
-  underline needs `.underline` to carry it; its colour now defaults to
+  underline needs `.underline` to carry it; its color now defaults to
   `currentColor`, so it follows the theme unless you name one with
   `.underline-{color}`.
 
   `.link-body-emphasis` becomes `.text-body-emphasis`.
 
-  The removed classes also computed their `:hover` colour in Sass, which froze it
+  The removed classes also computed their `:hover` color in Sass, which froze it
   at build time — overriding `--cui-primary` at runtime never reached the hover
   state. The theme slots are tokens, so it does.
 
@@ -3998,18 +3998,18 @@ runtime color math in place of precompiled shades. The global Sass knobs stay
 the build-time customization API, while a component's own surface is its token
 map — several things below are breaking and are called out as such.
 
-#### A theme class wins over a component's own colour token
+#### A theme class wins over a component's own color token
 
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **Under a `.theme-*` class the theme wins over a component colour token.** A
+  **Under a `.theme-*` class the theme wins over a component color token.** A
   component reads the `--cui-theme-*` slot on the property and its own token
-  only as the fallback. In v5 the colour came from the component's tokens,
-  which a modifier such as `.alert-danger` set, so a token you set on a coloured
+  only as the fallback. In v5 the color came from the component's tokens,
+  which a modifier such as `.alert-danger` set, so a token you set on a colored
   alert applied. In v6 a token set on a themed element, or for the whole page
   in your stylesheet or a `$…-tokens` map, changes only the components without
   a theme; the alert, avatar, badge, callout, chip, checkbox, radio, switch,
   List Box indicator, sidebar and tooltip follow the same order as the card,
-  toast, list group and nav. To recolour one themed element, set the slot
+  toast, list group and nav. To recolor one themed element, set the slot
   rather than the component token:
   `<div class="alert theme-danger" style="--cui-theme-bg-subtle: …">`.
 - **Variant classes keep the component token as the override point.**
@@ -4062,7 +4062,7 @@ map — several things below are breaking and are called out as such.
   Set the component's own token to keep a darker surface.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The neutral button steps down the ladder with everything else.** A `.btn`
-  without a theme colour rests on `--cui-bg-2` (was `--cui-bg-4`) and hovers
+  without a theme color rests on `--cui-bg-2` (was `--cui-bg-4`) and hovers
   on `--cui-bg-3` (was a hard-coded `gray-300`/`gray-700` pair outside the
   ladder); the neutral subtle variant rests on `--cui-bg-2` and the ghost
   variant's hover wash is `--cui-bg-1`. The default button is visibly
@@ -4138,25 +4138,25 @@ map — several things below are breaking and are called out as such.
 
 - **`--cui-link-color` is `light-dark(var(--cui-primary-base), var(--cui-primary-fg))`**
   (was the base in both schemes), so a link on the dark page reads the
-  lighter foreground stop instead of the fill colour, and
-  **`--cui-link-hover-color` is a 10 % darkening of the link colour**
+  lighter foreground stop instead of the fill color, and
+  **`--cui-link-hover-color` is a 10 % darkening of the link color**
   (`color-mix(in oklch, var(--cui-link-color) 90%, var(--cui-black))`) instead
   of `--cui-primary-fg`; override `--cui-link-color` and the hover follows.
 - **`--cui-hr-border-color` is `var(--cui-border-color)`** (was
   `currentcolor`): a rule is the same line as every other border, not a
-  faint copy of the text colour.
+  faint copy of the text color.
 
-#### Theme colours have no bare token
+#### Theme colors have no bare token
 
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`--cui-primary`, `--cui-secondary`, `--cui-success`, `--cui-info`,
   `--cui-warning`, `--cui-danger` and `--cui-inverse` are gone.** A theme
-  colour is its set of slots — `-base`, `-bg`, `-fg`, `-fg-emphasis`,
+  color is its set of slots — `-base`, `-bg`, `-fg`, `-fg-emphasis`,
   `-bg-subtle`, `-bg-muted`, `-border`, `-focus-ring`, `-contrast` — and the
-  colour itself is the `-base` slot: `--cui-primary-base` is what
+  color itself is the `-base` slot: `--cui-primary-base` is what
   `--cui-primary` was, the 100–900 scale is mixed from it, and `-bg` (the
   action background) points at it. Rename reads one to one, and set the
-  palette stop to retint a colour:
+  palette stop to retint a color:
 
   ```diff
   - .brand { color: var(--cui-primary); }
@@ -4166,7 +4166,7 @@ map — several things below are breaking and are called out as such.
   + :root { --cui-primary-500: #6f42c1; }
   ```
 
-  Components that filled with the bare colour read `-base` now; the derived
+  Components that filled with the bare color read `-base` now; the derived
   hover and active states of a `.theme-*` class are computed from `-bg`.
 
 #### Breakpoints: `lg` 1024, `xl` 1280, `2xl` 1536
@@ -4313,62 +4313,62 @@ map — several things below are breaking and are called out as such.
   outright (they used to skip it when the knob was already `none`), and
   `.btn-link` reads the tokens.
 
-#### Every theme colour gets an action-background slot
+#### Every theme color gets an action-background slot
 
-`:root` emits `--cui-{color}-bg` for every theme colour, pointing at the
-colour's base token. Active and checked states read the slot instead of the
+`:root` emits `--cui-{color}-bg` for every theme color, pointing at the
+color's base token. Active and checked states read the slot instead of the
 base directly — `--cui-list-group-active-bg`, `--cui-menu-item-active-bg`,
 `--cui-pagination-active-bg`, `--cui-nav-pills-link-active-bg`,
 `--cui-progress-bar-bg` and `--cui-range-thumb-bg` are all
 `var(--cui-primary-bg)` now. The resolved values are unchanged; the slot is a
-single place to retune what "filled with the theme colour" means without
-touching the base colour that text and borders derive from. (The `secondary`
-colour's slot takes over the name of the former surface alias — see the
+single place to retune what "filled with the theme color" means without
+touching the base color that text and borders derive from. (The `secondary`
+color's slot takes over the name of the former surface alias — see the
 ladder entry above.)
-- **A `.theme-*` class reads the colour's `-bg` slot, not its base.**
+- **A `.theme-*` class reads the color's `-bg` slot, not its base.**
   `--cui-theme-bg` is `var(--cui-danger-bg)` now (was `var(--cui-danger)`),
   so overriding `--cui-danger-bg` retunes every checked, active and filled
-  state under the class, as the colour slots page describes. The trade-off:
+  state under the class, as the color slots page describes. The trade-off:
   `--cui-danger-bg` resolves on `:root`, so a `--cui-danger` override on a
   single element no longer reaches the theme class on it — override the
-  colour on `:root`, or set `--cui-danger-bg` on the element.
+  color on `:root`, or set `--cui-danger-bg` on the element.
 
-#### Colour decisions are written, not computed
+#### Color decisions are written, not computed
 
-v6 stops evaluating colours at build time, the way upstream v6 does — Sass
+v6 stops evaluating colors at build time, the way upstream v6 does — Sass
 assembles maps of CSS expressions and the browser resolves them.
 
 - **The `contrast` slot holds written values** instead of
   `color-contrast()` results. The computed and written values are identical, so
-  nothing renders differently; the point is that a theme colour no longer has to
-  be a Sass colour for the contrast pass to run over it. Upstream keeps a
-  `"contrast"` key per colour and never calls the function either.
+  nothing renders differently; the point is that a theme color no longer has to
+  be a Sass color for the contrast pass to run over it. Upstream keeps a
+  `"contrast"` key per color and never calls the function either.
 - **Table variants read the theme tokens.**
   <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   `.table-primary` and friends still exist, but they are generated the way
   `.btn-primary` is: the class sets `--cui-theme-*` and the base `.table`
-  rules read it. `$table-variants` is now a **list of colour names**, not a map
-  of pre-shifted colours, and `$table-bg-scale` / `$table-border-factor` are
-  gone. A theme colour you add yourself now gets a table variant without
+  rules read it. `$table-variants` is now a **list of color names**, not a map
+  of pre-shifted colors, and `$table-bg-scale` / `$table-border-factor` are
+  gone. A theme color you add yourself now gets a table variant without
   compiling Sass.
-  Two visible consequences: the variant background is the colour's
+  Two visible consequences: the variant background is the color's
   `bg-subtle` token rather than a `shift-color()` of the base, and striped /
-  hover / active are `color-mix()` overlays on the text colour rather than
+  hover / active are `color-mix()` overlays on the text color rather than
   opaque mixes — so they compose over the row's own background. Table variants
-  also follow colour modes now, where before they stayed on light-palette
+  also follow color modes now, where before they stayed on light-palette
   values in dark mode.
 
-#### The theme colours are retuned so white text reads on them
+#### The theme colors are retuned so white text reads on them
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-**Four of the five base colours moved, and `success`, `info` and `danger` now
+**Four of the five base colors moved, and `success`, `info` and `danger` now
 carry white contrast text instead of black.** The bases were picked at the
 brightest point where white text still clears both contrast gates: WCAG 4.5:1
 and APCA Lc 75, the APCA threshold for body text. Before this, only `primary`
 paired with white, because the bases sat at lightnesses between 61 and 81 that
 no dark-on-light pairing and no light-on-dark pairing could both satisfy.
 
-| Colour | Before | After |
+| Color | Before | After |
 | --- | --- | --- |
 | `$primary` | `oklch(52.945% 0.19103 278.34)` | unchanged |
 | `$success` | `oklch(61.237% 0.17298 146.95)` | `oklch(55.1% 0.173 145)` |
@@ -4377,16 +4377,16 @@ no dark-on-light pairing and no light-on-dark pairing could both satisfy.
 | `$danger` | `oklch(63.864% 0.18175 23.81)` | `oklch(58.7% 0.237 23.81)` |
 
 `success` and `info` get darker, `danger` gains chroma, and `warning` goes the
-other way: it is the one colour that cannot take white text at any hue, so it
+other way: it is the one color that cannot take white text at any hue, so it
 stays on black and moved brighter, where black reads at Lc 75 instead of 69.
 `info` also shifts four degrees of hue, which sounds cosmetic and is not: at
-252 degrees the sRGB gamut caps chroma at 0.171 and the colour reads as petrol,
+252 degrees the sRGB gamut caps chroma at 0.171 and the color reads as petrol,
 while at 256 the cap rises to 0.196 and it reads as blue.
 
-Every colour is a `500` stop, so the whole scale moves with it and any component
-tinted from these colours changes tone. If you pinned a base, nothing changes
+Every color is a `500` stop, so the whole scale moves with it and any component
+tinted from these colors changes tone. If you pinned a base, nothing changes
 for you. To keep the old look, set the five variables back through
-`@use ... with()`; to keep the old contrast text, set `"contrast"` on the colour
+`@use ... with()`; to keep the old contrast text, set `"contrast"` on the color
 in `$theme-colors`.
 
 Two pairings are still open and are tracked rather than fixed here. Dark-mode
@@ -4422,12 +4422,12 @@ background is too dark for any text to clear 75 against it.
 - **The button focus ring is the theme ring.** `--cui-btn-focus-shadow-rgb` and
   the per-variant `$btn-*-focus-shadow-rgb` Sass variables are gone without a
   renamed successor, and so is `--cui-btn-focus-ring`: the button draws the ring
-  from the global width and the theme's colour, so a colour button rings in its
-  colour and a neutral one gets the global ring. To restyle it, set
+  from the global width and the theme's color, so a color button rings in its
+  color and a neutral one gets the global ring. To restyle it, set
   `--cui-focus-ring-color` (or `--cui-theme-focus-ring`) on the button. Two
-  visible consequences: a colour button's ring uses the focus-ring opacity
+  visible consequences: a color button's ring uses the focus-ring opacity
   (fainter than the old 50% mix), and the neutral outline/ghost buttons ring in
-  the global colour instead of a grey.
+  the global color instead of a grey.
 
 #### Focus rings are keyboard-only on activation controls
 
@@ -4445,13 +4445,13 @@ Two suppressed rings are restored: the header toggler and the carousel
 controls declared `outline: 0` with no replacement, so keyboard focus was
 invisible on both.
 
-#### A validation state is a theme colour, not a palette of its own
+#### A validation state is a theme color, not a palette of its own
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
-`$form-validation-states` carried a colour, a border colour, a focus ring and a
-pair of tooltip colours per state, and `_root.scss` emitted four tokens to feed
-them. A state names a theme colour now, and every value is a slot of it.
+`$form-validation-states` carried a color, a border color, a focus ring and a
+pair of tooltip colors per state, and `_root.scss` emitted four tokens to feed
+them. A state names a theme color now, and every value is a slot of it.
 
 ```diff
   $form-validation-states: (
@@ -4469,19 +4469,19 @@ them. A state names a theme colour now, and every value is a slot of it.
 - **`--cui-form-valid-color`, `-valid-border-color`, `-invalid-color` and
   `-invalid-border-color` are removed**, together with the Sass variables behind
   them (`$form-valid-*`, `$form-invalid-*`, `$form-feedback-valid-color`,
-  `$form-feedback-invalid-color`). Retint a state by retinting its theme colour,
+  `$form-feedback-invalid-color`). Retint a state by retinting its theme color,
   or override the slot on the map.
 - **Feedback text and the invalid border are one step darker**, because both
-  read the state colour's `fg` slot instead of the raw brand colour. That is a
+  read the state color's `fg` slot instead of the raw brand color. That is a
   fix, not a preference: measured against the body background, the old pair
   scored **3.50** (valid) and **3.69** (invalid), both under WCAG AA; the new
-  pair scores **5.13** and **5.39**. Text and border stay the same colour, as
+  pair scores **5.13** and **5.39**. Text and border stay the same color, as
   they were before.
 - **`$input-btn-focus-color-opacity` is removed.** The validation ring comes
-  from the colour's `focus-ring` slot, which reads
+  from the color's `focus-ring` slot, which reads
   `--cui-focus-ring-opacity`; set that instead.
 - **`$focus-ring` is removed and `$focus-ring-color` reads the slot.** The
-  colour was `rgba($primary, $focus-ring-opacity)`, resolved at build time, so
+  color was `rgba($primary, $focus-ring-opacity)`, resolved at build time, so
   neither retinting `--cui-primary` nor changing
   `--cui-focus-ring-opacity` at runtime moved the default ring. It is
   `var(--cui-primary-focus-ring)` now — the slot every `.theme-*` ring
@@ -4506,18 +4506,18 @@ them. A state names a theme colour now, and every value is a slot of it.
   `0` with `if($value == 0, …)` where it can actually occur. `divide()` stays,
   the grid still uses it.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **The theme colour tokens finish the rename to the slot names.**
+  **The theme color tokens finish the rename to the slot names.**
   `--cui-{color}-text-emphasis` is `--cui-{color}-fg-emphasis` and
   `--cui-{color}-border-subtle` is `--cui-{color}-border`. The theme slots
   (`--cui-theme-fg-emphasis`, `--cui-theme-border`) already carried these
-  names; the colour tokens they read did not, so the two halves of the same
+  names; the color tokens they read did not, so the two halves of the same
   system spelled the same idea differently. `--cui-{color}-base` is added
   alongside the bare `--cui-{color}` (itself gone since, the literal sits in
   `--cui-{color}-500`). The Sass keys move with
   them: `"text-emphasis"` → `"fg-emphasis"` and `"border-subtle"` → `"border"`
   in `$theme-colors`; `$theme-colors-text` and `$theme-colors-border-subtle`
   are gone with the other per-slot maps, and `theme-color-refs("fg-emphasis")`
-  returns the slot's token for every colour. **No class names
+  returns the slot's token for every color. **No class names
   change** — `.text-primary-emphasis` and `.border-primary-subtle` take their
   suffix from the utility definition, not from the token.
 - **`form-validation-state()` takes `$theme` where it took `$color`**, and the
@@ -4538,7 +4538,7 @@ them. A state names a theme colour now, and every value is a slot of it.
 One shared pair in `_config.scss` fed every active state in the library — the
 list group, pagination, the menu, nav pills, the dropdown, both range sliders
 and the checkable controls. Each component names its own default now and points
-it at the colour's slots, so nothing is defined in a file that never renders it.
+it at the color's slots, so nothing is defined in a file that never renders it.
 
 ```diff
 - $list-group-active-color:  $component-active-color;
@@ -4548,26 +4548,26 @@ it at the colour's slots, so nothing is defined in a file that never renders it.
 ```
 
 - **Active text is fully opaque.** `$component-active-color` was
-  `rgba($white, .87)`, a colour frozen at build time, so an active state
-  recoloured to a light background kept near-white text. It reads the
+  `rgba($white, .87)`, a color frozen at build time, so an active state
+  recolored to a light background kept near-white text. It reads the
   `contrast` slot now. Against the default primary that lifts the ratio from
   **4.71** to **5.65**, and it matches `.text-bg-primary`, which already used
   the slot — the two whites in the library are one white again.
-- **Override the colour, not the pair.** Set `$primary` (or
+- **Override the color, not the pair.** Set `$primary` (or
   `--cui-primary-500` at runtime) to move every active state at once, or the
   component's own knob to move one. Per instance, `.theme-*` still wins where a
   component reads `--cui-theme-*`.
 - **The switch has no SVG knob at all any more.** The thumb is painted with
   `background-color` in every state, so `$switch-thumb-bg` and
-  `$switch-checked-thumb-bg` are ordinary colour knobs; the v5 knob images and
+  `$switch-checked-thumb-bg` are ordinary color knobs; the v5 knob images and
   the variables that fed them (`$form-switch-bg-image` and friends) are gone.
 
-#### A theme colour is one nested map entry
+#### A theme color is one nested map entry
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
-`$theme-colors` carried one value per colour and three further families carried
-the rest, so a theme colour was defined in four places and adding one meant
+`$theme-colors` carried one value per color and three further families carried
+the rest, so a theme color was defined in four places and adding one meant
 editing four blocks. It is a map of maps now — one name, eight slots.
 
 - **Twenty-four Sass variables are removed**: `$primary-text-emphasis` and its
@@ -4587,9 +4587,9 @@ editing four blocks. It is a map of maps now — one name, eight slots.
   + );
   ```
 
-  The map merges one level deep, so a built-in colour is replaced as a whole:
+  The map merges one level deep, so a built-in color is replaced as a whole:
   copy its sub-map from `scss/_theme.scss` and change the slot. `$theme-colors`
-  goes through `defaults()` like every other configuration map, so a new colour
+  goes through `defaults()` like every other configuration map, so a new color
   is one entry passed through `with ()` and `null` removes one.
 
   Every `--cui-{color}-*` custom property keeps its name and its value, so
@@ -4598,8 +4598,8 @@ editing four blocks. It is a map of maps now — one name, eight slots.
   now yields a map. Use `map-get-nested($theme-colors, "base")` where a flat
   `name → value` map is what you want, or `theme-color-refs("base")` for the
   `:root` tokens the utilities read.
-- **New slots:** `fg` (the state colour readable as text, one step lighter than
-  `text-emphasis`), `bg-muted` (between `bg-subtle` and the solid colour) and
+- **New slots:** `fg` (the state color readable as text, one step lighter than
+  `text-emphasis`), `bg-muted` (between `bg-subtle` and the solid color) and
   `focus-ring` (the hue the `.theme-*` ring mixes from). They emit
   `--cui-{color}-fg`, `-bg-muted` and `-focus-ring`, and reach components
   as `--cui-theme-fg`, `--cui-theme-bg-muted` and
@@ -4644,12 +4644,12 @@ override reaches the whole family as before, and a runtime override of one
 root token restyles every text control at once.
 
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **`$input-focus-border-color` is a `var()` reference, not a Sass colour.**
+  **`$input-focus-border-color` is a `var()` reference, not a Sass color.**
   It was `tint-color($primary, 50%)`, frozen at build time — retint the
   palette and the focus border stayed on the old primary. It reads
   `--cui-btn-input-focus-border-color` now (the same 50% mix, computed
-  in the browser). Sass colour functions on it no longer compile; override
-  the token or the variable with a colour of your own instead.
+  in the browser). Sass color functions on it no longer compile; override
+  the token or the variable with a color of your own instead.
 
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`$time-picker-roll-cell-selected-hover-bg` is computed in the browser.**
@@ -4658,7 +4658,7 @@ root token restyles every text control at once.
   on the old indigo. It darkens the primary the way the solid button darkens
   its own background — `oklch(from var(--cui-primary) calc(l * .85) c h)` —
   which also drops the separate dark-mode variant, since the formula works in
-  both. Sass colour functions on it no longer compile.
+  both. Sass color functions on it no longer compile.
 
 #### The field transition is three tokens, not one shorthand
 
@@ -4745,7 +4745,7 @@ The class names are unchanged. `.form-check`, `.form-check-input` and
 30 others were aliases: each one held nothing but `var(--cui-btn-input-…)`, the
 token the frame already declares on `:root`. Components read them in some places
 and wrote the token out in others, so a Sass override reached part of the
-library and not the rest — `$input-color: lime` recoloured the file-input button
+library and not the rest — `$input-color: lime` recolored the file-input button
 and the input group addon but not the input's own text.
 
 There is one place to configure the frame now. `$input-btn-*` in `_root.scss`
@@ -4814,12 +4814,12 @@ tintable and lets dark mode deepen every shadow at once.
   the point of overriding it.
 - **New: `$shadow-color`, `$shadow-strength`, `$shadow-strength-dark`** and the
   `--cui-shadow-color` / `--cui-shadow-strength` tokens they emit.
-  Setting the colour once at the root recolours every shadow in the page,
+  Setting the color once at the root recolors every shadow in the page,
   components included.
-- **New utilities:** `.shadow-{color}` for the theme colours plus
+- **New utilities:** `.shadow-{color}` for the theme colors plus
   `current`/`black`/`white`, and `.shadow-opacity-{25|50|75|100}`. They write
   `--cui-shadow-tint` and `--cui-shadow-opacity`, both registered
-  `inherits: false`, so a tinted element does not recolour the shadows nested
+  `inherits: false`, so a tinted element does not recolor the shadows nested
   inside it.
 - **Dark mode raises `--cui-shadow-strength` to 2.5** instead of carrying
   a second set of shadow values. The same alpha reads as weaker against a dark
@@ -4831,10 +4831,10 @@ tintable and lets dark mode deepen every shadow at once.
 
 - **`.bg-{color}-gradient` and `.text-bg-{color}-gradient` are gone**, along
   with the `$theme-gradients` / `$theme-gradients-dark` maps that generated
-  them, the per-colour `$primary-gradient` … `$dark-gradient` variables (and
+  them, the per-color `$primary-gradient` … `$dark-gradient` variables (and
   their `-dark` twins), and the `--cui-{color}-start` / `--cui-{color}-stop`
   custom properties they read. These were CoreUI-only additions with no Bootstrap counterpart.
-  Replace a removed class with the base colour plus the generic gradient —
+  Replace a removed class with the base color plus the generic gradient —
   `class="bg-primary bg-gradient"` — or write the two-stop gradient yourself if
   you need the exact 45° ramp.
 - **`.bg-gradient` itself stays**, as do `$gradient`, `--cui-gradient`,
@@ -4952,7 +4952,7 @@ tintable and lets dark mode deepen every shadow at once.
   one custom property and nothing else: the chip and chip input size variants,
   the nav enclosed set, the OTP input sizes, the badge and rating sizes, the
   modal widths and margins, the toast surface, the form control group icon
-  sizes and the colour picker width. Each is the token it fed.
+  sizes and the color picker width. Each is the token it fed.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The artwork variables are gone too.** The accordion chevron, the breadcrumb
   divider, the four carousel controls, the close button glyph, the check and
@@ -4965,11 +4965,11 @@ tintable and lets dark mode deepen every shadow at once.
   `--cui-header-toggler-icon-bg`, `--cui-sidebar-toggler-icon`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The validation icon inside the field is gone**, and with it
-  `$enable-validation-icons`, the two glyphs and their colours, the geometry
+  `$enable-validation-icons`, the two glyphs and their colors, the geometry
   that made room for them and the select's second background layer. A valid or
   invalid field still says so through its border, its focus ring and its
   feedback text. The glyph was a `background-image` on the input itself with the
-  colour baked into the SVG, so it could never follow a token: an input renders
+  color baked into the SVG, so it could never follow a token: an input renders
   no pseudo-element to hang a mask on, and masking the input erases its own
   background. It comes back when the field has a wrapper to draw it in.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
@@ -5002,13 +5002,13 @@ tintable and lets dark mode deepen every shadow at once.
   with their Sass variables (`$time-picker-cleaner-icon-size-sm`/`-lg` were
   also declared twice). `--cui-time-picker-indicator-icon-color` stays and now
   carries the validation color as well. The validation state itself moved off
-  the root element: v1 recoloured the frame from `.time-picker.is-invalid` with
+  the root element: v1 recolored the frame from `.time-picker.is-invalid` with
   `!important` overrides, v2 reads it from the field inside the group, so
   `$time-picker-invalid-border-color` / `$time-picker-valid-border-color` and
   the matching indicator-icon variables are gone — theme the state through the
   standard `$form-invalid-*` / `$form-valid-*` variables instead. Section
   placeholders come from the field's own `hourPlaceholder` /
-  `minutePlaceholder` / `secondPlaceholder` options, not a colour token.
+  `minutePlaceholder` / `secondPlaceholder` options, not a color token.
 - `$input-padding-x-lg` was removed: `.form-control-lg` reads
   `--cui-btn-input-lg-padding-x` from the shared button/input token system, and
   the time picker's dead `gap-lg` was the variable's last consumer.
@@ -5022,14 +5022,14 @@ tintable and lets dark mode deepen every shadow at once.
   `--cui-theme-bg-subtle`, `--cui-theme-border`, and token-driven components
   (alert, buttons) read them. Contextual classes like `.alert-success` are now
   implemented through these tokens — same rendering, new mechanics.
-- **`--cui-theme-focus-ring` joins the set.** It carries the state colour mixed
-  at `$focus-ring-opacity` — a colour, like every other slot; the width stays
+- **`--cui-theme-focus-ring` joins the set.** It carries the state color mixed
+  at `$focus-ring-opacity` — a color, like every other slot; the width stays
   global. Every component draws its ring as
   `var(--cui-focus-ring-width) solid var(--cui-theme-focus-ring, var(--cui-focus-ring-color))`,
-  so a themed ancestor recolours the ring and the global colour applies
+  so a themed ancestor recolors the ring and the global color applies
   everywhere else.
 - **`--cui-{color}-contrast` custom properties are new root tokens.** Previously
-  only buttons computed their own contrast colour; the root tokens now carry it,
+  only buttons computed their own contrast color; the root tokens now carry it,
   written in the `contrast` slot. `.text-bg-*` reads the token instead of
   calling `color-contrast()`.
 
@@ -5052,11 +5052,11 @@ width.
 The Sass variable `$mobile-breakpoint` is unchanged; the sidebar's own media
 queries are built on it.
 
-#### Colour scales, and `_variables-dark.scss` removed
+#### Color scales, and `_variables-dark.scss` removed
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
-Dark mode no longer has a second set of Sass variables. Every colour is declared
+Dark mode no longer has a second set of Sass variables. Every color is declared
 once, as a native
 [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark)
 pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
@@ -5071,23 +5071,23 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   + $body-color:      light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87));
   ```
 
-  One exception remains, because a colour baked into an SVG cannot read
+  One exception remains, because a color baked into an SVG cannot read
   `light-dark()`: the select chevron and the switch knob keep a dark counterpart
   next to their component (`$form-select-indicator-dark`,
   `$form-switch-bg-image-dark`).
-- **Every palette colour gets a 025–975 scale of tokens in `:root`**, mixed at
+- **Every palette color gets a 025–975 scale of tokens in `:root`**, mixed at
   runtime from its `500` stop: `--cui-primary-025` … `--cui-primary-975`, for
   each key of `$colors`. Knobs: `$color-tints`, `$color-shades`,
   `$color-mix-space` (`oklch`), `$tint-color`, `$shade-color`. Override
   `--cui-primary-500` at runtime and the whole scale retints.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **The palette is the theme colours.** `$colors` holds `primary`, `success`,
+  **The palette is the theme colors.** `$colors` holds `primary`, `success`,
   `info`, `warning`, `danger` and `gray`; `$blue`, `$indigo`, `$purple`,
   `$pink`, `$red`, `$orange`, `$yellow`, `$green`, `$teal`, `$cyan` and every
   `--cui-{hue}` and `--cui-{hue}-{stop}` token are gone. Nothing read them:
   no utility was generated from them and the theme never pointed at them.
   `$secondary` and `$inverse` are gone too — they read gray stops, not a
-  colour of their own. Each `$theme-colors` entry points `base` and `bg` at
+  color of their own. Each `$theme-colors` entry points `base` and `bg` at
   its palette's `500` stop (`primary` at `var(--cui-primary-500)`) and the
   other slots at that scale; `secondary` reads `--cui-gray-200`, `inverse`
   `--cui-gray-900`, and their `bg` is the `light-dark()` pair that used to be
@@ -5102,8 +5102,8 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   + .hint { color: var(--cui-success-600); }
   ```
 
-  A new theme colour is a colour in `$colors` plus an entry in `$theme-colors`
-  that points at it; see [adding a theme colour](/customize/theme/#adding-a-theme-color).
+  A new theme color is a color in `$colors` plus an entry in `$theme-colors`
+  that points at it; see [adding a theme color](/customize/theme/#adding-a-theme-color).
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The seven `$theme-colors-{slot}` maps are removed** (`$theme-colors-fg`,
   `$theme-colors-fg-emphasis`, `$theme-colors-bg-subtle`, `$theme-colors-bg-muted`,
@@ -5112,14 +5112,14 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   returns the same shape as token references, which is what every utility
   reads.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **The palette is written in `oklch()` and mixes in `oklch`.** The base colours
+  **The palette is written in `oklch()` and mixes in `oklch`.** The base colors
   are unchanged — every hex converts to the same sRGB pixel — but the 100–900
   steps mixed from them shift, because `oklch` holds chroma where `lab` drained
   it (measured: 5.9 per RGB channel on average, 28 at most). `$black` is `#000`
   now rather than a near-black with a blue cast: `oklch` interpolates hue, so
   mixing a scale towards a tinted black rotated every shade towards blue.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **The gray ramp is generated like every other colour.** `$gray-025` …
+  **The gray ramp is generated like every other color.** `$gray-025` …
   `$gray-975` were thirteen hand-picked values; they are now one `$gray` base
   run through the same generator, and `gray` is an entry of `$colors`. The Sass
   variables stay, derived from the base, so `$gray-600` keeps working — but the
@@ -5127,7 +5127,7 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   overriding a stop.
 
   `$color-tints` and `$color-shades` gained `025`, `050`, `950` and `975`, so
-  **every** colour now carries the full thirteen stops. The curve is
+  **every** color now carries the full thirteen stops. The curve is
   `94 / 90 / 80 / 60 / 40 / 20 %` of white for `025` … `400` and
   `16 / 32 / 48 / 64 / 70 / 76 %` of black for `600` … `975`, and `$gray` is
   `oklch(60% 0.03948 265.02)` — the v5 hue and chroma, a cool gray, at the
@@ -5150,21 +5150,21 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   ```
 
   **This fixes a real dark-mode bug.** Only `light` and `dark` had genuine dark
-  variants before; for the six chromatic colours `$primary-bg-subtle-dark` was an
+  variants before; for the six chromatic colors `$primary-bg-subtle-dark` was an
   alias of the light value, so `.alert-success`, `.list-group-item-info` and
   `.table-warning` rendered a pale light-mode surface in dark mode. They now
   darken. Light mode shifts slightly too: subtle backgrounds are a shade lighter
   (an 80% tint rather than ~70%) and emphasis text a shade darker; borders are
   unchanged for practical purposes. Emphasis-on-subtle contrast improves in every
-  colour — the weakest pair goes from 6.03:1 to 7.57:1.
+  color — the weakest pair goes from 6.03:1 to 7.57:1.
 - **The dark grey palette is gone**: `$gray-100-dark` … `$gray-900-dark` and the
   `$grays-dark` map. Every one of them was defined as exactly its light
   counterpart, so they generated nothing — read `$gray-*` directly.
 - **`$theme-colors-dark` is gone**, along with `$theme-colors-fg-emphasis-dark`,
   `$theme-colors-bg-subtle-dark`, `$theme-colors-border-dark` and
   `$theme-colors-contrast-dark`, and the eight `$primary-dark` … `$dark-dark`
-  variables behind them. Theme colours themselves no longer change
-  between colour modes — the old dark variants were a 10% desaturation, which
+  variables behind them. Theme colors themselves no longer change
+  between color modes — the old dark variants were a 10% desaturation, which
   upstream does not do either. Consequence: the eight
   `[data#{$data-infix}theme="dark"] .text-bg-*` overrides are gone.
 - **The `--cui-{name}-dark` root tokens are gone**
@@ -5268,10 +5268,10 @@ Two consequences for the tokens:
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
-`light` and `dark` were theme colours whose names described a colour scheme, and
+`light` and `dark` were theme colors whose names described a color scheme, and
 they behaved like it: `.theme-dark` sat next to `data-coreui-theme="dark"`
 meaning something else entirely, and neither followed the reader's scheme — a
-`.btn-dark` stayed near-black on a near-black page. There are seven theme colours
+`.btn-dark` stayed near-black on a near-black page. There are seven theme colors
 now, and the two neutrals swap ends of the gray scale between schemes.
 
 - **`inverse` replaces `dark`.** It resolves to `gray-900` in light mode and
@@ -5285,35 +5285,35 @@ now, and the two neutrals swap ends of the gray scale between schemes.
   variants), `btn`, `btn-ghost`, `btn-outline`, `btn-subtle`, `callout`, `chip`,
   `focus-ring`, `underline`, `list-group-item`, `shadow`, `table`, `text`,
   `text-bg` and `theme`, plus the `-subtle` and `-emphasis` families. The
-  colour-scheme opt-ins keep their names: `.navbar-dark`, `.dropdown-menu-dark`
+  color-scheme opt-ins keep their names: `.navbar-dark`, `.dropdown-menu-dark`
   and `.sidebar-dark` are unaffected, as is `.fw-light`. (`.carousel-dark` is
   gone; see [Carousel](#carousel-slides-by-scrolling).)
-- **A surface is not a theme colour.** Where `.bg-light` was a neutral panel,
+- **A surface is not a theme color.** Where `.bg-light` was a neutral panel,
   reach for `.bg-4` or `.bg-3`; where `.bg-dark` was a
   fixed dark backdrop, set `data-coreui-theme="dark"` on the container and let
   the surface classes follow.
 - **`--cui-theme-base` is now `--cui-theme-bg`.** The contextual token that
   components read for a fill was named after the map slot rather than the job;
   the slot is still `base`, and `--cui-{color}` is unchanged.
-- **Colour utilities read the slot that stays legible.** `.text-*` points at
-  `--cui-{color}-fg` instead of the raw colour, and `.btn-outline-*` and
-  `.btn-ghost-*` take their text from it too. For the five chromatic colours this
+- **Color utilities read the slot that stays legible.** `.text-*` points at
+  `--cui-{color}-fg` instead of the raw color, and `.btn-outline-*` and
+  `.btn-ghost-*` take their text from it too. For the five chromatic colors this
   is a shade darker in light mode and a shade lighter in dark; for the neutrals it
   is the difference between readable and gray-on-gray. `.btn-outline-*` also
   takes its border from the `border` slot, so the outline is a subtle line
   rather than a full-strength one. `.bg-*` and `.border-*` keep reading the
-  colour itself.
+  color itself.
 - **`$light` and `$dark` are removed; `inverse` is new.** Neither `secondary`
   nor `inverse` is a hue of its own: they read `--cui-gray-200` and
-  `--cui-gray-900`, and there is no Sass colour behind them to pass to
+  `--cui-gray-900`, and there is no Sass color behind them to pass to
   `color-contrast()` or the tint/shade functions — read `$gray-*` for that.
-- **`$utilities-colors` is removed.** It was a flat `name → colour` copy of the
-  map's `base` slot, and no utility reads the raw colour for every family any
+- **`$utilities-colors` is removed.** It was a flat `name → color` copy of the
+  map's `base` slot, and no utility reads the raw color for every family any
   more. Call `map-get-nested($theme-colors, "base")` where you need one, or
   `theme-color-refs("fg")` for the slot a text utility uses.
 - **`$theme-lightness-overrides` is now `$theme-state-colors`** and carries
   ready values rather than lightness multipliers. A single multiplier cannot
-  serve a colour that is dark in one scheme and light in the other, so the two
+  serve a color that is dark in one scheme and light in the other, so the two
   neutrals step along the gray scale instead.
 
 #### Component icons render through CSS masks
@@ -5321,28 +5321,28 @@ now, and the two neutrals swap ends of the gray scale between schemes.
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The accordion chevron and the carousel arrows were `background-image` SVGs with
-the colour written inside the markup, which is why each needed a dark-mode rule —
+the color written inside the markup, which is why each needed a dark-mode rule —
 the accordion swapped in a second SVG, the carousel inverted the first with a
-`filter`. They are now painted through a CSS `mask`, so the colour lives on
-`background-color` as an ordinary token and follows the root colours by itself.
+`filter`. They are now painted through a CSS `mask`, so the color lives on
+`background-color` as an ordinary token and follows the root colors by itself.
 Upstream v6 does the same, with a `mask-icon()` mixin.
 
-- **The accordion's icon is one shape recoloured per state, not two images.**
+- **The accordion's icon is one shape recolored per state, not two images.**
   `--cui-accordion-header-active-icon` no longer has to carry a second copy
   of the artwork: it defaults to `--cui-accordion-header-icon`, and the open
   state changes `--cui-accordion-header-active-icon-color` instead. Set it
   only when the open state is a genuinely different shape — a minus against a
   plus. New tokens: `--cui-accordion-header-icon-color` and
   `--cui-accordion-header-active-icon-color`.
-- **A custom icon is now a shape, not a coloured image.** Whatever colour you put
+- **A custom icon is now a shape, not a colored image.** Whatever color you put
   inside `$accordion-header-icon` or `$carousel-control-prev-icon-bg` /
   `$carousel-control-next-icon-bg` is ignored — only the alpha of the SVG is used.
-  Set the colour through the token (`--cui-accordion-header-icon-color`,
+  Set the color through the token (`--cui-accordion-header-icon-color`,
   `--cui-carousel-control-color`).
 - **`$accordion-icon-color` and `$accordion-icon-active-color` are
-  `currentcolor` now**, not Sass colours — Sass colour functions on them no
-  longer work. The icon therefore takes the header's colour in every state, so
-  anything that recolours an open header (`--cui-accordion-active-color`,
+  `currentcolor` now**, not Sass colors — Sass color functions on them no
+  longer work. The icon therefore takes the header's color in every state, so
+  anything that recolors an open header (`--cui-accordion-active-color`,
   a `.theme-{color}` class) carries the icon with it. Both tokens stay, for the
   case where the icon is meant to differ from the text.
 - **`$carousel-control-icon-filter` is removed**, with its
@@ -5353,19 +5353,19 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   `$accordion-icon-active-color-dark`, `$accordion-button-icon-dark`,
   `$accordion-button-active-icon-dark`). The accordion's dark-mode block is gone
   entirely.
-- **The carousel's colours are tokens.** `--cui-carousel-control-color` is
-  new, and each colour is a `light-dark()` pair resolved on the carousel, so
+- **The carousel's colors are tokens.** `--cui-carousel-control-color` is
+  new, and each color is a `light-dark()` pair resolved on the carousel, so
   `data-coreui-theme` picks the side (see [Carousel](#carousel-slides-by-scrolling)). RTL still swaps the two arrows, now through
   `mask-image`.
 - **Visible in dark mode**: the old dark accordion chevron was a *filled* glyph
   where the light one was *stroked*. Both modes now use the stroked shape — same
-  colour, same size, slightly different drawing. Worth knowing if you diff
+  color, same size, slightly different drawing. Worth knowing if you diff
   screenshots.
 
 #### Buttons
 
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **`button-variant()` takes a variant name, not a colour pair**, and reads it
+  **`button-variant()` takes a variant name, not a color pair**, and reads it
   from `$button-variants`. Each entry of that map names, per state, the theme
   token a button variable reads and the neutral value behind it; `disabled`
   repeats `base`. `button-outline-variant()` and `button-ghost-variant()` are
@@ -5384,8 +5384,8 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The interaction shade belongs to the theme, not to the button.** Every
   `.theme-*` class emits `--cui-theme-hover` and `--cui-theme-active` — its own
-  colour, shifted in lightness — and the button variants read them, so a
-  component that wants "this theme colour, one step darker" no longer has to
+  color, shifted in lightness — and the button variants read them, so a
+  component that wants "this theme color, one step darker" no longer has to
   recompute it. The knobs moved with them: `$btn-hover-lightness`,
   `$btn-active-lightness` and `$btn-lightness-overrides` are now
   `$theme-hover-lightness`, `$theme-active-lightness` and
@@ -5495,12 +5495,12 @@ and still compose. What changes is where the translucency expression lives:
   `translucent-css-var()` is removed, along with the unused `map-loop()` and
   `color-contrast-variables()`.
 - **`.text-body-secondary` now responds to `.text-opacity-*`.** It rendered the
-  same colour before and renders the same colour now; it simply went through the
-  plain value and so ignored the opacity knob every other colour utility
+  same color before and renders the same color now; it simply went through the
+  plain value and so ignored the opacity knob every other color utility
   honoured.
-- The colour custom properties the utilities assign — `--cui-bg`, `--cui-fg`,
+- The color custom properties the utilities assign — `--cui-bg`, `--cui-fg`,
   `--cui-border` and `--cui-underline` — are registered
-  `@property { inherits: false }`, so a colour set on a container cannot leak
+  `@property { inherits: false }`, so a color set on a container cannot leak
   into a descendant that only carries an opacity class.
 
 `at-property: false` still opts a utility out of that registration, for the one
@@ -5533,11 +5533,11 @@ Nothing existing changes; these are additions. See
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 - **The `dark:` theme-variant utilities are gone** (40 classes:
-  `.dark\:bg-*`, `.dark\:text-*`). They were generated for the colour
+  `.dark\:bg-*`, `.dark\:text-*`). They were generated for the color
   utilities only, duplicating every value under a `[data-coreui-theme=dark]`
   selector, and were never documented. The palette already resolves per theme
   through `light-dark()`, so `.bg-body`, `.text-body-secondary` and friends
-  follow the colour mode on their own. The `dark-mode` key of a `$utilities`
+  follow the color mode on their own. The `dark-mode` key of a `$utilities`
   entry is no longer read.
 - **The `rtl` key of a `$utilities` entry is no longer read.** It did two
   jobs: `rtl: false` wrapped the output in RTLCSS `/* rtl:remove */`
@@ -5674,8 +5674,8 @@ longhands after ours — a shorthand still yields to a later longhand.
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
 The opacity utilities compose through custom properties — `.text-opacity-50` sets
-`--cui-text-opacity` and the colour utilities read it. Custom properties
-inherit, so the value leaked into every descendant. The colour utilities that
+`--cui-text-opacity` and the color utilities read it. Custom properties
+inherit, so the value leaked into every descendant. The color utilities that
 restate their own opacity (`.text-primary` declares
 `--cui-text-opacity: 1`) were immune; the ones reading it through a
 `var(…, 1)` fallback were not.
@@ -5864,14 +5864,14 @@ classes* — `.modal`, `.offcanvas`, `.dropdown`, `.dropdown-menu` and
 Bootstrap app, so `_modal.scss`, `_offcanvas.scss` and `_dropdown.scss` keep their
 names and their classes here.
 
-#### The colour system has its own modules
+#### The color system has its own modules
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
-`_config.scss` no longer defines a single colour. The palette — the base
-colours, the grays and their maps — lives in `scss/_colors.scss`; the theme
-colour system — the `$theme-colors` map, the runtime
-colour-scale knobs and the `$theme-colors-*` slot maps — lives in
+`_config.scss` no longer defines a single color. The palette — the base
+colors, the grays and their maps — lives in `scss/_colors.scss`; the theme
+color system — the `$theme-colors` map, the runtime
+color-scale knobs and the `$theme-colors-*` slot maps — lives in
 `scss/_theme.scss`. `scss/_maps.scss` is dissolved: the `$utilities-*` maps and
 `$negative-spacers` sit in `scss/_utilities.scss` next to the `$utilities`
 definitions they feed, and `$gutters` in `scss/_config.scss` with the rest of
@@ -5948,7 +5948,7 @@ box-shadow ring was cut off.
   `--cui-*-focus-box-shadow` — button, pagination, accordion button, check,
   radio, switch, calendar cell and nav button, stepper indicator, range-slider
   thumb, search button, combobox, chip — had exactly one value, and the ring is
-  now drawn from the global width and the theme's colour wherever it appears.
+  now drawn from the global width and the theme's color wherever it appears.
   Restyle it with `--cui-focus-ring-color` / `--cui-focus-ring-width` for the
   whole page, or set either on the component itself for one instance.
 
@@ -5963,7 +5963,7 @@ box-shadow ring was cut off.
   Form fields draw the same ring: the text input, select, control group,
   date-time field, OTP cell and List Box option read the theme's focus ring or
   `--cui-focus-ring-color`, and a validation state draws its own ring in its
-  colour. The ring has no per-field colour token.
+  color. The ring has no per-field color token.
 - **The Sass variables follow**: `$focus-ring-box-shadow` → `$focus-ring`, and
   the per-component ones (`$btn-focus-box-shadow`, `$pagination-focus-ring`,
   `$combobox-focus-ring`, `$form-check-input-focus-ring`, …) are removed.
@@ -5999,8 +5999,8 @@ box-shadow ring was cut off.
   `--cui-focus-ring-color`) instead. `$input-btn-focus-width` is
   unaffected — it still sizes the validation rings and the button.
 
-**Sizes and colours are unchanged**, so the ring keeps its width
-(`$focus-ring-width`, `.25rem`) and its translucent theme colour. What changes is
+**Sizes and colors are unchanged**, so the ring keeps its width
+(`$focus-ring-width`, `.25rem`) and its translucent theme color. What changes is
 the property drawing it, which also means the ring no longer participates in a
 `box-shadow` transition.
 
@@ -6152,7 +6152,7 @@ markup.
   through them never reached it. Theme the frame once through the `$input-*`
   variables, or per instance through `--cui-control-*` on
   `.form-control-group`. Each family keeps only the variables for what is
-  genuinely its own (placeholder colours, the pickers' footers, the chip row).
+  genuinely its own (placeholder colors, the pickers' footers, the chip row).
 
   Markup you write by hand has to be updated: the password input wrapper
   (`<div class="form-control-group">` with a `.form-control-action` button) and
@@ -6160,8 +6160,8 @@ markup.
   components that build their own DOM do it for you.
 
   The adornment icons are inline SVG rendered by the component now, not CSS
-  masks, so they take their colour from the button (`currentColor`) and follow
-  it through hover, validation and disabled — the per-family icon, icon colour
+  masks, so they take their color from the button (`currentColor`) and follow
+  it through hover, validation and disabled — the per-family icon, icon color
   and icon size variables are gone with them. Every adornment across the
   library is the same mark at the same size.
 
@@ -6223,7 +6223,7 @@ markup.
   `shake` or `pop` of your own, and stand down under
   `prefers-reduced-motion: reduce`; `.color-scheme-{light|dark}` sets CSS
   `color-scheme`, which is what the browser reads to paint form controls and
-  scrollbars — it changes no colours of its own.
+  scrollbars — it changes no colors of its own.
 - **`.link-underline-*` is `.underline-*`.** `.link-underline-danger` becomes
   `.underline-danger`, and the opacity steps become `.underline-{n}`
   (`.link-underline-opacity-50-hover` → `.underline-50-hover`). Like
@@ -6231,15 +6231,15 @@ markup.
   element rather than only on a link, and it now sits beside
   `.underline-thickness-*`, which already carried that name.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **The colour utilities take upstream's names, and opacity is a step of the
-  same family.** Text colour is `.fg-{color}` (`.fg-emphasis-{color}`,
+  **The color utilities take upstream's names, and opacity is a step of the
+  same family.** Text color is `.fg-{color}` (`.fg-emphasis-{color}`,
   `.fg-contrast-{color}`, `.fg-reset`, plus the `.fg-body` / `.fg-1` … `.fg-4`
   ladder that already carried the name); the light surfaces are
   `.bg-subtle-{color}` and `.bg-muted-{color}`, the light border
   `.border-subtle-{color}`. Opacity is no longer a separate `-opacity-` family
   with its own token: `.fg-{n}`, `.bg-{n}`, `.border-{n}`, `.link-{n}`
   (`.link-{n}-hover`) and `.underline-{n}` (`.underline-{n}-hover`) run from
-  `10` to `100` in steps of ten and mix the colour the companion class wrote into
+  `10` to `100` in steps of ten and mix the color the companion class wrote into
   `--cui-fg` / `--cui-bg` / `--cui-border` / `--cui-link-color` /
   `--cui-underline` with `transparent` through `color-mix()`. `.lh-md` is the
   body line height (`.lh-sm` and `.lh-lg` read the type scale's stops) and
@@ -6259,9 +6259,9 @@ markup.
   `--cui-border-opacity`, `--cui-underline-opacity` and `--cui-link-opacity`
   tokens are gone (`--cui-text` is `--cui-fg`), so an inline
   `style="--cui-bg-opacity: .5"` no longer fades a `.bg-*` — use `.bg-50`, or
-  set `--cui-bg` to a translucent colour. Reboot's `a` reads
+  set `--cui-bg` to a translucent color. Reboot's `a` reads
   `var(--cui-theme-fg, var(--cui-link-color))` directly instead of mixing the
-  link colour through `--cui-link-opacity` on every link.
+  link color through `--cui-link-opacity` on every link.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.rounded-*` counts the stops of the radius scale.** The numbers are the
   keys of `$radii` (`--cui-radius-0` … `-9`) instead of the five v5 sizes, so
@@ -6301,7 +6301,7 @@ markup.
   writes the token as well, so `.rounded-3 .rounded-top` keeps the top on
   size 3; a side class with its own number (`.rounded-top-3`) sets that side
   directly.
-- **The derived colour utilities compose with their opacity classes.**
+- **The derived color utilities compose with their opacity classes.**
   `.bg-*-subtle`, `.bg-*-muted`, `.border-*-subtle` and `.text-*-emphasis` each
   wrote the property directly, so `.bg-opacity-50` on a `.bg-primary-subtle`
   did nothing while the same class on `.bg-primary` worked. They now declare

@@ -6,14 +6,14 @@ description: "Pick the layer behind a dialog or a drawer — a dark scrim, a tra
 
 ## How it works
 
-Every overlay that dims the page paints its native `::backdrop` from three tokens on `:root`: `--cui-backdrop-color`, `--cui-backdrop-opacity` and `--cui-backdrop-blur`. The colour and the opacity are mixed on the element, so either can be changed alone. The [dialog](/components/dialog/) keeps the root defaults — a dark scrim that deepens in the dark colour scheme — and the [drawer](/components/drawer/) tints the page instead.
+Every overlay that dims the page paints its native `::backdrop` from three tokens on `:root`: `--cui-backdrop-color`, `--cui-backdrop-opacity` and `--cui-backdrop-blur`. The color and the opacity are mixed on the element, so either can be changed alone. The [dialog](/components/dialog/) keeps the root defaults — a dark scrim that deepens in the dark color scheme — and the [drawer](/components/drawer/) tints the page instead.
 
-The backdrop helpers set the colour and the opacity on the overlay element itself, so one instance can take the other look without touching `:root`:
+The backdrop helpers set the color and the opacity on the overlay element itself, so one instance can take the other look without touching `:root`:
 
 | Class | Backdrop |
 | --- | --- |
 | `.backdrop-scrim` | Black at 50% (65% in the dark scheme) — the dialog's default |
-| `.backdrop-translucent` | The page colour at 25% — the drawer's default |
+| `.backdrop-translucent` | The page color at 25% — the drawer's default |
 | `.backdrop-none` | No backdrop; the overlay still takes the top layer and traps focus |
 
 Put the class next to `.dialog` or `.drawer`. `::backdrop` inherits custom properties from the element that opened it, so nothing else is needed.
@@ -90,7 +90,7 @@ The helpers are nothing more than the first two tokens set on the element:
 
 <ScssDocs file="scss/helpers/_backdrop.scss" capture="backdrop-presets" />
 
-A look the helpers do not cover is a matter of the same tokens — a brand-coloured tint with no blur:
+A look the helpers do not cover is a matter of the same tokens — a brand-colored tint with no blur:
 
 <dialog class="dialog" id="exampleBackdropCustom" aria-labelledby="exampleBackdropCustomLabel" style="--cui-backdrop-color: var(--cui-primary-base); --cui-backdrop-opacity: 35%; --cui-backdrop-blur: 0;">
   <div class="dialog-header">

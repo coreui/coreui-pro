@@ -93,7 +93,7 @@ The second line is the part that is easy to miss. Set the token alone and the ba
 
 A validation state works the same way: `.is-invalid` sets the checkbox's tokens and re-declares `background-color` and `border-color` on `:checked`, so a red invalid checkbox stays red inside a `.theme-success` form.
 
-While no theme class is present the token behaves as an override point; under one, the theme wins. That keeps a token set for the whole page (`.alert { --cui-alert-bg: … }` in your stylesheet, or `$alert-tokens` in Sass) from switching the themes off. To recolour a single element that carries a theme class, set the slot instead of the component token:
+While no theme class is present the token behaves as an override point; under one, the theme wins. That keeps a token set for the whole page (`.alert { --cui-alert-bg: … }` in your stylesheet, or `$alert-tokens` in Sass) from switching the themes off. To recolor a single element that carries a theme class, set the slot instead of the component token:
 
 ```html
 <div class="alert theme-danger" style="--cui-theme-bg-subtle: #fde2e4">…</div>
@@ -107,7 +107,7 @@ Every overlay that dims the page — the dialog and the drawer through their nat
 
 <ScssDocs file="scss/_root.scss" capture="root-backdrop-variables" />
 
-The colour and the opacity are mixed on the element (`color-mix(in oklch, var(--cui-backdrop-color) var(--cui-backdrop-opacity), transparent)`), so either can be changed alone, globally on `:root` or on one overlay. The dialog keeps the defaults, a dark scrim that deepens in the dark scheme; the drawer sets its own tint of the page (`--cui-bg-body` at 25%). The [backdrop helper](/helpers/backdrop/) picks either look — or no backdrop at all — from the markup.
+The color and the opacity are mixed on the element (`color-mix(in oklch, var(--cui-backdrop-color) var(--cui-backdrop-opacity), transparent)`), so either can be changed alone, globally on `:root` or on one overlay. The dialog keeps the defaults, a dark scrim that deepens in the dark scheme; the drawer sets its own tint of the page (`--cui-bg-body` at 25%). The [backdrop helper](/helpers/backdrop/) picks either look — or no backdrop at all — from the markup.
 
 ## Translucent
 

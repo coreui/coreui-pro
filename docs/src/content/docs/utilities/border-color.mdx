@@ -64,7 +64,7 @@ The same utilities repaint the border a component ships with:
 
 ## Opacity
 
-Every `.border-{color}` utility writes its colour into `--cui-border` and reads it back, so a companion `.border-{percentage}` class can mix that colour with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
+Every `.border-{color}` utility writes its color into `--cui-border` and reads it back, so a companion `.border-{percentage}` class can mix that color with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
 
 ```css
 .border-success {
@@ -77,7 +77,7 @@ Every `.border-{color}` utility writes its colour into `--cui-border` and reads 
 }
 ```
 
-Override `--cui-border` to repaint the utility with another colour; the opacity class keeps working, because it reads whatever the token holds.
+Override `--cui-border` to repaint the utility with another color; the opacity class keeps working, because it reads whatever the token holds.
 
 <Example code={`<div class="border border-success p-3 mb-3">This is default success border</div>
 <div class="border border-success p-3 mb-3 border-70">This is 70% opacity success border</div>

@@ -9,7 +9,7 @@ import { getData } from '@coreui/astro-docs/data'
 
 ## Link opacity
 
-Change the alpha opacity of the link colour with `.link-{percentage}` utilities — `color-mix()` fades `--cui-link-color` towards `transparent`. Please be aware that changes to a color's opacity can lead to links with [*insufficient* contrast](/accessibility/color-contrast/).
+Change the alpha opacity of the link color with `.link-{percentage}` utilities — `color-mix()` fades `--cui-link-color` towards `transparent`. Please be aware that changes to a color's opacity can lead to links with [*insufficient* contrast](/accessibility/color-contrast/).
 
 <Example code={`<p><a class="link-10" href="#">Link opacity 10</a></p>
 <p><a class="link-20" href="#">Link opacity 20</a></p>
@@ -65,7 +65,7 @@ Change how heavy the underline is drawn, on links or any underlined text. Hover 
 
 ### Underline opacity
 
-Change the underline's opacity with `.underline-{percentage}`. The underline colour comes from `--cui-underline`, which `.underline` sets to `currentColor` and `.underline-{color}` to a theme colour; without either class the opacity utility fades `currentColor`.
+Change the underline's opacity with `.underline-{percentage}`. The underline color comes from `--cui-underline`, which `.underline` sets to `currentColor` and `.underline-{color}` to a theme color; without either class the opacity utility fades `currentColor`.
 
 <Example code={`<p><a class="underline-offset-2 underline underline-10" href="#">Underline opacity 10</a></p>
 <p><a class="underline-offset-2 underline underline-30" href="#">Underline opacity 30</a></p>
@@ -85,13 +85,13 @@ Just like the `.link-{percentage}-hover` utilities, `.underline-offset` and `.un
 
 ## Coloring links
 
-Give a link a theme colour with a [`.theme-*`](/customize/theme/) class. Reboot resolves a link's colour from `--cui-theme-fg`, which every theme class sets, so the link follows the theme rather than needing a class of its own.
+Give a link a theme color with a [`.theme-*`](/customize/theme/) class. Reboot resolves a link's color from `--cui-theme-fg`, which every theme class sets, so the link follows the theme rather than needing a class of its own.
 
 <Example code={[...getData('theme-colors').map((c) => `<p><a href="#" class="theme-${c.name} underline-offset-2 underline underline-20 underline-100-hover">${c.title} link</a></p>`), ``, `<p><a href="#" class="text-body-emphasis underline-offset-2 underline underline-30 underline-70-hover">Emphasis link</a></p>`]} />
 
-`.underline` here carries the underline colour, which defaults to `currentColor` — so it follows the theme too, and the `.underline-{percentage}` utilities have something to fade. Name a colour with `.underline-{color}` to break that pairing deliberately.
+`.underline` here carries the underline color, which defaults to `currentColor` — so it follows the theme too, and the `.underline-{percentage}` utilities have something to fade. Name a color with `.underline-{color}` to break that pairing deliberately.
 
-The theme slot is a tone picked for text, not the raw brand colour: it darkens on a light background and lightens on a dark one, which is why the same class reads on both.
+The theme slot is a tone picked for text, not the raw brand color: it darkens on a light background and lightens on a dark one, which is why the same class reads on both.
 
 <Callout color="info">
 ##### Conveying meaning to assistive technologies

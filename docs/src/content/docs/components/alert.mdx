@@ -261,7 +261,7 @@ myAlert.addEventListener('closed.coreui.alert', event => {
 
 <DeprecatedIn version="6.0.0" />
 
-The v5 spelling — `.alert` with a colour modifier — still works and renders identically. Each colour class is generated from the same theme map as the class it replaces, so `.alert-primary` *is* `.alert.theme-primary`. They are removed in v7.
+The v5 spelling — `.alert` with a color modifier — still works and renders identically. Each color class is generated from the same theme map as the class it replaces, so `.alert-primary` *is* `.alert.theme-primary`. They are removed in v7.
 
 <Example code={getData('theme-colors').map((c) => `<div class="alert alert-${c.name}" role="alert">
     Here's a straightforward example of a ${c.name} alert—take a look!
@@ -272,7 +272,7 @@ The v5 spelling — `.alert` with a colour modifier — still works and renders 
 + <div class="alert theme-success" role="alert">Saved</div>
 ```
 
-The rewrite buys two things the modifier cannot. A theme colour set on a wrapper reaches every alert inside it, and a colour of your own works the moment you define its theme tokens, with no Sass to compile.
+The rewrite buys two things the modifier cannot. A theme color set on a wrapper reaches every alert inside it, and a color of your own works the moment you define its theme tokens, with no Sass to compile.
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 

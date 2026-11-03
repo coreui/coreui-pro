@@ -21,20 +21,20 @@ has to hold for the whole 6.x line:
 
 | Feature | Sets the floor for |
 | --- | --- |
-| `color-mix()` hue carry-over | Safari and iOS 18 — a mix in `oklch` with an achromatic operand (`transparent`, white, black, the greys) keeps the other colour's hue only from Safari 18; 17.x interpolates the hue towards 0°, so every translucent or tinted colour comes out the wrong hue (indigo turns pink) |
+| `color-mix()` hue carry-over | Safari and iOS 18 — a mix in `oklch` with an achromatic operand (`transparent`, white, black, the greys) keeps the other color's hue only from Safari 18; 17.x interpolates the hue towards 0°, so every translucent or tinted color comes out the wrong hue (indigo turns pink) |
 | `light-dark()` | Chrome and Edge 123 — every theme decision resolves through it, and `color-mix()`, with no fallback |
 | `<details name="…">` | Firefox 130 — exclusive accordions, which group their panels by `details.name` |
 | `@starting-style`, `transition-behavior: allow-discrete` | Firefox 129 — the Menu's entry animation |
-| `@property` | Firefox 128 — `inherits: false` on the colour and opacity utilities' custom properties |
+| `@property` | Firefox 128 — `inherits: false` on the color and opacity utilities' custom properties |
 | `:has()` | Firefox 121 — validation and focus states on Multi Select and Autocomplete, the sidebar navigation indicators, calendar ranges and the rating icons are all selected with it |
 
 A browser below the floor does not merely lose polish. An unsupported `:has()`
 invalidates the whole rule it appears in, unresolved `light-dark()` leaves
 colors unset, and a Safari 17 renders the palette with rotated hues — nothing
-fails, the colours are just not the ones you set. Where `details.name` reads back undefined, an exclusive accordion
+fails, the colors are just not the ones you set. Where `details.name` reads back undefined, an exclusive accordion
 stops closing its siblings and every panel can stand open at once. `@property`
 is the quietest of them and the one worth knowing about: without it the
-registrations are ignored, custom properties inherit again, and a colour or
+registrations are ignored, custom properties inherit again, and a color or
 opacity utility on a container tints everything nested inside it.
 
 Versions come from MDN's browser compatibility data. Note that caniuse does not

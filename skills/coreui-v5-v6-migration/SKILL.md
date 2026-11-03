@@ -84,7 +84,7 @@ Modal, Offcanvas and Dropdown keep their names in v6: `.modal`, `.offcanvas`, `.
    | `scss/forms/form-select`, `scss/forms/form-password` | removed, styles live in `scss/forms/form-control` and the plugin |
    | `scss/mixins/breakpoints` | `scss/layout/breakpoints` |
 
-9. Decide on the compatibility stylesheet. The deprecated v5 spellings moved out of `coreui.css` into `coreui-legacy.css`: the colour modifiers `.btn-{color}`, `.btn-outline-{color}`, `.btn-ghost-{color}`, `.alert-{color}`, `.callout-{color}`, `.chip-{color}`, `.list-group-item-{color}`, the `.form-check*` and `.form-switch*` markup, `.btn-check` on an `<input>`, and `.dropdown-menu-{breakpoint}-{start|end}`. Prefer migrating the markup in Steps 2 and 3. Load the sheet only while markup still uses them, after `coreui.css`:
+9. Decide on the compatibility stylesheet. The deprecated v5 spellings moved out of `coreui.css` into `coreui-legacy.css`: the color modifiers `.btn-{color}`, `.btn-outline-{color}`, `.btn-ghost-{color}`, `.alert-{color}`, `.callout-{color}`, `.chip-{color}`, `.list-group-item-{color}`, the `.form-check*` and `.form-switch*` markup, `.btn-check` on an `<input>`, and `.dropdown-menu-{breakpoint}-{start|end}`. Prefer migrating the markup in Steps 2 and 3. Load the sheet only while markup still uses them, after `coreui.css`:
 
    ```html
    <link href="css/coreui.min.css" rel="stylesheet">
@@ -138,9 +138,9 @@ Replace in descending order (`5` to `12`, then `4` to `7`, then `3` to `5`, then
 
 Apply the same numbers to `.rounded-top-*`, `.rounded-end-*`, `.rounded-bottom-*` and `.rounded-start-*`. Replace in descending order (`4` to `9`, `3` to `5`, `2` to `4`, `1` to `3`). `.rounded-0`, `.rounded-circle` and `.rounded-pill` are unchanged.
 
-### Colour classes: variant plus theme
+### Color classes: variant plus theme
 
-A colour modifier is now a variant class plus a `.theme-{color}` class. The v5 classes only work with `coreui-legacy.css`.
+A color modifier is now a variant class plus a `.theme-{color}` class. The v5 classes only work with `coreui-legacy.css`.
 
 | v5 | v6 |
 | --- | --- |
@@ -158,7 +158,7 @@ A colour modifier is now a variant class plus a `.theme-{color}` class. The v5 c
 
 ### `dark` and `light` are `inverse` and `secondary`
 
-The `dark` and `light` theme colours are gone. Rename `-dark` to `-inverse` and `-light` to `-secondary` in `bg`, `text`, `text-bg`, `border`, `btn`, `btn-outline`, `btn-ghost`, `alert`, `callout`, `chip`, `list-group-item`, `table`, `focus-ring`, `shadow` and `underline` classes, and in their `-subtle` and `-emphasis` forms (`.bg-dark-subtle` becomes `.bg-inverse-subtle`, `.text-dark-emphasis` becomes `.text-inverse-emphasis`). `.navbar-dark`, `.dropdown-menu-dark`, `.sidebar-dark` and `.fw-light` keep their names. Where `.bg-light` meant a neutral panel, use `.bg-3` or `.bg-4`. Where `.bg-dark` meant a dark area, set `data-coreui-theme="dark"` on the container.
+The `dark` and `light` theme colors are gone. Rename `-dark` to `-inverse` and `-light` to `-secondary` in `bg`, `text`, `text-bg`, `border`, `btn`, `btn-outline`, `btn-ghost`, `alert`, `callout`, `chip`, `list-group-item`, `table`, `focus-ring`, `shadow` and `underline` classes, and in their `-subtle` and `-emphasis` forms (`.bg-dark-subtle` becomes `.bg-inverse-subtle`, `.text-dark-emphasis` becomes `.text-inverse-emphasis`). `.navbar-dark`, `.dropdown-menu-dark`, `.sidebar-dark` and `.fw-light` keep their names. Where `.bg-light` meant a neutral panel, use `.bg-3` or `.bg-4`. Where `.bg-dark` meant a dark area, set `data-coreui-theme="dark"` on the container.
 
 ### Utility renames
 
@@ -448,7 +448,7 @@ A custom ratio moves from `--cui-aspect-ratio: 50%` to `--cui-ratio: 2 / 1` on `
 - **Toast.** Remove `.fade` from toasts. Remove CSS that targets `.showing`.
 - **Tab.** Remove `.fade` from `.tab-pane`; panes fade on their own. Add `.tab-pane-instant` to switch without a fade.
 - **Collapse.** Replace `.collapsed` selectors with `[aria-expanded="false"]` on the trigger.
-- **Close button.** Delete `.btn-close-white`. The icon follows the text colour.
+- **Close button.** Delete `.btn-close-white`. The icon follows the text color.
 - **Button toolbar.** Remove `me-*` utilities between groups in `.btn-toolbar`; it has its own gap.
 - **Spinner.** Spinners are `1em` square. Set `--cui-spinner-width` and `--cui-spinner-height` where a standalone spinner must keep a fixed size.
 - **Breadcrumb.** The bottom margin is gone. Add `.mb-5` where the page relied on it.
@@ -626,7 +626,7 @@ If no token matches, the variable has no v6 replacement. Delete the line.
 
 `$primary`, `$success`, `$info`, `$warning`, `$danger`, `$gray`, `$spacer`, `$spacers`, `$prefix`, `$enable-shadows`, `$enable-gradients`, `$enable-dark-mode`, `$enable-cssgrid`, `$enable-rtl`, `$enable-ltr`, `$container-max-widths`, `$mobile-breakpoint` and `$sidebar-width` are still Sass variables.
 
-Delete every `$*-dark` variable. `scss/_variables-dark.scss` is gone; each colour is one `light-dark()` value in the light variable.
+Delete every `$*-dark` variable. `scss/_variables-dark.scss` is gone; each color is one `light-dark()` value in the light variable.
 
 ### Sass mixins and functions
 
@@ -647,7 +647,7 @@ Hard-coded media queries at `992px`, `1200px` or `1400px` no longer match `lg`, 
 
 | v5 | v6 |
 | --- | --- |
-| `--cui-primary` (and every theme colour) | read `--cui-primary-base`; set `--cui-primary-500` to retint |
+| `--cui-primary` (and every theme color) | read `--cui-primary-base`; set `--cui-primary-500` to retint |
 | `--cui-dark`, `--cui-light` | `--cui-inverse-base`, `--cui-secondary-base` |
 | `--cui-{color}-rgb`, `--cui-body-color-rgb`, `--cui-link-color-rgb` | removed; `color-mix(in srgb, var(--cui-primary-base) 50%, transparent)` |
 | `--cui-{color}-text-emphasis` | `--cui-{color}-fg-emphasis` |
@@ -658,20 +658,20 @@ Hard-coded media queries at `992px`, `1200px` or `1400px` no longer match `lg`, 
 | `--cui-border-radius`, `-sm`, `-lg`, `-pill` | `--cui-radius-4`, `--cui-radius-3`, `--cui-radius-5`, `--cui-radius-pill`; `--cui-radius` scales all |
 | `--cui-font-monospace` | `--cui-font-mono` |
 | `--cui-highlight-color`, `--cui-highlight-bg` | `--cui-mark-color`, `--cui-mark-bg`, set on `mark` |
-| `--cui-text-opacity`, `--cui-bg-opacity`, `--cui-border-opacity`, `--cui-link-opacity` | removed; use `.fg-{n}`, `.bg-{n}`, `.border-{n}`, `.link-{n}`, or set `--cui-bg` to a translucent colour |
+| `--cui-text-opacity`, `--cui-bg-opacity`, `--cui-border-opacity`, `--cui-link-opacity` | removed; use `.fg-{n}`, `.bg-{n}`, `.border-{n}`, `.link-{n}`, or set `--cui-bg` to a translucent color |
 | `--cui-focus-ring-x`, `--cui-focus-ring-y`, `--cui-focus-ring-blur` | removed; `--cui-focus-ring-offset` |
 | `--cui-btn-focus-box-shadow`, `--cui-pagination-focus-box-shadow`, `--cui-accordion-btn-focus-box-shadow`, `--cui-btn-focus-shadow-rgb` | removed; set `--cui-focus-ring-color` or `--cui-focus-ring-width` |
-| `--cui-form-valid-color`, `--cui-form-valid-border-color`, `--cui-form-invalid-color` | removed; retint the `success` and `danger` theme colours |
+| `--cui-form-valid-color`, `--cui-form-valid-border-color`, `--cui-form-invalid-color` | removed; retint the `success` and `danger` theme colors |
 | `--cui-form-select-bg-img` | `--cui-control-select-bg-img` |
 | `--cui-input-placeholder-color` | `--cui-control-placeholder-color` |
 | `--cui-form-multi-select-selection-tags-gap`, `-padding-y` | `--cui-multi-select-selection-chips-gap`, `-padding-y` |
-| `--cui-autocomplete-*`, `--cui-date-picker-*`, `--cui-time-picker-*`, `--cui-form-multi-select-*`, `--cui-chip-input-*` frame tokens (padding, font, colour, border) | `--cui-control-*` on the same element (`--cui-control-padding-y`, `--cui-control-bg`, …) |
+| `--cui-autocomplete-*`, `--cui-date-picker-*`, `--cui-time-picker-*`, `--cui-form-multi-select-*`, `--cui-chip-input-*` frame tokens (padding, font, color, border) | `--cui-control-*` on the same element (`--cui-control-padding-y`, `--cui-control-bg`, …) |
 | `--cui-accordion-btn-*` | `--cui-accordion-header-*` |
 | `--cui-accordion-inner-border-radius` | removed; the header follows `--cui-accordion-border-radius` |
 | `--cui-avatar-width`, `--cui-avatar-height` | `--cui-avatar-size` |
 | `--cui-avatar-status-width`, `--cui-avatar-status-height` | `--cui-avatar-status-size` |
 | `--cui-btn-close-bg` | `--cui-btn-close-icon` |
-| `--cui-btn-close-filter`, `--cui-btn-close-focus-shadow` | removed; recolour with `--cui-btn-close-color` |
+| `--cui-btn-close-filter`, `--cui-btn-close-focus-shadow` | removed; recolor with `--cui-btn-close-color` |
 | `--cui-btn-box-shadow` | removed |
 | `--cui-alert-border` | `--cui-alert-border-width` and `--cui-alert-border-color` |
 | `--cui-modal-padding`, `--cui-modal-header-padding`, `--cui-card-img-overlay-padding`, `--cui-calendar-nav-padding` | `-padding-x` and `-padding-y` pairs |
@@ -713,7 +713,7 @@ All library CSS is in cascade layers and utilities no longer carry `!important`.
 | `.link-{color}` | `.theme-{color}.underline` |
 | `.elevation-*` | `.shadow-sm`, `.shadow`, `.shadow-lg` |
 | `.bg-{color}-gradient`, `.text-bg-{color}-gradient` | `.bg-{color}.bg-gradient` |
-| `.dark:bg-*`, `.dark:text-*` | none; colour utilities follow the colour mode |
+| `.dark:bg-*`, `.dark:text-*` | none; color utilities follow the color mode |
 | `.collapsed` | `[aria-expanded="false"]` |
 | `.carousel-dark` | `data-coreui-theme="dark"` on `.carousel` |
 | `.modal-dialog`, `.modal-content`, `.modal-dialog-centered` | `<dialog class="modal">` (Step 3) |
@@ -744,8 +744,8 @@ All library CSS is in cascade layers and utilities no longer carry `!important`.
    grep -rnE 'var\(--cui-[a-z0-9-]+-rgb\)|--cui-(primary|secondary|success|danger|warning|info|light|dark)\)|-text-emphasis\)|-border-subtle\)|--cui-border-radius|--cui-font-monospace|--cui-highlight-|--cui-(text|bg|border|link)-opacity|focus-box-shadow|--cui-accordion-btn-|--cui-avatar-(width|height)|--cui-btn-close-(bg|filter)|--cui-range-slider-|--cui-(autocomplete|date-picker|time-picker|form-multi-select|chip-input)-' .
    ```
 
-   Review each hit, not every hit is a v5 leftover. Expected matches include `.btn-outline` without a colour, `.icon-xxl`, the deprecated aliases listed in Step 2, and option names in code that does not configure a CoreUI plugin. The option-name `grep` lines are broad on purpose: check each hit against the tables in Step 4.
+   Review each hit, not every hit is a v5 leftover. Expected matches include `.btn-outline` without a color, `.icon-xxl`, the deprecated aliases listed in Step 2, and option names in code that does not configure a CoreUI plugin. The option-name `grep` lines are broad on purpose: check each hit against the tables in Step 4.
 3. Search the spacing and radius classes changed in Step 2 (`[mp][tbsexy]?-[1-5]`, `gap-[1-5]`, `g[xy]?-[1-5]`, `rounded(-[a-z]+)?-[1-5]`) and confirm each was renamed once, in descending order.
 4. Remove `coreui-legacy.css` (or the `coreui-legacy` `@use`) and rebuild. If nothing renders differently, the markup no longer uses v5 spellings.
 5. Open the pages in a browser that meets Step 1 and check: modals, offcanvas panels and accordions open and close; pickers, Autocomplete and Multi Select submit their values under the expected `name`; forms with `data-coreui-validate` block an invalid submit.
-6. Review visual changes that have no rename: theme colours are retuned, most radii are rounder, a bare `.btn` and a bare `.badge` are neutral, button labels do not wrap, card padding is `1.25rem` (set `--cui-card-spacer-y` and `--cui-card-spacer-x` to `var(--cui-spacer-5)` on `.card` to keep v5), focus rings are outlines, and the `lg`, `xl` and `2xl` breakpoints moved.
+6. Review visual changes that have no rename: theme colors are retuned, most radii are rounder, a bare `.btn` and a bare `.badge` are neutral, button labels do not wrap, card padding is `1.25rem` (set `--cui-card-spacer-y` and `--cui-card-spacer-x` to `var(--cui-spacer-5)` on `.card` to keep v5), focus rings are outlines, and the `lg`, `xl` and `2xl` breakpoints moved.

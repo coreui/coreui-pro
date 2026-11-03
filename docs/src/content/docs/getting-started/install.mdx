@@ -329,7 +329,7 @@ The v5 spellings that v6 deprecated are not in `coreui.css`; they ship in `coreu
 It is 3.8&nbsp;kB gzip minified and covers:
 
 - the responsive dropdown alignment classes `.dropdown-menu{-sm|-md|-lg|-xl|-2xl}{-start|-end}`, replaced by a responsive `data-coreui-placement`
-- the colour modifiers `.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
+- the color modifiers `.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
   `.btn-subtle-{color}`, `.btn-ghost-{color}`, `.callout-{color}`,
   `.chip-{color}` and `.list-group-item-{color}` — each an alias of the matching
   [`.theme-{color}`](/customize/components/#theme-variants) class;
@@ -360,7 +360,7 @@ button are separate from `buttons.css`.
 `base.css` carries the design tokens on `:root`, [Reboot](/content/reboot/) and
 the `.theme-*` classes. Every component stylesheet reads those tokens, Reboot
 sets the element defaults components build on, and the theme classes are how a
-component is coloured — `<button class="btn-solid theme-primary">` is grey
+component is colored — `<button class="btn-solid theme-primary">` is grey
 without them. So `base.css` always comes first; a component file on its own has
 nothing to resolve its tokens against.
 

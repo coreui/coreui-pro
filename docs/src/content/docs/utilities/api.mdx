@@ -247,8 +247,8 @@ Output:
 ```
 
 This is what lets a utility **store its value in a custom property and consume
-it in the same rule**. The colour lives in `--cui-bg`, so anything that reads
-the token sees the colour the class chose. A companion utility then reads it
+it in the same rule**. The color lives in `--cui-bg`, so anything that reads
+the token sees the color the class chose. A companion utility then reads it
 back through an expression of its own:
 
 ```scss
@@ -266,8 +266,8 @@ $utilities: (
 ```
 
 The two rules write the same property, so the order of the map decides: the
-opacity family is declared after the colour family, and `.bg-primary.bg-50`
-mixes the primary colour whichever order the classes appear in the attribute.
+opacity family is declared after the color family, and `.bg-primary.bg-50`
+mixes the primary color whichever order the classes appear in the attribute.
 On its own, `.bg-50` reads a token nobody set, so the declaration is invalid at
 computed-value time and the background stays as it was.
 

@@ -12,7 +12,7 @@ import { getData } from '@coreui/astro-docs/data'
 
 ## Base class
 
-The `.btn` class sets up the shape of a button — size, spacing, radius, the focus ring — and paints it in the neutral surface colour, so it is a usable button on its own.
+The `.btn` class sets up the shape of a button — size, spacing, radius, the focus ring — and paints it in the neutral surface color, so it is a usable button on its own.
 
 <Example code={`<button type="button" class="btn">Base class</button>`} />
 
@@ -89,7 +89,7 @@ These buttons use a transparent background, subtle border, and inherit text colo
 
 ### Themed outline buttons
 
-Add a theme colour and the border, the text and the hover fill all follow it.
+Add a theme color and the border, the text and the hover fill all follow it.
 
 <Example code={getData('theme-colors').map((c) => `<button type="button" class="btn-outline theme-${c.name}">${c.title}</button>`)} />
 
@@ -113,7 +113,7 @@ They’re perfect for interfaces where you want buttons to be present but visual
 
 ### Themed ghost buttons
 
-With a theme colour the text takes it, and the fill that appears on hover takes it too.
+With a theme color the text takes it, and the fill that appears on hover takes it too.
 
 <Example code={getData('theme-colors').map((c) => `<button type="button" class="btn-ghost theme-${c.name}">${c.title}</button>`)} />
 
@@ -121,7 +121,7 @@ With a theme colour the text takes it, and the fill that appears on hover takes 
 
 <AddedIn version="6.0.0" />
 
-`.btn-subtle` fills the button with the theme's tinted background instead of the colour itself, so it carries the meaning of the colour without the weight of a solid button. Use it where a solid button would shout: a secondary action next to a primary one, or a row of actions that all matter equally.
+`.btn-subtle` fills the button with the theme's tinted background instead of the color itself, so it carries the meaning of the color without the weight of a solid button. Use it where a solid button would shout: a secondary action next to a primary one, or a row of actions that all matter equally.
 
 <Example code={`<button type="button" class="btn-subtle">Base subtle button</button>
   <button type="button" class="btn-subtle active">Active state</button>
@@ -280,7 +280,7 @@ document.querySelectorAll('.btn').forEach(buttonElement => {
 
 <DeprecatedIn version="6.0.0" />
 
-The v5 spelling — `.btn` with a colour modifier — still works and renders identically. Each colour class is generated from the same variants map as the class it replaces, so `.btn-primary` *is* `.btn-solid.theme-primary`, `.btn-outline-primary` is `.btn-outline.theme-primary`, and `.btn-ghost-primary` is `.btn-ghost.theme-primary`. They are removed in v7.
+The v5 spelling — `.btn` with a color modifier — still works and renders identically. Each color class is generated from the same variants map as the class it replaces, so `.btn-primary` *is* `.btn-solid.theme-primary`, `.btn-outline-primary` is `.btn-outline.theme-primary`, and `.btn-ghost-primary` is `.btn-ghost.theme-primary`. They are removed in v7.
 
 <Example code={[...getData('theme-colors').map((c) => `<button type="button" class="btn btn-${c.name}">${c.title}</button>`)]} />
 
@@ -292,7 +292,7 @@ The v5 spelling — `.btn` with a colour modifier — still works and renders id
 + <button class="btn-outline theme-danger">Delete</button>
 ```
 
-Two things are worth the rewrite rather than the alias. A theme colour reaches a whole toolbar from one class on the wrapper, which no `.btn-{color}` can do; and a colour of your own works with every variant the moment you define its theme tokens, with no Sass to compile.
+Two things are worth the rewrite rather than the alias. A theme color reaches a whole toolbar from one class on the wrapper, which no `.btn-{color}` can do; and a color of your own works with every variant the moment you define its theme tokens, with no Sass to compile.
 
 The v5 toggle button — `.btn-check` on the input, with a sibling `.btn` label tied to it by `id`/`for` — is deprecated the same way and renders identically. The current spelling puts `.btn-check` on the `<label>` with the input nested inside it, so the pair cannot fall out of sync.
 
@@ -319,9 +319,9 @@ Buttons use local CSS variables on `.btn` for enhanced real-time customization.
 
 <ScssDocs file="scss/mixins/_button.scss" capture="btn-link-tokens" />
 
-Each variant class rewrites those variables from the theme tokens, falling back to a neutral value, which is why one set of rules serves every colour — including a theme colour you add yourself, with no Sass to compile.
+Each variant class rewrites those variables from the theme tokens, falling back to a neutral value, which is why one set of rules serves every color — including a theme color you add yourself, with no Sass to compile.
 
-A brand colour of your own is a theme, not a button: set the theme tokens anywhere above the buttons and every variant follows, in plain CSS. The tokens inherit, so one ancestor themes the whole subtree.
+A brand color of your own is a theme, not a button: set the theme tokens anywhere above the buttons and every variant follows, in plain CSS. The tokens inherit, so one ancestor themes the whole subtree.
 
 <Example code={`<div style="--cui-theme-bg: #6f42c1; --cui-theme-contrast: #fff; --cui-theme-hover: #6134ae; --cui-theme-active: #56309b; --cui-theme-bg-subtle: #e9e0f7; --cui-theme-fg: #59359a; --cui-theme-fg-emphasis: #432a72;">
     <button type="button" class="btn-solid">Solid</button>
@@ -350,7 +350,7 @@ In your own stylesheet that is a class, and the buttons carry it the way they ca
 
 Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
-The variables below are the neutral fallbacks — what a variant renders as when no theme colour reaches it.
+The variables below are the neutral fallbacks — what a variant renders as when no theme color reaches it.
 
 <ScssDocs file="scss/mixins/_button.scss" capture="btn-variables" />
 

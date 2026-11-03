@@ -22,7 +22,7 @@ result reads as a single field rather than a row of parts.
 ## How it works
 
 - **The group is the frame.** `.form-control-group` looks exactly like
-  `.form-control` — same padding, typography, colours, border and transition,
+  `.form-control` — same padding, typography, colors, border and transition,
   from the same `--cui-control-*` custom properties — and lays its
   children out in a row. Theme `.form-control` and the group follows.
 - **The control inside keeps its own class.** Put `.form-control` on the input:
@@ -44,7 +44,7 @@ result reads as a single field rather than a row of parts.
 
 Icons take their size from the group, so they follow `.form-control-sm` and
 `.form-control-lg` without being told. An icon inside an action follows the
-button's colour, which is how a validation state reaches it.
+button's color, which is how a validation state reaches it.
 
 <Example code={`<div class="form-control-group">
     <input type="text" class="form-control" value="Ada Lovelace" aria-label="Name">
@@ -115,7 +115,7 @@ from the control inside it, so a component that validates its own field lights
 the frame up without any extra wiring. A sibling `.invalid-feedback` follows the
 `.is-invalid` class wherever it sits, on the group or on the control inside it,
 and a `.valid-feedback` waits until nothing is invalid, the frame included.
-The actions inside the group carry the state colour too.
+The actions inside the group carry the state color too.
 
 <Example code={`<div class="form-field">
     <div class="form-control-group is-invalid">

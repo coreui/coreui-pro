@@ -76,7 +76,7 @@ its new one.
 The library's configuration is split across four modules, each loadable on its
 own: `scss/config` holds the global settings — options, spacing, breakpoints,
 borders, shadows, typography, z-index; `scss/colors` the palette and the grays;
-`scss/theme` the theme colours, the `$theme-colors` map and the runtime colour
+`scss/theme` the theme colors, the `$theme-colors` map and the runtime color
 scale; and `scss/root` emits every token on `:root`.
 
 ## Compiling
@@ -116,7 +116,7 @@ Once your CSS is compiled, you can include it in your HTML files. Inside your `i
 
 Every Sass variable in CoreUI for Bootstrap includes the `!default` flag allowing you to override the variable's default value in your own Sass without modifying CoreUI for Bootstrap's source code. Copy and paste variables as needed, modify their values, and remove the `!default` flag. If a variable has already been assigned, then it won't be re-assigned by the default values in Bootstrap.
 
-The global settings live in `scss/_config.scss`, the palette in `scss/_colors.scss`, the theme colours in `scss/_theme.scss`, and each component's variables at the top of its own partial. Some variables are set to `null`, these variables don't output the property unless they are overridden in your configuration.
+The global settings live in `scss/_config.scss`, the palette in `scss/_colors.scss`, the theme colors in `scss/_theme.scss`, and each component's variables at the top of its own partial. Some variables are set to `null`, these variables don't output the property unless they are overridden in your configuration.
 
 Variable overrides must come after our functions are imported, but before the rest of the imports.
 
@@ -182,7 +182,7 @@ $theme-colors: (
 
 ### Add to map
 
-Add new colors to `$theme-colors`, or any other map, through `with ()`: `defaults()` merges your entries on top of the built-ins, so you pass only what you add. A theme colour entry is a map of slots that read one hue of the palette: add the hue to `$colors`, point `base` and `bg` at its `500` stop, and the remaining slots at the 025–975 scale the library mixes from it at runtime, the same way the built-in colours do.
+Add new colors to `$theme-colors`, or any other map, through `with ()`: `defaults()` merges your entries on top of the built-ins, so you pass only what you add. A theme color entry is a map of slots that read one hue of the palette: add the hue to `$colors`, point `base` and `bg` at its `500` stop, and the remaining slots at the 025–975 scale the library mixes from it at runtime, the same way the built-in colors do.
 
 ```scss
 @use "@coreui/coreui/scss/coreui" with (
@@ -205,7 +205,7 @@ Add new colors to `$theme-colors`, or any other map, through `with ()`: `default
 );
 ```
 
-The merge is one level deep: to change one slot of a built-in colour, pass that colour's whole sub-map.
+The merge is one level deep: to change one slot of a built-in color, pass that color's whole sub-map.
 
 ### Remove from map
 
@@ -405,7 +405,7 @@ A shorthand mixin for the `prefers-color-scheme` media query is available with s
 
 ### Mask icons
 
-An icon carried as a `background-image` paints the colour baked into the SVG, so it cannot follow a theme. `mask-icon()` renders the shape through a CSS mask instead, which paints it with the element's `background-color` — so the icon takes whatever token that property reads.
+An icon carried as a `background-image` paints the color baked into the SVG, so it cannot follow a theme. `mask-icon()` renders the shape through a CSS mask instead, which paints it with the element's `background-color` — so the icon takes whatever token that property reads.
 
 <ScssDocs file="scss/mixins/_mask-icon.scss" capture="mask-icon-mixin" />
 

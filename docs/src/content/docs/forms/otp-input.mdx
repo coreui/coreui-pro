@@ -299,7 +299,7 @@ Disable the entire one-time password input by adding the `data-coreui-disabled="
 
 ## Validation
 
-The code is validated as one value, kept in an input laid invisibly over the group. With `data-coreui-required="true"` an empty or incomplete code blocks the submit, and an incomplete code blocks it even when the field is not required; the browser, or the [form plugin](/forms/validation/#usage) in a form with `novalidate`, puts focus on the first empty slot, the browser with its own message over the group. The state shows on the group as `.is-{state}`, which colours every slot and shows the `.invalid-feedback` that follows the group, and while it is `'invalid'` every slot carries `aria-invalid="true"` and is described by that message. Every change of the code sends `input` and `change` from the input that holds the value.
+The code is validated as one value, kept in an input laid invisibly over the group. With `data-coreui-required="true"` an empty or incomplete code blocks the submit, and an incomplete code blocks it even when the field is not required; the browser, or the [form plugin](/forms/validation/#usage) in a form with `novalidate`, puts focus on the first empty slot, the browser with its own message over the group. The state shows on the group as `.is-{state}`, which colors every slot and shows the `.invalid-feedback` that follows the group, and while it is `'invalid'` every slot carries `aria-invalid="true"` and is described by that message. Every change of the code sends `input` and `change` from the input that holds the value.
 
 <Example pro code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-12">

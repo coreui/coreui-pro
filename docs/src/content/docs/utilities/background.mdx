@@ -45,7 +45,7 @@ Do you need a gradient in your custom CSS? Read the token: `background-image: va
 
 ## Opacity
 
-Every `.bg-*` utility writes its colour into `--cui-bg` and reads it back, so a companion `.bg-{percentage}` class can mix that colour with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
+Every `.bg-*` utility writes its color into `--cui-bg` and reads it back, so a companion `.bg-{percentage}` class can mix that color with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
 
 ```css
 .bg-success {
@@ -58,7 +58,7 @@ Every `.bg-*` utility writes its colour into `--cui-bg` and reads it back, so a 
 }
 ```
 
-Override `--cui-bg` to repaint the utility with another colour; the opacity class keeps working, because it reads whatever the token holds.
+Override `--cui-bg` to repaint the utility with another color; the opacity class keeps working, because it reads whatever the token holds.
 
 <Example class="d-flex flex-column gap-3" code={`<div class="text-bg-success p-3">This is default success background</div>
 <div class="bg-success p-3 bg-90">This is 90% opacity success background</div>
