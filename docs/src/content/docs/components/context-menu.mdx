@@ -152,7 +152,7 @@ The plugin writes nothing on the trigger area. Give it a role and a name (`role=
 
 Three gestures open the menu: a right-click (or a long-press on touch devices that dispatch `contextmenu`), and, with focus on the trigger, <kbd>Shift</kbd>+<kbd>F10</kbd> or the <kbd>Menu</kbd> key, which anchor the menu to the element instead of the pointer. <kbd>Shift</kbd>+<kbd>F10</kbd> is the Windows convention the [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/) adopt for opening a context menu from the keyboard; the plugin handles the keys itself, so they work on macOS too, where no system shortcut exists and browsers never turn them into a `contextmenu` event. On Apple keyboards the function keys default to their media actions, so the shortcut is <kbd>Fn</kbd>+<kbd>Shift</kbd>+<kbd>F10</kbd> unless the system is set to use them as standard function keys.
 
-Opening from the keyboard moves focus to the first item; a right-click moves it to the panel, and the arrow keys go on from there. While focus is in the menu, <kbd>Tab</kbd> and <kbd>Shift</kbd>+<kbd>Tab</kbd> do nothing, as in a native context menu. <kbd>Esc</kbd> closes the menu, also while focus is still on the trigger, and focus returns to the trigger when the menu had it.
+Opening from the keyboard moves focus to the first item; a right-click moves it to the panel, and the arrow keys go on from there. While focus is in the menu, <kbd>Tab</kbd> and <kbd>Shift</kbd>+<kbd>Tab</kbd> do nothing, as in a native context menu. <kbd>Esc</kbd> closes the menu, also while focus is still on the trigger, and when the menu closes with the focus in it or on no element, the focus goes back to the trigger. A menu opened with <kbd>Shift</kbd>+<kbd>F10</kbd> or the <kbd>Menu</kbd> key gives it back to the element in the trigger that had it at that moment, such as a field, and to the trigger only when that element can no longer take it.
 
 ### Keyboard navigation
 
@@ -163,7 +163,7 @@ Opening from the keyboard moves focus to the first item; a right-click moves it 
 | `→` | Enter submenu (or `←` in RTL) |
 | `←` | Exit submenu and return to parent (or `→` in RTL) |
 | `Enter` / `Space` | Activate focused item or open submenu |
-| `Esc` | In a submenu, close only that submenu and return focus to its trigger; elsewhere, close the menu and return focus to the trigger. With focus on the trigger, close the menu |
+| `Esc` | In a submenu, close only that submenu and return focus to its trigger; elsewhere, close the menu and return focus as described above. With focus on the trigger, close the menu |
 | `Home` / `End` | Jump to first/last menu item |
 | `Tab` / `Shift`+`Tab` | Nothing while focus is in the menu |
 
@@ -240,7 +240,7 @@ The context menu accepts every [Menu option](/components/menu/#options), adds `a
 | `dispose` | Destroys an element's context menu. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the context menu instance associated to a DOM element, you can use it like this: `coreui.ContextMenu.getInstance(element)`. |
 | `getOrCreateInstance` | Static method which returns a context menu instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.ContextMenu.getOrCreateInstance(element)`. |
-| `hide` | Hides the menu and returns focus to the trigger when the menu had it. |
+| `hide` | Hides the menu and returns the focus as described in [Accessibility](#accessibility). |
 | `show` | Shows the menu. Accepts an optional `{ x, y }` point in viewport coordinates; without it the menu anchors to the trigger element. |
 | `toggle` | Toggles the menu. Accepts the same optional point as `show`. |
 | `update` | Updates the position of the menu and, while it is open, gives items added since it opened their roles. |
