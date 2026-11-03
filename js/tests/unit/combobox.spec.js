@@ -181,7 +181,10 @@ describe('Combobox', () => {
       new Combobox(toggle) // eslint-disable-line no-new
 
       toggle.focus()
-      toggle.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }))
+      toggle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
+      expect(toggle.getAttribute('aria-activedescendant')).not.toBeNull()
+
+      toggle.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
 
       expect(toggle.getAttribute('aria-expanded')).toEqual('false')
       expect(toggle.getAttribute('aria-activedescendant')).toBeNull()
@@ -1413,6 +1416,243 @@ describe('Combobox', () => {
 
         combobox.dispose()
       }
+    })
+
+    it('should open without a value on the first option, or the last one for ArrowUp, and keep the value', () => {
+      const cases = [['ArrowDown', 'us'], ['ArrowUp', 'ca'], ['Enter', 'us'], [' ', 'us'], ['ArrowDown', 'us', true], ['ArrowUp', 'ca', true]]
+
+      for (const [key, active, altKey = false] of cases) {
+        const toggle = setMarkup()
+        const combobox = new Combobox(toggle)
+        const changes = []
+        toggle.addEventListener('change.coreui.combobox', event => changes.push(event.value))
+        const event = new KeyboardEvent('keydown', {
+          key, altKey, bubbles: true, cancelable: true
+        })
+        toggle.dispatchEvent(event)
+
+        expect(event.defaultPrevented).withContext(key).toBeTrue()
+
+        expect(toggle.classList.contains('show')).withContext(key).toBeTrue()
+        expect(toggle.getAttribute('aria-activedescendant')).withContext(key).toEqual(option(combobox, active).id)
+        expect(combobox.getValue()).withContext(key).toBeNull()
+        expect(changes).withContext(key).toEqual([])
+
+        combobox.dispose()
+      }
+    })
+
+    it('should open on the first available option when the first one is disabled', () => {
+      const toggle = setMarkup('', [
+        '<div class="list-box-option disabled" data-coreui-value="us">United States</div>',
+        '<div class="list-box-option" data-coreui-value="uk">United Kingdom</div>',
+        '<div class="list-box-option" data-coreui-value="ca">Canada</div>'
+      ])
+      const combobox = new Combobox(toggle)
+
+      keydown(toggle, 'ArrowDown')
+
+      expect(toggle.getAttribute('aria-activedescendant')).toEqual(option(combobox, 'uk').id)
+    })
+
+    it('should neither open nor move the highlight on Home or End while the panel is closed', () => {
+      for (const key of ['Home', 'End']) {
+        const toggle = setMarkup(' data-coreui-value="uk"')
+        const combobox = new Combobox(toggle)
+
+        const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+        toggle.dispatchEvent(event)
+
+        expect(event.defaultPrevented).withContext(key).toBeFalse()
+        expect(combobox._isShown()).withContext(key).toBeFalse()
+        expect(toggle.getAttribute('aria-activedescendant')).withContext(key).toBeNull()
+        expect(combobox.getValue()).withContext(key).toEqual('uk')
+
+        keydown(toggle, 'ArrowDown')
+
+        expect(toggle.getAttribute('aria-activedescendant')).withContext(key).toEqual(option(combobox, 'uk').id)
+
+        combobox.dispose()
+
+        const empty = setMarkup()
+        const emptyCombobox = new Combobox(empty)
+
+        keydown(empty, key)
+        emptyCombobox.show()
+
+        expect(empty.getAttribute('aria-activedescendant')).withContext(key).toBeNull()
+
+        emptyCombobox.dispose()
+      }
+    })
+
+    it('should open on a typed character at the next match after the selected option and keep the value', () => {
+      const toggle = setMarkup(' data-coreui-value="us"', [
+        '<div class="list-box-option" data-coreui-value="us">United States</div>',
+        '<div class="list-box-option" data-coreui-value="uk">United Kingdom</div>',
+        '<div class="list-box-option" data-coreui-value="ca">Canada</div>'
+      ])
+      const combobox = new Combobox(toggle)
+
+      keydown(toggle, 'u')
+
+      expect(toggle.classList.contains('show')).toBeTrue()
+      expect(toggle.getAttribute('aria-activedescendant')).toEqual(option(combobox, 'uk').id)
+      expect(combobox.getValue()).toEqual('us')
+    })
+
+    it('should not open on a key pressed with Ctrl or Meta, nor on a character with the typeahead off or with a search field', () => {
+      const cases = [
+        ['', { key: 'c', ctrlKey: true }],
+        ['', { key: 'c', metaKey: true }],
+        ['', { key: 'ArrowDown', ctrlKey: true }],
+        ['', { key: 'ArrowUp', metaKey: true }],
+        ['', { key: 'Enter', metaKey: true }],
+        [' data-coreui-typeahead="false"', { key: 'c' }],
+        [' data-coreui-search="true"', { key: 'c' }]
+      ]
+
+      for (const [attrs, init] of cases) {
+        const toggle = setMarkup(attrs)
+        const combobox = new Combobox(toggle)
+
+        const event = new KeyboardEvent('keydown', { ...init, bubbles: true, cancelable: true })
+        toggle.dispatchEvent(event)
+
+        expect(combobox._isShown()).withContext(JSON.stringify([attrs, init])).toBeFalse()
+        expect(event.defaultPrevented).withContext(JSON.stringify([attrs, init])).toBeFalse()
+
+        combobox.dispose()
+      }
+    })
+
+    it('should open on no option without a value when a click opens the panel', () => {
+      const toggle = setMarkup(' data-coreui-toggle="combobox"')
+      const combobox = Combobox.getOrCreateInstance(toggle)
+
+      click(toggle)
+
+      expect(combobox._isShown()).toBeTrue()
+      expect(toggle.getAttribute('aria-activedescendant')).toBeNull()
+    })
+
+    it('should open on no option without a value when show() opens the panel after a key opened and closed it', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+
+      keydown(toggle, 'ArrowUp')
+      keydown(toggle, 'Escape')
+      combobox.show()
+
+      expect(toggle.getAttribute('aria-activedescendant')).toBeNull()
+    })
+
+    it('should start a new typeahead search when a character opens the panel again right after it closed', () => {
+      const toggle = setMarkup('', [
+        '<div class="list-box-option" data-coreui-value="ca">Canada</div>',
+        '<div class="list-box-option" data-coreui-value="cl">Chile</div>',
+        '<div class="list-box-option" data-coreui-value="hn">Honduras</div>',
+        '<div class="list-box-option" data-coreui-value="hu">Hungary</div>'
+      ])
+      const combobox = new Combobox(toggle)
+
+      keydown(toggle, 'c')
+      expect(toggle.getAttribute('aria-activedescendant')).toEqual(option(combobox, 'ca').id)
+      keydown(toggle, 'Escape')
+      keydown(toggle, 'h')
+      expect(toggle.getAttribute('aria-activedescendant')).toEqual(option(combobox, 'hn').id)
+      keydown(toggle, 'u')
+
+      expect(toggle.getAttribute('aria-activedescendant')).toEqual(option(combobox, 'hu').id)
+    })
+
+    it('should continue the typeahead search with the characters typed after the one that opened the panel', () => {
+      const toggle = setMarkup('', [
+        '<div class="list-box-option" data-coreui-value="ca">Canada</div>',
+        '<div class="list-box-option" data-coreui-value="cl">Chile</div>',
+        '<div class="list-box-option" data-coreui-value="hn">Honduras</div>'
+      ])
+      const combobox = new Combobox(toggle)
+
+      keydown(toggle, 'c')
+      keydown(toggle, 'h')
+
+      expect(toggle.getAttribute('aria-activedescendant')).toEqual(option(combobox, 'cl').id)
+    })
+
+    it('should open on a character typed with AltGr, which reports Ctrl and Alt together', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+
+      toggle.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ł', ctrlKey: true, altKey: true, bubbles: true, cancelable: true
+      }))
+
+      expect(combobox._isShown()).toBeTrue()
+    })
+
+    it('should open on a typed character at the first match without a value, and on the selected option or none without a match', () => {
+      for (const [attrs, key, active] of [['', 'u', 'us'], ['', 'z', null], [' data-coreui-value="ca"', 'z', 'ca'], [' data-coreui-value="ca"', 'c', 'ca']]) {
+        const toggle = setMarkup(attrs)
+        const combobox = new Combobox(toggle)
+
+        keydown(toggle, key)
+
+        expect(combobox._isShown()).withContext(attrs + key).toBeTrue()
+        expect(toggle.getAttribute('aria-activedescendant')).withContext(attrs + key).toEqual(active && option(combobox, active).id)
+
+        combobox.dispose()
+      }
+    })
+
+    it('should keep the value of a multiple combobox when an arrow or a character opens the panel', () => {
+      for (const key of ['ArrowUp', 'c']) {
+        const toggle = setMarkup(' data-coreui-multiple="true" data-coreui-value="uk"')
+        const combobox = new Combobox(toggle)
+        const changes = []
+        toggle.addEventListener('change.coreui.combobox', event => changes.push(event.value))
+
+        keydown(toggle, key)
+
+        expect(combobox._isShown()).withContext(key).toBeTrue()
+        expect(combobox.getValue()).withContext(key).toEqual(['uk'])
+        expect(changes).withContext(key).toEqual([])
+
+        combobox.dispose()
+      }
+    })
+
+    it('should leave the value of a multiple combobox alone on Shift with an arrow while the panel is closing', () => {
+      const toggle = setMarkup(' data-coreui-multiple="true"')
+      const combobox = new Combobox(toggle)
+
+      combobox.show()
+      combobox.hide()
+      toggle.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowDown', shiftKey: true, bubbles: true, cancelable: true
+      }))
+
+      expect(combobox.getValue()).toEqual([])
+    })
+
+    it('should not scroll the page when a key opens a panel it has not placed yet', () => {
+      const spacer = document.createElement('div')
+      spacer.style.height = '4000px'
+      document.body.append(spacer)
+
+      for (const key of ['ArrowUp', 'c']) {
+        const toggle = setMarkup(' data-coreui-container="body"')
+        const combobox = new Combobox(toggle)
+        window.scrollTo(0, 0)
+
+        keydown(toggle, key)
+
+        expect(combobox._isShown()).withContext(key).toBeTrue()
+        expect(window.scrollY).withContext(key).toEqual(0)
+        combobox.dispose()
+      }
+
+      spacer.remove()
     })
 
     it('should open on the selected option, whichever key or show() opens the panel', () => {

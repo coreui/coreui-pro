@@ -62,6 +62,30 @@ export const findTypeaheadMatch = <T>(items: readonly T[], current: number, text
 }
 
 /**
+ * Finds the entry a list starts on when a key opens it: a character other than the space gives its
+ * typeahead match, and any other key the current entry. Without a current entry, `ArrowUp` gives
+ * the last entry, any other key the first, and no key nothing. A character that matches nothing
+ * keeps the current entry.
+ *
+ * @param items - The entries, in order
+ * @param current - The index of the current entry, such as the selected one, `-1` for none
+ * @param key - The key value that opened the list, `null` when no key did
+ * @param textOf - Reads the text of an entry
+ * @returns The entry to start on, or `undefined` when there is none to move to
+ */
+export const findOpeningItem = <T>(items: readonly T[], current: number, key: string | null, textOf: (item: T) => string): T | undefined => {
+  if (key?.length === 1 && key !== ' ') {
+    return findTypeaheadMatch(items, current, key, textOf) ?? items[current]
+  }
+
+  if (current !== -1 || key === null) {
+    return items[current]
+  }
+
+  return items.at(key === 'ArrowUp' ? -1 : 0)
+}
+
+/**
  * Lists the entries from an anchor to a target, both included and in list order whichever comes
  * first. An anchor that is not in the list counts as the target itself.
  *

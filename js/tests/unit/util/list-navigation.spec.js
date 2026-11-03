@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  createTypeaheadBuffer, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, isTypingKey, rangeBetween, scrollIntoContainer
+  createTypeaheadBuffer, findOpeningItem, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, isTypingKey, rangeBetween, scrollIntoContainer
 } from '../../../src/util/list-navigation.js'
 import * as Util from '../../../src/util/index.js'
 
@@ -93,6 +93,50 @@ describe('List navigation utilities', () => {
 
       expect(vi.getTimerCount()).toBe(0)
       expect(buffer.push('a')).toBe('a')
+    })
+  })
+
+  describe('findOpeningItem', () => {
+    const items = ['Banana', 'Apple', 'Avocado', 'Blueberry', 'Apricot']
+    const textOf = item => item
+
+    it('should give the typeahead match for a character, searched after the current entry', () => {
+      expect(findOpeningItem(items, 1, 'a', textOf)).toBe('Avocado')
+      expect(findOpeningItem(items, -1, 'A', textOf)).toBe('Apple')
+      expect(findOpeningItem(items, 3, 'b', textOf)).toBe('Banana')
+    })
+
+    it('should keep the current entry when a character matches nothing', () => {
+      expect(findOpeningItem(items, 2, 'z', textOf)).toBe('Avocado')
+      expect(findOpeningItem(items, -1, 'z', textOf)).toBeUndefined()
+    })
+
+    it('should treat the space as an opening key, not a character', () => {
+      expect(findOpeningItem(items, 2, ' ', textOf)).toBe('Avocado')
+      expect(findOpeningItem(items, -1, ' ', textOf)).toBe('Banana')
+    })
+
+    it('should keep the current entry for any other key', () => {
+      expect(findOpeningItem(items, 2, 'ArrowDown', textOf)).toBe('Avocado')
+      expect(findOpeningItem(items, 2, 'ArrowUp', textOf)).toBe('Avocado')
+      expect(findOpeningItem(items, 2, 'Enter', textOf)).toBe('Avocado')
+    })
+
+    it('should give the last entry for ArrowUp and the first for any other key without a current entry', () => {
+      expect(findOpeningItem(items, -1, 'ArrowUp', textOf)).toBe('Apricot')
+      expect(findOpeningItem(items, -1, 'ArrowDown', textOf)).toBe('Banana')
+      expect(findOpeningItem(items, -1, 'Enter', textOf)).toBe('Banana')
+    })
+
+    it('should give the current entry when no key opened the list', () => {
+      expect(findOpeningItem(items, 4, null, textOf)).toBe('Apricot')
+      expect(findOpeningItem(items, -1, null, textOf)).toBeUndefined()
+    })
+
+    it('should give nothing for an empty list', () => {
+      for (const key of ['a', 'ArrowUp', 'ArrowDown', null]) {
+        expect(findOpeningItem([], -1, key, textOf)).toBeUndefined()
+      }
     })
   })
 

@@ -1241,6 +1241,11 @@ class ListBox extends BaseComponent {
     }
   }
 
+  _seedTypeahead(key: string): void {
+    this._typeaheadBuffer.clear()
+    this._typeaheadBuffer.push(key)
+  }
+
   _typeahead(key: string): void {
     const text = this._config.typeahead ? this._typeaheadBuffer.push(key) : null
 
@@ -1342,7 +1347,7 @@ class ListBox extends BaseComponent {
   }
 
   _handleKeydown(event: any): void {
-    if (this._config.disabled) {
+    if (this._config.disabled || (this._field && (!this._list.isConnected || this._list.closest('[inert]')))) {
       return
     }
 

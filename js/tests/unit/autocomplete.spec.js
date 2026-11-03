@@ -1024,6 +1024,28 @@ describe('Autocomplete', () => {
     })
   })
 
+  describe('opening keys', () => {
+    it('should open on the first option with ArrowDown and on the last one with ArrowUp', () => {
+      for (const [key, label] of [['ArrowDown', 'Apple'], ['ArrowUp', 'Cherry']]) {
+        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+        const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+          options: [{ label: 'Apple', value: 'a' }, { label: 'Banana', value: 'b' }, { label: 'Cherry', value: 'c' }]
+        })
+        const input = fixtureEl.querySelector('[role="combobox"]')
+
+        input.focus()
+        const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+        input.dispatchEvent(event)
+
+        expect(event.defaultPrevented).withContext(key).toBeTrue()
+        expect(autocomplete._isShown()).withContext(key).toBeTrue()
+        expect(document.getElementById(input.getAttribute('aria-activedescendant')).textContent).withContext(key).toContain(label)
+
+        autocomplete.dispose()
+      }
+    })
+  })
+
   describe('picking the selected option again', () => {
     it('should close and fire no change on Enter and on a click', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'

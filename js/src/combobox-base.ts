@@ -12,6 +12,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { createAnchoredPosition } from './util/floating-ui.js'
 import { findOptionByValue, isOptionGroup } from './util/option-tree.js'
 import { focusIfUsable } from './util/focus.js'
+import { findOpeningItem } from './util/list-navigation.js'
 import {
   handleEscape, isInDescendantParts, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
 } from './util/layers.js'
@@ -59,6 +60,7 @@ class ComboboxBase extends BaseComponent {
   protected declare _togglerElement: any
   protected declare _optionsElement: any
   protected declare _listBox: ListBox | null
+  protected declare _openingKey: string | null
   protected declare _listBoxElement: any
   protected declare _listBoxChangeHandler: (() => void) | null
   protected declare _menu: any
@@ -244,6 +246,8 @@ class ComboboxBase extends BaseComponent {
   // panel through CSS once the panel can leave it, so the width rides along
   // inline.
   _mountMenu(): void {
+    this._activateForKey(this._openingKey)
+
     const showTarget = this._getShowTarget()
     const container = resolvePopupContainer(showTarget, this._config.container ? getElement(this._config.container) : null)
 
@@ -324,6 +328,24 @@ class ComboboxBase extends BaseComponent {
 
   _isOpenKey(event: KeyboardEvent): boolean {
     return event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY
+  }
+
+  _activateForKey(key: string | null): void {
+    const listBox = this._listBox
+
+    if (!listBox || !key) {
+      return
+    }
+
+    const options = listBox._navigableOptions()
+    const current = options.findIndex(option => listBox._optionValue(option) === listBox.getActive())
+    const option = findOpeningItem(options, current, key, item => listBox._optionText(item))
+
+    listBox._seedTypeahead(key)
+
+    if (option) {
+      listBox._setActive(listBox._optionValue(option), true)
+    }
   }
 
   // Options panel — one render path for every combobox surface

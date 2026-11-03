@@ -15,6 +15,7 @@ import {
   alignValueField, configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
 } from './util/form-validation.js'
 import { CARET_ICON } from './util/icons.js'
+import { isTypingKey } from './util/list-navigation.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
@@ -38,6 +39,7 @@ const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
 const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
+const OPEN_KEYS = new Set([ARROW_DOWN_KEY, ARROW_UP_KEY, ENTER_KEY, SPACE_KEY])
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
@@ -186,6 +188,7 @@ class Combobox extends ComboboxBase {
       restore: () => this._restoreValue()
     })
     this._listBox = null
+    this._openingKey = null
     this._listBoxElement = null
     this._menu = null
     this._optionsElement = null
@@ -650,17 +653,18 @@ class Combobox extends ComboboxBase {
       return
     }
 
-    if (key === ARROW_DOWN_KEY || key === ARROW_UP_KEY) {
-      event.preventDefault()
-      this.show()
+    // The list closes the panel on the press it selects with, so that press must not open it again.
+    if ((key === ENTER_KEY || key === SPACE_KEY) && event.defaultPrevented) {
       return
     }
 
-    // The list runs its own typeahead off the same field, so a press it has
-    // already spent on a value must not also open the panel.
-    if ((key === ENTER_KEY || key === SPACE_KEY) && !event.defaultPrevented) {
+    const opens = OPEN_KEYS.has(key) ? !event.ctrlKey && !event.metaKey : this._config.typeahead && !this._searchElement && key.length === 1 && isTypingKey(event)
+
+    if (opens) {
       event.preventDefault()
+      this._openingKey = key
       this.show()
+      this._openingKey = null
     }
   }
 
