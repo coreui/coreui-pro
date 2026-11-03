@@ -140,5 +140,42 @@ describe('Focus utilities', () => {
       expect(focusIfUsable(fixtureEl.querySelector('#plain'))).toBeFalse()
       expect(document.activeElement).toEqual(fixtureEl.querySelector('#ok'))
     })
+
+    it('should not count an element that only contains the focus', () => {
+      fixtureEl.innerHTML = '<div id="area"><button id="inside"></button></div>'
+
+      fixtureEl.querySelector('#inside').focus()
+
+      expect(focusIfUsable(fixtureEl.querySelector('#area'))).toBeFalse()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#inside'))
+    })
+
+    it('should count an element inside a shadow root', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+
+      const shadow = fixtureEl.querySelector('#host').attachShadow({ mode: 'open' })
+      shadow.innerHTML = '<button></button>'
+
+      expect(focusIfUsable(shadow.querySelector('button'))).toBeTrue()
+    })
+
+    it('should count an element whose focus() moves the focus inside it', () => {
+      fixtureEl.innerHTML = '<div id="field"><input></div>'
+
+      const field = fixtureEl.querySelector('#field')
+      field.focus = () => field.querySelector('input').focus()
+
+      expect(focusIfUsable(field)).toBeTrue()
+    })
+
+    it('should count a shadow host that hands the focus to its shadow tree', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+
+      const host = fixtureEl.querySelector('#host')
+      host.attachShadow({ mode: 'open', delegatesFocus: true }).innerHTML = '<button></button>'
+
+      expect(focusIfUsable(host)).toBeTrue()
+      expect(host.shadowRoot.activeElement).toEqual(host.shadowRoot.querySelector('button'))
+    })
   })
 })

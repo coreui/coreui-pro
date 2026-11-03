@@ -30,15 +30,20 @@ export const holdsFocusOrNone = (element: Element | null | undefined): boolean =
  *
  * @param element - The element to focus
  * @param options - Passed on to `focus()`, e.g. `{ preventScroll: true }`
- * @returns `true` when the focus is on the element or inside it afterwards
+ * @returns `true` when the element holds the focus afterwards, or when `focus()` moved the focus
+ * inside it; an element that only already contained the focus does not count
  */
 export const focusIfUsable = (element: HTMLElement | null | undefined, options?: FocusOptions): boolean => {
   if (!element?.isConnected || isDisabled(element) || !isVisible(element)) {
     return false
   }
 
+  const root = element.getRootNode() as Document | ShadowRoot
+  const before = root.activeElement
   element.focus(options)
-  return containsFocus(element)
+  const { activeElement } = root
+
+  return activeElement === element || (activeElement !== before && element.contains(activeElement))
 }
 
 /**
