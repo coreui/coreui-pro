@@ -1228,16 +1228,11 @@ class ListBox extends BaseComponent {
       return
     }
 
-    if (this._config.selectionMode === SELECTION_MODE_NONE || this._isLink(option)) {
-      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_ACTION), { value, relatedTarget: option })
-    }
+    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_ACTION), { value, relatedTarget: option })
 
     if (this._config.selectionMode === SELECTION_MODE_MULTIPLE) {
       this.toggle(value)
-      return
-    }
-
-    if (this._config.selectionMode === SELECTION_MODE_SINGLE) {
+    } else if (this._config.selectionMode === SELECTION_MODE_SINGLE) {
       this.select(value)
     }
   }
@@ -1418,11 +1413,15 @@ class ListBox extends BaseComponent {
       return
     }
 
-    const follows = isEnter && this._isLink(option)
+    if (isEnter && this._isLink(option)) {
+      if (this._field) {
+        option.click()
+      }
 
-    if (!follows) {
-      event.preventDefault()
+      return
     }
+
+    event.preventDefault()
 
     if (!isEnter && this._config.selectionMode === SELECTION_MODE_NONE) {
       return
@@ -1430,10 +1429,6 @@ class ListBox extends BaseComponent {
 
     this._anchor = this._active
     this._activate(option)
-
-    if (follows && this._field) {
-      option.click()
-    }
   }
 
   // Static

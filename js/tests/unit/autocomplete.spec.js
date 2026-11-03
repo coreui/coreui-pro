@@ -1024,6 +1024,35 @@ describe('Autocomplete', () => {
     })
   })
 
+  describe('picking the selected option again', () => {
+    it('should close and fire no change on Enter and on a click', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+        options: [{ label: 'Apple', value: 'a' }, { label: 'Banana', value: 'b', selected: true }]
+      })
+      const input = fixtureEl.querySelector('[role="combobox"]')
+      const changes = []
+      fixtureEl.querySelector('.autocomplete').addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      const press = key => input.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+
+      input.focus()
+      press('ArrowDown')
+      press('ArrowDown')
+      expect(document.getElementById(input.getAttribute('aria-activedescendant')).textContent).toContain('Banana')
+      press('Enter')
+
+      expect(autocomplete._isShown()).toBeFalse()
+      expect(input.value).toEqual('Banana')
+
+      autocomplete.show();
+      [...document.querySelectorAll('.list-box-option')].find(option => option.textContent.includes('Banana')).click()
+
+      expect(autocomplete._isShown()).toBeFalse()
+      expect(input.value).toEqual('Banana')
+      expect(changes).toEqual([])
+    })
+  })
+
   describe('toggle', () => {
     it('should toggle autocomplete visibility', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'

@@ -363,6 +363,29 @@ describe('MultiSelect', () => {
       expect(selectEl.checkValidity()).toBeTrue()
     })
 
+    it('should close a single select without a change when a click or Enter in the search picks the selected option again', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        multiple: false,
+        options: [{ value: '1', text: 'Option 1', selected: true }, { value: '2', text: 'Option 2' }],
+        search: true
+      })
+      const changes = []
+      selectEl.addEventListener('change.coreui.multi-select', event => changes.push(event.value))
+
+      multiSelect.show()
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+      expect(multiSelect._isShown()).toBeFalse()
+
+      multiSelect.show()
+      multiSelect._searchElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+      expect(multiSelect._isShown()).toBeFalse()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
+      expect(changes).toEqual([])
+    })
+
     it('should keep the state of a single select that loads with a selected option', () => {
       fixtureEl.innerHTML = '<select class="is-invalid"></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {

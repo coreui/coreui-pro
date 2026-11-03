@@ -68,7 +68,7 @@ In `multiple` a click toggles one option, <kbd>Shift</kbd> extends the selection
     </div>
   </div>`} />
 
-With `none` nothing is ever selected and no `aria-selected` is written; activating an option fires `action.coreui.list-box` instead, which turns the list into a keyboard-navigable list of commands.
+With `none` nothing is ever selected and no `aria-selected` is written; activating an option only fires `action.coreui.list-box`, which turns the list into a keyboard-navigable list of commands.
 
 <Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="none" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Actions">
@@ -380,7 +380,7 @@ The option's checkbox indicator is decorative — it is a `<span>` marked `aria-
 | `↓` / `↑` | Move the highlight to the next/previous option; it stops at the ends |
 | `Home` / `End` | Move the highlight to the first/last option; a text `activeDescendant` field keeps them for the caret |
 | `Space` | Toggle the option in `multiple` mode, select it in `single`; a text `activeDescendant` field keeps it for typing |
-| `Enter` | Select the option; on a link, follow it; in `none` mode, fire `action` |
+| `Enter` | Fire `action`, then select the option (`single`) or toggle it (`multiple`); on a link, follow it |
 | `Shift` + `↓` / `↑` | Extend the selection to the next/previous option |
 | `Shift` + `Home` / `End` | Extend the selection to the first/last option |
 | `Ctrl` / `Cmd` + `A` | Select every option (`multiple` mode) |
@@ -482,7 +482,7 @@ Events fire on the `.list-box` element.
 
 | Event type | Description |
 | --- | --- |
-| `action.coreui.list-box` | Fired when an option is activated in `none` mode or when the option is a link; `event.value` is the value and `event.relatedTarget` the option. |
+| `action.coreui.list-box` | Fired when the user activates an option with a click or <kbd>Enter</kbd> in every mode, or with <kbd>Space</kbd> in `single` and `multiple`, also when the option is already selected; before the selection it causes, so `getSelectedValues()` still holds the previous value. A link fires it from its click. A <kbd>Shift</kbd> or <kbd>Ctrl</kbd> click in `multiple`, the select-all button and the methods do not fire it. `event.value` is the value and `event.relatedTarget` the option. |
 | `activate.coreui.list-box` | Fired when the highlight moves; `event.value` is the newly highlighted value. |
 | `change.coreui.list-box` | Fired once per operation after the selection settled; `event.value` is the array of selected values. |
 | `deselect.coreui.list-box` | Fires before a value is removed from the selection. Cancelable. |

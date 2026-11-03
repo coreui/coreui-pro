@@ -707,9 +707,9 @@ class MultiSelect extends ComboboxBase {
       if (this._isShown() && event.target === this._searchElement && event.key === ENTER_KEY) {
         const stop = SelectorEngine.findOne(`${SELECTOR_OPTION}[tabindex="0"]`, this._menu)
 
-        if (stop?.dataset.coreuiValue) {
+        if (stop) {
           event.preventDefault()
-          this._listBox?.toggle(stop.dataset.coreuiValue)
+          this._listBox?._activate(stop)
         }
 
         return
