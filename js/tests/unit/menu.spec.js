@@ -2346,6 +2346,120 @@ describe('Menu', () => {
       })
     })
 
+    const unfocusableMenu = async (attributes, items) => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        `  <button class="btn" data-coreui-toggle="menu" ${attributes}>Menu</button>`,
+        `  <div class="menu">${items}</div>`,
+        '</div>'
+      ].join('')
+
+      const trigger = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const shown = new Promise(resolve => {
+        trigger.addEventListener('shown.coreui.menu', resolve, { once: true })
+      })
+      new Menu(trigger).show()
+      await shown
+      return trigger
+    }
+
+    const pressKey = (element, key) => {
+      const keydown = createEvent('keydown')
+      keydown.key = key
+      element.dispatchEvent(keydown)
+    }
+
+    it('should skip items that cannot take the focus with the arrows, Home and End', async () => {
+      const trigger = await unfocusableMenu('data-coreui-loop-focus="true"', [
+        '<a class="menu-item">Heading</a>',
+        '<div class="menu-item">Note</div>',
+        '<a id="first" class="menu-item" href="#">First</a>',
+        '<a id="last" class="menu-item" href="#">Last</a>',
+        '<div class="menu-item">Note</div>',
+        '<a class="menu-item">Footer</a>'
+      ].join(''))
+      const first = fixtureEl.querySelector('#first')
+      const last = fixtureEl.querySelector('#last')
+
+      trigger.focus()
+      pressKey(trigger, 'ArrowDown')
+      expect(document.activeElement).toEqual(first)
+
+      pressKey(first, 'End')
+      expect(document.activeElement).toEqual(last)
+
+      pressKey(last, 'Home')
+      expect(document.activeElement).toEqual(first)
+
+      pressKey(first, 'ArrowUp')
+      expect(document.activeElement).toEqual(last)
+
+      pressKey(last, 'ArrowDown')
+      expect(document.activeElement).toEqual(first)
+    })
+
+    it('should stop at the last item that can take the focus on ArrowDown without loopFocus', async () => {
+      await unfocusableMenu('', [
+        '<a id="first" class="menu-item" href="#">First</a>',
+        '<a id="last" class="menu-item" href="#">Last</a>',
+        '<a class="menu-item">Footer</a>'
+      ].join(''))
+      const last = fixtureEl.querySelector('#last')
+      const footer = fixtureEl.querySelector('a:not([href])')
+      const focus = spyOn(footer, 'focus').and.callThrough()
+
+      last.focus()
+      pressKey(last, 'ArrowDown')
+
+      expect(document.activeElement).toEqual(last)
+      expect(focus).toHaveBeenCalledTimes(1)
+    })
+
+    it('should keep the focus where it is when no item can take the focus on the arrows', async () => {
+      const trigger = await unfocusableMenu('data-coreui-loop-focus="true"', '<a class="menu-item">One</a><a class="menu-item">Two</a>')
+
+      trigger.focus()
+      pressKey(trigger, 'ArrowDown')
+      pressKey(trigger, 'ArrowUp')
+
+      expect(document.activeElement).toEqual(trigger)
+    })
+
+    it('should enter a submenu on its first item that can take the focus', async () => {
+      await unfocusableMenu('', [
+        '<div class="submenu">',
+        '  <button class="menu-item" type="button">More</button>',
+        '  <div class="menu"><a class="menu-item">Heading</a><a id="sub" class="menu-item" href="#">Sub</a></div>',
+        '</div>'
+      ].join(''))
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+
+      submenuTrigger.focus()
+      pressKey(submenuTrigger, 'ArrowRight')
+      await new Promise(requestAnimationFrame)
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#sub'))
+    })
+
+    it('should not enter a nested submenu when the items of the submenu it opens cannot take the focus', async () => {
+      await unfocusableMenu('', [
+        '<div class="submenu">',
+        '  <button class="menu-item" type="button">More</button>',
+        '  <div class="menu">',
+        '    <a class="menu-item">Heading</a>',
+        '    <div class="submenu"><a class="menu-item">Deeper</a><div class="menu show"><a id="deep" class="menu-item" href="#">Deep</a></div></div>',
+        '  </div>',
+        '</div>'
+      ].join(''))
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+
+      submenuTrigger.focus()
+      pressKey(submenuTrigger, 'ArrowRight')
+      await new Promise(requestAnimationFrame)
+
+      expect(document.activeElement).toEqual(submenuTrigger)
+    })
+
     it('should move from the last item of a submenu to its first on ArrowDown with loopFocus', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

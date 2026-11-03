@@ -51,7 +51,7 @@ Dropdown shares the keyboard handling of [Menu](/components/menu/#keyboard-navig
 | `Home` / `End` | Jump to the first/last item |
 | `Tab` / `Shift`+`Tab` | With `role="menu"`, close the menu whatever `autoClose` says: `Tab` moves on to the element after the toggle, `Shift`+`Tab` to the toggle. Without it, move to the next or previous element: leaving the menu closes it when `autoClose` is `true` or `'outside'`, and `Shift`+`Tab` back onto the toggle keeps it open. With `container`, `Tab` from the toggle enters the menu and `Tab` from its last element moves on after the toggle |
 
-Arrow keys, `Home` and `End` pressed in a field, an editable region or a widget with its own keys inside the menu (a slider, a list box, a radio group, a toolbar) stay with that control.
+Arrow keys, `Home` and `End` pressed in a field, an editable region or a widget with its own keys inside the menu (a slider, a list box, a radio group, a toolbar) stay with that control. The arrow keys, `Home` and `End` pass over an item that cannot take the focus, such as a `.dropdown-item` link without `href` in a panel without `role="menu"`.
 
 ## Examples
 
