@@ -374,6 +374,17 @@ describe('ListBox', () => {
       expect(listBox.getSelectedValues()).toEqual(['lettuce', 'onion', 'cheese'])
     })
 
+    it('should start a shift-click after setActive() from no anchor', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple' })
+
+      click(item(el, 'lettuce'))
+      listBox.setActive('tomato')
+      click(item(el, 'cheese'), { shiftKey: true })
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'cheese'])
+    })
+
     it('should treat the select all button as one switch for the whole list', () => {
       const el = setMarkup(' data-coreui-selection-mode="multiple"', [
         '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',

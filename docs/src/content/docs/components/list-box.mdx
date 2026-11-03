@@ -470,7 +470,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `next` / `prev` | Moves the highlight one option down/up. |
 | `select(value)` | Selects the option. In `single` mode it replaces the current selection. |
 | `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
-| `setActive(value)` | Moves the highlight without taking the focus. |
+| `setActive(value)` | Moves the highlight without taking the focus and forgets where the last <kbd>Shift</kbd> range started. |
 | `setItems(items)` | Rebuilds the list from an `items` array. The selection stays as it is, values the new items no longer carry included; items marked `selected` join a multiple selection, or a single one that holds nothing, and `change` fires only when they do. With `resetSelectionOnItemsChange` new values empty the selection first. |
 | `setLoading(loading)` | Turns the loading state on or off; turning it on announces `loadingLabel` while the list is on the page. |
 | `toggle(value)` | Selects the value, or deselects it when it is already selected. |

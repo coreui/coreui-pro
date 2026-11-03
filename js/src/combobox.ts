@@ -566,6 +566,11 @@ class Combobox extends ComboboxBase {
     return (label ?? option).textContent?.trim() ?? this._valueOf(option)
   }
 
+  override _mountMenu(): void {
+    this._listBox?._activateSelected()
+    super._mountMenu()
+  }
+
   override _afterShow(): void {
     this._searchElement?.focus()
   }

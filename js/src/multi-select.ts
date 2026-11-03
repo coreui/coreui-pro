@@ -391,11 +391,7 @@ class MultiSelect extends ComboboxBase {
 
     // A query puts its first match first; only an empty one restores the selection.
     if (this._listBox.getActive() === null && !this._searchElement?.value) {
-      const selected = SelectorEngine.findOne(`${SELECTOR_OPTION}.${CLASS_NAME_SELECTED}:not([hidden])`, this._menu)
-
-      if (selected?.dataset.coreuiValue) {
-        this._listBox.setActive(selected.dataset.coreuiValue)
-      }
+      this._listBox._activateSelected()
     }
 
     this._listBox.focusActive()

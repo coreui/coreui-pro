@@ -4849,6 +4849,25 @@ describe('MultiSelect', () => {
       expect(document.activeElement).not.toBe(multiSelect._optionsElement)
     })
 
+    it('should open on the first selected option that can be highlighted', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          {
+            value: '2', text: 'Option 2', disabled: true, selected: true
+          },
+          { value: '3', text: 'Option 3', selected: true }
+        ],
+        selectAll: false
+      })
+
+      multiSelect.show()
+
+      expect(multiSelect._listBox.getActive()).toBe('3')
+    })
+
     it('should move focus into the options list on arrow keys in the search input', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
