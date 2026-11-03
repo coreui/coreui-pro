@@ -650,7 +650,7 @@ describe('Dialog', () => {
       })
     })
 
-    it('should not close non-modal dialog with an escape key that ends an input composition', () => {
+    it('should not close non-modal dialog with an escape key that ends an input composition, repeats or was handled', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'
 
@@ -665,7 +665,18 @@ describe('Dialog', () => {
             }))
           }
 
+          const repeated = new KeyboardEvent('keydown', {
+            bubbles: true, cancelable: true, key: 'Escape', repeat: true
+          })
+          dialogEl.dispatchEvent(repeated)
+          const handled = new KeyboardEvent('keydown', {
+            bubbles: true, cancelable: true, key: 'Escape'
+          })
+          handled.preventDefault()
+          dialogEl.dispatchEvent(handled)
+
           setTimeout(() => {
+            expect(repeated.defaultPrevented).toBeTrue()
             expect(spy).not.toHaveBeenCalled()
             resolve()
           }, 10)

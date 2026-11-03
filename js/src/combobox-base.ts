@@ -184,6 +184,10 @@ class ComboboxBase extends BaseComponent {
     }
   }
 
+  _handleFieldEscape(event: KeyboardEvent): void {
+    handleEscape(event, this._getLayer())
+  }
+
   _hideOnTabOut(event: any): void {
     const path = event.composedPath()
 

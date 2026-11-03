@@ -2405,6 +2405,61 @@ describe('Autocomplete', () => {
       })
     })
 
+    it('should stay open on an Escape that ends an input composition or repeats', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.show()
+
+      for (const init of [{ isComposing: true }, { keyCode: 229 }, { repeat: true }]) {
+        autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'Escape', bubbles: true, cancelable: true, ...init
+        }))
+      }
+
+      expect(autocomplete._isShown()).toBe(true)
+    })
+
+    it('should not clear the field on an Escape the page already handled', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: true,
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.show()
+      autocomplete._inputElement.value = 'Opt'
+      const handled = new KeyboardEvent('keydown', {
+        key: 'Escape', bubbles: true, cancelable: true
+      })
+      handled.preventDefault()
+      autocomplete._inputElement.dispatchEvent(handled)
+
+      expect(autocomplete._inputElement.value).toBe('Opt')
+    })
+
+    it('should not clear the field on an Escape that ends an input composition or repeats', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: true,
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      for (const init of [{ isComposing: true }, { keyCode: 229 }, { repeat: true }]) {
+        autocomplete._inputElement.value = 'テスト'
+        autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'Escape', bubbles: true, cancelable: true, ...init
+        }))
+
+        expect(autocomplete._inputElement.value).toBe('テスト')
+      }
+    })
+
     it('should clear input on Escape when allowOnlyDefinedOptions and no selection', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')

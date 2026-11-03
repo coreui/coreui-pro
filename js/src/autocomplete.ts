@@ -16,7 +16,7 @@ import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
-import { settleClick } from './util/layers.js'
+import { isComposingKey, settleClick } from './util/layers.js'
 import { isTypingKey } from './util/list-navigation.js'
 import {
   filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, highlightMatches, isOptionGroup
@@ -437,15 +437,10 @@ class Autocomplete extends ComboboxBase {
       this._keySerial = nextStateSerial()
 
       if (event.key === ESCAPE_KEY) {
-        // An open menu owns the press; a closed one leaves it to whatever
-        // encloses the field, such as a modal dialog.
-        if (this._isShown()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
+        const handled = event.defaultPrevented
+        this._handleFieldEscape(event)
 
-        this.hide()
-        if (this._config.allowOnlyDefinedOptions && this._store.size() === 0) {
+        if (!handled && !event.repeat && !isComposingKey(event) && this._config.allowOnlyDefinedOptions && this._store.size() === 0) {
           this._emptyByUser()
           this.search('')
         }
@@ -591,8 +586,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   _handleEnterKey(event: KeyboardEvent): void {
-    // eslint-disable-next-line unicorn/prefer-keyboard-event-key -- Safari reports an IME composition only as keyCode 229
-    if (event.isComposing || event.keyCode === 229) {
+    if (isComposingKey(event)) {
       return
     }
 

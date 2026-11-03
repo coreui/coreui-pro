@@ -14,7 +14,9 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { holdAnnouncements } from './util/announce.js'
-import { registerLayer, unregisterLayer, type LayerEntry } from './util/layers.js'
+import {
+  isComposingKey, registerLayer, unregisterLayer, type LayerEntry
+} from './util/layers.js'
 import { unwrapLegacyShell } from './util/legacy-markup.js'
 
 /**
@@ -376,13 +378,13 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
     // Escape for non-modal dialogs — native cancel doesn't fire for show()
     EventHandler.on(this._element, `keydown${eventKey}`, event => {
-      if (event.key !== 'Escape' || event.isComposing || event.keyCode === 229 || this._openedAsModal) {
+      if (event.key !== 'Escape' || event.defaultPrevented || isComposingKey(event as unknown as KeyboardEvent) || this._openedAsModal) {
         return
       }
 
       event.preventDefault()
 
-      if (!this._config.keyboard) {
+      if (event.repeat || !this._config.keyboard) {
         return
       }
 
