@@ -9,7 +9,7 @@ import type { ReferenceElement } from '@floating-ui/dom'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
-import { focusIfUsable } from './util/focus.js'
+import { deepActiveElement, focusFirstUsable } from './util/focus.js'
 import {
   defineJQueryPlugin, isDisabled, jQueryDispatch
 } from './util/index.js'
@@ -63,7 +63,7 @@ const DefaultType: Record<string, string> = {
 class ContextMenu extends Menu {
   declare ['constructor']: typeof ContextMenu
   protected declare _config: ContextMenuConfig
-  protected declare _openedFrom: HTMLElement | null
+  protected declare _openedFrom: HTMLElement[]
   protected declare _point: Point | null
   protected declare _scrollBlocker: ((event: Event) => void) | null
   protected declare _shown: boolean
@@ -72,7 +72,7 @@ class ContextMenu extends Menu {
   constructor(element?: string | Element | null, config?: Partial<ContextMenuConfig> | null) {
     super(element, config as Partial<MenuConfig>)
 
-    this._openedFrom = null
+    this._openedFrom = []
     this._point = null
     this._scrollBlocker = null
     this._shown = false
@@ -112,8 +112,9 @@ class ContextMenu extends Menu {
   // Private
   protected _showAt(point: Point | undefined, relatedTarget: Record<string, unknown>, fromKeyboard = false): void {
     if (!this._isShown()) {
-      const active = (this._element.getRootNode() as Document | ShadowRoot).activeElement
-      this._openedFrom = fromKeyboard && active instanceof HTMLElement && this._element.contains(active) ? active : null
+      const root = this._element.getRootNode() as Document | ShadowRoot
+      const active = root.activeElement
+      this._openedFrom = fromKeyboard && this._element.contains(active) ? [deepActiveElement(root), active].filter(element => element instanceof HTMLElement) : []
       this._point = point ?? null
     }
 
@@ -152,12 +153,7 @@ class ContextMenu extends Menu {
   }
 
   protected override _returnFocus(): void {
-    const openedFrom = this._openedFrom
-    this._openedFrom = null
-
-    if (!focusIfUsable(openedFrom, { preventScroll: true })) {
-      focusIfUsable(this._element, { preventScroll: true })
-    }
+    focusFirstUsable([...this._openedFrom, this._element], { preventScroll: true })
   }
 
   // The trigger is an area, not a button: a click anywhere outside the menu

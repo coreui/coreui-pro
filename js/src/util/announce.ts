@@ -1,3 +1,5 @@
+import { deepActiveElement } from './focus.js'
+
 export type AnnouncePriority = 'high' | 'normal'
 
 export type AnnounceOptions = {
@@ -83,12 +85,7 @@ const getDialogAround = (element: Element | null): HTMLElement | null => {
  * @returns The modal dialog to announce in, or `null` when none is open
  */
 const getModal = (context: Element | null): HTMLElement | null => {
-  let focused = document.activeElement
-
-  while (focused?.shadowRoot?.activeElement) {
-    focused = focused.shadowRoot.activeElement
-  }
-
+  const focused = deepActiveElement(document)
   const modals = [...document.querySelectorAll<HTMLElement>('dialog[open], [aria-modal="true"]')].filter(isModal)
 
   return getDialogAround(focused) ?? getDialogAround(context) ?? modals.at(-1) ?? null
