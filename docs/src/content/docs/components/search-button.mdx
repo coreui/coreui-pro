@@ -156,27 +156,6 @@ Because the component dispatches a real `click()` when the configured shortcut m
 </div>
 ```
 
-## Keyboard behavior
-
-### When the configured shortcut is pressed
-
-| Key | Action |
-| --- | --- |
-| `Enter` / `Space` on a focused search button | Trigger the same action as a pointer click |
-| Configured shortcut, e.g. `⌘/` / `Ctrl+/` | Trigger the same action as a pointer click |
-| Modifier key inside the visible shortcut | Add `.active` to the corresponding `.search-button-key` while pressed |
-| Final key inside the visible shortcut | Add `.active` to the corresponding `.search-button-key` while pressed |
-
-### Keyboard state behavior
-
-| Interaction | Effect |
-| --- | --- |
-| Matching shortcut on `keydown` | Optionally prevents the browser's default behavior and dispatches the component trigger |
-| Plain typing inside `input`, `textarea`, `select`, or `contenteditable` | Does not trigger the component without `meta` or `ctrl` |
-| `keyup` after a shortcut key press | Removes `.active` from the rendered shortcut keys |
-| Browser window `blur` | Clears all active shortcut key states |
-| Multiple configured shortcuts | The component listens to all configured shortcuts and renders the platform-preferred one in the UI |
-
 ## Accessibility
 
 Accessibility is an important part of the Search Button design. The component includes built-in behaviors that help preserve expected keyboard interaction and reduce conflicts with assistive technologies, but accessible results still depend on choosing the right markup and shortcut combinations.
@@ -194,6 +173,27 @@ Accessibility is an important part of the Search Button design. The component in
 - Mark decorative icons with `aria-hidden="true"` when they do not contribute to the accessible name.
 - Choose shortcuts carefully and avoid overriding common browser or system shortcuts unless that behavior is intentional and clearly communicated.
 - Make sure the visible button label clearly describes the action, for example `Search`, `Open search`, or `Command palette`.
+
+### Keyboard support
+
+#### When the configured shortcut is pressed
+
+| Key | Action |
+| --- | --- |
+| `Enter` / `Space` on a focused search button | Trigger the same action as a pointer click |
+| Configured shortcut, e.g. `⌘/` / `Ctrl+/` | Trigger the same action as a pointer click |
+| Modifier key inside the visible shortcut | Add `.active` to the corresponding `.search-button-key` while pressed |
+| Final key inside the visible shortcut | Add `.active` to the corresponding `.search-button-key` while pressed |
+
+#### Keyboard state
+
+| Interaction | Effect |
+| --- | --- |
+| Matching shortcut on `keydown` | Optionally prevents the browser's default behavior and dispatches the component trigger |
+| Plain typing inside `input`, `textarea`, `select`, or `contenteditable` | Does not trigger the component without `meta` or `ctrl` |
+| `keyup` after a shortcut key press | Removes `.active` from the rendered shortcut keys |
+| Browser window `blur` | Clears all active shortcut key states |
+| Multiple configured shortcuts | The component listens to all configured shortcuts and renders the platform-preferred one in the UI |
 
 ## Usage
 

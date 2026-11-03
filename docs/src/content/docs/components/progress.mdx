@@ -323,6 +323,10 @@ const progress = new coreui.Progress(element)
 | `getOrCreateInstance` | Static method which returns a Progress instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Progress.getOrCreateInstance(element)` |
 | `update` | Recomputes the segment count and the filled segments. Call it after a script changes the bar's `aria-valuenow`, `aria-valuemin` or `aria-valuemax`, or the tokens; the plugin follows the track's width on its own. |
 
+## Accessibility
+
+Put `role="progressbar"` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax` on each `.progress-bar`, as in the examples, and give a bar without a visible label an `aria-label`. Progress is CSS only: it sets none of these attributes and does not announce changes.
+
 ## Customizing
 
 ### CSS variables

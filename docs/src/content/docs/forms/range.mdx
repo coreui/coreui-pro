@@ -187,6 +187,18 @@ input.addEventListener('changed.coreui.range', event => {
 })
 ```
 
+## Accessibility
+
+- The control is a native `<input type="range">`: label it with a `<label>`, and the browser exposes it as a slider with its value, minimum and maximum.
+- When the value has a tick label, or `tooltipsFormat` formats it, the input gets `aria-valuetext` with that text; otherwise an `aria-valuetext` the page set stays.
+
+### Keyboard support
+
+| Key | Action |
+| --- | --- |
+| <kbd>←</kbd> <kbd>↓</kbd> / <kbd>→</kbd> <kbd>↑</kbd> | Decrease or increase the value by one step. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Set the minimum or maximum. |
+
 ## Customizing
 
 ### CSS variables

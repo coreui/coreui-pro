@@ -307,6 +307,12 @@ The v5 toggle button — `.btn-check` on the input, with a sibling `.btn` label 
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 
+## Accessibility
+
+- Use a `<button>` for actions and an `<a>` for navigation. A button that shows only an icon needs an `aria-label` or a visually hidden text.
+- A toggle button (`data-coreui-toggle="button"`) carries `aria-pressed`: on page load the plugin adds it from the `.active` class when the button has none, and every toggle keeps it in sync with `.active`.
+- A `.disabled` link is not disabled for the keyboard; see [Link functionality caveat](#link-functionality-caveat).
+
 ## Customizing
 
 ### CSS variables

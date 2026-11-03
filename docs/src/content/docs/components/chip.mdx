@@ -325,26 +325,6 @@ myChip.addEventListener('selected.coreui.chip', event => {
 })
 ```
 
-## Keyboard behavior
-
-A standalone chip handles its own selection and removal from the keyboard when it is `selectable` and/or `removable`. Roving focus between chips (arrow keys, <kbd>Home</kbd>/<kbd>End</kbd>) is provided by the parent [Chip set](/components/chip-set/) container.
-
-### When a chip is focused
-
-| Key | Action |
-| --- | --- |
-| `Enter` / `Space` | Toggle selection (only when `selectable` is enabled) |
-| `Backspace` / `Delete` | Close chip when `removable` is enabled |
-
-When chips are grouped in a [Chip set](/components/chip-set/), the arrow keys, <kbd>Home</kbd>, and <kbd>End</kbd> move focus between chips, and removing the focused chip moves focus to a neighboring chip, or to the set once no enabled chip is left.
-
-### Mouse interaction
-
-| Action | Effect |
-| --- | --- |
-| Click chip | Toggle selection (only when `selectable` is enabled) |
-| Click remove | Close chip (only when `removable` is enabled) |
-
 ## Accessibility
 
 The Bootstrap Chip component follows WAI-ARIA patterns for interactive widgets, ensuring the chip component is fully usable with keyboards and assistive technologies.
@@ -354,6 +334,26 @@ The Bootstrap Chip component follows WAI-ARIA patterns for interactive widgets, 
 - `aria-disabled="true"` is applied to disabled chips that carry a role; a role-less chip conveys the state through the `disabled` class and its removed interactivity.
 - Each `.chip-remove` button is named with `ariaRemoveLabel` and the chip's text, `Remove <text>` by default, so every remove button in a set has its own name. A selectable chip is a `role="button"`, and inside a selectable [chip set](/components/chip-set/#accessibility) a `role="option"`; both get a `<span aria-hidden="true">` as the affordance instead, so the remove control does not join the chip's name, and <kbd>Backspace</kbd> / <kbd>Delete</kbd> remove the chip.
 - Use descriptive `aria-label` attributes on chip containers when the chip component group has a meaningful role (e.g., "Applied filters").
+
+### Keyboard support
+
+A standalone chip handles its own selection and removal from the keyboard when it is `selectable` and/or `removable`. Roving focus between chips (arrow keys, <kbd>Home</kbd>/<kbd>End</kbd>) is provided by the parent [Chip set](/components/chip-set/) container.
+
+#### When a chip is focused
+
+| Key | Action |
+| --- | --- |
+| `Enter` / `Space` | Toggle selection (only when `selectable` is enabled) |
+| `Backspace` / `Delete` | Close chip when `removable` is enabled |
+
+When chips are grouped in a [Chip set](/components/chip-set/), the arrow keys, <kbd>Home</kbd>, and <kbd>End</kbd> move focus between chips, and removing the focused chip moves focus to a neighboring chip, or to the set once no enabled chip is left.
+
+#### Mouse interaction
+
+| Action | Effect |
+| --- | --- |
+| Click chip | Toggle selection (only when `selectable` is enabled) |
+| Click remove | Close chip (only when `removable` is enabled) |
 
 ## Deprecated markup
 

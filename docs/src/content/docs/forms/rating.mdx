@@ -238,6 +238,21 @@ myRating.addEventListener('change.coreui.rating', event => {
 })
 ```
 
+## Accessibility
+
+- The rating element gets `role="radiogroup"`, with `aria-readonly` when `readonly` is on and `aria-required` when the rating is required. Name the group with `aria-label` or `aria-labelledby`.
+- Each star is a native radio button named by the `ariaLabel` option, `1 of 5` by default.
+
+### Keyboard support
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Move into the group, to the checked star or to the first one when none is checked. The group is one tab stop. |
+| <kbd>←</kbd> <kbd>↑</kbd> / <kbd>→</kbd> <kbd>↓</kbd> | Check the previous or next value. Blocked when the rating is `readonly`. |
+| <kbd>Space</kbd> | Check the focused star. |
+
+The arrow keys and the single tab stop come from the browser's radio group: the stars share one name, the `name` option or a generated one.
+
 ## Customizing
 
 ### CSS variables

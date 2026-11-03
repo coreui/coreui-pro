@@ -294,6 +294,18 @@ myTooltipEl.addEventListener('hidden.coreui.tooltip', () => {
 tooltip.hide()
 ```
 
+## Accessibility
+
+- The tip is rendered with `role="tooltip"`. While it is shown, the plugin adds the tip's `id` to the trigger's `aria-describedby`, so the text is read as the trigger's description. When the trigger has neither text nor an `aria-label`, the title becomes its `aria-label`.
+- Put tooltips on elements that already take focus, such as links, buttons and form controls, and keep the default `hover focus` trigger so keyboard users get them too. See [Making tooltips work for keyboard and assistive technology users](#making-tooltips-work-for-keyboard-and-assistive-technology-users).
+
+### Keyboard support
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Focusing the trigger shows the tooltip; moving focus away hides it. |
+| <kbd>Escape</kbd> | Hides the shown tooltip. When focus was inside the tip, it returns to the trigger. Inside a dialog, drawer or dropdown menu the first <kbd>Escape</kbd> closes the tooltip and the next one closes the container. |
+
 ## Customizing
 
 ### CSS variables

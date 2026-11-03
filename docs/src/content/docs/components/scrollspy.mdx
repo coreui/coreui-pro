@@ -409,3 +409,8 @@ firstScrollSpyEl.addEventListener('activate.coreui.scrollspy', () => {
   // do something...
 })
 ```
+
+## Accessibility
+
+- Scrollspy marks the current link with the `.active` class only; it does not set `aria-current`.
+- When a link in the spied navigation is followed, the plugin moves focus to the target section once scrolling ends, adding `tabindex="-1"` when the section has no `tabindex`, so keyboard and screen reader users continue from there.
