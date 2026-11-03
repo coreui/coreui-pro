@@ -416,6 +416,21 @@ The rewrite buys two things the modifier cannot. A theme color set on the `.list
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 
+## Accessibility
+
+- A plain list group carries no roles. Mark the current item with `aria-current="true"`, and use `<a>` or `<button>` items for actions so they take focus.
+- `.disabled` on a link item does not take it out of the tab order; prefer a `<button disabled>`, or add `aria-disabled="true"` and `tabindex="-1"` to a link.
+- With the [tab plugin](#javascript-behavior), the list gets `role="tablist"` and each item `role="tab"` with `aria-selected`, only the active item stays in the tab order (`tabindex="-1"` on the others), and each panel gets `role="tabpanel"`. Roles the page set are kept.
+
+### Keyboard support
+
+With the tab plugin, when an item has focus:
+
+| Key | Action |
+| --- | --- |
+| <kbd>←</kbd> <kbd>↑</kbd> / <kbd>→</kbd> <kbd>↓</kbd> | Move to the previous or next enabled item and show its panel; wraps at the ends. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Move to the first or last enabled item and show its panel. |
+
 ## Customizing
 
 ### CSS variables
