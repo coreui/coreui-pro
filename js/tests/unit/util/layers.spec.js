@@ -1,6 +1,6 @@
 import {
-  closeLayersIn, getLayerAnchorFor, getLayerFocusTargetFor, getParentLayer, handleEscape, isInDescendantParts, registerLayer, settleClick,
-  unregisterLayer
+  closeLayersIn, getLayerAnchorFor, getLayerFocusTargetFor, getParentLayer, handleEscape, isComposingKey, isInDescendantParts, registerLayer,
+  settleClick, unregisterLayer
 } from '../../../src/util/layers.js'
 import { trackPress } from '../../../src/util/press.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
@@ -899,6 +899,14 @@ describe('layers', () => {
       expect(getParentLayer(t)).toBe(d)
       expect(getLayerFocusTargetFor(el('#inside'))).toBe(el('#toggle'))
       expect(getLayerAnchorFor(el('#inside'))).toBe(el('#toggle'))
+    })
+  })
+
+  describe('isComposingKey', () => {
+    it('should tell a press that belongs to an input method composition', () => {
+      expect(isComposingKey(new KeyboardEvent('keydown', { key: 'Escape', isComposing: true }))).toBeTrue()
+      expect(isComposingKey(new KeyboardEvent('keydown', { key: 'Escape', keyCode: 229 }))).toBeTrue()
+      expect(isComposingKey(new KeyboardEvent('keydown', { key: 'Escape' }))).toBeFalse()
     })
   })
 })

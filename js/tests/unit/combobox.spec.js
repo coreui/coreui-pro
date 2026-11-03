@@ -1361,6 +1361,22 @@ describe('Combobox', () => {
       expect(document.activeElement).toEqual(toggle)
     })
 
+    it('should keep the panel open on an Escape that ends an input composition or repeats', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+
+      combobox.show()
+      toggle.focus()
+
+      for (const init of [{ isComposing: true }, { keyCode: 229 }, { repeat: true }]) {
+        toggle.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'Escape', bubbles: true, cancelable: true, ...init
+        }))
+      }
+
+      expect(toggle.classList.contains('show')).toBeTrue()
+    })
+
     it('should close the panel on Escape from inside it', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { search: true })

@@ -36,6 +36,16 @@ interface LayerState {
   stack: LayerRecord[]
 }
 
+/**
+ * Tells whether a key press belongs to an input method composition, so it ends the composition
+ * rather than acting on the page. Safari reports such a press only as `keyCode` 229.
+ *
+ * @param event - The keydown
+ * @returns `true` when the press is part of a composition
+ */
+// eslint-disable-next-line unicorn/prefer-keyboard-event-key -- Safari reports an IME composition only as keyCode 229
+export const isComposingKey = (event: KeyboardEvent): boolean => event.isComposing || event.keyCode === 229
+
 const STATE_KEY = Symbol.for('coreui.layers')
 
 /**
@@ -311,8 +321,7 @@ const fallbackEscape = (event: KeyboardEvent): void => {
  * @param event - The keydown
  */
 const routeEscape = (event: KeyboardEvent): void => {
-  // eslint-disable-next-line unicorn/prefer-keyboard-event-key -- Safari reports an IME composition only as keyCode 229
-  if (event.key !== 'Escape' || event.defaultPrevented || event.repeat || event.isComposing || event.keyCode === 229) {
+  if (event.key !== 'Escape' || event.defaultPrevented || event.repeat || isComposingKey(event)) {
     return
   }
 
@@ -522,8 +531,7 @@ export const handleEscape = (event: KeyboardEvent, entry: LayerEntry): boolean =
 
   event.stopPropagation()
 
-  // eslint-disable-next-line unicorn/prefer-keyboard-event-key -- Safari reports an IME composition only as keyCode 229
-  if (event.isComposing || event.keyCode === 229) {
+  if (isComposingKey(event)) {
     return true
   }
 

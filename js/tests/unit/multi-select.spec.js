@@ -5049,6 +5049,24 @@ describe('MultiSelect', () => {
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
+    it('should stay open on an Escape that ends an input composition or repeats', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }]
+      })
+
+      multiSelect.show()
+
+      for (const init of [{ isComposing: true }, { keyCode: 229 }, { repeat: true }]) {
+        multiSelect._wrapperElement.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'Escape', bubbles: true, cancelable: true, ...init
+        }))
+      }
+
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
+    })
+
     it('should return focus to the toggler when closed from inside the component', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
