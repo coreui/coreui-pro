@@ -272,6 +272,18 @@ myPopoverTrigger.addEventListener('hidden.coreui.popover', () => {
 })
 ```
 
+## Accessibility
+
+- The popover is rendered with `role="tooltip"`. While it is shown, the plugin adds its `id` to the trigger's `aria-describedby`, so its whole content is read as the trigger's description. Keep that content short.
+- The popover does not move focus into itself when it opens. Do not rely on controls inside it; use a [modal](/components/modal/) or a [dialog](/components/dialog/) instead. See [Making popovers work for keyboard and assistive technology users](#making-popovers-work-for-keyboard-and-assistive-technology-users).
+
+### Keyboard support
+
+| Key | Action |
+| --- | --- |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | On a button trigger with the default `click` trigger, toggles the popover. |
+| <kbd>Escape</kbd> | Hides the shown popover. When focus was inside it, focus returns to the trigger. |
+
 ## Customizing
 
 ### CSS variables

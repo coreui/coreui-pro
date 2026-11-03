@@ -103,6 +103,10 @@ Animate placeholders to suggest that content is _actively_ loading. Use `.placeh
 
 <Example code={`<span class="placeholder-wave fg-3">Working on it…</span>`} />
 
+## Accessibility
+
+Placeholders are visual only. Hide them with `aria-hidden="true"` when they mirror content that is still loading, and announce the loading state elsewhere, for example with `aria-busy` on the region.
+
 ## Customizing
 
 ### CSS variables

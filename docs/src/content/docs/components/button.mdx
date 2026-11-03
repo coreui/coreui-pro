@@ -224,7 +224,7 @@ Visually, these toggle buttons are identical to the [checkbox toggle buttons](/f
 
 ### Toggle states
 
-Add `data-coreui-toggle="button"` to toggle a button's `active` state. Also add `aria-pressed` so assistive technologies announce the control as a toggle button. Use `aria-pressed="false"` for the default state. If you're pre-toggling a button, add the `.active` class **and** `aria-pressed="true"`.
+Add `data-coreui-toggle="button"` to toggle a button's `active` state. The plugin keeps `aria-pressed` in sync with `.active`, so assistive technologies announce the control as a toggle button: on page load it adds `aria-pressed` from `.active` to a button that has none, and every toggle updates it. To pre-toggle a button, add the `.active` class.
 
 <Example code={`<div class="d-flex flex-wrap gap-1 mb-4">
     <button type="button" class="btn" data-coreui-toggle="button" aria-pressed="false">Toggle button</button>
@@ -306,6 +306,12 @@ The v5 toggle button — `.btn-check` on the input, with a sibling `.btn` label 
 ```
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
+
+## Accessibility
+
+- Use a `<button>` for actions and an `<a>` for navigation. A button that shows only an icon needs an `aria-label` or a visually hidden text.
+- A toggle button (`data-coreui-toggle="button"`) carries `aria-pressed`: on page load the plugin adds it from the `.active` class when the button has none, and every toggle keeps it in sync with `.active`.
+- A `.disabled` link is not disabled for the keyboard; see [Link functionality caveat](#link-functionality-caveat).
 
 ## Customizing
 

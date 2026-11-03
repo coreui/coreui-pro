@@ -297,3 +297,9 @@ Make a set of buttons appear vertically stacked rather than horizontally. **Spli
       Radio 3
     </label>
   </div>`} />
+
+## Accessibility
+
+- Give a button group `role="group"` and a toolbar `role="toolbar"`, and name each with `aria-label` or `aria-labelledby`. The component sets neither.
+- A toolbar does not add arrow-key navigation: every button stays its own <kbd>Tab</kbd> stop.
+- For toggle buttons, see the [button plugin](/components/button/#toggle-states), which keeps `aria-pressed` in sync.

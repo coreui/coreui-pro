@@ -276,6 +276,12 @@ The rewrite buys two things the modifier cannot. A theme color set on a wrapper 
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 
+## Accessibility
+
+- An alert is not announced by itself. For a message added after the page loads, put `role="alert"` on it (or add it into a live region) as in the [live example](#live-example).
+- Give the close button a name, as the examples do with `aria-label="Close"`. Closing an alert removes it from the DOM; when the close button had focus, move focus somewhere sensible in a `closed.coreui.alert` listener.
+- Color alone does not carry meaning; see [Conveying meaning to assistive technologies](#conveying-meaning-to-assistive-technologies).
+
 ## Customizing
 
 ### CSS variables

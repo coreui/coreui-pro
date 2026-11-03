@@ -450,6 +450,22 @@ myCarousel.addEventListener('slide.coreui.carousel', event => {
 })
 ```
 
+## Accessibility
+
+- The previous and next controls are `<button>` elements; give each a name, for example with a visually hidden text. At either end of a carousel that does not loop the control is disabled, and when it had focus, focus moves to the opposite control.
+- The indicator of the active slide gets `aria-current="true"`. Label each indicator, as in `aria-label="Slide 1"`.
+- The play/pause control swaps its `aria-label` between `data-coreui-pause-label` and `data-coreui-play-label`. An autoplaying carousel needs it, so users can stop the motion. Autoplay also pauses on hover, on a drag or swipe and on keyboard navigation.
+- Clones used for looping get `aria-hidden="true"` and `inert`. With `prefers-reduced-motion: reduce`, slides change without the scroll animation and the carousel does not loop through clones.
+
+### Keyboard support
+
+With the `keyboard` option on (the default) and focus inside the carousel, outside a text field:
+
+| Key | Action |
+| --- | --- |
+| <kbd>←</kbd> | Go to the previous slide and pause autoplay. |
+| <kbd>→</kbd> | Go to the next slide and pause autoplay. |
+
 ## Customizing
 
 ### CSS variables

@@ -160,6 +160,12 @@ Or with `.justify-content-end`:
     </ul>
   </nav>`} />
 
+## Accessibility
+
+- Wrap the list in a `<nav>` with an `aria-label` that names it, as in `aria-label="Page navigation"`, and mark the current page link with `aria-current="page"`.
+- Icon-only links, such as previous and next arrows, need an `aria-label`, with the icon `aria-hidden="true"`.
+- `.disabled` does not take a link out of the tab order; add `tabindex="-1"` or use a `<span>`, as described in [Disabled and active states](#disabled-and-active-states).
+
 ## Customizing
 
 ### CSS variables

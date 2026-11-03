@@ -571,13 +571,13 @@ Leave lists of links, text and forms without these roles. A list of links is nav
 
 From `role="menu"` the plugin writes the rest when it starts: an `id` on the toggle and the panel where they have none, `aria-haspopup="menu"` and `aria-controls` on the toggle, `tabindex="-1"` on the panel, and `aria-labelledby` pointing at the toggle, or at what the toggle's own `aria-labelledby` names, when the panel has neither `aria-label` nor `aria-labelledby`. Each time the menu opens, and on `update()`, it gives every item `role="menuitem"` and `tabindex="-1"`, a `.disabled` item `aria-disabled="true"`, headers, `.submenu` wrappers and the lists around items `role="none"`, and every submenu `role="menu"` labelled by its trigger. What you write stays: a `menuitemcheckbox` or `menuitemradio` role, `aria-disabled` on an item, and `role="group"` with a label or `role="separator"` on a list wrapper. Call `update()` after adding items to an open menu.
 
-The panel is then one stop in the <kbd>Tab</kbd> order. Opening from the keyboard moves the focus to the first item, a pointer click moves it to the panel, and <kbd>Tab</kbd> closes the menu (see [Keyboard navigation](#keyboard-navigation)). A click on a `.disabled` item does nothing. Headers, `.menu-text` and dividers must not hold links or fields: the arrow keys skip them and <kbd>Tab</kbd> closes the menu.
+The panel is then one stop in the <kbd>Tab</kbd> order. Opening from the keyboard moves the focus to the first item, a pointer click moves it to the panel, and <kbd>Tab</kbd> closes the menu (see [Keyboard support](#keyboard-support)). A click on a `.disabled` item does nothing. Headers, `.menu-text` and dividers must not hold links or fields: the arrow keys skip them and <kbd>Tab</kbd> closes the menu.
 
 The plugin reads `role="menu"` once, when it starts; to turn a panel into a menu or back, replace its markup. A panel that several toggles share through the `menu` option is named by the first of them, so give it an `aria-label` of its own.
 
 Without `role="menu"` the plugin writes only the state: `aria-expanded` on the toggle, and `aria-haspopup="menu"` and `aria-expanded` on every submenu trigger.
 
-### Keyboard navigation
+### Keyboard support
 
 Menus include built-in keyboard support for navigating menu items.
 

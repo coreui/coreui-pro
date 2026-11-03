@@ -423,6 +423,15 @@ form.addEventListener('submit', event => {
 | --- | --- |
 | `validate.coreui.form` | Fired when the form is validated, on submit or by `validate()`, before the plugin shows the result. `event.isValid` tells whether every control passed; `preventDefault()` leaves the result to you. |
 
+## Accessibility
+
+With the form plugin (`data-coreui-validate` on a form with `novalidate`), a failed submit:
+
+- sets `aria-invalid="true"` on every invalid control and adds the `id` of its invalid feedback to its `aria-describedby`, keeping the ids the page set; the next validation takes both off a control that is valid again;
+- moves focus to the first invalid control that can take it. When focus is already there, or no invalid control can take focus, its message is announced in the page's live region instead.
+
+With the browser's own validation (no `novalidate`), the browser shows and reads its own messages. For server-side feedback (`.is-invalid` in the markup), associate the message with the field through `aria-describedby` yourself, as described in [Server side](#server-side).
+
 ## Customizing
 
 Validation states can be customized via Sass with the `$form-validation-states` map. Located in our `scss/mixins/_form-validation.scss` file, this Sass map is how we generate the default `valid`/`invalid` validation states. Included is a nested map for customizing each state's color, tooltip color, and focus shadow. While no other states are supported by browsers, those using custom styles can easily add more complex form feedback.

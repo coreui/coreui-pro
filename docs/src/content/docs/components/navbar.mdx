@@ -694,6 +694,12 @@ When using offcanvas in a dark navbar, be aware that you may need to have a dark
     </div>
   </nav>`} />
 
+## Accessibility
+
+- Use a `<nav>` for the navbar, or give a generic container `role="navigation"`, and mark the current link with `aria-current="page"`.
+- The `.navbar-toggler` is a `<button>` that the collapse plugin drives: it keeps `aria-expanded` on every trigger of the collapsed content in sync as it opens and closes. Give the toggler a name, as in `aria-label="Toggle navigation"`, and point `aria-controls` at the collapsed content.
+- With an [offcanvas](/components/offcanvas/) instead of a collapse, focus handling and <kbd>Escape</kbd> come from the offcanvas.
+
 ## Customizing
 
 ### CSS variables
