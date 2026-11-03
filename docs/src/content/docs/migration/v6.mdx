@@ -84,16 +84,16 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 - **`dist/css` gained `coreui-legacy.css`, and `coreui.css` lost the v5
   spellings it carries.**
   <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  `coreui.css` is the v6 class API only. The deprecated v5 spellings — the
+  `coreui.css` no longer carries the deprecated v5 spellings. They — the
   colour modifiers (`.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
   `.btn-subtle-{color}`, `.btn-ghost-{color}`, `.callout-{color}`,
   `.chip-{color}`, `.list-group-item-{color}`), the form check markup
   (`.form-check`, `.form-check-input`, `.form-check-label`,
   `.form-check-inline`, `.form-switch`, `.form-switch-lg` / `-xl`) and
-  `.btn-check` on the input — moved to `coreui-legacy.css`, 3.4&nbsp;kB gzip.
-  That takes 2.1&nbsp;kB gzip off `coreui.css` for markup that has already
-  moved, and turns the compatibility layer into something you can see on a
-  network tab and delete in one line.
+  `.btn-check` on the input — moved to `coreui-legacy.css` (3.8&nbsp;kB gzip
+  minified). Markup that has already moved stops paying for them, and the
+  compatibility layer becomes something you can see on a network tab and
+  delete in one line.
 
   **What to change:** if your markup still uses any of them, add the sheet
   after `coreui.css` (or last, after `base.css` and the component files):
@@ -103,7 +103,7 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   <link href="css/coreui-legacy.min.css" rel="stylesheet">
   ```
 
-  From Sass, `@use "coreui-legacy";` next to your `@use "coreui";`. Everything
+  From Sass, `@use "legacy";` after your `@use "coreui";`. Everything
   in it is still removed in v7. See
   [v5 compatibility CSS](/getting-started/install/#v5-compatibility-css).
 
@@ -117,7 +117,7 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
-**The minimum supported browsers are now Chrome 123, Edge 123, Firefox 129,
+**The minimum supported browsers are now Chrome 123, Edge 123, Firefox 130,
 Safari 18 and iOS 18.** Safari 18 is set by `color-mix()`: a mix in `oklch` with
 an achromatic operand — `transparent`, white, black, the greys, which is how
 every translucent and tinted colour in v6 is made — keeps the other colour's
@@ -126,7 +126,9 @@ forward as the spec requires; Safari 17.x interpolates the hue towards 0° and
 renders indigo as pink. Apple ships Safari 18 for macOS 13 and 14 as well, so
 the cut only affects browsers left un-updated. `light-dark()` sets the
 Chrome/Edge floor;
-`@starting-style` and `transition-behavior: allow-discrete` set Firefox 129 (the
+`<details name>` sets Firefox 130: exclusive accordions group their panels
+through `details.name`, which reads back undefined below it.
+`@starting-style` and `transition-behavior: allow-discrete` need Firefox 129 (the
 Menu's entry animation) and `@property` needs 128 — its `inherits: false`
 registrations are what stop the colour and opacity utilities leaking into
 descendants, so an older Firefox does not lose an animation, it gets a bug.
@@ -138,7 +140,7 @@ theme decisions resolve in the browser via `light-dark()` and `color-mix()`
 with no fallback, so on older browsers dark mode did not work regardless of
 what the previous `.browserslistrc` claimed (Chrome 60 / Safari 12). v6 makes
 the declaration honest and takes the wins: the compiled CSS drops legacy
-vendor prefixes (about 8&nbsp;kB gzip off `coreui.min.css`) and the JavaScript
+vendor prefixes and the JavaScript
 ships modern syntax un-transpiled. If you must support older browsers, stay
 on v5.
 
@@ -2447,7 +2449,7 @@ can be hidden once the field is enabled again.
 
 - New components render their icons as **inline SVG on `currentColor`** (the
   chips pattern) instead of CSS `mask` data-URIs: swap them with the
-  `indicatorIcon` / `separatorIcon` options (sanitized with the SVG allowlist),
+  `pickerIcon` / `separatorIcon` options (sanitized with the SVG allowlist),
   recolor them with plain CSS `color`. The corresponding
   `$date-picker-*-icon`/`-icon-size` Sass variables disappear with the v1
   shells.
@@ -3383,7 +3385,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   underlines clear descenders instead of cutting through them. The
   `.underline-offset-*` utilities and `.icon-link` still override it per element;
   set the token to `auto` for the old browser default.
-- **`accent-color: var(--cui-primary)` on `:root`.** Native controls we don't
+- **`accent-color: var(--cui-primary-base)` on `:root`.** Native controls we don't
   restyle — a bare checkbox, radio, range or `<progress>` — follow the brand
   color instead of the browser's blue.
 - **Every segment of a date or time input gets its padding removed.** The list
@@ -4259,7 +4261,7 @@ map — several things below are breaking and are called out as such.
 #### Padding tokens carry both axes
 
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **A token that sets `padding` names an axis.** The six that v5 also had as
+  **A token that sets `padding` names an axis.** The seven that v5 also had as
   custom properties are `-padding-y` and `-padding-x` now:
   `--cui-modal-padding`, `--cui-modal-header-padding`,
   `--cui-calendar-nav-padding`, `--cui-nav-enclosed-padding`,
@@ -4706,18 +4708,19 @@ named after `.form-check` — the v5 wrapper they no longer use. The names said
 
 | v5 | v6 |
 | --- | --- |
-| `$form-check-input-width` | `$control-size` |
-| `$form-check-input-focus-border` | `$control-focus-border` |
-| `$form-check-input-active-filter` | `$control-active-filter` |
-| `$form-check-input-disabled-opacity` | `$control-disabled-opacity` |
-| `$form-check-label-disabled-opacity` | `$control-label-disabled-opacity` |
-| `$form-check-input-checked-bg-color` | `$control-checked-bg` |
-| `$form-check-input-checked-border-color` | `$control-checked-border-color` |
-| `$form-check-input-indeterminate-bg-color` | `$control-indeterminate-bg` |
-| `$form-check-input-indeterminate-border-color` | `$control-indeterminate-border-color` |
+| `$form-check-input-width` | `--cui-control-size` |
+| `$form-check-input-focus-border` | `--cui-control-focus-border-color` |
+| `$form-check-input-active-filter` | `--cui-control-active-filter` |
+| `$form-check-input-disabled-opacity` | `--cui-control-disabled-opacity` |
+| `$form-check-label-disabled-opacity` | `--cui-control-label-disabled-opacity` |
+| `$form-check-input-checked-bg-color` | `--cui-control-checked-bg` |
+| `$form-check-input-checked-border-color` | `--cui-control-checked-border-color` |
+| `$form-check-input-indeterminate-bg-color` | `--cui-control-indeterminate-bg` |
+| `$form-check-input-indeterminate-border-color` | `--cui-control-indeterminate-border-color` |
 
-All nine sit in `_root.scss` and are emitted as `--cui-control-*` on `:root`,
-so the three controls can also be retuned together without recompiling:
+All nine are tokens in `$root-tokens` (`_root.scss`), emitted on `:root`.
+Set them through `$root-tokens` in Sass, or retune the three controls together
+without recompiling:
 
 ```css
 :root { --cui-control-disabled-opacity: .3; }
@@ -5282,8 +5285,9 @@ now, and the two neutrals swap ends of the gray scale between schemes.
   variants), `btn`, `btn-ghost`, `btn-outline`, `btn-subtle`, `callout`, `chip`,
   `focus-ring`, `underline`, `list-group-item`, `shadow`, `table`, `text`,
   `text-bg` and `theme`, plus the `-subtle` and `-emphasis` families. The
-  colour-scheme opt-ins keep their names: `.navbar-dark`, `.dropdown-menu-dark`,
-  `.carousel-dark` and `.sidebar-dark` are unaffected, as is `.fw-light`.
+  colour-scheme opt-ins keep their names: `.navbar-dark`, `.dropdown-menu-dark`
+  and `.sidebar-dark` are unaffected, as is `.fw-light`. (`.carousel-dark` is
+  gone; see [Carousel](#carousel-slides-by-scrolling).)
 - **A surface is not a theme colour.** Where `.bg-light` was a neutral panel,
   reach for `.bg-4` or `.bg-3`; where `.bg-dark` was a
   fixed dark backdrop, set `data-coreui-theme="dark"` on the container and let
@@ -5350,10 +5354,8 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   `$accordion-button-active-icon-dark`). The accordion's dark-mode block is gone
   entirely.
 - **The carousel's colours are tokens.** `--cui-carousel-control-color` is
-  new; `.carousel-dark` pins the dark side of each pair through
-  `$carousel-dark-control-color`, `$carousel-dark-indicator-active-bg` and
-  `$carousel-dark-caption-color` (previously `$carousel-*-dark` in
-  `_variables-dark.scss`). RTL still swaps the two arrows, now through
+  new, and each colour is a `light-dark()` pair resolved on the carousel, so
+  `data-coreui-theme` picks the side (see [Carousel](#carousel-slides-by-scrolling)). RTL still swaps the two arrows, now through
   `mask-image`.
 - **Visible in dark mode**: the old dark accordion chevron was a *filled* glyph
   where the light one was *stroked*. Both modes now use the stroked shape — same
@@ -5496,10 +5498,10 @@ and still compose. What changes is where the translucency expression lives:
   same colour before and renders the same colour now; it simply went through the
   plain value and so ignored the opacity knob every other colour utility
   honoured.
-- Every custom property a utility assigns is registered
-  `@property { inherits: false }`, which now covers `--cui-bg`, `--cui-text`,
-  `--cui-border` and `--cui-underline` as well — so a colour set on a
-  container cannot leak into a descendant that only carries an opacity class.
+- The colour custom properties the utilities assign — `--cui-bg`, `--cui-fg`,
+  `--cui-border` and `--cui-underline` — are registered
+  `@property { inherits: false }`, so a colour set on a container cannot leak
+  into a descendant that only carries an opacity class.
 
 `at-property: false` still opts a utility out of that registration, for the one
 case that writes an inheriting global token (`.focus-ring-*`).

@@ -27,7 +27,7 @@ We're building a npm project with CoreUI from scratch, so there are some prerequ
    **For PRO users**
 
    ```sh
-   npm i --save @coreui/coreui-pro @floating-ui/dom
+   npm i --save @coreui/coreui-pro@next @floating-ui/dom
    ```
 
 3. **Install additional dependencies.** In addition to CoreUI, we need a few more dependencies to compile and post-process our CSS. Sass compiles our source `.scss` files into CSS, and Autoprefixer and PostCSS handle browser compatibility. We install the `postcss-cli` package so we can run PostCSS from the command line.
@@ -85,7 +85,7 @@ With dependencies installed and our project folder ready for us to start coding,
    }
    ```
 
-2. **Tell Autoprefixer which browsers to support.** Without this, Autoprefixer falls back to its own defaults, which track newer browsers than [the ones CoreUI supports](/getting-started/browsers-devices/) — and quietly skips prefixes the floor still needs, such as `-webkit-backdrop-filter` for Safari below 18. Add a `browserslist` entry to `package.json` mirroring our floors:
+2. **Tell Autoprefixer which browsers to support.** Without this, Autoprefixer falls back to its own defaults, which track newer browsers than [the ones CoreUI supports](/getting-started/browsers-devices/). Add a `browserslist` entry to `package.json` mirroring our floors:
 
    ```json
    {
@@ -94,8 +94,8 @@ With dependencies installed and our project folder ready for us to start coding,
        "Chrome >= 123",
        "Edge >= 123",
        "Firefox >= 130",
-       "Safari >= 17.5",
-       "iOS >= 17.5"
+       "Safari >= 18",
+       "iOS >= 18"
      ],
      // ...
    }
@@ -186,7 +186,7 @@ Importing CoreUI into our project requires adding a Sass import to our `scss/sty
    @use "@coreui/coreui/scss/coreui" with (
      $root-tokens: (
        --cui-radius-5: .25rem,
-       --cui-spacer: 1.5rem,
+       --cui-body-line-height: 1.6,
      ),
      $alert-tokens: (
        --cui-alert-padding-x: 2rem,

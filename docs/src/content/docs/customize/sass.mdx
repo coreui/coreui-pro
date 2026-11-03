@@ -55,7 +55,6 @@ In your `custom.scss`, you'll load CoreUI's source Sass files with `@use`. You h
 // 2. Optionally include any other parts as needed
 @use "@coreui/coreui/scss/utilities";
 @use "@coreui/coreui/scss/content/reboot";
-@use "@coreui/coreui/scss/content/type";
 @use "@coreui/coreui/scss/content/images";
 @use "@coreui/coreui/scss/layout/containers";
 @use "@coreui/coreui/scss/layout/grid";
@@ -140,7 +139,7 @@ Every CSS custom property the library emits is built from a Sass map you can ove
 @use "@coreui/coreui/scss/coreui" with (
   $root-tokens: (
     --cui-radius-5: .25rem,
-    --cui-spacer: 1.5rem,
+    --cui-body-line-height: 1.6,
   ),
   $alert-tokens: (
     --cui-alert-padding-x: 2rem,
