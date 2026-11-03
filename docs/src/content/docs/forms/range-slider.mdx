@@ -164,7 +164,7 @@ Color the filled track and the handles by adding a [`.theme-{color}` class](/cus
 
 <Example pro class="d-flex flex-column gap-4" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-range-slider data-coreui-value="25, 75" data-coreui-aria-label='["${c.title} minimum", "${c.title} maximum"]'></div>`)} />
 
-The theme class on the slider colours the track and the handles; the tooltip keeps its default look. To theme the tooltip, set `tooltipClass` (`data-coreui-tooltip-class`) — the class lands on the tooltip only. `theme-secondary` gives a grey tooltip on the default slider; `theme-danger` makes the tooltip match a danger slider.
+The theme class on the slider colors the track and the handles; the tooltip keeps its default look. To theme the tooltip, set `tooltipClass` (`data-coreui-tooltip-class`) — the class lands on the tooltip only. `theme-secondary` gives a grey tooltip on the default slider; `theme-danger` makes the tooltip match a danger slider.
 
 <Example pro class="d-flex flex-column gap-4" code={`<div data-coreui-range-slider data-coreui-value="40" data-coreui-tooltip-class="theme-secondary" data-coreui-aria-label='["Secondary tooltip"]'></div>
   <div class="theme-danger" data-coreui-range-slider data-coreui-value="60" data-coreui-tooltip-class="theme-danger" data-coreui-aria-label='["Danger slider, danger tooltip"]'></div>`} />
@@ -174,7 +174,7 @@ The theme class on the slider colours the track and the handles; the tooltip kee
 A range never fails the browser's own validation: a handle always holds a value between `min` and `max` on a step, and `required` does not apply to it. A state comes from the page, when the value breaks a rule the browser does not know, such as a budget below the minimum of a plan.
 
 - Give it with the `validationState` option (`data-coreui-validation-state`), or with `.is-invalid` or `.is-valid` on the slider element in the HTML the server renders. The class is read once, when the slider starts; after that, use `setValidationState()`, which changes the state without building the handles again.
-- The state shows on the slider element and on its handles: `'invalid'` colours the thumbs, sets `aria-invalid` on every handle and adds the invalid feedback that follows the slider element, or the one named in `data-coreui-invalid-feedback` on it, to their `aria-describedby`.
+- The state shows on the slider element and on its handles: `'invalid'` colors the thumbs, sets `aria-invalid` on every handle and adds the invalid feedback that follows the slider element, or the one named in `data-coreui-invalid-feedback` on it, to their `aria-describedby`.
 - `'invalid'` blocks the submit through the first handle, with the text of the feedback as the message the browser shows, or `Invalid value.` without one, and the browser moves the focus to that handle. `'valid'` and a custom state do not block, and neither does a disabled slider.
 - The user's move of a handle removes the state before the change events fire, and a native form reset removes it too. A change from code, such as `setValue()`, keeps it.
 - A validity you set on a handle with `setCustomValidity()` shows on the slider once a validation reports it, and a given `'valid'` shows over it.
@@ -301,7 +301,7 @@ Additionally, ensure that labels and tooltips are clear and descriptive to provi
 
 ### CSS variables
 
-The slider is a [range](/forms/range/#css-variables), so it reads the range's tokens, declared on the `.form-range` it renders inside its element: one setting styles both controls. `--cui-range-track-fill-bg` colours the band between the handles and `--cui-range-tick-*` the tick marks and their labels. Because the `.form-range` declares them, set them on it, not on the slider element:
+The slider is a [range](/forms/range/#css-variables), so it reads the range's tokens, declared on the `.form-range` it renders inside its element: one setting styles both controls. `--cui-range-track-fill-bg` colors the band between the handles and `--cui-range-tick-*` the tick marks and their labels. Because the `.form-range` declares them, set them on it, not on the slider element:
 
 ```css
 .price-filter .form-range {

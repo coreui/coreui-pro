@@ -20,7 +20,7 @@ While shadows on components are disabled by default in CoreUI for Bootstrap and 
 
 <AddedIn version="6.0.0" />
 
-A shadow does not have to be grey. Add a `.shadow-{color}` class next to the size class to tint it — the size class supplies the geometry, the colour class supplies the hue.
+A shadow does not have to be grey. Add a `.shadow-{color}` class next to the size class to tint it — the size class supplies the geometry, the color class supplies the hue.
 
 <Example code={`<div class="d-flex flex-wrap gap-5">
     <div class="shadow shadow-primary p-4 bg-body rounded">Primary</div>
@@ -29,7 +29,7 @@ A shadow does not have to be grey. Add a `.shadow-{color}` class next to the siz
     <div class="shadow shadow-current p-4 bg-body rounded fg-info">Current color</div>
   </div>`} />
 
-The tint does not reach nested shadows: an element inside a `.shadow-primary` box draws its own shadow in the default colour, so a tinted card does not silently recolour everything inside it.
+The tint does not reach nested shadows: an element inside a `.shadow-primary` box draws its own shadow in the default color, so a tinted card does not silently recolor everything inside it.
 
 <Example code={`<div class="shadow shadow-primary p-6 bg-body rounded">
     <div class="shadow p-4 bg-body rounded">Untinted, inside a tinted parent</div>
@@ -39,7 +39,7 @@ The tint does not reach nested shadows: an element inside a `.shadow-primary` bo
 
 <AddedIn version="6.0.0" />
 
-`.shadow-opacity-{10…100}`, in steps of ten, scales the shadow without touching its colour or geometry, which is the usual way to soften a shadow on a busy surface. `.shadow-opacity-25` and `-75` are deprecated v5 steps, removed in v7.
+`.shadow-opacity-{10…100}`, in steps of ten, scales the shadow without touching its color or geometry, which is the usual way to soften a shadow on a busy surface. `.shadow-opacity-25` and `-75` are deprecated v5 steps, removed in v7.
 
 <Example code={`<div class="d-flex flex-wrap gap-5">
     <div class="shadow shadow-opacity-30 p-4 bg-body rounded">30%</div>
@@ -58,9 +58,9 @@ Every shadow computes its alpha as `base × strength × opacity`, so three separ
 
 | Variable | Scope | What it does |
 | --- | --- | --- |
-| `--cui-shadow-color` | inherits from `:root` | The colour every shadow is mixed from. |
+| `--cui-shadow-color` | inherits from `:root` | The color every shadow is mixed from. |
 | `--cui-shadow-strength` | inherits from `:root` | Multiplies every shadow's alpha. Dark mode raises it, because the same alpha reads as weaker against a dark surface. |
-| `--cui-shadow-tint` | set by `.shadow-{color}`, does not inherit | Overrides the colour for one element. |
+| `--cui-shadow-tint` | set by `.shadow-{color}`, does not inherit | Overrides the color for one element. |
 | `--cui-shadow-opacity` | set by `.shadow-opacity-*`, does not inherit | Scales one element's shadow. |
 
 Setting `--cui-shadow-color` on the page changes every shadow at once, including the ones components draw:
