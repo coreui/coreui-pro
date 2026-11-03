@@ -385,6 +385,7 @@ class ListBox extends BaseComponent {
 
   setActive(value: string | null): void {
     this._setActive(value, false)
+    this._anchor = null
   }
 
   getActive(): string | null {
@@ -818,6 +819,14 @@ class ListBox extends BaseComponent {
 
   _navigableOptions(): HTMLElement[] {
     return this._allOptions().filter(option => !this._isHidden(option) && !this._isDisabled(option))
+  }
+
+  _activateSelected(): void {
+    const option = this._navigableOptions().find(option => this._store.has(this._optionValue(option)))
+
+    if (option) {
+      this.setActive(this._optionValue(option))
+    }
   }
 
   _navigable(): HTMLElement[] {

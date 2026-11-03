@@ -1359,6 +1359,107 @@ describe('Combobox', () => {
       }
     })
 
+    it('should open on the selected option, whichever key or show() opens the panel', () => {
+      for (const open of ['ArrowDown', 'ArrowUp', 'Enter', ' ', 'show']) {
+        const toggle = setMarkup(' data-coreui-value="uk"')
+        const combobox = new Combobox(toggle)
+
+        if (open === 'show') {
+          combobox.show()
+        } else {
+          keydown(toggle, open)
+        }
+
+        expect(toggle.getAttribute('aria-activedescendant')).withContext(open).toEqual(option(combobox, 'uk').id)
+
+        combobox.dispose()
+      }
+    })
+
+    it('should open on the selected option when the panel has a search field', () => {
+      const toggle = setMarkup(' data-coreui-value="uk" data-coreui-search="true"')
+      const combobox = new Combobox(toggle)
+
+      let atFocus = null
+      combobox._menu.addEventListener('focusin', event => {
+        atFocus = event.target.getAttribute('aria-activedescendant')
+      })
+
+      keydown(toggle, 'ArrowDown')
+
+      expect(atFocus).toEqual(option(combobox, 'uk').id)
+    })
+
+    it('should keep the highlight where it is when the first selection goes away in multiple mode', () => {
+      const toggle = setMarkup(' data-coreui-multiple="true" data-coreui-value="us,ca"')
+      const combobox = new Combobox(toggle)
+
+      keydown(toggle, 'ArrowDown')
+      keydown(toggle, 'Enter')
+
+      expect(combobox.getValue()).toEqual(['ca'])
+      expect(toggle.getAttribute('aria-activedescendant')).toEqual(option(combobox, 'us').id)
+    })
+
+    it('should keep the highlight the arrow gave when the selected option cannot be highlighted', () => {
+      const toggle = setMarkup(' data-coreui-value="uk"', [
+        '<div class="list-box-option" data-coreui-value="us">United States</div>',
+        '<div class="list-box-option disabled" data-coreui-value="uk">United Kingdom</div>'
+      ])
+      const combobox = new Combobox(toggle)
+
+      keydown(toggle, 'ArrowDown')
+
+      expect(toggle.getAttribute('aria-activedescendant')).toEqual(option(combobox, 'us').id)
+    })
+
+    it('should open on the first selected option in the order of the list', () => {
+      const toggle = setMarkup(' data-coreui-multiple="true" data-coreui-value="ca,uk"')
+      const combobox = new Combobox(toggle)
+
+      keydown(toggle, 'ArrowDown')
+
+      expect(toggle.getAttribute('aria-activedescendant')).toEqual(option(combobox, 'uk').id)
+    })
+
+    it('should start a range from the option it opened on', () => {
+      const toggle = setMarkup(' data-coreui-multiple="true" data-coreui-value="uk"')
+      const combobox = new Combobox(toggle)
+
+      keydown(toggle, 'ArrowDown')
+      toggle.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'End', shiftKey: true, bubbles: true, cancelable: true
+      }))
+
+      expect(combobox.getValue()).toEqual(['uk', 'ca'])
+    })
+
+    it('should open on the value picked last time', () => {
+      const toggle = setMarkup(' data-coreui-value="uk"')
+      const combobox = new Combobox(toggle)
+
+      combobox.show()
+      option(combobox, 'ca').click()
+      keydown(toggle, 'ArrowDown')
+
+      expect(toggle.getAttribute('aria-activedescendant')).toEqual(option(combobox, 'ca').id)
+    })
+
+    it('should not scroll the page to a panel it has not placed yet', () => {
+      const spacer = document.createElement('div')
+      spacer.style.height = '4000px'
+      document.body.append(spacer)
+      const toggle = setMarkup(' data-coreui-value="uk" data-coreui-container="body"')
+      const combobox = new Combobox(toggle)
+      window.scrollTo(0, 0)
+
+      combobox.show()
+
+      expect(window.scrollY).toEqual(0)
+      combobox.dispose()
+      spacer.remove()
+    })
+
     it('should select the active option with Enter and close the panel', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle)

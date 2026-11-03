@@ -138,8 +138,8 @@ class ComboboxBase extends BaseComponent {
     this._menu.classList.remove(CLASS_NAME_SHOW)
     this._menu.inert = true
 
-    // A closed panel has no highlighted option, so reopening starts from the
-    // top and the field's activation keys stop reaching a stale one.
+    // A closed panel has no highlighted option, so the field's activation
+    // keys stop reaching a stale one and the next open sets it afresh.
     this._listBox?.setActive(null)
 
     this._onHideEnd()
