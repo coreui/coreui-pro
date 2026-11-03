@@ -480,6 +480,26 @@ describe('layers', () => {
     expect(calls).toEqual([])
   })
 
+  it('should decide a click after the page control it landed on, so a control that toggles a layer closes it', () => {
+    fixtureEl.innerHTML = '<button id="anchor"></button><div id="panel"></div><button id="toggle"></button>'
+
+    const popup = layer('popup', { anchor: el('#anchor'), parts: [el('#anchor'), el('#panel')] })
+    registerLayer(popup)
+    el('#toggle').addEventListener('click', () => {
+      if (popup.open) {
+        popup.dismiss('page')
+        return
+      }
+
+      popup.open = true
+      registerLayer(popup)
+    })
+    el('#toggle').click()
+
+    expect(popup.open).toBeFalse()
+    expect(calls.map(call => [call.name, call.reason])).toEqual([['popup', 'page']])
+  })
+
   it('should tell whether a click landed in a descendant', () => {
     fixtureEl.innerHTML = '<button id="d"></button><div id="d-panel"><input id="l"><span id="in-d"></span></div><div id="l-panel"></div>'
 
