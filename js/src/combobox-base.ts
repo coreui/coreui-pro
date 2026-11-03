@@ -108,6 +108,7 @@ class ComboboxBase extends BaseComponent {
     EventHandler.trigger(this._element, this.constructor.eventName('shown'))
 
     this._createFloating()
+    this._listBox?._revealActive()
     this._afterShow()
   }
 

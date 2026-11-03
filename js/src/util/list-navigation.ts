@@ -81,6 +81,33 @@ export const rangeBetween = <T>(items: readonly T[], from: number, to: number): 
 }
 
 /**
+ * Scrolls a container just enough to show an element inside its padding box, the part a border or
+ * a scrollbar does not cover. An element taller than that is aligned by its top edge. Only the
+ * container's own scroll position moves, never the page's, so a panel that is still being placed
+ * cannot drag the page.
+ *
+ * @param container - The scrolling element, such as a list with a `max-height`
+ * @param element - The element to show; nothing happens without one
+ * @returns Nothing
+ */
+export const scrollIntoContainer = (container: Element, element: Element | null | undefined): void => {
+  if (!element) {
+    return
+  }
+
+  const top = container.getBoundingClientRect().top + container.clientTop
+  const rect = element.getBoundingClientRect()
+  const above = rect.top - top
+  const below = rect.bottom - top - container.clientHeight
+
+  if (above < 0) {
+    container.scrollTop += above
+  } else if (below > 0) {
+    container.scrollTop += Math.min(above, below)
+  }
+}
+
+/**
  * Picks the item the focus moves to when one leaves a list: the next item, or the previous one when
  * the item was the last. An item the list does not hold gives the first item.
  *
