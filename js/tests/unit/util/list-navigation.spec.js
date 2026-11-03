@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  createTypeaheadBuffer, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, isTypingKey, rangeBetween
+  createTypeaheadBuffer, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, isTypingKey, rangeBetween, scrollIntoContainer
 } from '../../../src/util/list-navigation.js'
 import * as Util from '../../../src/util/index.js'
 
@@ -198,6 +198,48 @@ describe('List navigation utilities', () => {
 
     it('should leave out a key event without a key', () => {
       expect(isTypingKey(new Event('keydown'))).toBeFalse()
+    })
+  })
+
+  describe('scrollIntoContainer', () => {
+    it('should scroll only the container to show the element, below and above, and leave a visible one alone', () => {
+      const fixture = document.createElement('div')
+      fixture.innerHTML = `<div style="height: 3000px"></div><div id="box" style="height: 100px; overflow: auto">${
+        Array.from({ length: 20 }, (_, index) => `<div id="i${index}" style="height: 40px">${index}</div>`).join('')
+      }</div>`
+      document.body.append(fixture)
+      const box = fixture.querySelector('#box')
+      const pageScroll = window.scrollY
+
+      scrollIntoContainer(box, box.querySelector('#i10'))
+      expect(box.scrollTop).toEqual(340)
+
+      scrollIntoContainer(box, box.querySelector('#i9'))
+      expect(box.scrollTop).toEqual(340)
+
+      scrollIntoContainer(box, box.querySelector('#i2'))
+      expect(box.scrollTop).toEqual(80)
+
+      scrollIntoContainer(box, null)
+      expect(box.scrollTop).toEqual(80)
+      expect(window.scrollY).toEqual(pageScroll)
+      fixture.remove()
+    })
+
+    it('should keep the element clear of the container border and align a taller element by its top', () => {
+      const fixture = document.createElement('div')
+      fixture.innerHTML = `<div id="box" style="height: 100px; border: 10px solid; overflow: auto">${
+        Array.from({ length: 20 }, (_, index) => `<div id="i${index}" style="height: 40px">${index}</div>`).join('')
+      }<div id="tall" style="height: 200px"></div></div>`
+      document.body.append(fixture)
+      const box = fixture.querySelector('#box')
+
+      scrollIntoContainer(box, box.querySelector('#i10'))
+      expect(box.scrollTop).toEqual(340)
+
+      scrollIntoContainer(box, box.querySelector('#tall'))
+      expect(box.scrollTop).toEqual(800)
+      fixture.remove()
     })
   })
 })

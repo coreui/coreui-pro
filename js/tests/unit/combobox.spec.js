@@ -1362,6 +1362,27 @@ describe('Combobox', () => {
       expect(combobox._isShown()).toBeTrue()
     })
 
+    it('should scroll the list to the selected option when the panel opens', () => {
+      fixtureEl.innerHTML = [
+        '<button class="form-control combobox-toggle" type="button" data-coreui-value="o15"><span class="combobox-value"></span></button>',
+        '<div class="popup combobox-popup"><div class="list-box">',
+        '<div class="list-box-options" aria-label="Many" style="max-height: 80px; overflow: auto">',
+        ...Array.from({ length: 20 }, (_, index) => `<div class="list-box-option" data-coreui-value="o${index}" style="height: 20px">Option ${index}</div>`),
+        '</div></div></div>'
+      ].join('')
+      const toggle = fixtureEl.querySelector('.combobox-toggle')
+      const combobox = new Combobox(toggle)
+
+      combobox.show()
+
+      const list = combobox._menu.querySelector('.list-box-options')
+      const box = list.getBoundingClientRect()
+      const rect = option(combobox, 'o15').getBoundingClientRect()
+      expect(list.scrollTop).toBeGreaterThan(0)
+      expect(rect.top).toBeGreaterThanOrEqual(box.top)
+      expect(rect.bottom).toBeLessThanOrEqual(box.bottom)
+    })
+
     it('should close without a change when Enter or a click picks the selected option again', () => {
       const toggle = setMarkup(' data-coreui-value="uk"')
       const combobox = new Combobox(toggle)

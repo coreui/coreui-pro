@@ -10,7 +10,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
 import {
-  createTypeaheadBuffer, findTypeaheadMatch, rangeBetween, type TypeaheadBuffer
+  createTypeaheadBuffer, findTypeaheadMatch, rangeBetween, scrollIntoContainer, type TypeaheadBuffer
 } from './util/list-navigation.js'
 import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
@@ -958,6 +958,10 @@ class ListBox extends BaseComponent {
 
   _findNavigable(value: string): HTMLElement | undefined {
     return this._navigable().find(element => this._optionValue(element) === value)
+  }
+
+  _revealActive(): void {
+    scrollIntoContainer(this._list, this._activeOption())
   }
 
   _activeOption(): HTMLElement | null {
