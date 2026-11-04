@@ -80,7 +80,8 @@ const EVENT_KEYDOWN = 'keydown'
 const EVENT_POINTERCANCEL = 'pointercancel'
 const EVENT_POINTERDOWN = 'pointerdown'
 
-const ANCHOR_SWITCH_DELAY = 100
+const ANCHOR_LEAVE_DELAY = 100
+const ANCHOR_SWITCH_DELAY = 30
 
 const ATTACHMENTS: Record<string, [string, string]> = {
   AUTO: ['auto', 'auto'],
@@ -1186,7 +1187,7 @@ class Tooltip extends BaseComponent {
 
     return this._setTimeout(
       () => this._isHovered ? undefined : this.hide(),
-      this._config.anchors ? Math.max(hide, ANCHOR_SWITCH_DELAY) : hide
+      this._config.anchors ? Math.max(hide, ANCHOR_LEAVE_DELAY) : hide
     )
   }
 

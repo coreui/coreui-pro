@@ -725,6 +725,33 @@ describe('Util', () => {
       })
     })
 
+    it('should leave a wait for one property alone when another wait times out, and finish it on its own timer', () => {
+      return new Promise(resolve => {
+        const el = document.createElement('div')
+        const first = jasmine.createSpy('first')
+        const second = jasmine.createSpy('second')
+        const durations = ['0.02s', '0.1s']
+
+        spyOn(window, 'getComputedStyle').and.callFake(() => ({
+          transitionDuration: durations.shift() ?? '0.1s',
+          transitionDelay: '0s'
+        }))
+
+        Util.executeAfterTransition(first, el, true, 'left')
+        Util.executeAfterTransition(second, el, true, 'left')
+
+        setTimeout(() => {
+          expect(first).toHaveBeenCalled()
+          expect(second).not.toHaveBeenCalled()
+        }, 60)
+
+        setTimeout(() => {
+          expect(second).toHaveBeenCalled()
+          resolve()
+        }, 140)
+      })
+    })
+
     it('should not execute a function a second time after a computed CSS transition duration and if a transitionend event has already been dispatched', () => {
       return new Promise(resolve => {
         const el = document.createElement('div')

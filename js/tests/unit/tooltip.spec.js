@@ -1795,6 +1795,25 @@ describe('Tooltip', () => {
       tooltip.dispose()
     })
 
+    it('should switch on hover after a short pause', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(Date.now()))
+
+      hover(b, a)
+      await sleep(10)
+
+      expect(moves).toEqual([])
+
+      await sleep(80)
+
+      expect(moves).toHaveSize(1)
+      tooltip.dispose()
+    })
+
     it('should let EventHandler listen to the move', async () => {
       const { a, b, bar, tooltip } = setup()
       const shown = wait(bar, 'shown')
@@ -1855,7 +1874,7 @@ describe('Tooltip', () => {
 
       const moved = wait(bar, 'moved')
       leave(a, gap)
-      await sleep(30)
+      await sleep(60)
       hover(b, gap)
       await moved
 

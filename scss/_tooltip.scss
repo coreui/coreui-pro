@@ -64,7 +64,7 @@ $tooltip-tokens: defaults(
     }
 
     &[data-coreui-moving] {
-      transition-property: opacity, left, top;
+      @include transition-props((opacity, left, top), .2s, cubic-bezier(.22, 1, .36, 1));
 
       .tooltip-arrow {
         transition-timing-function: inherit;

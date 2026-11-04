@@ -154,7 +154,7 @@ const tooltip = new coreui.Tooltip(toolbar, {
 - An anchor without text shows no tooltip, so the others keep theirs. To leave some elements out, narrow the selector, for example `data-coreui-anchors="[title]"`.
 - Call the methods on the wrapper's instance; `Tooltip.getOrCreateInstance()` on an anchor would create a second tooltip.
 - `move.coreui.tooltip` fires when the tooltip starts moving to another anchor and `moved.coreui.tooltip` once it stands there; `event.relatedTarget` is the new anchor. Content you set with `setContent()` in a `move` listener applies to the new anchor.
-- The move animates `left` and `top` only while the tooltip carries `data-coreui-moving`, for the length of the fade, so outside a move it follows a scrolling anchor at once. With `animation: false` or reduced motion it jumps.
+- The move animates `left` and `top` for 0.2 seconds, only while the tooltip carries `data-coreui-moving`, so outside a move it follows a scrolling anchor at once. A move that starts before the previous one ends continues from where the tooltip is. With `animation: false` or reduced motion it jumps.
 - Next to an anchor in another `<dialog>` or with another text direction, the tooltip closes and opens again instead of moving.
 
 ## Usage

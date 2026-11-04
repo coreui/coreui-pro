@@ -46,7 +46,7 @@ describe.each([
     b.click()
     const moving = tip.hasAttribute('data-coreui-moving')
     const property = getComputedStyle(tip).transitionProperty.split(', ')
-    const { transitionDuration } = getComputedStyle(tip)
+    const { transitionDuration, transitionTimingFunction } = getComputedStyle(tip)
     const arrow = getComputedStyle(tip.querySelector(`.${name}-arrow`)).transitionProperty.split(', ')
     await moved
 
@@ -55,6 +55,8 @@ describe.each([
     } else {
       expect(moving).toBeTrue()
       expect(property).toEqual(['opacity', 'left', 'top'])
+      expect(transitionDuration).toBe('0.2s')
+      expect(transitionTimingFunction).toBe('cubic-bezier(0.22, 1, 0.36, 1)')
       expect(arrow).toContain('left')
     }
 
