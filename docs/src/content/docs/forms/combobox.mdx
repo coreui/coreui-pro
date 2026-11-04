@@ -243,7 +243,6 @@ The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-se
         <div class="list-box-option" data-coreui-value="fr">France</div>
         <div class="list-box-option" data-coreui-value="jp">Japan</div>
         <div class="list-box-option" data-coreui-value="br">Brazil</div>
-        <div class="list-box-empty">No results found</div>
       </div>
     </div>
   </div>`} />
@@ -267,7 +266,6 @@ The panel is as tall as its content — cap it where you want a scroll container
         <div class="list-box-option" data-coreui-value="renee">Renée</div>
         <div class="list-box-option" data-coreui-value="joao">João</div>
         <div class="list-box-option" data-coreui-value="ana">Ana</div>
-        <div class="list-box-empty">No results found</div>
       </div>
     </div>
   </div>`} />
@@ -542,7 +540,7 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `disabled` | boolean | `false` | Turns the control off: the panel never opens and the list box is disabled. The combobox sets the `.disabled` class and, on a button toggle, the `disabled` attribute from it. |
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option. |
-| `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever the panel already holds. |
+| `items` | array, null | `null` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever the panel already holds; an empty array is an empty list. With `null` the options come from the markup. |
 | `multiple` | boolean | `false` | Toggles options instead of replacing the selection, and keeps the panel open. |
 | `name` | string, null | `null` | Name of the hidden select the value is submitted under, inserted right before the toggle. With `multiple` it posts one key per value, as a `<select multiple>` does: `tags=a&tags=b&tags=c`. Without a name the combobox is not submitted with the form. |
 | `placeholder` | string | `''` | Text shown in the toggle while nothing is selected. |

@@ -40,7 +40,6 @@ const TAB_KEY = 'Tab'
 
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_POPUP = 'combobox-popup'
-const CLASS_NAME_EMPTY = 'list-box-empty'
 const CLASS_NAME_LIST_BOX = 'list-box'
 const CLASS_NAME_OPTIONS = 'list-box-options'
 
@@ -372,15 +371,6 @@ class ComboboxBase extends BaseComponent {
       optionsDiv.style.overflowY = 'auto'
     }
 
-    if (this._config.searchNoResultsLabel) {
-      const empty = document.createElement('div')
-      empty.classList.add(CLASS_NAME_EMPTY)
-      empty.setAttribute('role', 'status')
-      empty.setAttribute('hidden', '')
-      empty.textContent = this._config.searchNoResultsLabel
-      optionsDiv.append(empty)
-    }
-
     listBoxDiv.append(optionsDiv)
 
     this._addPanelEscapeListener(popupDiv)
@@ -413,6 +403,7 @@ class ComboboxBase extends BaseComponent {
     return {
       activeDescendant: this._getActiveDescendantField(),
       allowList: this._config.allowList,
+      emptyLabel: this._config.searchNoResultsLabel || '',
       html: this._hasOptionTemplates(),
       items: this._getListBoxItems(),
       sanitize: this._config.sanitize,

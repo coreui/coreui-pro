@@ -107,7 +107,7 @@ describe('Transfer', () => {
         disabled: false,
         html: false,
         indicator: 'checkbox',
-        items: [],
+        items: null,
         loading: false,
         loadingLabel: 'Loading…',
         moveAllToSourceIcon: jasmine.any(String),
@@ -212,7 +212,7 @@ describe('Transfer', () => {
       // eslint-disable-next-line no-new
       new Transfer(el)
 
-      expect(el.querySelector('[role="status"], [role="log"], [role="alert"], [aria-live]')).toBeNull()
+      expect(el.querySelector('[role="status"]:not(.list-box-empty), [role="log"], [role="alert"], [aria-live]')).toBeNull()
     })
 
     it('should initialize on page load with the data api', () => {
@@ -582,6 +582,14 @@ describe('Transfer', () => {
       { value: 'bob', label: 'Bob' },
       { value: 'cleo', label: 'Cleo' }
     ]
+
+    it('should take an empty items array as empty lists, not as a cue to read the markup', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el, { items: [] })
+
+      expect(transfer.getSource()).toEqual([])
+      expect(transfer.getTarget()).toEqual([])
+    })
 
     it('should build both lists from the items and the value', () => {
       const el = setMarkup('', [], [])

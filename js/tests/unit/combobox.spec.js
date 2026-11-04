@@ -98,7 +98,7 @@ describe('Combobox', () => {
         disabled: false,
         html: false,
         indicator: 'none',
-        items: [],
+        items: null,
         multiple: false,
         name: null,
         placeholder: '',
@@ -1080,6 +1080,13 @@ describe('Combobox', () => {
   })
 
   describe('items', () => {
+    it('should take an empty items array as an empty list, not as a cue to read the markup', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { items: [] })
+
+      expect(menu(combobox).querySelectorAll('.list-box-option').length).toEqual(0)
+    })
+
     it('should render the list from the items option', () => {
       fixtureEl.innerHTML = '<button class="form-control" type="button"></button>'
       const toggle = fixtureEl.querySelector('button')
@@ -1248,6 +1255,19 @@ describe('Combobox', () => {
   })
 
   describe('search', () => {
+    it('should show the empty state of the list box when the search matches nothing', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { search: true })
+
+      combobox.show()
+      const empty = menu(combobox).querySelector('.list-box-empty')
+      expect(empty.hasAttribute('hidden')).toBeTrue()
+
+      type(searchField(combobox), 'zzz')
+      expect(empty.hasAttribute('hidden')).toBeFalse()
+      expect(empty.textContent).toEqual('No results found')
+    })
+
     it('should render the search field of the list box in the panel', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { search: true, searchPlaceholder: 'Filter' })

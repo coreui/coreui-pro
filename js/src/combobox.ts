@@ -83,7 +83,7 @@ type ComboboxConfig = {
   disabled: boolean
   html: boolean
   indicator: string
-  items: ListBoxEntry[]
+  items: ListBoxEntry[] | null
   multiple: boolean
   name: string | null
   placeholder: string
@@ -109,7 +109,7 @@ const Default: ComboboxConfig = {
   disabled: false,
   html: false,
   indicator: 'none',
-  items: [],
+  items: null,
   multiple: false,
   name: null,
   placeholder: '',
@@ -135,7 +135,7 @@ const DefaultType: Record<string, string> = {
   disabled: 'boolean',
   html: 'boolean',
   indicator: 'string',
-  items: 'array',
+  items: '(array|null)',
   multiple: 'boolean',
   name: '(string|null)',
   placeholder: 'string',

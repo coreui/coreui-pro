@@ -72,6 +72,7 @@ const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
+const CLASS_NAME_EMPTY = 'list-box-empty'
 const CLASS_NAME_LOADING = 'loading'
 const CLASS_NAME_LOADING_REGION = 'list-box-loading'
 const CLASS_NAME_OPTION = 'list-box-option'
@@ -87,7 +88,6 @@ const CLASS_NAME_SELECTED = 'selected'
 
 const SELECTOR_DATA_LIST_BOX = '[data-coreui-list-box]'
 const SELECTOR_COUNTER = '[data-coreui-list-box-counter]'
-const SELECTOR_EMPTY = '.list-box-empty'
 const SELECTOR_HEADER = '.list-box-header'
 const SELECTOR_OPTION = '.list-box-option'
 const SELECTOR_OPTION_INDICATOR = '.list-box-option-indicator'
@@ -132,9 +132,10 @@ type ListBoxConfig = {
   ariaSearchLabel: string
   counter: boolean
   disabled: boolean
+  emptyLabel: string
   html: boolean
   indicator: string
-  items: ListBoxEntry[]
+  items: ListBoxEntry[] | null
   loading: boolean
   loadingLabel: string
   resetSelectionOnItemsChange: boolean
@@ -157,9 +158,10 @@ const Default: ListBoxConfig = {
   ariaSearchLabel: 'Search options',
   counter: false,
   disabled: false,
+  emptyLabel: 'No results found',
   html: false,
   indicator: 'none',
-  items: [],
+  items: null,
   loading: false,
   loadingLabel: 'Loading…',
   resetSelectionOnItemsChange: false,
@@ -182,9 +184,10 @@ const DefaultType: Record<string, string> = {
   ariaSearchLabel: 'string',
   counter: 'boolean',
   disabled: 'boolean',
+  emptyLabel: 'string',
   html: 'boolean',
   indicator: 'string',
-  items: 'array',
+  items: '(array|null)',
   loading: 'boolean',
   loadingLabel: 'string',
   resetSelectionOnItemsChange: 'boolean',
@@ -211,6 +214,7 @@ class ListBox extends BaseComponent {
   protected declare _counter: HTMLElement | null
   protected declare _createdNodes: HTMLElement[]
   protected declare _disabledSections: WeakSet<HTMLElement>
+  protected declare _empty: HTMLElement | null
   protected declare _field: HTMLElement | null
   protected declare _items: ListBoxEntry[] | null
   protected declare _focused: boolean
@@ -233,11 +237,12 @@ class ListBox extends BaseComponent {
     this._createdNodes = []
     this._disabledSections = new WeakSet()
     this._field = getElement(this._config.activeDescendant)
-    this._items = this._config.items.length > 0 ? this._normalizeItems(this._config.items) : null
+    this._items = this._config.items === null ? null : this._normalizeItems(this._config.items)
     this._focused = false
     this._limited = null
     this._hostListNodes = null
     this._list = this._resolveList()
+    this._empty = this._createEmpty()
     this._loadingAnnouncement = null
     this._counter = this._resolveCounter()
     this._loadingRegion = this._createLoadingRegion()
@@ -518,6 +523,22 @@ class ListBox extends BaseComponent {
     this._loadingAnnouncement = loading ? announce(this._config.loadingLabel, { context: this._element }) : null
   }
 
+  _createEmpty(): HTMLElement | null {
+    if (!this._config.emptyLabel) {
+      return null
+    }
+
+    const empty = document.createElement('div')
+    empty.className = CLASS_NAME_EMPTY
+    empty.setAttribute('role', 'status')
+    empty.hidden = true
+    empty.textContent = this._config.emptyLabel
+    this._list.append(empty)
+    this._createdNodes.push(empty)
+
+    return empty
+  }
+
   _createLoadingRegion(): HTMLElement {
     const region = document.createElement('div')
     const spinner = document.createElement('span')
@@ -567,10 +588,7 @@ class ListBox extends BaseComponent {
       option.setAttribute('tabindex', value === this._active || option === roving ? '0' : '-1')
     }
 
-    const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._list)
-    if (empty) {
-      empty.toggleAttribute('hidden', this._config.loading || this._navigableOptions().length > 0)
-    }
+    this._empty?.toggleAttribute('hidden', this._config.loading || this._navigableOptions().length > 0)
   }
 
   _resolveCounter(): HTMLElement | null {
@@ -741,16 +759,14 @@ class ListBox extends BaseComponent {
       return
     }
 
-    const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._list)
-
     if (this._hostListNodes === null && !this._createdNodes.includes(this._list)) {
       this._hostListNodes = [...this._list.childNodes]
     }
 
     this._list.replaceChildren(...this._items.map(entry => (Array.isArray((entry as ListBoxGroup).items) ? this._renderSection(entry as ListBoxGroup) : this._renderOption(entry as ListBoxItem))))
 
-    if (empty) {
-      this._list.append(empty)
+    if (this._empty) {
+      this._list.append(this._empty)
     }
   }
 

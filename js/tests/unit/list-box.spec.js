@@ -94,9 +94,10 @@ describe('ListBox', () => {
         ariaSearchLabel: 'Search options',
         counter: false,
         disabled: false,
+        emptyLabel: 'No results found',
         html: false,
         indicator: 'none',
-        items: [],
+        items: null,
         loading: false,
         loadingLabel: 'Loading…',
         resetSelectionOnItemsChange: false,
@@ -1290,13 +1291,14 @@ describe('ListBox', () => {
 
     it('should show the empty state when nothing is left to navigate', () => {
       const el = setMarkup('', [
-        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
-        '<div class="list-box-empty" hidden>No results</div>'
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>'
       ])
       const listBox = new ListBox(el)
       const empty = el.querySelector('.list-box-empty')
 
       expect(empty.hasAttribute('hidden')).toBeTrue()
+      expect(empty.getAttribute('role')).toEqual('status')
+      expect(empty.textContent).toEqual('No results found')
 
       item(el, 'lettuce').setAttribute('hidden', '')
       listBox.update()
@@ -1304,11 +1306,26 @@ describe('ListBox', () => {
       expect(empty.hasAttribute('hidden')).toBeFalse()
     })
 
+    it('should write the empty state from emptyLabel, leave it out for an empty label, and remove it on dispose', () => {
+      const el = setMarkup('', ['<div class="list-box-option" data-coreui-value="lettuce" hidden>Lettuce</div>'])
+      const listBox = new ListBox(el, { emptyLabel: 'No vegetables' })
+
+      expect(el.querySelectorAll('.list-box-empty')).toHaveSize(1)
+      expect(el.querySelector('.list-box-empty').textContent).toEqual('No vegetables')
+      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeFalse()
+
+      listBox.dispose()
+      expect(el.querySelector('.list-box-empty')).toBeNull()
+
+      // eslint-disable-next-line no-new
+      new ListBox(el, { emptyLabel: '' })
+      expect(el.querySelector('.list-box-empty')).toBeNull()
+    })
+
     it('should show the empty state when only disabled options are left on the screen', () => {
       const el = setMarkup('', [
         '<div class="list-box-option" data-coreui-value="lettuce" hidden>Lettuce</div>',
-        '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>',
-        '<div class="list-box-empty" hidden>No results</div>'
+        '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>'
       ])
       // eslint-disable-next-line no-new
       new ListBox(el)
@@ -1460,6 +1477,15 @@ describe('ListBox', () => {
       fixtureEl.innerHTML = `<div class="list-box"${attrs}></div>`
       return fixtureEl.querySelector('.list-box')
     }
+
+    it('should take an empty items array as an empty list, not as a cue to read the markup', () => {
+      const el = setMarkup('', ['<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>'])
+      const listBox = new ListBox(el, { items: [] })
+
+      expect(el.querySelectorAll('.list-box-option')).toHaveSize(0)
+      expect(listBox.getItems()).toEqual([])
+      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeFalse()
+    })
 
     it('should disable every item of a disabled group', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
@@ -2200,10 +2226,7 @@ describe('ListBox', () => {
     })
 
     it('should show the empty state and narrow the select all scope', () => {
-      const el = setMarkup('', [
-        ...sectionsMarkup,
-        '<div class="list-box-empty" hidden>No results</div>'
-      ], selectAllMarkup)
+      const el = setMarkup('', sectionsMarkup, selectAllMarkup)
       const listBox = new ListBox(el, { selectionMode: 'multiple' })
 
       listBox.filter('ham')
@@ -2445,7 +2468,6 @@ describe('ListBox', () => {
         `<div class="list-box"${attrs}>`,
         '<div class="list-box-options" aria-label="Results">',
         '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
-        '<div class="list-box-empty">No results</div>',
         '</div>',
         '</div>'
       ].join('')

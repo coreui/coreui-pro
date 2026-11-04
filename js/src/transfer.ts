@@ -75,7 +75,7 @@ type TransferConfig = {
   disabled: boolean
   html: boolean
   indicator: string
-  items: ListBoxEntry[]
+  items: ListBoxEntry[] | null
   loading: boolean
   loadingLabel: string
   moveAllToSourceIcon: string
@@ -104,7 +104,7 @@ const Default: TransferConfig = {
   disabled: false,
   html: false,
   indicator: 'checkbox',
-  items: [],
+  items: null,
   loading: false,
   loadingLabel: 'Loading…',
   moveAllToSourceIcon: CHEVRON_DOUBLE_LEFT_ICON,
@@ -133,7 +133,7 @@ const DefaultType: Record<string, string> = {
   disabled: 'boolean',
   html: 'boolean',
   indicator: 'string',
-  items: 'array',
+  items: '(array|null)',
   loading: 'boolean',
   loadingLabel: 'string',
   moveAllToSourceIcon: 'string',
@@ -172,7 +172,7 @@ class Transfer extends BaseComponent {
 
     this._createdNodes = []
     this._itemRanks = new Map()
-    this._items = this._config.items.length > 0 ? this._config.items : null
+    this._items = this._config.items
     this._sides = {
       [SIDE_SOURCE]: this._createSide(SIDE_SOURCE),
       [SIDE_TARGET]: this._createSide(SIDE_TARGET)
