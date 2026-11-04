@@ -586,8 +586,10 @@ class ListBox extends BaseComponent {
       option.setAttribute('tabindex', value === this._active || option === roving ? '0' : '-1')
     }
 
-    if (this._empty) {
-      this._empty.textContent = this._config.loading || this._navigableOptions().length > 0 ? '' : this._config.emptyLabel
+    const emptyText = this._config.loading || this._navigableOptions().length > 0 ? '' : this._config.emptyLabel
+
+    if (this._empty && this._empty.textContent !== emptyText) {
+      this._empty.textContent = emptyText
     }
   }
 

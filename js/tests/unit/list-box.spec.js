@@ -1307,6 +1307,12 @@ describe('ListBox', () => {
 
       expect(el.querySelector('.list-box-empty')).toBe(empty)
       expect(empty.textContent).toEqual('No results found')
+
+      const observer = new MutationObserver(() => {})
+      observer.observe(empty, { characterData: true, childList: true, subtree: true })
+      listBox.update()
+      expect(observer.takeRecords()).toHaveSize(0)
+      observer.disconnect()
     })
 
     it('should write the empty state from emptyLabel, leave it out for an empty label, and remove it on dispose', () => {
