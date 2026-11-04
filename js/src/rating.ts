@@ -128,7 +128,7 @@ class Rating extends BaseComponent {
   protected declare _name: string
   protected declare _sizeClassName: string | null
   protected declare _startValue: number | string | null
-  protected declare _tooltip: any
+  protected declare _tooltip: Tooltip | null
   protected declare _validation: FieldValidation
 
   constructor(element?: string | Element | null, config?: Partial<RatingConfig> | null) {
@@ -161,6 +161,7 @@ class Rating extends BaseComponent {
 
     this._createRating()
     this._addEventListeners()
+    this._createTooltip()
   }
 
   // Getters
@@ -217,6 +218,7 @@ class Rating extends BaseComponent {
 
     this._validation.dispose()
     this._removeRating()
+    this._tooltip?.dispose()
     super.dispose()
   }
 
@@ -234,7 +236,9 @@ class Rating extends BaseComponent {
     }
 
     if (disabled) {
-      this._disposeTooltips()
+      this._tooltip?.disable()
+    } else if (!this._config.readonly) {
+      this._tooltip?.enable()
     }
 
     this._paintValue()
@@ -272,7 +276,7 @@ class Rating extends BaseComponent {
   }
 
   _removeRating(): ChildNode | null {
-    this._disposeTooltips()
+    this._tooltip?.hide()
 
     const anchor = this._items.at(-1)?.nextSibling ?? null
 
@@ -282,14 +286,6 @@ class Rating extends BaseComponent {
 
     this._items = []
     return anchor
-  }
-
-  _disposeTooltips(): void {
-    for (const item of SelectorEngine.find(`${SELECTOR_RATING_ITEM}, ${SELECTOR_RATING_ITEM} > div`, this._element as ParentNode)) {
-      Tooltip.getInstance(item)?.dispose()
-    }
-
-    this._tooltip = null
   }
 
   _addEventListeners(): void {
@@ -356,8 +352,6 @@ class Rating extends BaseComponent {
         value: (input as HTMLInputElement).value
       })
 
-      this._createTooltip(label!.parentElement, (input as HTMLInputElement).value)
-
       if (this._config.highlightOnlySelected) {
         label!.classList.add(CLASS_NAME_ACTIVE)
 
@@ -375,10 +369,6 @@ class Rating extends BaseComponent {
     EventHandler.on(this._element, EVENT_MOUSELEAVE, SELECTOR_RATING_ITEM_LABEL, () => {
       if (this._disabled || this._config.readonly) {
         return
-      }
-
-      if (this._tooltip) {
-        this._tooltip.hide()
       }
 
       const checkedInput = SelectorEngine.findOne(`${SELECTOR_RATING_ITEM_INPUT}[value="${this._currentValue}"]`, this._element as ParentNode)
@@ -405,8 +395,6 @@ class Rating extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_HOVER, {
         value: target.value
       })
-
-      this._createTooltip(target.parentElement, target.value)
     })
 
     EventHandler.on(this._element, EVENT_FOCUSOUT, SELECTOR_RATING_ITEM_INPUT, () => {
@@ -417,38 +405,28 @@ class Rating extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_HOVER, {
         value: null
       })
-
-      if (this._tooltip) {
-        this._tooltip.hide()
-      }
     })
   }
 
-  _createTooltip(selector: any, value: any): void {
-    if (this._config.tooltips === false) {
+  _createTooltip(): void {
+    const { tooltips } = this._config
+
+    if (tooltips === false) {
       return
     }
 
-    if (this._tooltip) {
-      this._tooltip.hide()
-    }
+    this._tooltip = new Tooltip(this._element, {
+      anchors: `${SELECTOR_RATING_ITEM}, ${SELECTOR_RATING_ITEM} > div`,
+      disabled: this._disabled || this._config.readonly,
+      title(anchor: Element) {
+        const { value } = SelectorEngine.findOne<HTMLInputElement>(SELECTOR_RATING_ITEM_INPUT, anchor)!
 
-    let tooltipTitle
+        if (Array.isArray(tooltips)) {
+          return tooltips[Number(value) - 1]
+        }
 
-    if (typeof this._config.tooltips === 'boolean') {
-      tooltipTitle = value
-    }
-
-    if (typeof this._config.tooltips === 'object') {
-      tooltipTitle = this._config.tooltips[value]
-    }
-
-    if (Array.isArray(this._config.tooltips)) {
-      tooltipTitle = this._config.tooltips[value - 1]
-    }
-
-    this._tooltip = new Tooltip(selector, {
-      title: tooltipTitle
+        return typeof tooltips === 'object' ? tooltips[value] : value
+      }
     })
   }
 

@@ -131,6 +131,32 @@ It’s recommended to set the container option to `'body'` to avoid positioning 
 
 Using Bootstrap Tooltips with SVGs is a great way to enhance accessibility and interactivity for icon-based UIs or data visualizations without modifying the structure of your SVGs.
 
+### Multiple anchors
+
+One tooltip can serve many elements. Put `data-coreui-toggle="tooltip"` on a wrapper and list its anchors with `data-coreui-anchors`, a selector for the elements inside it. Each anchor keeps its own text in `title` or `data-coreui-title`; every other option comes from the wrapper. When the pointer or the focus moves to the next anchor, the tooltip slides there and changes its text instead of hiding and showing again.
+
+<Example class="tooltip-demo" sandboxJsId="enable-tooltips" code={`<div class="btn-group" role="group" aria-label="Text style" data-coreui-toggle="tooltip" data-coreui-anchors="button">
+    <button type="button" class="btn-outline" title="Bold">B</button>
+    <button type="button" class="btn-outline" title="Italic">I</button>
+    <button type="button" class="btn-outline" title="Underline">U</button>
+  </div>`} />
+
+The same works from JavaScript, where `title` can also be a function of the anchor:
+
+```js
+const toolbar = document.querySelector('#toolbar')
+const tooltip = new coreui.Tooltip(toolbar, {
+  anchors: 'button',
+  title: anchor => anchor.dataset.hint
+})
+```
+
+- An anchor without text shows no tooltip, so the others keep theirs. To leave some elements out, narrow the selector, for example `data-coreui-anchors="[title]"`.
+- Call the methods on the wrapper's instance; `Tooltip.getOrCreateInstance()` on an anchor would create a second tooltip.
+- `move.coreui.tooltip` fires when the tooltip starts moving to another anchor and `moved.coreui.tooltip` once it stands there; `event.relatedTarget` is the new anchor. Content you set with `setContent()` in a `move` listener applies to the new anchor.
+- The move animates `left` and `top` only while the tooltip carries `data-coreui-moving`, for the length of the fade, so outside a move it follows a scrolling anchor at once. With `animation: false` or reduced motion it jumps.
+- Next to an anchor in another `<dialog>` or with another text direction, the tooltip closes and opens again instead of moving.
+
 ## Usage
 
 The tooltip plugin creates content and markup as needed, and by default places tooltips following their trigger elements.
@@ -202,11 +228,13 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Defines the set of permitted HTML tags and attributes that can safely appear in the tooltip content when HTML rendering is enabled. This helps maintain control over the output and prevent injection of malicious code. |
+| `anchors` | string, false | `false` | A selector for the elements inside the tooltip's element that share one tooltip. The tooltip moves between them and reads each one's text from its `title` or `data-coreui-title`. Cannot be combined with `selector`. See [Multiple anchors](#multiple-anchors). |
 | `animation` | boolean | `true` | Determines whether the tooltip should fade in and out using a CSS transition. Set to `false` for instant show/hide behavior, which may be preferable for performance-sensitive interfaces — it renders `.tooltip-instant`, the same class you can put in a custom `template`. Retime the fade with `--cui-tooltip-transition-duration` and `--cui-tooltip-transition-timing`. |
 | `boundary` | string, element | `'clippingParents'` | Determines the boundary within which the tooltip must remain visible. Can be a specific element or the default `'clippingParents'`. This setting helps avoid unwanted clipping or overflow. For more information refer to Floating UI's [detectOverflow docs](https://floating-ui.com/docs/detectOverflow/#boundary). |
 | `container` | string, element, false | `false` | Specifies the parent container in which the tooltip should be inserted. Commonly used value is `'body'`, which helps avoid layout or overflow issues by ensuring the tooltip isn't clipped by parent elements. |
 | `customClass` | string, function | `''` | Allows adding one or more custom CSS classes to the tooltip when it's rendered. Accepts a string with class names or a callback function that returns the class string. Useful for styling variants (e.g. light vs dark). |
 | `delay` | number, object | `0` | Defines how long (in milliseconds) to wait before showing or hiding the tooltip. A single number applies to both actions, or you can provide an object like `{ show: 500, hide: 200 }` for separate control over each. |
+| `disabled` | boolean | `false` | Starts the tooltip disabled, so no trigger shows it until `enable()` runs. |
 | `fallbackPlacements` | string, array | `['top', 'right', 'bottom', 'left']` | Specifies alternative placements for the tooltip if the preferred one isn't feasible (e.g., due to lack of space). The tooltip will try these placements in order until one fits. For more information refer to Floating UI's [flip docs](https://floating-ui.com/docs/flip/#fallbackplacements). |
 | `floatingConfig` | null, object, function | `null` | Allows you to override or extend the default Floating UI configuration used by the tooltip. Can be an object or a function that receives the default config and returns a modified one, giving you full control over tooltip behavior and positioning logic. See Floating UI's [computePosition docs](https://floating-ui.com/docs/computePosition/#options).|
 | `html` | boolean | `false` | Enables support for HTML content inside the tooltip. When set to `true`, the `title` attribute may include tags like `<strong>`, `<em>`, or even icons. Be cautious with untrusted content as it increases XSS risk. |
@@ -249,7 +277,7 @@ const tooltip = new coreui.Tooltip(element, {
 
 | Method | Description |
 | --- | --- |
-| `disable` | Disables the tooltip from being triggered. This includes both manual and automatic triggers until it's enabled again. |
+| `disable` | Disables the tooltip from being triggered and hides it when it is shown. This includes both manual and automatic triggers until it's enabled again. |
 | `dispose` | Completely removes the tooltip instance from the target element. It clears event listeners and internal data. Tooltips created using delegation (e.g., via `selector`) cannot be destroyed on individual children. |
 | `enable` | Gives an element’s tooltip the ability to be shown. All tooltips are enabled by default unless manually disabled. |
 | `getInstance` | *Static* method that retrieves the current tooltip instance tied to a specific element. Returns `null` if the tooltip has not been initialized. |
@@ -280,6 +308,8 @@ The `setContent` method accepts an `object` argument, where each property-key is
 | `hidden.coreui.tooltip` | Dispatched once the tooltip has been fully removed from view and CSS transitions (if any) have finished. Ideal for cleanup logic or analytics. |
 | `hide.coreui.tooltip` | Emitted immediately when the `hide()` method is called. At this point, the tooltip is still visible but is beginning the process of being hidden. |
 | `inserted.coreui.tooltip` | Occurs after the tooltip has been injected into the DOM but before it becomes visible. This event gives you access to the generated tooltip element for advanced DOM manipulation. |
+| `move.coreui.tooltip` | With `anchors`, fires when the tooltip starts moving to another anchor, already holding that anchor's content. `event.relatedTarget` is the new anchor. |
+| `moved.coreui.tooltip` | With `anchors`, fires once the tooltip stands at the new anchor and its move transition has finished. `event.relatedTarget` is the new anchor. |
 | `show.coreui.tooltip` | Triggered right after the `show()` method is invoked. The tooltip is about to become visible, but hasn't been inserted into the DOM yet. You can use this event to perform actions before the tooltip is rendered. |
 | `shown.coreui.tooltip` | Fired after the tooltip is fully visible and any CSS transitions (like fade) have completed. Useful for tracking when the user can actually see the Bootstrap tooltip. |
 
@@ -297,6 +327,7 @@ tooltip.hide()
 ## Accessibility
 
 - The tip is rendered with `role="tooltip"`. While it is shown, the plugin adds the tip's `id` to the trigger's `aria-describedby`, so the text is read as the trigger's description. When the trigger has neither text nor an `aria-label`, the title becomes its `aria-label`.
+- With `anchors`, the description moves with the tooltip: only the anchor it stands at, or the focused element inside that anchor, carries the tip's `id`. A text you change with `setContent()` while the anchor keeps the focus is not announced; use a live region for that.
 - Put tooltips on elements that already take focus, such as links, buttons and form controls, and keep the default `hover focus` trigger so keyboard users get them too. See [Making tooltips work for keyboard and assistive technology users](#making-tooltips-work-for-keyboard-and-assistive-technology-users).
 
 ### Keyboard support

@@ -22,10 +22,11 @@ import {
 import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
+import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import { containsFocus, focusIfUsable } from './util/focus.js'
 import {
-  handleEscape, registerLayer, unregisterLayer, type LayerEntry
+  closeLayersIn, handleEscape, reanchorLayer, registerLayer, unregisterLayer, type LayerEntry
 } from './util/layers.js'
 import {
   defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop, splitIds, writeAttribute
@@ -52,8 +53,11 @@ const NAME = 'tooltip'
 
 const CLASS_NAME_SHOW = 'show'
 
+const ATTRIBUTE_MOVING = 'data-coreui-moving'
+
 const SELECTOR_TOOLTIP_INNER = '.tooltip-inner'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="tooltip"]'
+const SELECTOR_DATA_ANCHORS = '[data-coreui-toggle="tooltip"][data-coreui-anchors]'
 
 const TRIGGER_HOVER = 'hover'
 const TRIGGER_FOCUS = 'focus'
@@ -65,6 +69,8 @@ const EVENT_HIDDEN = 'hidden'
 const EVENT_SHOW = 'show'
 const EVENT_SHOWN = 'shown'
 const EVENT_INSERTED = 'inserted'
+const EVENT_MOVE = 'move'
+const EVENT_MOVED = 'moved'
 const EVENT_CLICK = 'click'
 const EVENT_FOCUSIN = 'focusin'
 const EVENT_FOCUSOUT = 'focusout'
@@ -73,6 +79,8 @@ const EVENT_MOUSELEAVE = 'mouseleave'
 const EVENT_KEYDOWN = 'keydown'
 const EVENT_POINTERCANCEL = 'pointercancel'
 const EVENT_POINTERDOWN = 'pointerdown'
+
+const ANCHOR_SWITCH_DELAY = 100
 
 const ATTACHMENTS: Record<string, [string, string]> = {
   AUTO: ['auto', 'auto'],
@@ -86,11 +94,13 @@ const ATTACHMENTS: Record<string, [string, string]> = {
 
 type TooltipConfig = {
   allowList: SanitizerAllowList
+  anchors: string | boolean
   animation: boolean
   boundary: string | Element
   container: string | Element | boolean
   customClass: string | ((...args: any[]) => string)
   delay: number | { show: number, hide: number }
+  disabled: boolean
   fallbackPlacements: string[]
   floatingConfig: FloatingConfigOption
   html: boolean
@@ -110,11 +120,13 @@ type TooltipInternalConfig = TooltipConfig & { _trigger: string }
 
 const Default: TooltipConfig = {
   allowList: DefaultAllowlist,
+  anchors: false,
   animation: true,
   boundary: 'clippingParents',
   container: false,
   customClass: '',
   delay: 0,
+  disabled: false,
   fallbackPlacements: ['top', 'right', 'bottom', 'left'],
   floatingConfig: null,
   html: false,
@@ -133,11 +145,13 @@ const Default: TooltipConfig = {
 
 const DefaultType = {
   allowList: 'object',
+  anchors: '(string|boolean)',
   animation: 'boolean',
   boundary: '(string|element)',
   container: '(string|element|boolean)',
   customClass: '(string|function)',
   delay: '(number|object)',
+  disabled: 'boolean',
   fallbackPlacements: 'array',
   floatingConfig: '(null|object|function)',
   html: 'boolean',
@@ -173,6 +187,10 @@ class Tooltip extends BaseComponent {
   protected declare _mediaQueryListeners: BreakpointListener[]
   protected declare _responsivePlacements: ResponsivePlacements | null
   protected declare _layer: LayerEntry
+  protected declare _anchor: HTMLElement
+  protected declare _described: Element | null
+  protected declare _focusedAnchor: HTMLElement | null
+  protected declare _switchTimeout: number
   declare tip: HTMLElement | null
 
   constructor(element?: string | Element | null, config?: Partial<TooltipConfig> | null) {
@@ -183,7 +201,7 @@ class Tooltip extends BaseComponent {
     super(element, config)
 
     // Private
-    this._isEnabled = true
+    this._isEnabled = !this._config.disabled
     this._timeout = 0
     this._resolveTimeout = null
     this._isHovered = null
@@ -192,7 +210,7 @@ class Tooltip extends BaseComponent {
     this._keydownHandler = null
     this._focusOutsideHandler = null
     this._layer = {
-      anchor: () => this._element,
+      anchor: () => this._anchor,
       closesOn: reason => reason === 'escape' || reason === 'parent',
       closesSiblings: () => false,
       dismiss: () => {
@@ -209,6 +227,10 @@ class Tooltip extends BaseComponent {
     this._newContent = null
     this._mediaQueryListeners = []
     this._responsivePlacements = null
+    this._anchor = this._element as HTMLElement
+    this._described = null
+    this._focusedAnchor = null
+    this._switchTimeout = 0
 
     // Protected
     this.tip = null
@@ -216,7 +238,7 @@ class Tooltip extends BaseComponent {
     this._parseResponsivePlacements()
     this._setListeners()
 
-    if (!this._config.selector) {
+    if (!this._config.selector && !this._config.anchors) {
       this._fixTitle()
     }
   }
@@ -241,10 +263,21 @@ class Tooltip extends BaseComponent {
 
   disable(): void {
     this._isEnabled = false
+    this.hide()
+
+    if (this._config.selector) {
+      for (const element of SelectorEngine.find(this._config.selector as string, this._element)) {
+        this.constructor.getInstance(element)?.hide()
+      }
+    }
   }
 
   toggleEnabled(): void {
-    this._isEnabled = !this._isEnabled
+    if (this._isEnabled) {
+      this.disable()
+    } else {
+      this.enable()
+    }
   }
 
   toggle(): Promise<void> {
@@ -257,13 +290,16 @@ class Tooltip extends BaseComponent {
 
   override dispose(): void {
     this._clearTimeout()
+    clearTimeout(this._switchTimeout)
 
     this._removeEscapeListener()
     this._removeFocusOutsideListener()
     unregisterLayer(this._layer, 'parent')
 
-    if (this._element.getAttribute('data-coreui-original-title')) {
-      this._element.setAttribute('title', this._element.getAttribute('data-coreui-original-title')!)
+    for (const element of this._config.anchors ? SelectorEngine.find(this._config.anchors as string, this._element) : [this._element]) {
+      if (element.getAttribute('data-coreui-original-title')) {
+        element.setAttribute('title', element.getAttribute('data-coreui-original-title')!)
+      }
     }
 
     this._disposeFloating()
@@ -272,7 +308,11 @@ class Tooltip extends BaseComponent {
   }
 
   async show(): Promise<void> {
-    if (this._element.style.display === 'none') {
+    if (this._config.anchors && this._anchor === this._element) {
+      return
+    }
+
+    if (this._anchor.style.display === 'none') {
       throw new Error('Please use show on visible elements')
     }
 
@@ -280,9 +320,9 @@ class Tooltip extends BaseComponent {
       return
     }
 
-    const showEvent = EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SHOW))
-    const shadowRoot = findShadowRoot(this._element)
-    const isInTheDom = (shadowRoot || this._element.ownerDocument.documentElement).contains(this._element)
+    const showEvent = this._triggerEvent(EVENT_SHOW)
+    const shadowRoot = findShadowRoot(this._anchor)
+    const isInTheDom = (shadowRoot || this._anchor.ownerDocument.documentElement).contains(this._anchor)
 
     if (showEvent.defaultPrevented || !isInTheDom) {
       // Reset the transient hover/active state so a prevented (or not-in-DOM)
@@ -300,7 +340,7 @@ class Tooltip extends BaseComponent {
     this._describe(tip, true)
 
     let { container } = this._config as TooltipConfig & { container: Element }
-    const closestDialog = this._element.closest('dialog[open]')
+    const closestDialog = this._anchor.closest('dialog[open]')
     if (closestDialog && container === document.body) {
       container = closestDialog
     }
@@ -314,7 +354,7 @@ class Tooltip extends BaseComponent {
         tip.dir = this._isRTL() ? 'rtl' : 'ltr'
       }
 
-      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_INSERTED))
+      this._triggerEvent(EVENT_INSERTED)
       this._setTipListeners(tip)
     }
 
@@ -338,7 +378,7 @@ class Tooltip extends BaseComponent {
     }
 
     const complete = () => {
-      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SHOWN))
+      this._triggerEvent(EVENT_SHOWN)
 
       if (this._isHovered === false) {
         this._leave()
@@ -355,7 +395,7 @@ class Tooltip extends BaseComponent {
       return
     }
 
-    const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName(EVENT_HIDE))
+    const hideEvent = this._triggerEvent(EVENT_HIDE)
     if (hideEvent.defaultPrevented) {
       return
     }
@@ -368,10 +408,11 @@ class Tooltip extends BaseComponent {
 
     if (focusInside && this._element.ownerDocument.hasFocus()) {
       this._describe(tip, false)
-      focusIfUsable(this._element)
+      focusIfUsable(this._anchor)
     }
 
     tip.classList.remove(CLASS_NAME_SHOW)
+    tip.removeAttribute(ATTRIBUTE_MOVING)
 
     // If this is a touch-enabled device we remove the extra
     // empty mouseover listeners we added for iOS support
@@ -385,6 +426,8 @@ class Tooltip extends BaseComponent {
     this._activeTrigger[TRIGGER_FOCUS] = false
     this._activeTrigger[TRIGGER_HOVER] = false
     this._isHovered = null // it is a trick to support manual triggering
+    this._focusedAnchor = null
+    clearTimeout(this._switchTimeout)
 
     const complete = () => {
       if (this._isWithActiveTrigger()) {
@@ -396,7 +439,7 @@ class Tooltip extends BaseComponent {
       }
 
       this._describe(tip, false)
-      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_HIDDEN))
+      this._triggerEvent(EVENT_HIDDEN)
     }
 
     await this._queueCallback(complete, this.tip!, this._isAnimated())
@@ -448,6 +491,11 @@ class Tooltip extends BaseComponent {
 
   setContent(content: Record<string, TemplateContentEntry>): void {
     this._newContent = content
+    if (this._config.anchors && this._isShown()) {
+      this._renderTip(this.tip!)
+      return
+    }
+
     if (this._isShown()) {
       this._disposeFloating()
       this.show()
@@ -477,12 +525,13 @@ class Tooltip extends BaseComponent {
   }
 
   protected _getTitle(): string | Element | null {
-    return this._resolvePossibleFunction(this._config.title) || this._element.getAttribute('data-coreui-original-title')
+    return (this._config.anchors && (this._anchor.getAttribute('data-coreui-title') || this._anchor.getAttribute('data-coreui-original-title'))) ||
+      this._resolvePossibleFunction(this._config.title) || this._anchor.getAttribute('data-coreui-original-title')
   }
 
   // Private
-  protected _initializeOnDelegatedTarget(event: CoreUIEvent): Tooltip {
-    return this.constructor.getOrCreateInstance(event.delegateTarget, this._getDelegateConfig())
+  protected _initializeOnDelegatedTarget(event: CoreUIEvent): Tooltip | null {
+    return event.delegateTarget.hasAttribute('data-coreui-anchors') ? null : this.constructor.getOrCreateInstance(event.delegateTarget, this._getDelegateConfig())
   }
 
   protected _getInstantClassName(): string {
@@ -498,13 +547,26 @@ class Tooltip extends BaseComponent {
   }
 
   protected _describe(tip: HTMLElement, described: boolean): void {
-    const ids = splitIds(this._element.getAttribute('aria-describedby')).filter(id => id !== tip.id)
+    const write = (element: Element, add: boolean) => {
+      const ids = splitIds(element.getAttribute('aria-describedby')).filter(id => id !== tip.id)
 
-    if (described) {
-      ids.push(tip.id)
+      if (add) {
+        ids.push(tip.id)
+      }
+
+      writeAttribute(element, 'aria-describedby', ids.join(' ') || null)
     }
 
-    writeAttribute(this._element, 'aria-describedby', ids.join(' ') || null)
+    if (this._described) {
+      write(this._described, false)
+    }
+
+    const active = this._anchor.ownerDocument.activeElement
+    this._described = described ? (this._config.anchors && active !== this._anchor && this._anchor.contains(active) ? active! : this._anchor) : null
+
+    if (this._described) {
+      write(this._described, true)
+    }
   }
 
   protected _getPlacement(tip: HTMLElement): string {
@@ -514,7 +576,7 @@ class Tooltip extends BaseComponent {
     }
 
     // Execute placement (can be a function)
-    return this._attachment(execute(this._config.placement, [this, tip, this._element]) as string)
+    return this._attachment(execute(this._config.placement, [this, tip, this._anchor]) as string)
   }
 
   protected _attachment(placement: string): string {
@@ -525,7 +587,7 @@ class Tooltip extends BaseComponent {
   // own text direction: reboot keeps `tel`, `url`, `email` and `number` fields
   // left-to-right whatever the page does, and the tip is not part of the value.
   protected _isRTL(): boolean {
-    return isRTL(this._element.parentElement ?? this._element)
+    return isRTL(this._anchor.parentElement ?? this._anchor)
   }
 
   protected _parseResponsivePlacements(): void {
@@ -563,16 +625,23 @@ class Tooltip extends BaseComponent {
     // Initial position update
     await this._updateFloatingPosition(tip, placement, arrowElement)
 
+    if (tip !== this.tip) {
+      return
+    }
+
     // Set up auto-update for scroll/resize
+    this._floatingCleanup?.()
     this._floatingCleanup = autoUpdate(
-      this._element,
+      this._anchor,
       tip,
-      () => this._updateFloatingPosition(tip, null, arrowElement)
+      () => this._config.anchors && !this._anchor.isConnected ? this.hide() : this._updateFloatingPosition(tip, null, arrowElement)
     )
   }
 
   protected async _updateFloatingPosition(tip: HTMLElement | null = this.tip, placement: string | null = null, arrowElement: HTMLElement | null = null): Promise<void> {
-    if (!tip) {
+    const anchor = this._anchor
+
+    if (!tip?.isConnected) {
       return
     }
 
@@ -598,15 +667,15 @@ class Tooltip extends BaseComponent {
     Manipulator.setDataAttribute(tip, 'placement', floatingConfig.placement)
 
     let { x, y, placement: finalPlacement, middlewareData } = await computePosition(
-      this._element,
+      anchor,
       tip,
       floatingConfig
     )
 
-    if (finalPlacement !== floatingConfig.placement) {
+    if (finalPlacement !== floatingConfig.placement && tip.isConnected) {
       Manipulator.setDataAttribute(tip, 'placement', finalPlacement);
       ({ x, y, placement: finalPlacement, middlewareData } = await computePosition(
-        this._element,
+        anchor,
         tip,
         { ...floatingConfig, placement: finalPlacement }
       ))
@@ -653,7 +722,7 @@ class Tooltip extends BaseComponent {
     if (typeof offset === 'function') {
       // Floating UI passes different args, adapt the interface for offset function callbacks
       return ({ placement, rects }) => {
-        const result = offset({ placement, reference: rects.reference, floating: rects.floating }, this._element)
+        const result = offset({ placement, reference: rects.reference, floating: rects.floating }, this._anchor)
         return toFloatingOffset(result)
       }
     }
@@ -662,7 +731,7 @@ class Tooltip extends BaseComponent {
   }
 
   protected _resolvePossibleFunction<T>(arg: T | ((...args: any[]) => T)): T {
-    return execute(arg, [this._element, this._element])
+    return execute(arg, [this._anchor, this._anchor])
   }
 
   protected _getFloatingMiddleware(arrowElement: HTMLElement | null): Middleware[] {
@@ -706,12 +775,21 @@ class Tooltip extends BaseComponent {
   }
 
   protected _setListeners(): void {
+    if (this._config.anchors) {
+      this._setAnchorListeners()
+      return
+    }
+
     const triggers = this._config.trigger.split(' ')
 
     for (const trigger of triggers) {
       if (trigger === 'click') {
         EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), this._config.selector as string, event => {
           const context = this._initializeOnDelegatedTarget(event)
+          if (!context || !this._isEnabled) {
+            return
+          }
+
           context._activeTrigger[TRIGGER_CLICK] = !(context._isShown() && context._activeTrigger[TRIGGER_CLICK])
           context.toggle()
         })
@@ -720,13 +798,17 @@ class Tooltip extends BaseComponent {
 
         EventHandler.on(this._element, eventIn, this._config.selector as string, event => {
           const context = this._initializeOnDelegatedTarget(event)
+          if (!context || !this._isEnabled) {
+            return
+          }
+
           context._activeTrigger[event.type === 'focusin' ? TRIGGER_FOCUS : TRIGGER_HOVER] = true
           context._enter()
         })
         EventHandler.on(this._element, eventOut, this._config.selector as string, event => {
           const context = this._initializeOnDelegatedTarget(event)
 
-          if (event.type === 'focusout' && context._pressedInside) {
+          if (!context || (event.type === 'focusout' && context._pressedInside)) {
             return
           }
 
@@ -737,6 +819,188 @@ class Tooltip extends BaseComponent {
         })
       }
     }
+  }
+
+  protected _setAnchorListeners(): void {
+    const anchors = this._config.anchors as string
+
+    for (const trigger of this._config.trigger.split(' ')) {
+      if (trigger === TRIGGER_CLICK) {
+        EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), anchors, event => {
+          const anchor = event.delegateTarget as HTMLElement
+          this._fixTitle(anchor)
+
+          if (!this._isEnabled) {
+            return
+          }
+
+          if (this._isShown() && anchor !== this._anchor) {
+            this._activeTrigger[TRIGGER_CLICK] = true
+            this._moveTo(anchor)
+            return
+          }
+
+          this._setAnchor(anchor)
+          this._activeTrigger[TRIGGER_CLICK] = !(this._isShown() && this._activeTrigger[TRIGGER_CLICK])
+          this.toggle()
+        })
+      } else if (trigger !== TRIGGER_MANUAL) {
+        const [eventIn, eventOut] = this._getTriggerEvents(trigger)
+
+        EventHandler.on(this._element, eventIn, anchors, event => {
+          this._enterAnchor(event.delegateTarget as HTMLElement, trigger)
+        })
+        EventHandler.on(this._element, eventOut, anchors, event => {
+          this._leaveAnchor(event, trigger)
+        })
+      }
+    }
+  }
+
+  protected _enterAnchor(anchor: HTMLElement, trigger: string): void {
+    this._fixTitle(anchor)
+
+    if (!this._isEnabled || this.tip?.contains(anchor)) {
+      return
+    }
+
+    clearTimeout(this._switchTimeout)
+
+    if (!this._hasContent(anchor)) {
+      if (this._isShown() && this._focusedAnchor !== this._anchor) {
+        this._activeTrigger[trigger] = false
+        this._leave()
+      }
+
+      return
+    }
+
+    if (trigger === TRIGGER_FOCUS) {
+      this._focusedAnchor = anchor
+    }
+
+    this._activeTrigger[trigger] = true
+
+    if (!this._isShown() || anchor === this._anchor) {
+      if (this.tip && anchor === this._anchor) {
+        this._describe(this.tip, true)
+      }
+
+      this._setAnchor(anchor)
+      this._enter()
+      return
+    }
+
+    this._isHovered = true
+    this._clearTimeout()
+
+    if (trigger === TRIGGER_FOCUS) {
+      this._moveTo(anchor)
+      return
+    }
+
+    this._switchTimeout = setTimeout(() => this._moveTo(anchor), ANCHOR_SWITCH_DELAY)
+  }
+
+  protected _leaveAnchor(event: CoreUIEvent, trigger: string): void {
+    if (trigger === TRIGGER_FOCUS) {
+      if (this._pressedInside) {
+        return
+      }
+
+      this._focusedAnchor = null
+    }
+
+    clearTimeout(this._switchTimeout)
+    this._activeTrigger[trigger] = this._isInside(event.relatedTarget as Node | null)
+
+    if (this._activeTrigger[trigger]) {
+      return
+    }
+
+    if (this._focusedAnchor && this._focusedAnchor !== this._anchor) {
+      this._moveTo(this._focusedAnchor)
+      return
+    }
+
+    this._leave()
+  }
+
+  protected _setAnchor(anchor: HTMLElement): void {
+    if (anchor !== this._anchor) {
+      this._anchor = anchor
+      this._newContent = null
+      this._templateFactory = null
+    }
+  }
+
+  protected _hasContent(anchor: HTMLElement): boolean {
+    if (anchor === this._anchor) {
+      return this._isWithContent()
+    }
+
+    const { _anchor: current, _newContent: content } = this
+    this._anchor = anchor
+    this._newContent = null
+    const hasContent = this._isWithContent()
+    this._anchor = current
+    this._newContent = content
+    return hasContent
+  }
+
+  protected async _moveTo(anchor: HTMLElement): Promise<void> {
+    const { tip } = this
+    const previous = this._anchor
+
+    if (!tip || anchor === previous) {
+      return
+    }
+
+    closeLayersIn(tip)
+    this._setAnchor(anchor)
+
+    if (containsFocus(tip)) {
+      focusIfUsable(anchor)
+    }
+
+    if (anchor.closest('dialog[open]') !== previous.closest('dialog[open]') || this._isRTL() !== isRTL(previous.parentElement ?? previous)) {
+      await this.hide()
+      return this.show()
+    }
+
+    const animated = this._isAnimated()
+    tip.toggleAttribute(ATTRIBUTE_MOVING, animated)
+    const positioned = this._renderTip(tip)
+    this._describe(tip, true)
+    reanchorLayer(this._layer)
+    this._triggerEvent(EVENT_MOVE)
+    await positioned
+
+    await this._queueCallback(() => {
+      if (this._anchor === anchor && this._isShown()) {
+        tip.removeAttribute(ATTRIBUTE_MOVING)
+        this._triggerEvent(EVENT_MOVED)
+      }
+    }, tip, animated, 'left')
+  }
+
+  protected _renderTip(tip: HTMLElement): Promise<void> {
+    closeLayersIn(tip)
+
+    if (containsFocus(tip)) {
+      focusIfUsable(this._anchor)
+    }
+
+    const fresh = this._createTipElement(this._newContent || this._getContentForTemplate())
+    fresh.classList.add(CLASS_NAME_SHOW)
+    tip.className = fresh.className
+    tip.replaceChildren(...fresh.childNodes)
+    this._floatingCleanup?.()
+    return this._createFloating(tip)
+  }
+
+  protected _triggerEvent(name: string): CoreUIEvent {
+    return EventHandler.trigger(this._element, this.constructor.eventName(name), { relatedTarget: this._anchor })
   }
 
   // Keep the tooltip open while the pointer or focus moves onto the tip
@@ -764,6 +1028,10 @@ class Tooltip extends BaseComponent {
         EventHandler.on(tip, eventOut, this._tipEventOut)
       }
     }
+
+    if (this._config.anchors) {
+      EventHandler.on(tip, this.constructor.eventName(EVENT_MOUSEENTER), () => clearTimeout(this._switchTimeout))
+    }
   }
 
   protected _removeTipListeners(tip: HTMLElement): void {
@@ -780,11 +1048,12 @@ class Tooltip extends BaseComponent {
       }
     }
 
+    EventHandler.off(tip, this.constructor.eventName(EVENT_MOUSEENTER))
     this._tipEventOut = null
   }
 
   protected _isInside(element: Node | null): boolean {
-    return this._element.contains(element) || Boolean(this.tip?.contains(element))
+    return this._anchor.contains(element) || Boolean(this.tip?.contains(element))
   }
 
   protected _getTrigger(): string {
@@ -834,7 +1103,7 @@ class Tooltip extends BaseComponent {
 
     this._focusOutsideHandler = event => {
       const inside = event.composedPath().some(node =>
-        node === this._element || node === this.tip || (node as Element).getAttribute?.('role') === 'tooltip'
+        node === this._anchor || node === this.tip || (node as Element).getAttribute?.('role') === 'tooltip'
       )
 
       if (event.type === EVENT_POINTERDOWN) {
@@ -850,7 +1119,7 @@ class Tooltip extends BaseComponent {
         event.type === EVENT_POINTERCANCEL ||
         (event.type === EVENT_CLICK && pressedInside) ||
         !this._activeTrigger[TRIGGER_FOCUS] ||
-        [this._element, this.tip].some(element => containsFocus(element))
+        [this._anchor, this.tip].some(element => containsFocus(element))
       ) {
         return
       }
@@ -877,19 +1146,19 @@ class Tooltip extends BaseComponent {
     this._pressedInside = false
   }
 
-  protected _fixTitle(): void {
-    const title = this._element.getAttribute('title')
+  protected _fixTitle(element: Element = this._element): void {
+    const title = element.getAttribute('title')
 
     if (!title) {
       return
     }
 
-    if (!this._element.getAttribute('aria-label') && !this._element.textContent!.trim()) {
-      this._element.setAttribute('aria-label', title)
+    if (!element.getAttribute('aria-label') && !element.textContent!.trim()) {
+      element.setAttribute('aria-label', title)
     }
 
-    this._element.setAttribute('data-coreui-original-title', title) // DO NOT USE IT. Is only for backwards compatibility
-    this._element.removeAttribute('title')
+    element.setAttribute('data-coreui-original-title', title) // DO NOT USE IT. Is only for backwards compatibility
+    element.removeAttribute('title')
   }
 
   protected _enter(): Promise<void> {
@@ -913,9 +1182,11 @@ class Tooltip extends BaseComponent {
 
     this._isHovered = false
 
+    const { hide } = this._config.delay as { show: number, hide: number }
+
     return this._setTimeout(
       () => this._isHovered ? undefined : this.hide(),
-      (this._config.delay as { show: number, hide: number }).hide
+      this._config.anchors ? Math.max(hide, ANCHOR_SWITCH_DELAY) : hide
     )
   }
 
@@ -947,6 +1218,10 @@ class Tooltip extends BaseComponent {
   }
 
   override _configAfterMerge(config: ComponentConfig): ComponentConfig {
+    if (config.anchors && (config.selector || config.trigger.includes(TRIGGER_MANUAL))) {
+      throw new TypeError(`${this.constructor.NAME.toUpperCase()}: "anchors" cannot be used with "selector" or a manual trigger.`)
+    }
+
     config.container = config.container === false ? document.body : getElement(config.container)
 
     // Delegated tooltips are created on the fly with `trigger` set to `manual`,
@@ -984,6 +1259,7 @@ class Tooltip extends BaseComponent {
       }
     }
 
+    config.disabled = false
     config.selector = false
     config.trigger = 'manual'
 
@@ -1018,7 +1294,9 @@ class Tooltip extends BaseComponent {
  */
 
 const initTooltip = (event: CoreUIEvent): void => {
-  const target = (event.target as Element).closest(SELECTOR_DATA_TOGGLE)
+  const element = event.target as Element
+  const host = element.closest(SELECTOR_DATA_ANCHORS)
+  const target = host?.contains(element.closest(host.getAttribute('data-coreui-anchors')!)) ? host : element.closest(SELECTOR_DATA_TOGGLE)
   if (!target) {
     return
   }

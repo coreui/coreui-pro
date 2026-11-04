@@ -63,6 +63,16 @@ $tooltip-tokens: defaults(
       );
     }
 
+    &[data-coreui-moving] {
+      transition-property: opacity, left, top;
+
+      .tooltip-arrow {
+        transition-timing-function: inherit;
+        transition-duration: inherit;
+        transition-property: inherit;
+      }
+    }
+
     &.show { opacity: 1; }
 
     .tooltip-arrow {

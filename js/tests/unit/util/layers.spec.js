@@ -1,6 +1,6 @@
 import {
-  closeLayersIn, getLayerAnchorFor, getLayerFocusTargetFor, getParentLayer, handleEscape, isComposingKey, isInDescendantParts, registerLayer,
-  settleClick, unregisterLayer
+  closeLayersIn, getLayerAnchorFor, getLayerFocusTargetFor, getParentLayer, handleEscape, isComposingKey, isInDescendantParts, reanchorLayer,
+  registerLayer, settleClick, unregisterLayer
 } from '../../../src/util/layers.js'
 import { trackPress } from '../../../src/util/press.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
@@ -81,6 +81,38 @@ describe('layers', () => {
 
     expect(getParentLayer(l)).toBe(d)
     expect(calls).toEqual([])
+  })
+
+  it('should find the parent again and stack the layer above it when its anchor changes', () => {
+    fixtureEl.innerHTML = '<button id="p-toggle"></button><div id="p-panel"><button id="inner"></button></div><button id="outer"></button><div id="tip"></div>'
+
+    let anchor = el('#outer')
+    const tip = layer('tip', { anchor: null, parts: [el('#tip')], tip: true })
+    tip.anchor = () => anchor
+    const popover = layer('p', { anchor: el('#p-toggle'), parts: [el('#p-toggle'), el('#p-panel')] })
+    registerLayer(tip)
+    registerLayer(popover)
+
+    expect(getParentLayer(tip)).toBeNull()
+
+    anchor = el('#inner')
+    reanchorLayer(tip)
+
+    expect(getParentLayer(tip)).toBe(popover)
+    expect(state().stack.map(record => record.entry)).toEqual([popover, tip])
+
+    anchor = el('#outer')
+    reanchorLayer(tip)
+
+    expect(getParentLayer(tip)).toBeNull()
+  })
+
+  it('should change nothing for a layer that is not open', () => {
+    const tip = layer('tip', { anchor: null, parts: [] })
+
+    reanchorLayer(tip)
+
+    expect(state()?.stack ?? []).toEqual([])
   })
 
   it('should cross shadow roots when it looks for the parent', () => {
