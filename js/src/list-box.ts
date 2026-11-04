@@ -531,8 +531,6 @@ class ListBox extends BaseComponent {
     const empty = document.createElement('div')
     empty.className = CLASS_NAME_EMPTY
     empty.setAttribute('role', 'status')
-    empty.hidden = true
-    empty.textContent = this._config.emptyLabel
     this._loadingRegion.after(empty)
     this._createdNodes.push(empty)
 
@@ -588,7 +586,9 @@ class ListBox extends BaseComponent {
       option.setAttribute('tabindex', value === this._active || option === roving ? '0' : '-1')
     }
 
-    this._empty?.toggleAttribute('hidden', this._config.loading || this._navigableOptions().length > 0)
+    if (this._empty) {
+      this._empty.textContent = this._config.loading || this._navigableOptions().length > 0 ? '' : this._config.emptyLabel
+    }
   }
 
   _resolveCounter(): HTMLElement | null {

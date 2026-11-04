@@ -222,7 +222,7 @@ Nothing marks the selection on its own — `aria-selected` and the `.selected` b
 
 ## Search
 
-`search` puts the List box's own search field at the top of the panel and hides what does not match. Because a hidden option leaves the navigation, everything downstream follows: the arrows skip it and the empty state appears when nothing is left. The focus moves into the field when the panel opens, and `aria-activedescendant` moves there with it, so typing and choosing happen in one place.
+`search` puts the List box's own search field at the top of the panel and hides what does not match. Because a hidden option leaves the navigation, everything downstream follows: the arrows skip it and the list box writes `emptyLabel` (`'No results found'` by default) into its status row when nothing is left, so screen readers hear it. The focus moves into the field when the panel opens, and `aria-activedescendant` moves there with it, so typing and choosing happen in one place.
 
 The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-search`; put one in the panel yourself and it is used as it is, wherever you placed it. `searchPlaceholder` fills its placeholder and `ariaSearchLabel` its accessible name.
 

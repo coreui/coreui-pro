@@ -298,4 +298,8 @@ $list-box-tokens: defaults(
     padding: var(--#{$prefix}list-box-option-padding-y) calc(var(--#{$prefix}list-box-padding-x) + var(--#{$prefix}list-box-option-padding-x));
     color: var(--#{$prefix}list-box-option-disabled-color);
   }
+
+  .list-box-empty:empty {
+    padding: 0;
+  }
 }

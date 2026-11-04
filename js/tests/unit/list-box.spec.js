@@ -1296,16 +1296,17 @@ describe('ListBox', () => {
       const listBox = new ListBox(el)
       const empty = el.querySelector('.list-box-empty')
 
-      expect(empty.hasAttribute('hidden')).toBeTrue()
+      expect(empty.textContent).toEqual('')
+      expect(empty.hasAttribute('hidden')).toBeFalse()
       expect(empty.getAttribute('role')).toEqual('status')
-      expect(empty.textContent).toEqual('No results found')
       expect(list(el).contains(empty)).toBeFalse()
       expect(el.querySelector('.list-box-loading').nextElementSibling).toBe(empty)
 
       item(el, 'lettuce').setAttribute('hidden', '')
       listBox.update()
 
-      expect(empty.hasAttribute('hidden')).toBeFalse()
+      expect(el.querySelector('.list-box-empty')).toBe(empty)
+      expect(empty.textContent).toEqual('No results found')
     })
 
     it('should write the empty state from emptyLabel, leave it out for an empty label, and remove it on dispose', () => {
@@ -1314,7 +1315,7 @@ describe('ListBox', () => {
 
       expect(el.querySelectorAll('.list-box-empty')).toHaveSize(1)
       expect(el.querySelector('.list-box-empty').textContent).toEqual('No vegetables')
-      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeFalse()
+      expect(el.querySelector('.list-box-empty').textContent).not.toEqual('')
 
       listBox.dispose()
       expect(el.querySelector('.list-box-empty')).toBeNull()
@@ -1342,7 +1343,7 @@ describe('ListBox', () => {
       // eslint-disable-next-line no-new
       new ListBox(el)
 
-      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeFalse()
+      expect(el.querySelector('.list-box-empty').textContent).not.toEqual('')
     })
   })
 
@@ -1496,7 +1497,7 @@ describe('ListBox', () => {
 
       expect(el.querySelectorAll('.list-box-option')).toHaveSize(0)
       expect(listBox.getItems()).toEqual([])
-      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeFalse()
+      expect(el.querySelector('.list-box-empty').textContent).not.toEqual('')
     })
 
     it('should disable every item of a disabled group', () => {
@@ -1644,11 +1645,11 @@ describe('ListBox', () => {
       const el = fixtureEl.querySelector('.list-box')
       const listBox = new ListBox(el, { items: [{ value: 'ham', label: 'Ham' }] })
 
-      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeTrue()
+      expect(el.querySelector('.list-box-empty').textContent).toEqual('')
 
       listBox.setItems([])
       expect(el.querySelectorAll('.list-box-option')).toHaveSize(0)
-      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeFalse()
+      expect(el.querySelector('.list-box-empty').textContent).not.toEqual('')
     })
 
     it('should normalize the items', () => {
@@ -2245,11 +2246,11 @@ describe('ListBox', () => {
       listBox.selectAll()
 
       expect(listBox.getSelectedValues()).toEqual(['ham'])
-      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeTrue()
+      expect(el.querySelector('.list-box-empty').textContent).toEqual('')
 
       listBox.filter('zzz')
 
-      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeFalse()
+      expect(el.querySelector('.list-box-empty').textContent).not.toEqual('')
     })
 
     it('should keep a hidden option out of the keyboard navigation', () => {
@@ -2505,19 +2506,19 @@ describe('ListBox', () => {
       expect(list(el).getAttribute('aria-busy')).toBeNull()
 
       listBox.setItems([])
-      expect(empty.hasAttribute('hidden')).toBeFalse()
+      expect(empty.textContent).not.toEqual('')
 
       listBox.setLoading(true)
       expect(el.classList.contains('loading')).toBeTrue()
       expect(list(el).getAttribute('aria-busy')).toEqual('true')
-      expect(empty.hasAttribute('hidden')).toBeTrue()
+      expect(empty.textContent).toEqual('')
 
       listBox.setItems([{ value: 'ham', label: 'Ham' }])
       listBox.setLoading(false)
 
       expect(el.classList.contains('loading')).toBeFalse()
       expect(list(el).getAttribute('aria-busy')).toBeNull()
-      expect(empty.hasAttribute('hidden')).toBeTrue()
+      expect(empty.textContent).toEqual('')
     })
 
     it('should let a script change the selection while loading', () => {

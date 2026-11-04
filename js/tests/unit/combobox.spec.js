@@ -1262,10 +1262,10 @@ describe('Combobox', () => {
 
       combobox.show()
       const empty = menu(combobox).querySelector('.list-box-empty')
-      expect(empty.hasAttribute('hidden')).toBeTrue()
+      expect(empty.textContent).toEqual('')
 
       type(searchField(combobox), 'zzz')
-      expect(empty.hasAttribute('hidden')).toBeFalse()
+      expect(empty.textContent).not.toEqual('')
       expect(empty.textContent).toEqual('No results found')
     })
 
@@ -1273,6 +1273,8 @@ describe('Combobox', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { emptyLabel: 'Brak wyników', search: true })
 
+      combobox.show()
+      type(searchField(combobox), 'zzz')
       expect(menu(combobox).querySelector('.list-box-empty').textContent).toEqual('Brak wyników')
       expect(new Combobox(setMarkup(), { emptyLabel: '' })._menu.querySelector('.list-box-empty')).toBeNull()
     })

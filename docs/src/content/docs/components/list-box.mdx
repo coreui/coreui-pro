@@ -337,7 +337,7 @@ An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</
 
 ## Empty state
 
-The list box writes a `.list-box-empty` row with `role="status"` after the options and shows it whenever nothing is left to navigate, so filtering a list has somewhere to land; it stays hidden while the list is loading. Its text is `emptyLabel`, `'No results found'` unless you set another; an empty `emptyLabel` leaves the row out. `update()` re-evaluates it.
+The list box writes a `.list-box-empty` row with `role="status"` after the `.list-box-options` element and fills it with `emptyLabel` whenever nothing is left to navigate, so filtering a list has somewhere to land and screen readers hear it; while something is left, and while the list is loading, the row stays on the page empty. Its text is `'No results found'` unless you set another; an empty `emptyLabel` leaves the row out, and so does a list box whose options sit directly in its root element, without `.list-box-options`. `update()` re-evaluates it.
 
 <Example code={`<div class="list-box" data-coreui-empty-label="No results" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Results">
