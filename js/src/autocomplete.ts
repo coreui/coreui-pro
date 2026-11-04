@@ -37,12 +37,11 @@ const DATA_KEY = 'coreui.autocomplete'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const ARROW_DOWN_KEY = 'ArrowDown'
-const ARROW_UP_KEY = 'ArrowUp'
 const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
+const F4_KEY = 'F4'
 const TAB_KEY = 'Tab'
 
 const EVENT_BLUR = `blur${EVENT_KEY}`
@@ -472,8 +471,6 @@ class Autocomplete extends ComboboxBase {
       }
     })
 
-    this._addTogglerKeydownListeners()
-
     EventHandler.on(this._indicatorElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()
       this.toggle()
@@ -508,21 +505,15 @@ class Autocomplete extends ComboboxBase {
     })
 
     EventHandler.on(this._inputElement, EVENT_KEYDOWN, (event: any) => {
-      // The list activated its highlighted option and closed the panel; the
-      // same press must not reopen it or match the value it just wrote.
-      const handledByList = event.key === ENTER_KEY && event.defaultPrevented
+      const f4 = event.key === F4_KEY && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey
 
-      if (!handledByList && !this._isShown() && event.key !== TAB_KEY && event.key !== ESCAPE_KEY && event.key !== ENTER_KEY) {
-        if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
-          event.preventDefault()
-          this._openingKey = event.key
-        }
-
-        this.show()
-        this._openingKey = null
+      if (!this._isShown() && (f4 || this._isOpeningArrow(event))) {
+        this._showForKey(event, f4 ? null : event.key)
       }
 
-      if (handledByList) {
+      // The list activated its highlighted option and closed the panel; the
+      // same press must not match the value it just wrote.
+      if (event.key === ENTER_KEY && event.defaultPrevented) {
         return
       }
 
@@ -904,10 +895,6 @@ class Autocomplete extends ComboboxBase {
     }
 
     this._cleanerElement.style.display = 'none'
-  }
-
-  override _isOpenKey(event: KeyboardEvent): boolean {
-    return event.key === ARROW_DOWN_KEY || (event.key === ENTER_KEY && event.target === this._togglerElement)
   }
 
   _restoreInitialSelection(): void {

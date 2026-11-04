@@ -5238,7 +5238,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
 
-      selectEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+      selectEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Home' }))
 
       expect(multiSelect._isShown()).toBeFalse()
       expect(document.activeElement).toBe(multiSelect._togglerElement)
@@ -5836,6 +5836,279 @@ describe('MultiSelect', () => {
       // Should not throw when nothing is selected
       multiSelect._deselectLastOption()
       expect(multiSelect.getValue().length).toBe(0)
+    })
+  })
+
+  describe('opening keys', () => {
+    const fruits = (selected = []) => ['Apple', 'Banana', 'Blueberry', 'Cherry'].map(text => ({ text, value: text, selected: selected.includes(text) }))
+    const mount = config => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, config)
+      const field = multiSelect._getFocusTarget()
+
+      field.focus()
+
+      return { field, multiSelect, selectEl }
+    }
+
+    const press = (target, key, init = {}) => {
+      const event = new KeyboardEvent('keydown', {
+        key, bubbles: true, cancelable: true, ...init
+      })
+      target.dispatchEvent(event)
+      return event
+    }
+
+    const focusedText = () => document.activeElement.textContent.trim()
+
+    it('should enter the list on ArrowDown from the closed search field', () => {
+      for (const init of [{}, { altKey: true }]) {
+        const { field, multiSelect } = mount({ options: fruits(), search: true })
+        const event = press(field, 'ArrowDown', init)
+
+        expect(event.defaultPrevented).toBeTrue()
+        expect(multiSelect._isShown()).toBeTrue()
+        expect(focusedText()).toBe('Apple')
+
+        multiSelect.dispose()
+      }
+    })
+
+    it('should enter the list at the last option on ArrowUp from the closed search field', () => {
+      for (const init of [{}, { altKey: true }]) {
+        const { field, multiSelect } = mount({ options: fruits(), search: true })
+        const event = press(field, 'ArrowUp', init)
+
+        expect(event.defaultPrevented).toBeTrue()
+        expect(focusedText()).toBe('Cherry')
+
+        multiSelect.dispose()
+      }
+    })
+
+    it('should enter the list at the selected option from the closed search field', () => {
+      for (const key of ['ArrowDown', 'ArrowUp']) {
+        const { field, multiSelect } = mount({ options: fruits(['Banana', 'Blueberry']), search: true })
+
+        press(field, key)
+
+        expect(focusedText()).withContext(key).toBe('Banana')
+
+        multiSelect.dispose()
+      }
+    })
+
+    it('should keep the focus in the search field when no option can take it', () => {
+      const cases = [
+        ['disabled', { options: [{ text: 'Apple', value: 'a', disabled: true }], search: true }],
+        ['loading', { options: [], search: true }],
+        ['external', { options: [], search: 'external' }]
+      ]
+
+      for (const [name, config] of cases) {
+        for (const key of ['ArrowDown', 'ArrowUp']) {
+          const { field, multiSelect } = mount(config)
+
+          if (name === 'loading') {
+            multiSelect.setLoading(true)
+          }
+
+          const event = press(field, key)
+          const context = `${name} ${key}`
+
+          expect(event.defaultPrevented).withContext(context).toBeTrue()
+          expect(multiSelect._isShown()).withContext(context).toBeTrue()
+          expect(document.activeElement).withContext(context).toBe(field)
+
+          multiSelect.dispose()
+        }
+      }
+    })
+
+    it('should leave arrows with Ctrl, Meta or Shift and composing arrows to the search field', () => {
+      for (const init of [{ ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { isComposing: true }, { keyCode: 229 }]) {
+        const { field, multiSelect } = mount({ options: fruits(), search: true })
+        const event = press(field, 'ArrowDown', init)
+
+        expect(event.defaultPrevented).withContext(JSON.stringify(init)).toBeFalse()
+        expect(multiSelect._isShown()).withContext(JSON.stringify(init)).toBeFalse()
+
+        multiSelect.dispose()
+      }
+    })
+
+    it('should open on Space and ArrowUp from the frame', () => {
+      const cases = [
+        [' ', {}, 'Apple'],
+        ['ArrowUp', {}, 'Cherry'],
+        ['ArrowUp', { altKey: true }, 'Cherry'],
+        ['ArrowUp', { shiftKey: true }, 'Cherry'],
+        ['ArrowDown', { shiftKey: true }, 'Apple'],
+        ['Enter', { shiftKey: true }, 'Apple'],
+        ['ArrowDown', { ctrlKey: true }, null],
+        ['ArrowUp', { metaKey: true }, null],
+        ['Enter', { ctrlKey: true }, null],
+        ['Enter', { metaKey: true }, null],
+        [' ', { ctrlKey: true }, null],
+        [' ', { isComposing: true }, null],
+        [' ', { keyCode: 229 }, null],
+        ['Enter', { isComposing: true }, null]
+      ]
+
+      for (const [key, init, text] of cases) {
+        const { field, multiSelect } = mount({ options: fruits() })
+        const event = press(field, key, init)
+        const context = `${key} ${JSON.stringify(init)}`
+
+        expect(event.defaultPrevented).withContext(context).toBe(text !== null)
+        expect(multiSelect._isShown()).withContext(context).toBe(text !== null)
+
+        if (text) {
+          expect(focusedText()).withContext(context).toBe(text)
+        }
+
+        multiSelect.dispose()
+      }
+    })
+
+    it('should prevent the key when the page refuses the open', () => {
+      const { field, multiSelect, selectEl } = mount({ options: fruits() })
+
+      selectEl.addEventListener('show.coreui.multi-select', event => event.preventDefault())
+
+      expect(press(field, 'ArrowDown').defaultPrevented).toBeTrue()
+      expect(multiSelect._isShown()).toBeFalse()
+    })
+
+    it('should open on Enter from the closed search field and keep the focus there', () => {
+      const { field, multiSelect } = mount({ options: fruits(), search: true })
+      const event = press(field, 'Enter')
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(multiSelect._isShown()).toBeTrue()
+      expect(document.activeElement).toBe(field)
+      expect(multiSelect._listBox.getActive()).toBeNull()
+    })
+
+    it('should close another open layer when the cleaner is clicked', () => {
+      fixtureEl.innerHTML = '<select id="first"></select><select id="second"></select>'
+      const first = new MultiSelect(fixtureEl.querySelector('#first'), { options: fruits(['Apple']) })
+      const second = new MultiSelect(fixtureEl.querySelector('#second'), { options: fruits() })
+
+      second.show()
+      first._wrapperElement.querySelector('.form-control-cleaner').click()
+
+      expect(first.getValue()).toEqual([])
+      expect(second._isShown()).toBeFalse()
+    })
+
+    it('should keep the focus on the control after the cleaner clears it', async () => {
+      const clear = async (search, action) => {
+        const { multiSelect } = mount({ options: fruits(['Apple']), search })
+        const cleaner = multiSelect._wrapperElement.querySelector('.form-control-cleaner')
+
+        cleaner.focus()
+
+        if (action === 'Enter') {
+          await userEvent.keyboard('{Enter}')
+        } else {
+          cleaner.click()
+        }
+
+        expect(multiSelect.getValue()).withContext(`${search} ${action}`).toEqual([])
+        expect(document.activeElement).withContext(`${search} ${action}`).toBe(multiSelect._getFocusTarget())
+
+        multiSelect.dispose()
+      }
+
+      await clear(false, 'Enter')
+      await clear(true, 'Enter')
+      await clear(false, 'click')
+      await clear(true, 'click')
+    })
+    it('should open on the first option starting with a typed letter from the frame', () => {
+      for (const [selected, init, text] of [[[], {}, 'Banana'], [['Banana'], {}, 'Blueberry'], [[], { ctrlKey: true }, null], [[], { metaKey: true }, null]]) {
+        const { field, multiSelect } = mount({ options: fruits(selected) })
+        const event = press(field, 'b', init)
+
+        expect(event.defaultPrevented).withContext(JSON.stringify(init)).toBe(text !== null)
+        expect(multiSelect._isShown()).withContext(JSON.stringify(init)).toBe(text !== null)
+
+        if (text) {
+          expect(focusedText()).toBe(text)
+        }
+
+        multiSelect.dispose()
+      }
+
+      const { field } = mount({
+        options: [{ label: 'Berries', options: [{ text: 'Strawberry', value: 's' }] }, { label: 'Other', options: [{ text: 'Banana', value: 'b' }] }],
+        optionsGroupsSelectable: true
+      })
+
+      press(field, 'b')
+
+      expect(focusedText()).toBe('Banana')
+    })
+
+    it('should continue the typeahead with the next letter after opening', () => {
+      const { field } = mount({ options: fruits() })
+
+      press(field, 'b')
+      expect(focusedText()).toBe('Banana')
+
+      press(document.activeElement, 'l')
+      expect(focusedText()).toBe('Blueberry')
+    })
+
+    it('should leave keys on a chip, the cleaner or the picker button to them', () => {
+      const { multiSelect } = mount({ options: fruits(['Apple']) })
+      const targets = [
+        multiSelect._selectionElement.querySelector('.chip'),
+        multiSelect._wrapperElement.querySelector('.form-control-cleaner'),
+        multiSelect._indicatorElement
+      ]
+
+      for (const target of targets) {
+        for (const key of ['Enter', 'ArrowDown', ' ']) {
+          expect(press(target, key).defaultPrevented).withContext(`${target.className} ${key}`).toBeFalse()
+          expect(multiSelect._isShown()).withContext(`${target.className} ${key}`).toBeFalse()
+        }
+      }
+    })
+
+    it('should open from the native select with the same keys as the frame', () => {
+      for (const [key, text] of [['ArrowDown', 'Apple'], ['ArrowUp', 'Cherry'], [' ', 'Apple'], ['Enter', 'Apple'], ['b', 'Banana']]) {
+        const { multiSelect, selectEl } = mount({ options: fruits() })
+
+        press(selectEl, key)
+
+        expect(multiSelect._isShown()).withContext(key).toBeTrue()
+        expect(focusedText()).withContext(key).toBe(text)
+
+        multiSelect.dispose()
+      }
+    })
+
+    it('should open on the selected option, skipping a disabled one', () => {
+      const options = selected => [
+        { text: 'Apple', value: 'a' },
+        {
+          text: 'Banana', value: 'b', selected: true, disabled: true
+        },
+        { text: 'Cherry', value: 'c', selected }
+      ]
+
+      for (const [selected, key, text] of [[true, 'ArrowDown', 'Cherry'], [true, 'ArrowUp', 'Cherry'], [false, 'ArrowDown', 'Apple'], [false, 'ArrowUp', 'Cherry']]) {
+        const { field, multiSelect } = mount({ options: options(selected) })
+
+        press(field, key)
+
+        expect(focusedText()).withContext(`${selected} ${key}`).toBe(text)
+
+        multiSelect.dispose()
+      }
     })
   })
 

@@ -14,7 +14,7 @@ import { findOptionByValue, isOptionGroup } from './util/option-tree.js'
 import { focusIfUsable } from './util/focus.js'
 import { findOpeningItem } from './util/list-navigation.js'
 import {
-  handleEscape, isInDescendantParts, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
+  handleEscape, isComposingKey, isInDescendantParts, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
 } from './util/layers.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { escapeHtml } from './util/sanitizer.js'
@@ -35,8 +35,12 @@ import { executeAfterTransition, getElement } from './util/index.js'
  */
 
 const ARROW_DOWN_KEY = 'ArrowDown'
+const ARROW_UP_KEY = 'ArrowUp'
 const ENTER_KEY = 'Enter'
+const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
+
+const OPEN_KEYS = new Set([ARROW_DOWN_KEY, ARROW_UP_KEY, ENTER_KEY, SPACE_KEY])
 
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_POPUP = 'combobox-popup'
@@ -306,27 +310,26 @@ class ComboboxBase extends BaseComponent {
   }
 
   // Shared keyboard wiring — the list itself runs the arrows, Home/End and the
-  // activation keys off the field it was given, so the frame only has to open.
+  // activation keys off the field it was given, so the field only has to open.
 
-  _addTogglerKeydownListeners(): void {
-    EventHandler.on(this._togglerElement, this.constructor.eventName('keydown'), (event: any) => {
-      // A nested control that owns its own keyboard handling marks the event
-      // handled — Multi Select's native <select> overlay lives inside the frame
-      // and hands the keystroke over itself, so the frame must not act on the
-      // same press a second time and jump into the menu.
-      if (event.defaultPrevented) {
-        return
-      }
-
-      if (!this._isShown() && this._isOpenKey(event)) {
-        event.preventDefault()
-        this.show()
-      }
-    })
+  _isOpenKey(key: string): boolean {
+    return OPEN_KEYS.has(key)
   }
 
-  _isOpenKey(event: KeyboardEvent): boolean {
-    return event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY
+  _isOpeningArrow(event: KeyboardEvent): boolean {
+    return (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) &&
+      !event.ctrlKey && !event.metaKey && !event.shiftKey && !isComposingKey(event)
+  }
+
+  _showForKey(event: KeyboardEvent, key: string | null = event.key): void {
+    if (!this._canShow()) {
+      return
+    }
+
+    event.preventDefault()
+    this._openingKey = key
+    this.show()
+    this._openingKey = null
   }
 
   _activateForKey(key: string | null): void {
@@ -336,14 +339,14 @@ class ComboboxBase extends BaseComponent {
       return
     }
 
-    const options = listBox._navigableOptions()
-    const current = options.findIndex(option => listBox._optionValue(option) === listBox.getActive())
-    const option = findOpeningItem(options, current, key, item => listBox._optionText(item))
+    const items = listBox._navigable()
+    const current = items.findIndex(item => this._store.has(listBox._optionValue(item)))
+    const item = findOpeningItem(items, current, key, item => listBox._isSectionToggle(item) ? '' : listBox._optionText(item))
 
     listBox._seedTypeahead(key)
 
-    if (option) {
-      listBox._setActive(listBox._optionValue(option), true)
+    if (item) {
+      listBox._setActive(listBox._optionValue(item), true)
     }
   }
 
