@@ -20,17 +20,17 @@ const loadUsers = async (query = '') => {
     }))
     const found = new Set(users.map(user => user.value))
 
-    transfer.setItems([...users, ...[...invited.values()].filter(user => !found.has(user.value))])
+    transfer.setOptions([...users, ...[...invited.values()].filter(user => !found.has(user.value))])
   } catch (error) {
     console.error('Error fetching users:', error)
-    transfer.setItems([...invited.values()])
+    transfer.setOptions([...invited.values()])
   } finally {
     transfer.setLoading(false, 'source')
   }
 }
 
 element.addEventListener('change.coreui.transfer', event => {
-  const users = new Map(transfer.getItems().map(user => [user.value, user]))
+  const users = new Map(transfer.getOptions().map(user => [user.value, user]))
 
   invited.clear()
 

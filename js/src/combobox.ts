@@ -84,12 +84,12 @@ type ComboboxConfig = {
   emptyLabel: string
   html: boolean
   indicator: string
-  items: ListBoxEntry[] | null
   multiple: boolean
   name: string | null
+  options: ListBoxEntry[] | null
   placeholder: string
   required: boolean
-  resetSelectionOnItemsChange: boolean
+  resetSelectionOnOptionsChange: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   search: boolean | string
@@ -111,12 +111,12 @@ const Default: ComboboxConfig = {
   emptyLabel: 'No results found',
   html: false,
   indicator: 'none',
-  items: null,
   multiple: false,
   name: null,
+  options: null,
   placeholder: '',
   required: false,
-  resetSelectionOnItemsChange: false,
+  resetSelectionOnOptionsChange: false,
   sanitize: true,
   sanitizeFn: null,
   search: false,
@@ -138,12 +138,12 @@ const DefaultType: Record<string, string> = {
   emptyLabel: 'string',
   html: 'boolean',
   indicator: 'string',
-  items: '(array|null)',
   multiple: 'boolean',
   name: '(string|null)',
+  options: '(array|null)',
   placeholder: 'string',
   required: 'boolean',
-  resetSelectionOnItemsChange: 'boolean',
+  resetSelectionOnOptionsChange: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   search: '(boolean|string)',
@@ -236,11 +236,11 @@ class Combobox extends ComboboxBase {
     this._applySelection([])
   }
 
-  setItems(items: ListBoxEntry[]): void {
+  setOptions(items: ListBoxEntry[]): void {
     const listed = new Map(SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).map(option => [this._valueOf(option as HTMLElement), this._labelOf(option as HTMLElement)]))
 
     this._labels = new Map((this._listBox?.getSelectedValues() ?? []).map(value => [value, listed.get(value) ?? this._labels.get(value) ?? value]))
-    this._listBox?.setItems(items)
+    this._listBox?.setOptions(items)
     this._updateValue()
   }
 
@@ -413,7 +413,7 @@ class Combobox extends ComboboxBase {
   }
 
   // The panel is written next to the toggle, or built here when the options
-  // come from `items`. Either way it leaves the document until the first
+  // come from `options`. Either way it leaves the document until the first
   // open — a `.popup` is laid out absolutely, so it would otherwise sit in
   // the flow of whatever follows the toggle.
   _resolveMenu(): void {
@@ -489,8 +489,8 @@ class Combobox extends ComboboxBase {
       emptyLabel: this._config.emptyLabel,
       html: this._config.html,
       indicator: this._config.indicator,
-      items: this._config.items,
-      resetSelectionOnItemsChange: this._config.resetSelectionOnItemsChange,
+      options: this._config.options,
+      resetSelectionOnOptionsChange: this._config.resetSelectionOnOptionsChange,
       sanitize: this._config.sanitize,
       sanitizeFn: this._config.sanitizeFn,
       search: this._config.search,

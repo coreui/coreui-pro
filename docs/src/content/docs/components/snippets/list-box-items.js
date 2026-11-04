@@ -1,10 +1,10 @@
 const element = document.getElementById('listBoxItems')
 
 coreui.ListBox.getOrCreateInstance(element, {
-  items: [
+  options: [
     {
       label: 'Veggies',
-      items: [
+      options: [
         { value: 'lettuce', label: 'Lettuce' },
         { value: 'tomato', label: 'Tomato', description: 'Ripe' },
         { value: 'onion', label: 'Onion', disabled: true }
@@ -12,7 +12,7 @@ coreui.ListBox.getOrCreateInstance(element, {
     },
     {
       label: 'Protein',
-      items: [
+      options: [
         { value: 'ham', label: 'Ham', selected: true },
         { value: 'tuna', label: 'Tuna', description: 'Line caught' }
       ]

@@ -478,7 +478,7 @@ class MultiSelect extends ComboboxBase {
     this._initialSelection = this._fit(initial.map(option => option.value)).map(value => initial.find(option => option.value === value))
     this._element.replaceChildren()
     this._createNativeOptions(this._element, this._options)
-    this._listBox?.setItems(this._getListBoxItems())
+    this._listBox?.setOptions(this._getListBoxOptions())
     this._filterOptionsList()
     this._commit(next, reset)
 

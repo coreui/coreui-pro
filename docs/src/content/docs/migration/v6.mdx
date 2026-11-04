@@ -357,7 +357,7 @@ after the option it changes:
 | --- | --- |
 | Autocomplete | `setValue()`, `setOptions()`, `setValidationState()`, `disable()`, `enable()` |
 | Calendar | `setStartDate()`, `setEndDate()`, `setRange()`, `setCalendarDate()`, `setSelectEndDate()` |
-| Chip Input, Combobox | `setValidationState()`; Combobox keeps `setValue()` and `setItems()` |
+| Chip Input, Combobox | `setValidationState()`; Combobox keeps `setValue()` and `setOptions()` |
 | Date Input, Time Input | `setDate()`, `setValidationState()`, `disable()`, `enable()` |
 | Date Range Input, Date Range Picker | `setStartDate()`, `setEndDate()`, `setRange()`, `setValidationState()` |
 | Date Picker, Time Picker | `setDate()` / `setTime()`, `setValidationState()` |
@@ -396,20 +396,22 @@ after the option it changes:
 `Toaster.update(id, options)` is unchanged — it rewrites one toast in the store
 rather than reconfiguring the component.
 
-#### The list box writes its own empty row, and an empty `items` array is a list
+#### The list box writes its own empty row, and its data is `options`
 
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **List box writes the `.list-box-empty` row itself.** Its text is the new
   `emptyLabel` option, `'No results found'` by default; an empty string leaves
   the row out. Drop the `.list-box-empty` element from your markup and move its
-  text to `data-coreui-empty-label`. Combobox and Transfer show the row too now,
-  Multi Select passes `searchNoResultsLabel` and Autocomplete shows it only when
-  `searchNoResultsLabel` is set.
+  text to `data-coreui-empty-label`. Combobox and Transfer show the row too and
+  take `emptyLabel` as well, Multi Select passes `searchNoResultsLabel` and
+  Autocomplete shows it only when `searchNoResultsLabel` is set.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **`items` defaults to `null` on List box, Combobox and Transfer.** `null` reads
-  the options from the markup; any array, an empty one included, is the list.
-  Before, an empty array at construction fell back to the markup while
-  `setItems([])` emptied the list.
+  **List box, Combobox and Transfer take their data as `options`, like Multi
+  Select and Autocomplete.** `items` is now `options`, a group is
+  `{ label, options, disabled }`, `setItems()`/`getItems()` are
+  `setOptions()`/`getOptions()` and `resetSelectionOnItemsChange` is
+  `resetSelectionOnOptionsChange`. `options` defaults to `null`, which reads the
+  markup; any array, an empty one included, is the list.
 
 #### A getter says what it returns
 

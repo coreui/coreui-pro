@@ -405,7 +405,7 @@ class ComboboxBase extends BaseComponent {
       allowList: this._config.allowList,
       emptyLabel: this._config.searchNoResultsLabel || '',
       html: this._hasOptionTemplates(),
-      items: this._getListBoxItems(),
+      options: this._getListBoxOptions(),
       sanitize: this._config.sanitize,
       sanitizeFn: this._config.sanitizeFn,
       selectionMode: 'single',
@@ -423,12 +423,12 @@ class ComboboxBase extends BaseComponent {
       typeof this._config.optionsGroupsTemplate === 'function'
   }
 
-  _getListBoxItems(options: any[] = this._options): any[] {
+  _getListBoxOptions(options: any[] = this._options): any[] {
     return options.map((option: any) => {
       if (isOptionGroup(option)) {
         return {
           label: this._renderGroupLabel(option),
-          items: this._getListBoxItems(option.options)
+          options: this._getListBoxOptions(option.options)
         }
       }
 
@@ -467,8 +467,8 @@ class ComboboxBase extends BaseComponent {
     return this._hasOptionTemplates() ? escapeHtml(String(label)) : String(label)
   }
 
-  _setListBoxItems(): void {
-    this._listBox?.setItems(this._getListBoxItems())
+  _setListBoxOptions(): void {
+    this._listBox?.setOptions(this._getListBoxOptions())
     this._afterOptionsRendered()
   }
 

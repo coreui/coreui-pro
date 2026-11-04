@@ -4652,7 +4652,7 @@ describe('Autocomplete', () => {
       })
 
       autocomplete._search = 'app'
-      autocomplete._setListBoxItems()
+      autocomplete._setListBoxOptions()
 
       const optionEl = autocomplete._optionsElement.querySelector('.list-box-option')
       expect(optionEl.innerHTML).toContain('<strong>')

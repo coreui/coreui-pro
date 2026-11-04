@@ -97,10 +97,10 @@ describe('ListBox', () => {
         emptyLabel: 'No results found',
         html: false,
         indicator: 'none',
-        items: null,
+        options: null,
         loading: false,
         loadingLabel: 'Loading…',
-        resetSelectionOnItemsChange: false,
+        resetSelectionOnOptionsChange: false,
         sanitize: true,
         sanitizeFn: null,
         search: false,
@@ -503,19 +503,19 @@ describe('ListBox', () => {
   })
 
   describe('selectionLimit', () => {
-    it('should keep the values it holds past the limit when setItems brings them again', () => {
+    it('should keep the values it holds past the limit when setOptions brings them again', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 1, selected: ['lettuce', 'tomato'] })
       const changes = []
 
       el.addEventListener('change.coreui.list-box', () => changes.push(true))
-      listBox.setItems([{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }])
+      listBox.setOptions([{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }])
 
       expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
       expect(changes).toEqual([])
     })
 
-    it('should report the item setItems left out even when a change listener selects', () => {
+    it('should report the option setOptions left out even when a change listener selects', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
       const reported = []
@@ -523,7 +523,7 @@ describe('ListBox', () => {
       listBox.select('lettuce')
       el.addEventListener('selectionLimit.coreui.list-box', event => reported.push(event.value))
       el.addEventListener('change.coreui.list-box', () => listBox.select('cheese'), { once: true })
-      listBox.setItems([
+      listBox.setOptions([
         { value: 'lettuce', label: 'Lettuce' },
         { value: 'tomato', label: 'Tomato', selected: true },
         { value: 'onion', label: 'Onion', selected: true },
@@ -533,14 +533,14 @@ describe('ListBox', () => {
       expect(reported).toEqual(['cheese', 'onion'])
     })
 
-    it('should press select all once setItems leaves a selected value off the list and the limit is used up', () => {
+    it('should press select all once setOptions leaves a selected value off the list and the limit is used up', () => {
       const el = setMarkup(' data-coreui-selection-mode="multiple"', null, selectAllMarkup)
       const listBox = new ListBox(el, { selectionLimit: 2 })
       const selectAll = el.querySelector('[data-coreui-select-all]')
 
       listBox.select('lettuce')
       listBox.select('tomato')
-      listBox.setItems([{ value: 'tomato', label: 'Tomato' }, { value: 'onion', label: 'Onion' }])
+      listBox.setOptions([{ value: 'tomato', label: 'Tomato' }, { value: 'onion', label: 'Onion' }])
 
       expect(selectAll.getAttribute('aria-pressed')).toEqual('true')
 
@@ -572,28 +572,28 @@ describe('ListBox', () => {
       expect(el.querySelector('[data-coreui-select-all]').disabled).toBeFalse()
     })
 
-    it('should not let a change listener that disposes the list box break setItems over the limit', () => {
+    it('should not let a change listener that disposes the list box break setOptions over the limit', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
 
       listBox.select('lettuce')
       el.addEventListener('change.coreui.list-box', () => listBox.dispose(), { once: true })
 
-      expect(() => listBox.setItems([
+      expect(() => listBox.setOptions([
         { value: 'lettuce', label: 'Lettuce' },
         { value: 'tomato', label: 'Tomato', selected: true },
         { value: 'onion', label: 'Onion', selected: true }
       ])).not.toThrow()
     })
 
-    it('should add marked items from setItems only up to the limit and report the first one left out', () => {
+    it('should add marked options from setOptions only up to the limit and report the first one left out', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
       const reported = []
 
       el.addEventListener('selectionLimit.coreui.list-box', event => reported.push(event.value))
       listBox.select('lettuce')
-      listBox.setItems([
+      listBox.setOptions([
         { value: 'lettuce', label: 'Lettuce' },
         { value: 'tomato', label: 'Tomato', selected: true },
         { value: 'onion', label: 'Onion', selected: true }
@@ -1422,24 +1422,24 @@ describe('ListBox', () => {
       fixtureEl.innerHTML = '<div class="list-box"></div>'
       const el = fixtureEl.querySelector('.list-box')
 
-      new ListBox(el, { counter: true, items: [{ value: 'a', label: 'A' }], search: true }).dispose()
+      new ListBox(el, { counter: true, options: [{ value: 'a', label: 'A' }], search: true }).dispose()
 
       expect(el.childElementCount).toEqual(0)
 
       // eslint-disable-next-line no-new
-      new ListBox(el, { items: [{ value: 'a', label: 'A' }] })
+      new ListBox(el, { options: [{ value: 'a', label: 'A' }] })
 
       expect(el.querySelector('[data-coreui-list-box-counter], .list-box-header, .list-box-search')).toBeNull()
     })
 
-    it('should give a page list its own children back after setItems rendered into it', () => {
+    it('should give a page list its own children back after setOptions rendered into it', () => {
       fixtureEl.innerHTML = '<div class="list-box"><div class="list-box-options" aria-label="Fruit"><div class="list-box-option" data-coreui-value="x">X</div></div></div>'
       const el = fixtureEl.querySelector('.list-box')
       const list = el.querySelector('.list-box-options')
       const listBox = new ListBox(el)
 
-      listBox.setItems([{ value: 'a', label: 'A' }])
-      listBox.setItems([{ value: 'b', label: 'B' }])
+      listBox.setOptions([{ value: 'a', label: 'A' }])
+      listBox.setOptions([{ value: 'b', label: 'B' }])
       listBox.dispose()
 
       expect([...list.querySelectorAll('.list-box-option')].map(option => option.dataset.coreuiValue)).toEqual(['x'])
@@ -1454,12 +1454,12 @@ describe('ListBox', () => {
       expect(el.querySelector('.list-box-header').innerHTML).toEqual('<span>Fruit</span>')
     })
 
-    it('should give a page list its own children back after rendering items into it', () => {
+    it('should give a page list its own children back after rendering options into it', () => {
       fixtureEl.innerHTML = '<div class="list-box"><div class="list-box-options" aria-label="Fruit"><span class="page-note">Pick one</span></div></div>'
       const el = fixtureEl.querySelector('.list-box')
       const list = el.querySelector('.list-box-options')
 
-      new ListBox(el, { items: [{ value: 'a', label: 'A' }] }).dispose()
+      new ListBox(el, { options: [{ value: 'a', label: 'A' }] }).dispose()
 
       expect(list.innerHTML).toEqual('<span class="page-note">Pick one</span>')
     })
@@ -1491,26 +1491,26 @@ describe('ListBox', () => {
     })
   })
 
-  describe('items', () => {
+  describe('options', () => {
     const setEmptyMarkup = (attrs = '') => {
       fixtureEl.innerHTML = `<div class="list-box"${attrs}></div>`
       return fixtureEl.querySelector('.list-box')
     }
 
-    it('should take an empty items array as an empty list, not as a cue to read the markup', () => {
+    it('should take an empty options array as an empty list, not as a cue to read the markup', () => {
       const el = setMarkup('', ['<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>'])
-      const listBox = new ListBox(el, { items: [] })
+      const listBox = new ListBox(el, { options: [] })
 
       expect(el.querySelectorAll('.list-box-option')).toHaveSize(0)
-      expect(listBox.getItems()).toEqual([])
+      expect(listBox.getOptions()).toEqual([])
       expect(el.querySelector('.list-box-empty').textContent).not.toEqual('')
     })
 
-    it('should disable every item of a disabled group', () => {
+    it('should disable every option of a disabled group', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
-        items: [
-          { label: 'Meat', disabled: true, items: [{ value: 'ham', label: 'Ham' }] },
+        options: [
+          { label: 'Meat', disabled: true, options: [{ value: 'ham', label: 'Ham' }] },
           { value: 'lettuce', label: 'Lettuce' }
         ]
       })
@@ -1519,24 +1519,24 @@ describe('ListBox', () => {
 
       expect(item(el, 'ham').getAttribute('aria-disabled')).toEqual('true')
       expect(listBox.getSelectedValues()).toEqual([])
-      expect(listBox.getItems()[0].disabled).toBeTrue()
+      expect(listBox.getOptions()[0].disabled).toBeTrue()
     })
 
-    it('should enable the items of a group again when setItems drops the group flag', () => {
+    it('should enable the options of a group again when setOptions drops the group flag', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
-      const listBox = new ListBox(el, { items: [{ label: 'Meat', disabled: true, items: [{ value: 'ham', label: 'Ham' }] }] })
-      const items = listBox.getItems()
+      const listBox = new ListBox(el, { options: [{ label: 'Meat', disabled: true, options: [{ value: 'ham', label: 'Ham' }] }] })
+      const items = listBox.getOptions()
 
       items[0].disabled = false
-      listBox.setItems(items)
+      listBox.setOptions(items)
 
       expect(item(el, 'ham').hasAttribute('aria-disabled')).toBeFalse()
     })
 
-    it('should render flat items and create the options element', () => {
+    it('should render flat options and create the options element', () => {
       const el = setEmptyMarkup()
       const listBox = new ListBox(el, {
-        items: [
+        options: [
           { value: 'lettuce', label: 'Lettuce' },
           { value: 'tomato', label: 'Tomato' }
         ]
@@ -1554,9 +1554,9 @@ describe('ListBox', () => {
       const el = setEmptyMarkup()
       // eslint-disable-next-line no-new
       new ListBox(el, {
-        items: [
-          { label: 'Veggies', items: [{ value: 'lettuce', label: 'Lettuce' }] },
-          { label: 'Protein', items: [{ value: 'ham', label: 'Ham' }] }
+        options: [
+          { label: 'Veggies', options: [{ value: 'lettuce', label: 'Lettuce' }] },
+          { label: 'Protein', options: [{ value: 'ham', label: 'Ham' }] }
         ]
       })
 
@@ -1576,17 +1576,17 @@ describe('ListBox', () => {
       const el = setEmptyMarkup()
       // eslint-disable-next-line no-new
       new ListBox(el, {
-        items: [{ value: 'free', label: 'Free', description: 'One project' }]
+        options: [{ value: 'free', label: 'Free', description: 'One project' }]
       })
 
       expect(item(el, 'free').querySelector('.list-box-option-label').textContent).toEqual('Free')
       expect(item(el, 'free').querySelector('.list-box-option-description').textContent).toEqual('One project')
     })
 
-    it('should render a disabled item', () => {
+    it('should render a disabled option', () => {
       const el = setEmptyMarkup()
       const listBox = new ListBox(el, {
-        items: [
+        options: [
           { value: 'lettuce', label: 'Lettuce' },
           { value: 'tomato', label: 'Tomato', disabled: true }
         ]
@@ -1599,10 +1599,10 @@ describe('ListBox', () => {
       expect(listBox.getSelectedValues()).toEqual([])
     })
 
-    it('should take the initial selection from the items', () => {
+    it('should take the initial selection from the options', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
-        items: [
+        options: [
           { value: 'lettuce', label: 'Lettuce', selected: true },
           { value: 'tomato', label: 'Tomato' },
           { value: 'onion', label: 'Onion', selected: true }
@@ -1613,10 +1613,10 @@ describe('ListBox', () => {
       expect(item(el, 'lettuce').getAttribute('aria-selected')).toEqual('true')
     })
 
-    it('should take a disabled item marked selected into the initial selection', () => {
+    it('should take a disabled option marked selected into the initial selection', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
-        items: [
+        options: [
           { value: 'lettuce', label: 'Lettuce', selected: true },
           {
             value: 'ham', label: 'Ham', disabled: true, selected: true
@@ -1631,12 +1631,12 @@ describe('ListBox', () => {
     it('should replace the markup already present in the options', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, {
-        items: [{ value: 'ham', label: 'Ham' }]
+        options: [{ value: 'ham', label: 'Ham' }]
       })
 
       expect(el.querySelectorAll('.list-box-option')).toHaveSize(1)
       expect(item(el, 'lettuce')).toBeNull()
-      expect(listBox.getItems()).toEqual([{ value: 'ham', label: 'Ham' }])
+      expect(listBox.getOptions()).toEqual([{ value: 'ham', label: 'Ham' }])
     })
 
     it('should keep the empty state element when rendering', () => {
@@ -1649,45 +1649,45 @@ describe('ListBox', () => {
       ].join('')
 
       const el = fixtureEl.querySelector('.list-box')
-      const listBox = new ListBox(el, { items: [{ value: 'ham', label: 'Ham' }] })
+      const listBox = new ListBox(el, { options: [{ value: 'ham', label: 'Ham' }] })
 
       expect(el.querySelector('.list-box-empty').textContent).toEqual('')
 
-      listBox.setItems([])
+      listBox.setOptions([])
       expect(el.querySelectorAll('.list-box-option')).toHaveSize(0)
       expect(el.querySelector('.list-box-empty').textContent).not.toEqual('')
     })
 
-    it('should normalize the items', () => {
+    it('should normalize the options', () => {
       const el = setEmptyMarkup()
       const listBox = new ListBox(el, {
-        items: [
+        options: [
           { value: 'lettuce' },
           { label: 'Tomato' },
           'nonsense',
           {
-            label: 'Protein', items: [{
+            label: 'Protein', options: [{
               value: 'ham', label: 'Ham', description: 'Cured', disabled: true
             }]
           }
         ]
       })
 
-      expect(listBox.getItems()).toEqual([
+      expect(listBox.getOptions()).toEqual([
         { value: 'lettuce', label: 'lettuce' },
         { value: 'Tomato', label: 'Tomato' },
         {
-          label: 'Protein', items: [{
+          label: 'Protein', options: [{
             value: 'ham', label: 'Ham', description: 'Cured', disabled: true
           }]
         }
       ])
     })
 
-    it('should keep the selection of the values the new items no longer carry', () => {
+    it('should keep the selection of the values the new options no longer carry', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
-        items: [
+        options: [
           { value: 'lettuce', label: 'Lettuce' },
           { value: 'tomato', label: 'Tomato' },
           { value: 'onion', label: 'Onion' }
@@ -1700,7 +1700,7 @@ describe('ListBox', () => {
       const changed = []
       el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
 
-      listBox.setItems([
+      listBox.setOptions([
         { value: 'tomato', label: 'Tomato' },
         { value: 'cheese', label: 'Cheese' }
       ])
@@ -1711,25 +1711,25 @@ describe('ListBox', () => {
       expect(item(el, 'cheese').classList.contains('selected')).toBeFalse()
     })
 
-    it('should replace a value the new items no longer carry in single selection mode', () => {
+    it('should replace a value the new options no longer carry in single selection mode', () => {
       const el = setEmptyMarkup()
-      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const listBox = new ListBox(el, { options: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
       const events = []
 
       el.addEventListener('deselected.coreui.list-box', event => events.push(`deselected:${event.value}`))
       el.addEventListener('change.coreui.list-box', event => events.push(`change:${event.value}`))
 
-      listBox.setItems([{ value: 'tomato', label: 'Tomato' }])
+      listBox.setOptions([{ value: 'tomato', label: 'Tomato' }])
       click(item(el, 'tomato'))
 
       expect(listBox.getSelectedValues()).toEqual(['tomato'])
       expect(events).toEqual(['deselected:lettuce', 'change:tomato'])
     })
 
-    it('should count the values the new items no longer carry against the selection limit', () => {
+    it('should count the values the new options no longer carry against the selection limit', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
-        items: [
+        options: [
           { value: 'lettuce', label: 'Lettuce' },
           { value: 'tomato', label: 'Tomato' }
         ],
@@ -1740,19 +1740,19 @@ describe('ListBox', () => {
       el.addEventListener('selectionLimit.coreui.list-box', event => reported.push(event.value))
 
       listBox.selectAll()
-      listBox.setItems([{ value: 'onion', label: 'Onion' }])
+      listBox.setOptions([{ value: 'onion', label: 'Onion' }])
       click(item(el, 'onion'))
 
       expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
       expect(reported).toEqual(['onion'])
     })
 
-    it('should clear the values the new items no longer carry', () => {
+    it('should clear the values the new options no longer carry', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
-      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const listBox = new ListBox(el, { options: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
       const changed = []
 
-      listBox.setItems([{ value: 'tomato', label: 'Tomato' }])
+      listBox.setOptions([{ value: 'tomato', label: 'Tomato' }])
       el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
       listBox.clear()
 
@@ -1760,12 +1760,12 @@ describe('ListBox', () => {
       expect(changed).toEqual([[]])
     })
 
-    it('should deselect a value the new items no longer carry', () => {
+    it('should deselect a value the new options no longer carry', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
-      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const listBox = new ListBox(el, { options: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
       const changed = []
 
-      listBox.setItems([{ value: 'tomato', label: 'Tomato' }])
+      listBox.setOptions([{ value: 'tomato', label: 'Tomato' }])
       el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
       listBox.deselect('lettuce')
 
@@ -1773,46 +1773,46 @@ describe('ListBox', () => {
       expect(changed).toEqual([[]])
     })
 
-    it('should keep the held value over an item marked selected in single selection mode', () => {
+    it('should keep the held value over an option marked selected in single selection mode', () => {
       const el = setEmptyMarkup()
-      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const listBox = new ListBox(el, { options: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
       const changed = []
 
       el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
-      listBox.setItems([{ value: 'tomato', label: 'Tomato', selected: true }])
+      listBox.setOptions([{ value: 'tomato', label: 'Tomato', selected: true }])
 
       expect(listBox.getSelectedValues()).toEqual(['lettuce'])
       expect(changed).toEqual([])
     })
 
-    it('should start from the marked items when resetSelectionOnItemsChange is set and the values change', () => {
+    it('should start from the marked options when resetSelectionOnOptionsChange is set and the values change', () => {
       const el = setEmptyMarkup()
       const listBox = new ListBox(el, {
-        items: [{ value: 'lettuce', label: 'Lettuce' }],
-        resetSelectionOnItemsChange: true,
+        options: [{ value: 'lettuce', label: 'Lettuce' }],
+        resetSelectionOnOptionsChange: true,
         selected: 'lettuce'
       })
       const changed = []
 
       el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
-      listBox.setItems([{ value: 'tomato', label: 'Tomato', selected: true }, { value: 'onion', label: 'Onion' }])
+      listBox.setOptions([{ value: 'tomato', label: 'Tomato', selected: true }, { value: 'onion', label: 'Onion' }])
 
       expect(listBox.getSelectedValues()).toEqual(['tomato'])
       expect(changed).toEqual([['tomato']])
     })
 
-    it('should not report a reset to new items that marks the same values in another order', () => {
+    it('should not report a reset to new options that marks the same values in another order', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
-        items: [{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }],
-        resetSelectionOnItemsChange: true
+        options: [{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }],
+        resetSelectionOnOptionsChange: true
       })
       const changed = []
 
       listBox.select('tomato')
       listBox.select('lettuce')
       el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
-      listBox.setItems([
+      listBox.setOptions([
         { value: 'lettuce', label: 'Lettuce', selected: true },
         { value: 'tomato', label: 'Tomato', selected: true },
         { value: 'onion', label: 'Onion' }
@@ -1822,107 +1822,107 @@ describe('ListBox', () => {
       expect(changed).toEqual([])
     })
 
-    it('should keep the selection when resetSelectionOnItemsChange is set and the values stay the same', () => {
+    it('should keep the selection when resetSelectionOnOptionsChange is set and the values stay the same', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const items = [{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }]
-      const listBox = new ListBox(el, { items, resetSelectionOnItemsChange: true, selected: 'tomato' })
+      const listBox = new ListBox(el, { options: items, resetSelectionOnOptionsChange: true, selected: 'tomato' })
       const changed = []
 
       el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
-      listBox.setItems([{ value: 'tomato', label: 'Tomato, fresh' }, { value: 'lettuce', label: 'Lettuce, fresh' }])
+      listBox.setOptions([{ value: 'tomato', label: 'Tomato, fresh' }, { value: 'lettuce', label: 'Lettuce, fresh' }])
 
       expect(listBox.getSelectedValues()).toEqual(['tomato'])
       expect(changed).toEqual([])
 
-      listBox.setItems([{ value: 'onion', label: 'Onion' }])
+      listBox.setOptions([{ value: 'onion', label: 'Onion' }])
 
       expect(listBox.getSelectedValues()).toEqual([])
       expect(changed).toEqual([[]])
     })
 
-    it('should reset the selection when resetSelectionOnItemsChange is set and the selected values are still listed', () => {
+    it('should reset the selection when resetSelectionOnOptionsChange is set and the selected values are still listed', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
-        items: [{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }],
-        resetSelectionOnItemsChange: true,
+        options: [{ value: 'lettuce', label: 'Lettuce' }, { value: 'tomato', label: 'Tomato' }],
+        resetSelectionOnOptionsChange: true,
         selected: 'lettuce'
       })
       const changed = []
 
       el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
-      listBox.setItems([{ value: 'lettuce', label: 'Lettuce' }, { value: 'onion', label: 'Onion' }])
+      listBox.setOptions([{ value: 'lettuce', label: 'Lettuce' }, { value: 'onion', label: 'Onion' }])
 
       expect(listBox.getSelectedValues()).toEqual([])
       expect(changed).toEqual([[]])
     })
 
-    it('should compare the values of a list box built from markup when resetSelectionOnItemsChange is set', () => {
-      const el = setMarkup(' data-coreui-reset-selection-on-items-change="true"')
+    it('should compare the values of a list box built from markup when resetSelectionOnOptionsChange is set', () => {
+      const el = setMarkup(' data-coreui-reset-selection-on-options-change="true"')
       const listBox = new ListBox(el)
 
       click(item(el, 'tomato'))
-      listBox.setItems([...el.querySelectorAll('.list-box-option')].map(option => ({ value: option.dataset.coreuiValue, label: option.textContent })))
+      listBox.setOptions([...el.querySelectorAll('.list-box-option')].map(option => ({ value: option.dataset.coreuiValue, label: option.textContent })))
 
       expect(listBox.getSelectedValues()).toEqual(['tomato'])
     })
 
-    it('should reset the selection of a disabled list box with resetSelectionOnItemsChange', () => {
+    it('should reset the selection of a disabled list box with resetSelectionOnOptionsChange', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, {
         disabled: true,
-        items: [{ value: 'lettuce', label: 'Lettuce' }],
-        resetSelectionOnItemsChange: true,
+        options: [{ value: 'lettuce', label: 'Lettuce' }],
+        resetSelectionOnOptionsChange: true,
         selected: 'lettuce'
       })
 
-      listBox.setItems([{ value: 'tomato', label: 'Tomato' }])
+      listBox.setOptions([{ value: 'tomato', label: 'Tomato' }])
 
       expect(listBox.getSelectedValues()).toEqual([])
     })
 
     it('should keep a selected value that comes back disabled', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
-      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const listBox = new ListBox(el, { options: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
 
-      listBox.setItems([{ value: 'lettuce', label: 'Lettuce', disabled: true }])
+      listBox.setOptions([{ value: 'lettuce', label: 'Lettuce', disabled: true }])
 
       expect(listBox.getSelectedValues()).toEqual(['lettuce'])
       expect(item(el, 'lettuce').classList.contains('selected')).toBeTrue()
     })
 
-    it('should fire change when setItems marks a value that was not selected', () => {
+    it('should fire change when setOptions marks a value that was not selected', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
-      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
+      const listBox = new ListBox(el, { options: [{ value: 'lettuce', label: 'Lettuce' }], selected: 'lettuce' })
       const changed = []
 
       el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
-      listBox.setItems([{ value: 'tomato', label: 'Tomato', selected: true }])
+      listBox.setOptions([{ value: 'tomato', label: 'Tomato', selected: true }])
 
       expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
       expect(changed).toEqual([['lettuce', 'tomato']])
     })
 
-    it('should keep the selection mode when setItems marks several items', () => {
+    it('should keep the selection mode when setOptions marks several options', () => {
       const items = [
         { value: 'lettuce', label: 'Lettuce', selected: true },
         { value: 'tomato', label: 'Tomato', selected: true }
       ]
-      const single = new ListBox(setEmptyMarkup(), { items: [] })
+      const single = new ListBox(setEmptyMarkup(), { options: [] })
 
-      single.setItems(items)
+      single.setOptions(items)
       expect(single.getSelectedValues()).toEqual(['lettuce'])
 
-      const none = new ListBox(setEmptyMarkup(' data-coreui-selection-mode="none"'), { items: [] })
+      const none = new ListBox(setEmptyMarkup(' data-coreui-selection-mode="none"'), { options: [] })
 
-      none.setItems(items)
+      none.setOptions(items)
       expect(none.getSelectedValues()).toEqual([])
     })
 
-    it('should take a disabled item marked selected into the selection on setItems', () => {
+    it('should take a disabled option marked selected into the selection on setOptions', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
-      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }] })
+      const listBox = new ListBox(el, { options: [{ value: 'lettuce', label: 'Lettuce' }] })
 
-      listBox.setItems([
+      listBox.setOptions([
         { value: 'lettuce', label: 'Lettuce', selected: true },
         {
           value: 'ham', label: 'Ham', disabled: true, selected: true
@@ -1935,14 +1935,14 @@ describe('ListBox', () => {
     it('should not fire change when the selection survived the rebuild', () => {
       const el = setEmptyMarkup()
       const listBox = new ListBox(el, {
-        items: [{ value: 'lettuce', label: 'Lettuce' }],
+        options: [{ value: 'lettuce', label: 'Lettuce' }],
         selected: 'lettuce'
       })
 
       const spy = jasmine.createSpy('change')
       el.addEventListener('change.coreui.list-box', spy)
 
-      listBox.setItems([
+      listBox.setOptions([
         { value: 'lettuce', label: 'Lettuce' },
         { value: 'tomato', label: 'Tomato' }
       ])
@@ -1954,7 +1954,7 @@ describe('ListBox', () => {
     it('should escape the labels by default and sanitize them with html', () => {
       const el = setEmptyMarkup()
       const listBox = new ListBox(el, {
-        items: [{ value: 'a', label: '<span>Ok</span>' }]
+        options: [{ value: 'a', label: '<span>Ok</span>' }]
       })
 
       expect(item(el, 'a').textContent).toEqual('<span>Ok</span>')
@@ -1966,7 +1966,7 @@ describe('ListBox', () => {
       // eslint-disable-next-line no-new
       new ListBox(html, {
         html: true,
-        items: [{ value: 'a', label: '<span>Ok</span><script>alert(1)</script>' }]
+        options: [{ value: 'a', label: '<span>Ok</span><script>alert(1)</script>' }]
       })
 
       expect(item(html, 'a').querySelector('span').textContent).toEqual('Ok')
@@ -1978,7 +1978,7 @@ describe('ListBox', () => {
       // eslint-disable-next-line no-new
       new ListBox(el, {
         html: true,
-        items: [{ value: 'a', label: '<em>Ok</em>' }],
+        options: [{ value: 'a', label: '<em>Ok</em>' }],
         sanitize: false
       })
 
@@ -2027,12 +2027,12 @@ describe('ListBox', () => {
       expect(counter.textContent).toEqual('0/0 selected')
     })
 
-    it('should follow the items it was given', () => {
+    it('should follow the options it was given', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { counter: true, selectedLabel: (count, total) => `${count}/${total} picked`, selectionMode: 'multiple' })
       const counter = el.querySelector('[data-coreui-list-box-counter]')
 
-      listBox.setItems([{ value: 'ada', label: 'Ada' }, { value: 'bob', label: 'Bob', selected: true }])
+      listBox.setOptions([{ value: 'ada', label: 'Ada' }, { value: 'bob', label: 'Bob', selected: true }])
 
       expect(counter.textContent).toEqual('1/2 picked')
     })
@@ -2511,7 +2511,7 @@ describe('ListBox', () => {
       expect(el.classList.contains('loading')).toBeFalse()
       expect(list(el).getAttribute('aria-busy')).toBeNull()
 
-      listBox.setItems([])
+      listBox.setOptions([])
       expect(empty.textContent).not.toEqual('')
 
       listBox.setLoading(true)
@@ -2519,7 +2519,7 @@ describe('ListBox', () => {
       expect(list(el).getAttribute('aria-busy')).toEqual('true')
       expect(empty.textContent).toEqual('')
 
-      listBox.setItems([{ value: 'ham', label: 'Ham' }])
+      listBox.setOptions([{ value: 'ham', label: 'Ham' }])
       listBox.setLoading(false)
 
       expect(el.classList.contains('loading')).toBeFalse()
@@ -2570,7 +2570,7 @@ describe('ListBox', () => {
 
       expect(region.hidden).toBeFalse()
 
-      listBox.setItems([{ value: 'ham', label: 'Ham' }])
+      listBox.setOptions([{ value: 'ham', label: 'Ham' }])
 
       expect(el.querySelector('.list-box-loading')).toBe(region)
       expect(region.hidden).toBeFalse()

@@ -54,13 +54,13 @@ The two lists order themselves differently, and on purpose: the target keeps the
 
 The transfer caps how tall a list gets — `--cui-transfer-list-max-height` puts a `max-height` and `overflow-y: auto` on `.list-box-options`, so a long list scrolls inside its own box instead of stretching the row.
 
-## Items from configuration
+## Options from configuration
 
-Instead of writing every option by hand, hand the plugin an `items` array and it renders both lists — the same markup the sections above document, so every class, role and attribute is where you would have put it. An item is `{ value, label, description, disabled, selected }`; an entry with its own `items` array is a section. `value` names what starts in the target list, in the order you list it, and everything else lands in the source in the order the items came in — including a value moved back later, which returns to its place among the items rather than to the end.
+Instead of writing every option by hand, hand the plugin an `options` array and it renders both lists — the same markup the sections above document, so every class, role and attribute is where you would have put it. An option is `{ value, label, description, disabled, selected }`; an entry with its own `options` array is a section. `value` names what starts in the target list, in the order you list it, and everything else lands in the source in the order the options came in — including a value moved back later, which returns to its place among the items rather than to the end.
 
 Labels are text: they land as `textContent`, so a label carrying markup shows up as characters. Set `html: true` to have them parsed instead — the result runs through the sanitizer first, and `sanitize`, `sanitizeFn` and `allowList` steer it the same way they do everywhere else.
 
-Leave an empty `.list-box-options` in each list so you can name it; the plugin appends one when it is missing, but then the list has no accessible name. Options already written inside it are replaced — `items` owns both lists from the moment it is set.
+Leave an empty `.list-box-options` in each list so you can name it; the plugin appends one when it is missing, but then the list has no accessible name. Options already written inside it are replaced — `options` owns both lists from the moment it is set.
 
 <Example code={`<div class="transfer" id="transferItems">
     <div class="list-box transfer-list" data-coreui-transfer-list="source">
@@ -85,7 +85,7 @@ Leave an empty `.list-box-options` in each list so you can name it; the plugin a
 
 <Code code={transferItems} lang="js" />
 
-`setItems(items)` rebuilds both lists at any time: the values the target holds survive the rebuild as long as the new items still carry them, in the order they were chosen, and the rest go back to the source. A value that is gone drops out. `getItems()` hands back the array as it was given.
+`setOptions(options)` rebuilds both lists at any time: the values the target holds survive the rebuild as long as the new options still carry them, in the order they were chosen, and the rest go back to the source. A value that is gone drops out. `getOptions()` hands back the array as it was given.
 
 ## Search
 
@@ -122,11 +122,11 @@ The search belongs to the list box — `search` and `searchPlaceholder` are pass
 
 ## External search
 
-`search: 'external'` hands the searching over to you — the [list box's external mode](/components/list-box/#external-search) on both lists at once. The transfer re-emits what they report as `search.coreui.transfer`, adding the `side` that was typed in, and you answer with `setItems()` — one method for both lists, so pass the whole set you want shown and leave out what the query rules out. Values already in the target stay there as long as your set still carries them, which is why the example below keeps the chosen users in what it sends back.
+`search: 'external'` hands the searching over to you — the [list box's external mode](/components/list-box/#external-search) on both lists at once. The transfer re-emits what they report as `search.coreui.transfer`, adding the `side` that was typed in, and you answer with `setOptions()` — one method for both lists, so pass the whole set you want shown and leave out what the query rules out. Values already in the target stay there as long as your set still carries them, which is why the example below keeps the chosen users in what it sends back.
 
 `loading` covers the wait: `setLoading(true, 'source')` writes `aria-busy="true"` on that list's options element and shows a loading row with `loadingLabel` below its options until the answer arrives. The second argument is what scopes it — `setLoading(true)` and the `loading` option both cover *both* lists, so a list you never fetch for keeps its loading row until something releases it. Fetch one list, mark one list.
 
-Rebuilding is a fresh start for the selection: after `setItems()` neither list has anything checked, and `selected` on an item applies to the first render only, so a re-fetch never brings the checkboxes back. Moving options across clears the destination's selection too — what arrives is ready to be picked, not already picked.
+Rebuilding is a fresh start for the selection: after `setOptions()` neither list has anything checked, and `selected` on an option applies to the first render only, so a re-fetch never brings the checkboxes back. Moving options across clears the destination's selection too — what arrives is ready to be picked, not already picked.
 
 <Example code={`<div class="transfer" id="transferExternalSearch">
     <div class="list-box transfer-list" data-coreui-transfer-list="source">
@@ -360,9 +360,8 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `ariaMoveToTargetLabel` | string | `'Move to chosen'` | Accessible name of the button that moves the selection to the target list. |
 | `disabled` | boolean | `false` | Turns the whole transfer off: both list boxes, both move buttons and both search fields. |
 | `emptyLabel` | string | `'No results found'` | Text of the row the list box shows when nothing is left to pick. An empty string leaves the row out. |
-| `html` | boolean | `false` | Parse the labels and descriptions of `items` as markup instead of text. Passed to both list boxes. |
+| `html` | boolean | `false` | Parse the labels and descriptions of `options` as markup instead of text. Passed to both list boxes. |
 | `indicator` | string | `'checkbox'` | Passed to both list boxes. `'none'` drops the checkbox in front of every option. |
-| `items` | array, null | `null` | The options of both lists, rendered instead of the markup (an empty array gives two empty lists, `null` reads the markup): `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` keeps every item in it on its side. `value` decides which of them start in the target list, `selected` which start checked — on the first render only, and never a disabled item. |
 | `loading` | boolean | `false` | Marks both lists as busy: `aria-busy="true"` on the options element and a loading row below the options, while the lists stay usable. Release it with `setLoading(false)`, or scope it per list with `setLoading(value, list)`. |
 | `loadingLabel` | string | `'Loading…'` | Text of the loading row of a busy list, announced to screen readers when it starts loading. |
 | `moveAllToSourceIcon` | string | double chevron SVG | Icon of the button that moves everything back. Inline SVG, put in the button only when the markup left it empty. |
@@ -370,15 +369,16 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `moveToSourceIcon` | string | chevron SVG | Icon of the button that moves the selection back. |
 | `moveToTargetIcon` | string | chevron SVG | Icon of the button that moves the selection across. |
 | `oneWay` | boolean | `false` | Hides and disables both buttons that move back, and makes `moveToSource()` and `moveAllToSource()` no-ops. |
+| `options` | array, null | `null` | The options of both lists, rendered instead of the markup (an empty array gives two empty lists, `null` reads the markup): `{ value, label, description, disabled, selected }`, or `{ label, options, disabled }` for a section, where `disabled: true` keeps every item in it on its side. `value` decides which of them start in the target list, `selected` which start checked — on the first render only, and never a disabled item. |
 | `sanitize` | boolean | `true` | Run the icon strings through the sanitizer. |
 | `sanitizeFn` | null, function | `null` | Your own sanitizer, used instead of the built-in one. |
-| `search` | boolean, string | `false` | Passed to both list boxes: builds a search field above each list. `'external'` filters nothing — every keystroke fires `search.coreui.transfer` and you answer with `setItems()`. |
+| `search` | boolean, string | `false` | Passed to both list boxes: builds a search field above each list. `'external'` filters nothing — every keystroke fires `search.coreui.transfer` and you answer with `setOptions()`. |
 | `searchPlaceholder` | string | `'Search'` | Passed to both list boxes as the placeholder of their search field, and used as the first half of each field's accessible name so the two are told apart. |
 | `selectedLabel` | string, function | `` (count, total) => `${count}/${total} selected` `` | Passed to both list boxes as their header count text. The transfer turns their [counter](/components/list-box/#counter) on. |
 | `sourceTitle` | string | `'Available'` | Title of the source list: its select-all label when the button is empty, and its accessible name. |
 | `targetTitle` | string | `'Chosen'` | Title of the target list. |
 | `typeahead` | boolean | `true` | Passed to both list boxes: move the highlight to the option matching what the user types. |
-| `value` | array | `[]` | The values of `items` that start in the target list, in the order given. The rest go to the source list. |
+| `value` | array | `[]` | The values of `options` that start in the target list, in the order given. The rest go to the source list. |
 
 ### Methods
 
@@ -386,7 +386,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | --- | --- |
 | `dispose` | Destroys the transfer and both list boxes, and removes the option containers it created. |
 | `getInstance` | Static method which allows you to get the transfer instance associated to a DOM element, you can use it like this: `coreui.Transfer.getInstance(element)`. |
-| `getItems()` | The items array both lists were built from. |
+| `getOptions()` | The options array both lists were built from. |
 | `getOrCreateInstance` | Static method which returns a transfer instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Transfer.getOrCreateInstance(element)`. |
 | `getSelectedValues(list)` | The selected values of `'source'` or `'target'`. Throws when `list` is anything else. |
 | `getSource()` | The values in the source list, in document order. |
@@ -395,7 +395,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `moveAllToTarget()` | Moves every visible, enabled option of the source list — the same scope the select-all button works on. |
 | `moveToSource(values?)` | The same in the other direction. Does nothing with `oneWay`. |
 | `moveToTarget(values?)` | Moves the source list's selection to the target list. Pass an array of values to move exactly those, selected or not. |
-| `setItems(items)` | Rebuilds both lists from a new `items` array. The values the target holds keep their place as long as the new items still carry them; everything else goes to the source in the items order. Both selections come back empty. |
+| `setOptions(options)` | Rebuilds both lists from a new `options` array. The values the target holds keep their place as long as the new options still carry them; everything else goes to the source in the order of `options`. Both selections come back empty. |
 | `setLoading(loading, list?)` | Marks a list busy while you fetch: pass `'source'` or `'target'` for one of them, nothing for both. A list left busy keeps its loading row, so release every list you marked. |
 | `update` | Re-reads the DOM: options added or removed reach both list boxes, which re-apply their search and counter, and the move buttons are re-evaluated. |
 
@@ -408,7 +408,7 @@ Events fire on the `.transfer` element.
 | `change.coreui.transfer` | Fired after a move settled; `event.value` is the target list and `event.source` the source list. `event.target` stays the `.transfer` element. |
 | `move.coreui.transfer` | Fires before options are moved; `event.direction` is `'source'` or `'target'` and `event.values` the values about to move. Cancelable — calling `preventDefault()` leaves both lists as they were. |
 | `moved.coreui.transfer` | Fired after the options were moved, with the same `direction` and `values`. |
-| `search.coreui.transfer` | Fired on every keystroke in a search field with `search: 'external'`; `event.side` is `'source'` or `'target'` and `event.query` what was typed. Nothing is filtered — answer with `setItems()`. |
+| `search.coreui.transfer` | Fired on every keystroke in a search field with `search: 'external'`; `event.side` is `'source'` or `'target'` and `event.query` what was typed. Nothing is filtered — answer with `setOptions()`. |
 
 ```js
 const myTransfer = document.getElementById('myTransfer')

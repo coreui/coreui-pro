@@ -353,7 +353,7 @@ class Autocomplete extends ComboboxBase {
     const normalized = this._normalizeOptions(options)
     this._typeCheckConfig({ options: normalized }, { options: DefaultType.options })
     this._options = this._getOptionsFromConfig(normalized)
-    this._setListBoxItems()
+    this._setListBoxOptions()
     this._seedSelection()
     this._validation.update()
   }
