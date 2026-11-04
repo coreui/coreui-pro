@@ -242,10 +242,10 @@ class ListBox extends BaseComponent {
     this._limited = null
     this._hostListNodes = null
     this._list = this._resolveList()
-    this._empty = this._createEmpty()
     this._loadingAnnouncement = null
     this._counter = this._resolveCounter()
     this._loadingRegion = this._createLoadingRegion()
+    this._empty = this._createEmpty()
     this._query = null
     this._searchField = this._resolveSearch()
     this._selectAll = SelectorEngine.findOne(SELECTOR_SELECT_ALL, this._element) as HTMLButtonElement | null
@@ -533,7 +533,13 @@ class ListBox extends BaseComponent {
     empty.setAttribute('role', 'status')
     empty.hidden = true
     empty.textContent = this._config.emptyLabel
-    this._list.append(empty)
+
+    if (this._list === this._element) {
+      this._list.append(empty)
+    } else {
+      this._loadingRegion.after(empty)
+    }
+
     this._createdNodes.push(empty)
 
     return empty
@@ -764,10 +770,6 @@ class ListBox extends BaseComponent {
     }
 
     this._list.replaceChildren(...this._items.map(entry => (Array.isArray((entry as ListBoxGroup).items) ? this._renderSection(entry as ListBoxGroup) : this._renderOption(entry as ListBoxItem))))
-
-    if (this._empty) {
-      this._list.append(this._empty)
-    }
   }
 
   _renderSection(group: ListBoxGroup): HTMLElement {

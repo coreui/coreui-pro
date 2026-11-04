@@ -295,7 +295,7 @@ $list-box-tokens: defaults(
   }
 
   .list-box-empty {
-    padding: var(--#{$prefix}list-box-option-padding-y) var(--#{$prefix}list-box-option-padding-x);
+    padding: var(--#{$prefix}list-box-option-padding-y) calc(var(--#{$prefix}list-box-padding-x) + var(--#{$prefix}list-box-option-padding-x));
     color: var(--#{$prefix}list-box-option-disabled-color);
   }
 }

@@ -1299,6 +1299,8 @@ describe('ListBox', () => {
       expect(empty.hasAttribute('hidden')).toBeTrue()
       expect(empty.getAttribute('role')).toEqual('status')
       expect(empty.textContent).toEqual('No results found')
+      expect(list(el).contains(empty)).toBeFalse()
+      expect(el.querySelector('.list-box-loading').nextElementSibling).toBe(empty)
 
       item(el, 'lettuce').setAttribute('hidden', '')
       listBox.update()
