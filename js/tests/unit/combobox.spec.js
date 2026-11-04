@@ -96,6 +96,7 @@ describe('Combobox', () => {
         caretIcon: CARET_ICON,
         container: false,
         disabled: false,
+        emptyLabel: 'No results found',
         html: false,
         indicator: 'none',
         items: null,
@@ -1266,6 +1267,14 @@ describe('Combobox', () => {
       type(searchField(combobox), 'zzz')
       expect(empty.hasAttribute('hidden')).toBeFalse()
       expect(empty.textContent).toEqual('No results found')
+    })
+
+    it('should write its emptyLabel into the empty state of the list box', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { emptyLabel: 'Brak wyników', search: true })
+
+      expect(menu(combobox).querySelector('.list-box-empty').textContent).toEqual('Brak wyników')
+      expect(new Combobox(setMarkup(), { emptyLabel: '' })._menu.querySelector('.list-box-empty')).toBeNull()
     })
 
     it('should render the search field of the list box in the panel', () => {

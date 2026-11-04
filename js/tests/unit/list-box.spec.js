@@ -1324,6 +1324,16 @@ describe('ListBox', () => {
       expect(el.querySelector('.list-box-empty')).toBeNull()
     })
 
+    it('should leave the empty row out when the options sit on the list box element itself', () => {
+      fixtureEl.innerHTML = '<div class="list-box"><div class="list-box-option" data-coreui-value="a" hidden>A</div></div>'
+      const el = fixtureEl.querySelector('.list-box')
+      // eslint-disable-next-line no-new
+      new ListBox(el)
+
+      expect(el.querySelector('.list-box-empty')).toBeNull()
+      expect(el.parentElement.querySelector('.list-box-empty')).toBeNull()
+    })
+
     it('should show the empty state when only disabled options are left on the screen', () => {
       const el = setMarkup('', [
         '<div class="list-box-option" data-coreui-value="lettuce" hidden>Lettuce</div>',

@@ -533,13 +533,7 @@ class ListBox extends BaseComponent {
     empty.setAttribute('role', 'status')
     empty.hidden = true
     empty.textContent = this._config.emptyLabel
-
-    if (this._list === this._element) {
-      this._list.append(empty)
-    } else {
-      this._loadingRegion.after(empty)
-    }
-
+    this._loadingRegion.after(empty)
     this._createdNodes.push(empty)
 
     return empty

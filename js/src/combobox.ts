@@ -81,6 +81,7 @@ type ComboboxConfig = {
   caretIcon: string
   container: string | Element | boolean
   disabled: boolean
+  emptyLabel: string
   html: boolean
   indicator: string
   items: ListBoxEntry[] | null
@@ -107,6 +108,7 @@ const Default: ComboboxConfig = {
   caretIcon: CARET_ICON,
   container: false,
   disabled: false,
+  emptyLabel: 'No results found',
   html: false,
   indicator: 'none',
   items: null,
@@ -133,6 +135,7 @@ const DefaultType: Record<string, string> = {
   caretIcon: 'string',
   container: '(string|element|boolean)',
   disabled: 'boolean',
+  emptyLabel: 'string',
   html: 'boolean',
   indicator: 'string',
   items: '(array|null)',
@@ -483,6 +486,7 @@ class Combobox extends ComboboxBase {
       allowList: this._config.allowList,
       ariaSearchLabel: this._config.ariaSearchLabel,
       disabled: this._config.disabled,
+      emptyLabel: this._config.emptyLabel,
       html: this._config.html,
       indicator: this._config.indicator,
       items: this._config.items,

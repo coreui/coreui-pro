@@ -359,6 +359,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `ariaMoveToSourceLabel` | string | `'Move to available'` | Accessible name of the button that moves the selection back to the source list. A button with its own `aria-label` keeps it. |
 | `ariaMoveToTargetLabel` | string | `'Move to chosen'` | Accessible name of the button that moves the selection to the target list. |
 | `disabled` | boolean | `false` | Turns the whole transfer off: both list boxes, both move buttons and both search fields. |
+| `emptyLabel` | string | `'No results found'` | Text of the row the list box shows when nothing is left to pick. An empty string leaves the row out. |
 | `html` | boolean | `false` | Parse the labels and descriptions of `items` as markup instead of text. Passed to both list boxes. |
 | `indicator` | string | `'checkbox'` | Passed to both list boxes. `'none'` drops the checkbox in front of every option. |
 | `items` | array, null | `null` | The options of both lists, rendered instead of the markup (an empty array gives two empty lists, `null` reads the markup): `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` keeps every item in it on its side. `value` decides which of them start in the target list, `selected` which start checked — on the first render only, and never a disabled item. |

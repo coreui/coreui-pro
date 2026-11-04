@@ -73,6 +73,7 @@ type TransferConfig = {
   ariaMoveToTargetLabel: string
   ariaMovedAnnouncement: string
   disabled: boolean
+  emptyLabel: string
   html: boolean
   indicator: string
   items: ListBoxEntry[] | null
@@ -102,6 +103,7 @@ const Default: TransferConfig = {
   ariaMoveToTargetLabel: 'Move to chosen',
   ariaMovedAnnouncement: '{count} moved to {title}',
   disabled: false,
+  emptyLabel: 'No results found',
   html: false,
   indicator: 'checkbox',
   items: null,
@@ -131,6 +133,7 @@ const DefaultType: Record<string, string> = {
   ariaMoveToTargetLabel: 'string',
   ariaMovedAnnouncement: 'string',
   disabled: 'boolean',
+  emptyLabel: 'string',
   html: 'boolean',
   indicator: 'string',
   items: '(array|null)',
@@ -305,6 +308,7 @@ class Transfer extends BaseComponent {
         ariaSearchLabel: `${this._config.searchPlaceholder} ${title}`,
         counter: true,
         disabled: this._config.disabled,
+        emptyLabel: this._config.emptyLabel,
         html: this._config.html,
         indicator: this._config.indicator,
         loading: this._config.loading,

@@ -105,6 +105,7 @@ describe('Transfer', () => {
         ariaMoveToTargetLabel: 'Move to chosen',
         ariaMovedAnnouncement: '{count} moved to {title}',
         disabled: false,
+        emptyLabel: 'No results found',
         html: false,
         indicator: 'checkbox',
         items: null,
@@ -582,6 +583,16 @@ describe('Transfer', () => {
       { value: 'bob', label: 'Bob' },
       { value: 'cleo', label: 'Cleo' }
     ]
+
+    it('should write its emptyLabel into the empty state of both lists', () => {
+      const el = setMarkup()
+      // eslint-disable-next-line no-new
+      new Transfer(el, { emptyLabel: 'Nothing here', items: [] })
+
+      const rows = el.querySelectorAll('.list-box-empty')
+      expect(rows).toHaveSize(2)
+      expect([...rows].map(row => row.textContent)).toEqual(['Nothing here', 'Nothing here'])
+    })
 
     it('should take an empty items array as empty lists, not as a cue to read the markup', () => {
       const el = setMarkup()
