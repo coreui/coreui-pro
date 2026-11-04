@@ -153,7 +153,7 @@ For disabled popover triggers, you may also prefer `data-coreui-trigger="hover f
 
 One popover can serve many elements, for example the rows of a list. Put `data-coreui-toggle="popover"` on a wrapper and list its anchors with `data-coreui-anchors`. Each anchor keeps its own `title` (or `data-coreui-title`) and `data-coreui-content`; every other option comes from the wrapper. A click on another anchor moves the open popover there and swaps its content, and a click on the anchor it stands at closes it. A click elsewhere inside the wrapper keeps its default action.
 
-<Example code={`<div class="d-flex gap-2" data-coreui-toggle="popover" data-coreui-anchors="button">
+<Example code={`<div class="d-flex gap-2" data-coreui-toggle="popover" data-coreui-anchors="button" data-coreui-placement="bottom">
     <button type="button" class="btn-outline" data-coreui-title="Invoice 1042" data-coreui-content="Paid on 3 November.">1042</button>
     <button type="button" class="btn-outline" data-coreui-title="Invoice 1043" data-coreui-content="Due on 18 November.">1043</button>
     <button type="button" class="btn-outline" data-coreui-title="Invoice 1044" data-coreui-content="Draft, not sent yet.">1044</button>
