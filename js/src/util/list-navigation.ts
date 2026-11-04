@@ -131,6 +131,102 @@ export const scrollIntoContainer = (container: Element, element: Element | null 
   }
 }
 
+export type VirtualWindow = {
+  overscan: number
+  pinned?: readonly number[]
+  rows: number
+  scrollTop: number
+  viewport: number
+}
+
+export type VirtualRows = {
+  gaps: number[]
+  indexes: number[]
+}
+
+/**
+ * Picks the rows a windowed list renders: the rows the viewport shows at the scroll position, the
+ * given number of rows before and after them, and the pinned rows wherever they are. Until the
+ * rows or the viewport have a height, the first `rows` rows stand in for the visible ones.
+ *
+ * @param sizes - The height of every row, in order; `0` for a row not measured yet
+ * @param window - `scrollTop` and `viewport`, the scroll position and the height of the viewport
+ * (`0` when it is not known); `rows`, how many rows stand in for the visible ones before anything is
+ * measured; `overscan`, how many rows are rendered before and after the visible ones; `pinned`,
+ * indexes rendered even outside the window, such as the active row, skipped when outside the list
+ * @returns `indexes`, the rows to render in list order, each once, and `gaps`, the height of the
+ * rows skipped before each of them, with one more entry for the rows skipped after the last
+ */
+export const getVirtualRows = (sizes: readonly number[], { overscan, pinned = [], rows, scrollTop, viewport }: VirtualWindow): VirtualRows => {
+  const offsets = [0]
+
+  for (const size of sizes) {
+    offsets.push(offsets.at(-1)! + size)
+  }
+
+  const total = offsets.at(-1)!
+  let first = 0
+  let last = Math.min(rows, sizes.length)
+
+  if (viewport > 0 && total > 0) {
+    while (first < sizes.length - 1 && offsets[first + 1] <= scrollTop) {
+      first++
+    }
+
+    last = first
+
+    while (last < sizes.length && offsets[last] < scrollTop + viewport) {
+      last++
+    }
+  }
+
+  const indexes = new Set<number>()
+
+  for (let index = Math.max(first - overscan, 0); index < Math.min(last + overscan, sizes.length); index++) {
+    indexes.add(index)
+  }
+
+  for (const index of pinned) {
+    if (index >= 0 && index < sizes.length) {
+      indexes.add(index)
+    }
+  }
+
+  const sorted = [...indexes].toSorted((a, b) => a - b)
+  const gaps = sorted.map((index, position) => offsets[index] - (position === 0 ? 0 : offsets[sorted[position - 1] + 1]))
+
+  gaps.push(total - (sorted.length === 0 ? 0 : offsets[sorted.at(-1)! + 1]))
+
+  return { gaps, indexes: sorted }
+}
+
+/**
+ * Finds the scroll position that shows a row of a windowed list with the least movement: the
+ * current one when the row is in view, the row's top edge when it is above or taller than the
+ * viewport, and the position that puts its bottom edge at the bottom of the viewport when it is
+ * below.
+ *
+ * @param sizes - The height of every row, in order
+ * @param index - The row to show
+ * @param scrollTop - The current scroll position
+ * @param viewport - The height of the viewport
+ * @returns The scroll position, or the current one for an index outside the list
+ */
+export const getRevealScrollTop = (sizes: readonly number[], index: number, scrollTop: number, viewport: number): number => {
+  if (index < 0 || index >= sizes.length) {
+    return scrollTop
+  }
+
+  const top = sizes.slice(0, index).reduce((sum, size) => sum + size, 0)
+  const bottom = top + sizes[index]
+
+  if (top < scrollTop || bottom - top > viewport) {
+    return top
+  }
+
+  return bottom > scrollTop + viewport ? bottom - viewport : scrollTop
+}
+
 /**
  * Picks the item the focus moves to when one leaves a list: the next item, or the previous one when
  * the item was the last. An item the list does not hold gives the first item.

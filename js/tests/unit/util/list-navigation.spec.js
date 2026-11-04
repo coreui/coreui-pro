@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  createTypeaheadBuffer, findOpeningItem, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, isTypingKey, rangeBetween, scrollIntoContainer
+  createTypeaheadBuffer, findOpeningItem, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, getRevealScrollTop, getVirtualRows, isTypingKey, rangeBetween, scrollIntoContainer
 } from '../../../src/util/list-navigation.js'
 import * as Util from '../../../src/util/index.js'
 
@@ -284,6 +284,83 @@ describe('List navigation utilities', () => {
       scrollIntoContainer(box, box.querySelector('#tall'))
       expect(box.scrollTop).toEqual(800)
       fixture.remove()
+    })
+  })
+
+  describe('getVirtualRows', () => {
+    const sizes = Array.from({ length: 50 }, () => 20)
+
+    it('should render the visible rows and the overscan around them, with the skipped height before and after', () => {
+      const { indexes, gaps } = getVirtualRows(sizes, {
+        overscan: 2, rows: 5, scrollTop: 400, viewport: 100
+      })
+
+      expect(indexes).toEqual([18, 19, 20, 21, 22, 23, 24, 25, 26])
+      expect(gaps).toEqual([360, ...Array.from({ length: 8 }, () => 0), 460])
+    })
+
+    it('should start the window at the row that holds the scroll position', () => {
+      expect(getVirtualRows(sizes, {
+        overscan: 0, rows: 5, scrollTop: 410, viewport: 100
+      }).indexes).toEqual([20, 21, 22, 23, 24, 25])
+    })
+
+    it('should keep a pinned row in list order, with the gaps around it', () => {
+      const { indexes, gaps } = getVirtualRows(sizes, {
+        overscan: 1, pinned: [40], rows: 5, scrollTop: 0, viewport: 100
+      })
+
+      expect(indexes).toEqual([0, 1, 2, 3, 4, 5, 40])
+      expect(gaps).toEqual([0, 0, 0, 0, 0, 0, 680, 180])
+    })
+
+    it('should stand in the first rows until anything is measured, and still render the pinned ones', () => {
+      expect(getVirtualRows(Array.from({ length: 50 }, () => 0), {
+        overscan: 2, pinned: [45], rows: 5, scrollTop: 0, viewport: 100
+      }).indexes).toEqual([0, 1, 2, 3, 4, 5, 6, 45])
+      expect(getVirtualRows(sizes, {
+        overscan: 0, rows: 3, scrollTop: 0, viewport: 0
+      }).indexes).toEqual([0, 1, 2])
+    })
+
+    it('should follow rows of different heights', () => {
+      const { indexes, gaps } = getVirtualRows([40, 20, 20, 40, 20, 20], {
+        overscan: 0, rows: 2, scrollTop: 50, viewport: 40
+      })
+
+      expect(indexes).toEqual([1, 2, 3])
+      expect(gaps).toEqual([40, 0, 0, 40])
+    })
+
+    it('should skip pinned indexes outside the list and render nothing for an empty one', () => {
+      expect(getVirtualRows(sizes.slice(0, 3), {
+        overscan: 0, pinned: [-1, 7], rows: 5, scrollTop: 0, viewport: 100
+      }).indexes).toEqual([0, 1, 2])
+      expect(getVirtualRows([], {
+        overscan: 2, pinned: [0], rows: 5, scrollTop: 0, viewport: 100
+      })).toEqual({ gaps: [0], indexes: [] })
+    })
+  })
+
+  describe('getRevealScrollTop', () => {
+    const sizes = Array.from({ length: 50 }, () => 20)
+
+    it('should leave the scroll position alone for a row in view', () => {
+      expect(getRevealScrollTop(sizes, 22, 400, 100)).toBe(400)
+    })
+
+    it('should align a row above the view by its top edge and a row below it by its bottom edge', () => {
+      expect(getRevealScrollTop(sizes, 3, 400, 100)).toBe(60)
+      expect(getRevealScrollTop(sizes, 49, 400, 100)).toBe(900)
+    })
+
+    it('should align a row taller than the view by its top edge', () => {
+      expect(getRevealScrollTop([20, 200, 20], 1, 0, 100)).toBe(20)
+    })
+
+    it('should keep the scroll position for an index outside the list', () => {
+      expect(getRevealScrollTop(sizes, 50, 120, 100)).toBe(120)
+      expect(getRevealScrollTop(sizes, -1, 120, 100)).toBe(120)
     })
   })
 })
