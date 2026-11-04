@@ -3256,11 +3256,11 @@ describe('Autocomplete', () => {
 
       autocomplete._search = 'xyz'
       autocomplete._filterOptionsList()
-      expect(autocomplete._menu.querySelector('.list-box-empty').hasAttribute('hidden')).toBe(false)
+      expect(autocomplete._menu.querySelector('.list-box-empty').textContent).not.toEqual('')
 
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
-      expect(autocomplete._menu.querySelector('.list-box-empty').hasAttribute('hidden')).toBe(true)
+      expect(autocomplete._menu.querySelector('.list-box-empty').textContent).toEqual('')
     })
 
     it('should not duplicate no results message when filtering multiple times', () => {
@@ -4652,7 +4652,7 @@ describe('Autocomplete', () => {
       })
 
       autocomplete._search = 'app'
-      autocomplete._setListBoxItems()
+      autocomplete._setListBoxOptions()
 
       const optionEl = autocomplete._optionsElement.querySelector('.list-box-option')
       expect(optionEl.innerHTML).toContain('<strong>')

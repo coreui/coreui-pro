@@ -3969,11 +3969,11 @@ describe('MultiSelect', () => {
       multiSelect.search('xyz')
 
       const emptyMessage = multiSelect._menu.querySelector('.list-box-empty')
-      expect(emptyMessage.hasAttribute('hidden')).toBe(false)
+      expect(emptyMessage.textContent).not.toEqual('')
 
       multiSelect.search('app')
 
-      expect(emptyMessage.hasAttribute('hidden')).toBe(true)
+      expect(emptyMessage.textContent).toEqual('')
     })
 
     it('should trigger search event', () => {

@@ -6,7 +6,7 @@
  */
 
 import BaseComponent from './base-component.js'
-import ListBox, { type ListBoxEntry, type ListBoxGroup, type ListBoxItem } from './list-box.js'
+import ListBox, { type ListBoxEntry, type ListBoxGroup, type ListBoxOption } from './list-box.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
@@ -73,9 +73,9 @@ type TransferConfig = {
   ariaMoveToTargetLabel: string
   ariaMovedAnnouncement: string
   disabled: boolean
+  emptyLabel: string
   html: boolean
   indicator: string
-  items: ListBoxEntry[]
   loading: boolean
   loadingLabel: string
   moveAllToSourceIcon: string
@@ -83,6 +83,7 @@ type TransferConfig = {
   moveToSourceIcon: string
   moveToTargetIcon: string
   oneWay: boolean
+  options: ListBoxEntry[] | null
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   search: boolean | string
@@ -102,9 +103,9 @@ const Default: TransferConfig = {
   ariaMoveToTargetLabel: 'Move to chosen',
   ariaMovedAnnouncement: '{count} moved to {title}',
   disabled: false,
+  emptyLabel: 'No results found',
   html: false,
   indicator: 'checkbox',
-  items: [],
   loading: false,
   loadingLabel: 'Loading…',
   moveAllToSourceIcon: CHEVRON_DOUBLE_LEFT_ICON,
@@ -112,6 +113,7 @@ const Default: TransferConfig = {
   moveToSourceIcon: CHEVRON_LEFT_ICON,
   moveToTargetIcon: CHEVRON_RIGHT_ICON,
   oneWay: false,
+  options: null,
   sanitize: true,
   sanitizeFn: null,
   search: false,
@@ -131,9 +133,9 @@ const DefaultType: Record<string, string> = {
   ariaMoveToTargetLabel: 'string',
   ariaMovedAnnouncement: 'string',
   disabled: 'boolean',
+  emptyLabel: 'string',
   html: 'boolean',
   indicator: 'string',
-  items: 'array',
   loading: 'boolean',
   loadingLabel: 'string',
   moveAllToSourceIcon: 'string',
@@ -141,6 +143,7 @@ const DefaultType: Record<string, string> = {
   moveToSourceIcon: 'string',
   moveToTargetIcon: 'string',
   oneWay: 'boolean',
+  options: '(array|null)',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   search: '(boolean|string)',
@@ -159,7 +162,7 @@ const DefaultType: Record<string, string> = {
 class Transfer extends BaseComponent {
   protected declare _createdNodes: HTMLElement[]
   protected declare _itemRanks: Map<string, number>
-  protected declare _items: ListBoxEntry[] | null
+  protected declare _entries: ListBoxEntry[] | null
   protected declare _onListBoxChange: () => void
   protected declare _onListBoxSearch: (event: Event) => void
   protected declare _order: WeakMap<HTMLElement, number>
@@ -172,7 +175,7 @@ class Transfer extends BaseComponent {
 
     this._createdNodes = []
     this._itemRanks = new Map()
-    this._items = this._config.items.length > 0 ? this._config.items : null
+    this._entries = this._config.options
     this._sides = {
       [SIDE_SOURCE]: this._createSide(SIDE_SOURCE),
       [SIDE_TARGET]: this._createSide(SIDE_TARGET)
@@ -183,7 +186,7 @@ class Transfer extends BaseComponent {
     this._ranks = 0
     this._rendered = false
 
-    if (this._items) {
+    if (this._entries) {
       this._applyItems(this._config.value)
     }
 
@@ -237,14 +240,14 @@ class Transfer extends BaseComponent {
     return this._sides[side].listBox.getSelectedValues()
   }
 
-  setItems(items: ListBoxEntry[]): void {
-    this._items = Array.isArray(items) ? items : []
+  setOptions(items: ListBoxEntry[]): void {
+    this._entries = Array.isArray(items) ? items : []
     this._applyItems(this.getTarget())
     this.update()
   }
 
-  getItems(): ListBoxEntry[] {
-    return this._items ?? []
+  getOptions(): ListBoxEntry[] {
+    return this._entries ?? []
   }
 
   setLoading(loading: boolean, side?: string): void {
@@ -305,11 +308,12 @@ class Transfer extends BaseComponent {
         ariaSearchLabel: `${this._config.searchPlaceholder} ${title}`,
         counter: true,
         disabled: this._config.disabled,
+        emptyLabel: this._config.emptyLabel,
         html: this._config.html,
         indicator: this._config.indicator,
         loading: this._config.loading,
         loadingLabel: this._config.loadingLabel,
-        resetSelectionOnItemsChange: true,
+        resetSelectionOnOptionsChange: true,
         sanitize: this._config.sanitize,
         sanitizeFn: this._config.sanitizeFn,
         search: this._config.search,
@@ -332,7 +336,7 @@ class Transfer extends BaseComponent {
       return existing
     }
 
-    if (!this._items) {
+    if (!this._entries) {
       return element
     }
 
@@ -422,8 +426,8 @@ class Transfer extends BaseComponent {
   }
 
   _applyItems(values: string[]): void {
-    const items = this._items ?? []
-    const flat = this._flatItems(items)
+    const items = this._entries ?? []
+    const flat = this._flatOptions(items)
     const byValue = new Map(flat.map(item => [this._itemValue(item), item]))
 
     this._itemRanks = new Map([...byValue.keys()].map((value, index) => [value, index]))
@@ -431,8 +435,8 @@ class Transfer extends BaseComponent {
     const chosen = (Array.isArray(values) ? values : []).filter(value => byValue.has(value))
     const taken = new Set(chosen)
 
-    this._sides[SIDE_TARGET].listBox.setItems(this._forwardItems(chosen.map(value => byValue.get(value) as ListBoxItem)))
-    this._sides[SIDE_SOURCE].listBox.setItems(this._forwardItems(this._availableItems(items, taken)))
+    this._sides[SIDE_TARGET].listBox.setOptions(this._forwardOptions(chosen.map(value => byValue.get(value) as ListBoxOption)))
+    this._sides[SIDE_SOURCE].listBox.setOptions(this._forwardOptions(this._availableOptions(items, taken)))
 
     if (this._rendered) {
       for (const side of Object.values(this._sides)) {
@@ -443,18 +447,18 @@ class Transfer extends BaseComponent {
     this._rendered = true
   }
 
-  _forwardItems(entries: ListBoxEntry[]): ListBoxEntry[] {
+  _forwardOptions(entries: ListBoxEntry[]): ListBoxEntry[] {
     return entries.map(entry => {
-      if (Array.isArray((entry as ListBoxGroup).items)) {
+      if (Array.isArray((entry as ListBoxGroup).options)) {
         const group = entry as ListBoxGroup
-        return { ...group, items: group.items.map(item => this._unmarked(item, group.disabled)) }
+        return { ...group, options: group.options.map(item => this._unmarked(item, group.disabled)) }
       }
 
-      return this._unmarked(entry as ListBoxItem)
+      return this._unmarked(entry as ListBoxOption)
     })
   }
 
-  _unmarked(item: ListBoxItem, disabled = false): ListBoxItem {
+  _unmarked(item: ListBoxOption, disabled = false): ListBoxOption {
     if (!item.selected || (!this._rendered && !disabled && !item.disabled)) {
       return item
     }
@@ -464,7 +468,7 @@ class Transfer extends BaseComponent {
     return rest
   }
 
-  _availableItems(items: ListBoxEntry[], taken: Set<string>): ListBoxEntry[] {
+  _availableOptions(items: ListBoxEntry[], taken: Set<string>): ListBoxEntry[] {
     const available: ListBoxEntry[] = []
 
     for (const entry of items) {
@@ -472,8 +476,8 @@ class Transfer extends BaseComponent {
         continue
       }
 
-      if (!Array.isArray((entry as ListBoxGroup).items)) {
-        if (!taken.has(this._itemValue(entry as ListBoxItem))) {
+      if (!Array.isArray((entry as ListBoxGroup).options)) {
+        if (!taken.has(this._itemValue(entry as ListBoxOption))) {
           available.push(entry)
         }
 
@@ -481,36 +485,36 @@ class Transfer extends BaseComponent {
       }
 
       const group = entry as ListBoxGroup
-      const rest = group.items.filter(item => !taken.has(this._itemValue(item)))
+      const rest = group.options.filter(item => !taken.has(this._itemValue(item)))
 
       if (rest.length > 0) {
-        available.push({ ...group, items: rest })
+        available.push({ ...group, options: rest })
       }
     }
 
     return available
   }
 
-  _flatItems(items: ListBoxEntry[]): ListBoxItem[] {
+  _flatOptions(items: ListBoxEntry[]): ListBoxOption[] {
     return items
       .filter(entry => entry !== null && typeof entry === 'object')
       .flatMap(entry => {
         const group = entry as ListBoxGroup
 
-        if (!Array.isArray(group.items)) {
-          return [entry as ListBoxItem]
+        if (!Array.isArray(group.options)) {
+          return [entry as ListBoxOption]
         }
 
-        return group.disabled ? group.items.map(item => ({ ...item, disabled: true })) : group.items
+        return group.disabled ? group.options.map(item => ({ ...item, disabled: true })) : group.options
       })
   }
 
-  _itemValue(item: ListBoxItem): string {
+  _itemValue(item: ListBoxOption): string {
     return getOptionValue(item)
   }
 
   _rankOptions(): void {
-    if (this._items) {
+    if (this._entries) {
       return
     }
 
@@ -524,7 +528,7 @@ class Transfer extends BaseComponent {
   }
 
   _rankOf(option: HTMLElement): number {
-    if (this._items) {
+    if (this._entries) {
       return this._itemRanks.get(this._optionValue(option)) ?? Number.MAX_SAFE_INTEGER
     }
 

@@ -96,14 +96,15 @@ describe('Combobox', () => {
         caretIcon: CARET_ICON,
         container: false,
         disabled: false,
+        emptyLabel: 'No results found',
         html: false,
         indicator: 'none',
-        items: [],
+        options: null,
         multiple: false,
         name: null,
         placeholder: '',
         required: false,
-        resetSelectionOnItemsChange: false,
+        resetSelectionOnOptionsChange: false,
         sanitize: true,
         sanitizeFn: null,
         search: false,
@@ -414,12 +415,12 @@ describe('Combobox', () => {
       expect(value(toggle)).toEqual('2 of 3 selected')
     })
 
-    it('should count the selected values the items do not list in {total}', () => {
+    it('should count the selected values the options do not list in {total}', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { multiple: true, selectedLabel: '{count} of {total} selected' })
 
       combobox.setValue(['us', 'uk', 'ca'])
-      combobox.setItems([{ value: 'de', label: 'Germany' }])
+      combobox.setOptions([{ value: 'de', label: 'Germany' }])
 
       expect(value(toggle)).toEqual('3 of 4 selected')
     })
@@ -582,11 +583,11 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toBeNull()
     })
 
-    it('should seed the selection from items marked selected and bring it back on a form reset', async () => {
+    it('should seed the selection from options marked selected and bring it back on a form reset', async () => {
       fixtureEl.innerHTML = '<form><button class="form-control" type="button"></button></form>'
       const toggle = fixtureEl.querySelector('button')
       const combobox = new Combobox(toggle, {
-        items: [{ value: 'a', label: 'A', selected: true }, { value: 'b', label: 'B' }]
+        options: [{ value: 'a', label: 'A', selected: true }, { value: 'b', label: 'B' }]
       })
 
       expect(combobox.getValue()).toEqual('a')
@@ -605,7 +606,7 @@ describe('Combobox', () => {
       fixtureEl.innerHTML = '<form><button class="form-control" type="button"></button></form>'
       const toggle = fixtureEl.querySelector('button')
       const combobox = new Combobox(toggle, {
-        items: [{ value: 'a', label: 'A' }, { value: 'd', label: 'D', disabled: true }],
+        options: [{ value: 'a', label: 'A' }, { value: 'd', label: 'D', disabled: true }],
         value: 'd'
       })
 
@@ -620,12 +621,12 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toEqual('d')
     })
 
-    it('should disable every item of a disabled group', () => {
+    it('should disable every option of a disabled group', () => {
       fixtureEl.innerHTML = '<button class="form-control" type="button"></button>'
       const toggle = fixtureEl.querySelector('button')
       const combobox = new Combobox(toggle, {
         multiple: true,
-        items: [{ label: 'Closed', disabled: true, items: [{ value: 'a', label: 'A' }] }, { value: 'b', label: 'B' }]
+        options: [{ label: 'Closed', disabled: true, options: [{ value: 'a', label: 'A' }] }, { value: 'b', label: 'B' }]
       })
 
       combobox.show()
@@ -884,13 +885,13 @@ describe('Combobox', () => {
       expect(searchField(combobox).classList.contains('is-valid')).toBeFalse()
     })
 
-    it('should keep a state given after a pick through setItems that marks another value', () => {
+    it('should keep a state given after a pick through setOptions that marks another value', () => {
       const toggle = setMarkupInForm()
       const combobox = new Combobox(toggle, { multiple: true, validationState: 'invalid' })
 
       pick(combobox, 'ca')
       combobox.setValidationState('invalid')
-      combobox.setItems([{ value: 'us', label: 'United States', selected: true }])
+      combobox.setOptions([{ value: 'us', label: 'United States', selected: true }])
 
       expect(combobox.getValue()).toEqual(['ca', 'us'])
       expect(toggle.classList.contains('is-invalid')).toBeTrue()
@@ -1079,14 +1080,21 @@ describe('Combobox', () => {
     })
   })
 
-  describe('items', () => {
-    it('should render the list from the items option', () => {
+  describe('options', () => {
+    it('should take an empty options array as an empty list, not as a cue to read the markup', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { options: [] })
+
+      expect(menu(combobox).querySelectorAll('.list-box-option').length).toEqual(0)
+    })
+
+    it('should render the list from the options option', () => {
       fixtureEl.innerHTML = '<button class="form-control" type="button"></button>'
       const toggle = fixtureEl.querySelector('button')
       const combobox = new Combobox(toggle, {
-        items: [
+        options: [
           { value: 'us', label: 'United States' },
-          { label: 'Europe', items: [{ value: 'uk', label: 'United Kingdom' }] }
+          { label: 'Europe', options: [{ value: 'uk', label: 'United Kingdom' }] }
         ]
       })
 
@@ -1094,35 +1102,35 @@ describe('Combobox', () => {
       expect(menu(combobox).querySelector('.list-box-section-label').textContent).toEqual('Europe')
     })
 
-    it('should rebuild the list with setItems', () => {
+    it('should rebuild the list with setOptions', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle)
 
       combobox.setValue('ca')
-      combobox.setItems([{ value: 'ca', label: 'Kanada' }, { value: 'de', label: 'Germany' }])
+      combobox.setOptions([{ value: 'ca', label: 'Kanada' }, { value: 'de', label: 'Germany' }])
 
       expect(menu(combobox).querySelectorAll('.list-box-option').length).toEqual(2)
       expect(combobox.getValue()).toEqual('ca')
       expect(value(toggle)).toEqual('Kanada')
     })
 
-    it('should keep a value the new items no longer carry, with its label', () => {
+    it('should keep a value the new options no longer carry, with its label', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { placeholder: 'Pick a country' })
 
       combobox.setValue('ca')
-      combobox.setItems([{ value: 'de', label: 'Germany' }])
+      combobox.setOptions([{ value: 'de', label: 'Germany' }])
 
       expect(combobox.getValue()).toEqual('ca')
       expect(value(toggle)).toEqual('Canada')
     })
 
-    it('should keep a held value the items no longer carry when setValue gives it back', () => {
+    it('should keep a held value the options no longer carry when setValue gives it back', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { multiple: true })
 
       combobox.setValue(['us', 'uk'])
-      combobox.setItems([{ value: 'us', label: 'United States' }, { value: 'de', label: 'Germany' }])
+      combobox.setOptions([{ value: 'us', label: 'United States' }, { value: 'de', label: 'Germany' }])
       combobox.setValue([...combobox.getValue(), 'de'])
 
       expect(combobox.getValue()).toEqual(['us', 'uk', 'de'])
@@ -1198,7 +1206,7 @@ describe('Combobox', () => {
       const combobox = new Combobox(toggle, { multiple: true })
 
       combobox.setValue(['us', 'ca'])
-      combobox.setItems([
+      combobox.setOptions([
         { value: 'ca', label: 'Canada', disabled: true },
         { value: 'us', label: 'United States' },
         { value: 'de', label: 'Germany' }
@@ -1208,12 +1216,12 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toEqual(['ca', 'us'])
     })
 
-    it('should keep the value of a combobox built from markup when resetSelectionOnItemsChange is set and the values stay', () => {
+    it('should keep the value of a combobox built from markup when resetSelectionOnOptionsChange is set and the values stay', () => {
       const toggle = setMarkup()
-      const combobox = new Combobox(toggle, { resetSelectionOnItemsChange: true })
+      const combobox = new Combobox(toggle, { resetSelectionOnOptionsChange: true })
 
       combobox.setValue('ca')
-      combobox.setItems([
+      combobox.setOptions([
         { value: 'us', label: 'United States' },
         { value: 'uk', label: 'United Kingdom' },
         { value: 'ca', label: 'Canada' }
@@ -1222,23 +1230,23 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toEqual('ca')
     })
 
-    it('should drop the value and take the marked item when resetSelectionOnItemsChange is set', () => {
+    it('should drop the value and take the marked option when resetSelectionOnOptionsChange is set', () => {
       const toggle = setMarkup()
-      const combobox = new Combobox(toggle, { resetSelectionOnItemsChange: true })
+      const combobox = new Combobox(toggle, { resetSelectionOnOptionsChange: true })
 
       combobox.setValue('ca')
-      combobox.setItems([{ value: 'de', label: 'Germany', selected: true }, { value: 'fr', label: 'France' }])
+      combobox.setOptions([{ value: 'de', label: 'Germany', selected: true }, { value: 'fr', label: 'France' }])
 
       expect(combobox.getValue()).toEqual('de')
       expect(value(toggle)).toEqual('Germany')
     })
 
-    it('should label a value the new items no longer carry once it is the only one left', () => {
+    it('should label a value the new options no longer carry once it is the only one left', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { multiple: true })
 
       combobox.setValue(['us', 'ca'])
-      combobox.setItems([{ value: 'us', label: 'United States' }, { value: 'de', label: 'Germany' }])
+      combobox.setOptions([{ value: 'us', label: 'United States' }, { value: 'de', label: 'Germany' }])
       combobox.show()
       option(combobox, 'us').click()
 
@@ -1248,6 +1256,29 @@ describe('Combobox', () => {
   })
 
   describe('search', () => {
+    it('should show the empty state of the list box when the search matches nothing', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { search: true })
+
+      combobox.show()
+      const empty = menu(combobox).querySelector('.list-box-empty')
+      expect(empty.textContent).toEqual('')
+
+      type(searchField(combobox), 'zzz')
+      expect(empty.textContent).not.toEqual('')
+      expect(empty.textContent).toEqual('No results found')
+    })
+
+    it('should write its emptyLabel into the empty state of the list box', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { emptyLabel: 'Brak wyników', search: true })
+
+      combobox.show()
+      type(searchField(combobox), 'zzz')
+      expect(menu(combobox).querySelector('.list-box-empty').textContent).toEqual('Brak wyników')
+      expect(new Combobox(setMarkup(), { emptyLabel: '' })._menu.querySelector('.list-box-empty')).toBeNull()
+    })
+
     it('should render the search field of the list box in the panel', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { search: true, searchPlaceholder: 'Filter' })
@@ -1308,14 +1339,14 @@ describe('Combobox', () => {
       option(combobox, 'ca').click()
       combobox.show()
       type(searchField(combobox), 'ger')
-      combobox.setItems([{ value: 'de', label: 'Germany' }])
+      combobox.setOptions([{ value: 'de', label: 'Germany' }])
 
       expect(combobox.getValue()).toEqual('ca')
       expect(value(toggle)).toEqual('Canada')
       expect(toggle.classList.contains('show')).toBeTrue()
 
       type(searchField(combobox), 'gerf')
-      combobox.setItems([{ value: 'fr', label: 'France' }])
+      combobox.setOptions([{ value: 'fr', label: 'France' }])
 
       expect(value(toggle)).toEqual('Canada')
     })
@@ -1912,14 +1943,14 @@ describe('Combobox', () => {
       expect(reported).toEqual([[1, 'uk']])
     })
 
-    it('should fire selectionLimit for an item setItems marks selected past the limit, and not for setValue', () => {
+    it('should fire selectionLimit for an option setOptions marks selected past the limit, and not for setValue', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { multiple: true, selectionLimit: 1 })
       const reported = []
 
       toggle.addEventListener('selectionLimit.coreui.combobox', event => reported.push(event.value))
       combobox.setValue(['us', 'uk'])
-      combobox.setItems([
+      combobox.setOptions([
         { value: 'us', label: 'United States' },
         { value: 'ca', label: 'Canada', selected: true }
       ])
@@ -2137,7 +2168,7 @@ describe('Combobox', () => {
       fixtureEl.innerHTML = '<form><button class="form-control" id="pick"></button></form>'
       const toggle = fixtureEl.querySelector('#pick')
       const cycle = () => new Combobox(toggle, {
-        items: [{ value: 'a', label: 'A' }], name: 'pick', search: true, value: 'a'
+        options: [{ value: 'a', label: 'A' }], name: 'pick', search: true, value: 'a'
       }).dispose()
 
       cycle()
@@ -2159,7 +2190,7 @@ describe('Combobox', () => {
       ].join('')
       const toggle = fixtureEl.querySelector('#pick')
       const popup = fixtureEl.querySelector('.popup')
-      const combobox = new Combobox(toggle, { items: [{ value: 'a', label: 'A' }], value: 'a' })
+      const combobox = new Combobox(toggle, { options: [{ value: 'a', label: 'A' }], value: 'a' })
 
       combobox.show()
       await new Promise(resolve => {
@@ -2191,7 +2222,7 @@ describe('Combobox', () => {
       fixtureEl.innerHTML = '<button class="form-control" id="pick"></button><div class="popup"></div>'
       const popup = fixtureEl.querySelector('.popup')
 
-      new Combobox(fixtureEl.querySelector('#pick'), { items: [{ value: 'a', label: 'A' }], search: true }).dispose()
+      new Combobox(fixtureEl.querySelector('#pick'), { options: [{ value: 'a', label: 'A' }], search: true }).dispose()
 
       expect(popup.childElementCount).toBe(0)
     })
@@ -2210,7 +2241,7 @@ describe('Combobox', () => {
       fixtureEl.innerHTML = '<button class="form-control disabled" id="pick"></button>'
       const toggle = fixtureEl.querySelector('#pick')
       // eslint-disable-next-line no-new
-      new Combobox(toggle, { items: [{ value: 'a', label: 'A' }] })
+      new Combobox(toggle, { options: [{ value: 'a', label: 'A' }] })
 
       expect(toggle.disabled).toBeFalse()
       expect(toggle.classList.contains('disabled')).toBeFalse()

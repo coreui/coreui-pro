@@ -1,10 +1,10 @@
 const element = document.getElementById('transferItems')
 
 coreui.Transfer.getOrCreateInstance(element, {
-  items: [
+  options: [
     {
       label: 'Engineering',
-      items: [
+      options: [
         { value: 'ada', label: 'Ada Lovelace', description: 'Analyst' },
         { value: 'grace', label: 'Grace Hopper', description: 'Compilers' },
         {
@@ -14,7 +14,7 @@ coreui.Transfer.getOrCreateInstance(element, {
     },
     {
       label: 'Design',
-      items: [
+      options: [
         { value: 'ray', label: 'Ray Eames' },
         { value: 'dieter', label: 'Dieter Rams' }
       ]

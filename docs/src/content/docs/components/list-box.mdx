@@ -96,7 +96,7 @@ A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the
     </div>
   </div>`} />
 
-"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the button take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides which values a second click drops, so a value the filter hid stays selected. The button reads as pressed once that set is selected, or once the values of it you selected fill what `selectionLimit` leaves after the values selected outside it, hidden by the filter or missing from the items; a click then drops the visible values. Pass an explicit list to `selectAll(values)` to select beyond the filter, and call `clear()` to empty the selection whatever the filter shows.
+"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the button take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides which values a second click drops, so a value the filter hid stays selected. The button reads as pressed once that set is selected, or once the values of it you selected fill what `selectionLimit` leaves after the values selected outside it, hidden by the filter or missing from the options; a click then drops the visible values. Pass an explicit list to `selectAll(values)` to select beyond the filter, and call `clear()` to empty the selection whatever the filter shows.
 
 ### Selection limit
 
@@ -113,13 +113,13 @@ A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the
 
 With a limit, the select-all button counts as pressed once the visible, enabled options it selected fill the room the limit leaves after the values selected outside them, `mixed` while some are selected below that and not pressed while none is; clicking it while pressed drops the visible, enabled options it had selected.
 
-## Items from configuration
+## Options from configuration
 
-Instead of writing every option by hand, hand the plugin an `items` array and it renders the list — the same markup the sections above document, so every class, role and attribute is where you would have put it. An item is `{ value, label, description, disabled, selected }`; an entry with its own `items` array is a section, and its `label` becomes the `.list-box-section-label` the group is named by.
+Instead of writing every option by hand, hand the plugin an `options` array and it renders the list — the same markup the sections above document, so every class, role and attribute is where you would have put it. An option is `{ value, label, description, disabled, selected }`; an entry with its own `options` array is a section, and its `label` becomes the `.list-box-section-label` the group is named by.
 
 Labels are text: they land as `textContent`, so a label carrying markup shows up as characters. Set `html: true` to have them parsed instead — the result runs through the sanitizer first, and `sanitize`, `sanitizeFn` and `allowList` steer it the same way they do everywhere else.
 
-Leave an empty `.list-box-options` in the markup so you can name it; the plugin appends one when it is missing, but then the list has no accessible name. Options already written inside it are replaced — `items` owns the list from the moment it is set.
+Leave an empty `.list-box-options` in the markup so you can name it; the plugin appends one when it is missing, but then the list has no accessible name. Options already written inside it are replaced — `options` owns the list from the moment it is set.
 
 <Example code={`<div class="list-box" id="listBoxItems" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich"></div>
@@ -129,18 +129,17 @@ Leave an empty `.list-box-options` in the markup so you can name it; the plugin 
 
 ## Remote data
 
-`setItems(items)` rebuilds the list at any time and leaves the selection alone. A value the new items no longer carry stays selected, counts against `selectionLimit`, and comes off with `deselect()`, `clear()` or the next pick in single mode. An item marked `selected` joins a multiple selection up to `selectionLimit` and fires `change.coreui.list-box` once, and the first one the limit leaves out fires `selectionLimit.coreui.list-box`; in single mode it is taken only while nothing is selected. Otherwise nothing fires, so re-fetching the same page or answering a search costs the user nothing. `getItems()` hands back the normalized array.
+`setOptions(options)` rebuilds the list at any time and leaves the selection alone. A value the new options no longer carry stays selected, counts against `selectionLimit`, and comes off with `deselect()`, `clear()` or the next pick in single mode. An option marked `selected` joins a multiple selection up to `selectionLimit` and fires `change.coreui.list-box` once, and the first one the limit leaves out fires `selectionLimit.coreui.list-box`; in single mode it is taken only while nothing is selected. Otherwise nothing fires, so re-fetching the same page or answering a search costs the user nothing. `getOptions()` hands back the normalized array.
 
-A list that depends on another field, such as the cities of the chosen country, sets `resetSelectionOnItemsChange: true`. Whenever the values of the new items differ from the ones before, `setItems` then starts from an empty selection and takes the items marked `selected`, so the city of the previous country never travels on with the next one. The same values again, in any order, keep the selection. Leave it off with `search: 'external'`, where every answer brings different values and would drop the pick.
+A list that depends on another field, such as the cities of the chosen country, sets `resetSelectionOnOptionsChange: true`. Whenever the values of the new options differ from the ones before, `setOptions` then starts from an empty selection and takes the options marked `selected`, so the city of the previous country never travels on with the next one. The same values again, in any order, keep the selection. Leave it off with `search: 'external'`, where every answer brings different values and would drop the pick.
 
 `loading` covers the wait: it writes `aria-busy="true"` on the options element, shows a row with a spinner and the `loadingLabel` text below the options, announces that text to screen readers when the wait starts or the list shows up waiting, and holds the empty state back, so "No results" never flashes before the answer arrives. The options stay as they are and can still be picked, so a choice from the shown results counts. `setLoading(value)` turns it on and off around the request.
 
-<Example code={`<div class="list-box" id="listBoxRemote" style="max-width: 22rem">
+<Example code={`<div class="list-box" data-coreui-empty-label="No users" id="listBoxRemote" style="max-width: 22rem">
     <div class="list-box-header">
       <button type="button" class="btn btn-sm btn-ghost" id="listBoxReload">Reload</button>
     </div>
     <div class="list-box-options" role="listbox" aria-label="Users" style="max-height: 14rem; overflow-y: auto">
-      <div class="list-box-empty">No users</div>
     </div>
   </div>`} sandboxJs={listBoxRemote} />
 
@@ -152,7 +151,7 @@ A list that depends on another field, such as the cities of the chosen country, 
 
 The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-search`, built for you unless the markup already has an input with that attribute — put one there and it is used as it is, wherever you placed it. `searchPlaceholder` fills the placeholder and `ariaSearchLabel` the accessible name; `--cui-list-box-search-margin` sets how it sits between the two.
 
-<Example code={`<div class="list-box" data-coreui-list-box data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-empty-label="No fruit matches" data-coreui-list-box data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Fruit</button>
     </div>
@@ -163,17 +162,15 @@ The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-se
       <div class="list-box-option" data-coreui-value="blueberry">Blueberry</div>
       <div class="list-box-option" data-coreui-value="cherry">Cherry</div>
       <div class="list-box-option" data-coreui-value="cranberry">Cranberry</div>
-      <div class="list-box-empty">No fruit matches</div>
     </div>
   </div>`} />
 
 ### External search
 
-`search: 'external'` builds the same field and filters nothing. Every keystroke fires `search.coreui.list-box` with the `query`, and you answer with `setItems()` — the list shows what you hand it, so the query is yours to interpret. What the user picked stays picked while the results change, also when the next answer does not carry it. Debounce the request and put `setLoading()` around it, so the loading row shows while the answer is on its way and the options already shown can still be picked.
+`search: 'external'` builds the same field and filters nothing. Every keystroke fires `search.coreui.list-box` with the `query`, and you answer with `setOptions()` — the list shows what you hand it, so the query is yours to interpret. What the user picked stays picked while the results change, also when the next answer does not carry it. Debounce the request and put `setLoading()` around it, so the loading row shows while the answer is on its way and the options already shown can still be picked.
 
-<Example code={`<div class="list-box" id="listBoxExternalSearch" style="max-width: 22rem">
+<Example code={`<div class="list-box" data-coreui-empty-label="No users" id="listBoxExternalSearch" style="max-width: 22rem">
     <div class="list-box-options" role="listbox" aria-label="Users" style="max-height: 14rem; overflow-y: auto">
-      <div class="list-box-empty">No users</div>
     </div>
   </div>`} sandboxJs={listBoxExternalSearch} />
 
@@ -185,7 +182,7 @@ The built-in search field is not the only way in. `filter(query)` runs the same 
 
 <Example code={`<label for="listBoxOwnField" class="form-label">Fruit</label>
   <input type="search" class="form-control mb-3" id="listBoxOwnField" autocomplete="off" style="max-width: 20rem">
-  <div class="list-box" id="listBoxOwnFieldList" style="max-width: 20rem">
+  <div class="list-box" data-coreui-empty-label="No fruit matches" id="listBoxOwnFieldList" style="max-width: 20rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
     </div>
@@ -194,7 +191,6 @@ The built-in search field is not the only way in. `filter(query)` runs the same 
       <div class="list-box-option" data-coreui-value="apricot">Apricot</div>
       <div class="list-box-option" data-coreui-value="banana">Banana</div>
       <div class="list-box-option" data-coreui-value="cherry">Cherry</div>
-      <div class="list-box-empty">No fruit matches</div>
     </div>
   </div>
   <button type="button" class="btn btn-secondary mt-3" id="listBoxOwnFieldReset">Clear the filter</button>`} sandboxJs={listBoxFilter} />
@@ -225,7 +221,7 @@ The checkbox is a decorative `<span class="list-box-option-indicator check">`, n
 
 Both numbers read the same set — the options that are visible and enabled, which is also what the select-all button works on — so the counter always describes what is on screen. Filter the list and the denominator drops with it, and a selected value the filter hid drops out of the numerator too: it stays selected, it just stops being counted, so `2/4` can become `1/1` without anything being deselected. A disabled option never appears in either number. `selectedLabel` builds the whole text, so a translated list reads in its own language and its own word order: pass a function of `(count, total)`, or a string in which `{count}` and `{total}` are replaced.
 
-<Example code={`<div class="list-box" data-coreui-list-box data-coreui-counter="true" data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-empty-label="No fruit matches" data-coreui-list-box data-coreui-counter="true" data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Fruit</button>
     </div>
@@ -235,7 +231,6 @@ Both numbers read the same set — the options that are visible and enabled, whi
       <div class="list-box-option" data-coreui-value="banana">Banana</div>
       <div class="list-box-option disabled" data-coreui-value="blueberry">Blueberry</div>
       <div class="list-box-option" data-coreui-value="cherry">Cherry</div>
-      <div class="list-box-empty">No fruit matches</div>
     </div>
   </div>`} />
 
@@ -330,7 +325,7 @@ An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</
 
 ## Disabled items
 
-`.disabled` (with `aria-disabled="true"` for assistive technology) keeps the user out: it takes an option out of the keyboard order and out of every selection the user makes, the arrows, a click, a section label, a range and select all. Your code is not kept out of the values it sets, as with a native `<select>`: a disabled value passed in `selected`, an item carrying both `disabled` and `selected`, and a value that is already selected when `setItems()` brings it back disabled are selected and read as selected, and come off with `deselect()` or `clear()`. `select()`, `toggle()` and `selectAll()` act as the user would and leave a disabled option alone. `data-coreui-disabled="true"` on the list box does the same for all of it: `aria-disabled` lands on the options element and the select-all button is disabled.
+`.disabled` (with `aria-disabled="true"` for assistive technology) keeps the user out: it takes an option out of the keyboard order and out of every selection the user makes, the arrows, a click, a section label, a range and select all. Your code is not kept out of the values it sets, as with a native `<select>`: a disabled value passed in `selected`, an option carrying both `disabled` and `selected`, and a value that is already selected when `setOptions()` brings it back disabled are selected and read as selected, and come off with `deselect()` or `clear()`. `select()`, `toggle()` and `selectAll()` act as the user would and leave a disabled option alone. `data-coreui-disabled="true"` on the list box does the same for all of it: `aria-disabled` lands on the options element and the select-all button is disabled.
 
 <Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
@@ -342,12 +337,11 @@ An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</
 
 ## Empty state
 
-A `.list-box-empty` element inside the options is shown whenever nothing is left to navigate and hidden as soon as something is, so filtering a list has somewhere to land. `update()` re-evaluates it.
+The list box writes a `.list-box-empty` row with `role="status"` after the `.list-box-options` element and fills it with `emptyLabel` whenever nothing is left to navigate, so filtering a list has somewhere to land and screen readers hear it; while something is left, and while the list is loading, the row stays on the page empty. Its text is `'No results found'` unless you set another; an empty `emptyLabel` leaves the row out, and so does a list box whose options sit directly in its root element, without `.list-box-options`. `update()` re-evaluates it.
 
-<Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-empty-label="No results" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Results">
       <div class="list-box-option" data-coreui-value="lettuce" hidden>Lettuce</div>
-      <div class="list-box-empty">No results</div>
     </div>
   </div>`} />
 
@@ -430,17 +424,18 @@ const listBox = new coreui.ListBox('#myListBox', {
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `activeDescendant` | null, string, element | `null` | Field that keeps the focus. The plugin drops the roving `tabindex`, gives the options ids, and writes `aria-activedescendant` and `aria-controls` on the field while the list is in the document. The keyboard is handled on the field while the list is in the document and not `inert`. |
-| `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags for the labels rendered from `items`. |
+| `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags for the labels rendered from `options`. |
 | `ariaSearchLabel` | string | `'Search options'` | Accessible name of the search field. An input with its own `aria-label` keeps it. |
 | `counter` | boolean | `false` | Puts a `{selected}/{available} selected` readout in the header, counting the visible, enabled options. Builds the header when the markup has none. |
 | `disabled` | boolean | `false` | Turns the whole list box off: `aria-disabled` on `.list-box-options` and the select-all button disabled. |
-| `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
+| `emptyLabel` | string | `'No results found'` | Text of the row shown when nothing is left to navigate. An empty string leaves the row out. |
+| `html` | boolean | `false` | Parses the labels rendered from `options` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and marks the container with `data-coreui-indicator="checkbox"`, which is what lays the options out in two columns. |
-| `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever `.list-box-options` already holds. |
 | `loading` | boolean | `false` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, the loading row below the options, empty state held back. The options stay usable. |
 | `loadingLabel` | string | `'Loading…'` | Text of the loading row, announced to screen readers when the list starts loading on the page or shows up loading. |
-| `resetSelectionOnItemsChange` | boolean | `false` | Empties the selection when `setItems()` brings items with different values, then takes the items marked `selected`. For a list that depends on another field. |
-| `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`. |
+| `options` | array, null | `null` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, options, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever `.list-box-options` already holds; an empty array is an empty list. With `null` the options come from the markup. |
+| `resetSelectionOnOptionsChange` | boolean | `false` | Empties the selection when `setOptions()` brings options with different values, then takes the options marked `selected`. For a list that depends on another field. |
+| `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `options` with `html`. |
 | `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |
 | `search` | boolean, string | `false` | Builds a search field above the options. `true` filters the list itself; `'external'` filters nothing and fires `search.coreui.list-box` instead. An input the markup already carries is used either way. |
 | `searchNormalize` | boolean | `false` | Compares both sides of the filter without their diacritics, so `zoe` matches `Zoë`. |
@@ -458,20 +453,20 @@ const listBox = new coreui.ListBox('#myListBox', {
 | --- | --- |
 | `clear()` | Empties the selection. |
 | `deselect(value)` | Removes the value from the selection. |
-| `dispose` | Destroys the list box, releases the field, and removes the header, counter, search field, list and loading row it created. A list from your markup gets its own children back when `items` replaced them. |
+| `dispose` | Destroys the list box, releases the field, and removes the header, counter, search field, list and loading row it created. A list from your markup gets its own children back when `options` replaced them. |
 | `filter(query)` | Hides the options that do not contain `query`, and a section left without a match with them. `null` clears the filter. The selection is untouched. |
 | `first` / `last` | Moves the highlight to the first/last option. |
 | `focusActive()` | Moves the focus onto the highlighted option, or onto the first navigable one when nothing is highlighted, and makes that one the highlight. Does nothing while the list drives a field, where the focus belongs to that field. |
 | `getActive()` | The highlighted value, or `null`. |
 | `getInstance` | Static method which allows you to get the list box instance associated to a DOM element, you can use it like this: `coreui.ListBox.getInstance(element)`. |
-| `getItems()` | The normalized `items` array. |
+| `getOptions()` | The normalized `options` array. |
 | `getOrCreateInstance` | Static method which returns a list box instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.ListBox.getOrCreateInstance(element)`. |
 | `getSelectedValues()` | The selected values, in selection order. |
 | `next` / `prev` | Moves the highlight one option down/up. |
 | `select(value)` | Selects the option. In `single` mode it replaces the current selection. |
 | `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
 | `setActive(value)` | Moves the highlight without taking the focus and forgets where the last <kbd>Shift</kbd> range started. |
-| `setItems(items)` | Rebuilds the list from an `items` array. The selection stays as it is, values the new items no longer carry included; items marked `selected` join a multiple selection, or a single one that holds nothing, and `change` fires only when they do. With `resetSelectionOnItemsChange` new values empty the selection first. |
+| `setOptions(options)` | Rebuilds the list from an `options` array. The selection stays as it is, values the new options no longer carry included; options marked `selected` join a multiple selection, or a single one that holds nothing, and `change` fires only when they do. With `resetSelectionOnOptionsChange` new values empty the selection first. |
 | `setLoading(loading)` | Turns the loading state on or off; turning it on announces `loadingLabel` while the list is on the page. |
 | `toggle(value)` | Selects the value, or deselects it when it is already selected. |
 | `update` | Re-reads the DOM: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, the empty state and the select-all button are re-evaluated. The selection survives all of it. |
@@ -487,7 +482,7 @@ Events fire on the `.list-box` element.
 | `change.coreui.list-box` | Fired once per operation after the selection settled; `event.value` is the array of selected values. |
 | `deselect.coreui.list-box` | Fires before a value is removed from the selection. Cancelable. |
 | `deselected.coreui.list-box` | Fired after the value was removed from the selection. |
-| `search.coreui.list-box` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setItems()`. |
+| `search.coreui.list-box` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setOptions()`. |
 | `select.coreui.list-box` | Fires before a value is selected; `event.value` is the value. Cancelable — calling `preventDefault()` keeps the selection as it was. |
 | `selected.coreui.list-box` | Fired after the value was selected. |
 | `selectionLimit.coreui.list-box` | Fired once per interaction when `selectionLimit` refused a selection; `event.limit` is the cap and `event.value` the first refused value. |

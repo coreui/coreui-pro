@@ -105,9 +105,10 @@ describe('Transfer', () => {
         ariaMoveToTargetLabel: 'Move to chosen',
         ariaMovedAnnouncement: '{count} moved to {title}',
         disabled: false,
+        emptyLabel: 'No results found',
         html: false,
         indicator: 'checkbox',
-        items: [],
+        options: null,
         loading: false,
         loadingLabel: 'Loading…',
         moveAllToSourceIcon: jasmine.any(String),
@@ -212,7 +213,7 @@ describe('Transfer', () => {
       // eslint-disable-next-line no-new
       new Transfer(el)
 
-      expect(el.querySelector('[role="status"], [role="log"], [role="alert"], [aria-live]')).toBeNull()
+      expect(el.querySelector('[role="status"]:not(.list-box-empty), [role="log"], [role="alert"], [aria-live]')).toBeNull()
     })
 
     it('should initialize on page load with the data api', () => {
@@ -576,26 +577,44 @@ describe('Transfer', () => {
     })
   })
 
-  describe('items', () => {
+  describe('options', () => {
     const users = [
       { value: 'ada', label: 'Ada' },
       { value: 'bob', label: 'Bob' },
       { value: 'cleo', label: 'Cleo' }
     ]
 
-    it('should build both lists from the items and the value', () => {
+    it('should write its emptyLabel into the empty state of both lists', () => {
+      const el = setMarkup()
+      // eslint-disable-next-line no-new
+      new Transfer(el, { emptyLabel: 'Nothing here', options: [] })
+
+      const rows = el.querySelectorAll('.list-box-empty')
+      expect(rows).toHaveSize(2)
+      expect([...rows].map(row => row.textContent)).toEqual(['Nothing here', 'Nothing here'])
+    })
+
+    it('should take an empty options array as empty lists, not as a cue to read the markup', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el, { options: [] })
+
+      expect(transfer.getSource()).toEqual([])
+      expect(transfer.getTarget()).toEqual([])
+    })
+
+    it('should build both lists from the options and the value', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { items: users, value: ['cleo', 'ada'] })
+      const transfer = new Transfer(el, { options: users, value: ['cleo', 'ada'] })
 
       expect(transfer.getSource()).toEqual(['bob'])
       expect(transfer.getTarget()).toEqual(['cleo', 'ada'])
       expect(option(el, 'source', 'bob').textContent).toEqual('Bob')
     })
 
-    it('should keep the items of a disabled group disabled on both sides and out of the move', () => {
+    it('should keep the options of a disabled group disabled on both sides and out of the move', () => {
       const el = setMarkup('', [], [])
       const transfer = new Transfer(el, {
-        items: [{ label: 'Closed', disabled: true, items: [{ value: 'a', label: 'A', selected: true }, { value: 'b', label: 'B' }] }],
+        options: [{ label: 'Closed', disabled: true, options: [{ value: 'a', label: 'A', selected: true }, { value: 'b', label: 'B' }] }],
         value: ['b']
       })
 
@@ -607,10 +626,10 @@ describe('Transfer', () => {
       expect(transfer.getTarget()).toEqual(['b'])
     })
 
-    it('should not offer a disabled item for moving', () => {
+    it('should not offer a disabled option for moving', () => {
       const el = setMarkup('', [], [])
       const transfer = new Transfer(el, {
-        items: [{
+        options: [{
           value: 'billing', label: 'Billing', disabled: true, selected: true
         }, ...users]
       })
@@ -624,17 +643,17 @@ describe('Transfer', () => {
       expect(transfer.getTarget()).toEqual([])
     })
 
-    it('should return the configured items', () => {
+    it('should return the configured options', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { items: users })
+      const transfer = new Transfer(el, { options: users })
 
-      expect(transfer.getItems()).toEqual(users)
+      expect(transfer.getOptions()).toEqual(users)
     })
 
     it('should keep a group together in the source list', () => {
       const el = setMarkup('', [], [])
       const transfer = new Transfer(el, {
-        items: [{ label: 'Crew', items: users }],
+        options: [{ label: 'Crew', options: users }],
         value: ['bob']
       })
 
@@ -650,36 +669,36 @@ describe('Transfer', () => {
         '</div>'
       ].join('')
       const el = fixtureEl.querySelector('.transfer')
-      const transfer = new Transfer(el, { items: users, value: ['ada'] })
+      const transfer = new Transfer(el, { options: users, value: ['ada'] })
 
       expect(transfer.getSource()).toEqual(['bob', 'cleo'])
       expect(transfer.getTarget()).toEqual(['ada'])
     })
 
-    it('should put a value returned to the source back in the items order', () => {
+    it('should put a value returned to the source back in the options order', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { items: users, value: ['ada'] })
+      const transfer = new Transfer(el, { options: users, value: ['ada'] })
 
       transfer.moveToSource(['ada'])
 
       expect(transfer.getSource()).toEqual(['ada', 'bob', 'cleo'])
     })
 
-    it('should keep the target when the items change', () => {
+    it('should keep the target when the options change', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { items: users, value: ['cleo'] })
+      const transfer = new Transfer(el, { options: users, value: ['cleo'] })
 
-      transfer.setItems([...users, { value: 'dan', label: 'Dan' }])
+      transfer.setOptions([...users, { value: 'dan', label: 'Dan' }])
 
       expect(transfer.getTarget()).toEqual(['cleo'])
       expect(transfer.getSource()).toEqual(['ada', 'bob', 'dan'])
     })
 
-    it('should drop a target value that the new items no longer carry', () => {
+    it('should drop a target value that the new options no longer carry', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { items: users, value: ['cleo'] })
+      const transfer = new Transfer(el, { options: users, value: ['cleo'] })
 
-      transfer.setItems([{ value: 'ada', label: 'Ada' }])
+      transfer.setOptions([{ value: 'ada', label: 'Ada' }])
 
       expect(transfer.getTarget()).toEqual([])
       expect(transfer.getSource()).toEqual(['ada'])
@@ -687,15 +706,15 @@ describe('Transfer', () => {
 
     it('should parse a label as markup only with the html option', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { html: true, items: [{ value: 'ada', label: '<b>Ada</b>' }] })
+      const transfer = new Transfer(el, { html: true, options: [{ value: 'ada', label: '<b>Ada</b>' }] })
 
       expect(option(el, 'source', 'ada').querySelector('b')).not.toBeNull()
       expect(transfer.getSource()).toEqual(['ada'])
     })
 
-    it('should leave the target unselected after setItems', () => {
+    it('should leave the target unselected after setOptions', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { items: users, value: ['cleo'] })
+      const transfer = new Transfer(el, { options: users, value: ['cleo'] })
 
       transfer.moveToTarget(['ada'])
 
@@ -706,7 +725,7 @@ describe('Transfer', () => {
 
       expect(transfer.getSelectedValues('target')).toEqual(['cleo'])
 
-      transfer.setItems([...users, { value: 'dan', label: 'Dan' }])
+      transfer.setOptions([...users, { value: 'dan', label: 'Dan' }])
 
       expect(transfer.getTarget()).toEqual(['cleo', 'ada'])
       expect(transfer.getSelectedValues('target')).toEqual([])
@@ -714,23 +733,23 @@ describe('Transfer', () => {
       expect(option(el, 'target', 'cleo').getAttribute('aria-selected')).toEqual('false')
     })
 
-    it('should leave nothing selected after setItems on a disabled transfer', () => {
+    it('should leave nothing selected after setOptions on a disabled transfer', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { disabled: true, items: [{ value: 'ada', label: 'Ada', selected: true }, { value: 'bob', label: 'Bob' }] })
+      const transfer = new Transfer(el, { disabled: true, options: [{ value: 'ada', label: 'Ada', selected: true }, { value: 'bob', label: 'Bob' }] })
 
       expect(transfer.getSelectedValues('source')).toEqual(['ada'])
 
-      transfer.setItems([{ value: 'cleo', label: 'Cleo' }])
+      transfer.setOptions([{ value: 'cleo', label: 'Cleo' }])
 
       expect(transfer.getSelectedValues('source')).toEqual([])
     })
 
     it('should let a target option be toggled after an external re-fetch', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { items: users, search: 'external', value: ['cleo'] })
+      const transfer = new Transfer(el, { options: users, search: 'external', value: ['cleo'] })
 
       type(searchField(el, 'source'), 'a')
-      transfer.setItems(users)
+      transfer.setOptions(users)
 
       const target = option(el, 'target', 'cleo')
 
@@ -747,21 +766,21 @@ describe('Transfer', () => {
       expect(transfer.getSource()).toEqual(['ada', 'bob', 'cleo'])
     })
 
-    it('should honour a selected item on the first render only', () => {
+    it('should honour a selected option on the first render only', () => {
       const el = setMarkup('', [], [])
       const marked = [{ value: 'ada', label: 'Ada', selected: true }, { value: 'bob', label: 'Bob' }]
-      const transfer = new Transfer(el, { items: marked })
+      const transfer = new Transfer(el, { options: marked })
 
       expect(transfer.getSelectedValues('source')).toEqual(['ada'])
 
-      transfer.setItems(marked)
+      transfer.setOptions(marked)
 
       expect(transfer.getSelectedValues('source')).toEqual([])
     })
 
     it('should clear the destination selection after a move', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { items: users, value: ['cleo'] })
+      const transfer = new Transfer(el, { options: users, value: ['cleo'] })
 
       const chosen = option(el, 'target', 'cleo')
 
@@ -774,7 +793,7 @@ describe('Transfer', () => {
 
     it('should release both lists when setLoading is called without a side', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { items: users, loading: true })
+      const transfer = new Transfer(el, { options: users, loading: true })
 
       expect(side(el, 'source').classList.contains('loading')).toBeTrue()
       expect(side(el, 'target').classList.contains('loading')).toBeTrue()
@@ -787,7 +806,7 @@ describe('Transfer', () => {
 
     it('should mark a loading list as busy', () => {
       const el = setMarkup('', [], [])
-      const transfer = new Transfer(el, { items: users })
+      const transfer = new Transfer(el, { options: users })
 
       transfer.setLoading(true, 'source')
 
@@ -850,7 +869,7 @@ describe('Transfer', () => {
     it('should not filter in external search mode and report the query', () => {
       const el = setMarkup('', [], [])
       const transfer = new Transfer(el, {
-        items: [{ value: 'ada', label: 'Ada' }, { value: 'bob', label: 'Bob' }],
+        options: [{ value: 'ada', label: 'Ada' }, { value: 'bob', label: 'Bob' }],
         search: 'external'
       })
       const spy = jasmine.createSpy('search')
@@ -867,7 +886,7 @@ describe('Transfer', () => {
     it('should report the side the external search was typed in', () => {
       const el = setMarkup('', [], [])
       // eslint-disable-next-line no-new
-      new Transfer(el, { items: [{ value: 'ada', label: 'Ada' }], search: 'external', value: ['ada'] })
+      new Transfer(el, { options: [{ value: 'ada', label: 'Ada' }], search: 'external', value: ['ada'] })
       const spy = jasmine.createSpy('search')
 
       el.addEventListener('search.coreui.transfer', event => spy(event.side, event.query))
@@ -1038,7 +1057,7 @@ describe('Transfer', () => {
   })
 
   describe('dispose', () => {
-    it('should remove the option containers it built for its items', () => {
+    it('should remove the option containers it built for its options', () => {
       fixtureEl.innerHTML = [
         '<div class="transfer">',
         '<div class="list-box transfer-list" data-coreui-transfer-list="source"></div>',
@@ -1047,7 +1066,7 @@ describe('Transfer', () => {
       ].join('')
       const el = fixtureEl.querySelector('.transfer')
 
-      new Transfer(el, { items: [{ value: 'a', label: 'A' }] }).dispose()
+      new Transfer(el, { options: [{ value: 'a', label: 'A' }] }).dispose()
 
       expect(el.querySelectorAll('.list-box-options')).toHaveSize(0)
     })

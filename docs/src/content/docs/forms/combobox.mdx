@@ -222,7 +222,7 @@ Nothing marks the selection on its own — `aria-selected` and the `.selected` b
 
 ## Search
 
-`search` puts the List box's own search field at the top of the panel and hides what does not match. Because a hidden option leaves the navigation, everything downstream follows: the arrows skip it and the empty state appears when nothing is left. The focus moves into the field when the panel opens, and `aria-activedescendant` moves there with it, so typing and choosing happen in one place.
+`search` puts the List box's own search field at the top of the panel and hides what does not match. Because a hidden option leaves the navigation, everything downstream follows: the arrows skip it and the list box writes `emptyLabel` (`'No results found'` by default) into its status row when nothing is left, so screen readers hear it. The focus moves into the field when the panel opens, and `aria-activedescendant` moves there with it, so typing and choosing happen in one place.
 
 The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-search`; put one in the panel yourself and it is used as it is, wherever you placed it. `searchPlaceholder` fills its placeholder and `ariaSearchLabel` its accessible name.
 
@@ -243,7 +243,6 @@ The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-se
         <div class="list-box-option" data-coreui-value="fr">France</div>
         <div class="list-box-option" data-coreui-value="jp">Japan</div>
         <div class="list-box-option" data-coreui-value="br">Brazil</div>
-        <div class="list-box-empty">No results found</div>
       </div>
     </div>
   </div>`} />
@@ -267,14 +266,13 @@ The panel is as tall as its content — cap it where you want a scroll container
         <div class="list-box-option" data-coreui-value="renee">Renée</div>
         <div class="list-box-option" data-coreui-value="joao">João</div>
         <div class="list-box-option" data-coreui-value="ana">Ana</div>
-        <div class="list-box-empty">No results found</div>
       </div>
     </div>
   </div>`} />
 
 ### External search
 
-`search: "external"` builds the same field and filters nothing. Every keystroke fires `search.coreui.combobox` with the `query`, and you answer with `setItems()` — the list shows what you hand it, so the query is yours to interpret. The value the user picked stays while the results change, and the toggle keeps its label when the next answer does not carry it.
+`search: "external"` builds the same field and filters nothing. Every keystroke fires `search.coreui.combobox` with the `query`, and you answer with `setOptions()` — the list shows what you hand it, so the query is yours to interpret. The value the user picked stays while the results change, and the toggle keeps its label when the next answer does not carry it.
 
 ## Groups
 
@@ -474,7 +472,7 @@ The state comes from four places, in this order:
 - A validation that reports the hidden select invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the toggle shows it invalid whenever the value is invalid, until a native reset of the form.
 - In a form with `data-coreui-validate`, the `:user-invalid` state of the hidden select, and with `data-coreui-validate="valid"` also its `:user-valid` state.
 
-A state you give, with the option or with the class, is a verdict on the value it was given for, so the next change of the value the user makes in the list drops it; picking the option a single combobox already holds keeps it. What your code does in a `change.coreui.combobox`, `input` or `change` listener while the pick runs counts as your change, so a state you give there stays, and a change through `setValue()`, `clear()` or `setItems()` keeps the state. To set it again, call `setValidationState()`: it updates the state without rebuilding the combobox, replaces a class written on the toggle, so `setValidationState(null)` withdraws that class. While the given state is `'invalid'`, the select blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled combobox does not block. A native reset of the form puts back the value the combobox started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays. A message placed where the stylesheet does not show it for the toggle can be named in `data-coreui-invalid-feedback` on the toggle.
+A state you give, with the option or with the class, is a verdict on the value it was given for, so the next change of the value the user makes in the list drops it; picking the option a single combobox already holds keeps it. What your code does in a `change.coreui.combobox`, `input` or `change` listener while the pick runs counts as your change, so a state you give there stays, and a change through `setValue()`, `clear()` or `setOptions()` keeps the state. To set it again, call `setValidationState()`: it updates the state without rebuilding the combobox, replaces a class written on the toggle, so `setValidationState(null)` withdraws that class. While the given state is `'invalid'`, the select blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled combobox does not block. A native reset of the form puts back the value the combobox started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays. A message placed where the stylesheet does not show it for the toggle can be named in `data-coreui-invalid-feedback` on the toggle.
 
 The toggle carries `aria-invalid="true"` while the state is `'invalid'`, and `aria-required="true"` when `required` is set, so a screen reader announces both together with the message in its description.
 
@@ -518,37 +516,38 @@ const combobox = new coreui.Combobox('#myCombobox', {
 })
 ```
 
-With no panel in the markup, `items` builds one — the same array a [List box](/components/list-box/) takes:
+With no panel in the markup, `options` builds one — the same array a [List box](/components/list-box/) takes:
 
 ```js
 const combobox = new coreui.Combobox('#myCombobox', {
-  items: [
+  options: [
     { value: 'us', label: 'United States' },
-    { label: 'Europe', items: [{ value: 'uk', label: 'United Kingdom' }] }
+    { label: 'Europe', options: [{ value: 'uk', label: 'United Kingdom' }] }
   ]
 })
 ```
 
-A combobox whose list depends on another field, such as the cities of the chosen country, sets `resetSelectionOnItemsChange: true`: `setItems()` with different values then drops the value and takes the item marked `selected`. Leave it off with `search: 'external'`, where every answer brings different values and would drop the pick.
+A combobox whose list depends on another field, such as the cities of the chosen country, sets `resetSelectionOnOptionsChange: true`: `setOptions()` with different values then drops the value and takes the option marked `selected`. Leave it off with `search: 'external'`, where every answer brings different values and would drop the pick.
 
 ### Options
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags for the labels rendered from `items`. |
+| `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags for the labels rendered from `options`. |
 | `ariaSearchLabel` | string | `'Search options'` | Accessible name of the search field. An input with its own `aria-label` keeps it. |
 | `caretIcon` | string | `'<svg …>'` | The caret drawn at the end of the toggle, as inline SVG, sanitized against the SVG allow list whatever `allowList` holds; its last element becomes the caret. Empty string, or a `.combobox-caret` already in the markup, and the plugin draws none. |
 | `container` | string, element, boolean | `false` | Where the panel is mounted while open. `true` means `<body>`; leave it alone and the panel goes next to the toggle unless an ancestor would clip it. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `disabled` | boolean | `false` | Turns the control off: the panel never opens and the list box is disabled. The combobox sets the `.disabled` class and, on a button toggle, the `disabled` attribute from it. |
-| `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
+| `emptyLabel` | string | `'No results found'` | Text of the row the list box shows when nothing is left to pick. An empty string leaves the row out. |
+| `html` | boolean | `false` | Parses the labels rendered from `options` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option. |
-| `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever the panel already holds. |
 | `multiple` | boolean | `false` | Toggles options instead of replacing the selection, and keeps the panel open. |
 | `name` | string, null | `null` | Name of the hidden select the value is submitted under, inserted right before the toggle. With `multiple` it posts one key per value, as a `<select multiple>` does: `tags=a&tags=b&tags=c`. Without a name the combobox is not submitted with the form. |
+| `options` | array, null | `null` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, options, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever the panel already holds; an empty array is an empty list. With `null` the options come from the markup. |
 | `placeholder` | string | `''` | Text shown in the toggle while nothing is selected. |
 | `required` | boolean | `false` | Makes the hidden select required, so an empty combobox blocks the submit. See [Validation](#validation). |
-| `resetSelectionOnItemsChange` | boolean | `false` | Drops the value when `setItems()` brings items with different values, then takes the items marked `selected`. For a list that depends on another field. |
-| `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`, and of the `caretIcon`. |
+| `resetSelectionOnOptionsChange` | boolean | `false` | Drops the value when `setOptions()` brings options with different values, then takes the options marked `selected`. For a list that depends on another field. |
+| `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `options` with `html`, and of the `caretIcon`. |
 | `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |
 | `search` | boolean, string | `false` | Builds a search field at the top of the panel. `true` filters the list itself; `'external'` filters nothing and fires `search.coreui.combobox` instead. |
 | `searchNormalize` | boolean | `false` | Compares both sides of the filter without their diacritics, so `zoe` matches `Zoë`. |
@@ -570,7 +569,7 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `getValue()` | The selected value — an array in `multiple` mode, a string or `null` otherwise. |
 | `hide` | Closes the panel. |
 | `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
-| `setItems(items)` | Rebuilds the list from an `items` array. The value stays, also when the new items no longer carry it, and the toggle keeps the label it had; items marked `selected` join a multiple value, or a single one that is empty. With `resetSelectionOnItemsChange` new values drop the value first. |
+| `setOptions(options)` | Rebuilds the list from an `options` array. The value stays, also when the new options no longer carry it, and the toggle keeps the label it had; options marked `selected` join a multiple value, or a single one that is empty. With `resetSelectionOnOptionsChange` new values drop the value first. |
 | `setValue(value)` | Replaces the selection with `value` (a string, an array, or `null` to empty it), in the order given and up to `selectionLimit`. A value the list does not carry is skipped unless it is already selected. A disabled option and a disabled combobox take it, as a native select takes a value from a script; only the user is kept out. It fires no change event, since the code that calls it already holds the value. A number is taken as its string, as the `value` option takes it; a value of another type throws the `TypeError` the constructor throws. |
 | `show` | Opens the panel. |
 | `toggle` | Opens the panel, or closes it when it is open. |
@@ -585,8 +584,8 @@ Events fire on the toggle button.
 | `change.coreui.combobox` | Fired after the value changed and the selection settled, from the list, `clear()` or a native form reset, along with the native `input` and `change` of the value field; `setValue()` does not fire it; `event.value` is what `getValue()` would return. A call that leaves the value as it was does not fire it. |
 | `hidden.coreui.combobox` | Fired when the panel has been hidden. |
 | `hide.coreui.combobox` | Fires immediately when `hide` is called. |
-| `search.coreui.combobox` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setItems()`. |
-| `selectionLimit.coreui.combobox` | Fired when `selectionLimit` refuses a pick or an item `setItems()` marks selected; `setValue()` trims to the limit without it. `event.limit` is the limit and `event.value` the value that did not fit. |
+| `search.coreui.combobox` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setOptions()`. |
+| `selectionLimit.coreui.combobox` | Fired when `selectionLimit` refuses a pick or an option `setOptions()` marks selected; `setValue()` trims to the limit without it. `event.limit` is the limit and `event.value` the value that did not fit. |
 | `show.coreui.combobox` | Fires immediately when `show` is called. |
 | `shown.coreui.combobox` | Fired when the panel has been made visible. |
 

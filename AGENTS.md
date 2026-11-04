@@ -49,7 +49,7 @@ second one reports zero tests. Pass `--api.port <free port>` when you run suites
   computed from options on every start and never read back from the DOM. From markup the
   component reads only content, names and references (`<label for>`, `aria-labelledby`, `id`).
 - A live instance changes through setters, never through a generic `setConfig()`. A setter is
-  named `set` + the option (`setValue`, `setDate`, `setItems`), takes the option's type, throws
+  named `set` + the option (`setValue`, `setDate`, `setOptions`), takes the option's type, throws
   the constructor's `TypeError` on a wrong type, returns `void`, and fires no change event. A
   boolean option becomes a verb pair (`disable()` / `enable()`). Change events report what the user
   did and form resets. Value and validation state are independent.

@@ -8,14 +8,14 @@ const loadUsers = async () => {
     const response = await fetch('https://apitest.coreui.io/demos/users?limit=10')
     const { records } = await response.json()
 
-    listBox.setItems(records.map(user => ({
+    listBox.setOptions(records.map(user => ({
       value: user.id,
       label: `${user.first_name} ${user.last_name}`,
       description: user.email
     })))
   } catch (error) {
     console.error('Error fetching users:', error)
-    listBox.setItems([])
+    listBox.setOptions([])
   } finally {
     listBox.setLoading(false)
   }
