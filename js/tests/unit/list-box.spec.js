@@ -1133,6 +1133,48 @@ describe('ListBox', () => {
       expect(listBox.getActive()).toEqual('lettuce')
     })
 
+    it('should leave the keys of its field alone while the list is inert', () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="field"></button>',
+        '<div inert><div class="list-box">',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
+        '</div></div>'
+      ].join('')
+
+      const field = fixtureEl.querySelector('#field')
+      const listBox = new ListBox(fixtureEl.querySelector('.list-box'), { activeDescendant: field })
+      const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true })
+      field.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeFalse()
+      expect(listBox.getActive()).toBeNull()
+    })
+
+    it('should leave the keys of its field alone while the list is out of the document', () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="field"></button>',
+        '<div class="list-box">',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
+        '</div>'
+      ].join('')
+
+      const field = fixtureEl.querySelector('#field')
+      const el = fixtureEl.querySelector('.list-box')
+      const listBox = new ListBox(el, { activeDescendant: field })
+      el.remove()
+
+      for (const key of ['ArrowDown', 'End', 't']) {
+        const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+        field.dispatchEvent(event)
+
+        expect(event.defaultPrevented).withContext(key).toBeFalse()
+      }
+
+      expect(listBox.getActive()).toBeNull()
+    })
+
     it('should drop its references on the field while the list is out of the document, and restore them on focus', () => {
       fixtureEl.innerHTML = [
         '<input type="text" id="field">',

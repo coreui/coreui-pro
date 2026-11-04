@@ -38,6 +38,7 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const ARROW_DOWN_KEY = 'ArrowDown'
+const ARROW_UP_KEY = 'ArrowUp'
 const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
@@ -201,6 +202,7 @@ class Autocomplete extends ComboboxBase {
     this._inputElement = null
     this._inputHintElement = null
     this._togglerElement = null
+    this._openingKey = null
     this._keySerial = null
     this._shownText = ''
     this._validation = new FieldValidation(this._element, {
@@ -511,7 +513,13 @@ class Autocomplete extends ComboboxBase {
       const handledByList = event.key === ENTER_KEY && event.defaultPrevented
 
       if (!handledByList && !this._isShown() && event.key !== TAB_KEY && event.key !== ESCAPE_KEY && event.key !== ENTER_KEY) {
+        if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
+          event.preventDefault()
+          this._openingKey = event.key
+        }
+
         this.show()
+        this._openingKey = null
       }
 
       if (handledByList) {
