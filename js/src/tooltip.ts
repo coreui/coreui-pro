@@ -824,7 +824,11 @@ class Tooltip extends BaseComponent {
           context._activeTrigger[event.type === 'focusout' ? TRIGGER_FOCUS : TRIGGER_HOVER] =
             context._isInside(event.relatedTarget)
 
-          context._leave()
+          if (event.type === 'focusout') {
+            context._leave()
+          } else {
+            context._leaveTowardTip(event)
+          }
         })
       }
     }
@@ -866,7 +870,7 @@ class Tooltip extends BaseComponent {
     }
   }
 
-  protected _enterAnchor(anchor: HTMLElement, trigger: string, event?: MouseEvent): void {
+  protected _enterAnchor(anchor: HTMLElement, trigger: string, event: MouseEvent): void {
     this._fixTitle(anchor)
 
     if (!this._isEnabled || this.tip?.contains(anchor)) {
@@ -909,24 +913,33 @@ class Tooltip extends BaseComponent {
       return
     }
 
-    const move = () => {
-      this._intent = null
+    if (!this._exitPoint || !this._follow(this._exitPoint, { x: event.clientX, y: event.clientY }, () => this._moveTo(anchor))) {
       this._moveTo(anchor)
     }
+  }
 
-    this._intent = this._exitPoint && event ?
-      followPointerIntent({
-        exit: this._exitPoint,
-        floating: this.tip!,
-        onLeave: move,
-        placement: this.tip!.getAttribute('data-coreui-placement') ?? 'top',
-        point: { x: event.clientX, y: event.clientY },
-        rest: ANCHOR_SWITCH_DELAY
-      }) :
-      null
+  protected _follow(exit: Point, point: Point, onLeave: () => void): boolean {
+    this._stopIntent()
+    this._intent = followPointerIntent({
+      exit,
+      floating: this.tip!,
+      onLeave: () => {
+        this._intent = null
+        onLeave()
+      },
+      placement: this.tip!.getAttribute('data-coreui-placement') ?? 'top',
+      point,
+      rest: ANCHOR_SWITCH_DELAY
+    })
 
-    if (!this._intent) {
-      move()
+    return Boolean(this._intent)
+  }
+
+  protected _leaveTowardTip(event: CoreUIEvent): void {
+    const point = { x: (event as unknown as MouseEvent).clientX, y: (event as unknown as MouseEvent).clientY }
+
+    if (this._isWithActiveTrigger() || !this._tipEventOut || !this._isShown() || !this._follow(point, point, () => this._leave())) {
+      this._leave()
     }
   }
 
@@ -968,7 +981,11 @@ class Tooltip extends BaseComponent {
       return
     }
 
-    this._leave()
+    if (trigger === TRIGGER_FOCUS) {
+      this._leave()
+    } else {
+      this._leaveTowardTip(event)
+    }
   }
 
   protected _setAnchor(anchor: HTMLElement): void {
@@ -1074,10 +1091,12 @@ class Tooltip extends BaseComponent {
       }
     }
 
-    if (this._config.anchors) {
+    if (trigger.includes(TRIGGER_HOVER)) {
       EventHandler.on(tip, this.constructor.eventName(EVENT_MOUSEENTER), () => {
         clearTimeout(this._switchTimeout)
         this._stopIntent()
+        this._clearTimeout()
+        this._activeTrigger[TRIGGER_HOVER] = Boolean(this._isShown())
       })
     }
   }
