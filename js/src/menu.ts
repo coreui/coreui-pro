@@ -51,6 +51,7 @@ import {
 import { isFromPanelControl, isFromPanelWidget } from './util/panel-control.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { pressPathOf, trackPress } from './util/press.js'
+import { followPointerIntent } from './util/safe-triangle.js'
 
 /**
  * Constants
@@ -74,6 +75,7 @@ const SPACE_KEY = ' '
 const RIGHT_MOUSE_BUTTON = 2
 
 const SUBMENU_CLOSE_DELAY = 100
+const SUBMENU_INTENT_REST = 30
 
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY}${DATA_API_KEY}`
@@ -86,11 +88,6 @@ const SELECTOR_NAVBAR_NAV = '.navbar-nav'
 
 const DEFAULT_PLACEMENT = 'bottom-start'
 const SUBMENU_PLACEMENT = 'end-start'
-
-type Point = { x: number, y: number }
-
-const triangleSign = (p1: Point, p2: Point, p3: Point): number =>
-  ((p1.x - p3.x) * (p2.y - p3.y)) - ((p2.x - p3.x) * (p1.y - p3.y))
 
 type MenuConfig = {
   autoClose: boolean | 'inside' | 'outside'
@@ -158,7 +155,10 @@ class Menu extends BaseComponent {
   protected declare _hoverOpenedSubmenus: Set<HTMLElement>
   protected declare _submenuCloseTimeouts: Map<HTMLElement, number>
   protected declare _submenuListeners: Array<[string, string | null, EventCallable]>
-  protected declare _hoverIntentData: { x: number, y: number, timestamp: number } | null
+  protected declare _intent: (() => void) | null
+  protected declare _intentSubmenu: HTMLElement | null
+  protected declare _pendingTrigger: HTMLElement | null
+  protected declare _intentTimeout: ReturnType<typeof setTimeout> | undefined
   protected declare _menu: HTMLElement
   protected declare _isMenu: boolean
   protected declare _isSubmenu: boolean
@@ -183,7 +183,9 @@ class Menu extends BaseComponent {
     this._hoverOpenedSubmenus = new Set()
     this._submenuCloseTimeouts = new Map()
     this._submenuListeners = []
-    this._hoverIntentData = null
+    this._intent = null
+    this._intentSubmenu = null
+    this._pendingTrigger = null
     this._disabledItems = new WeakSet()
     this._openedBy = null
 
@@ -810,10 +812,6 @@ class Menu extends BaseComponent {
       this._listenOnMenu('mouseleave', this.constructor.SELECTOR_SUBMENU, event => {
         this._onSubmenuLeave(event)
       })
-
-      this._listenOnMenu('mousemove', null, event => {
-        this._trackMousePosition(event)
-      })
     }
 
     if (this._config.submenuTrigger === 'click' || this._config.submenuTrigger === 'both') {
@@ -845,8 +843,19 @@ class Menu extends BaseComponent {
       return
     }
 
+    if (this._intent && !trigger.closest(this.constructor.SELECTOR_SUBMENU)!.contains(this._intentSubmenu)) {
+      this._pendingTrigger = trigger
+      return
+    }
+
+    this._enterSubmenuTrigger(trigger)
+  }
+
+  protected _enterSubmenuTrigger(trigger: HTMLElement): void {
     const submenuWrapper = trigger.closest(this.constructor.SELECTOR_SUBMENU)!
     const submenu = SelectorEngine.findOne(this.constructor.SELECTOR_MENU, submenuWrapper)
+    this._releaseIntent(submenu)
+
     if (!submenu) {
       return
     }
@@ -863,15 +872,66 @@ class Menu extends BaseComponent {
   protected _onSubmenuLeave(event: CoreUIEvent): void {
     const submenuWrapper = (event.target as Element).closest(this.constructor.SELECTOR_SUBMENU)!
     const submenu = SelectorEngine.findOne(this.constructor.SELECTOR_MENU, submenuWrapper)
+
+    if (this._pendingTrigger && submenuWrapper.contains(this._pendingTrigger)) {
+      this._pendingTrigger = null
+    }
+
     if (!submenu || !this._openSubmenus.has(submenu)) {
       return
     }
 
-    if (this._isMovingTowardSubmenu(event, submenu)) {
+    this._releaseIntent(submenu)
+
+    const exit = { x: (event as unknown as MouseEvent).clientX, y: (event as unknown as MouseEvent).clientY }
+
+    this._intent = followPointerIntent({
+      exit,
+      floating: submenu,
+      onLeave: () => {
+        this._intent = null
+        this._intentSubmenu = null
+        this._intentTimeout = setTimeout(() => {
+          const pending = this._pendingTrigger
+          this._pendingTrigger = null
+
+          if (pending) {
+            this._enterSubmenuTrigger(pending)
+            return
+          }
+
+          this._scheduleSubmenuClose(submenu, submenuWrapper)
+        })
+      },
+      onReach: () => this._stopIntent(),
+      placement: submenu.getAttribute('data-coreui-placement') ?? SUBMENU_PLACEMENT,
+      point: exit,
+      rest: SUBMENU_INTENT_REST
+    })
+
+    if (this._intent) {
+      this._intentSubmenu = submenu
       return
     }
 
     this._scheduleSubmenuClose(submenu, submenuWrapper)
+  }
+
+  protected _releaseIntent(keep: HTMLElement | null): void {
+    const followed = this._intentSubmenu
+    this._stopIntent()
+
+    if (followed && followed !== keep && this._openSubmenus.has(followed)) {
+      this._scheduleSubmenuClose(followed, followed.closest(this.constructor.SELECTOR_SUBMENU)!)
+    }
+  }
+
+  protected _stopIntent(): void {
+    clearTimeout(this._intentTimeout)
+    this._intent?.()
+    this._intent = null
+    this._intentSubmenu = null
+    this._pendingTrigger = null
   }
 
   protected _onSubmenuTriggerClick(event: CoreUIEvent): void {
@@ -954,6 +1014,10 @@ class Menu extends BaseComponent {
       return
     }
 
+    if (submenu === this._intentSubmenu) {
+      this._stopIntent()
+    }
+
     const nestedSubmenus = SelectorEngine.find(`${this.constructor.SELECTOR_SUBMENU} ${this.constructor.SELECTOR_MENU}.${CLASS_NAME_SHOW}`, submenu)
     for (const nested of nestedSubmenus) {
       const nestedWrapper = nested.closest(this.constructor.SELECTOR_SUBMENU)!
@@ -961,6 +1025,10 @@ class Menu extends BaseComponent {
     }
 
     const trigger = SelectorEngine.findOne(this.constructor.SELECTOR_SUBMENU_TOGGLE, submenuWrapper)
+
+    if (trigger && containsFocus(submenu)) {
+      focusIfUsable(trigger)
+    }
 
     const cleanup = this._openSubmenus.get(submenu)
     if (cleanup) {
@@ -1057,46 +1125,6 @@ class Menu extends BaseComponent {
     }
 
     this._submenuCloseTimeouts.clear()
-  }
-
-  // -------------------------------------------------------------------------
-  // Hover intent / Safe triangle
-  // -------------------------------------------------------------------------
-
-  protected _trackMousePosition(event: CoreUIEvent): void {
-    this._hoverIntentData = {
-      x: event.clientX,
-      y: event.clientY,
-      timestamp: Date.now()
-    }
-  }
-
-  protected _isMovingTowardSubmenu(event: CoreUIEvent, submenu: HTMLElement): boolean {
-    if (!this._hoverIntentData) {
-      return false
-    }
-
-    const submenuRect = submenu.getBoundingClientRect()
-    const currentPos = { x: event.clientX, y: event.clientY }
-    const lastPos = { x: this._hoverIntentData.x, y: this._hoverIntentData.y }
-
-    const isRtl = isRTL(submenu)
-    const targetX = isRtl ? submenuRect.right : submenuRect.left
-    const topCorner = { x: targetX, y: submenuRect.top }
-    const bottomCorner = { x: targetX, y: submenuRect.bottom }
-
-    return this._pointInTriangle(currentPos, lastPos, topCorner, bottomCorner)
-  }
-
-  protected _pointInTriangle(point: Point, v1: Point, v2: Point, v3: Point): boolean {
-    const d1 = triangleSign(point, v1, v2)
-    const d2 = triangleSign(point, v2, v3)
-    const d3 = triangleSign(point, v3, v1)
-
-    const hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0)
-    const hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0)
-
-    return !(hasNeg && hasPos)
   }
 
   // -------------------------------------------------------------------------
@@ -1372,6 +1400,8 @@ class Menu extends BaseComponent {
     if (!instance) {
       return
     }
+
+    instance._stopIntent()
 
     if ((isLeftOrRightEvent || isHomeOrEndEvent || (isEnterOrSpaceEvent && isSubmenuTrigger)) && instance._handleSubmenuKeydown(event)) {
       return

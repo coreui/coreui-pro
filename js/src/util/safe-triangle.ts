@@ -55,15 +55,17 @@ export const safeTriangle = ({ x, y }: Point, rect: DOMRect, placement: string):
  * @param options.exit - The point where the pointer left the anchor
  * @param options.floating - The floating element the pointer may be heading for
  * @param options.onLeave - Called once when the pointer stops heading for the floating element
+ * @param options.onReach - Called once when the pointer reaches the floating element
  * @param options.placement - The floating element's side, as for `safeTriangle()`
  * @param options.point - The pointer's current position
  * @param options.rest - How long the pointer may rest before `onLeave`, in milliseconds
  * @returns A function that stops following, or `null` when `point` is not heading for the floating element
  */
-export const followPointerIntent = ({ exit, floating, onLeave, placement, point, rest }: {
+export const followPointerIntent = ({ exit, floating, onLeave, onReach, placement, point, rest }: {
   exit: Point
   floating: HTMLElement
   onLeave: () => void
+  onReach?: () => void
   placement: string
   point: Point
   rest: number
@@ -89,8 +91,9 @@ export const followPointerIntent = ({ exit, floating, onLeave, placement, point,
   const onMove = (event: PointerEvent) => {
     clearTimeout(timeout)
 
-    if (floating.contains(event.target as Node)) {
+    if (floating.contains(event.composedPath()[0] as Node)) {
       stop()
+      onReach?.()
     } else if (isInTriangle({ x: event.clientX, y: event.clientY }, ...triangle)) {
       timeout = setTimeout(leave, rest)
     } else {

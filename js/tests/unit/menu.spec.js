@@ -1494,19 +1494,16 @@ describe('Menu', () => {
       const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
       const enterSpy = spyOn(Menu.prototype, '_onSubmenuTriggerEnter')
       const leaveSpy = spyOn(Menu.prototype, '_onSubmenuLeave')
-      const moveSpy = spyOn(Menu.prototype, '_trackMousePosition')
       const clickSpy = spyOn(Menu.prototype, '_onSubmenuTriggerClick')
 
       new Menu(btnMenu, { submenuTrigger: 'both' }).dispose()
 
       submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
       submenuTrigger.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
-      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
       submenuTrigger.click()
 
       expect(enterSpy).not.toHaveBeenCalled()
       expect(leaveSpy).not.toHaveBeenCalled()
-      expect(moveSpy).not.toHaveBeenCalled()
       expect(clickSpy).not.toHaveBeenCalled()
     })
 
@@ -4612,76 +4609,6 @@ describe('Menu', () => {
       })
     })
 
-    it('should detect point inside triangle', () => {
-      fixtureEl.innerHTML = [
-        '<div>',
-        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
-        '  <ul class="menu">',
-        '    <li class="submenu">',
-        '      <button class="menu-item" type="button">More options</button>',
-        '      <ul class="menu">',
-        '        <li><a class="menu-item" href="#">Sub-action</a></li>',
-        '      </ul>',
-        '    </li>',
-        '  </ul>',
-        '</div>'
-      ].join('')
-
-      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
-      const menu = new Menu(btnMenu)
-
-      // Triangle with vertices at (0,0), (10,0), (5,10)
-      const v1 = { x: 0, y: 0 }
-      const v2 = { x: 10, y: 0 }
-      const v3 = { x: 5, y: 10 }
-
-      // Point inside triangle
-      const inside = { x: 5, y: 5 }
-      expect(menu._pointInTriangle(inside, v1, v2, v3)).toBeTrue()
-
-      // Point outside triangle
-      const outside = { x: 20, y: 20 }
-      expect(menu._pointInTriangle(outside, v1, v2, v3)).toBeFalse()
-
-      // Point on edge should be inside
-      const onEdge = { x: 5, y: 0 }
-      expect(menu._pointInTriangle(onEdge, v1, v2, v3)).toBeTrue()
-    })
-
-    it('should track mouse position for safe triangle', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<div>',
-          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
-          '  <ul class="menu">',
-          '    <li class="submenu">',
-          '      <button class="menu-item" type="button">More options</button>',
-          '      <ul class="menu">',
-          '        <li><a class="menu-item" href="#">Sub-action</a></li>',
-          '      </ul>',
-          '    </li>',
-          '  </ul>',
-          '</div>'
-        ].join('')
-
-        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
-        const menu = new Menu(btnMenu)
-
-        btnMenu.addEventListener('shown.coreui.menu', () => {
-          // Call track method directly
-          menu._trackMousePosition({ clientX: 100, clientY: 200 })
-
-          // Should have tracked position in hover intent data
-          expect(menu._hoverIntentData).toBeDefined()
-          expect(menu._hoverIntentData.x).toEqual(100)
-          expect(menu._hoverIntentData.y).toEqual(200)
-          resolve()
-        })
-
-        menu.show()
-      })
-    })
-
     it('should handle hover trigger opening submenu via internal method', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
@@ -4867,44 +4794,6 @@ describe('Menu', () => {
       })
     })
 
-    it('should handle _isMovingTowardSubmenu with no hover data', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<div>',
-          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
-          '  <ul class="menu">',
-          '    <li class="submenu">',
-          '      <button class="menu-item" type="button">More options</button>',
-          '      <ul class="menu">',
-          '        <li><a class="menu-item" href="#">Sub-action</a></li>',
-          '      </ul>',
-          '    </li>',
-          '  </ul>',
-          '</div>'
-        ].join('')
-
-        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
-        const menu = new Menu(btnMenu)
-        const submenuWrapper = fixtureEl.querySelector('.submenu')
-        const submenu = submenuWrapper.querySelector('.menu')
-
-        btnMenu.addEventListener('shown.coreui.menu', () => {
-          // No hover data tracked yet
-          menu._hoverIntentData = null
-
-          const mockEvent = { clientX: 100, clientY: 100 }
-          const result = menu._isMovingTowardSubmenu(mockEvent, submenu)
-
-          // Should return false when no hover data
-          expect(result).toBeFalse()
-
-          resolve()
-        })
-
-        menu.show()
-      })
-    })
-
     it('should handle click on submenu trigger when submenu is already open', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
@@ -5033,53 +4922,6 @@ describe('Menu', () => {
       })
     })
 
-    it('should handle _onSubmenuLeave when not moving toward submenu', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<div>',
-          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
-          '  <ul class="menu">',
-          '    <li class="submenu">',
-          '      <button class="menu-item" type="button">More options</button>',
-          '      <ul class="menu" style="position: absolute; left: 200px; top: 0; width: 100px; height: 100px;">',
-          '        <li><a class="menu-item" href="#">Sub-action</a></li>',
-          '      </ul>',
-          '    </li>',
-          '  </ul>',
-          '</div>'
-        ].join('')
-
-        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
-        const menu = new Menu(btnMenu, { submenuDelay: 50 })
-        const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
-        const submenuWrapper = fixtureEl.querySelector('.submenu')
-        const submenu = submenuWrapper.querySelector('.menu')
-
-        btnMenu.addEventListener('shown.coreui.menu', () => {
-          // Open submenu
-          menu._openSubmenu(submenuTrigger, submenu, submenuWrapper)
-
-          // Track mouse position far from submenu
-          menu._trackMousePosition({ clientX: 0, clientY: 0 })
-
-          // Simulate mouseleave moving away from submenu
-          const mockEvent = {
-            target: submenuWrapper,
-            clientX: -100,
-            clientY: -100
-          }
-          menu._onSubmenuLeave(mockEvent)
-
-          // Should schedule close since not moving toward submenu
-          expect(menu._submenuCloseTimeouts.has(submenu)).toBeTrue()
-
-          resolve()
-        })
-
-        menu.show()
-      })
-    })
-
     it('should cancel timeout when calling cancelSubmenuCloseTimeout', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
@@ -5149,49 +4991,6 @@ describe('Menu', () => {
           expect(() => {
             menu._closeSubmenu(submenu, submenuWrapper)
           }).not.toThrow()
-
-          resolve()
-        })
-
-        menu.show()
-      })
-    })
-
-    it('should handle _isMovingTowardSubmenu when cursor is in safe triangle', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<div class="menu" style="position: relative;">',
-          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
-          '  <ul class="menu" style="position: absolute; display: block;">',
-          '    <li class="submenu">',
-          '      <button class="menu-item" type="button">More options</button>',
-          '      <ul class="menu" style="position: absolute; left: 100px; top: 0; width: 100px; height: 100px; display: block;">',
-          '        <li><a class="menu-item" href="#">Sub-action</a></li>',
-          '      </ul>',
-          '    </li>',
-          '  </ul>',
-          '</div>'
-        ].join('')
-
-        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
-        const menu = new Menu(btnMenu)
-        const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
-        const submenuWrapper = fixtureEl.querySelector('.submenu')
-        const submenu = submenuWrapper.querySelector('.menu')
-
-        btnMenu.addEventListener('shown.coreui.menu', () => {
-          // Open submenu
-          menu._openSubmenu(submenuTrigger, submenu, submenuWrapper)
-
-          // Track a mouse position
-          menu._trackMousePosition({ clientX: 50, clientY: 50 })
-
-          // Call isMovingTowardSubmenu
-          const mockEvent = { clientX: 75, clientY: 50 }
-          const result = menu._isMovingTowardSubmenu(mockEvent, submenu)
-
-          // Result depends on geometry, just verify it returns a boolean
-          expect(typeof result).toBe('boolean')
 
           resolve()
         })
@@ -6993,6 +6792,242 @@ describe('Menu', () => {
       await userEvent.keyboard('{Shift>}{Tab}{/Shift}')
       expect(document.activeElement).toEqual(toggle)
       expect(panel).toHaveClass('show')
+    })
+  })
+
+  describe('submenu path', () => {
+    const sleep = ms => new Promise(resolve => {
+      setTimeout(resolve, ms)
+    })
+
+    const pointer = (x, y, target = document) => target.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: x, clientY: y }))
+    const over = (element, relatedTarget, x = 0, y = 0) => element.dispatchEvent(new MouseEvent('mouseover', {
+      bubbles: true, clientX: x, clientY: y, relatedTarget
+    }))
+    const out = (element, relatedTarget, x = 0, y = 0) => element.dispatchEvent(new MouseEvent('mouseout', {
+      bubbles: true, clientX: x, clientY: y, relatedTarget
+    }))
+
+    const setup = async ({ dir = 'ltr', nested = false } = {}) => {
+      fixtureEl.innerHTML = [
+        `<div dir="${dir}" style="position: fixed; left: ${dir === 'rtl' ? 240 : 40}px; top: 120px;">`,
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu" style="margin: 0; padding: 0; width: 100px; list-style: none;">',
+        '    <li class="submenu" id="a" style="height: 20px;">',
+        '      <button class="menu-item" type="button" style="display: block; width: 100px; height: 20px;">A</button>',
+        '      <ul class="menu" style="position: absolute; margin: 0; padding: 0; width: 100px; height: 80px;"><li><a class="menu-item" href="#">A1</a></li>',
+        nested ? '<li class="submenu" id="n"><button class="menu-item" type="button" style="display: block; width: 100px; height: 20px;">N</button><ul class="menu" style="position: absolute; margin: 0; padding: 0; width: 100px; height: 120px;"><li><a class="menu-item" href="#">N1</a></li></ul></li>' : '',
+        '      </ul>',
+        '    </li>',
+        '    <li class="submenu" id="b" style="height: 20px;">',
+        '      <button class="menu-item" type="button" style="display: block; width: 100px; height: 20px;">B</button>',
+        '      <ul class="menu" style="position: absolute; margin: 0; padding: 0; width: 100px; height: 80px;"><li><a class="menu-item" href="#">B1</a></li></ul>',
+        '    </li>',
+        '    <li style="height: 20px;"><a class="menu-item" id="c" href="#" style="display: block; height: 20px;">C</a></li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const menu = new Menu(toggle, { submenuDelay: 0 })
+      const [triggerA, triggerB] = fixtureEl.querySelectorAll('.submenu > .menu-item')
+      const [panelA, panelB] = fixtureEl.querySelectorAll('.submenu > .menu')
+
+      menu.show()
+      await sleep(20)
+      over(triggerA, toggle)
+      await sleep(20)
+
+      const rect = triggerA.getBoundingClientRect()
+      const exit = { x: rect.right - 2, y: rect.bottom - 1 }
+
+      return {
+        exit, menu, panelA, panelB, rect, toggle, triggerA, triggerB
+      }
+    }
+
+    it('should keep the submenu while the pointer crosses another submenu trigger on its way to it', async () => {
+      const { exit, panelA, panelB, rect, triggerA, triggerB } = await setup()
+
+      out(triggerA, triggerB, exit.x, exit.y)
+      over(triggerB, triggerA, exit.x, exit.y + 2)
+      pointer(rect.right - 1, rect.bottom + 4)
+      await sleep(10)
+
+      expect(panelA).toHaveClass('show')
+      expect(panelB).not.toHaveClass('show')
+    })
+
+    it('should keep the submenu once the pointer reaches it', async () => {
+      const { exit, panelA, triggerA } = await setup()
+      const c = fixtureEl.querySelector('#c')
+
+      out(triggerA, c, exit.x, exit.y)
+      const panel = panelA.getBoundingClientRect()
+      pointer(panel.left + 5, panel.top + 5, panelA)
+      await sleep(60)
+
+      expect(panelA).toHaveClass('show')
+    })
+
+    it('should open the submenu trigger the pointer rests on', async () => {
+      const { exit, panelA, panelB, rect, triggerA, triggerB } = await setup()
+
+      out(triggerA, triggerB, exit.x, exit.y)
+      over(triggerB, triggerA, exit.x, exit.y + 2)
+      pointer(rect.right - 1, rect.bottom + 4)
+      await sleep(60)
+
+      expect(panelB).toHaveClass('show')
+      expect(panelA).not.toHaveClass('show')
+    })
+
+    it('should close the submenu once the pointer turns away from it', async () => {
+      const { exit, panelA, rect, triggerA } = await setup()
+      const c = fixtureEl.querySelector('#c')
+
+      out(triggerA, c, exit.x, exit.y)
+      pointer(rect.left + 2, rect.bottom + 30)
+      await sleep(20)
+
+      expect(panelA).not.toHaveClass('show')
+    })
+
+    it('should not open a submenu trigger the pointer left while it was heading for another submenu', async () => {
+      const { exit, panelA, panelB, rect, triggerA, triggerB } = await setup()
+      const c = fixtureEl.querySelector('#c')
+
+      out(triggerA, triggerB, exit.x, exit.y)
+      over(triggerB, triggerA, exit.x, exit.y + 2)
+      out(triggerB, c, rect.right - 1, rect.bottom + 19)
+      pointer(rect.left + 2, rect.bottom + 30)
+      await sleep(20)
+
+      expect(panelA).not.toHaveClass('show')
+      expect(panelB).not.toHaveClass('show')
+    })
+
+    it('should stop following the pointer on a key', async () => {
+      const { exit, menu, triggerA } = await setup()
+      const c = fixtureEl.querySelector('#c')
+      const close = spyOn(menu, '_scheduleSubmenuClose')
+
+      out(triggerA, c, exit.x, exit.y)
+      triggerA.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+      pointer(0, 0)
+      await sleep(60)
+
+      expect(menu._intent).toBeNull()
+      expect(close).not.toHaveBeenCalled()
+    })
+
+    it('should open a submenu trigger in the panel the pointer reached', async () => {
+      const { exit, menu, panelA, triggerA } = await setup({ nested: true })
+      const c = fixtureEl.querySelector('#c')
+      const nTrigger = fixtureEl.querySelector('#n > .menu-item')
+      const nPanel = fixtureEl.querySelector('#n > .menu')
+      const panel = panelA.getBoundingClientRect()
+
+      out(triggerA, c, exit.x, exit.y)
+      pointer(panel.left + 5, panel.top + 5, panelA)
+      over(nTrigger, panelA)
+      await sleep(20)
+
+      expect(menu._intent).toBeNull()
+      expect(nPanel).toHaveClass('show')
+    })
+
+    it('should close a deeper submenu the pointer left once it heads for the panel around it', async () => {
+      const { panelA, rect, triggerA } = await setup({ nested: true })
+      const nTrigger = fixtureEl.querySelector('#n > .menu-item')
+      const nPanel = fixtureEl.querySelector('#n > .menu')
+
+      over(nTrigger, panelA)
+      await sleep(20)
+      const nRect = nTrigger.getBoundingClientRect()
+      out(nTrigger, document.body, nRect.right - 2, nRect.bottom - 1)
+      out(triggerA, document.body, rect.right - 2, rect.bottom - 1)
+      const panel = panelA.getBoundingClientRect()
+      pointer(panel.left + 5, panel.top + 5, panelA)
+      await sleep(40)
+
+      expect(panelA).toHaveClass('show')
+      expect(nPanel).not.toHaveClass('show')
+    })
+
+    it('should not open a pending submenu trigger the pointer leaves right after it turns away', async () => {
+      const { exit, panelA, panelB, rect, triggerA, triggerB } = await setup()
+      const c = fixtureEl.querySelector('#c')
+
+      out(triggerA, triggerB, exit.x, exit.y)
+      over(triggerB, triggerA, exit.x, exit.y + 2)
+      pointer(rect.left + 2, rect.bottom + 30)
+      out(triggerB, c, rect.left + 2, rect.bottom + 30)
+
+      expect(panelB).not.toHaveClass('show')
+
+      await sleep(20)
+
+      expect(panelA).not.toHaveClass('show')
+      expect(panelB).not.toHaveClass('show')
+    })
+
+    it('should follow a panel that opens to the left', async () => {
+      const { panelA, panelB, triggerA, triggerB } = await setup({ dir: 'rtl' })
+      const rect = triggerA.getBoundingClientRect()
+
+      expect(panelA.getBoundingClientRect().right).toBeLessThanOrEqual(rect.left + 1)
+
+      out(triggerA, triggerB, rect.left + 2, rect.bottom - 1)
+      over(triggerB, triggerA, rect.left + 2, rect.bottom + 1)
+      pointer(rect.left + 1, rect.bottom + 4)
+      await sleep(10)
+
+      expect(panelA).toHaveClass('show')
+      expect(panelB).not.toHaveClass('show')
+    })
+
+    it('should stop following the pointer on a navigation key that keeps the submenu open', async () => {
+      const { exit, menu, panelA, triggerA } = await setup()
+      const c = fixtureEl.querySelector('#c')
+      const item = panelA.querySelector('.menu-item')
+      const close = spyOn(menu, '_scheduleSubmenuClose')
+
+      item.focus()
+      out(triggerA, c, exit.x, exit.y)
+      item.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+      pointer(0, 0)
+      await sleep(60)
+
+      expect(menu._intent).toBeNull()
+      expect(close).not.toHaveBeenCalled()
+      expect(panelA).toHaveClass('show')
+    })
+
+    it('should hand the focus to the trigger of a submenu that closes while it holds the focus', async () => {
+      const { exit, panelA, rect, triggerA } = await setup()
+      const c = fixtureEl.querySelector('#c')
+
+      panelA.querySelector('.menu-item').focus()
+      out(triggerA, c, exit.x, exit.y)
+      pointer(rect.left + 2, rect.bottom + 30)
+      await sleep(20)
+
+      expect(panelA).not.toHaveClass('show')
+      expect(document.activeElement).toBe(triggerA)
+    })
+
+    it('should stop following the pointer when it is disposed', async () => {
+      const { exit, menu, triggerA } = await setup()
+      const c = fixtureEl.querySelector('#c')
+      const close = spyOn(menu, '_scheduleSubmenuClose')
+
+      out(triggerA, c, exit.x, exit.y)
+      menu.dispose()
+      pointer(0, 0)
+      await sleep(60)
+
+      expect(close).not.toHaveBeenCalled()
     })
   })
 })
