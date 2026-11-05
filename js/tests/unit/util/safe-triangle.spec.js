@@ -1,6 +1,8 @@
 import { followPointerIntent, isInTriangle, safeTriangle } from '../../../src/util/safe-triangle.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
+const noop = () => {}
+
 describe('Safe triangle', () => {
   let fixtureEl
   let floating
@@ -129,6 +131,38 @@ describe('Safe triangle', () => {
       pointer({ x: 40, y: 300 })
       await sleep(50)
 
+      expect(onLeave).not.toHaveBeenCalled()
+    })
+
+    it('should call onReach once when the pointer reaches the floating element', () => {
+      const onReach = jasmine.createSpy('onReach')
+      followPointerIntent({
+        exit: { x: 10, y: 215 }, floating, onLeave: noop, onReach, placement: 'right', point: { x: 20, y: 215 }, rest: 30
+      })
+
+      pointer({ x: 120, y: 215 }, floating)
+      pointer({ x: 120, y: 216 }, floating)
+
+      expect(onReach).toHaveBeenCalledTimes(1)
+    })
+
+    it('should count a pointer over the floating element inside a shadow root as reaching it', () => {
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const panel = document.createElement('div')
+      panel.style.cssText = 'position: fixed; left: 100px; top: 200px; width: 50px; height: 30px;'
+      host.attachShadow({ mode: 'open' }).append(panel)
+      const onLeave = jasmine.createSpy('onLeave')
+      const onReach = jasmine.createSpy('onReach')
+      followPointerIntent({
+        exit: { x: 10, y: 215 }, floating: panel, onLeave, onReach, placement: 'right', point: { x: 20, y: 215 }, rest: 30
+      })
+
+      panel.dispatchEvent(new PointerEvent('pointermove', {
+        bubbles: true, clientX: 120, clientY: 215, composed: true
+      }))
+
+      expect(onReach).toHaveBeenCalledTimes(1)
       expect(onLeave).not.toHaveBeenCalled()
     })
 
