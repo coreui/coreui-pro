@@ -2816,6 +2816,13 @@ field behind that kept submitting.
   `--cui-theme-bg`/`--cui-theme-contrast` slots, with `--cui-tooltip-bg` and
   `--cui-tooltip-color` as the fallbacks, so a `.theme-{color}` class on the
   tip (via `customClass`) colors it; the default look is unchanged.
+- **One tooltip or popover can serve many elements (new).** `anchors` (or
+  `data-coreui-anchors` on a wrapper) lists the elements that share one tip,
+  which moves between them with `move` and `moved` events. Rating uses it, so a
+  rating renders one tooltip instead of one per star.
+- **`disable()` hides an open tooltip or popover, and `disabled` is an option.**
+  The tip used to stay on screen after `disable()` until the pointer left;
+  `disabled: true` (or `data-coreui-disabled="true"`) starts it disabled.
 
 #### OTP input
 

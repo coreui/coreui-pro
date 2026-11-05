@@ -1,5 +1,6 @@
 import EventHandler from '../../src/dom/event-handler.js'
 import Tooltip from '../../src/tooltip.js'
+import { getParentLayer, registerLayer, unregisterLayer } from '../../src/util/layers.js'
 import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
@@ -1732,6 +1733,1097 @@ describe('Tooltip', () => {
       })
 
       expect(tooltip._getTitle()).toEqual('bar')
+    })
+  })
+
+  describe('anchors', () => {
+    const markup = '<style>.tooltip { position: absolute; }</style><div id="bar" title="Toolbar" style="position: fixed; left: 40px; top: 120px;"><button type="button" id="a" title="Bold">B</button><button type="button" id="b" title="Italic">I</button><span id="gap">|</span><button type="button" id="c">C</button><button type="button" id="d" title="Underline">U</button></div>'
+    const wait = (element, name) => new Promise(resolve => {
+      element.addEventListener(`${name}.coreui.tooltip`, resolve, { once: true })
+    })
+    const hover = (element, relatedTarget = null) => element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget }))
+    const leave = (element, relatedTarget = null) => element.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget }))
+    const sleep = ms => new Promise(resolve => {
+      setTimeout(resolve, ms)
+    })
+    const text = () => document.querySelector('.tooltip .tooltip-inner')?.textContent
+    const mouse = (element, type, { x, y }, relatedTarget = null) => element.dispatchEvent(new MouseEvent(type, {
+      bubbles: true, clientX: x, clientY: y, relatedTarget
+    }))
+    const pointer = ({ x, y }, target = document) => target.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: x, clientY: y }))
+    const cross = (from, to) => {
+      const rect = to.getBoundingClientRect()
+      const exit = { x: rect.left, y: rect.top + (rect.height / 2) }
+      mouse(from, 'mouseout', exit, to)
+      mouse(to, 'mouseover', exit, from)
+      const tip = document.querySelector('.tooltip').getBoundingClientRect()
+      const above = tip.bottom <= exit.y
+      const edge = { x: tip.left + (tip.width / 2), y: above ? tip.bottom : tip.top }
+      return {
+        away: { x: exit.x + 2, y: exit.y + (above ? 8 : -8) },
+        exit,
+        toward: share => ({ x: exit.x + ((edge.x - exit.x) * share), y: exit.y + ((edge.y - exit.y) * share) })
+      }
+    }
+
+    const setup = (config = {}) => {
+      fixtureEl.innerHTML = markup
+      const bar = fixtureEl.querySelector('#bar')
+      return {
+        a: bar.querySelector('#a'), b: bar.querySelector('#b'), bar, c: bar.querySelector('#c'), d: bar.querySelector('#d'), gap: bar.querySelector('#gap'),
+        tooltip: new Tooltip(bar, { anchors: 'button', ...config })
+      }
+    }
+
+    it('should open on the anchor the pointer enters and tell which one', async () => {
+      const { a, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+
+      hover(a)
+      const event = await shown
+
+      expect(event.relatedTarget).toBe(a)
+      expect(text()).toBe('Bold')
+      expect(a.getAttribute('aria-describedby')).toBe(document.querySelector('.tooltip').id)
+      tooltip.dispose()
+    })
+
+    it('should move one tip to the next anchor without hiding it', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const tip = document.querySelector('.tooltip')
+      const events = []
+      for (const name of ['show', 'hide', 'hidden', 'inserted', 'move']) {
+        bar.addEventListener(`${name}.coreui.tooltip`, event => events.push([name, event.relatedTarget]))
+      }
+
+      const moved = wait(bar, 'moved')
+      leave(a, b)
+      hover(b, a)
+      const event = await moved
+
+      expect(event.relatedTarget).toBe(b)
+      expect(events).toEqual([['move', b]])
+      expect(document.querySelectorAll('.tooltip')).toHaveSize(1)
+      expect(document.querySelector('.tooltip')).toBe(tip)
+      expect(text()).toBe('Italic')
+      expect(b.getAttribute('aria-describedby')).toBe(tip.id)
+      expect(a.hasAttribute('aria-describedby')).toBeFalse()
+      tooltip.dispose()
+    })
+
+    it('should move at once when the pointer enters another anchor away from the tip', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+      const rect = b.getBoundingClientRect()
+      const exit = { x: rect.left, y: rect.top + (rect.height / 2) }
+      const tip = document.querySelector('.tooltip').getBoundingClientRect()
+
+      mouse(a, 'mouseout', exit, b)
+      mouse(b, 'mouseover', { x: exit.x + 2, y: exit.y + (tip.bottom <= exit.y ? 8 : -8) }, a)
+
+      expect(moves).toHaveSize(1)
+      expect(text()).toBe('Italic')
+      tooltip.dispose()
+    })
+
+    it('should keep the tip while the pointer crosses another anchor on its way to the tip', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+
+      const { toward } = cross(a, b)
+      await sleep(15)
+      pointer(toward(0.2))
+      await sleep(15)
+      pointer(toward(0.5))
+      await sleep(15)
+      pointer(toward(0.8))
+
+      expect(moves).toEqual([])
+
+      document.querySelector('.tooltip').dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: b }))
+      await sleep(100)
+
+      expect(moves).toEqual([])
+      expect(text()).toBe('Bold')
+      tooltip.dispose()
+    })
+
+    it('should keep the tip when the pointer moves over it before its mouseover', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+
+      cross(a, b)
+      const tip = document.querySelector('.tooltip')
+      const rect = tip.getBoundingClientRect()
+      pointer({ x: rect.left + (rect.width / 2), y: rect.top + (rect.height / 2) }, tip)
+      pointer({ x: 0, y: 0 })
+      await sleep(60)
+
+      expect(moves).toEqual([])
+      expect(text()).toBe('Bold')
+      tooltip.dispose()
+    })
+
+    it('should move once the pointer stops right after entering the other anchor', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+
+      cross(a, b)
+      await sleep(10)
+
+      expect(moves).toEqual([])
+
+      await sleep(80)
+
+      expect(moves).toHaveSize(1)
+      tooltip.dispose()
+    })
+
+    it('should move once the pointer rests on the other anchor', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+
+      const { toward } = cross(a, b)
+      await sleep(10)
+      pointer(toward(0.3))
+      await sleep(10)
+
+      expect(moves).toEqual([])
+
+      await sleep(80)
+
+      expect(moves).toHaveSize(1)
+      expect(text()).toBe('Italic')
+      tooltip.dispose()
+    })
+
+    it('should move at once when the pointer turns away from the tip', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+
+      const { away, toward } = cross(a, b)
+      pointer(toward(0.3))
+
+      expect(moves).toEqual([])
+
+      pointer(away)
+
+      expect(moves).toHaveSize(1)
+      tooltip.dispose()
+    })
+
+    it('should move at once when the tip was opened by the focus, not the pointer', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      a.focus()
+      await shown
+      const moved = wait(bar, 'moved')
+      b.focus()
+      await moved
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+      const rect = a.getBoundingClientRect()
+
+      mouse(a, 'mouseover', { x: rect.left + 1, y: rect.top + 1 })
+
+      expect(moves).toHaveSize(1)
+      tooltip.dispose()
+    })
+
+    it('should stop following the pointer when it is disposed', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+
+      const { away } = cross(a, b)
+      const moveTo = spyOn(Tooltip.prototype, '_moveTo')
+      tooltip.dispose()
+      pointer(away)
+      await sleep(60)
+
+      expect(moveTo).not.toHaveBeenCalled()
+      expect(moves).toEqual([])
+    })
+
+    it('should keep the tip on its way to a tip below the anchors', async () => {
+      const { a, b, bar, tooltip } = setup({ placement: 'bottom' })
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+
+      const { away, toward } = cross(a, b)
+      pointer(toward(0.5))
+
+      expect(document.querySelector('.tooltip').getAttribute('data-coreui-placement')).toBe('bottom')
+      expect(moves).toEqual([])
+
+      pointer(away)
+
+      expect(moves).toHaveSize(1)
+      tooltip.dispose()
+    })
+
+    it('should move at once when the anchor is wider than the tip and the pointer crosses sideways', async () => {
+      const { a, b, bar, tooltip } = setup()
+      a.style.width = '160px'
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+
+      cross(a, b)
+
+      expect(moves).toHaveSize(1)
+      expect(text()).toBe('Italic')
+      tooltip.dispose()
+    })
+
+    it('should stop following the pointer when it leaves the anchors', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+
+      const { away } = cross(a, b)
+      leave(b, document.body)
+      pointer(away)
+      await sleep(60)
+
+      expect(moves).toEqual([])
+      tooltip.dispose()
+    })
+
+    it('should move at once when the pointer comes to an anchor from outside the anchors', async () => {
+      const { a, b, bar, d, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      d.focus()
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', event => moves.push(event.relatedTarget))
+      const rect = b.getBoundingClientRect()
+      const point = { x: rect.left, y: rect.top + (rect.height / 2) }
+
+      const tip = document.querySelector('.tooltip').getBoundingClientRect()
+      const entry = { x: (point.x + tip.left + (tip.width / 2)) / 2, y: (point.y + tip.bottom) / 2 }
+
+      mouse(a, 'mouseout', point, document.body)
+      mouse(b, 'mouseover', entry, document.body)
+
+      expect(moves).toEqual([b])
+      tooltip.dispose()
+    })
+
+    it('should forget where the pointer left an anchor once the tip hides', async () => {
+      const { a, b, bar, d, gap, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const rect = b.getBoundingClientRect()
+      const point = { x: rect.left, y: rect.top + (rect.height / 2) }
+      mouse(a, 'mouseout', point, gap)
+      await tooltip.hide()
+
+      const reshown = wait(bar, 'shown')
+      d.focus()
+      await reshown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', event => moves.push(event.relatedTarget))
+      const tip = document.querySelector('.tooltip').getBoundingClientRect()
+      mouse(b, 'mouseover', { x: (point.x + tip.left + (tip.width / 2)) / 2, y: (point.y + tip.bottom) / 2 }, document.body)
+
+      expect(moves).toEqual([b])
+      tooltip.dispose()
+    })
+
+    it('should stay on the focused anchor when the focus moves while the pointer heads to the tip', async () => {
+      const { a, b, bar, d, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', event => moves.push(event.relatedTarget))
+
+      const { away } = cross(a, b)
+      d.focus()
+      pointer(away)
+      await sleep(60)
+
+      expect(moves).toEqual([d])
+      expect(d.getAttribute('aria-describedby')).toBe(document.querySelector('.tooltip').id)
+      tooltip.dispose()
+    })
+
+    it('should keep following the pointer when the focus leaves the anchors', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      a.focus()
+      hover(a)
+      await shown
+
+      cross(a, b)
+      const moved = wait(bar, 'moved')
+      a.blur()
+      const event = await moved
+
+      expect(event.relatedTarget).toBe(b)
+      tooltip.dispose()
+    })
+
+    it('should let the pointer reach the tip across another anchor while a third one holds the focus', async () => {
+      const { a, b, bar, d, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      d.focus()
+      await shown
+      const atA = wait(bar, 'moved')
+      const rect = a.getBoundingClientRect()
+      mouse(a, 'mouseover', { x: rect.left + 1, y: rect.top + 1 }, document.body)
+      await atA
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', event => moves.push(event.relatedTarget))
+
+      const { toward } = cross(a, b)
+      pointer(toward(0.5))
+      await sleep(15)
+      pointer(toward(0.7))
+
+      expect(moves).toEqual([])
+      expect(text()).toBe('Bold')
+      tooltip.dispose()
+    })
+
+    it('should not leave a pointer listener behind when the pointer enters a nested anchor', async () => {
+      fixtureEl.innerHTML = '<style>.tooltip { position: absolute; }</style><div id="bar" style="position: fixed; left: 40px; top: 120px;"><button type="button" id="x" title="Bold">B</button><span id="s" title="Group" style="display: inline-block; padding: 8px;"><button type="button" id="y" title="Inner">I</button></span></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const [x, span, y] = [bar.querySelector('#x'), bar.querySelector('#s'), bar.querySelector('#y')]
+      const tooltip = new Tooltip(bar, { anchors: '[title]' })
+      const shown = wait(bar, 'shown')
+      hover(x)
+      await shown
+      const listeners = []
+      spyOn(document, 'addEventListener').and.callFake(function (type, ...rest) {
+        if (type === 'pointermove') {
+          listeners.push(rest[0])
+        }
+
+        return EventTarget.prototype.addEventListener.call(this, type, ...rest)
+      })
+      spyOn(document, 'removeEventListener').and.callFake(function (type, ...rest) {
+        if (type === 'pointermove') {
+          listeners.splice(listeners.indexOf(rest[0]), 1)
+        }
+
+        return EventTarget.prototype.removeEventListener.call(this, type, ...rest)
+      })
+
+      const { exit } = cross(x, span)
+      mouse(y, 'mouseover', exit, span)
+      tooltip.dispose()
+
+      expect(listeners).toEqual([])
+    })
+
+    it('should keep matching an anchor selector on title after the tip takes the title', async () => {
+      const { a, bar, tooltip } = setup({ anchors: '[title]' })
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      expect(a.getAttribute('title')).toBe('')
+      expect(a.getAttribute('data-coreui-original-title')).toBe('Bold')
+
+      const hidden = wait(bar, 'hidden')
+      leave(a, document.body)
+      await hidden
+      const reshown = wait(bar, 'shown')
+      hover(a)
+      await reshown
+
+      expect(text()).toBe('Bold')
+      tooltip.dispose()
+
+      expect(a.getAttribute('title')).toBe('Bold')
+    })
+
+    it('should show the tip of a wrapper around a disabled button listed among the anchors', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a" title="Bold">B</button><span id="s" tabindex="0" title="Italic is not available"><button type="button" id="off" disabled>I</button></span></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const a = bar.querySelector('#a')
+      const span = bar.querySelector('#s')
+      const off = bar.querySelector('#off')
+      const tooltip = new Tooltip(bar, { anchors: 'button:enabled, [tabindex]' })
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      const moved = wait(bar, 'moved')
+      leave(a, off)
+      hover(off, a)
+      const event = await moved
+
+      expect(event.relatedTarget).toBe(span)
+      expect(text()).toBe('Italic is not available')
+      expect(span.getAttribute('aria-describedby')).toBe(document.querySelector('.tooltip').id)
+
+      const hides = []
+      bar.addEventListener('hide.coreui.tooltip', () => hides.push(1))
+      leave(off, span)
+      hover(span, off)
+      await sleep(200)
+
+      expect(hides).toEqual([])
+      tooltip.dispose()
+    })
+
+    it('should let EventHandler listen to the move', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      EventHandler.on(bar, 'move.coreui.tooltip', event => moves.push(event.relatedTarget))
+
+      const moved = wait(bar, 'moved')
+      hover(b, a)
+      await moved
+
+      expect(moves).toEqual([b])
+      tooltip.dispose()
+    })
+
+    it('should move at once on Tab and describe the new anchor in the same task', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      a.focus()
+      await shown
+      const tip = document.querySelector('.tooltip')
+      const moved = wait(bar, 'moved')
+
+      b.focus()
+
+      expect(b.getAttribute('aria-describedby')).toBe(tip.id)
+      expect(a.hasAttribute('aria-describedby')).toBeFalse()
+      expect(text()).toBe('Italic')
+      await moved
+      tooltip.dispose()
+    })
+
+    it('should keep the tip across a gap between two anchors', async () => {
+      const { a, b, bar, gap, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const hides = []
+      bar.addEventListener('hide.coreui.tooltip', () => hides.push(1))
+
+      const moved = wait(bar, 'moved')
+      leave(a, gap)
+      await sleep(60)
+      hover(b, gap)
+      await moved
+
+      expect(hides).toEqual([])
+      expect(text()).toBe('Italic')
+      tooltip.dispose()
+    })
+
+    it('should hide once the pointer leaves the anchors', async () => {
+      const { a, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      const hidden = wait(bar, 'hidden')
+      leave(a, document.body)
+      await hidden
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      expect(a.hasAttribute('aria-describedby')).toBeFalse()
+      tooltip.dispose()
+    })
+
+    it('should go back to the focused anchor when the pointer leaves another one', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      a.focus()
+      await shown
+
+      let moved = wait(bar, 'moved')
+      hover(b)
+      await moved
+      expect(text()).toBe('Italic')
+
+      moved = wait(bar, 'moved')
+      leave(b, document.body)
+      const event = await moved
+
+      expect(event.relatedTarget).toBe(a)
+      expect(text()).toBe('Bold')
+      expect(a.getAttribute('aria-describedby')).toBe(document.querySelector('.tooltip').id)
+      tooltip.dispose()
+    })
+
+    it('should keep the tip on the focused anchor while the pointer rests on one without content', async () => {
+      const { a, bar, c, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      a.focus()
+      await shown
+
+      hover(c)
+      await sleep(150)
+
+      expect(text()).toBe('Bold')
+      expect(document.querySelector('.tooltip.show')).not.toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should hide when the pointer moves onto an anchor without content', async () => {
+      const { a, bar, c, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      const hidden = wait(bar, 'hidden')
+      leave(a, c)
+      hover(c, a)
+      await hidden
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should close when the active anchor leaves the document', async () => {
+      const { a, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      const hidden = wait(bar, 'hidden')
+      a.remove()
+      window.dispatchEvent(new Event('resize'))
+      await hidden
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should close and open again when the next anchor sits in a dialog', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a" title="Bold">B</button><dialog open><button type="button" id="b" title="Italic">I</button></dialog></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const a = bar.querySelector('#a')
+      const b = bar.querySelector('#b')
+      const tooltip = new Tooltip(bar, { anchors: 'button' })
+      let shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      shown = wait(bar, 'shown')
+      hover(b, a)
+      const event = await shown
+
+      expect(event.relatedTarget).toBe(b)
+      expect(document.querySelector('.tooltip').parentElement).toBe(bar.querySelector('dialog'))
+      tooltip.dispose()
+    })
+
+    it('should ignore anchors inside its own tip', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a">B</button></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const a = bar.querySelector('#a')
+      const tooltip = new Tooltip(bar, {
+        anchors: 'button, b', container: '#bar', html: true, title: '<b>Bold</b>'
+      })
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+      const inner = document.querySelector('.tooltip b')
+
+      expect(inner).not.toBeNull()
+
+      inner.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      await sleep(20)
+
+      expect(moves).toEqual([])
+      tooltip.dispose()
+    })
+
+    it('should rewrite the content in place and drop it on the next anchor', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const tip = document.querySelector('.tooltip')
+      const events = []
+      for (const name of ['show', 'inserted']) {
+        bar.addEventListener(`${name}.coreui.tooltip`, () => events.push(name))
+      }
+
+      tooltip.setContent({ '.tooltip-inner': 'Copied' })
+
+      expect(document.querySelector('.tooltip')).toBe(tip)
+      expect(text()).toBe('Copied')
+
+      const moved = wait(bar, 'moved')
+      hover(b, a)
+      await moved
+
+      expect(text()).toBe('Italic')
+      expect(events).toEqual([])
+      tooltip.dispose()
+    })
+
+    it('should keep content set in a move listener', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      bar.addEventListener('move.coreui.tooltip', event => {
+        tooltip.setContent({ '.tooltip-inner': `Loaded ${event.relatedTarget.id}` })
+      })
+
+      const moved = wait(bar, 'moved')
+      hover(b, a)
+      await moved
+
+      expect(text()).toBe('Loaded b')
+      tooltip.dispose()
+    })
+
+    it('should leave the title of the wrapper alone and give the anchors theirs back on dispose', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      expect(bar.getAttribute('title')).toBe('Toolbar')
+      expect(a.getAttribute('title')).toBe('')
+
+      tooltip.dispose()
+
+      expect(a.getAttribute('title')).toBe('Bold')
+      expect(b.getAttribute('title')).toBe('Italic')
+      expect(document.querySelector('.tooltip')).toBeNull()
+    })
+
+    it('should refuse anchors together with selector', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      expect(() => new Tooltip(fixtureEl.querySelector('div'), { anchors: 'button', selector: 'button' })).toThrowError(TypeError)
+    })
+
+    it('should create the instance of the wrapper from the data API and show on the first hover', async () => {
+      fixtureEl.innerHTML = '<div id="bar" data-coreui-toggle="tooltip" data-coreui-anchors="button"><button type="button" id="a" title="Bold" data-coreui-toggle="tooltip">B</button></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const a = fixtureEl.querySelector('#a')
+      const shown = wait(bar, 'shown')
+
+      a.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await shown
+
+      expect(Tooltip.getInstance(bar)).not.toBeNull()
+      expect(Tooltip.getInstance(a)).toBeNull()
+      expect(document.querySelectorAll('.tooltip')).toHaveSize(1)
+      Tooltip.getInstance(bar).dispose()
+    })
+
+    it('should be left out of a delegation that matches its wrapper', async () => {
+      fixtureEl.innerHTML = '<div id="bar" data-coreui-toggle="tooltip" data-coreui-anchors="button"><button type="button" id="a" title="Bold">B</button></div>'
+      const host = new Tooltip(fixtureEl, { selector: '[data-coreui-toggle="tooltip"]', trigger: 'click' })
+      const bar = fixtureEl.querySelector('#bar')
+
+      fixtureEl.querySelector('#a').click()
+      await sleep(20)
+
+      expect(Tooltip.getInstance(bar)).toBeNull()
+      host.dispose()
+    })
+
+    it('should open on a titled anchor after the focus rested on one without content', async () => {
+      const { a, bar, c, tooltip } = setup()
+      c.focus()
+      await sleep(20)
+
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      expect(text()).toBe('Bold')
+      tooltip.dispose()
+    })
+
+    it('should keep a tip dismissed with Escape away when the pointer crosses another anchor', async () => {
+      const { a, b, bar, tooltip } = setup()
+      let shown = wait(bar, 'shown')
+      a.focus()
+      await shown
+
+      const hidden = wait(bar, 'hidden')
+      document.querySelector('.tooltip').dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+      await hidden
+
+      shown = wait(bar, 'shown')
+      hover(b)
+      await shown
+      const gone = wait(bar, 'hidden')
+      leave(b, document.body)
+      await gone
+      await sleep(150)
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should drop content set from code once the tip opens on another anchor', async () => {
+      const { a, b, bar, c, tooltip } = setup()
+      let shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      tooltip.setContent({ '.tooltip-inner': 'Copied' })
+
+      const hidden = wait(bar, 'hidden')
+      leave(a, c)
+      hover(c, a)
+      await hidden
+
+      shown = wait(bar, 'shown')
+      hover(b)
+      await shown
+
+      expect(text()).toBe('Italic')
+      tooltip.dispose()
+    })
+
+    it('should follow the active anchor with its position, option callbacks and classes', async () => {
+      const placements = []
+      const offsets = []
+      const { a, b, bar, tooltip } = setup({
+        customClass: anchor => `c-${anchor.id}`,
+        offset(_, anchor) {
+          offsets.push(anchor.id)
+          return [0, 6]
+        },
+        placement(tip, anchor) {
+          placements.push(anchor.id)
+          return 'bottom'
+        }
+      })
+      b.style.marginLeft = '200px'
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      expect(document.querySelector('.tooltip')).toHaveClass('c-a')
+
+      const moved = wait(bar, 'moved')
+      hover(b, a)
+      await moved
+      const center = rect => rect.left + (rect.width / 2)
+      const tip = center(document.querySelector('.tooltip').getBoundingClientRect())
+
+      expect(document.querySelector('.tooltip')).toHaveClass('c-b')
+      expect(document.querySelector('.tooltip')).not.toHaveClass('c-a')
+      expect(placements.at(-1)).toBe('b')
+      expect(offsets.at(-1)).toBe('b')
+      expect(Math.abs(tip - center(b.getBoundingClientRect()))).toBeLessThan(Math.abs(tip - center(a.getBoundingClientRect())))
+      expect(Math.abs(tip - center(b.getBoundingClientRect()))).toBeLessThan(Math.abs(tip - center(bar.getBoundingClientRect())))
+      tooltip.dispose()
+    })
+
+    it('should hide when the focus moves to an element of the wrapper that is not an anchor', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a" title="Bold">B</button><input id="field"></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const tooltip = new Tooltip(bar, { anchors: 'button' })
+      const shown = wait(bar, 'shown')
+      bar.querySelector('#a').focus()
+      await shown
+
+      const hidden = wait(bar, 'hidden')
+      bar.querySelector('#field').focus()
+      await hidden
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should give the moved tip the parent layer of its new anchor', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><div id="panel"><button type="button" id="a" title="Bold">B</button></div><button type="button" id="b" title="Italic">I</button></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const panel = {
+        anchor: () => null, closesOn: () => false, dismiss() {}, isOpen: () => true, kind: 'popup', parts: () => [bar.querySelector('#panel')]
+      }
+      registerLayer(panel)
+      const tooltip = new Tooltip(bar, { anchors: 'button' })
+      const shown = wait(bar, 'shown')
+      hover(bar.querySelector('#a'))
+      await shown
+
+      expect(getParentLayer(tooltip._layer)).toBe(panel)
+
+      const moved = wait(bar, 'moved')
+      hover(bar.querySelector('#b'), bar.querySelector('#a'))
+      await moved
+
+      expect(getParentLayer(tooltip._layer)).toBeNull()
+      tooltip.dispose()
+      unregisterLayer(panel)
+    })
+
+    it('should close and open again at an anchor with another text direction', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a" title="Bold">B</button><span dir="rtl"><button type="button" id="b" title="Italic">I</button></span></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const tooltip = new Tooltip(bar, { anchors: 'button' })
+      let shown = wait(bar, 'shown')
+      hover(bar.querySelector('#a'))
+      await shown
+      const events = []
+      for (const name of ['hide', 'hidden', 'show', 'move']) {
+        bar.addEventListener(`${name}.coreui.tooltip`, () => events.push(name))
+      }
+
+      shown = wait(bar, 'shown')
+      hover(bar.querySelector('#b'), bar.querySelector('#a'))
+      await shown
+
+      expect(events).toEqual(['hide', 'hidden', 'show'])
+      expect(document.querySelector('.tooltip').dir).toBe('rtl')
+      tooltip.dispose()
+    })
+
+    it('should not mark a tip as moving without animation', async () => {
+      const { a, b, bar, tooltip } = setup({ animation: false })
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const tip = document.querySelector('.tooltip')
+
+      const moved = wait(bar, 'moved')
+      b.focus()
+
+      expect(tip.hasAttribute('data-coreui-moving')).toBeFalse()
+      await moved
+      tooltip.dispose()
+    })
+
+    it('should send moved only for the anchor a move ends at', async () => {
+      const { a, b, bar, c, tooltip } = setup()
+      c.setAttribute('title', 'Code')
+      const shown = wait(bar, 'shown')
+      a.focus()
+      await shown
+      const moved = []
+      bar.addEventListener('moved.coreui.tooltip', event => moved.push(event.relatedTarget.id))
+
+      b.focus()
+      c.focus()
+      await sleep(50)
+
+      expect(moved).toEqual(['c'])
+      tooltip.dispose()
+    })
+
+    it('should drop the moving mark and a pending move when it hides', async () => {
+      const { a, b, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const moves = []
+      bar.addEventListener('move.coreui.tooltip', () => moves.push(1))
+
+      const { away } = cross(a, b)
+      const tip = document.querySelector('.tooltip')
+      tip.setAttribute('data-coreui-moving', '')
+      await tooltip.hide()
+      const moveTo = spyOn(tooltip, '_moveTo')
+      pointer(away)
+      await sleep(150)
+
+      expect(moveTo).not.toHaveBeenCalled()
+
+      expect(tip.hasAttribute('data-coreui-moving')).toBeFalse()
+      expect(moves).toEqual([])
+      tooltip.dispose()
+    })
+
+    it('should describe the focused element inside an anchor and follow the focus within it', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><div class="row" data-coreui-title="Row"><button type="button" id="x">x</button><button type="button" id="y">y</button></div></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const x = bar.querySelector('#x')
+      const y = bar.querySelector('#y')
+      const tooltip = new Tooltip(bar, { anchors: '.row' })
+      const shown = wait(bar, 'shown')
+      x.focus()
+      await shown
+      const { id } = document.querySelector('.tooltip')
+
+      expect(x.getAttribute('aria-describedby')).toBe(id)
+
+      y.focus()
+
+      expect(y.getAttribute('aria-describedby')).toBe(id)
+      expect(x.hasAttribute('aria-describedby')).toBeFalse()
+      expect(bar.querySelector('.row').hasAttribute('aria-describedby')).toBeFalse()
+      tooltip.dispose()
+    })
+
+    it('should refuse anchors with a manual trigger and do nothing on show() before an anchor is active', async () => {
+      fixtureEl.innerHTML = '<div title="Wrapper"><button type="button" title="Bold">B</button></div>'
+      const wrapper = fixtureEl.querySelector('div')
+
+      expect(() => new Tooltip(wrapper, { anchors: 'button', trigger: 'manual' })).toThrowError(TypeError)
+
+      const tooltip = new Tooltip(wrapper, { anchors: 'button', title: 'Fallback' })
+      await tooltip.show()
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should take the title off the anchors of a group that starts disabled', () => {
+      const { a, tooltip } = setup({ disabled: true })
+
+      hover(a)
+
+      expect(a.getAttribute('title')).toBe('')
+      expect(document.querySelector('.tooltip')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should give its own tooltip to a toggle inside the wrapper that is not an anchor', async () => {
+      fixtureEl.innerHTML = '<div id="bar" data-coreui-toggle="tooltip" data-coreui-anchors=".anchor"><button type="button" class="anchor" title="Bold">B</button><span id="own" tabindex="0" data-coreui-toggle="tooltip" title="Own">x</span></div>'
+      const own = fixtureEl.querySelector('#own')
+      const shown = new Promise(resolve => {
+        own.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+
+      own.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await shown
+
+      expect(Tooltip.getInstance(own)).not.toBeNull()
+      expect(text()).toBe('Own')
+      Tooltip.getInstance(own).dispose()
+      Tooltip.getInstance(fixtureEl.querySelector('#bar'))?.dispose()
+    })
+  })
+
+  describe('disabled', () => {
+    it('should not show while the disabled option is set and show once enabled', async () => {
+      fixtureEl.innerHTML = '<a href="#" title="Tip" data-coreui-disabled="true">x</a>'
+      const element = fixtureEl.querySelector('a')
+      const tooltip = new Tooltip(element)
+
+      await tooltip.show()
+      expect(document.querySelector('.tooltip')).toBeNull()
+
+      tooltip.enable()
+      await tooltip.show()
+
+      expect(document.querySelector('.tooltip.show')).not.toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should hide an open tip when disabled', async () => {
+      fixtureEl.innerHTML = '<a href="#" title="Tip">x</a>'
+      const element = fixtureEl.querySelector('a')
+      const tooltip = new Tooltip(element)
+      await tooltip.show()
+
+      const hidden = new Promise(resolve => {
+        element.addEventListener('hidden.coreui.tooltip', resolve, { once: true })
+      })
+      tooltip.toggleEnabled()
+      await hidden
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should keep a delegation disabled from code quiet and show again once enabled', async () => {
+      fixtureEl.innerHTML = '<div><a href="#" title="Tip">x</a></div>'
+      const host = new Tooltip(fixtureEl.querySelector('div'), { selector: 'a' })
+      const element = fixtureEl.querySelector('a')
+      let shown = new Promise(resolve => {
+        element.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await shown
+
+      const hidden = new Promise(resolve => {
+        element.addEventListener('hidden.coreui.tooltip', resolve, { once: true })
+      })
+      host.disable()
+      await hidden
+      element.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+      element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+
+      host.enable()
+      element.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+      shown = new Promise(resolve => {
+        element.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await shown
+
+      expect(document.querySelector('.tooltip.show')).not.toBeNull()
+      host.dispose()
+      Tooltip.getInstance(element).dispose()
+    })
+
+    it('should let a delegation enabled from code show its tips', async () => {
+      fixtureEl.innerHTML = '<div><a href="#" title="Tip">x</a></div>'
+      const host = new Tooltip(fixtureEl.querySelector('div'), { disabled: true, selector: 'a' })
+      const element = fixtureEl.querySelector('a')
+
+      host.enable()
+      const shown = new Promise(resolve => {
+        element.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await shown
+
+      expect(document.querySelector('.tooltip.show')).not.toBeNull()
+      host.dispose()
+      Tooltip.getInstance(element).dispose()
     })
   })
 

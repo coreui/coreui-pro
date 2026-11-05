@@ -22,6 +22,7 @@ const NAME = 'popover'
 const SELECTOR_TITLE = '.popover-header'
 const SELECTOR_CONTENT = '.popover-body'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="popover"]'
+const SELECTOR_DATA_ANCHORS = '[data-coreui-toggle="popover"][data-coreui-anchors]'
 
 const EVENT_CLICK = 'click'
 const EVENT_FOCUSIN = 'focusin'
@@ -88,7 +89,7 @@ class Popover extends Tooltip {
   }
 
   protected _getContent(): string | Element | null {
-    return this._resolvePossibleFunction(this._config.content)
+    return (this._config.anchors && this._anchor.getAttribute('data-coreui-content')) || this._resolvePossibleFunction(this._config.content)
   }
 
   // Static
@@ -102,13 +103,16 @@ class Popover extends Tooltip {
  */
 
 const initPopover = (event: CoreUIEvent): void => {
-  const target = (event.target as Element).closest(SELECTOR_DATA_TOGGLE)
+  const element = event.target as Element
+  const host = element.closest(SELECTOR_DATA_ANCHORS)
+  const inAnchor = Boolean(host?.contains(element.closest(host.getAttribute('data-coreui-anchors')!)))
+  const target = inAnchor ? host : element.closest(SELECTOR_DATA_TOGGLE)
   if (!target) {
     return
   }
 
   // Prevent default for click events to avoid navigation (e.g. <a href="#">)
-  if (event.type === 'click') {
+  if (event.type === 'click' && (inAnchor || !target.hasAttribute('data-coreui-anchors'))) {
     event.preventDefault()
   }
 

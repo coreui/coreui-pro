@@ -70,6 +70,16 @@ $popover-tokens: defaults(
       );
     }
 
+    &[data-coreui-moving] {
+      @include transition-props((opacity, left, top), .2s, cubic-bezier(.22, 1, .36, 1));
+
+      .popover-arrow {
+        transition-timing-function: inherit;
+        transition-duration: inherit;
+        transition-property: inherit;
+      }
+    }
+
     &.show {
       opacity: 1;
     }

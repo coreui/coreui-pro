@@ -10,6 +10,10 @@ import {
 
 describe('Rating', () => {
   let fixtureEl
+  const tipEvent = (element, name) => new Promise(resolve => {
+    element.addEventListener(`${name}.coreui.tooltip`, resolve, { once: true })
+  })
+  const tipText = () => document.querySelector('.tooltip.show .tooltip-inner')?.textContent
 
   beforeAll(() => {
     fixtureEl = getFixture()
@@ -645,20 +649,22 @@ describe('Rating', () => {
       expect(div.querySelector('.rating-item-label.active')).toBeNull()
     })
 
-    it('should keep the items and their tooltip through setValue', () => {
+    it('should keep the items and their tooltip through setValue', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 3, tooltips: true })
 
       const label = div.querySelectorAll('.rating-item-label')[1]
-      label.dispatchEvent(createEvent('mouseover'))
       const item = label.parentElement
-      expect(Tooltip.getInstance(item)).not.toBeNull()
+      const shown = tipEvent(div, 'shown')
+      label.dispatchEvent(createEvent('mouseover'))
+      await shown
 
       rating.setValue(2)
 
       expect(div.querySelectorAll('.rating-item')[1]).toBe(item)
-      expect(Tooltip.getInstance(item)).not.toBeNull()
+      expect(tipText()).toBe('2')
+      rating.dispose()
     })
 
     it('should update disabled state', () => {
@@ -785,23 +791,34 @@ describe('Rating', () => {
       expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
     })
 
-    it('should drop the tooltip and the hover highlight when disable() runs over a hovered star', () => {
+    it('should drop the tooltip and the hover highlight when disable() runs over a hovered star', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { value: 2, tooltips: true })
       const label = div.querySelectorAll('.rating-item-label')[4]
-      const item = label.parentElement
+      const shown = tipEvent(div, 'shown')
 
       label.dispatchEvent(createEvent('mouseover'))
+      await shown
 
       expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(5)
-      expect(Tooltip.getInstance(item)).not.toBeNull()
+      expect(tipText()).toBe('5')
 
+      const hidden = tipEvent(div, 'hidden')
       rating.disable()
       label.dispatchEvent(createEvent('mouseout'))
+      await hidden
 
       expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
-      expect(Tooltip.getInstance(item)).toBeNull()
+      expect(document.querySelector('.tooltip')).toBeNull()
+
+      label.dispatchEvent(createEvent('mouseover'))
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      rating.dispose()
     })
   })
 
@@ -1395,100 +1412,116 @@ describe('Rating', () => {
       expect(rating._tooltip).not.toBeNull()
     })
 
-    it('should use value as tooltip title when tooltips is true (boolean)', () => {
+    it('should use value as tooltip title when tooltips is true (boolean)', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 3, tooltips: true })
+      const shown = tipEvent(div, 'shown')
 
-      const label = div.querySelectorAll('.rating-item-label')[1]
-      const mouseover = createEvent('mouseover')
-      label.dispatchEvent(mouseover)
+      div.querySelectorAll('.rating-item-label')[1].dispatchEvent(createEvent('mouseover'))
+      await shown
 
-      expect(rating._tooltip).not.toBeNull()
+      expect(tipText()).toBe('2')
+      rating.dispose()
     })
 
-    it('should use object values for tooltip titles when tooltips is an object', () => {
+    it('should use object values for tooltip titles when tooltips is an object', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const tooltipConfig = { 1: 'Bad', 2: 'OK', 3: 'Good' }
-      const rating = new Rating(div, { itemCount: 3, tooltips: tooltipConfig })
+      const rating = new Rating(div, { itemCount: 3, tooltips: { 1: 'Bad', 2: 'OK', 3: 'Good' } })
+      const shown = tipEvent(div, 'shown')
 
-      const label = div.querySelectorAll('.rating-item-label')[1]
-      const mouseover = createEvent('mouseover')
-      label.dispatchEvent(mouseover)
+      div.querySelectorAll('.rating-item-label')[1].dispatchEvent(createEvent('mouseover'))
+      await shown
 
-      expect(rating._tooltip).not.toBeNull()
+      expect(tipText()).toBe('OK')
+      rating.dispose()
     })
 
-    it('should use array values for tooltip titles when tooltips is an array', () => {
+    it('should use array values for tooltip titles when tooltips is an array', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const tooltipArray = ['Bad', 'OK', 'Good']
-      const rating = new Rating(div, { itemCount: 3, tooltips: tooltipArray })
+      const rating = new Rating(div, { itemCount: 3, tooltips: ['Bad', 'OK', 'Good'] })
+      const shown = tipEvent(div, 'shown')
 
-      const label = div.querySelectorAll('.rating-item-label')[1]
-      const mouseover = createEvent('mouseover')
-      label.dispatchEvent(mouseover)
+      div.querySelectorAll('.rating-item-label')[2].dispatchEvent(createEvent('mouseover'))
+      await shown
 
-      expect(rating._tooltip).not.toBeNull()
+      expect(tipText()).toBe('Good')
+      rating.dispose()
     })
 
-    it('should hide tooltip on mouseleave', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-      const rating = new Rating(div, { itemCount: 3, tooltips: true })
-
-      const label = div.querySelectorAll('.rating-item-label')[1]
-      const mouseover = createEvent('mouseover')
-      label.dispatchEvent(mouseover)
-
-      expect(rating._tooltip).not.toBeNull()
-      spyOn(rating._tooltip, 'hide')
-
-      const mouseout = createEvent('mouseout')
-      label.dispatchEvent(mouseout)
-
-      expect(rating._tooltip.hide).toHaveBeenCalled()
-    })
-
-    it('should hide tooltip on focusout', () => {
+    it('should hide tooltip on mouseleave', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 3, tooltips: true })
+      const label = div.querySelectorAll('.rating-item-label')[1]
+      const shown = tipEvent(div, 'shown')
 
+      label.dispatchEvent(createEvent('mouseover'))
+      await shown
+
+      const hidden = tipEvent(div, 'hidden')
+      label.dispatchEvent(createEvent('mouseout'))
+      await hidden
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      rating.dispose()
+    })
+
+    it('should hide tooltip on focusout', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3, tooltips: true })
       const input = div.querySelectorAll('.rating-item-input')[1]
-      const focusin = createEvent('focusin', { bubbles: true })
-      input.dispatchEvent(focusin)
+      const shown = tipEvent(div, 'shown')
 
-      expect(rating._tooltip).not.toBeNull()
-      spyOn(rating._tooltip, 'hide')
+      input.dispatchEvent(createEvent('focusin', { bubbles: true }))
+      await shown
 
-      const focusout = createEvent('focusout', { bubbles: true })
-      input.dispatchEvent(focusout)
+      const hidden = tipEvent(div, 'hidden')
+      input.dispatchEvent(createEvent('focusout', { bubbles: true }))
+      await hidden
 
-      expect(rating._tooltip.hide).toHaveBeenCalled()
+      expect(document.querySelector('.tooltip')).toBeNull()
+      rating.dispose()
     })
 
-    it('should hide existing tooltip before creating new one on mouseenter', () => {
+    it('should keep a read-only rating without tooltips through disable and enable', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3, readonly: true, tooltips: true })
+
+      rating.disable()
+      rating.enable()
+      div.querySelectorAll('.rating-item-label')[1].dispatchEvent(createEvent('mouseover'))
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(document.querySelector('.tooltip')).toBeNull()
+      rating.dispose()
+    })
+
+    it('should move one tooltip to the star the pointer moves onto', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 3, tooltips: true })
+      const labels = div.querySelectorAll('.rating-item-label')
+      const shown = tipEvent(div, 'shown')
 
-      // Hover on first label
-      const label1 = div.querySelectorAll('.rating-item-label')[0]
-      const mouseover1 = createEvent('mouseover')
-      label1.dispatchEvent(mouseover1)
+      labels[0].dispatchEvent(createEvent('mouseover'))
+      await shown
+      const tip = document.querySelector('.tooltip')
 
-      expect(rating._tooltip).not.toBeNull()
-      const firstTooltip = rating._tooltip
-      spyOn(firstTooltip, 'hide')
+      const moved = tipEvent(div, 'moved')
+      labels[1].dispatchEvent(createEvent('mouseover', { relatedTarget: labels[0] }))
+      await moved
 
-      // Hover on second label
-      const label2 = div.querySelectorAll('.rating-item-label')[1]
-      const mouseover2 = createEvent('mouseover')
-      label2.dispatchEvent(mouseover2)
-
-      expect(firstTooltip.hide).toHaveBeenCalled()
+      expect(document.querySelectorAll('.tooltip')).toHaveSize(1)
+      expect(document.querySelector('.tooltip')).toBe(tip)
+      expect(tipText()).toBe('2')
+      rating.dispose()
     })
   })
 
@@ -2419,19 +2452,21 @@ describe('Rating', () => {
       expect(div.innerHTML).toEqual('<div class="rating-item">Fallback</div>')
     })
 
-    it('should dispose the tooltips of half-star items', () => {
+    it('should dispose the tooltip of half-star items', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 3, precision: 0.5, tooltips: true })
-      const label = div.querySelectorAll('.rating-item-label')[1]
+      const shown = tipEvent(div, 'shown')
 
-      label.dispatchEvent(createEvent('mouseover'))
-      const wrapper = label.parentElement
-      expect(Tooltip.getInstance(wrapper)).not.toBeNull()
+      div.querySelectorAll('.rating-item-label')[1].dispatchEvent(createEvent('mouseover'))
+      await shown
+
+      expect(tipText()).toBe('1')
 
       rating.dispose()
 
-      expect(Tooltip.getInstance(wrapper)).toBeNull()
+      expect(Tooltip.getInstance(div)).toBeNull()
+      expect(document.querySelector('.tooltip')).toBeNull()
     })
 
     it('should not throw when a change listener disposes the rating', () => {
@@ -2500,20 +2535,18 @@ describe('Rating', () => {
       expect(Rating.getInstance(div)).toBeNull()
     })
 
-    it('should dispose every tooltip created on the items', () => {
+    it('should create no tooltip on the items', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 3, tooltips: true })
-
       const labels = div.querySelectorAll('.rating-item-label')
+      const shown = tipEvent(div, 'shown')
+
       labels[0].dispatchEvent(createEvent('mouseover'))
-      labels[2].dispatchEvent(createEvent('mouseover'))
-      const items = [labels[0].parentElement, labels[2].parentElement]
-      expect(items.map(item => Tooltip.getInstance(item))).not.toContain(null)
+      await shown
 
+      expect([...div.querySelectorAll('.rating-item')].map(item => Tooltip.getInstance(item))).toEqual([null, null, null])
       rating.dispose()
-
-      expect(items.map(item => Tooltip.getInstance(item))).toEqual([null, null])
     })
   })
 

@@ -395,6 +395,21 @@ const listen = (doc: Document): void => {
 }
 
 /**
+ * Finds the parent of a layer anchored at an element: the deepest open layer of the document whose
+ * parts other than its own anchor hold that anchor.
+ *
+ * @param stack - The open layers
+ * @param doc - The document of the anchor
+ * @param anchor - The anchor of the layer
+ * @param self - The layer itself, never its own parent
+ * @returns The parent, or `null` for a top-level layer
+ */
+const parentOf = (stack: LayerRecord[], doc: Document, anchor: Element | null | undefined, self?: LayerRecord): LayerRecord | null => {
+  const candidates = stack.filter(record => record !== self && record.doc === doc && inPanel(record, anchor))
+  return candidates.find(record => candidates.every(other => other === record || !inParts(record, other.entry.parts().find(Boolean)))) ?? null
+}
+
+/**
  * Puts an open layer on the stack. Its parent is the deepest open layer whose parts other than its
  * own anchor hold the new layer's anchor; open layers anchored in the new layer's parts other than
  * its anchor become its children, unless that would make a cycle. Every other open layer that
@@ -415,8 +430,7 @@ export const registerLayer = (entry: LayerEntry): void => {
   const anchor = entry.anchor()
   const doc = anchor?.ownerDocument ?? entry.parts().find(Boolean)?.ownerDocument ?? document
   trackPress(doc)
-  const candidates = stack.filter(record => record.doc === doc && inPanel(record, anchor))
-  const parent = candidates.find(record => candidates.every(other => other === record || !inParts(record, other.entry.parts().find(Boolean)))) ?? null
+  const parent = parentOf(stack, doc, anchor)
   const record: LayerRecord = {
     closing: false, doc, entry, parent
   }
@@ -442,6 +456,26 @@ export const registerLayer = (entry: LayerEntry): void => {
   for (const other of siblings) {
     request(other, 'sibling')
   }
+}
+
+/**
+ * Follows an open layer whose anchor changed, as a tooltip that moves to another anchor: its parent
+ * is found again for the new anchor and it moves to the top of the stack, above that parent. A layer
+ * that is not open changes nothing.
+ *
+ * @param entry - The layer
+ */
+export const reanchorLayer = (entry: LayerEntry): void => {
+  const { stack } = getState()
+  const record = recordOf(entry)
+
+  if (!record) {
+    return
+  }
+
+  record.parent = parentOf(stack, record.doc, entry.anchor(), record)
+  stack.splice(stack.indexOf(record), 1)
+  stack.push(record)
 }
 
 /**

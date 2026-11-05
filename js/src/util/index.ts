@@ -349,7 +349,7 @@ const getCoveredTransitions = (element: Element, duration: number, transitionPro
  * then waited for until it finishes or is cancelled, at most as long again and one more second.
  * In a hidden document the timer always settles. `transitionProperty` narrows the wait to that
  * property, since the events of a run that just finished can land after the next run has started
- * waiting.
+ * waiting; such a wait ignores the event another wait's timer sends, and its own timer finishes it.
  *
  * @param callback The function to run.
  * @param transitionElement The element whose transition is waited for.
@@ -384,8 +384,7 @@ const executeAfterTransition = (callback: () => void, transitionElement: Element
       return
     }
 
-    const { propertyName } = event as TransitionEvent
-    if (transitionProperty && propertyName && propertyName !== transitionProperty) {
+    if (transitionProperty && (event as TransitionEvent).propertyName !== transitionProperty) {
       return
     }
 
@@ -398,7 +397,9 @@ const executeAfterTransition = (callback: () => void, transitionElement: Element
     const running = called || document.hidden || !late ? [] : transitions.filter(transition => transition.playState === 'running')
 
     if (running.length === 0) {
-      if (!called) {
+      if (transitionProperty) {
+        finish()
+      } else if (!called) {
         triggerTransitionEnd(transitionElement)
       }
 

@@ -97,7 +97,6 @@ const nativeEvents = new Set([
   'unload',
   'beforeunload',
   'resize',
-  'move',
   'DOMContentLoaded',
   'readystatechange',
   'error',

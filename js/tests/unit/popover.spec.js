@@ -1306,6 +1306,183 @@ describe('Popover', () => {
     })
   })
 
+  describe('anchors', () => {
+    const wait = (element, name) => new Promise(resolve => {
+      element.addEventListener(`${name}.coreui.popover`, resolve, { once: true })
+    })
+
+    it('should take the title and content of the anchor it opens on and move on a click on another one', async () => {
+      fixtureEl.innerHTML = '<div id="list"><button type="button" id="a" data-coreui-title="Row 1" data-coreui-content="First">A</button><button type="button" id="b" data-coreui-title="Row 2" data-coreui-content="Second">B</button></div>'
+      const list = fixtureEl.querySelector('#list')
+      const popover = new Popover(list, { anchors: 'button' })
+      const shown = wait(list, 'shown')
+
+      fixtureEl.querySelector('#a').click()
+      await shown
+      const tip = document.querySelector('.popover')
+
+      expect(tip.querySelector('.popover-header').textContent).toBe('Row 1')
+      expect(tip.querySelector('.popover-body').textContent).toBe('First')
+
+      const moved = wait(list, 'moved')
+      fixtureEl.querySelector('#b').click()
+      await moved
+
+      expect(document.querySelector('.popover')).toBe(tip)
+      expect(tip.querySelector('.popover-header').textContent).toBe('Row 2')
+      expect(tip.querySelector('.popover-body').textContent).toBe('Second')
+      popover.dispose()
+    })
+
+    it('should keep the popover while the pointer heads to it across another anchor on hover', async () => {
+      fixtureEl.innerHTML = '<style>.popover { position: absolute; }</style><div id="list" style="position: fixed; left: 40px; top: 120px;"><button type="button" id="a" data-coreui-title="Row 1" data-coreui-content="First">A</button><button type="button" id="b" data-coreui-title="Row 2" data-coreui-content="Second">B</button></div>'
+      const list = fixtureEl.querySelector('#list')
+      const a = fixtureEl.querySelector('#a')
+      const b = fixtureEl.querySelector('#b')
+      const popover = new Popover(list, { anchors: 'button', trigger: 'hover' })
+      const shown = wait(list, 'shown')
+      a.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await shown
+      const moves = []
+      list.addEventListener('move.coreui.popover', event => moves.push(event.relatedTarget))
+      const tip = document.querySelector('.popover')
+      const rect = b.getBoundingClientRect()
+      const exit = { x: rect.left, y: rect.top + (rect.height / 2) }
+      const edge = tip.getBoundingClientRect()
+
+      a.dispatchEvent(new MouseEvent('mouseout', {
+        bubbles: true, clientX: exit.x, clientY: exit.y, relatedTarget: b
+      }))
+      b.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true, clientX: exit.x, clientY: exit.y, relatedTarget: a
+      }))
+      document.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: (exit.x + edge.left) / 2, clientY: exit.y }))
+
+      expect(tip.getAttribute('data-coreui-placement')).toBe('right')
+      expect(moves).toEqual([])
+
+      document.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: exit.x + 2, clientY: rect.bottom + 20 }))
+
+      expect(moves).toEqual([b])
+      popover.dispose()
+    })
+
+    it('should rebuild a header the previous anchor left out', async () => {
+      fixtureEl.innerHTML = '<div id="list"><button type="button" id="a" data-coreui-content="First">A</button><button type="button" id="b" data-coreui-title="Row 2" data-coreui-content="Second">B</button></div>'
+      const list = fixtureEl.querySelector('#list')
+      const popover = new Popover(list, { anchors: 'button' })
+      const shown = wait(list, 'shown')
+      fixtureEl.querySelector('#a').click()
+      await shown
+
+      expect(document.querySelector('.popover-header')).toBeNull()
+
+      const moved = wait(list, 'moved')
+      fixtureEl.querySelector('#b').click()
+      await moved
+
+      expect(document.querySelector('.popover-header').textContent).toBe('Row 2')
+      popover.dispose()
+    })
+
+    it('should hand the focus to the new anchor when it was in the popover', async () => {
+      fixtureEl.innerHTML = '<div id="list"><button type="button" id="a" data-coreui-content="<a href=&quot;#&quot;>Link</a>">A</button><button type="button" id="b" data-coreui-content="Second">B</button></div>'
+      const list = fixtureEl.querySelector('#list')
+      const b = fixtureEl.querySelector('#b')
+      const popover = new Popover(list, { anchors: 'button', html: true })
+      const shown = wait(list, 'shown')
+      fixtureEl.querySelector('#a').click()
+      await shown
+      document.querySelector('.popover a').focus()
+
+      const moved = wait(list, 'moved')
+      b.click()
+      await moved
+
+      expect(document.activeElement).toBe(b)
+      popover.dispose()
+    })
+
+    it('should close on a click on the anchor it stands at', async () => {
+      fixtureEl.innerHTML = '<div id="list"><button type="button" id="a" data-coreui-content="First">A</button></div>'
+      const list = fixtureEl.querySelector('#list')
+      const popover = new Popover(list, { anchors: 'button' })
+      const shown = wait(list, 'shown')
+      fixtureEl.querySelector('#a').click()
+      await shown
+
+      const hidden = wait(list, 'hidden')
+      fixtureEl.querySelector('#a').click()
+      await hidden
+
+      expect(document.querySelector('.popover')).toBeNull()
+      popover.dispose()
+    })
+
+    it('should hand the focus back to the anchor it moved to', async () => {
+      fixtureEl.innerHTML = '<div id="list"><button type="button" id="a" data-coreui-content="First">A</button><button type="button" id="b" data-coreui-content="<a href=&quot;#&quot;>Link</a>">B</button></div>'
+      const list = fixtureEl.querySelector('#list')
+      const b = fixtureEl.querySelector('#b')
+      const popover = new Popover(list, { anchors: 'button', html: true })
+      const shown = wait(list, 'shown')
+      fixtureEl.querySelector('#a').click()
+      await shown
+      const moved = wait(list, 'moved')
+      b.click()
+      await moved
+      document.querySelector('.popover a').focus()
+
+      const hidden = wait(list, 'hidden')
+      document.querySelector('.popover a').dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+      await hidden
+
+      expect(document.activeElement).toBe(b)
+      popover.dispose()
+    })
+
+    it('should hand the focus to the anchor when content set from code replaces what held it', async () => {
+      fixtureEl.innerHTML = '<div id="list"><button type="button" id="a" data-coreui-content="<a href=&quot;#&quot;>Link</a>">A</button></div>'
+      const list = fixtureEl.querySelector('#list')
+      const a = fixtureEl.querySelector('#a')
+      const popover = new Popover(list, { anchors: 'button', html: true })
+      const shown = wait(list, 'shown')
+      a.click()
+      await shown
+      document.querySelector('.popover a').focus()
+
+      popover.setContent({ '.popover-body': 'Saved' })
+
+      expect(document.activeElement).toBe(a)
+      expect(document.querySelector('.popover-body').textContent).toBe('Saved')
+      popover.dispose()
+    })
+
+    it('should keep the default action of a link in the wrapper when an ancestor matches the anchors', () => {
+      fixtureEl.innerHTML = '<div class="row"><div data-coreui-toggle="popover" data-coreui-anchors=".row"><a href="#other" id="link">Other</a></div></div>'
+      const click = new MouseEvent('click', { bubbles: true, cancelable: true })
+
+      fixtureEl.querySelector('#link').dispatchEvent(click)
+
+      expect(click.defaultPrevented).toBeFalse()
+      Popover.getInstance(fixtureEl.querySelector('[data-coreui-anchors]'))?.dispose()
+    })
+
+    it('should prevent the default action of a click only on an anchor of the data API wrapper', () => {
+      fixtureEl.innerHTML = '<div data-coreui-toggle="popover" data-coreui-anchors="button"><button type="button" data-coreui-content="x">A</button><a href="#other" id="link">Other</a></div>'
+      const link = fixtureEl.querySelector('#link')
+      const button = fixtureEl.querySelector('button')
+      const linkClick = new MouseEvent('click', { bubbles: true, cancelable: true })
+      const buttonClick = new MouseEvent('click', { bubbles: true, cancelable: true })
+
+      link.dispatchEvent(linkClick)
+      button.dispatchEvent(buttonClick)
+
+      expect(linkClick.defaultPrevented).toBeFalse()
+      expect(buttonClick.defaultPrevented).toBeTrue()
+      Popover.getInstance(fixtureEl.querySelector('div')).dispose()
+    })
+  })
+
   describe('getInstance', () => {
     it('should return popover instance', () => {
       fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap">BS X</a>'
