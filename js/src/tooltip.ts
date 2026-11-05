@@ -32,6 +32,7 @@ import {
   defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop, splitIds, writeAttribute
 } from './util/index.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
+import { followPointerIntent, type Point } from './util/safe-triangle.js'
 import TemplateFactory, { type TemplateContentEntry } from './util/template-factory.js'
 import {
   parseResponsivePlacement,
@@ -192,6 +193,8 @@ class Tooltip extends BaseComponent {
   protected declare _described: Element | null
   protected declare _focusedAnchor: HTMLElement | null
   protected declare _switchTimeout: number
+  protected declare _exitPoint: Point | null
+  protected declare _intent: (() => void) | null
   declare tip: HTMLElement | null
 
   constructor(element?: string | Element | null, config?: Partial<TooltipConfig> | null) {
@@ -232,6 +235,8 @@ class Tooltip extends BaseComponent {
     this._described = null
     this._focusedAnchor = null
     this._switchTimeout = 0
+    this._exitPoint = null
+    this._intent = null
 
     // Protected
     this.tip = null
@@ -292,6 +297,7 @@ class Tooltip extends BaseComponent {
   override dispose(): void {
     this._clearTimeout()
     clearTimeout(this._switchTimeout)
+    this._stopIntent()
 
     this._removeEscapeListener()
     this._removeFocusOutsideListener()
@@ -429,6 +435,8 @@ class Tooltip extends BaseComponent {
     this._isHovered = null // it is a trick to support manual triggering
     this._focusedAnchor = null
     clearTimeout(this._switchTimeout)
+    this._stopIntent()
+    this._exitPoint = null
 
     const complete = () => {
       if (this._isWithActiveTrigger()) {
@@ -849,7 +857,7 @@ class Tooltip extends BaseComponent {
         const [eventIn, eventOut] = this._getTriggerEvents(trigger)
 
         EventHandler.on(this._element, eventIn, anchors, event => {
-          this._enterAnchor(event.delegateTarget as HTMLElement, trigger)
+          this._enterAnchor(event.delegateTarget as HTMLElement, trigger, event as unknown as MouseEvent)
         })
         EventHandler.on(this._element, eventOut, anchors, event => {
           this._leaveAnchor(event, trigger)
@@ -858,7 +866,7 @@ class Tooltip extends BaseComponent {
     }
   }
 
-  protected _enterAnchor(anchor: HTMLElement, trigger: string): void {
+  protected _enterAnchor(anchor: HTMLElement, trigger: string, event?: MouseEvent): void {
     this._fixTitle(anchor)
 
     if (!this._isEnabled || this.tip?.contains(anchor)) {
@@ -866,6 +874,7 @@ class Tooltip extends BaseComponent {
     }
 
     clearTimeout(this._switchTimeout)
+    this._stopIntent()
 
     if (!this._hasContent(anchor)) {
       if (this._isShown() && this._focusedAnchor !== this._anchor) {
@@ -900,27 +909,62 @@ class Tooltip extends BaseComponent {
       return
     }
 
-    this._switchTimeout = setTimeout(() => this._moveTo(anchor), ANCHOR_SWITCH_DELAY)
+    const move = () => {
+      this._intent = null
+      this._moveTo(anchor)
+    }
+
+    this._intent = this._exitPoint && event ?
+      followPointerIntent({
+        exit: this._exitPoint,
+        floating: this.tip!,
+        onLeave: move,
+        placement: this.tip!.getAttribute('data-coreui-placement') ?? 'top',
+        point: { x: event.clientX, y: event.clientY },
+        rest: ANCHOR_SWITCH_DELAY
+      }) :
+      null
+
+    if (!this._intent) {
+      move()
+    }
+  }
+
+  protected _stopIntent(): void {
+    this._intent?.()
+    this._intent = null
   }
 
   protected _leaveAnchor(event: CoreUIEvent, trigger: string): void {
+    const related = event.relatedTarget as Node | null
+
     if (trigger === TRIGGER_FOCUS) {
       if (this._pressedInside) {
         return
       }
 
       this._focusedAnchor = null
+    } else {
+      clearTimeout(this._switchTimeout)
+      this._stopIntent()
+      this._exitPoint = related && this._element.contains(related) ? { x: (event as unknown as MouseEvent).clientX, y: (event as unknown as MouseEvent).clientY } : null
     }
 
-    clearTimeout(this._switchTimeout)
-    this._activeTrigger[trigger] = this._isInside(event.relatedTarget as Node | null)
+    this._activeTrigger[trigger] = this._isInside(related)
 
     if (this._activeTrigger[trigger]) {
       return
     }
 
-    if (this._focusedAnchor && this._focusedAnchor !== this._anchor) {
-      this._moveTo(this._focusedAnchor)
+    const focused = this._focusedAnchor
+
+    if (focused && focused !== this._anchor) {
+      if (this._exitPoint) {
+        this._switchTimeout = setTimeout(() => this._moveTo(focused), ANCHOR_LEAVE_DELAY)
+      } else {
+        this._moveTo(focused)
+      }
+
       return
     }
 
@@ -1031,7 +1075,10 @@ class Tooltip extends BaseComponent {
     }
 
     if (this._config.anchors) {
-      EventHandler.on(tip, this.constructor.eventName(EVENT_MOUSEENTER), () => clearTimeout(this._switchTimeout))
+      EventHandler.on(tip, this.constructor.eventName(EVENT_MOUSEENTER), () => {
+        clearTimeout(this._switchTimeout)
+        this._stopIntent()
+      })
     }
   }
 

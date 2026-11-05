@@ -151,6 +151,7 @@ const tooltip = new coreui.Tooltip(toolbar, {
 })
 ```
 
+- On its way from an anchor to the tooltip the pointer may cross another anchor. The tooltip stays while the pointer keeps heading towards it, and moves to the anchor under the pointer once the pointer stops or turns away.
 - An anchor without text shows no tooltip, so the others keep theirs. To leave some elements out, narrow the selector, for example `data-coreui-anchors="[title]"`.
 - Call the methods on the wrapper's instance; `Tooltip.getOrCreateInstance()` on an anchor would create a second tooltip.
 - `move.coreui.tooltip` fires when the tooltip starts moving to another anchor and `moved.coreui.tooltip` once it stands there; `event.relatedTarget` is the new anchor. Content you set with `setContent()` in a `move` listener applies to the new anchor.

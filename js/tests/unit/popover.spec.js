@@ -1334,6 +1334,39 @@ describe('Popover', () => {
       popover.dispose()
     })
 
+    it('should keep the popover while the pointer heads to it across another anchor on hover', async () => {
+      fixtureEl.innerHTML = '<style>.popover { position: absolute; }</style><div id="list" style="position: fixed; left: 40px; top: 120px;"><button type="button" id="a" data-coreui-title="Row 1" data-coreui-content="First">A</button><button type="button" id="b" data-coreui-title="Row 2" data-coreui-content="Second">B</button></div>'
+      const list = fixtureEl.querySelector('#list')
+      const a = fixtureEl.querySelector('#a')
+      const b = fixtureEl.querySelector('#b')
+      const popover = new Popover(list, { anchors: 'button', trigger: 'hover' })
+      const shown = wait(list, 'shown')
+      a.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await shown
+      const moves = []
+      list.addEventListener('move.coreui.popover', event => moves.push(event.relatedTarget))
+      const tip = document.querySelector('.popover')
+      const rect = b.getBoundingClientRect()
+      const exit = { x: rect.left, y: rect.top + (rect.height / 2) }
+      const edge = tip.getBoundingClientRect()
+
+      a.dispatchEvent(new MouseEvent('mouseout', {
+        bubbles: true, clientX: exit.x, clientY: exit.y, relatedTarget: b
+      }))
+      b.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true, clientX: exit.x, clientY: exit.y, relatedTarget: a
+      }))
+      document.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: (exit.x + edge.left) / 2, clientY: exit.y }))
+
+      expect(tip.getAttribute('data-coreui-placement')).toBe('right')
+      expect(moves).toEqual([])
+
+      document.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: exit.x + 2, clientY: rect.bottom + 20 }))
+
+      expect(moves).toEqual([b])
+      popover.dispose()
+    })
+
     it('should rebuild a header the previous anchor left out', async () => {
       fixtureEl.innerHTML = '<div id="list"><button type="button" id="a" data-coreui-content="First">A</button><button type="button" id="b" data-coreui-title="Row 2" data-coreui-content="Second">B</button></div>'
       const list = fixtureEl.querySelector('#list')
