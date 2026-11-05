@@ -81,6 +81,8 @@ type ComboboxConfig = {
   emptyLabel: string
   html: boolean
   indicator: string
+  loading: boolean
+  loadingLabel: string
   multiple: boolean
   name: string | null
   options: ListBoxEntry[] | null
@@ -108,6 +110,8 @@ const Default: ComboboxConfig = {
   emptyLabel: 'No results found',
   html: false,
   indicator: 'none',
+  loading: false,
+  loadingLabel: 'Loading…',
   multiple: false,
   name: null,
   options: null,
@@ -135,6 +139,8 @@ const DefaultType: Record<string, string> = {
   emptyLabel: 'string',
   html: 'boolean',
   indicator: 'string',
+  loading: 'boolean',
+  loadingLabel: 'string',
   multiple: 'boolean',
   name: '(string|null)',
   options: '(array|null)',
@@ -486,6 +492,8 @@ class Combobox extends ComboboxBase {
       emptyLabel: this._config.emptyLabel,
       html: this._config.html,
       indicator: this._config.indicator,
+      loading: this._config.loading,
+      loadingLabel: this._config.loadingLabel,
       options: this._config.options,
       resetSelectionOnOptionsChange: this._config.resetSelectionOnOptionsChange,
       sanitize: this._config.sanitize,
@@ -571,7 +579,7 @@ class Combobox extends ComboboxBase {
   }
 
   override _mountMenu(): void {
-    this._listBox?._activateSelected()
+    this._listBox?._requestEntry({ preferSelected: true })
     super._mountMenu()
   }
 

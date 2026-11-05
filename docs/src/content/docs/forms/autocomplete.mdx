@@ -329,6 +329,8 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `highlightOptionsOnSearch` | boolean | `false` | Highlights matching text in options during search. |
 | `id` | string, null | `null` | Sets a custom ID for the component. If not provided, a unique ID is auto-generated. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
+| `loading` | boolean | `false` | Marks the list busy while you fetch the options: a row with `loadingLabel` shows below them and is announced, and the options it shows can still be picked. An arrow that opened the panel lands on its option once the options are in. |
+| `loadingLabel` | string | `'Loading…'` | Text of the row below the options while the list loads, announced to screen readers when the open panel starts waiting or opens on a wait. |
 | `name` | string, null | `null` | Name of the text input the form posts. That input holds what the user sees — the selected option's label, or their own text when `allowOnlyDefinedOptions` is off — so `{ value: 'ng', label: 'Angular' }` posts `Angular`, not `ng`. Without a name the autocomplete is not submitted with the form. |
 | `options` | array, string, null | `[]` | Array of options or option objects to populate the dropdown. An option marked `selected: true` is applied the first time it appears, and again after a form reset. It replaces the current selection and the field's text, a pick or typing of the user's included, and fires `change.coreui.autocomplete` only when it fills a field a form reset left empty. While `value` holds anything but `''` or `null`, the flags are ignored. A group with `disabled: true` disables every option in it. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
@@ -358,6 +360,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `search` | Performs a search with the provided text parameter. |
 | `disable()` | Disables the field. |
 | `enable()` | Enables the field. |
+| `setLoading(loading)` | Sets `loading` on a live autocomplete. |
 | `setOptions(options)` | Replaces the options, as an array or a comma-separated string. The value stays unless the new options mark another option `selected`, and a value `setValue()` gave that the earlier options lacked is picked without an event; a start value a form reset waits for is reported with `change` when the options bring it. A pick, typing or clearing ends the wait of either value. |
 | `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
 | `setValue(value)` | Sets the value without firing a change event, also after a form reset; a value the options lack waits for `setOptions()` until the user picks, types or the field is cleared. It replaces the whole selection, a disabled option included, as a native select takes a value from a script. |

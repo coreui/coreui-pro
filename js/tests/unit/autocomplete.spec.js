@@ -1194,6 +1194,47 @@ describe('Autocomplete', () => {
       expect(autocomplete._isShown()).toBeTrue()
       expect(input.hasAttribute('aria-activedescendant')).toBeFalse()
     })
+
+    it('should drop the wait when the user pastes into the field', async () => {
+      const { autocomplete, input } = mount({ loading: true, options: [], searchNoResultsLabel: 'No results' })
+
+      press(input, 'ArrowDown')
+      input.value = 'che'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      autocomplete.setOptions(fruits('Banana'))
+      autocomplete.setLoading(false)
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(input.hasAttribute('aria-activedescendant')).toBeFalse()
+    })
+
+    it('should show its loadingLabel in the loading row', () => {
+      const { autocomplete, input } = mount({ loading: true, loadingLabel: 'Fetching fruit', options: fruits() })
+
+      press(input, 'ArrowDown')
+
+      expect(autocomplete._menu.querySelector('.list-box-loading').textContent).toContain('Fetching fruit')
+    })
+
+    for (const [key, selected, label] of [['ArrowDown', null, 'Apple'], ['ArrowUp', null, 'Cherry'], ['ArrowDown', 'Banana', 'Banana']]) {
+      it(`should land on the option the key points at once the options arrive while loading (${key}, ${selected ?? 'no value'})`, async () => {
+        const { autocomplete, input } = mount({ loading: true, options: [], searchNoResultsLabel: 'No results' })
+
+        press(input, key)
+        expect(autocomplete._isShown()).toBeTrue()
+        expect(input.hasAttribute('aria-activedescendant')).toBeFalse()
+
+        autocomplete.setOptions(fruits(selected))
+        autocomplete.setLoading(false)
+        await new Promise(resolve => {
+          setTimeout(resolve)
+        })
+
+        expect(activeText(input)).toContain(label)
+      })
+    }
   })
 
   describe('picking the selected option again', () => {

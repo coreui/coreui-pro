@@ -99,6 +99,8 @@ describe('Combobox', () => {
         emptyLabel: 'No results found',
         html: false,
         indicator: 'none',
+        loading: false,
+        loadingLabel: 'Loading…',
         options: null,
         multiple: false,
         name: null,
@@ -1252,6 +1254,220 @@ describe('Combobox', () => {
 
       expect(combobox.getValue()).toEqual(['ca'])
       expect(value(toggle)).toEqual('Canada')
+    })
+  })
+
+  describe('options that arrive after the panel opened', () => {
+    const countries = [
+      { value: 'us', label: 'United States' },
+      { value: 'uk', label: 'United Kingdom' },
+      { value: 'ca', label: 'Canada' }
+    ]
+    const highlighted = field => document.getElementById(field.getAttribute('aria-activedescendant') ?? '')?.textContent ?? null
+    const settle = () => new Promise(resolve => {
+      setTimeout(resolve)
+    })
+    const open = (combobox, key) => {
+      const toggle = combobox._togglerElement
+
+      if (key) {
+        toggle.focus()
+        keydown(toggle, key)
+      } else {
+        combobox.show()
+      }
+
+      expect(combobox._isShown()).toBeTrue()
+      return toggle
+    }
+
+    const arrivals = {
+      'with loading': [{ loading: true }, combobox => {
+        combobox.setOptions(countries)
+        combobox.setLoading(false)
+      }],
+      'without loading': [{}, combobox => combobox.setOptions(countries)],
+      'loading lifted first': [{ loading: true }, combobox => {
+        combobox.setLoading(false)
+        combobox.setOptions(countries)
+      }],
+      'loading lifted a task earlier': [{ loading: true }, async combobox => {
+        combobox.setLoading(false)
+        await settle()
+        combobox.setOptions(countries)
+      }]
+    }
+
+    for (const [name, [config, arrive]] of Object.entries(arrivals)) {
+      for (const [key, expected] of [[null, 'United Kingdom'], ['ArrowDown', 'United Kingdom'], ['c', 'Canada']]) {
+        it(`should open on the selected option, or on the option the key points at, once the options arrive (${name}, ${key ?? 'show'})`, async () => {
+          const combobox = new Combobox(setMarkup(), { ...config, options: [], value: 'uk' })
+          const toggle = open(combobox, key)
+
+          expect(highlighted(toggle)).toBeNull()
+
+          await arrive(combobox)
+          await settle()
+
+          expect(highlighted(toggle)).toEqual(expected)
+        })
+      }
+    }
+
+    it('should open on the selected option at once when the options shown while loading list it', () => {
+      const combobox = new Combobox(setMarkup(), { loading: true, options: countries, value: 'uk' })
+
+      expect(highlighted(open(combobox))).toEqual('United Kingdom')
+    })
+
+    it('should wait for the selected option while loading when the options shown do not list it', async () => {
+      const shown = [countries[0], countries[2]]
+      const combobox = new Combobox(setMarkup(), { loading: true, options: shown, value: 'uk' })
+      const toggle = open(combobox)
+
+      expect(highlighted(toggle)).toBeNull()
+
+      combobox.setOptions([...shown, { value: 'mx', label: 'Mexico' }])
+      await settle()
+      expect(highlighted(toggle)).toBeNull()
+
+      combobox.setOptions(countries)
+      combobox.setLoading(false)
+      await settle()
+      expect(highlighted(toggle)).toEqual('United Kingdom')
+    })
+
+    it('should keep the option the user moves to while the options load', async () => {
+      const combobox = new Combobox(setMarkup(), { loading: true, options: [countries[0], countries[2]], value: 'uk' })
+      const toggle = open(combobox)
+
+      keydown(toggle, 'ArrowDown')
+      expect(highlighted(toggle)).toEqual('United States')
+
+      combobox.setOptions(countries)
+      combobox.setLoading(false)
+      await settle()
+      expect(highlighted(toggle)).toEqual('United States')
+    })
+
+    it('should wait for the selected option when a key opens a panel whose loading options do not list it', async () => {
+      const combobox = new Combobox(setMarkup(), { loading: true, options: [countries[0], countries[2]], value: 'uk' })
+      const toggle = open(combobox, 'ArrowDown')
+
+      expect(highlighted(toggle)).toBeNull()
+
+      combobox.setOptions(countries)
+      combobox.setLoading(false)
+      await settle()
+      expect(highlighted(toggle)).toEqual('United Kingdom')
+    })
+
+    it('should keep the option the user clicks while the options load', async () => {
+      const combobox = new Combobox(setMarkup(), {
+        loading: true, multiple: true, options: [countries[0], countries[2]], selectionLimit: 1, value: ['uk']
+      })
+      const toggle = open(combobox, 'ArrowDown')
+
+      click(option(combobox, 'ca'))
+      combobox.setOptions(countries)
+      combobox.setLoading(false)
+      await settle()
+
+      expect(highlighted(toggle)).toEqual('Canada')
+    })
+
+    it('should keep the wait through a key that does nothing to the list', async () => {
+      const combobox = new Combobox(setMarkup(), { loading: true, options: [], value: 'uk' })
+      const toggle = open(combobox)
+
+      keydown(toggle, 'Control')
+      keydown(toggle, 'Shift')
+      keydown(toggle, 'ArrowDown')
+      combobox.setOptions(countries)
+      combobox.setLoading(false)
+      await settle()
+
+      expect(highlighted(toggle)).toEqual('United Kingdom')
+    })
+
+    it('should open on the selected option again when reopened before the options arrived', async () => {
+      const combobox = new Combobox(setMarkup(), { loading: true, options: [], value: 'uk' })
+      const toggle = open(combobox, 'c')
+
+      combobox.hide()
+      combobox.show()
+      combobox.setOptions(countries)
+      combobox.setLoading(false)
+      await settle()
+
+      expect(highlighted(toggle)).toEqual('United Kingdom')
+    })
+
+    it('should show its loadingLabel in the loading row', () => {
+      const combobox = new Combobox(setMarkup(), { loading: true, loadingLabel: 'Fetching countries', options: [] })
+
+      combobox.show()
+
+      expect(menu(combobox).querySelector('.list-box-loading').textContent).toContain('Fetching countries')
+    })
+
+    it('should throw the constructor TypeError for a loading that is not a boolean', () => {
+      const combobox = new Combobox(setMarkup())
+
+      expect(() => combobox.setLoading('yes')).toThrowError(TypeError)
+    })
+
+    it('should drop the wait when the user presses a key on the list', async () => {
+      const combobox = new Combobox(setMarkup(), { loading: true, options: [], value: 'uk' })
+      const toggle = open(combobox)
+
+      keydown(toggle, 'z')
+      combobox.setOptions(countries)
+      combobox.setLoading(false)
+      await settle()
+
+      expect(highlighted(toggle)).toBeNull()
+    })
+
+    it('should drop the wait when the user types in the search field', async () => {
+      const combobox = new Combobox(setMarkup(), {
+        loading: true, options: [], search: 'external', value: 'uk'
+      })
+
+      open(combobox)
+      type(searchField(combobox), 'u')
+      combobox.setOptions(countries)
+      combobox.setLoading(false)
+      await settle()
+
+      expect(searchField(combobox).hasAttribute('aria-activedescendant')).toBeFalse()
+    })
+
+    it('should forget the wait when the panel closes', async () => {
+      const combobox = new Combobox(setMarkup(), { loading: true, options: [], value: 'uk' })
+      const toggle = open(combobox)
+
+      combobox.hide()
+      combobox.setOptions(countries)
+      combobox.setLoading(false)
+      await settle()
+
+      expect(combobox._listBox.getActive()).toBeNull()
+      expect(toggle.hasAttribute('aria-activedescendant')).toBeFalse()
+    })
+
+    it('should open on the selected option with loading set through the setter', async () => {
+      const combobox = new Combobox(setMarkup(), { options: [], value: 'uk' })
+
+      combobox.setLoading(true)
+      const toggle = open(combobox)
+
+      expect(menu(combobox).querySelector('.list-box-options').getAttribute('aria-busy')).toEqual('true')
+
+      combobox.setOptions(countries)
+      combobox.setLoading(false)
+      await settle()
+      expect(highlighted(toggle)).toEqual('United Kingdom')
     })
   })
 

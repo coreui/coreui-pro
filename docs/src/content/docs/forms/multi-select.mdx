@@ -572,6 +572,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `id` | string, null | `null` | Id of the native select and the base of the ids the component builds (`-listbox`, `-label`, `search-`). Without it the select keeps its own `id`, or gets a generated one. |
 | `indicator` | string | `'checkbox'` | Sets the marker used by the options, the selectable group labels and the select all button: `'checkbox'` or `'none'`. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
+| `loading` | boolean | `false` | Marks the list busy while you fetch the options, as `setLoading()` does. An open without a search box, or an arrow from it, enters the list on the selected option once that option is listed. |
 | `loadingLabel` | string | `'Loading…'` | Text of the row below the options while the list loads, announced to screen readers when the open panel starts waiting or opens on a wait. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
 | `name` | string, null | `null` | Name of the native select the selection is submitted under. A `name` written on the `<select>` itself is honoured too, and this option wins over it. With neither the selection is not submitted with the form. |
@@ -612,7 +613,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `hide` | Hides the multi select's options. |
 | `selectAll` | Select all options. |
 | `selectFiltered` | Select only the currently filtered (search-matched) options. |
-| `setLoading` | Marks the list busy while you wait for options, for example with `search: 'external'`: a row with `loadingLabel` shows below the options and is announced, and the options it shows can still be picked. |
+| `setLoading` | Sets `loading` on a live multi select: while you wait for options, for example with `search: 'external'`, a row with `loadingLabel` shows below the options and is announced, and the options it shows can still be picked. |
 | `setOptions` | Replaces the options without rebuilding the control: the selection, an open panel and the search box keep their state, and the focus stays where it was unless the element holding it goes. A selected option the new list lacks stays selected and is still sent with the form unless it is disabled; `selected` flags in the new options are ignored unless `resetSelectionOnOptionsChange` empties the selection first. |
 | `disable()` | Disables the select. |
 | `enable()` | Enables the select. |

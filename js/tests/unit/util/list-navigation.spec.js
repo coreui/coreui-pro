@@ -1,6 +1,7 @@
-import { vi } from 'vitest'
+import { onTestFinished, vi } from 'vitest'
 import {
-  createTypeaheadBuffer, findOpeningItem, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, getRevealScrollTop, getVirtualRows, isTypingKey, rangeBetween, scrollIntoContainer
+  createTypeaheadBuffer, endsEntryWait, findOpeningItem, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, getRevealScrollTop, getVirtualRows,
+  isEntryWaiting, isTypingKey, keepsFocus, rangeBetween, scrollIntoContainer
 } from '../../../src/util/list-navigation.js'
 import * as Util from '../../../src/util/index.js'
 
@@ -242,6 +243,91 @@ describe('List navigation utilities', () => {
 
     it('should leave out a key event without a key', () => {
       expect(isTypingKey(new Event('keydown'))).toBeFalse()
+    })
+  })
+
+  describe('isEntryWaiting', () => {
+    it('should wait while there is no option to move to, whatever the request', () => {
+      for (const request of [{}, { preferSelected: true }, { key: 'a' }, { last: true }]) {
+        expect(isEntryWaiting(request, 0, false, true)).toBeTrue()
+      }
+    })
+
+    it('should never hold an activation back', () => {
+      expect(isEntryWaiting({ activate: true }, 0, true, false)).toBeFalse()
+    })
+
+    it('should wait while loading only for a request after a selection that is not listed', () => {
+      expect(isEntryWaiting({ preferSelected: true }, 2, true, false)).toBeTrue()
+      expect(isEntryWaiting({ key: 'ArrowDown' }, 2, true, false)).toBeTrue()
+      expect(isEntryWaiting({ preferSelected: true }, 2, true, true)).toBeFalse()
+      expect(isEntryWaiting({ last: true, preferSelected: true }, 2, true, false)).toBeFalse()
+      expect(isEntryWaiting({}, 2, true, false)).toBeFalse()
+      expect(isEntryWaiting({ preferSelected: true }, 2, false, false)).toBeFalse()
+    })
+  })
+
+  describe('endsEntryWait', () => {
+    const key = (value, init = {}) => ({
+      altKey: false, ctrlKey: false, isComposing: false, metaKey: false, key: value, ...init
+    })
+
+    it('should end the wait on a key that types, even with no option', () => {
+      expect(endsEntryWait(key('a'), false, 0)).toBeTrue()
+      expect(endsEntryWait(key('Backspace'), true, 0)).toBeTrue()
+    })
+
+    it('should end the wait on a key that moves or activates, only with options to act on', () => {
+      for (const value of ['ArrowUp', 'ArrowDown', 'Enter', ' ']) {
+        expect(endsEntryWait(key(value), false, 2)).withContext(value).toBeTrue()
+        expect(endsEntryWait(key(value), false, 0)).withContext(value).toBeFalse()
+      }
+    })
+
+    it('should leave Home and End to the caret of a field that takes text', () => {
+      expect(endsEntryWait(key('Home'), false, 2)).toBeTrue()
+      expect(endsEntryWait(key('End'), true, 2)).toBeFalse()
+    })
+
+    it('should leave the wait alone on a modifier, Tab or Escape', () => {
+      for (const value of ['Control', 'Shift', 'Alt', 'Meta', 'Tab', 'Escape']) {
+        expect(endsEntryWait(key(value), false, 2)).withContext(value).toBeFalse()
+      }
+    })
+  })
+
+  describe('keepsFocus', () => {
+    const mount = markup => {
+      const fixture = document.createElement('div')
+      fixture.innerHTML = markup
+      document.body.append(fixture)
+      onTestFinished(() => fixture.remove())
+      return fixture
+    }
+
+    it('should let the focus move from the list, an element holding it and the body', () => {
+      const fixture = mount('<div class="panel" tabindex="-1"><div class="list" tabindex="-1"></div></div>')
+      const list = fixture.querySelector('.list')
+
+      document.activeElement?.blur()
+      expect(keepsFocus(list)).toBeFalse()
+
+      fixture.querySelector('.panel').focus()
+      expect(keepsFocus(list)).toBeFalse()
+
+      list.focus()
+      expect(keepsFocus(list)).toBeFalse()
+    })
+
+    it('should keep the focus on a control, also outside the shadow root that holds the list', () => {
+      const fixture = mount('<div class="list"></div><input><div class="host"></div>')
+      const root = fixture.querySelector('.host').attachShadow({ mode: 'open' })
+      root.innerHTML = '<div class="list"></div>'
+
+      fixture.querySelector('input').focus()
+
+      expect(keepsFocus(fixture.querySelector('.list'))).toBeTrue()
+      expect(keepsFocus(root.querySelector('.list'))).toBeTrue()
     })
   })
 

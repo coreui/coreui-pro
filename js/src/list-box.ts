@@ -10,7 +10,8 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
 import {
-  createTypeaheadBuffer, findTypeaheadMatch, rangeBetween, scrollIntoContainer, type TypeaheadBuffer
+  createTypeaheadBuffer, endsEntryWait, type EntryRequest, findOpeningItem, findTypeaheadMatch, isEntryWaiting, keepsFocus, rangeBetween,
+  scrollIntoContainer, type TypeaheadBuffer
 } from './util/list-navigation.js'
 import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
@@ -215,6 +216,9 @@ class ListBox extends BaseComponent {
   protected declare _createdNodes: HTMLElement[]
   protected declare _disabledSections: WeakSet<HTMLElement>
   protected declare _empty: HTMLElement | null
+  protected declare _entry: EntryRequest | null
+  protected declare _entryQueued: boolean
+  protected declare _entryWaited: boolean
   protected declare _field: HTMLElement | null
   protected declare _entries: ListBoxEntry[] | null
   protected declare _focused: boolean
@@ -236,6 +240,9 @@ class ListBox extends BaseComponent {
     this._anchor = null
     this._createdNodes = []
     this._disabledSections = new WeakSet()
+    this._entry = null
+    this._entryQueued = false
+    this._entryWaited = false
     this._field = getElement(this._config.activeDescendant)
     this._entries = this._config.options === null ? null : this._normalizeOptions(this._config.options)
     this._focused = false
@@ -448,6 +455,14 @@ class ListBox extends BaseComponent {
     this._updateSelectAll()
     this._updateCounter()
     this._updateActiveDescendant()
+
+    if (this._entry && !this._entryQueued) {
+      this._entryQueued = true
+      queueMicrotask(() => {
+        this._entryQueued = false
+        this._enterWhenListed()
+      })
+    }
   }
 
   override dispose(): void {
@@ -835,12 +850,54 @@ class ListBox extends BaseComponent {
     return this._allOptions().filter(option => !this._isHidden(option) && !this._isDisabled(option))
   }
 
-  _activateSelected(): void {
-    const option = this._navigableOptions().find(option => this._store.has(this._optionValue(option)))
+  _requestEntry(request: EntryRequest | null): void {
+    this._entry = request
+    this._entryWaited = false
+    this._enterWhenListed()
+  }
+
+  _isEntryPending(): boolean {
+    return this._entry !== null
+  }
+
+  _enterWhenListed(): void {
+    const request = this._entry
+
+    if (!request) {
+      return
+    }
+
+    const items = this._navigable()
+    const listed = this._store.size() === 0 || items.some(item => this._store.has(this._optionValue(item)))
+
+    if (isEntryWaiting(request, items.length, this._config.loading, listed)) {
+      this._entryWaited = true
+      return
+    }
+
+    const option = this._findEntryTarget(request) ?? (this._field ? undefined : items[0])
+    const focus = !this._entryWaited || !keepsFocus(this._list)
+
+    this._entry = null
+    this._entryWaited = false
 
     if (option) {
-      this.setActive(this._optionValue(option))
+      this._setActive(this._optionValue(option), focus)
     }
+  }
+
+  _findEntryTarget({ key, last, preferSelected }: EntryRequest): HTMLElement | undefined {
+    const items = this._navigable()
+
+    if (key) {
+      const current = items.findIndex(item => this._store.has(this._optionValue(item)))
+
+      return findOpeningItem(items, current, key, item => this._isSectionToggle(item) ? '' : this._optionText(item))
+    }
+
+    const selected = preferSelected ? this._navigableOptions().find(option => this._store.has(this._optionValue(option))) : undefined
+
+    return this._activeOption() ?? (last ? items.at(-1) : selected)
   }
 
   _navigable(): HTMLElement[] {
@@ -1294,6 +1351,8 @@ class ListBox extends BaseComponent {
       }
     })
     EventHandler.on(this._element, this.constructor.eventName(EVENT_INPUT), SELECTOR_SEARCH, (event: any) => {
+      this._requestEntry(null)
+
       if (this._config.search === SEARCH_EXTERNAL) {
         EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SEARCH), {
           query: (event.target as HTMLInputElement).value
@@ -1330,6 +1389,8 @@ class ListBox extends BaseComponent {
   _handleClick(event: any): void {
     const option = (event.target as HTMLElement).closest(SELECTOR_OPTION) as HTMLElement | null
 
+    this._requestEntry(null)
+
     if (!option || this._config.disabled) {
       return
     }
@@ -1363,6 +1424,10 @@ class ListBox extends BaseComponent {
   _handleKeydown(event: any): void {
     if (this._config.disabled || (this._field && (!this._list.isConnected || this._list.closest('[inert]')))) {
       return
+    }
+
+    if (endsEntryWait(event, this._fieldTakesText(), this._navigable().length)) {
+      this._requestEntry(null)
     }
 
     const { key } = event

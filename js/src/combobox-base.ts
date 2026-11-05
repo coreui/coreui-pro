@@ -12,7 +12,6 @@ import SelectorEngine from './dom/selector-engine.js'
 import { createAnchoredPosition } from './util/floating-ui.js'
 import { findOptionByValue, isOptionGroup } from './util/option-tree.js'
 import { focusIfUsable } from './util/focus.js'
-import { findOpeningItem } from './util/list-navigation.js'
 import {
   handleEscape, isComposingKey, isInDescendantParts, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
 } from './util/layers.js'
@@ -121,6 +120,12 @@ class ComboboxBase extends BaseComponent {
     this._hide(true)
   }
 
+  setLoading(loading: boolean): void {
+    this._typeCheckConfig({ loading }, { loading: 'boolean' })
+    this._config.loading = loading
+    this._listBox?.setLoading(loading)
+  }
+
   _hide(returnFocus: boolean, reason?: LayerReason): void {
     if (!this._isShown()) {
       return
@@ -147,6 +152,7 @@ class ComboboxBase extends BaseComponent {
 
     // A closed panel has no highlighted option, so the field's activation
     // keys stop reaching a stale one and the next open sets it afresh.
+    this._listBox?._requestEntry(null)
     this._listBox?.setActive(null)
 
     this._onHideEnd()
@@ -339,15 +345,8 @@ class ComboboxBase extends BaseComponent {
       return
     }
 
-    const items = listBox._navigable()
-    const current = items.findIndex(item => this._store.has(listBox._optionValue(item)))
-    const item = findOpeningItem(items, current, key, item => listBox._isSectionToggle(item) ? '' : listBox._optionText(item))
-
     listBox._seedTypeahead(key)
-
-    if (item) {
-      listBox._setActive(listBox._optionValue(item), true)
-    }
+    listBox._requestEntry({ key })
   }
 
   // Options panel — one render path for every combobox surface
@@ -408,6 +407,8 @@ class ComboboxBase extends BaseComponent {
       allowList: this._config.allowList,
       emptyLabel: this._config.searchNoResultsLabel || '',
       html: this._hasOptionTemplates(),
+      loading: this._config.loading,
+      loadingLabel: this._config.loadingLabel,
       options: this._getListBoxOptions(),
       sanitize: this._config.sanitize,
       sanitizeFn: this._config.sanitizeFn,
