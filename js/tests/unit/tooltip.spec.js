@@ -2157,6 +2157,58 @@ describe('Tooltip', () => {
       expect(listeners).toEqual([])
     })
 
+    it('should keep matching an anchor selector on title after the tip takes the title', async () => {
+      const { a, bar, tooltip } = setup({ anchors: '[title]' })
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      expect(a.getAttribute('title')).toBe('')
+      expect(a.getAttribute('data-coreui-original-title')).toBe('Bold')
+
+      const hidden = wait(bar, 'hidden')
+      leave(a, document.body)
+      await hidden
+      const reshown = wait(bar, 'shown')
+      hover(a)
+      await reshown
+
+      expect(text()).toBe('Bold')
+      tooltip.dispose()
+
+      expect(a.getAttribute('title')).toBe('Bold')
+    })
+
+    it('should show the tip of a wrapper around a disabled button listed among the anchors', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a" title="Bold">B</button><span id="s" tabindex="0" title="Italic is not available"><button type="button" id="off" disabled>I</button></span></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const a = bar.querySelector('#a')
+      const span = bar.querySelector('#s')
+      const off = bar.querySelector('#off')
+      const tooltip = new Tooltip(bar, { anchors: 'button:enabled, [tabindex]' })
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      const moved = wait(bar, 'moved')
+      leave(a, off)
+      hover(off, a)
+      const event = await moved
+
+      expect(event.relatedTarget).toBe(span)
+      expect(text()).toBe('Italic is not available')
+      expect(span.getAttribute('aria-describedby')).toBe(document.querySelector('.tooltip').id)
+
+      const hides = []
+      bar.addEventListener('hide.coreui.tooltip', () => hides.push(1))
+      leave(off, span)
+      hover(span, off)
+      await sleep(200)
+
+      expect(hides).toEqual([])
+      tooltip.dispose()
+    })
+
     it('should let EventHandler listen to the move', async () => {
       const { a, b, bar, tooltip } = setup()
       const shown = wait(bar, 'shown')
@@ -2380,7 +2432,7 @@ describe('Tooltip', () => {
       await shown
 
       expect(bar.getAttribute('title')).toBe('Toolbar')
-      expect(a.hasAttribute('title')).toBeFalse()
+      expect(a.getAttribute('title')).toBe('')
 
       tooltip.dispose()
 
@@ -2667,7 +2719,7 @@ describe('Tooltip', () => {
 
       hover(a)
 
-      expect(a.hasAttribute('title')).toBeFalse()
+      expect(a.getAttribute('title')).toBe('')
       expect(document.querySelector('.tooltip')).toBeNull()
       tooltip.dispose()
     })

@@ -1206,7 +1206,7 @@ class Tooltip extends BaseComponent {
     }
 
     element.setAttribute('data-coreui-original-title', title) // DO NOT USE IT. Is only for backwards compatibility
-    element.removeAttribute('title')
+    writeAttribute(element, 'title', this._config.anchors ? '' : null)
   }
 
   protected _enter(): Promise<void> {
