@@ -89,6 +89,8 @@ type AutocompleteConfig = {
   highlightOptionsOnSearch: boolean
   id: string | null
   invalid: boolean
+  loading: boolean
+  loadingLabel: string
   name: string | null
   options: string | any[] | null
   optionsGroupsTemplate: ((group: any) => string) | null
@@ -120,6 +122,8 @@ const Default: AutocompleteConfig = {
   highlightOptionsOnSearch: false,
   id: null,
   invalid: false,
+  loading: false,
+  loadingLabel: 'Loading…',
   name: null,
   options: [] as any[],
   optionsGroupsTemplate: null,
@@ -151,6 +155,8 @@ const DefaultType: Record<string, string> = {
   highlightOptionsOnSearch: 'boolean',
   id: '(string|null)',
   invalid: 'boolean',
+  loading: 'boolean',
+  loadingLabel: 'string',
   name: '(string|null)',
   options: '(array|null)',
   optionsGroupsTemplate: '(function|null)',
@@ -535,6 +541,8 @@ class Autocomplete extends ComboboxBase {
 
     EventHandler.on(this._inputElement, EVENT_INPUT, () => {
       const { value } = this._inputElement
+
+      this._listBox?._requestEntry(null)
 
       if (value !== this._shownText) {
         this._validation.dismiss(this._keySerial ?? Number.POSITIVE_INFINITY)

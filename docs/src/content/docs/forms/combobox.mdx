@@ -274,6 +274,10 @@ The panel is as tall as its content — cap it where you want a scroll container
 
 `search: "external"` builds the same field and filters nothing. Every keystroke fires `search.coreui.combobox` with the `query`, and you answer with `setOptions()` — the list shows what you hand it, so the query is yours to interpret. The value the user picked stays while the results change, and the toggle keeps its label when the next answer does not carry it.
 
+## Loading options
+
+Set `loading` while you fetch the options, for example from the `show.coreui.combobox` event, and lift it with `setLoading(false)` once they are in. The panel shows a row with a spinner and `loadingLabel` below the options and announces it, and the options it already shows can still be picked. The panel opens on the selected option, or on the option the opening key points at, as soon as that option is listed, so options that arrive after the panel opened still start on the value. Call `setOptions()` and `setLoading(false)` in the same task, in either order; a list that is still empty keeps waiting across tasks. An arrow, a letter, a click on an option or a query the user gives before that keeps what they did.
+
 ## Groups
 
 Group options in a `.list-box-section` and name it with a `.list-box-section-label`. The plugin adds `role="group"`; point `aria-labelledby` at the label so the group is announced with its name. A section whose options are all filtered out is hidden with its label.
@@ -541,6 +545,8 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `emptyLabel` | string | `'No results found'` | Text of the row the list box shows when nothing is left to pick. An empty string leaves the row out. |
 | `html` | boolean | `false` | Parses the labels rendered from `options` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option. |
+| `loading` | boolean | `false` | Marks the list busy while you fetch the options: a row with `loadingLabel` shows below them and is announced, and the options it shows can still be picked. The panel opens on the selected option once it is listed. See [Loading options](#loading-options). |
+| `loadingLabel` | string | `'Loading…'` | Text of the row below the options while the list loads, announced to screen readers when the open panel starts waiting or opens on a wait. |
 | `multiple` | boolean | `false` | Toggles options instead of replacing the selection, and keeps the panel open. |
 | `name` | string, null | `null` | Name of the hidden select the value is submitted under, inserted right before the toggle. With `multiple` it posts one key per value, as a `<select multiple>` does: `tags=a&tags=b&tags=c`. Without a name the combobox is not submitted with the form. |
 | `options` | array, null | `null` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, options, disabled }` for a section, where `disabled: true` disables every item in it. Replaces whatever the panel already holds; an empty array is an empty list. With `null` the options come from the markup. |
@@ -569,6 +575,7 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `getValue()` | The selected value — an array in `multiple` mode, a string or `null` otherwise. |
 | `hide` | Closes the panel. |
 | `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
+| `setLoading(loading)` | Sets `loading` on a live combobox. See [Loading options](#loading-options). |
 | `setOptions(options)` | Rebuilds the list from an `options` array. The value stays, also when the new options no longer carry it, and the toggle keeps the label it had; options marked `selected` join a multiple value, or a single one that is empty. With `resetSelectionOnOptionsChange` new values drop the value first. |
 | `setValue(value)` | Replaces the selection with `value` (a string, an array, or `null` to empty it), in the order given and up to `selectionLimit`. A value the list does not carry is skipped unless it is already selected. A disabled option and a disabled combobox take it, as a native select takes a value from a script; only the user is kept out. It fires no change event, since the code that calls it already holds the value. A number is taken as its string, as the `value` option takes it; a value of another type throws the `TypeError` the constructor throws. |
 | `show` | Opens the panel. |

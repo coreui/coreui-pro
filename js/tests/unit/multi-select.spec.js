@@ -7213,6 +7213,123 @@ describe('MultiSelect', () => {
     })
   })
 
+  describe('options that arrive after the panel opened', () => {
+    const letters = (selected = null) => ['Alpha', 'Bravo', 'Charlie'].map(text => ({ value: text[0].toLowerCase(), text, selected: text === selected }))
+    const mountEmpty = config => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      return new MultiSelect(fixtureEl.querySelector('select'), { options: [], ...config })
+    }
+
+    const settle = () => new Promise(resolve => {
+      setTimeout(resolve)
+    })
+
+    it('should focus the selected option, not the first one, once the options arrive', () => {
+      const multiSelect = mountEmpty({ search: false, value: ['b'] })
+
+      multiSelect.show()
+      expect(document.activeElement).toBe(multiSelect._menu)
+
+      multiSelect.setOptions(letters())
+
+      expect(document.activeElement).toBe(multiSelect._menu.querySelector('[data-coreui-value="b"]'))
+    })
+
+    it('should focus the selected option once the options arrive and loading ends', async () => {
+      const multiSelect = mountEmpty({ loading: true, search: false, value: ['b'] })
+
+      multiSelect.show()
+      multiSelect.setLoading(false)
+      multiSelect.setOptions(letters())
+      await settle()
+
+      expect(document.activeElement).toBe(multiSelect._menu.querySelector('[data-coreui-value="b"]'))
+    })
+
+    it('should take the option shown on Enter in the search field while loading', async () => {
+      const multiSelect = mountEmpty({ loading: true, options: letters().filter(option => option.value !== 'b'), search: true })
+
+      multiSelect.show()
+      multiSelect._searchElement.focus()
+      await userEvent.keyboard('{Enter}')
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should leave the focus on a control of the header when the options arrive', async () => {
+      const multiSelect = mountEmpty({
+        loading: true, search: false, selectAll: true, value: ['b']
+      })
+
+      multiSelect.show()
+      const selectAll = multiSelect._menu.querySelector('.list-box-select-all')
+      selectAll.focus()
+
+      multiSelect.setOptions(letters())
+      multiSelect.setLoading(false)
+      await settle()
+
+      expect(multiSelect._listBox.getActive()).toEqual('b')
+      expect(document.activeElement).toBe(selectAll)
+    })
+
+    it('should leave the focus in the search field when the options arrive after an arrow opened the panel', async () => {
+      const multiSelect = mountEmpty({ loading: true, search: true, value: ['b'] })
+      const search = multiSelect._searchElement
+
+      search.focus()
+      await userEvent.keyboard('{ArrowDown}')
+      multiSelect.setOptions(letters())
+      multiSelect.setLoading(false)
+      await settle()
+
+      expect(multiSelect._listBox.getActive()).toEqual('b')
+      expect(document.activeElement).toBe(search)
+    })
+
+    it('should enter the options shown at once on an arrow in the search field with a query, while loading', async () => {
+      const multiSelect = mountEmpty({ loading: true, options: letters(), search: true })
+      const search = multiSelect._searchElement
+
+      multiSelect.show()
+      search.focus()
+      await userEvent.keyboard('a')
+      await userEvent.keyboard('{ArrowDown}')
+
+      expect(document.activeElement).toBe(multiSelect._menu.querySelector('[data-coreui-value="a"]'))
+    })
+
+    it('should land on the last option on an arrow up in the search field before the options arrive', async () => {
+      const multiSelect = mountEmpty({ loading: true, search: true })
+      const search = multiSelect._searchElement
+
+      multiSelect.show()
+      search.focus()
+      await userEvent.keyboard('{ArrowUp}')
+      multiSelect.setOptions(letters())
+      multiSelect.setLoading(false)
+      await settle()
+
+      expect(multiSelect._listBox.getActive()).toEqual('c')
+    })
+
+    it('should stay in the search field when the user types before the options arrive', async () => {
+      const multiSelect = mountEmpty({ loading: true, search: 'external' })
+      const search = multiSelect._searchElement
+
+      search.focus()
+      await userEvent.keyboard('{ArrowDown}')
+      expect(multiSelect._isShown()).toBeTrue()
+
+      await userEvent.keyboard('b')
+      multiSelect.setOptions(letters())
+      multiSelect.setLoading(false)
+      await settle()
+
+      expect(document.activeElement).toBe(search)
+    })
+  })
+
   describe('external search', () => {
     const mountExternal = (markup = '<select multiple name="tech"><option value="a">Angular</option><option value="r">React</option></select>') => {
       fixtureEl.innerHTML = `<form>${markup}</form>`

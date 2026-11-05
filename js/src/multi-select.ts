@@ -111,6 +111,7 @@ type MultiSelectConfig = {
   id: string | null
   indicator: 'checkbox' | 'none'
   invalid: boolean
+  loading: boolean
   loadingLabel: string
   multiple: boolean
   name: string | null
@@ -160,6 +161,7 @@ const Default: MultiSelectConfig = {
   id: null,
   indicator: 'checkbox',
   invalid: false,
+  loading: false,
   loadingLabel: 'Loading…',
   multiple: true,
   name: null,
@@ -209,6 +211,7 @@ const DefaultType: Record<string, string> = {
   id: '(string|null)',
   indicator: 'string',
   invalid: 'boolean',
+  loading: 'boolean',
   loadingLabel: 'string',
   multiple: 'boolean',
   name: '(string|null)',
@@ -261,7 +264,6 @@ class MultiSelect extends ComboboxBase {
   protected declare _hostOptions: ChildNode[]
   protected declare _initialSelection: any[]
   protected declare _known: Map<string, any>
-  protected declare _loading: boolean
   protected declare _offListOptions: HTMLOptionElement[]
   protected declare _seenValues: Set<string>
   protected declare _disabled: boolean
@@ -328,7 +330,6 @@ class MultiSelect extends ComboboxBase {
     this._floatingCleanup = null
     this._anchoredPosition = null
     this._search = ''
-    this._loading = false
     this._offListOptions = []
 
     if (this._config.options.length > 0) {
@@ -404,11 +405,13 @@ class MultiSelect extends ComboboxBase {
     }
 
     // A query puts its first match first; only an empty one restores the selection.
-    if (this._listBox.getActive() === null && !this._searchElement?.value) {
-      this._listBox._activateSelected()
+    if (this._listBox.getActive() === null && !this._searchElement?.value && !this._listBox._isEntryPending()) {
+      this._listBox._requestEntry({ preferSelected: true })
     }
 
-    this._listBox.focusActive()
+    if (!this._listBox._isEntryPending()) {
+      this._listBox.focusActive()
+    }
 
     if (!containsFocus(this._menu)) {
       this._menu.focus()
@@ -459,11 +462,6 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
-  setLoading(loading: boolean): void {
-    this._loading = loading
-    this._listBox?.setLoading(loading)
-  }
-
   setOptions(options: any[]): void {
     if (!this._config) {
       return
@@ -506,14 +504,21 @@ class MultiSelect extends ComboboxBase {
       return
     }
 
-    const items = this._getDisplayedItems()
-    const target = items.find(item => item.dataset.coreuiValue === active) ?? (this._config.search ? null : items[0])
+    const target = this._getDisplayedItems().find(item => item.dataset.coreuiValue === active)
 
     if (target) {
       this._listBox!.setActive(target.dataset.coreuiValue!)
       this._listBox!.focusActive()
+    } else if (this._config.search) {
+      this._searchElement.focus()
     } else {
-      (this._config.search ? this._searchElement : this._menu).focus()
+      this._menu.focus()
+
+      if (this._listBox!._isEntryPending()) {
+        this._listBox!._enterWhenListed()
+      } else {
+        this._listBox!._requestEntry({ preferSelected: true })
+      }
     }
   }
 
@@ -720,8 +725,8 @@ class MultiSelect extends ComboboxBase {
       } else if (isField && (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY)) {
         event.preventDefault()
 
-        if (event.key === ARROW_UP_KEY && this._listBox?.getActive() === null) {
-          this._listBox.last()
+        if (this._listBox?.getActive() === null) {
+          this._listBox._requestEntry({ last: event.key === ARROW_UP_KEY, preferSelected: !this._searchElement?.value })
           return
         }
 
@@ -807,6 +812,7 @@ class MultiSelect extends ComboboxBase {
     })
 
     EventHandler.on(this._searchElement, EVENT_INPUT, () => {
+      this._listBox?._requestEntry(null)
       this._onSearchChange(this._searchElement)
     })
 
@@ -1197,8 +1203,6 @@ class MultiSelect extends ComboboxBase {
       sectionsSelectable: this._config.optionsGroupsSelectable,
       selectionLimit: this._config.selectionLimit,
       selectionMode: this._config.multiple ? 'multiple' : 'single',
-      loading: this._loading,
-      loadingLabel: this._config.loadingLabel,
       typeahead: !this._routesTypingToSearch() && this._config.search !== 'external'
     }
   }

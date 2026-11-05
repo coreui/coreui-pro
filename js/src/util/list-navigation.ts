@@ -258,3 +258,55 @@ export const isTypingKey = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'i
 
   return ['Backspace', 'Dead', 'Delete'].includes(event.key) || (event.key.length === 1 && event.key !== ' ')
 }
+
+export type EntryRequest = {
+  activate?: boolean
+  key?: string
+  last?: boolean
+  preferSelected?: boolean
+}
+
+/**
+ * Tells whether a request to enter a list waits for more options instead of landing now: while the
+ * list has no option to move to, and while it is loading when the request is after the selection (an
+ * open on the selected option or on a key, not on the last option) and no selected value is listed
+ * yet. An activation never waits.
+ *
+ * @param request - The entry request: `activate`, `key`, `last`, `preferSelected`
+ * @param navigable - How many options the list can move to
+ * @param loading - Whether the list waits for its options
+ * @param selectionListed - Whether the selection is empty or one of its values is among those options
+ * @returns `true` while the request should wait
+ */
+export const isEntryWaiting = (request: EntryRequest, navigable: number, loading: boolean, selectionListed: boolean): boolean =>
+  !request.activate &&
+  (navigable === 0 || (loading && !selectionListed && !request.last && (Boolean(request.preferSelected) || request.key !== undefined)))
+
+/**
+ * Tells whether a key press ends the wait of an entry request: a key that types, or, while there are
+ * options to act on, one that moves through or activates them. Home and End count only when the field
+ * does not take text, where they move the caret instead. A modifier on its own, Tab and Escape leave
+ * the wait alone.
+ *
+ * @param event - The key press
+ * @param editable - Whether the key goes to a field that takes text
+ * @param navigable - How many options the list can move to
+ * @returns `true` when the key ends the wait
+ */
+export const endsEntryWait = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'isComposing' | 'key' | 'metaKey'>, editable: boolean, navigable: number): boolean =>
+  isTypingKey(event) ||
+  (navigable > 0 && (['ArrowUp', 'ArrowDown', 'Enter', ' '].includes(event.key) || (!editable && (event.key === 'Home' || event.key === 'End'))))
+
+/**
+ * Tells whether a list that is entered late leaves the focus where it is: everywhere but on the list,
+ * on an element holding it (such as its panel) and on the document body, read in the list's own
+ * document or shadow root, so a focus outside that root stays too.
+ *
+ * @param list - The element holding the options
+ * @returns `true` when the focus stays where it is
+ */
+export const keepsFocus = (list: Element): boolean => {
+  const focused = (list.getRootNode() as Document | ShadowRoot).activeElement
+
+  return focused !== document.body && !focused?.contains(list)
+}
