@@ -1025,24 +1025,174 @@ describe('Autocomplete', () => {
   })
 
   describe('opening keys', () => {
-    it('should open on the first option with ArrowDown and on the last one with ArrowUp', () => {
-      for (const [key, label] of [['ArrowDown', 'Apple'], ['ArrowUp', 'Cherry']]) {
-        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-        const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
-          options: [{ label: 'Apple', value: 'a' }, { label: 'Banana', value: 'b' }, { label: 'Cherry', value: 'c' }]
-        })
-        const input = fixtureEl.querySelector('[role="combobox"]')
+    const fruits = (selected = null) => ['Apple', 'Banana', 'Cherry'].map(label => ({ label, value: label[0].toLowerCase(), selected: label === selected }))
+    const mount = config => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), config)
+      const input = fixtureEl.querySelector('[role="combobox"]')
 
-        input.focus()
-        const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
-        input.dispatchEvent(event)
+      input.focus()
+
+      return { autocomplete, input }
+    }
+
+    const press = (input, key, init = {}) => {
+      const event = new KeyboardEvent('keydown', {
+        key, bubbles: true, cancelable: true, ...init
+      })
+      input.dispatchEvent(event)
+      return event
+    }
+
+    const activeText = input => document.getElementById(input.getAttribute('aria-activedescendant'))?.textContent
+
+    it('should open on the first option with ArrowDown and on the last with ArrowUp', () => {
+      for (const [key, init, label] of [['ArrowDown', {}, 'Apple'], ['ArrowUp', {}, 'Cherry'], ['ArrowDown', { altKey: true }, 'Apple'], ['ArrowUp', { altKey: true }, 'Cherry']]) {
+        const { autocomplete, input } = mount({ options: fruits() })
+        const event = press(input, key, init)
 
         expect(event.defaultPrevented).withContext(key).toBeTrue()
         expect(autocomplete._isShown()).withContext(key).toBeTrue()
-        expect(document.getElementById(input.getAttribute('aria-activedescendant')).textContent).withContext(key).toContain(label)
+        expect(activeText(input)).withContext(key).toContain(label)
 
         autocomplete.dispose()
       }
+    })
+
+    it('should open on the selected option with either arrow', () => {
+      for (const key of ['ArrowDown', 'ArrowUp']) {
+        const { autocomplete, input } = mount({ options: fruits('Banana') })
+        const event = press(input, key)
+
+        expect(event.defaultPrevented).withContext(key).toBeTrue()
+        expect(activeText(input)).withContext(key).toContain('Banana')
+
+        autocomplete.dispose()
+      }
+    })
+
+    it('should leave arrows with Ctrl, Meta or Shift and composing arrows to the field', () => {
+      for (const init of [{ ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { isComposing: true }, { keyCode: 229 }]) {
+        const { autocomplete, input } = mount({ options: fruits() })
+        const event = press(input, 'ArrowDown', init)
+
+        expect(event.defaultPrevented).withContext(JSON.stringify(init)).toBeFalse()
+        expect(autocomplete._isShown()).withContext(JSON.stringify(init)).toBeFalse()
+
+        autocomplete.dispose()
+      }
+    })
+
+    it('should not open on Home, End or other keys that do not change the text', () => {
+      const { autocomplete, input } = mount({ options: fruits() })
+
+      for (const key of ['Home', 'End', 'PageUp', 'Shift', 'Backspace', 'a', ' ']) {
+        expect(press(input, key).defaultPrevented).withContext(key).toBeFalse()
+        expect(autocomplete._isShown()).withContext(key).toBeFalse()
+      }
+
+      input.value = 'a'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(autocomplete._isShown()).toBeTrue()
+      expect(input.hasAttribute('aria-activedescendant')).toBeFalse()
+    })
+
+    it('should let an arrow through when there is nothing to show', () => {
+      const { autocomplete, input } = mount({ options: [] })
+      const event = press(input, 'ArrowDown')
+
+      expect(event.defaultPrevented).toBeFalse()
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should open on F4 without a highlight', () => {
+      for (const selected of [null, 'Banana']) {
+        const { autocomplete, input } = mount({ options: fruits(selected) })
+        const event = press(input, 'F4')
+
+        expect(event.defaultPrevented).withContext(String(selected)).toBeTrue()
+        expect(autocomplete._isShown()).withContext(String(selected)).toBeTrue()
+        expect(input.hasAttribute('aria-activedescendant')).withContext(String(selected)).toBeFalse()
+
+        autocomplete.dispose()
+      }
+    })
+
+    it('should leave F4 with a modifier to the browser', () => {
+      for (const init of [{ ctrlKey: true }, { altKey: true }, { shiftKey: true }, { metaKey: true }]) {
+        const { autocomplete, input } = mount({ options: fruits() })
+        const event = press(input, 'F4', init)
+
+        expect(event.defaultPrevented).withContext(JSON.stringify(init)).toBeFalse()
+        expect(autocomplete._isShown()).withContext(JSON.stringify(init)).toBeFalse()
+
+        autocomplete.dispose()
+      }
+    })
+
+    it('should prevent the key when the page refuses the open', () => {
+      const { autocomplete, input } = mount({ options: fruits() })
+
+      fixtureEl.querySelector('.autocomplete').addEventListener('show.coreui.autocomplete', event => event.preventDefault())
+
+      expect(press(input, 'ArrowDown').defaultPrevented).toBeTrue()
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should let Alt+ArrowDown through when there is nothing to show', () => {
+      const { autocomplete, input } = mount({ options: [] })
+      const event = press(input, 'ArrowDown', { altKey: true })
+
+      expect(event.defaultPrevented).toBeFalse()
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should open with ArrowDown wherever the caret is', () => {
+      for (const caret of [0, 3, 6]) {
+        const { autocomplete, input } = mount({ options: fruits('Banana') })
+
+        input.setSelectionRange(caret, caret)
+        press(input, 'ArrowDown')
+
+        expect(autocomplete._isShown()).withContext(String(caret)).toBeTrue()
+        expect(activeText(input)).withContext(String(caret)).toContain('Banana')
+
+        autocomplete.dispose()
+      }
+    })
+
+    it('should open as without a value when the selected option is disabled or filtered out', () => {
+      for (const [key, label] of [['ArrowDown', 'Apple'], ['ArrowUp', 'Cherry']]) {
+        const { autocomplete, input } = mount({ options: fruits().map(option => ({ ...option, disabled: option.label === 'Banana' })) })
+
+        autocomplete.setValue('b')
+        press(input, key)
+
+        expect(activeText(input)).withContext(`disabled ${key}`).toContain(label)
+
+        autocomplete.dispose()
+      }
+
+      for (const [key, label] of [['ArrowDown', 'Apple'], ['ArrowUp', 'Apricot']]) {
+        const { autocomplete, input } = mount({ options: [...fruits('Banana'), { label: 'Apricot', value: 'p' }] })
+
+        autocomplete.search('ap')
+        press(input, key)
+
+        expect(activeText(input)).withContext(`filtered ${key}`).toContain(label)
+
+        autocomplete.dispose()
+      }
+    })
+
+    it('should open without a highlight when every option is disabled', () => {
+      const { autocomplete, input } = mount({ options: fruits().map(option => ({ ...option, disabled: true })) })
+      const event = press(input, 'ArrowDown')
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(autocomplete._isShown()).toBeTrue()
+      expect(input.hasAttribute('aria-activedescendant')).toBeFalse()
     })
   })
 
@@ -1058,7 +1208,6 @@ describe('Autocomplete', () => {
       const press = key => input.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
 
       input.focus()
-      press('ArrowDown')
       press('ArrowDown')
       expect(document.getElementById(input.getAttribute('aria-activedescendant')).textContent).toContain('Banana')
       press('Enter')
@@ -2249,25 +2398,6 @@ describe('Autocomplete', () => {
   })
 
   describe('keyboard navigation', () => {
-    it('should open dropdown on ArrowDown key', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-        const autocomplete = new Autocomplete(autocompleteEl, {
-          options: [{ label: 'Option 1', value: '1' }]
-        })
-
-        autocompleteEl.addEventListener('shown.coreui.autocomplete', () => {
-          expect(autocomplete._isShown()).toBe(true)
-          resolve()
-        })
-
-        const keydownEvent = createEvent('keydown')
-        keydownEvent.key = 'ArrowDown'
-        autocomplete._togglerElement.dispatchEvent(keydownEvent)
-      })
-    })
-
     it('should walk the options with the arrow keys while the focus stays in the input', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div class="autocomplete"></div>'
@@ -2307,25 +2437,6 @@ describe('Autocomplete', () => {
         })
 
         autocomplete.show()
-      })
-    })
-
-    it('should open dropdown on Enter key', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-        const autocomplete = new Autocomplete(autocompleteEl, {
-          options: [{ label: 'Option 1', value: '1' }]
-        })
-
-        autocompleteEl.addEventListener('shown.coreui.autocomplete', () => {
-          expect(autocomplete._isShown()).toBe(true)
-          resolve()
-        })
-
-        const keydownEvent = createEvent('keydown')
-        keydownEvent.key = 'Enter'
-        autocomplete._togglerElement.dispatchEvent(keydownEvent)
       })
     })
 
@@ -2589,22 +2700,6 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.dispatchEvent(keydownEvent)
 
       expect(spy).not.toHaveBeenCalled()
-    })
-
-    it('should show dropdown on any non-Tab key on input when not shown', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        options: [{ label: 'Option 1', value: '1' }]
-      })
-
-      expect(autocomplete._isShown()).toBe(false)
-
-      const keydownEvent = createEvent('keydown')
-      keydownEvent.key = 'a'
-      autocomplete._inputElement.dispatchEvent(keydownEvent)
-
-      expect(autocomplete._isShown()).toBe(true)
     })
 
     it('should not show on Tab key on input when not shown', () => {

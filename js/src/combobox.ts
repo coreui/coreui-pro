@@ -33,13 +33,10 @@ const DATA_KEY = 'coreui.combobox'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const ARROW_UP_KEY = 'ArrowUp'
-const ARROW_DOWN_KEY = 'ArrowDown'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
 const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
-const OPEN_KEYS = new Set([ARROW_DOWN_KEY, ARROW_UP_KEY, ENTER_KEY, SPACE_KEY])
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
@@ -662,7 +659,7 @@ class Combobox extends ComboboxBase {
       return
     }
 
-    const opens = OPEN_KEYS.has(key) ? !event.ctrlKey && !event.metaKey : this._config.typeahead && !this._searchElement && key.length === 1 && isTypingKey(event)
+    const opens = this._isOpenKey(key) ? !event.ctrlKey && !event.metaKey : this._config.typeahead && !this._searchElement && key.length === 1 && isTypingKey(event)
 
     if (opens) {
       event.preventDefault()

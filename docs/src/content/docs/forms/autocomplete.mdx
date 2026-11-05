@@ -410,10 +410,13 @@ The Autocomplete component includes several accessibility features:
 
 ### Keyboard support
 
+Typing opens the list once the text is not empty and something can be shown. <kbd>Home</kbd>, <kbd>End</kbd> and other keys that leave the text alone keep it closed. An arrow opens it on the selected option, or without one on the first option for <kbd>Arrow Down</kbd> and the last one for <kbd>Arrow Up</kbd>, and <kbd>Alt</kbd> with an arrow does the same. With <kbd>Ctrl</kbd>, <kbd>Cmd</kbd> or <kbd>Shift</kbd> held, or while an input method composes text, the arrows stay with the field, and so does an arrow when there is nothing to show.
+
 | Key | Action |
 | --- | --- |
-| <kbd>Arrow Down</kbd> | Highlight the next option or open dropdown |
-| <kbd>Arrow Up</kbd> | Highlight the previous option |
+| <kbd>Arrow Down</kbd> | Open the list on the selected or the first option; once it is open, highlight the next option |
+| <kbd>Arrow Up</kbd> | Open the list on the selected or the last option; once it is open, highlight the previous option |
+| <kbd>F4</kbd> | Open the list without highlighting an option; with a modifier held, the key stays with the browser |
 | <kbd>Enter</kbd> | Select the highlighted option, or commit the typed text; with the list closed, also submit the form |
 | <kbd>Escape</kbd> | Close the dropdown; the input keeps focus and the highlighted option clears |
 | <kbd>Tab</kbd> | Accept hint completion (when hints are enabled) |

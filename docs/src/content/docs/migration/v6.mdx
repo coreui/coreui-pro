@@ -1079,9 +1079,11 @@ check, radio, carousel and toggler icons already work:
   the space bar keep working as text keys.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Multi Select opens a dialog instead.** The panel is
-  `role="dialog"` named by the control, and the focus moves into it: onto the
-  search box when `search` is on, otherwise onto the option the list points
-  at. Options take a roving `tabindex` and the arrows move the focus itself,
+  `role="dialog"` named by the control. Without `search` the focus moves into
+  the list when it opens. With `search` on, a click, <kbd>Enter</kbd> or a
+  typed character leaves it in the search box, and an arrow moves it into the
+  list unless no option can take it. Options take a roving `tabindex` and
+  the arrows move the focus itself,
   so there is no `aria-activedescendant` to read any more.
   <kbd>Tab</kbd> cycles through the panel and the search box without leaving
   them, and <kbd>Escape</kbd> closes the panel and hands the focus back to the
@@ -1089,6 +1091,23 @@ check, radio, carousel and toggler icons already work:
   header, reachable with <kbd>Tab</kbd>, and carries `aria-pressed`
   (`true`/`false`/`mixed`); selectable group labels are in the arrow order in
   its place.
+- **Autocomplete opens on a change of the text, and Multi Select on more
+  keys.** Autocomplete opened on almost any key, <kbd>Home</kbd> and
+  <kbd>Shift</kbd> included, before the character reached the field. Now
+  typing opens it once the text is not empty and something can be shown,
+  <kbd>F4</kbd> opens it without a highlight, and an arrow opens it on the
+  selected option, or on the first option for <kbd>↓</kbd> and the last one
+  for <kbd>↑</kbd>. Multi Select now also opens from the control on
+  <kbd>Space</kbd>, <kbd>↑</kbd> and a typed character, which lands on the
+  next option starting with it, and <kbd>↑</kbd> in the closed search box
+  enters the list at the selected option, or without one at the last option.
+  An arrow in Autocomplete's field or in the search box with <kbd>Ctrl</kbd>,
+  <kbd>Cmd</kbd> or <kbd>Shift</kbd>, or during an input method composition,
+  and any key on the Multi Select control with <kbd>Ctrl</kbd> or
+  <kbd>Cmd</kbd>, no longer opens the panel, and a key on a chip, the clear
+  button or the picker button stays with it: <kbd>Enter</kbd> on Multi
+  Select's clear button clears instead of opening and leaves the focus on the
+  control.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Multi Select's `search` takes `true`, `false` or `'external'`, and `search: 'global'` is gone.**
   Typing reaches the search box from anywhere in the component by default,

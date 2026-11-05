@@ -19,6 +19,7 @@ import { containsFocus } from './util/focus.js'
 import FocusTrap from './util/focustrap.js'
 import { type ValidationState } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
+import { isComposingKey, settleClick } from './util/layers.js'
 import { getRemovalNeighbor, isTypingKey } from './util/list-navigation.js'
 import { flattenOptions, isOptionGroup } from './util/option-tree.js'
 import {
@@ -376,12 +377,25 @@ class MultiSelect extends ComboboxBase {
     })
     this._focustrap.activate()
 
-    if (this._config.search) {
+    if (this._config.search && this._listBox?.getActive() === null) {
       this._searchElement.focus()
       return
     }
 
     this._focusListBox()
+  }
+
+  _showForFieldKey(event: any): void {
+    const { key } = event
+    const frameKey = (this._isOpenKey(key) || (isTypingKey(event) && key.length === 1)) &&
+      !event.ctrlKey && !event.metaKey && !isComposingKey(event)
+
+    if (this._config.search ? this._isOpeningArrow(event) : frameKey) {
+      this._showForKey(event)
+    } else if (key === ENTER_KEY && this._config.search) {
+      event.preventDefault()
+      this.show()
+    }
   }
 
   _focusListBox(): void {
@@ -665,9 +679,16 @@ class MultiSelect extends ComboboxBase {
 
     EventHandler.on(this._togglerElement, EVENT_CLICK, SELECTOR_CLEANER, (event: any) => {
       if (!this._disabled) {
+        const refocus = containsFocus(event.delegateTarget)
+
         event.preventDefault()
+        settleClick(event)
         event.stopPropagation()
         this._removeAsUser(() => this.deselectAll())
+
+        if (refocus) {
+          this._getFocusTarget().focus()
+        }
       }
     })
 
@@ -690,9 +711,13 @@ class MultiSelect extends ComboboxBase {
         return
       }
 
-      const isField = event.target === this._searchElement || (!this._config.search && event.target === this._togglerElement)
+      const isField = event.target === this._getFocusTarget() && !event.defaultPrevented
 
-      if (this._isShown() && isField && !event.defaultPrevented && (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY)) {
+      if (!this._isShown()) {
+        if (isField) {
+          this._showForFieldKey(event)
+        }
+      } else if (isField && (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY)) {
         event.preventDefault()
 
         if (event.key === ARROW_UP_KEY && this._listBox?.getActive() === null) {
@@ -702,9 +727,7 @@ class MultiSelect extends ComboboxBase {
 
         this._focusListBox()
         return
-      }
-
-      if (this._isShown() && event.target === this._searchElement && event.key === ENTER_KEY) {
+      } else if (event.target === this._searchElement && event.key === ENTER_KEY) {
         const stop = SelectorEngine.findOne(`${SELECTOR_OPTION}[tabindex="0"]`, this._menu)
 
         if (stop) {
@@ -734,8 +757,6 @@ class MultiSelect extends ComboboxBase {
       }
     })
 
-    this._addTogglerKeydownListeners()
-
     // Validation focuses the overlay select; hand its keystrokes to the custom control.
     if (this._nativeKeydownHandler) {
       EventHandler.off(this._element, EVENT_KEYDOWN, this._nativeKeydownHandler)
@@ -749,23 +770,21 @@ class MultiSelect extends ComboboxBase {
       // Suppress the native select's own keyboard behavior (typeahead, value change).
       event.preventDefault()
 
-      const isPrintable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey
-
-      if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY || (this._config.search && isPrintable))) {
+      // The keystroke can't be retargeted mid-event, so inject the character that
+      // would otherwise be lost and start filtering on this first press.
+      if (this._config.search && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
         this.show()
+        this._searchElement.focus()
+        this._searchElement.value += event.key
+        this._onSearchChange(this._searchElement)
+        return
       }
 
-      if (this._config.search) {
+      if (!this._isShown()) {
+        this._getFocusTarget().focus()
+        this._showForFieldKey(event)
+      } else if (this._config.search) {
         this._searchElement.focus()
-
-        // The keystroke can't be retargeted mid-event, so inject the character that
-        // would otherwise be lost and start filtering on this first press.
-        if (isPrintable) {
-          this._searchElement.value += event.key
-          this._onSearchChange(this._searchElement)
-        }
-      } else if (!this._isShown()) {
-        this._togglerElement.focus()
       }
     }
 
@@ -792,7 +811,7 @@ class MultiSelect extends ComboboxBase {
     })
 
     EventHandler.on(this._searchElement, EVENT_KEYDOWN, (event: any) => {
-      if ((!this._isShown() && event.key?.length === 1 && !event.ctrlKey && !event.metaKey) || event.key === ARROW_DOWN_KEY) {
+      if (!this._isShown() && event.key?.length === 1 && !event.ctrlKey && !event.metaKey) {
         this.show()
       }
 
