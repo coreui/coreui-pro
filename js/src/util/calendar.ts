@@ -244,33 +244,6 @@ export const convertIsoWeekToDate = (isoWeek: string) : Date => {
 }
 
 /**
- * Parses a week string (`2026-W05`, `2026W05` or `2026 W05`) to the Monday
- * of that week.
- *
- * @param dateString - The week string
- * @returns The Monday of the week
- */
-const parseWeekString = (dateString: string) : Date | null => {
-  const weekPatterns = [
-    /^(\d{4})-W(\d{1,2})$/,
-    /^(\d{4})W(\d{1,2})$/,
-    /^(\d{4})\s+W(\d{1,2})$/
-  ]
-
-  for (const pattern of weekPatterns) {
-    const match = dateString.trim().match(pattern)
-    if (match) {
-      const parsedYear = parseYearSmart(match[1])
-      const parsedWeek = Number.parseInt(match[2], 10)
-
-      return getDateOfISOWeek(parsedYear, parsedWeek)
-    }
-  }
-
-  return convertIsoWeekToDate(dateString)
-}
-
-/**
  * Parses a quarter string (`2026-Q3`, `2026Q3` or `2026 Q3`) to the first
  * day of that quarter.
  *
@@ -278,26 +251,9 @@ const parseWeekString = (dateString: string) : Date | null => {
  * @returns The first day of the quarter, or `null` for a string that is not a quarter
  */
 const parseQuarterString = (dateString: string) : Date | null => {
-  const quarterPatterns = [
-    /^(\d{4})-Q(\d{1})$/,
-    /^(\d{4})Q(\d{1})$/,
-    /^(\d{4})\s+Q(\d{1})$/
-  ]
+  const match = dateString.trim().match(/^(\d{4})(?:-|\s*)Q([1-4])$/)
 
-  for (const pattern of quarterPatterns) {
-    const match = dateString.trim().match(pattern)
-    if (match) {
-      const parsedYear = parseYearSmart(match[1])
-      const parsedQuarter = Number.parseInt(match[2], 10)
-
-      if (parsedQuarter >= 1 && parsedQuarter <= 4) {
-        const monthIndex = (parsedQuarter - 1) * 3
-        return createDate(parsedYear, monthIndex, 1)
-      }
-    }
-  }
-
-  return null
+  return match ? createDate(parseYearSmart(match[1]), (Number(match[2]) - 1) * 3, 1) : null
 }
 
 /**
@@ -721,7 +677,7 @@ export const convertToDateObject = (date: Date | number | string | null | undefi
   }
 
   const parsers: Record<string, (value: string) => Date | null> = {
-    week: parseWeekString,
+    week: convertIsoWeekToDate,
     month: parseMonthString,
     quarter: parseQuarterString,
     year: parseYearString
