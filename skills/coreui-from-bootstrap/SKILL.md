@@ -318,7 +318,7 @@ CoreUI v6 follows the Bootstrap 5 to 6 changes, with three exceptions: responsiv
     background-color: color-mix(in srgb, var(--cui-primary-base) 50%, transparent);
     ```
 
-13. **Browsers.** CoreUI v6 needs Chrome 123, Edge 123, Firefox 129, Safari 18 or newer.
+13. **Browsers.** CoreUI v6 needs Chrome 124, Edge 124, Firefox 130, Safari 18 or newer.
 
 ---
 

@@ -10,8 +10,8 @@ CoreUI for Bootstrap supports the **latest, stable releases** of all major brows
 Alternative browsers which use the latest version of WebKit, Blink, or Gecko, whether directly or via the platform's web view API, are not explicitly supported. However, CoreUI for Bootstrap should (in most cases) display and function correctly in these browsers as well. More specific support information is provided below.
 
 The floor is set by the platform features v6 depends on, with no fallbacks
-shipped: **Chrome 123, Edge 123, Firefox 130, Safari 18 and iOS 18**.
-Together with the evergreen lines below, this covers about 88% of global usage
+shipped: **Chrome 124, Edge 124, Firefox 130, Safari 18 and iOS 18**.
+Together with the evergreen lines below, this covers about 91% of global usage
 as measured with `npx browserslist --coverage`.
 
 ### Why these versions?
@@ -22,6 +22,7 @@ has to hold for the whole 6.x line:
 | Feature | Sets the floor for |
 | --- | --- |
 | `color-mix()` hue carry-over | Safari and iOS 18 — a mix in `oklch` with an achromatic operand (`transparent`, white, black, the greys) keeps the other color's hue only from Safari 18; 17.x interpolates the hue towards 0°, so every translucent or tinted color comes out the wrong hue (indigo turns pink) |
+| `writing-mode` on `<input type="range">` | Chrome and Edge 124 — vertical range sliders turn the native input with it, and it stays horizontal below 124 |
 | `light-dark()` | Chrome and Edge 123 — every theme decision resolves through it, and `color-mix()`, with no fallback |
 | `<details name="…">` | Firefox 130 — exclusive accordions, which group their panels by `details.name` |
 | `@starting-style`, `transition-behavior: allow-discrete` | Firefox 129 — the Menu's entry animation |
@@ -48,8 +49,8 @@ last 2 major versions
 not dead
 unreleased versions
 
-Chrome >= 123
-Edge >= 123
+Chrome >= 124
+Edge >= 124
 Firefox >= 130
 iOS >= 18
 Safari >= 18
@@ -133,7 +134,7 @@ Generally speaking, CoreUI for Bootstrap supports the latest versions of each ma
 | --- | --- |
 | Android | Chrome (last two major versions) |
 | iOS and iPadOS | Safari 18+, Chrome (uses WebKit on iOS) |
-| Windows, macOS, Linux | Chrome 123+, Edge 123+, Firefox 130+; Safari 18+ on macOS |
+| Windows, macOS, Linux | Chrome 124+, Edge 124+, Firefox 130+; Safari 18+ on macOS |
 
 For Firefox, in addition to the latest normal stable release, we also support the latest [Extended Support Release (ESR)](https://www.mozilla.org/en-US/firefox/enterprise/) version of Firefox.
 
