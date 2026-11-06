@@ -121,6 +121,27 @@ const formatTimePartials = (values: number[], locale: string, partial: 'hour' | 
 }
 
 /**
+ * Picks the values a part of a time selection offers.
+ *
+ * @param filter - A non-empty array of the values to keep, a function that keeps a value when it returns `true`, or anything else to keep every value
+ * @param values - Every value of the part
+ * @returns The values to offer
+ */
+const pickValues = (filter: PartialFilter, values: number[]): number[] =>
+  Array.isArray(filter) && filter.length > 0 ?
+    filter :
+    values.filter(value => typeof filter !== 'function' || filter(value))
+
+/**
+ * Tells whether hours use the 12-hour clock.
+ *
+ * @param locale - The locale that decides the clock when `ampm` is `'auto'`
+ * @param ampm - `true` for the 12-hour clock, `false` for the 24-hour clock, `'auto'` to follow the locale
+ * @returns `true` for the 12-hour clock
+ */
+const usesHour12 = (locale: string, ampm: 'auto' | boolean): boolean => (ampm === 'auto' && isAmPm(locale)) || ampm === true
+
+/**
  * Lists the localized hours, minutes and seconds a time selection offers.
  * For each part, a non-empty array lists exactly those values, a function
  * keeps the values for which it returns `true`, and anything else lists every
@@ -142,41 +163,21 @@ export const getLocalizedTimePartials = (
   minutes: PartialFilter = [],
   seconds: PartialFilter = []
 ): LocalizedTimePartials => {
-  const hour12 = (ampm === 'auto' && isAmPm(locale)) || ampm === true
+  const hour12 = usesHour12(locale, ampm)
   const cycle = Array.from({ length: 24 }, (_, i) => (hour12 ? (i + 1) % 24 : i))
-  const allowedHours = Array.isArray(hours) && hours.length > 0 ?
-    new Set(hours) :
-    cycle.filter(hour => typeof hours !== 'function' || hours(hour))
+  const sixty = Array.from({ length: 60 }, (_, i) => i)
   const hourValues = new Map<number, number[]>()
 
-  for (const hour of allowedHours) {
+  for (const hour of new Set(pickValues(hours, cycle))) {
     const value = hour12 ? convert24hTo12h(hour) : hour
     hourValues.set(value, [...(hourValues.get(value) ?? []), hour])
   }
 
-  const listOfMinutes =
-    Array.isArray(minutes) && minutes.length > 0 ?
-      minutes :
-      (typeof minutes === 'function' ?
-        Array.from({ length: 60 }, (_, i) => i).filter(minute =>
-          minutes(minute)
-        ) :
-        Array.from({ length: 60 }, (_, i) => i))
-
-  const listOfSeconds =
-    Array.isArray(seconds) && seconds.length > 0 ?
-      seconds :
-      (typeof seconds === 'function' ?
-        Array.from({ length: 60 }, (_, i) => i).filter(second =>
-          seconds(second)
-        ) :
-        Array.from({ length: 60 }, (_, i) => i))
-
   return {
     listOfHours: formatTimePartials([...hourValues.keys()], locale, 'hour', hour12)
       .map(partial => ({ ...partial, hours: hourValues.get(partial.value) })),
-    listOfMinutes: formatTimePartials(listOfMinutes, locale, 'minute'),
-    listOfSeconds: formatTimePartials(listOfSeconds, locale, 'second'),
+    listOfMinutes: formatTimePartials(pickValues(minutes, sixty), locale, 'minute'),
+    listOfSeconds: formatTimePartials(pickValues(seconds, sixty), locale, 'second'),
     hour12
   }
 }
@@ -191,9 +192,7 @@ export const getLocalizedTimePartials = (
  */
 export const getSelectedHour = (date: Date | null, locale: string, ampm: 'auto' | boolean = 'auto'): number | string =>
   date ?
-    ((ampm === 'auto' && isAmPm(locale)) || ampm === true ?
-      convert24hTo12h(date.getHours()) :
-      date.getHours()) :
+    (usesHour12(locale, ampm) ? convert24hTo12h(date.getHours()) : date.getHours()) :
     ''
 
 /**
