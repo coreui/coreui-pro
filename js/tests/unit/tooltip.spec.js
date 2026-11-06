@@ -1859,6 +1859,36 @@ describe('Tooltip', () => {
       tooltip.dispose()
     })
 
+    it('should keep the tip while the pointer leaves an anchor and heads for the tip', async () => {
+      const { a, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const rect = a.getBoundingClientRect()
+      const exit = { x: rect.left + (rect.width / 2), y: rect.top }
+      const tip = document.querySelector('.tooltip').getBoundingClientRect()
+      const edge = { x: tip.left + (tip.width / 2), y: tip.bottom }
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      mouse(a, 'mouseout', exit)
+      const toward = share => ({ x: exit.x + ((edge.x - exit.x) * share), y: exit.y + ((edge.y - exit.y) * share) })
+      await sleep(20)
+      pointer(toward(0.15))
+      await sleep(20)
+      pointer(toward(0.3))
+      await sleep(20)
+      pointer(toward(0.45))
+      await sleep(20)
+      pointer(toward(0.6))
+      await sleep(20)
+      pointer(toward(0.75))
+      await sleep(20)
+      pointer(toward(0.9))
+
+      expect(hide).not.toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
     it('should keep the tip when the pointer moves over it before its mouseover', async () => {
       const { a, b, bar, tooltip } = setup()
       const shown = wait(bar, 'shown')
@@ -2738,6 +2768,280 @@ describe('Tooltip', () => {
       expect(text()).toBe('Own')
       Tooltip.getInstance(own).dispose()
       Tooltip.getInstance(fixtureEl.querySelector('#bar'))?.dispose()
+    })
+  })
+
+  describe('path to the tip', () => {
+    const sleep = ms => new Promise(resolve => {
+      setTimeout(resolve, ms)
+    })
+    const mouse = (element, type, { x, y }, relatedTarget = null) => element.dispatchEvent(new MouseEvent(type, {
+      bubbles: true, clientX: x, clientY: y, relatedTarget
+    }))
+    const pointer = ({ x, y }) => document.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: x, clientY: y }))
+    const tipElement = () => document.querySelector('.tooltip')
+
+    const setup = async (config = {}) => {
+      fixtureEl.innerHTML = '<style>.tooltip { position: absolute; }</style><button type="button" title="A tip wider than its button" style="position: fixed; left: 200px; top: 200px; width: 40px; height: 30px;">B</button>'
+      const button = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(button, config)
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      mouse(button, 'mouseover', { x: 220, y: 215 })
+      await shown
+      const rect = tipElement().getBoundingClientRect()
+      const exit = { x: 220, y: 200 }
+      const edge = { x: rect.left + (rect.width / 2), y: rect.bottom }
+      return {
+        button,
+        exit,
+        leave: (point = exit) => mouse(button, 'mouseout', point),
+        toward: share => ({ x: exit.x + ((edge.x - exit.x) * share), y: exit.y + ((edge.y - exit.y) * share) }),
+        tooltip
+      }
+    }
+
+    it('should keep the tip while the pointer crosses the gap to it', async () => {
+      const { button, leave, toward, tooltip } = await setup()
+
+      leave()
+      await sleep(15)
+      pointer(toward(0.4))
+      await sleep(15)
+      pointer(toward(0.8))
+      await sleep(15)
+      mouse(tipElement(), 'mouseover', toward(1), button)
+      await sleep(60)
+
+      expect(tooltip._isShown()).toBeTrue()
+      tooltip.dispose()
+    })
+
+    it('should hide at once when the pointer moves away from the tip', async () => {
+      const { leave, tooltip } = await setup()
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      leave({ x: 220, y: 230 })
+      pointer({ x: 220, y: 236 })
+      await sleep(10)
+
+      expect(hide).toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
+    it('should hide once the pointer rests on its way to the tip', async () => {
+      const { leave, toward, tooltip } = await setup()
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      leave()
+      pointer(toward(0.3))
+      await sleep(10)
+
+      expect(hide).not.toHaveBeenCalled()
+
+      await sleep(50)
+
+      expect(hide).toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
+    it('should hide as soon as the pointer turns away from the tip', async () => {
+      const { exit, leave, tooltip } = await setup()
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      leave()
+      pointer({ x: exit.x + 40, y: exit.y + 2 })
+      await sleep(10)
+
+      expect(hide).toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
+    it('should count the hide delay from the moment the pointer stops heading for the tip', async () => {
+      const { leave, toward, tooltip } = await setup({ delay: { show: 0, hide: 60 } })
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      leave()
+      pointer(toward(0.3))
+      await sleep(70)
+
+      expect(hide).not.toHaveBeenCalled()
+
+      await sleep(60)
+
+      expect(hide).toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
+    it('should keep the tip when the pointer comes back to the button', async () => {
+      const { button, exit, leave, toward, tooltip } = await setup()
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      leave()
+      pointer(toward(0.3))
+      mouse(button, 'mouseover', exit)
+      await sleep(60)
+      pointer({ x: 0, y: 0 })
+
+      expect(hide).not.toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
+    it('should stop the previous following when the pointer leaves again right after coming back', async () => {
+      const { button, exit, leave, toward, tooltip } = await setup()
+
+      leave()
+      pointer(toward(0.1))
+      mouse(button, 'mouseover', exit)
+      const removed = spyOn(document, 'removeEventListener').and.callThrough()
+      leave()
+
+      expect(removed).toHaveBeenCalledWith('pointermove', jasmine.any(Function))
+      tooltip.dispose()
+    })
+
+    it('should keep the tip when the pointer reaches it within the hide delay', async () => {
+      const { button, leave, toward, tooltip } = await setup({ delay: { show: 0, hide: 80 } })
+
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      leave({ x: 220, y: 230 })
+      pointer({ x: 220, y: 236 })
+      await sleep(30)
+      mouse(tipElement(), 'mouseover', toward(1), button)
+      await sleep(100)
+
+      expect(hide).not.toHaveBeenCalled()
+      expect(tooltip._isShown()).toBeTrue()
+      tooltip.dispose()
+    })
+
+    it('should not bring the tip back after hide() while following', async () => {
+      const { leave, toward, tooltip } = await setup()
+
+      leave()
+      pointer(toward(0.3))
+      await tooltip.hide()
+      const leaveSpy = spyOn(tooltip, '_leave').and.callThrough()
+      await sleep(60)
+      pointer({ x: 0, y: 0 })
+
+      expect(leaveSpy).not.toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
+    it('should stop following on dispose()', async () => {
+      const { leave, toward, tooltip } = await setup()
+      const removed = spyOn(document, 'removeEventListener').and.callThrough()
+
+      leave()
+      pointer(toward(0.3))
+      tooltip.dispose()
+
+      expect(removed).toHaveBeenCalledWith('pointermove', jasmine.any(Function))
+    })
+
+    it('should keep a tip reached across the gap when the focus leaves it', async () => {
+      const { button, leave, toward, tooltip } = await setup()
+
+      leave()
+      pointer(toward(0.5))
+      mouse(tipElement(), 'mouseover', toward(1), button)
+      button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      button.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
+      await sleep(20)
+
+      expect(tooltip._isShown()).toBeTrue()
+      tooltip.dispose()
+    })
+
+    it('should hide as before with the hover and click triggers, which leave the tip without listeners', async () => {
+      const { leave, toward, tooltip } = await setup({ trigger: 'hover click' })
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      leave()
+      pointer(toward(0.3))
+      await sleep(10)
+
+      expect(hide).toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
+    it('should follow towards a tip on the start side in a right-to-left page', async () => {
+      fixtureEl.innerHTML = '<style>.tooltip { position: absolute; }</style><div dir="rtl"><button type="button" title="A tip on the start side" style="position: fixed; left: 300px; top: 200px; width: 40px; height: 30px;">B</button></div>'
+      const button = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(button, { placement: 'end' })
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      mouse(button, 'mouseover', { x: 320, y: 215 })
+      await shown
+      const rect = tipElement().getBoundingClientRect()
+      const exit = { x: 300, y: 215 }
+      const edge = { x: rect.right, y: rect.top + (rect.height / 2) }
+      const toward = share => ({ x: exit.x + ((edge.x - exit.x) * share), y: exit.y + ((edge.y - exit.y) * share) })
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      expect(tipElement().getAttribute('data-coreui-placement')).toBe('left')
+
+      mouse(button, 'mouseout', exit)
+      await sleep(15)
+      pointer(toward(0.5))
+      await sleep(15)
+      mouse(tipElement(), 'mouseover', toward(1), button)
+      await sleep(60)
+
+      expect(hide).not.toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
+    it('should finish hiding when the pointer enters the fading tip', async () => {
+      fixtureEl.innerHTML = '<style>.tooltip { position: absolute; transition: opacity .3s linear; } .tooltip:not(.show) { opacity: 0; }</style><button type="button" title="Tip" style="position: fixed; left: 200px; top: 200px; width: 40px; height: 30px;">B</button>'
+      const button = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(button)
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      mouse(button, 'mouseover', { x: 220, y: 215 })
+      await shown
+      const tip = tipElement()
+      let hidden = false
+      button.addEventListener('hidden.coreui.tooltip', () => {
+        hidden = true
+      })
+
+      mouse(button, 'mouseout', { x: 220, y: 230 })
+      pointer({ x: 220, y: 240 })
+      await sleep(20)
+
+      expect(tip.isConnected).toBeTrue()
+      expect(tip.classList.contains('show')).toBeFalse()
+
+      mouse(tip, 'mouseover', { x: 220, y: 190 }, button)
+      await sleep(450)
+
+      expect(hidden).toBeTrue()
+      tooltip.dispose()
+    })
+
+    it('should not keep a focus tip open when the pointer enters it', async () => {
+      fixtureEl.innerHTML = '<button type="button" title="Tip">B</button>'
+      const button = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(button, { delay: { show: 0, hide: 40 }, trigger: 'focus' })
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      await shown
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      button.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
+      tipElement().dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await sleep(60)
+
+      expect(hide).toHaveBeenCalled()
+      tooltip.dispose()
     })
   })
 

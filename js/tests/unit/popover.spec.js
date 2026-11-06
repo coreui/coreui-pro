@@ -1306,6 +1306,40 @@ describe('Popover', () => {
     })
   })
 
+  describe('path to the popover', () => {
+    it('should keep a hover popover while the pointer crosses the gap to it', async () => {
+      fixtureEl.innerHTML = '<style>.popover { position: absolute; }</style><button type="button" style="position: fixed; left: 200px; top: 200px; width: 40px; height: 30px;">B</button>'
+      const button = fixtureEl.querySelector('button')
+      const popover = new Popover(button, {
+        content: '<a href="#">Link</a>', html: true, placement: 'right', title: 'Title', trigger: 'hover'
+      })
+      const sleep = ms => new Promise(resolve => {
+        setTimeout(resolve, ms)
+      })
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+      button.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, clientX: 220, clientY: 215 }))
+      await shown
+      const tip = document.querySelector('.popover')
+      const rect = tip.getBoundingClientRect()
+      const exit = { x: 240, y: 215 }
+      const edge = { x: rect.left, y: rect.top + (rect.height / 2) }
+      const toward = share => ({ clientX: exit.x + ((edge.x - exit.x) * share), clientY: exit.y + ((edge.y - exit.y) * share) })
+      const hide = spyOn(popover, 'hide').and.callThrough()
+
+      button.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, clientX: exit.x, clientY: exit.y }))
+      await sleep(15)
+      document.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, ...toward(0.5) }))
+      await sleep(15)
+      tip.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: button, ...toward(1) }))
+      await sleep(60)
+
+      expect(hide).not.toHaveBeenCalled()
+      popover.dispose()
+    })
+  })
+
   describe('anchors', () => {
     const wait = (element, name) => new Promise(resolve => {
       element.addEventListener(`${name}.coreui.popover`, resolve, { once: true })
