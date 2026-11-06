@@ -16,11 +16,6 @@ import { createDate, isSameInstantAs } from './util/calendar.js'
 import {
   constrainDateTime, convertValue, getDateWithin, getHourCycle
 } from './util/date-sections.js'
-import {
-  appendControlGroupField,
-  applyControlGroupClasses,
-  applyControlGroupSize
-} from './util/form-control-group.js'
 import type { ValidationState } from './util/form-validation.js'
 import { CLEANER_ICON, CLOCK_ICON } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
@@ -37,11 +32,6 @@ const DATA_API_KEY = '.data-api'
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`
 
-const CLASS_NAME_BODY = 'time-picker-body'
-const CLASS_NAME_CLEANER = 'form-control-cleaner'
-const CLASS_NAME_INDICATOR = 'form-control-action'
-const CLASS_NAME_INPUT_GROUP = 'form-control-group'
-const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_TIME_PICKER = 'time-picker'
 
 const SELECTOR_ACTION_NOW = '[data-coreui-picker-action="now"]'
@@ -137,19 +127,15 @@ const DefaultType: Record<string, string> = {
 
 class TimePicker extends PickerBase {
   protected declare _initialTime: any
-  protected declare _input: any
   protected declare _selection: any
   protected declare _selectionElement: any
-  protected declare _source: 'code' | 'selection' | null
 
   constructor(element?: string | Element | null, config?: TimePickerOptions | null) {
     super(element, config)
 
     this._initialTime = config?.time ?? this._config.time
-    this._input = null
     this._selection = null
     this._selectionElement = null
-    this._source = null
 
     this._createTimePicker()
     this._createPopup()
@@ -202,11 +188,7 @@ class TimePicker extends PickerBase {
   }
 
   override _disposeParts(): void {
-    this._input.dispose()
     this._selection?.dispose()
-    this._fieldElement.remove()
-    this._cleanerElement?.remove()
-    this._toggleElement?.remove()
   }
 
   // Private
@@ -215,28 +197,12 @@ class TimePicker extends PickerBase {
   }
 
   _createTimePicker(): void {
-    this._element.classList.add(CLASS_NAME_TIME_PICKER, CLASS_NAME_PICKER)
+    this._createControlGroup(CLASS_NAME_TIME_PICKER)
 
-    const inputGroup = this._element
-    applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP)
-
-    applyControlGroupSize(inputGroup, this._config.size)
-
-    const inputEl = document.createElement('div')
-    this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
+    const inputEl = this._appendField()
     this._moveAriaToField(inputEl)
-
-    if (this._config.cleaner) {
-      this._cleanerElement = this._createAction(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
-      inputGroup.append(this._cleanerElement)
-    }
-
-    this._toggleElement = null
-
-    if (this._config.pickerIcon) {
-      this._toggleElement = this._createAction(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CLOCK_ICON : this._config.pickerIcon, this._config.ariaPickerLabel)
-      inputGroup.append(this._toggleElement)
-    }
+    this._appendCleaner(this._element, this._config.ariaCleanerLabel)
+    this._appendToggle(this._element, this._config.ariaPickerLabel, CLOCK_ICON)
 
     this._input = new TimeInput(inputEl, this._forwardConfig(TimeInput, {
       date: this._config.time,
@@ -257,16 +223,10 @@ class TimePicker extends PickerBase {
       this._onFieldChange(event.date)
     })
 
-    this._selectionElement = document.createElement('div')
-    this._selectionElement.classList.add(CLASS_NAME_BODY)
-    this._createMenu(CLASS_NAME_TIME_PICKER, this._selectionElement, SELECTOR_ACTION_NOW)
+    this._selectionElement = this._createMenu(CLASS_NAME_TIME_PICKER, [], SELECTOR_ACTION_NOW)
   }
 
-  override _isNowSelectable(): boolean {
-    return this._input.isDateSelectable(new Date())
-  }
-
-  _ensureSelection(): void {
+  override _onPopupShow(): void {
     if (this._selection) {
       return
     }
@@ -295,43 +255,19 @@ class TimePicker extends PickerBase {
     }
   }
 
-  _write(time: Date | null, source: 'code' | 'selection' = 'code', triggerChange = true): void {
-    const previous = this._source
-    this._source = source
-
-    try {
-      this._input.setDate(time, triggerChange)
-
-      if (this._element && this._source === source) {
-        this._syncParts()
-      }
-    } finally {
-      this._source = previous
-    }
-  }
-
   _onFieldChange(time: Date | null): void {
     this._syncParts()
     EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
   }
 
-  _syncParts(): void {
+  override _syncParts(): void {
     const source = this._source
+    const time = this.getTime()
     this._source = null
 
-    if (source !== 'selection') {
-      this._showTime(this.getTime())
-    }
-  }
-
-  _showTime(time: Date | null): void {
-    if (this._selection && !isSameInstantAs(this._selection.getTime(), time)) {
+    if (source !== 'selection' && this._selection && !isSameInstantAs(this._selection.getTime(), time)) {
       this._selection.setConfig({ time })
     }
-  }
-
-  override _onPopupShow(): void {
-    this._ensureSelection()
   }
 
   // Static

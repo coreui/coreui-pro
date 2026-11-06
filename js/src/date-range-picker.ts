@@ -35,13 +35,10 @@ const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
 const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
-const CLASS_NAME_BODY = 'date-picker-body'
 const CLASS_NAME_CALENDAR = 'date-picker-calendar'
 const CLASS_NAME_CALENDARS = 'date-picker-calendars'
 const CLASS_NAME_DATE_PICKER = 'date-picker'
 const CLASS_NAME_DATE_RANGE_PICKER = 'date-range-picker'
-const CLASS_NAME_CLEANER = 'form-control-cleaner'
-const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_RANGES = 'date-picker-ranges'
 
@@ -172,7 +169,6 @@ const DefaultType: Record<string, string> = {
 class DateRangePicker extends PickerBase {
   protected declare _frameElement: HTMLElement
   protected declare _rangesTemplate: any
-  protected declare _rangeInput: any
   protected declare _calendar: any
   protected declare _calendarElement: any
   protected declare _selectEndDate: any
@@ -181,7 +177,6 @@ class DateRangePicker extends PickerBase {
     super(element, config)
 
     this._rangesTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_RANGES, this._element)
-    this._rangeInput = null
     this._calendar = null
     this._calendarElement = null
     this._selectEndDate = false
@@ -207,35 +202,35 @@ class DateRangePicker extends PickerBase {
 
   // Public
   getStartDate(): Date | null {
-    return this._rangeInput?.getStartDate() ?? null
+    return this._input?.getStartDate() ?? null
   }
 
   getEndDate(): Date | null {
-    return this._rangeInput?.getEndDate() ?? null
+    return this._input?.getEndDate() ?? null
   }
 
   setEndDate(endDate: Date | null): void {
     this._typeCheckConfig({ endDate }, { endDate: DefaultType.endDate })
-    this._applyRange(() => this._rangeInput.setEndDate(endDate))
+    this._applyRange(() => this._input.setEndDate(endDate))
   }
 
   setRange(startDate: Date | null, endDate: Date | null): void {
     this._typeCheckConfig({ endDate, startDate }, { endDate: DefaultType.endDate, startDate: DefaultType.startDate })
-    this._applyRange(() => this._rangeInput.setRange(startDate, endDate))
+    this._applyRange(() => this._input.setRange(startDate, endDate))
   }
 
   setStartDate(startDate: Date | null): void {
     this._typeCheckConfig({ startDate }, { startDate: DefaultType.startDate })
-    this._applyRange(() => this._rangeInput.setStartDate(startDate))
+    this._applyRange(() => this._input.setStartDate(startDate))
   }
 
   clear(): void {
-    this._rangeInput.clear()
+    this._input.clear()
     this._setSelectEndDate(false)
   }
 
   reset(): void {
-    this._rangeInput.reset()
+    this._input.reset()
     this._showRange()
     this._setSelectEndDate(false)
   }
@@ -244,8 +239,8 @@ class DateRangePicker extends PickerBase {
     return {
       ...this._baseContext(),
       endDate: this.getEndDate(),
-      isDateSelectable: (date: Date | null) => this._rangeInput.isDateSelectable(date),
-      setRange: (startDate: Date | null, endDate: Date | null) => this._runAsUser(() => this._applyRange(() => this._rangeInput.setRange(startDate, endDate, true))),
+      isDateSelectable: (date: Date | null) => this._input.isDateSelectable(date),
+      setRange: (startDate: Date | null, endDate: Date | null) => this._runAsUser(() => this._applyRange(() => this._input.setRange(startDate, endDate, true))),
       startDate: this.getStartDate()
     }
   }
@@ -255,9 +250,7 @@ class DateRangePicker extends PickerBase {
   }
 
   override _disposeParts(): void {
-    this._rangeInput.dispose()
     this._calendar?.dispose()
-    this._frameElement.remove()
   }
 
   // Private
@@ -317,11 +310,12 @@ class DateRangePicker extends PickerBase {
     }
 
     this._element.append(inputGroup)
+    this._createdElements.push(inputGroup)
     this._frameElement = inputGroup
 
     const format = getPickerFormat(this._config.format, this._config.selectionType)
 
-    this._rangeInput = new DateRangeInput(inputGroup, this._forwardConfig(DateRangeInput, {
+    this._input = new DateRangeInput(inputGroup, this._forwardConfig(DateRangeInput, {
       disabled: this._config.disabled,
       endDate: this._config.endDate,
       locale: this._config.locale,
@@ -331,7 +325,7 @@ class DateRangePicker extends PickerBase {
       ...(format ? { format } : {})
     }, { inputOptions: { ...this._config.inputOptions, readonly: this._config.readonly } }))
     inputGroup.setAttribute('role', 'none')
-    this._validation.adopt(this._rangeInput._validation)
+    this._validation.adopt(this._input._validation)
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('startDateChange'), (event: any) => {
       this._nameToggle()
@@ -354,39 +348,16 @@ class DateRangePicker extends PickerBase {
       this._triggerDateChange(EVENT_END_DATE_CHANGE, event.date)
     })
 
-    if (this._config.cleaner) {
-      this._cleanerElement = this._createAction(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
-      inputGroup.append(this._cleanerElement)
-    }
+    this._appendCleaner(inputGroup, this._config.ariaCleanerLabel)
+    this._appendToggle(inputGroup, this._config.ariaPickerLabel, CALENDAR_ICON)
 
-    this._toggleElement = null
-
-    if (this._config.pickerIcon) {
-      this._toggleElement = this._createAction(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel)
-      inputGroup.append(this._toggleElement)
-    }
-
-    const body = document.createElement('div')
-    body.classList.add(CLASS_NAME_BODY)
-
-    if (this._rangesTemplate) {
-      const ranges = document.createElement('div')
-      ranges.classList.add(CLASS_NAME_RANGES)
-      ranges.append(this._rangesTemplate.content.cloneNode(true))
-      body.append(ranges)
-    }
-
-    const calendars = document.createElement('div')
-    calendars.classList.add(CLASS_NAME_CALENDARS)
-
-    this._calendarElement = document.createElement('div')
-    this._calendarElement.classList.add(CLASS_NAME_CALENDAR)
-    calendars.append(this._calendarElement)
-    body.append(calendars)
-    this._createMenu(CLASS_NAME_DATE_PICKER, body)
+    this._calendarElement = this._createDiv(CLASS_NAME_CALENDAR)
+    const calendars = this._createDiv(CLASS_NAME_CALENDARS, this._calendarElement)
+    const ranges = this._rangesTemplate && this._createDiv(CLASS_NAME_RANGES, this._rangesTemplate.content.cloneNode(true))
+    this._createMenu(CLASS_NAME_DATE_PICKER, ranges ? [ranges, calendars] : [calendars])
   }
 
-  _ensureCalendar(): void {
+  override _onPopupShow(): void {
     if (this._calendar) {
       return
     }
@@ -409,11 +380,11 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._runAsUser(() => this._rangeInput.setRange(event.dateObject, this.getEndDate(), true))
+      this._runAsUser(() => this._input.setRange(event.dateObject, this.getEndDate(), true))
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
-      this._runAsUser(() => this._rangeInput.setRange(this.getStartDate(), event.dateObject, true))
+      this._runAsUser(() => this._input.setRange(this.getStartDate(), event.dateObject, true))
 
       if (this.getEndDate() && this.getStartDate() && !this._footerTemplate) {
         this.hide()
@@ -442,25 +413,17 @@ class DateRangePicker extends PickerBase {
 
     const eventName = this.constructor.eventName('focusin')
 
-    EventHandler.on(this._rangeInput.getStartElement(), eventName, () => {
+    EventHandler.on(this._input.getStartElement(), eventName, () => {
       this._setSelectEndDate(false)
     })
 
-    EventHandler.on(this._rangeInput.getEndElement(), eventName, () => {
+    EventHandler.on(this._input.getEndElement(), eventName, () => {
       this._setSelectEndDate(true)
     })
   }
 
-  override _onPopupShow(): void {
-    this._ensureCalendar()
-  }
-
   override _popupAnchor(): HTMLElement {
     return this._frameElement
-  }
-
-  override _isNowSelectable(): boolean {
-    return this._rangeInput.isDateSelectable(new Date())
   }
 
   override _stateFrames(): Element[] {

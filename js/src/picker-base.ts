@@ -11,7 +11,12 @@ import SelectorEngine from './dom/selector-engine.js'
 import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
 import FieldValidation from './util/field-validation.js'
-import { createControlGroupAction } from './util/form-control-group.js'
+import {
+  appendControlGroupField,
+  applyControlGroupClasses,
+  applyControlGroupSize,
+  createControlGroupAction
+} from './util/form-control-group.js'
 import { type ValidationState } from './util/form-validation.js'
 import { getUID } from './util/index.js'
 import { settleClick } from './util/layers.js'
@@ -22,6 +27,10 @@ import { sanitizeByConfig } from './util/sanitizer.js'
  * Constants
  */
 
+const CLASS_NAME_CLEANER = 'form-control-cleaner'
+const CLASS_NAME_INDICATOR = 'form-control-action'
+const CLASS_NAME_INPUT_GROUP = 'form-control-group'
+const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_SHOW = 'show'
 
@@ -30,6 +39,8 @@ const SELECTOR_SECTION = '[data-coreui-section]'
 const SELECTOR_SVG = 'svg'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
+type WriteSource = 'calendar' | 'code' | 'selection'
+
 /**
  * Class definition
  */
@@ -37,10 +48,12 @@ const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 abstract class PickerBase extends BaseComponent {
   protected declare _adoptedAttributes: [Element, string, string | null, string | null][]
   protected declare _cleanerElement: HTMLElement | null
-  protected declare _fieldElement: HTMLElement
+  protected declare _createdElements: Element[]
   protected declare _footerTemplate: HTMLTemplateElement | null
+  protected declare _input: any
   protected declare _menu: HTMLElement
   protected declare _popup: Popup
+  protected declare _source: WriteSource | null
   protected declare _toggleElement: HTMLElement | null
   protected declare _validation: FieldValidation
 
@@ -49,9 +62,13 @@ abstract class PickerBase extends BaseComponent {
 
     this._adoptedAttributes = []
     this._cleanerElement = null
+    this._createdElements = []
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element) as HTMLTemplateElement | null
+    this._input = null
     this._menu = null as any
     this._popup = null as any
+    this._source = null
+    this._toggleElement = null
     this._validation = new FieldValidation(this._element, {
       aliases: true,
       config: () => this._config,
@@ -89,7 +106,13 @@ abstract class PickerBase extends BaseComponent {
     }
 
     this._popup.dispose()
+    this._input.dispose()
     this._disposeParts()
+
+    for (const element of this._createdElements) {
+      element.remove()
+    }
+
     this._restoreAdoptedAttributes()
     this._validation.dispose()
 
@@ -170,13 +193,52 @@ abstract class PickerBase extends BaseComponent {
     this._validation.runAsUser(action)
   }
 
-  _createAction(className: string, icon: string, label: string): HTMLElement {
-    return createControlGroupAction({
-      className, disabled: !this._isEditable(), icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
-    })
+  _createControlGroup(className: string): void {
+    this._element.classList.add(className, CLASS_NAME_PICKER)
+    applyControlGroupClasses(this._element, CLASS_NAME_INPUT_GROUP)
+    applyControlGroupSize(this._element, this._config.size)
   }
 
-  _createMenu(prefix: string, body: HTMLElement, nowAction?: string): void {
+  _appendField(): HTMLElement {
+    const field = document.createElement('div')
+    this._createdElements.push(appendControlGroupField(this._element, field, this._config.floatingLabel, `${this.constructor.NAME}-`))
+
+    return field
+  }
+
+  _appendCleaner(group: HTMLElement, label: string): void {
+    if (this._config.cleaner) {
+      this._cleanerElement = this._appendAction(group, CLASS_NAME_CLEANER, this._config.cleanerIcon, label)
+    }
+  }
+
+  _appendToggle(group: HTMLElement, label: string, icon: string): void {
+    if (this._config.pickerIcon) {
+      this._toggleElement = this._appendAction(group, CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? icon : this._config.pickerIcon, label)
+    }
+  }
+
+  _appendAction(group: HTMLElement, className: string, icon: string, label: string): HTMLElement {
+    const action = createControlGroupAction({
+      className, disabled: !this._isEditable(), icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
+    })
+    group.append(action)
+    this._createdElements.push(action)
+
+    return action
+  }
+
+  _createDiv(className: string, ...children: Node[]): HTMLElement {
+    const element = document.createElement('div')
+    element.classList.add(className)
+    element.append(...children)
+
+    return element
+  }
+
+  _createMenu(prefix: string, parts: Node[], nowAction?: string): HTMLElement {
+    const body = this._createDiv(`${prefix}-body`, ...parts)
+
     this._menu = document.createElement('div')
     this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, `${prefix}-popup`)
@@ -186,14 +248,12 @@ abstract class PickerBase extends BaseComponent {
     this._writeToggleAttribute('aria-haspopup', 'dialog')
 
     if (!this._footerTemplate) {
-      return
+      return body
     }
 
-    const footer = document.createElement('div')
-    footer.classList.add(`${prefix}-footer`)
-    footer.append(this._footerTemplate.content.cloneNode(true))
+    const footer = this._createDiv(`${prefix}-footer`, this._footerTemplate.content.cloneNode(true))
 
-    if (nowAction && !this._isNowSelectable()) {
+    if (nowAction && !this._input.isDateSelectable(new Date())) {
       for (const button of SelectorEngine.find(nowAction, footer)) {
         if ('disabled' in button) {
           (button as HTMLButtonElement).disabled = true
@@ -202,7 +262,26 @@ abstract class PickerBase extends BaseComponent {
     }
 
     this._menu.append(footer)
+
+    return body
   }
+
+  _write(value: Date | null, source: WriteSource = 'code', triggerChange = true): void {
+    const previous = this._source
+    this._source = source
+
+    try {
+      this._input.setDate(value, triggerChange)
+
+      if (this._element && this._source === source) {
+        this._syncParts()
+      }
+    } finally {
+      this._source = previous
+    }
+  }
+
+  _syncParts(): void {}
 
   _originalDefault(): Record<string, any> {
     return this.constructor.Default
@@ -304,7 +383,16 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _writeToggleAttribute(name: string, value: string): void {
-    this._toggleElement?.setAttribute(name, value)
+    if (!this._toggleElement) {
+      return
+    }
+
+    if (this._createdElements.includes(this._toggleElement) || (name !== 'aria-label' && name !== 'aria-controls')) {
+      this._toggleElement.setAttribute(name, value)
+      return
+    }
+
+    this._writeAdoptedAttribute(this._toggleElement, name, value)
   }
 
   _clearToggleAttribute(name: string): void {
@@ -325,8 +413,6 @@ abstract class PickerBase extends BaseComponent {
   abstract _onPopupShow(): void
 
   abstract _disposeParts(): void
-
-  abstract _isNowSelectable(): boolean
 
   abstract getContext(): Record<string, any>
 

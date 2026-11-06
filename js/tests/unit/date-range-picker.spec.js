@@ -328,7 +328,7 @@ describe('DateRangePicker', () => {
       const picker = buildPicker()
 
       expect(picker._frameElement.querySelector('.form-control-icon svg')).not.toBeNull()
-      expect(picker._rangeInput._config.separatorIcon).toEqual(picker._config.separatorIcon)
+      expect(picker._input._config.separatorIcon).toEqual(picker._config.separatorIcon)
     })
 
     it('should render the mirrored separator arrow inside an RTL ancestor', () => {
@@ -353,6 +353,7 @@ describe('DateRangePicker', () => {
       const ranges = fixtureEl.querySelector('.date-picker-popup .date-picker-ranges')
       expect(ranges).not.toBeNull()
       expect(ranges.querySelector('#lastWeek')).not.toBeNull()
+      expect(ranges.nextElementSibling.classList.contains('date-picker-calendars')).toBeTrue()
     })
   })
 
