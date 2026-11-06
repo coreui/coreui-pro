@@ -1071,7 +1071,7 @@ class Tooltip extends BaseComponent {
   protected _setTipListeners(tip: HTMLElement): void {
     const trigger = this._getTrigger()
 
-    if (trigger === TRIGGER_MANUAL || trigger.includes(TRIGGER_CLICK)) {
+    if (!trigger.includes(TRIGGER_HOVER) && !trigger.includes(TRIGGER_FOCUS)) {
       return
     }
 
