@@ -27,7 +27,7 @@ JavaScript adds and removes a small, fixed set of classes; `.fade` and `.transit
 | `.active` | The shown state for a tab pane, where it also marks the selected pane. |
 | `.fade` | The fade itself, for your own markup and for the components that animate only when asked. The alert and the tab pane take it from your markup; the tooltip and popover add it themselves unless `animation` is off. |
 | `.transition-size` | The box itself rather than the opacity: an element with it collapses as it leaves and grows as it arrives. Opt-in, on your own markup, and only where the browser can interpolate a size — see [size animations](#size-animations). |
-| `.{component}-instant` | Skips the transition on one element: `.dialog-instant`, `.drawer-instant`, `.modal-instant`, `.offcanvas-instant`, `.toast-instant`. |
+| `.{component}-instant` | Skips the transition on one element: `.dialog-instant`, `.drawer-instant`, `.modal-instant`, `.offcanvas-instant`, `.popup-instant`, `.toast-instant`. The React and Vue editions put `.popup-instant` on the panel of a picker, combobox, autocomplete or multi select that is open from the first render, so it appears without fading in, and take it off after the first frames. |
 | `.{component}-static` | The short bounce that signals a refused close: `.dialog-static`, `.drawer-static`, `.modal-static`, `.offcanvas-static`. |
 
 ## Customize the motion
