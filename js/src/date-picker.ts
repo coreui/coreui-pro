@@ -83,6 +83,7 @@ type DatePickerConfig = {
   monthNames: DateInputConfig['monthNames'],
   name: string | null,
   pickerIcon: string | boolean,
+  readonly: boolean,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
   seconds: boolean | number[] | ((second: number) => boolean),
@@ -120,6 +121,7 @@ const Default: DatePickerConfig = {
   monthNames: null,
   name: null,
   pickerIcon: true,
+  readonly: false,
   sanitize: true,
   sanitizeFn: null,
   seconds: true,
@@ -154,6 +156,7 @@ const DefaultType: Record<string, string> = {
   monthNames: '(array|null)',
   name: '(string|null)',
   pickerIcon: '(string|boolean)',
+  readonly: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   seconds: '(array|boolean|function)',
@@ -321,6 +324,7 @@ class DatePicker extends PickerBase {
     }, {
       ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}),
       ...this._config.inputOptions,
+      readonly: this._config.readonly,
       validationState: null
     }))
     this._validation.adopt(this._input._validation)

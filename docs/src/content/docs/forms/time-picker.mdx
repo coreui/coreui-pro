@@ -86,6 +86,18 @@ Add `.form-floating-always` to the component element to keep the label [always f
     </div>
   </div>`} />
 
+## Readonly
+
+Add `data-coreui-readonly="true"` to show a time that cannot be changed. The field stays focusable and
+readable, while typing, the time button, the cleaner and the keyboard shortcuts that open the time
+selection are turned off.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <div data-coreui-locale="en-US" data-coreui-readonly="true" data-coreui-time="09:30" data-coreui-time-picker></div>
+    </div>
+  </div>`} />
+
 ## Min and max times
 
 Constrain the times the user can pick with `minDate` and `maxDate`, given as time strings like `09:30` or as dates, of which only the time of day counts. The panel disables the hours that hold no allowed time and, once an hour is chosen, the minutes and seconds outside the range, and a time picked in the panel that crosses a limit moves to it. A time typed in the field outside the range gets the `.is-invalid` class, the picker reports `null` and submits no time until the value is corrected. A `maxDate` at midnight covers the whole day; any other `maxDate` before the `minDate` leaves no time to pick. The limits also apply when you give them through `inputOptions`.
@@ -252,7 +264,7 @@ by the picker itself.
 | `disabled` | boolean | `false` | Disables the field and the popup. |
 | `floatingLabel` | string, null | `null` | Renders a floating label over the field, which also becomes its accessible name. An `aria-label` or `aria-labelledby` on the picker element names the field instead. |
 | `hours` | array, function, null | `null` | Allowed hours, 0 to 23 in every locale — a list or a filter. |
-| `inputOptions` | object | `{}` | Programmatic escape hatch for time input options, except `validationState`, which the picker owns. |
+| `inputOptions` | object | `{}` | Programmatic escape hatch for time input options, except `readonly` and `validationState`, which the picker owns. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives the mask and the 12/24-hour split. |
 | `maxDate` | date, string, null | `null` | The latest time the user can pick, a time string or a date of which only the time of day counts. |
@@ -260,6 +272,7 @@ by the picker itself.
 | `minutes` | array, boolean, function | `true` | Allowed minutes, or `false` to drop the column. |
 | `name` | string, null | `null` | Name of the generated value input. Without it the field is not submitted with the form. |
 | `pickerIcon` | string, boolean | `true` | The button that opens the time selection: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Without it the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |
+| `readonly` | boolean | `false` | Makes the field read-only and keeps the time selection closed: the value can be read, not changed. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
 | `seconds` | array, boolean, function | `true` | `false` drops the column and the field's seconds section together. A list or a filter narrows the panel; the field still accepts any second. |

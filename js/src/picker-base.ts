@@ -112,7 +112,7 @@ abstract class PickerBase extends BaseComponent {
       container: this._config.container,
       content: this._menu,
       onBeforeHide: () => !EventHandler.trigger(this._element, this.constructor.eventName('hide'))?.defaultPrevented,
-      onBeforeShow: () => !this._config.disabled && !EventHandler.trigger(this._element, this.constructor.eventName('show'))?.defaultPrevented,
+      onBeforeShow: () => this._isEditable() && !EventHandler.trigger(this._element, this.constructor.eventName('show'))?.defaultPrevented,
       onHidden: () => EventHandler.trigger(this._element, this.constructor.eventName('hidden')),
       onHide: () => {
         this._clearToggleAttribute('aria-controls')
@@ -146,11 +146,7 @@ abstract class PickerBase extends BaseComponent {
       })
     }
 
-    EventHandler.on(this._toggleElement, eventName, () => {
-      if (!this._config.disabled) {
-        this.toggle()
-      }
-    })
+    EventHandler.on(this._toggleElement, eventName, () => this.toggle())
 
     EventHandler.on(this._menu, eventName, SELECTOR_ACTION, (event: any) => {
       const action = event.target.closest(SELECTOR_ACTION).dataset.coreuiPickerAction
@@ -166,13 +162,17 @@ abstract class PickerBase extends BaseComponent {
     return []
   }
 
+  _isEditable(): boolean {
+    return !this._config.disabled && !this._config.readonly
+  }
+
   _runAsUser(action: () => void): void {
     this._validation.runAsUser(action)
   }
 
   _createAction(className: string, icon: string, label: string): HTMLElement {
     return createControlGroupAction({
-      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
+      className, disabled: !this._isEditable(), icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
     })
   }
 
@@ -249,7 +249,7 @@ abstract class PickerBase extends BaseComponent {
     }
 
     if ('disabled' in element) {
-      (element as HTMLButtonElement).disabled = this._config.disabled
+      (element as HTMLButtonElement).disabled = !this._isEditable()
     }
 
     return element

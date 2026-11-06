@@ -537,6 +537,21 @@ describe('Popup', () => {
       expect(popup.isShown).toBeTrue()
     })
 
+    it('should leave the opening key to the page when onBeforeShow declines', () => {
+      const popup = buildField({ onBeforeShow: () => false })
+
+      const event = press('F4')
+
+      expect(event.defaultPrevented).toBeFalse()
+      expect(popup.isShown).toBeFalse()
+    })
+
+    it('should take the opening key when the panel opens', () => {
+      buildField()
+
+      expect(press('F4').defaultPrevented).toBeTrue()
+    })
+
     it('should leave a bare ArrowDown to the field, which spends it on the value', () => {
       const popup = buildField()
 

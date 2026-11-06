@@ -930,6 +930,28 @@ describe('TimePicker', () => {
       expect(picker._popup.isShown).toBeFalse()
     })
 
+    it('should keep the panel closed and turn off its button and cleaner while readonly', () => {
+      const picker = buildPicker({ cleaner: true, readonly: true })
+      const showSpy = jasmine.createSpy('show')
+      fixtureEl.querySelector('#picker').addEventListener('show.coreui.time-picker', showSpy)
+      const indicator = fixtureEl.querySelector('.form-control-action')
+
+      indicator.click()
+      picker.show()
+
+      expect(picker._popup.isShown).toBeFalse()
+      expect(showSpy).not.toHaveBeenCalled()
+      expect(indicator.disabled).toBeTrue()
+      expect(fixtureEl.querySelector('.form-control-cleaner').disabled).toBeTrue()
+      expect(fixtureEl.querySelector('.form-date-time-section').getAttribute('aria-readonly')).toEqual('true')
+    })
+
+    it('should make the field read-only from the picker option over inputOptions', () => {
+      buildPicker({ inputOptions: { readonly: false }, readonly: true })
+
+      expect(fixtureEl.querySelector('.form-date-time-section').getAttribute('aria-readonly')).toEqual('true')
+    })
+
     it('should keep the hour cycle of its field over selectionOptions', () => {
       const picker = buildPicker({ format: 'HH:mm', selectionOptions: { hourCycle: 'h12', minutes: [0, 30] }, time: '15:30' })
 

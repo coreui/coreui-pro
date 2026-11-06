@@ -846,6 +846,30 @@ describe('DateRangePicker', () => {
 
       expect(picker._popup.isShown).toBeFalse()
     })
+
+    it('should keep the panel closed and turn off its button and cleaner while readonly', () => {
+      const picker = buildPicker({ cleaner: true, readonly: true })
+      const showSpy = jasmine.createSpy('show')
+      fixtureEl.querySelector('#picker').addEventListener('show.coreui.date-range-picker', showSpy)
+      const indicator = fixtureEl.querySelector('.form-control-action')
+
+      indicator.click()
+      picker.show()
+
+      expect(picker._popup.isShown).toBeFalse()
+      expect(showSpy).not.toHaveBeenCalled()
+      expect(indicator.disabled).toBeTrue()
+      expect(fixtureEl.querySelector('.form-control-cleaner').disabled).toBeTrue()
+      expect(fixtureEl.querySelector('.form-date-time-section').getAttribute('aria-readonly')).toEqual('true')
+    })
+
+    it('should make both fields read-only from the picker option over inputOptions', () => {
+      buildPicker({ inputOptions: { readonly: false }, readonly: true })
+
+      const sections = [...fixtureEl.querySelectorAll('.form-date-time-section')]
+      expect(sections.length).toBeGreaterThan(0)
+      expect(sections.every(section => section.getAttribute('aria-readonly') === 'true')).toBeTrue()
+    })
   })
 
   describe('picker toggle', () => {

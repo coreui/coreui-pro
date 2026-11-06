@@ -62,6 +62,7 @@ type TimePickerConfig = {
   locale: string,
   name: string | null,
   pickerIcon: string | boolean,
+  readonly: boolean,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
   seconds: boolean | number[] | ((second: number) => boolean),
@@ -91,6 +92,7 @@ const Default: TimePickerConfig = {
   locale: navigator.language,
   name: null,
   pickerIcon: true,
+  readonly: false,
   sanitize: true,
   sanitizeFn: null,
   seconds: true,
@@ -118,6 +120,7 @@ const DefaultType: Record<string, string> = {
   locale: 'string',
   name: '(string|null)',
   pickerIcon: '(string|boolean)',
+  readonly: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   seconds: '(array|boolean|function)',
@@ -244,6 +247,7 @@ class TimePicker extends PickerBase {
     }, {
       ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}),
       ...this._config.inputOptions,
+      readonly: this._config.readonly,
       validationState: null
     }))
 

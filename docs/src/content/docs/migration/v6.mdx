@@ -1759,6 +1759,20 @@ start with `setValidationState()`. See the Validation sections of the
 [date range picker](/forms/date-range-picker/#validation) and
 [time picker](/forms/time-picker/#validation).
 
+#### A read-only picker keeps its panel closed
+
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+
+`DatePicker`, `DateRangePicker` and `TimePicker` have a `readonly` option. It used
+to reach only the field, so a read-only picker still opened its calendar or time
+selection and changed the value from there. Now the panel stays closed, and the
+picker button, the cleaner and the keyboard shortcuts that open the panel are
+turned off, while the field stays focusable and readable. The picker's `readonly`
+also wins over a `readonly` given in `inputOptions`. See the Readonly sections of
+the [date picker](/forms/date-picker/#readonly),
+[date range picker](/forms/date-range-picker/#readonly) and
+[time picker](/forms/time-picker/#readonly).
+
 #### The date picker adopts the markup you write
 
 The date picker is composed from the date input, the calendar and a popup,
