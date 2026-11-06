@@ -2390,6 +2390,142 @@ describe('Tooltip', () => {
       tooltip.dispose()
     })
 
+    it('should pin a tip that hovering an anchor opened on a click there', async () => {
+      const { a, bar, tooltip } = setup({ trigger: 'hover click' })
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      a.click()
+      leave(a, document.body)
+      await sleep(300)
+
+      expect(text()).toBe('Bold')
+      expect(document.querySelector('.tooltip.show')).not.toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should drop the pin when the pointer moves the tip to another anchor', async () => {
+      const { a, b, bar, tooltip } = setup({ trigger: 'hover click' })
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      a.click()
+
+      const moved = wait(bar, 'moved')
+      leave(a, b)
+      hover(b, a)
+      await moved
+      leave(b, document.body)
+      await Promise.race([wait(bar, 'hidden'), sleep(500)])
+
+      expect(document.querySelector('.tooltip.show')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should keep the pin when a click moves the tip into another dialog', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a" title="Bold">B</button><dialog open><button type="button" id="b" title="Italic">I</button></dialog></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const a = bar.querySelector('#a')
+      const b = bar.querySelector('#b')
+      const tooltip = new Tooltip(bar, { anchors: 'button', trigger: 'hover click' })
+      let shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      shown = wait(bar, 'shown')
+      b.click()
+      await shown
+      leave(b, document.body)
+      await sleep(300)
+
+      expect(text()).toBe('Italic')
+      expect(document.querySelector('.tooltip.show')).not.toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should pin the tip the pointer moved into another dialog on a click there', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a" title="Bold">B</button><dialog open><button type="button" id="b" title="Italic">I</button></dialog></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const a = bar.querySelector('#a')
+      const b = bar.querySelector('#b')
+      const tooltip = new Tooltip(bar, { anchors: 'button', trigger: 'hover click' })
+      let shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      shown = wait(bar, 'shown')
+      hover(b, a)
+      await shown
+      b.click()
+      leave(b, document.body)
+      await sleep(300)
+
+      expect(text()).toBe('Italic')
+      expect(document.querySelector('.tooltip.show')).not.toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should keep a click made while the tip reopens in another dialog', async () => {
+      fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a" title="Bold">B</button><dialog open><button type="button" id="b" title="Italic">I</button></dialog></div>'
+      const bar = fixtureEl.querySelector('#bar')
+      const a = bar.querySelector('#a')
+      const b = bar.querySelector('#b')
+      const tooltip = new Tooltip(bar, { anchors: 'button', trigger: 'hover click' })
+      let shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+
+      shown = wait(bar, 'shown')
+      hover(b, a)
+      b.click()
+      await shown
+      leave(b, document.body)
+      await sleep(300)
+
+      expect(text()).toBe('Italic')
+      expect(document.querySelector('.tooltip.show')).not.toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should drop the pin when the focus moves the tip to another anchor', async () => {
+      fixtureEl.innerHTML = `${markup}<button type="button" id="out">Out</button>`
+      const bar = fixtureEl.querySelector('#bar')
+      const a = bar.querySelector('#a')
+      const b = bar.querySelector('#b')
+      const tooltip = new Tooltip(bar, { anchors: 'button', trigger: 'focus click' })
+      const shown = wait(bar, 'shown')
+      a.focus()
+      await shown
+      a.click()
+
+      const moved = wait(bar, 'moved')
+      b.focus()
+      await moved
+      fixtureEl.querySelector('#out').focus()
+      await sleep(300)
+
+      expect(document.querySelector('.tooltip.show')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should pin the tip the pointer moved to another anchor on a click there', async () => {
+      const { a, b, bar, tooltip } = setup({ trigger: 'hover click' })
+      const shown = wait(bar, 'shown')
+      a.click()
+      await shown
+
+      const moved = wait(bar, 'moved')
+      hover(b)
+      await moved
+      b.click()
+      leave(b, document.body)
+      await sleep(300)
+
+      expect(text()).toBe('Italic')
+      expect(document.querySelector('.tooltip.show')).not.toBeNull()
+      tooltip.dispose()
+    })
+
     it('should ignore anchors inside its own tip', async () => {
       fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a">B</button></div>'
       const bar = fixtureEl.querySelector('#bar')
@@ -2956,15 +3092,203 @@ describe('Tooltip', () => {
       tooltip.dispose()
     })
 
-    it('should hide as before with the hover and click triggers, which leave the tip without listeners', async () => {
-      const { leave, toward, tooltip } = await setup({ trigger: 'hover click' })
+    it('should keep the tip across the gap with the hover and click triggers and hide it when the pointer leaves the tip', async () => {
+      const { button, leave, toward, tooltip } = await setup({ trigger: 'hover click' })
       const hide = spyOn(tooltip, 'hide').and.callThrough()
 
       leave()
-      pointer(toward(0.3))
+      await sleep(15)
+      pointer(toward(0.4))
+      await sleep(15)
+      pointer(toward(0.8))
+      await sleep(15)
+      mouse(tipElement(), 'mouseover', toward(1), button)
+      await sleep(60)
+
+      expect(hide).not.toHaveBeenCalled()
+
+      mouse(tipElement(), 'mouseout', { x: 0, y: 0 }, document.body)
       await sleep(10)
 
       expect(hide).toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
+    it('should keep a tip pinned by a click when the pointer leaves the tip', async () => {
+      const { button, leave, toward, tooltip } = await setup({ trigger: 'hover click' })
+      const hide = spyOn(tooltip, 'hide').and.callThrough()
+
+      button.click()
+      leave()
+      mouse(tipElement(), 'mouseover', toward(1), button)
+      mouse(tipElement(), 'mouseout', { x: 0, y: 0 }, document.body)
+      await sleep(60)
+
+      expect(hide).not.toHaveBeenCalled()
+      expect(tooltip._isShown()).toBeTrue()
+      tooltip.dispose()
+    })
+
+    it('should close a pinned tip on the next click with the pointer still on the trigger', async () => {
+      const { button, tooltip } = await setup({ trigger: 'hover click' })
+
+      button.click()
+      await sleep(10)
+
+      expect(tooltip._isShown()).toBeTrue()
+
+      button.click()
+      await sleep(60)
+
+      expect(document.querySelector('.tooltip.show')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should close a tip shown by show() on the first click with the pointer on the trigger', async () => {
+      fixtureEl.innerHTML = '<button type="button" title="A tip">B</button>'
+      const button = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(button, { trigger: 'hover click' })
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+
+      tooltip.show()
+      await shown
+      mouse(button, 'mouseover', { x: 0, y: 0 })
+      button.click()
+      await sleep(60)
+
+      expect(document.querySelector('.tooltip.show')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should forget that hover opened a tip once it hides', async () => {
+      const { button, leave, tooltip } = await setup({ trigger: 'hover click' })
+      const hidden = new Promise(resolve => {
+        button.addEventListener('hidden.coreui.tooltip', resolve, { once: true })
+      })
+
+      leave({ x: 0, y: 0 })
+      await hidden
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      tooltip.show()
+      await shown
+      button.click()
+      await sleep(60)
+
+      expect(document.querySelector('.tooltip.show')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should forget a hover that left before the show delay ended', async () => {
+      fixtureEl.innerHTML = '<button type="button" title="A tip">B</button>'
+      const button = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(button, { delay: { hide: 0, show: 200 }, trigger: 'hover click' })
+
+      mouse(button, 'mouseover', { x: 0, y: 0 })
+      await sleep(20)
+      mouse(button, 'mouseout', { x: 0, y: 0 }, document.body)
+      await sleep(250)
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      tooltip.show()
+      await shown
+      mouse(button, 'mouseover', { x: 0, y: 0 })
+      button.click()
+      await sleep(60)
+
+      expect(document.querySelector('.tooltip.show')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should keep a tip pinned again before the hide delay of the closing click ends', async () => {
+      const { button, tooltip } = await setup({ delay: { hide: 300, show: 0 }, trigger: 'hover click' })
+
+      button.click()
+      await sleep(10)
+      button.click()
+      await sleep(50)
+      button.click()
+      await sleep(400)
+
+      expect(tooltip._isShown()).toBeTrue()
+      tooltip.dispose()
+    })
+
+    it('should open on a second click that comes before the show delay ends', async () => {
+      fixtureEl.innerHTML = '<button type="button" title="A tip">B</button>'
+      const button = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(button, { delay: { hide: 0, show: 100 }, trigger: 'click' })
+
+      button.click()
+      await sleep(20)
+      button.click()
+      await sleep(200)
+
+      expect(tooltip._isShown()).toBeTrue()
+      tooltip.dispose()
+    })
+
+    it('should pin a tip that focus showed on a click and keep it after the focus leaves', async () => {
+      fixtureEl.innerHTML = '<button type="button" id="trigger" title="A tip">B</button><button type="button" id="next">Next</button>'
+      const button = fixtureEl.querySelector('#trigger')
+      const tooltip = new Tooltip(button, { trigger: 'click focus' })
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+
+      button.focus()
+      await shown
+      button.click()
+      await sleep(10)
+      fixtureEl.querySelector('#next').focus()
+      await sleep(60)
+
+      expect(tooltip._isShown()).toBeTrue()
+      tooltip.dispose()
+    })
+
+    it('should hide a tip shown by focus with the click and focus triggers when the focus leaves the tip', async () => {
+      fixtureEl.innerHTML = '<button type="button" id="trigger">B</button><button type="button" id="next">Next</button>'
+      const button = fixtureEl.querySelector('#trigger')
+      const tooltip = new Tooltip(button, { html: true, title: '<a href="#">Link</a>', trigger: 'click focus' })
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+
+      button.focus()
+      await shown
+      const link = tipElement().querySelector('a')
+      link.focus()
+      await sleep(10)
+
+      expect(tooltip._isShown()).toBeTrue()
+
+      fixtureEl.querySelector('#next').focus()
+      await sleep(10)
+
+      expect(document.querySelector('.tooltip.show')).toBeNull()
+      tooltip.dispose()
+    })
+
+    it('should leave a tip shown by the click trigger alone without listeners', async () => {
+      fixtureEl.innerHTML = '<button type="button" title="A tip">B</button>'
+      const button = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(button, { trigger: 'click' })
+      const shown = new Promise(resolve => {
+        button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+
+      button.click()
+      await shown
+      mouse(tipElement(), 'mouseout', { x: 0, y: 0 }, document.body)
+      await sleep(10)
+
+      expect(tooltip._tipEventOut).toBeNull()
+      expect(tooltip._isShown()).toBeTrue()
       tooltip.dispose()
     })
 

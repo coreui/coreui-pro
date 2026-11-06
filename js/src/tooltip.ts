@@ -179,6 +179,7 @@ class Tooltip extends BaseComponent {
   protected declare _resolveTimeout: (() => void) | null
   protected declare _isHovered: boolean | null
   protected declare _activeTrigger: Record<string, boolean>
+  protected declare _openedBy: string | null
   protected declare _floatingCleanup: (() => void) | null
   protected declare _keydownHandler: ((event: KeyboardEvent) => void) | null
   protected declare _focusOutsideHandler: ((event: Event) => void) | null
@@ -210,6 +211,7 @@ class Tooltip extends BaseComponent {
     this._resolveTimeout = null
     this._isHovered = null
     this._activeTrigger = {}
+    this._openedBy = null
     this._floatingCleanup = null
     this._keydownHandler = null
     this._focusOutsideHandler = null
@@ -432,6 +434,7 @@ class Tooltip extends BaseComponent {
     this._activeTrigger[TRIGGER_CLICK] = false
     this._activeTrigger[TRIGGER_FOCUS] = false
     this._activeTrigger[TRIGGER_HOVER] = false
+    this._openedBy = null
     this._isHovered = null // it is a trick to support manual triggering
     this._focusedAnchor = null
     clearTimeout(this._switchTimeout)
@@ -799,8 +802,7 @@ class Tooltip extends BaseComponent {
             return
           }
 
-          context._activeTrigger[TRIGGER_CLICK] = !(context._isShown() && context._activeTrigger[TRIGGER_CLICK])
-          context.toggle()
+          context._clickToggle()
         })
       } else if (trigger !== TRIGGER_MANUAL) {
         const [eventIn, eventOut] = this._getTriggerEvents(trigger)
@@ -811,7 +813,13 @@ class Tooltip extends BaseComponent {
             return
           }
 
-          context._activeTrigger[event.type === 'focusin' ? TRIGGER_FOCUS : TRIGGER_HOVER] = true
+          const via = event.type === 'focusin' ? TRIGGER_FOCUS : TRIGGER_HOVER
+
+          if (!context._isShown()) {
+            context._openedBy = via
+          }
+
+          context._activeTrigger[via] = true
           context._enter()
         })
         EventHandler.on(this._element, eventOut, this._config.selector as string, event => {
@@ -848,14 +856,12 @@ class Tooltip extends BaseComponent {
           }
 
           if (this._isShown() && anchor !== this._anchor) {
-            this._activeTrigger[TRIGGER_CLICK] = true
-            this._moveTo(anchor)
+            this._moveTo(anchor, true)
             return
           }
 
           this._setAnchor(anchor)
-          this._activeTrigger[TRIGGER_CLICK] = !(this._isShown() && this._activeTrigger[TRIGGER_CLICK])
-          this.toggle()
+          this._clickToggle()
         })
       } else if (trigger !== TRIGGER_MANUAL) {
         const [eventIn, eventOut] = this._getTriggerEvents(trigger)
@@ -893,6 +899,10 @@ class Tooltip extends BaseComponent {
       this._focusedAnchor = anchor
     }
 
+    if (!this._isShown()) {
+      this._openedBy = trigger
+    }
+
     this._activeTrigger[trigger] = true
 
     if (!this._isShown() || anchor === this._anchor) {
@@ -907,6 +917,7 @@ class Tooltip extends BaseComponent {
 
     this._isHovered = true
     this._clearTimeout()
+    this._openedBy = trigger
 
     if (trigger === TRIGGER_FOCUS) {
       this._moveTo(anchor)
@@ -1010,7 +1021,7 @@ class Tooltip extends BaseComponent {
     return hasContent
   }
 
-  protected async _moveTo(anchor: HTMLElement): Promise<void> {
+  protected async _moveTo(anchor: HTMLElement, pinned = false): Promise<void> {
     const { tip } = this
     const previous = this._anchor
 
@@ -1018,6 +1029,7 @@ class Tooltip extends BaseComponent {
       return
     }
 
+    this._activeTrigger[TRIGGER_CLICK] = pinned
     closeLayersIn(tip)
     this._setAnchor(anchor)
 
@@ -1026,7 +1038,10 @@ class Tooltip extends BaseComponent {
     }
 
     if (anchor.closest('dialog[open]') !== previous.closest('dialog[open]') || this._isRTL() !== isRTL(previous.parentElement ?? previous)) {
+      const openedBy = this._openedBy
       await this.hide()
+      this._activeTrigger[TRIGGER_CLICK] ||= pinned
+      this._openedBy ??= openedBy
       return this.show()
     }
 
@@ -1071,7 +1086,7 @@ class Tooltip extends BaseComponent {
   protected _setTipListeners(tip: HTMLElement): void {
     const trigger = this._getTrigger()
 
-    if (trigger === TRIGGER_MANUAL || trigger.includes(TRIGGER_CLICK)) {
+    if (!trigger.includes(TRIGGER_HOVER) && !trigger.includes(TRIGGER_FOCUS)) {
       return
     }
 
@@ -1228,6 +1243,18 @@ class Tooltip extends BaseComponent {
     writeAttribute(element, 'title', this._config.anchors ? '' : null)
   }
 
+  protected _clickToggle(): Promise<void> {
+    const close = this._isShown() && (this._activeTrigger[TRIGGER_CLICK] || !this._openedBy)
+
+    this._activeTrigger = close ? {} : { ...this._activeTrigger, [TRIGGER_CLICK]: true }
+
+    if (!close && this._isShown()) {
+      this._clearTimeout()
+    }
+
+    return this.toggle()
+  }
+
   protected _enter(): Promise<void> {
     if (this._isShown() || this._isHovered) {
       this._isHovered = true
@@ -1245,6 +1272,10 @@ class Tooltip extends BaseComponent {
   protected _leave(): Promise<void> {
     if (this._isWithActiveTrigger()) {
       return Promise.resolve()
+    }
+
+    if (!this._isShown()) {
+      this._openedBy = null
     }
 
     this._isHovered = false
