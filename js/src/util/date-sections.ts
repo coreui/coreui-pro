@@ -6,11 +6,13 @@
  */
 
 import {
-  constrainDate, convertToDateObject, createDate, type DisabledDate, getDateOfISOWeek, getISOWeekNumberAndYear, getWeekLabel, hasShortcutModifier, isCellDisabled, parseYearSmart, type PeriodTypes, removeTimeFromDate, type SelectionTypes
+  constrainDate, convertToDateObject, createDate, type DisabledDate, getDateOfISOWeek, getDaysInMonth, getISOWeekNumberAndYear, getWeekLabel, hasShortcutModifier, isCellDisabled, parseYearSmart, type PeriodTypes, removeTimeFromDate, type SelectionTypes
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
-export { getDateOfISOWeek, getWeekLabel, hasShortcutModifier } from './calendar.js'
+export {
+  getDateOfISOWeek, getDaysInMonth, getWeekLabel, hasShortcutModifier
+} from './calendar.js'
 
 export type EditableSectionType = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'hour' | 'minute' | 'second' | 'meridiem'
 
@@ -533,17 +535,6 @@ export const getIncrementedSectionValue = (section: EditableSection, delta: numb
 
   const range = max - min + 1
   return ((((section.value - min + delta) % range) + range) % range) + min
-}
-
-/**
- * Counts the days of a month in any year, including years below 100.
- *
- * @param year - The full year
- * @param month - The month, 1 to 12
- * @returns The number of days
- */
-export const getDaysInMonth = (year: number, month: number): number => {
-  return createDate(year, month, 0).getDate()
 }
 
 /**

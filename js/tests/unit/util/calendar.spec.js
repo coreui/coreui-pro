@@ -199,6 +199,8 @@ describe('Calendar Utilities', () => {
       expect(convertToDateObject('2/15/2023, 12:15:00 pm', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 12, 15))
       expect(convertToDateObject('2/15/2023, 9:05:00 am', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 9, 5))
       expect(convertToDateObject('2/15/2023, 12:15:00 am', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 0, 15))
+      expect(convertToDateObject('2/15/2023, 0:15:00 AM', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 0, 15))
+      expect(convertToDateObject('2/15/2023, 0:15:00 PM', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 12, 15))
     })
 
     it('should read noon on a 24-hour clock without a marker', () => {

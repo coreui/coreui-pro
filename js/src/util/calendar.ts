@@ -102,6 +102,15 @@ export const createDate = (year: number, month = 0, day = 1) : Date => {
 export const addDays = (date: Date, days: number) : Date => createDate(date.getFullYear(), date.getMonth(), date.getDate() + days)
 
 /**
+ * Counts the days of a month in any year, including years below 100.
+ *
+ * @param year - The full year
+ * @param month - The month, 1 to 12
+ * @returns The number of days
+ */
+export const getDaysInMonth = (year: number, month: number) : number => createDate(year, month, 0).getDate()
+
+/**
  * Reads a date written by `Date#toDateString`, the form calendar cells carry
  * in `data-coreui-date`, keeping a year below 100 that the `Date` parser would
  * read as 19xx or 20xx. Any other string gives an invalid date.
@@ -509,7 +518,7 @@ const validateDateComponents = (year: string, month: string, day: string) : bool
   const parsedDay = Number.parseInt(day, 10)
 
   return (
-    parsedMonth >= 1 && parsedMonth <= 12 && parsedDay >= 1 && parsedDay <= createDate(parseYearSmart(year), parsedMonth, 0).getDate()
+    parsedMonth >= 1 && parsedMonth <= 12 && parsedDay >= 1 && parsedDay <= getDaysInMonth(parseYearSmart(year), parsedMonth)
   )
 }
 
@@ -1051,7 +1060,7 @@ const getLeadingDays = (year: number, month: number, firstDayOfWeek: number) : {
  */
 const getMonthDays = (year: number, month: number) : { date: Date; month: string }[] => {
   const dates = []
-  const lastDay = createDate(year, month + 1, 0).getDate()
+  const lastDay = getDaysInMonth(year, month + 1)
   for (let i = 1; i <= lastDay; i++) {
     dates.push({
       date: createDate(year, month, i),
@@ -1640,7 +1649,7 @@ const getPageAction = (date: Date, direction: number, shiftKey: boolean, context
   const from = kept ? kept.target : date
   const target = new Date(date)
   target.setFullYear(from.getFullYear() + offset.years, from.getMonth() + offset.months, 1)
-  target.setDate(Math.min(day, createDate(target.getFullYear(), target.getMonth() + 1, 0).getDate()))
+  target.setDate(Math.min(day, getDaysInMonth(target.getFullYear(), target.getMonth() + 1)))
 
   const bound = direction > 0 ? maxDate : minDate ?? createDate(1)
   const [first, last] = getPanelMonth(context)

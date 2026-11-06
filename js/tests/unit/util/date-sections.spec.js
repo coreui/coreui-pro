@@ -512,6 +512,7 @@ describe('Date Sections Utilities', () => {
       expect(getDaysInMonth(2023, 2)).toBe(28)
       expect(getDaysInMonth(2026, 4)).toBe(30)
       expect(getDaysInMonth(2026, 12)).toBe(31)
+      expect(getDaysInMonth(0, 2)).toBe(29)
     })
   })
 
