@@ -1,3 +1,5 @@
+import { convert12hTo24h } from './time.js'
+
 export type DisabledDate = ((date: Date) => boolean) | Date | Date[]
 
 export type SelectionTypes = 'day' | 'week' | 'month' | 'quarter' | 'year'
@@ -88,6 +90,25 @@ export const createDate = (year: number, month = 0, day = 1) : Date => {
   date.setHours(0, 0, 0, 0)
   return date
 }
+
+/**
+ * Moves a date by whole days into a new date at the start of that day,
+ * keeping a year below 100 as written.
+ *
+ * @param date - The date to move from
+ * @param days - The number of days to move, negative to go back
+ * @returns The start of the day `days` away from `date`
+ */
+export const addDays = (date: Date, days: number) : Date => createDate(date.getFullYear(), date.getMonth(), date.getDate() + days)
+
+/**
+ * Counts the days of a month in any year, including years below 100.
+ *
+ * @param year - The full year
+ * @param month - The month, 1 to 12
+ * @returns The number of days
+ */
+export const getDaysInMonth = (year: number, month: number) : number => createDate(year, month, 0).getDate()
 
 /**
  * Reads a date written by `Date#toDateString`, the form calendar cells carry
@@ -464,33 +485,6 @@ const readWrittenDay = (dateString: string, locale: string) : DateOnlyGroups | n
 }
 
 /**
- * Converts a parsed hour to the 24-hour clock.
- *
- * @param hour - The hour as written
- * @param ampm - The day period as written, if any
- * @returns The hour on the 24-hour clock
- */
-const convertTo24Hour = (hour: string, ampm?: string) : number => {
-  const parsedHour = Number.parseInt(hour, 10)
-
-  if (!ampm) {
-    return parsedHour
-  }
-
-  const isPM = ampm.toLowerCase() === "pm"
-
-  if (isPM && parsedHour !== 12) {
-    return parsedHour + 12
-  }
-
-  if (!isPM && parsedHour === 12) {
-    return 0
-  }
-
-  return parsedHour
-}
-
-/**
  * Tells whether an hour, a minute and a second form a valid time.
  *
  * @param hour - The hour on the 24-hour clock
@@ -524,58 +518,45 @@ const validateDateComponents = (year: string, month: string, day: string) : bool
   const parsedDay = Number.parseInt(day, 10)
 
   return (
-    parsedMonth >= 1 && parsedMonth <= 12 && parsedDay >= 1 && parsedDay <= createDate(parseYearSmart(year), parsedMonth, 0).getDate()
+    parsedMonth >= 1 && parsedMonth <= 12 && parsedDay >= 1 && parsedDay <= getDaysInMonth(parseYearSmart(year), parsedMonth)
   )
 }
 
 /**
  * Builds a date with its time from parsed groups.
  *
- * @param groups - The parsed date and time parts
+ * @param groups - The parsed date and time parts, with a valid month and day
  * @returns The date, or `null` for an invalid time or an hour past 12 with a day period
  */
 const createDateWithTime = (groups: DateTimeGroups) : Date | null => {
-  const { year, month, day, hour, minute, second, ampm } = groups
+  const { hour, minute, second, ampm } = groups
+  const parsedHour = Number.parseInt(hour, 10)
 
-  if (ampm && Number.parseInt(hour, 10) > 12) {
+  if (ampm && parsedHour > 12) {
     return null
   }
 
-  const parsedYear = parseYearSmart(year)
-  const parsedMonth = Number.parseInt(month, 10) - 1
-  const parsedDay = Number.parseInt(day, 10)
-  const parsedHour = convertTo24Hour(hour, ampm)
+  const hour24 = ampm ? convert12hTo24h(ampm.toLowerCase(), parsedHour) : parsedHour
   const parsedMinute = Number.parseInt(minute ?? "0", 10) || 0
   const parsedSecond = Number.parseInt(second ?? "0", 10) || 0
 
-  if (!validateTimeComponents(parsedHour, parsedMinute, parsedSecond)) {
+  if (!validateTimeComponents(hour24, parsedMinute, parsedSecond)) {
     return null
   }
 
-  const date = createDate(parsedYear, parsedMonth, parsedDay)
-  date.setHours(parsedHour, parsedMinute, parsedSecond)
+  const date = createDateOnly(groups)
+  date.setHours(hour24, parsedMinute, parsedSecond)
   return date
 }
 
 /**
  * Builds a date at midnight from parsed groups.
  *
- * @param groups - The parsed date parts
- * @returns The date, or `null` for an invalid month or day
+ * @param groups - The parsed date parts, with a valid month and day
+ * @returns The date
  */
-const createDateOnly = (groups: DateOnlyGroups) : Date | null => {
-  const { year, month, day } = groups
-
-  if (!validateDateComponents(year, month, day)) {
-    return null
-  }
-
-  const parsedYear = parseYearSmart(year)
-  const parsedMonth = Number.parseInt(month, 10) - 1
-  const parsedDay = Number.parseInt(day, 10)
-
-  return createDate(parsedYear, parsedMonth, parsedDay)
-}
+const createDateOnly = ({ year, month, day }: DateOnlyGroups) : Date =>
+  createDate(parseYearSmart(year), Number.parseInt(month, 10) - 1, Number.parseInt(day, 10))
 
 /**
  * Counts the parts a complete date has in the locale's own pattern.
@@ -722,9 +703,9 @@ export const convertToShownDate = (date: Date | string | null | undefined, selec
   }
 
   const rowStart = getWeekRowStart(value, firstDayOfWeek)
-  const rowEnd = createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 6)
+  const rowEnd = addDays(rowStart, 6)
   const monday = getMonday(value)
-  return [rowStart, rowEnd].some(day => day.getFullYear() === value.getFullYear() && day.getMonth() === value.getMonth()) ? value : createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3)
+  return [rowStart, rowEnd].some(day => day.getFullYear() === value.getFullYear() && day.getMonth() === value.getMonth()) ? value : addDays(monday, 3)
 }
 
 /**
@@ -746,7 +727,7 @@ export const convertToLimitDate = (date: Date | string | null | undefined, selec
   }
 
   const monday = getMonday(value)
-  return createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3)
+  return addDays(monday, 3)
 }
 
 /**
@@ -998,7 +979,7 @@ export const formatSelectionName = (date: Date, { ariaWeekNumberLabel = null, fi
   }
 
   const first = getWeekRowStart(date, firstDayOfWeek)
-  const name = formatWeekName([{ date: first }, { date: createDate(first.getFullYear(), first.getMonth(), first.getDate() + 6) }], locale)
+  const name = formatWeekName([{ date: first }, { date: addDays(first, 6) }], locale)
 
   return showWeekNumber ? `${getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale ?? ''), ariaWeekNumberLabel)}, ${name}` : name
 }
@@ -1030,7 +1011,7 @@ export const formatSelectionRangeName = (start: Date, end: Date, options: Select
   if (selectionType === 'week') {
     const last = getWeekRowStart(end, firstDayOfWeek)
     const days = createDateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' })
-      .formatRange(getWeekRowStart(start, firstDayOfWeek), createDate(last.getFullYear(), last.getMonth(), last.getDate() + 6))
+      .formatRange(getWeekRowStart(start, firstDayOfWeek), addDays(last, 6))
     const weekName = (date: Date): string => getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale ?? ''), ariaWeekNumberLabel)
 
     return showWeekNumber ? `${weekName(start)} – ${weekName(end)}, ${days}` : days
@@ -1079,7 +1060,7 @@ const getLeadingDays = (year: number, month: number, firstDayOfWeek: number) : {
  */
 const getMonthDays = (year: number, month: number) : { date: Date; month: string }[] => {
   const dates = []
-  const lastDay = createDate(year, month + 1, 0).getDate()
+  const lastDay = getDaysInMonth(year, month + 1)
   for (let i = 1; i <= lastDay; i++) {
     dates.push({
       date: createDate(year, month, i),
@@ -1376,7 +1357,7 @@ export const getStartOfWeek = (date: Date, firstDayOfWeek: number) : Date => {
  * @returns The Monday of the row's week
  */
 export const getWeekRowDate = (rowStart: Date) : Date =>
-  getMonday(createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 3))
+  getMonday(addDays(rowStart, 3))
 
 /**
  * Finds the midnight that starts the ISO week of a date, read from the Monday
@@ -1401,7 +1382,7 @@ const getMonday = (date: Date) : Date => {
  */
 export const getWeekRowStart = (date: Date, firstDayOfWeek: number) : Date => {
   const monday = getMonday(date)
-  return getStartOfWeek(createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3), firstDayOfWeek)
+  return getStartOfWeek(addDays(monday, 3), firstDayOfWeek)
 }
 
 /**
@@ -1668,7 +1649,7 @@ const getPageAction = (date: Date, direction: number, shiftKey: boolean, context
   const from = kept ? kept.target : date
   const target = new Date(date)
   target.setFullYear(from.getFullYear() + offset.years, from.getMonth() + offset.months, 1)
-  target.setDate(Math.min(day, createDate(target.getFullYear(), target.getMonth() + 1, 0).getDate()))
+  target.setDate(Math.min(day, getDaysInMonth(target.getFullYear(), target.getMonth() + 1)))
 
   const bound = direction > 0 ? maxDate : minDate ?? createDate(1)
   const [first, last] = getPanelMonth(context)
@@ -1985,7 +1966,7 @@ export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | n
   if (startDate && endDate) {
     const end = createDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
 
-    for (let date = createDate(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 1); date <= end; date = createDate(date.getFullYear(), date.getMonth(), date.getDate() + 1)) {
+    for (let date = addDays(startDate, 1); date <= end; date = addDays(date, 1)) {
       if (isCellDisabled(date, view, null, null, disabledDates)) {
         return true
       }
@@ -2021,7 +2002,7 @@ export const isPeriodDisabled = (date: Date, view: PeriodTypes, min?: Date | nul
 
   if (view === 'weeks') {
     const monday = getMonday(date)
-    return isEveryDayDisabled(monday, createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6), null, null, disabledDates)
+    return isEveryDayDisabled(monday, addDays(monday, 6), null, null, disabledDates)
   }
 
   const months = MONTHS_IN_PERIOD[view]
@@ -2062,7 +2043,7 @@ export const isCellDisabled = (date: Date, view: ViewTypes | 'weeks', min?: Date
 export const isCellOutsideLimits = (date: Date, view: ViewTypes, min?: Date | null, max?: Date | null, rows = false) : boolean => {
   const start = getStartOfView(date, view)
   const end = view === 'days' ?
-    createDate(start.getFullYear(), start.getMonth(), start.getDate() + (rows ? 6 : 0)) :
+    addDays(start, rows ? 6 : 0) :
     createDate(start.getFullYear(), start.getMonth() + MONTHS_IN_PERIOD[view], 0)
 
   return end.getFullYear() < 1 || Boolean(min && end < getStartOfView(min, 'days')) || Boolean(max && start > getStartOfView(max, 'days'))

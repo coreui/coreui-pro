@@ -1,6 +1,7 @@
 import { onTestFinished, vi } from 'vitest'
 import { cdp } from 'vitest/browser'
 import {
+  addDays,
   constrainDate,
   convertIsoWeekToDate,
   convertToDateObject,
@@ -83,6 +84,19 @@ describe('Calendar Utilities', () => {
       expect([lastOfFebruary.getFullYear(), lastOfFebruary.getMonth(), lastOfFebruary.getDate()]).toEqual([26, 1, 28])
       expect([turnOfYear.getFullYear(), turnOfYear.getMonth(), turnOfYear.getDate()]).toEqual([100, 0, 1])
       expect(createDate(2026, 12)).toEqual(new Date(2027, 0, 1))
+    })
+  })
+
+  describe('addDays', () => {
+    it('should move by whole days into a new date at midnight, keeping a year below 100', () => {
+      const from = createDate(99, 11, 30)
+      from.setHours(15, 30)
+      const forward = addDays(from, 3)
+
+      expect([forward.getFullYear(), forward.getMonth(), forward.getDate(), forward.getHours()]).toEqual([100, 0, 2, 0])
+      expect(addDays(createDate(26, 2, 1), -1)).toEqual(createDate(26, 1, 28))
+      expect(addDays(from, 0)).toEqual(createDate(99, 11, 30))
+      expect(from.getHours()).toBe(15)
     })
   })
 
@@ -185,6 +199,8 @@ describe('Calendar Utilities', () => {
       expect(convertToDateObject('2/15/2023, 12:15:00 pm', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 12, 15))
       expect(convertToDateObject('2/15/2023, 9:05:00 am', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 9, 5))
       expect(convertToDateObject('2/15/2023, 12:15:00 am', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 0, 15))
+      expect(convertToDateObject('2/15/2023, 0:15:00 AM', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 0, 15))
+      expect(convertToDateObject('2/15/2023, 0:15:00 PM', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 12, 15))
     })
 
     it('should read noon on a 24-hour clock without a marker', () => {
