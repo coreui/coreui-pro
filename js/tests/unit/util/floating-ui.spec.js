@@ -157,6 +157,14 @@ describe('FloatingUI Util', () => {
       const placements = { md: 'top' } // No xs
       expect(getResponsivePlacement(placements, 'left')).toBe('left')
     })
+
+    it('should resolve against a given viewport width instead of the window', () => {
+      spyOnProperty(window, 'innerWidth').and.returnValue(1600)
+
+      const placements = { xs: 'bottom', md: 'top', xl: 'left' }
+      expect(getResponsivePlacement(placements, 'bottom', 0)).toBe('bottom')
+      expect(getResponsivePlacement(placements, 'bottom', 800)).toBe('top')
+    })
   })
 
   describe('createBreakpointListeners', () => {

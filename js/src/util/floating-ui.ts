@@ -73,23 +73,19 @@ export const parseResponsivePlacement = (placementString: string | null | undefi
  *
  * @param responsivePlacements - Object with breakpoint keys and placement values
  * @param defaultPlacement - Fallback placement
+ * @param viewportWidth - Viewport width to resolve against, the current `window.innerWidth` when omitted
  * @returns The active placement for current viewport
  */
-export const getResponsivePlacement = (responsivePlacements: ResponsivePlacements | null, defaultPlacement = 'bottom'): string => {
+export const getResponsivePlacement = (responsivePlacements: ResponsivePlacements | null, defaultPlacement = 'bottom', viewportWidth: number = window.innerWidth): string => {
   if (!responsivePlacements) {
     return defaultPlacement
   }
-
-  // Get current viewport width
-  const viewportWidth = window.innerWidth
 
   // Find the largest breakpoint that matches
   let activePlacement = responsivePlacements.xs || defaultPlacement
 
   // Check breakpoints in order (sm, md, lg, xl, 2xl)
-  const breakpointOrder = ['sm', 'md', 'lg', 'xl', '2xl']
-
-  for (const breakpoint of breakpointOrder) {
+  for (const breakpoint of Object.keys(BREAKPOINTS)) {
     const minWidth = BREAKPOINTS[breakpoint]
     if (viewportWidth >= minWidth && responsivePlacements[breakpoint]) {
       activePlacement = responsivePlacements[breakpoint]

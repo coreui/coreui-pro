@@ -17,6 +17,7 @@ import { createDate } from '@coreui/coreui-pro/utils/calendar'
 import { appendChipValues } from '@coreui/coreui-pro/utils/chip-values'
 import { getSectionLayout } from '@coreui/coreui-pro/utils/date-sections'
 import { onLabelClick } from '@coreui/coreui-pro/utils/field-label'
+import { getResponsivePlacement, parseResponsivePlacement } from '@coreui/coreui-pro/utils/floating-ui'
 import { containsFocus } from '@coreui/coreui-pro/utils/focus'
 import { focusFirstInvalidControl } from '@coreui/coreui-pro/utils/form-validation'
 
@@ -37,6 +38,7 @@ createDate(2026, 0, 1).getFullYear()
 appendChipValues(['a'], ['b'], 2).at(-1)
 getSectionLayout('dd.MM.yyyy', 'en-US')
 onLabelClick(element, () => {})()
+getResponsivePlacement(parseResponsivePlacement('top md:right'), 'top', 0).toUpperCase()
 containsFocus(element).valueOf()
 focusFirstInvalidControl(document.createElement('form'))
 

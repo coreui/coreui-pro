@@ -187,6 +187,16 @@
         "default": "./js/dist/util/field-label.js"
       }
     },
+    "./utils/floating-ui": {
+      "import": {
+        "types": "./js/dist/util/floating-ui.d.mts",
+        "default": "./js/dist/util/floating-ui.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/floating-ui.d.ts",
+        "default": "./js/dist/util/floating-ui.js"
+      }
+    },
     "./utils/focus": {
       "import": {
         "types": "./js/dist/util/focus.d.mts",
