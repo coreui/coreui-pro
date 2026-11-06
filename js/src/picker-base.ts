@@ -28,6 +28,7 @@ import { sanitizeByConfig } from './util/sanitizer.js'
  */
 
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
+const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
@@ -161,6 +162,11 @@ abstract class PickerBase extends BaseComponent {
       EventHandler.on(this._cleanerElement, eventName, (event: any) => {
         settleClick(event)
         event.stopPropagation()
+
+        if (!this._isEditable()) {
+          return
+        }
+
         this._runAsUser(() => this.clear())
 
         if (this._element && [this._cleanerElement, document.body].includes(document.activeElement as HTMLElement)) {
@@ -327,8 +333,18 @@ abstract class PickerBase extends BaseComponent {
       svg.setAttribute('aria-hidden', 'true')
     }
 
+    const editable = this._isEditable()
+
     if ('disabled' in element) {
-      (element as HTMLButtonElement).disabled = !this._isEditable()
+      (element as HTMLButtonElement).disabled = !editable
+    } else {
+      element.classList.toggle(CLASS_NAME_DISABLED, !editable)
+
+      if (editable || !element.hasAttribute('role')) {
+        element.removeAttribute('aria-disabled')
+      } else {
+        element.setAttribute('aria-disabled', 'true')
+      }
     }
 
     return element

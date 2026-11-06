@@ -198,6 +198,8 @@ The picker is built from other components — the [date input](/forms/date-input
 | `data-coreui-picker-toggle` | a `button` or any element | Opens and closes the calendar. Gets `aria-expanded` and `aria-haspopup`, and `aria-controls` while the calendar is open, and `ariaPickerLabel` as its name unless it has one or shows text of its own. |
 | `data-coreui-picker-cleaner` | a `button` | Clears the value. Gets `ariaCleanerLabel` as its name unless it has one or shows text of its own. |
 
+While the picker is disabled or read-only, neither opens the calendar nor clears the value. A `button` gets `disabled`; an element of another kind gets the `.disabled` class, and `aria-disabled="true"` when it has a role.
+
 A decorative `<svg>` inside an adopted button is marked `aria-hidden` for you. So a trigger can be a regular button with its own text and icon, the way a combobox has one:
 
 <Example pro code={`<div data-coreui-locale="en-US" data-coreui-date-picker>
