@@ -311,8 +311,12 @@ describe('Calendar Utilities', () => {
       expect(convertToDateObject(value, 'quarter')).toEqual(new Date(2026, 6, 1))
     })
 
-    it.each(['2026Q5', 'q3 2026'])('should return null for the quarter string %s', value => {
+    it.each(['2026Q5', '2026Q0', '2026  -Q3', 'q3 2026'])('should return null for the quarter string %s', value => {
       expect(convertToDateObject(value, 'quarter')).toBeNull()
+    })
+
+    it.each(['2026-W05', '2026W05', '2026 W05', '2026   W5', ' 2026-W05 '])('should read the week string %s as the Monday of the week', value => {
+      expect(convertToDateObject(value, 'week')).toEqual(new Date(2026, 0, 26))
     })
 
     it('should read an ISO week with a dash as the Monday of the week', () => {
