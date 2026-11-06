@@ -23,7 +23,7 @@ This skill adds only what is specific to jumping two majors: names that changed 
 
 ## Step 1: Browser floor and plan
 
-1. Check the browser floor first. v4 and v5 support Chrome 60, Firefox 60, Safari 12 and iOS 12. v6 requires Chrome 123, Edge 123, Firefox 130, Safari 18 and iOS 18. If the project must support older browsers, stop after the first hop and stay on v5.
+1. Check the browser floor first. v4 and v5 support Chrome 60, Firefox 60, Safari 12 and iOS 12. v6 requires Chrome 124, Edge 124, Firefox 130, Safari 18 and iOS 18. If the project must support older browsers, stop after the first hop and stay on v5.
 2. Plan two commits on one branch: one for the v5 hop, one for the v6 hop. When the second hop breaks something, the split shows which wave caused it.
 3. Install `@coreui/coreui-pro` `5.29.2` for the first hop. Build and open the pages before you start the second hop. The items that Step 2 tells you to write in v6 form can look wrong in the v5 build; that is expected.
 

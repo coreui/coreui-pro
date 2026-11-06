@@ -52,7 +52,7 @@ Modal, Offcanvas and Dropdown keep their names in v6: `.modal`, `.offcanvas`, `.
    import { Tooltip } from '@coreui/coreui-pro'
    ```
 
-6. Raise the browser targets to Chrome 123, Edge 123, Firefox 130, Safari 18 and iOS 18. If the project must support older browsers, stop and keep it on v5.
+6. Raise the browser targets to Chrome 124, Edge 124, Firefox 130, Safari 18 and iOS 18. If the project must support older browsers, stop and keep it on v5.
 7. Replace every Sass `@import` of CoreUI with `@use`. The `*.import.scss` files are gone, so `@import` no longer resolves. Configuration moves into a `with ()` clause, and the `@use` rule must come first in the file.
 
    ```scss

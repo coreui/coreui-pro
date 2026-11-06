@@ -31,7 +31,7 @@ This skill sets up the vanilla package `@coreui/coreui-pro` version `6.0.0-alpha
 | Static page, prototype, no build step | CDN or the downloaded `dist/` files | Step 2 |
 | Needs Sass customization or a JS bundler | npm | Step 3, then one subsection of Step 6 |
 
-Supported browsers: Chrome 123, Edge 123, Firefox 130, Safari 18, iOS 18. The CSS uses `light-dark()` and `color-mix()` with no fallback.
+Supported browsers: Chrome 124, Edge 124, Firefox 130, Safari 18, iOS 18. The CSS uses `light-dark()` and `color-mix()` with no fallback.
 
 ---
 
@@ -209,7 +209,7 @@ Pick the subsection that matches the project. Each one is complete on its own.
 4. Add the browser floors to `package.json` so Autoprefixer emits the prefixes CoreUI needs:
 
    ```json
-   "browserslist": ["Chrome >= 123", "Edge >= 123", "Firefox >= 130", "Safari >= 18", "iOS >= 18"]
+   "browserslist": ["Chrome >= 124", "Edge >= 124", "Firefox >= 130", "Safari >= 18", "iOS >= 18"]
    ```
 
 5. Add the scripts. `--load-path=node_modules` lets Sass resolve `@coreui/coreui-pro`:
