@@ -71,6 +71,7 @@ type DateRangePickerConfig = {
   maxDate: Date | string | null,
   minDate: Date | string | null,
   pickerIcon: string | boolean,
+  readonly: boolean,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
   selectionType: SelectionTypes,
@@ -111,6 +112,7 @@ const Default: DateRangePickerConfig = {
   maxDate: null,
   minDate: null,
   pickerIcon: true,
+  readonly: false,
   sanitize: true,
   sanitizeFn: null,
   selectionType: 'day',
@@ -149,6 +151,7 @@ const DefaultType: Record<string, string> = {
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
   pickerIcon: '(string|boolean)',
+  readonly: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   selectionType: 'string',
@@ -326,7 +329,7 @@ class DateRangePicker extends PickerBase {
       startDate: this._config.startDate,
       validationState: null,
       ...(format ? { format } : {})
-    }, { inputOptions: this._config.inputOptions }))
+    }, { inputOptions: { ...this._config.inputOptions, readonly: this._config.readonly } }))
     inputGroup.setAttribute('role', 'none')
     this._validation.adopt(this._rangeInput._validation)
 

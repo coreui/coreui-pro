@@ -248,6 +248,18 @@ appearance and remove pointer events.
     </div>
   </div>`} />
 
+## Readonly
+
+Add `data-coreui-readonly="true"` to show a date that cannot be changed. The field stays focusable and
+readable, while typing, the calendar button, the cleaner and the keyboard shortcuts that open the
+calendar are turned off.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-date="2026-07-14" data-coreui-locale="en-US" data-coreui-readonly="true" data-coreui-date-picker></div>
+    </div>
+  </div>`} />
+
 ## Disabled dates
 
 The `disabledDates` option excludes specific dates — single `Date`s,
@@ -463,7 +475,7 @@ by the picker itself.
 | `disabled` | boolean | `false` | Disables the field and the popup. |
 | `floatingLabel` | string, null | `null` | Renders a floating label over the field, which also becomes its accessible name. Not rendered for a `data-coreui-picker-field` you wrote, which only takes the name, and not even that when the field carries an `aria-label` of its own. An `aria-label` or `aria-labelledby` on the picker element names the field instead. |
 | `format` | function, string, null | `null` | Mask layout of the field: `null` derives it from the locale (or, for week, month, quarter and year selection, uses the matching default mask), a string is parsed as format tokens, a function receives the locale and returns the section layout. |
-| `inputOptions` | object | `{}` | Programmatic escape hatch for date input options, except `validationState`, which the picker owns. |
+| `inputOptions` | object | `{}` | Programmatic escape hatch for date input options, except `readonly` and `validationState`, which the picker owns. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. With `timepicker`, a time of day bounds the time on that day, and a date without one covers its whole day. |
@@ -471,6 +483,7 @@ by the picker itself.
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`). |
 | `name` | string, null | `null` | Name of the generated value input. Without it the field is not submitted with the form. |
 | `pickerIcon` | string, boolean | `true` | The button that opens the calendar: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Not used for a `data-coreui-picker-toggle` you wrote. Without either the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |
+| `readonly` | boolean | `false` | Makes the field read-only and keeps the calendar closed: the value can be read, not changed. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
 | `seconds` | array, boolean, function | `true` | Seconds offered by the time half. Ignored without `timepicker`. |

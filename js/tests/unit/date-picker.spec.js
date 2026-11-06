@@ -551,6 +551,58 @@ describe('DatePicker', () => {
 
       expect(picker._popup.isShown).toBeFalse()
     })
+
+    it('should keep the calendar closed while readonly, from the button, the keyboard and show()', () => {
+      const picker = buildPicker({ cleaner: true, date: new Date(2026, 6, 14), readonly: true })
+      const showSpy = jasmine.createSpy('show')
+      fixtureEl.querySelector('#picker').addEventListener('show.coreui.date-picker', showSpy)
+      const section = fixtureEl.querySelector('.form-date-time-section')
+
+      fixtureEl.querySelector('.form-control-action').click()
+      section.focus()
+      for (const init of [{ key: 'F4' }, { key: 'ArrowDown', altKey: true }]) {
+        section.dispatchEvent(new KeyboardEvent('keydown', { ...init, bubbles: true, cancelable: true }))
+      }
+
+      picker.show()
+
+      expect(picker._popup.isShown).toBeFalse()
+      expect(showSpy).not.toHaveBeenCalled()
+    })
+
+    it('should disable the indicator button and the cleaner and keep the field readable while readonly', () => {
+      buildPicker({ cleaner: true, date: new Date(2026, 6, 14), readonly: true })
+
+      const cleaner = fixtureEl.querySelector('.form-control-cleaner')
+      const indicator = fixtureEl.querySelector('.form-control-action')
+      const section = fixtureEl.querySelector('.form-date-time-section')
+      expect(indicator.disabled).toBeTrue()
+      expect(cleaner.disabled).toBeTrue()
+      expect(section.getAttribute('aria-readonly')).toEqual('true')
+      expect(section.tabIndex).toEqual(0)
+    })
+
+    it('should take readonly from the picker option over inputOptions, both ways', () => {
+      buildPicker({ date: new Date(2026, 6, 14), inputOptions: { readonly: false }, readonly: true })
+      expect(fixtureEl.querySelector('.form-date-time-section').getAttribute('aria-readonly')).toEqual('true')
+
+      buildPicker({ date: new Date(2026, 6, 14), inputOptions: { readonly: true } })
+      expect(fixtureEl.querySelector('.form-date-time-section').hasAttribute('aria-readonly')).toBeFalse()
+    })
+
+    it('should leave the opening keys to the page while readonly', () => {
+      buildPicker({ date: new Date(2026, 6, 14), readonly: true })
+      const section = fixtureEl.querySelector('.form-date-time-section')
+
+      section.focus()
+      const prevented = [{ key: 'F4' }, { key: 'ArrowDown', altKey: true }].map(init => {
+        const event = new KeyboardEvent('keydown', { ...init, bubbles: true, cancelable: true })
+        section.dispatchEvent(event)
+        return event.defaultPrevented
+      })
+
+      expect(prevented).toEqual([false, false])
+    })
   })
 
   describe('markup roles', () => {
@@ -780,6 +832,13 @@ describe('DatePicker', () => {
 
     it('should disable an adopted toggle and cleaner when the picker is disabled', () => {
       buildPicker({ disabled: true }, OWN_MARKUP)
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').disabled).toBeTrue()
+      expect(fixtureEl.querySelector('[data-coreui-picker-cleaner]').disabled).toBeTrue()
+    })
+
+    it('should disable an adopted toggle and cleaner when the picker is readonly', () => {
+      buildPicker({ readonly: true }, OWN_MARKUP)
 
       expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').disabled).toBeTrue()
       expect(fixtureEl.querySelector('[data-coreui-picker-cleaner]').disabled).toBeTrue()

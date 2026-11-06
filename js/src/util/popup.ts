@@ -448,8 +448,11 @@ class Popup extends Config {
         return
       }
 
-      event.preventDefault()
       this.show()
+
+      if (this._isShown) {
+        event.preventDefault()
+      }
     }
 
     EventHandler.on(this._anchor, EVENT_KEYDOWN, this._anchorKeydownListener)
