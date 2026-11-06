@@ -90,6 +90,16 @@ export const createDate = (year: number, month = 0, day = 1) : Date => {
 }
 
 /**
+ * Moves a date by whole days into a new date at the start of that day,
+ * keeping a year below 100 as written.
+ *
+ * @param date - The date to move from
+ * @param days - The number of days to move, negative to go back
+ * @returns The start of the day `days` away from `date`
+ */
+export const addDays = (date: Date, days: number) : Date => createDate(date.getFullYear(), date.getMonth(), date.getDate() + days)
+
+/**
  * Reads a date written by `Date#toDateString`, the form calendar cells carry
  * in `data-coreui-date`, keeping a year below 100 that the `Date` parser would
  * read as 19xx or 20xx. Any other string gives an invalid date.
@@ -722,9 +732,9 @@ export const convertToShownDate = (date: Date | string | null | undefined, selec
   }
 
   const rowStart = getWeekRowStart(value, firstDayOfWeek)
-  const rowEnd = createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 6)
+  const rowEnd = addDays(rowStart, 6)
   const monday = getMonday(value)
-  return [rowStart, rowEnd].some(day => day.getFullYear() === value.getFullYear() && day.getMonth() === value.getMonth()) ? value : createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3)
+  return [rowStart, rowEnd].some(day => day.getFullYear() === value.getFullYear() && day.getMonth() === value.getMonth()) ? value : addDays(monday, 3)
 }
 
 /**
@@ -746,7 +756,7 @@ export const convertToLimitDate = (date: Date | string | null | undefined, selec
   }
 
   const monday = getMonday(value)
-  return createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3)
+  return addDays(monday, 3)
 }
 
 /**
@@ -998,7 +1008,7 @@ export const formatSelectionName = (date: Date, { ariaWeekNumberLabel = null, fi
   }
 
   const first = getWeekRowStart(date, firstDayOfWeek)
-  const name = formatWeekName([{ date: first }, { date: createDate(first.getFullYear(), first.getMonth(), first.getDate() + 6) }], locale)
+  const name = formatWeekName([{ date: first }, { date: addDays(first, 6) }], locale)
 
   return showWeekNumber ? `${getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale ?? ''), ariaWeekNumberLabel)}, ${name}` : name
 }
@@ -1030,7 +1040,7 @@ export const formatSelectionRangeName = (start: Date, end: Date, options: Select
   if (selectionType === 'week') {
     const last = getWeekRowStart(end, firstDayOfWeek)
     const days = createDateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' })
-      .formatRange(getWeekRowStart(start, firstDayOfWeek), createDate(last.getFullYear(), last.getMonth(), last.getDate() + 6))
+      .formatRange(getWeekRowStart(start, firstDayOfWeek), addDays(last, 6))
     const weekName = (date: Date): string => getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale ?? ''), ariaWeekNumberLabel)
 
     return showWeekNumber ? `${weekName(start)} – ${weekName(end)}, ${days}` : days
@@ -1376,7 +1386,7 @@ export const getStartOfWeek = (date: Date, firstDayOfWeek: number) : Date => {
  * @returns The Monday of the row's week
  */
 export const getWeekRowDate = (rowStart: Date) : Date =>
-  getMonday(createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 3))
+  getMonday(addDays(rowStart, 3))
 
 /**
  * Finds the midnight that starts the ISO week of a date, read from the Monday
@@ -1401,7 +1411,7 @@ const getMonday = (date: Date) : Date => {
  */
 export const getWeekRowStart = (date: Date, firstDayOfWeek: number) : Date => {
   const monday = getMonday(date)
-  return getStartOfWeek(createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3), firstDayOfWeek)
+  return getStartOfWeek(addDays(monday, 3), firstDayOfWeek)
 }
 
 /**
@@ -1985,7 +1995,7 @@ export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | n
   if (startDate && endDate) {
     const end = createDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
 
-    for (let date = createDate(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 1); date <= end; date = createDate(date.getFullYear(), date.getMonth(), date.getDate() + 1)) {
+    for (let date = addDays(startDate, 1); date <= end; date = addDays(date, 1)) {
       if (isCellDisabled(date, view, null, null, disabledDates)) {
         return true
       }
@@ -2021,7 +2031,7 @@ export const isPeriodDisabled = (date: Date, view: PeriodTypes, min?: Date | nul
 
   if (view === 'weeks') {
     const monday = getMonday(date)
-    return isEveryDayDisabled(monday, createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6), null, null, disabledDates)
+    return isEveryDayDisabled(monday, addDays(monday, 6), null, null, disabledDates)
   }
 
   const months = MONTHS_IN_PERIOD[view]
@@ -2062,7 +2072,7 @@ export const isCellDisabled = (date: Date, view: ViewTypes | 'weeks', min?: Date
 export const isCellOutsideLimits = (date: Date, view: ViewTypes, min?: Date | null, max?: Date | null, rows = false) : boolean => {
   const start = getStartOfView(date, view)
   const end = view === 'days' ?
-    createDate(start.getFullYear(), start.getMonth(), start.getDate() + (rows ? 6 : 0)) :
+    addDays(start, rows ? 6 : 0) :
     createDate(start.getFullYear(), start.getMonth() + MONTHS_IN_PERIOD[view], 0)
 
   return end.getFullYear() < 1 || Boolean(min && end < getStartOfView(min, 'days')) || Boolean(max && start > getStartOfView(max, 'days'))
