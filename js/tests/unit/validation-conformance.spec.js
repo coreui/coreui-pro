@@ -205,14 +205,14 @@ const ADAPTERS = [
     }),
     filled: { startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) },
     serverClassElement: t => t.root.querySelector('#field'),
-    blockers: t => [t.instance._rangeInput._startInput._inputElement, t.instance._rangeInput._endInput._inputElement],
+    blockers: t => [t.instance._input._startInput._inputElement, t.instance._input._endInput._inputElement],
     frames: t => [...t.root.querySelectorAll('.form-date-time')],
     invalidTargets: sectionsOf,
     describedTargets: sectionsOf,
     changeAsUser: t => t.root.querySelector('.form-control-cleaner').click(),
     changeEvents: t => [
       [t.root.querySelector('#field'), 'startDateChange.coreui.date-range-picker'],
-      ...nativeChange(t.instance._rangeInput._startInput._inputElement)
+      ...nativeChange(t.instance._input._startInput._inputElement)
     ],
     changeFromCode: t => t.instance.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21)),
     required: { required: true }

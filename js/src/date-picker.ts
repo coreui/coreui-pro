@@ -23,11 +23,6 @@ import {
 import {
   constrainDateTime, convertValue, getHourCycle, getPickerFormat
 } from './util/date-sections.js'
-import {
-  appendControlGroupField,
-  applyControlGroupClasses,
-  applyControlGroupSize
-} from './util/form-control-group.js'
 import type { ValidationState } from './util/form-validation.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
@@ -45,14 +40,9 @@ const DATA_API_KEY = '.data-api'
 const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
-const CLASS_NAME_BODY = 'date-picker-body'
 const CLASS_NAME_CALENDAR = 'date-picker-calendar'
 const CLASS_NAME_CALENDARS = 'date-picker-calendars'
 const CLASS_NAME_DATE_PICKER = 'date-picker'
-const CLASS_NAME_CLEANER = 'form-control-cleaner'
-const CLASS_NAME_INDICATOR = 'form-control-action'
-const CLASS_NAME_INPUT_GROUP = 'form-control-group'
-const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_TIME_BODY = 'date-picker-time-body'
 const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers'
 
@@ -173,27 +163,21 @@ const DefaultType: Record<string, string> = {
  */
 
 class DatePicker extends PickerBase {
-  protected declare _created: { cleaner: boolean, field: boolean, toggle: boolean }
   protected declare _initialDate: any
-  protected declare _input: any
   protected declare _calendar: any
   protected declare _calendarElement: any
   protected declare _selection: any
   protected declare _selectionElement: any
-  protected declare _source: 'calendar' | 'code' | 'selection' | null
   protected declare _toggleLabel: string | null
 
   constructor(element?: string | Element | null, config?: DatePickerOptions | null) {
     super(element, config)
 
     this._initialDate = config?.date ?? this._config.date
-    this._created = { cleaner: false, field: false, toggle: false }
-    this._input = null
     this._calendar = null
     this._calendarElement = null
     this._selection = null
     this._selectionElement = null
-    this._source = null
 
     this._createDatePicker()
     this._nameToggle()
@@ -221,19 +205,19 @@ class DatePicker extends PickerBase {
 
   setDate(date: Date | null): void {
     this._typeCheckConfig({ date }, { date: DefaultType.date })
-    this._writeField(date, 'code', false)
+    this._write(date, 'code', false)
   }
 
   clear(): void {
-    this._writeField(null)
+    this._write(null)
   }
 
   reset(): void {
-    this._writeField(this._initialDate)
+    this._write(this._initialDate)
   }
 
   today(): void {
-    this._writeField(new Date())
+    this._write(new Date())
   }
 
   override getContext(): Record<string, any> {
@@ -241,27 +225,14 @@ class DatePicker extends PickerBase {
       ...this._baseContext(),
       date: this.getDate(),
       isDateSelectable: (date: Date | null) => this._input.isDateSelectable(date),
-      setDate: (date: Date | null) => this._runAsUser(() => this._writeField(date)),
+      setDate: (date: Date | null) => this._runAsUser(() => this._write(date)),
       today: () => this._runAsUser(() => this.today())
     }
   }
 
   override _disposeParts(): void {
-    this._input.dispose()
     this._calendar?.dispose()
     this._selection?.dispose()
-
-    if (this._created.field) {
-      this._fieldElement.remove()
-    }
-
-    if (this._created.cleaner) {
-      this._cleanerElement?.remove()
-    }
-
-    if (this._created.toggle) {
-      this._toggleElement?.remove()
-    }
   }
 
   // Private
@@ -270,17 +241,10 @@ class DatePicker extends PickerBase {
   }
 
   _createDatePicker(): void {
-    this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_PICKER)
+    this._createControlGroup(CLASS_NAME_DATE_PICKER)
 
     const inputGroup = this._element
-    applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP)
-
-    applyControlGroupSize(inputGroup, this._config.size)
-
-    const ownField = SelectorEngine.findOne(SELECTOR_ROLE_FIELD, inputGroup)
-    const inputEl = ownField ?? document.createElement('div')
-    this._created.field = !ownField
-    this._fieldElement = ownField ?? appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
+    const inputEl = SelectorEngine.findOne(SELECTOR_ROLE_FIELD, inputGroup) ?? this._appendField()
     this._moveAriaToField(inputEl)
 
     const cleanerLabel = this._withTime('ariaCleanerLabel', 'Clear date and time')
@@ -290,25 +254,18 @@ class DatePicker extends PickerBase {
 
     if (ownCleaner) {
       this._cleanerElement = this._adoptAction(ownCleaner, cleanerLabel)
-    } else if (this._config.cleaner) {
-      this._cleanerElement = this._createAction(CLASS_NAME_CLEANER, this._config.cleanerIcon, cleanerLabel)
-      this._created.cleaner = true
-      inputGroup.append(this._cleanerElement)
+    } else {
+      this._appendCleaner(inputGroup, cleanerLabel)
     }
 
     const ownToggle = SelectorEngine.findOne(SELECTOR_ROLE_TOGGLE, inputGroup)
 
-    this._toggleElement = null
-    this._toggleLabel = null
-
     if (ownToggle) {
       this._toggleLabel = ownToggle.hasAttribute('aria-label') || ownToggle.hasAttribute('aria-labelledby') || this._showsText(ownToggle) ? null : pickerLabel
       this._toggleElement = this._adoptAction(ownToggle, pickerLabel)
-    } else if (this._config.pickerIcon) {
-      this._toggleLabel = pickerLabel
-      this._toggleElement = this._createAction(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, pickerLabel)
-      this._created.toggle = true
-      inputGroup.append(this._toggleElement)
+    } else {
+      this._appendToggle(inputGroup, pickerLabel, CALENDAR_ICON)
+      this._toggleLabel = this._toggleElement ? pickerLabel : null
     }
 
     const format = getPickerFormat(this._config.format, this._config.selectionType)
@@ -333,31 +290,15 @@ class DatePicker extends PickerBase {
       this._onFieldChange(event.date)
     })
 
-    const body = document.createElement('div')
-    body.classList.add(CLASS_NAME_BODY)
-
-    const calendars = document.createElement('div')
-    calendars.classList.add(CLASS_NAME_CALENDARS)
-
-    this._calendarElement = document.createElement('div')
-    this._calendarElement.classList.add(CLASS_NAME_CALENDAR)
-    calendars.append(this._calendarElement)
-    body.append(calendars)
+    this._calendarElement = this._createDiv(CLASS_NAME_CALENDAR)
+    const parts = [this._createDiv(CLASS_NAME_CALENDARS, this._calendarElement)]
 
     if (this._config.timepicker) {
-      const timePickers = document.createElement('div')
-      timePickers.classList.add(CLASS_NAME_TIME_PICKERS)
-      this._selectionElement = document.createElement('div')
-      this._selectionElement.classList.add(CLASS_NAME_TIME_BODY)
-      timePickers.append(this._selectionElement)
-      body.append(timePickers)
+      this._selectionElement = this._createDiv(CLASS_NAME_TIME_BODY)
+      parts.push(this._createDiv(CLASS_NAME_TIME_PICKERS, this._selectionElement))
     }
 
-    this._createMenu(CLASS_NAME_DATE_PICKER, body, SELECTOR_ACTION_TODAY)
-  }
-
-  override _isNowSelectable(): boolean {
-    return this._input.isDateSelectable(new Date())
+    this._createMenu(CLASS_NAME_DATE_PICKER, parts, SELECTOR_ACTION_TODAY)
   }
 
   override _popupLabel(): string {
@@ -368,7 +309,7 @@ class DatePicker extends PickerBase {
     return this._config.timepicker && this._config[key] === ORIGINAL_DEFAULT[key] ? timed : this._config[key]
   }
 
-  _ensureCalendar(): void {
+  override _onPopupShow(): void {
     if (this._calendar) {
       return
     }
@@ -382,7 +323,7 @@ class DatePicker extends PickerBase {
     }))
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._runAsUser(() => this._writeField(this._withCurrentTime(event.dateObject), 'calendar'))
+      this._runAsUser(() => this._write(this._withCurrentTime(event.dateObject), 'calendar'))
 
       if (!this._config.timepicker) {
         this.hide()
@@ -435,25 +376,10 @@ class DatePicker extends PickerBase {
     merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())
     const limited = this._withinTimeLimits(merged)
 
-    this._writeField(limited, 'selection')
+    this._write(limited, 'selection')
 
     if (this._element && isSameInstantAs(this._selection?.getTime(), time)) {
       this._selection.setTime(this.getDate() ?? limited)
-    }
-  }
-
-  _writeField(date: Date | null, source: 'calendar' | 'code' | 'selection' = 'code', triggerChange = true): void {
-    const previous = this._source
-    this._source = source
-
-    try {
-      this._input.setDate(date, triggerChange)
-
-      if (this._element && this._source === source) {
-        this._syncParts()
-      }
-    } finally {
-      this._source = previous
     }
   }
 
@@ -463,7 +389,7 @@ class DatePicker extends PickerBase {
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, formattedDate: getDateBySelectionType(date, this._config.selectionType) })
   }
 
-  _syncParts(): void {
+  override _syncParts(): void {
     const source = this._source
     const date = this.getDate()
     this._source = null
@@ -489,23 +415,6 @@ class DatePicker extends PickerBase {
     const time = date && this._config.timepicker && createDateTimeFormat(this._config.locale, { timeStyle: this._config.seconds === false ? 'short' : 'medium' }).format(date)
 
     this._writeToggleAttribute('aria-label', [this._toggleLabel, name, time].filter(Boolean).join(', '))
-  }
-
-  override _writeToggleAttribute(name: string, value: string): void {
-    if (!this._toggleElement) {
-      return
-    }
-
-    if (this._created.toggle || (name !== 'aria-label' && name !== 'aria-controls')) {
-      this._toggleElement.setAttribute(name, value)
-      return
-    }
-
-    this._writeAdoptedAttribute(this._toggleElement, name, value)
-  }
-
-  override _onPopupShow(): void {
-    this._ensureCalendar()
   }
 
   // Static

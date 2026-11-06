@@ -2278,6 +2278,16 @@ describe('DatePicker', () => {
       expect(el.children).toHaveLength(0)
     })
 
+    it('should remove the floating label wrapper it built', () => {
+      fixtureEl.innerHTML = '<div id="picker"></div>'
+      const el = fixtureEl.querySelector('#picker')
+      const picker = new DatePicker(el, { floatingLabel: 'Date' })
+
+      picker.dispose()
+
+      expect(el.children).toHaveLength(0)
+    })
+
     it('should build one set of controls when re-initialised on the same element', () => {
       fixtureEl.innerHTML = '<div id="picker"></div>'
       const el = fixtureEl.querySelector('#picker')
@@ -2309,6 +2319,7 @@ describe('DatePicker', () => {
       expect(popup.querySelector('.calendar')).not.toBeNull()
       expect(popup.querySelectorAll('select.date-picker-time-select').length).toBeGreaterThan(0)
       expect(popup.querySelector('.time-picker-col')).toBeNull()
+      expect([...popup.querySelector('.date-picker-body').children].map(child => child.className)).toEqual(['date-picker-calendars', 'date-picker-timepickers'])
     })
 
     it('should take the field type from timepicker, not from a type option', () => {
