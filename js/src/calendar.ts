@@ -61,6 +61,7 @@ import {
   isYearBeforeMonth,
   type KeptDay,
   parseToDateString,
+  type PeriodTypes,
   type PeriodViewTypes,
   type SelectionTypes,
   setRovingTabIndex,
@@ -365,10 +366,8 @@ class Calendar extends BaseComponent {
   }
 
   _focusOnFirstAvailableCell(index: number): void {
-    const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index] as ParentNode
-    const target = (SelectorEngine.findOne(this._rovingSelector(), panel) ??
-      SelectorEngine.findOne('[tabindex="0"]', panel) ??
-      SelectorEngine.findOne('[tabindex="0"]', this._element as ParentNode)) as HTMLElement | null
+    const panel = this._panels()[index]
+    const target = SelectorEngine.findOne(this._rovingSelector(), panel) ?? this._tabStop(panel) ?? this._tabStop()
 
     if (target) {
       target.focus()
@@ -386,7 +385,7 @@ class Calendar extends BaseComponent {
   }
 
   _focusOnCell(date: Date, panel?: number): void {
-    const scope = panel === undefined ? this._element : SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[panel]
+    const scope = panel === undefined ? this._element : this._panels()[panel]
     const matches = (SelectorEngine.find(this._rovingSelector(), scope as ParentNode) as HTMLElement[])
       .filter(element => this._getDate(element).toDateString() === date.toDateString())
 
@@ -415,6 +414,10 @@ class Calendar extends BaseComponent {
     return this._rowsAreTargets() ? 'weeks' : this._view
   }
 
+  _isCellDisabled(date: Date): boolean {
+    return isCellDisabled(date, this._cellUnit(), this._minDate, this._maxDate, this._config.disabledDates)
+  }
+
   _getDate(target: HTMLElement): Date {
     if (this._rowsAreTargets()) {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW) as ParentNode)
@@ -440,7 +443,7 @@ class Calendar extends BaseComponent {
     const cloneDate = new Date(date)
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR) as HTMLElement, 'calendar-index') as number
 
-    if (isCellDisabled(date, this._cellUnit(), this._minDate, this._maxDate, this._config.disabledDates)) {
+    if (this._isCellDisabled(date)) {
       return
     }
 
@@ -514,9 +517,7 @@ class Calendar extends BaseComponent {
     }
 
     this._modifyCalendarDate(action.years, action.months, () => {
-      const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[context.panel]
-      const stop = (SelectorEngine.findOne('[tabindex="0"]', panel as ParentNode) ??
-        SelectorEngine.findOne('[tabindex="0"]', this._element as ParentNode)) as HTMLElement | null
+      const stop = this._tabStop(this._panels()[context.panel]) ?? this._tabStop()
 
       if (stop) {
         stop.focus()
@@ -532,7 +533,7 @@ class Calendar extends BaseComponent {
       keptDay: this._keptDay,
       maxDate: this._maxDate,
       minDate: this._minDate,
-      panel: SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode).indexOf(target.closest(SELECTOR_CALENDAR) as HTMLElement),
+      panel: this._panels().indexOf(target.closest(SELECTOR_CALENDAR) as HTMLElement),
       rows: this._rowsAreTargets(),
       rtl: isRTL(this._element),
       view: this._view
@@ -561,7 +562,7 @@ class Calendar extends BaseComponent {
 
     const date = this._getPickedDate(target)
 
-    if (isCellDisabled(date, this._cellUnit(), this._minDate, this._maxDate, this._config.disabledDates)) {
+    if (this._isCellDisabled(date)) {
       return
     }
 
@@ -673,10 +674,9 @@ class Calendar extends BaseComponent {
     this._setCalendarView(view, 'navigation')
     this._updateCalendar(() => {
       if (focus) {
-        const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index]
         const target = SelectorEngine.find(`[data-coreui-date="${start}"]`, this._element)
           .map(cell => cell.closest<HTMLElement>(this._rovingSelector()))
-          .find(Boolean) ?? SelectorEngine.findOne('[tabindex="0"]', panel)
+          .find(Boolean) ?? this._tabStop(this._panels()[index])
         target?.focus()
       }
     })
@@ -723,7 +723,7 @@ class Calendar extends BaseComponent {
   }
 
   _selectDate(date: any): void {
-    if (isCellDisabled(date, this._cellUnit(), this._minDate, this._maxDate, this._config.disabledDates)) {
+    if (this._isCellDisabled(date)) {
       return
     }
 
@@ -842,7 +842,7 @@ class Calendar extends BaseComponent {
   }
 
   _pages(): Array<[string | null, boolean]> {
-    return SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode).map(panel => {
+    return this._panels().map(panel => {
       const grid = panel.children[1]
       return [grid.getAttribute('aria-label'), grid.hasAttribute('aria-describedby')]
     })
@@ -884,7 +884,7 @@ class Calendar extends BaseComponent {
       return
     }
 
-    const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
+    const panels = this._panels()
     const active = (this._element.getRootNode() as Document | ShadowRoot).activeElement
     const date = active && this._element.contains(active) ?
       active.closest(`${SELECTOR_CALENDAR_CELL}[aria-label], ${SELECTOR_CALENDAR_ROW}[aria-label]`) :
@@ -996,6 +996,14 @@ class Calendar extends BaseComponent {
     return this._rowsAreTargets() ? SELECTOR_CALENDAR_ROW_FOCUSABLE : SELECTOR_CALENDAR_CELL_FOCUSABLE
   }
 
+  _panels(): HTMLElement[] {
+    return SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
+  }
+
+  _tabStop(scope: ParentNode = this._element): HTMLElement | null {
+    return SelectorEngine.findOne('[tabindex="0"]', scope)
+  }
+
   _createCalendar(): void {
     this._setCalendarClasses()
 
@@ -1073,47 +1081,55 @@ class Calendar extends BaseComponent {
   }
 
   _updateCalendar(callback?: () => void): void {
-    const focused = this._element.contains(document.activeElement) ? document.activeElement as HTMLElement : null
-    const restoreFocus = focused && this._focusRestorer(focused)
-    const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
     const pages = this._pages()
 
-    if (panels.length === this._config.calendars) {
-      this._setCalendarClasses()
+    this._keepingFocus(() => {
+      const panels = this._panels()
 
-      for (const [index, panel] of panels.entries()) {
-        this._renderCalendarPanel(panel as HTMLElement, index)
+      if (panels.length === this._config.calendars) {
+        this._setCalendarClasses()
+
+        for (const [index, panel] of panels.entries()) {
+          this._renderCalendarPanel(panel, index)
+        }
+
+        this._updateRovingTabIndex()
+      } else {
+        this._element.replaceChildren()
+        this._createCalendar()
       }
 
-      this._updateRovingTabIndex()
-    } else {
-      this._element.replaceChildren()
-      this._createCalendar()
-    }
-
-    if (callback) {
-      callback()
-    }
-
-    if (restoreFocus && (!document.activeElement || document.activeElement === document.body)) {
-      restoreFocus()
-    }
+      if (callback) {
+        callback()
+      }
+    })
 
     this._announcePages(pages)
   }
 
+  _keepingFocus(render: () => void): void {
+    const focused = this._element.contains(document.activeElement) ? document.activeElement as HTMLElement : null
+    const restoreFocus = focused && this._focusRestorer(focused)
+
+    render()
+
+    if (restoreFocus && (!document.activeElement || document.activeElement === document.body)) {
+      restoreFocus()
+    }
+  }
+
   _focusRestorer(focused: HTMLElement): () => void {
-    const index = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode).indexOf(focused.closest(SELECTOR_CALENDAR) as HTMLElement)
+    const index = this._panels().indexOf(focused.closest(SELECTOR_CALENDAR) as HTMLElement)
     const cell = focused.matches(SELECTOR_CALENDAR_ROW) ? SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, focused) : focused.closest(SELECTOR_CALENDAR_CELL)
     const date = cell?.getAttribute('data-coreui-date')
     const { className } = focused
 
     return () => {
-      const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index] ?? this._element
+      const panel = this._panels()[index] ?? this._element
       const matches = SelectorEngine.find(this._rovingSelector(), this._element as ParentNode).filter(target =>
         (target.matches(SELECTOR_CALENDAR_ROW) ? SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target) : target)?.getAttribute('data-coreui-date') === date)
       const target = ((date ? matches.find(target => !target.matches('.next, .previous')) ?? matches[0] : panel.getElementsByClassName(className)[0]) ??
-        SelectorEngine.findOne('[tabindex="0"]', panel) ?? SelectorEngine.findOne('[tabindex="0"]', this._element)) as HTMLElement | null
+        this._tabStop(panel) ?? this._tabStop()) as HTMLElement | null
 
       target?.focus({ preventScroll: true })
     }
@@ -1132,15 +1148,11 @@ class Calendar extends BaseComponent {
       }
     } else {
       for (const cell of SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[data-coreui-date]`, this._element as ParentNode)) {
-        const date = this._getDate(cell)
-
-        this._applyState(cell, this._view === 'days' ?
-          this._cellDayAttributes(date, ['previous', 'next'].find(month => cell.classList.contains(month)) ?? 'current') :
-          this._cellPeriodAttributes(date))
+        this._applyState(cell, this._cellAttributes(cell, this._getDate(cell)))
       }
     }
 
-    for (const panel of SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)) {
+    for (const panel of this._panels()) {
       this._describeGrid(panel)
     }
 
@@ -1152,25 +1164,17 @@ class Calendar extends BaseComponent {
       return
     }
 
-    const focused = this._element.contains(document.activeElement) ? document.activeElement as HTMLElement : null
-    const restoreFocus = focused && this._focusRestorer(focused)
+    this._keepingFocus(() => {
+      for (const cell of SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[data-coreui-date]`, this._element as ParentNode)) {
+        const date = parseToDateString(Manipulator.getDataAttribute(cell, 'date') as string)
+        const inner = SelectorEngine.findOne(`.${CLASS_NAME_CALENDAR_CELL_INNER}`, cell) as HTMLElement
+        const content = this._cellContent(date, this._cellAttributes(cell, date).meta)
 
-    for (const cell of SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[data-coreui-date]`, this._element as ParentNode)) {
-      const date = parseToDateString(Manipulator.getDataAttribute(cell, 'date') as string)
-      const attributes = this._view === 'days' ?
-        this._cellDayAttributes(date, ['previous', 'next'].find(month => cell.classList.contains(month)) ?? 'current', this._rowWeekAttributes(this._getDate(cell)).meta) :
-        this._cellPeriodAttributes(date)
-      const inner = SelectorEngine.findOne(`.${CLASS_NAME_CALENDAR_CELL_INNER}`, cell) as HTMLElement
-      const content = this._cellContent(date, attributes.meta)
-
-      if (inner.innerHTML !== content) {
-        inner.innerHTML = content
+        if (inner.innerHTML !== content) {
+          inner.innerHTML = content
+        }
       }
-    }
-
-    if (restoreFocus && (!document.activeElement || document.activeElement === document.body)) {
-      restoreFocus()
-    }
+    })
   }
 
   _applyState(element: HTMLElement, { ariaDisabled, ariaSelected, className, selectable }: Record<string, any>): void {
@@ -1199,6 +1203,15 @@ class Calendar extends BaseComponent {
       .filter(([_, value]) => Boolean(value))
       .map(([key]) => key)
       .join(' ')
+  }
+
+  _cellAttributes(cell: HTMLElement, date: Date): Record<string, any> {
+    if (this._view !== 'days') {
+      return this._cellPeriodAttributes(date)
+    }
+
+    const month = ['previous', 'next'].find(month => cell.classList.contains(month)) ?? 'current'
+    return this._cellDayAttributes(date, month, this._rowWeekAttributes(this._getDate(cell)).meta)
   }
 
   _cellDayAttributes(date: Date, month: string, row?: Record<string, boolean>): Record<string, any> {
@@ -1264,29 +1277,10 @@ class Calendar extends BaseComponent {
     const { firstDayOfWeek, selectionType } = this._config
     const start = convertToShownDate(this._startDate, selectionType, firstDayOfWeek)
     const end = convertToShownDate(this._endDate, selectionType, firstDayOfWeek)
-    const isDisabled = isPeriodDisabled(date, view, this._minDate, this._maxDate, this._config.disabledDates)
-    const isSelected = isPeriodSelected(date, view, start, end)
-    const isInRange = isPeriodInRange(date, view, start, end)
-    const isRangeHover = VIEW_BY_SELECTION_TYPE[this._config.selectionType] === view &&
-      this._isRangeHover((start, end) => isPeriodInRange(date, view, start, end))
 
     return {
-      className: this._classNames({
-        [CLASS_NAME_CALENDAR_CELL]: true,
-        disabled: isDisabled,
-        'range-hover': isRangeHover,
-        range: isInRange,
-        selected: isSelected
-      }),
-      focusable: !isCellOutsideLimits(date, view, this._minDate, this._maxDate),
-      selectable: !isDisabled,
-      ariaDisabled: isDisabled,
-      ariaSelected: isSelected || (this._picksRange() && isInRange && !isDisabled),
-      meta: {
-        isDisabled,
-        isInRange,
-        isSelected
-      }
+      ...this._periodState(date, view, start, end, CLASS_NAME_CALENDAR_CELL),
+      focusable: !isCellOutsideLimits(date, view, this._minDate, this._maxDate)
     }
   }
 
@@ -1300,24 +1294,27 @@ class Calendar extends BaseComponent {
       }
     }
 
-    const weekDate = getWeekRowDate(date)
-    const isDisabled = isPeriodDisabled(weekDate, 'weeks', this._minDate, this._maxDate, this._config.disabledDates)
-    const isSelected = isPeriodSelected(weekDate, 'weeks', this._startDate, this._endDate)
-    const isInRange = isPeriodInRange(weekDate, 'weeks', this._startDate, this._endDate)
+    return {
+      ...this._periodState(getWeekRowDate(date), 'weeks', this._startDate, this._endDate, CLASS_NAME_CALENDAR_ROW),
+      focusable: !isCellOutsideLimits(date, 'days', this._minDate, this._maxDate, true)
+    }
+  }
 
-    const isRangeHover = this._isRangeHover((start, end) => isPeriodInRange(weekDate, 'weeks', start, end))
-
-    const classNames = this._classNames({
-      [CLASS_NAME_CALENDAR_ROW]: true,
-      disabled: isDisabled,
-      range: isInRange,
-      'range-hover': isRangeHover,
-      selected: isSelected
-    })
+  _periodState(date: Date, view: PeriodTypes, start: Date | null, end: Date | null, className: string): Record<string, any> {
+    const isDisabled = isPeriodDisabled(date, view, this._minDate, this._maxDate, this._config.disabledDates)
+    const isSelected = isPeriodSelected(date, view, start, end)
+    const isInRange = isPeriodInRange(date, view, start, end)
+    const isRangeHover = this._selectionView() === this._view &&
+      this._isRangeHover((start, end) => isPeriodInRange(date, view, start, end))
 
     return {
-      className: classNames,
-      focusable: !isCellOutsideLimits(date, 'days', this._minDate, this._maxDate, true),
+      className: this._classNames({
+        [className]: true,
+        disabled: isDisabled,
+        range: isInRange,
+        'range-hover': isRangeHover,
+        selected: isSelected
+      }),
       selectable: !isDisabled,
       ariaDisabled: isDisabled,
       ariaSelected: isSelected || (this._picksRange() && isInRange && !isDisabled),
