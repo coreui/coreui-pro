@@ -21,16 +21,7 @@ Bootstrap modals are lightweight and multi-purpose popups built on the native `<
 - The backdrop is the native `::backdrop` pseudo-element. Clicking it closes the modal, and page scroll is blocked while a modal is open.
 - Modals are vertically and horizontally centered by the browser.
 - Menus, pickers and combobox panels open in the modal close when it hides, and opening the modal as a modal closes the ones open on the page. A click in such a panel or <kbd>Esc</kbd> pressed in it never closes the modal.
-- Due to how HTML5 defines its semantics, [the `autofocus` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-autofocus) has no effect in CoreUI modals. To achieve the same effect, use some custom JavaScript:
-
-```js
-const myModal = document.getElementById('myModal')
-const myInput = document.getElementById('myInput')
-
-myModal.addEventListener('shown.coreui.modal', () => {
-  myInput.focus()
-})
-```
+- To start in a particular field rather than at the first focusable element, give it [the `autofocus` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-autofocus). The browser moves focus to it each time the modal opens.
 
 <Callout color="info">
 This component's animation effect relies on the `prefers-reduced-motion` media query. For more information, refer to the [reduced motion section of our accessibility documentation](/accessibility/reduced-motion/).
