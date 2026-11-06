@@ -1,3 +1,5 @@
+import { convert12hTo24h } from './time.js'
+
 export type DisabledDate = ((date: Date) => boolean) | Date | Date[]
 
 export type SelectionTypes = 'day' | 'week' | 'month' | 'quarter' | 'year'
@@ -474,33 +476,6 @@ const readWrittenDay = (dateString: string, locale: string) : DateOnlyGroups | n
 }
 
 /**
- * Converts a parsed hour to the 24-hour clock.
- *
- * @param hour - The hour as written
- * @param ampm - The day period as written, if any
- * @returns The hour on the 24-hour clock
- */
-const convertTo24Hour = (hour: string, ampm?: string) : number => {
-  const parsedHour = Number.parseInt(hour, 10)
-
-  if (!ampm) {
-    return parsedHour
-  }
-
-  const isPM = ampm.toLowerCase() === "pm"
-
-  if (isPM && parsedHour !== 12) {
-    return parsedHour + 12
-  }
-
-  if (!isPM && parsedHour === 12) {
-    return 0
-  }
-
-  return parsedHour
-}
-
-/**
  * Tells whether an hour, a minute and a second form a valid time.
  *
  * @param hour - The hour on the 24-hour clock
@@ -541,51 +516,38 @@ const validateDateComponents = (year: string, month: string, day: string) : bool
 /**
  * Builds a date with its time from parsed groups.
  *
- * @param groups - The parsed date and time parts
+ * @param groups - The parsed date and time parts, with a valid month and day
  * @returns The date, or `null` for an invalid time or an hour past 12 with a day period
  */
 const createDateWithTime = (groups: DateTimeGroups) : Date | null => {
-  const { year, month, day, hour, minute, second, ampm } = groups
+  const { hour, minute, second, ampm } = groups
+  const parsedHour = Number.parseInt(hour, 10)
 
-  if (ampm && Number.parseInt(hour, 10) > 12) {
+  if (ampm && parsedHour > 12) {
     return null
   }
 
-  const parsedYear = parseYearSmart(year)
-  const parsedMonth = Number.parseInt(month, 10) - 1
-  const parsedDay = Number.parseInt(day, 10)
-  const parsedHour = convertTo24Hour(hour, ampm)
+  const hour24 = ampm ? convert12hTo24h(ampm.toLowerCase(), parsedHour) : parsedHour
   const parsedMinute = Number.parseInt(minute ?? "0", 10) || 0
   const parsedSecond = Number.parseInt(second ?? "0", 10) || 0
 
-  if (!validateTimeComponents(parsedHour, parsedMinute, parsedSecond)) {
+  if (!validateTimeComponents(hour24, parsedMinute, parsedSecond)) {
     return null
   }
 
-  const date = createDate(parsedYear, parsedMonth, parsedDay)
-  date.setHours(parsedHour, parsedMinute, parsedSecond)
+  const date = createDateOnly(groups)
+  date.setHours(hour24, parsedMinute, parsedSecond)
   return date
 }
 
 /**
  * Builds a date at midnight from parsed groups.
  *
- * @param groups - The parsed date parts
- * @returns The date, or `null` for an invalid month or day
+ * @param groups - The parsed date parts, with a valid month and day
+ * @returns The date
  */
-const createDateOnly = (groups: DateOnlyGroups) : Date | null => {
-  const { year, month, day } = groups
-
-  if (!validateDateComponents(year, month, day)) {
-    return null
-  }
-
-  const parsedYear = parseYearSmart(year)
-  const parsedMonth = Number.parseInt(month, 10) - 1
-  const parsedDay = Number.parseInt(day, 10)
-
-  return createDate(parsedYear, parsedMonth, parsedDay)
-}
+const createDateOnly = ({ year, month, day }: DateOnlyGroups) : Date =>
+  createDate(parseYearSmart(year), Number.parseInt(month, 10) - 1, Number.parseInt(day, 10))
 
 /**
  * Counts the parts a complete date has in the locale's own pattern.
