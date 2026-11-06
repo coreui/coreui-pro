@@ -835,6 +835,7 @@ describe('DatePicker', () => {
 
       expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').disabled).toBeTrue()
       expect(fixtureEl.querySelector('[data-coreui-picker-cleaner]').disabled).toBeTrue()
+      expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').hasAttribute('aria-disabled')).toBeFalse()
     })
 
     it('should disable an adopted toggle and cleaner when the picker is readonly', () => {
@@ -842,6 +843,46 @@ describe('DatePicker', () => {
 
       expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').disabled).toBeTrue()
       expect(fixtureEl.querySelector('[data-coreui-picker-cleaner]').disabled).toBeTrue()
+      expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').hasAttribute('aria-disabled')).toBeFalse()
+    })
+
+    it('should mark an adopted toggle and cleaner that are not buttons as disabled from the options on every start', () => {
+      const markup = `<div id="picker" data-coreui-locale="en-US">
+          <div data-coreui-picker-field></div>
+          <span role="button" tabindex="0" data-coreui-picker-cleaner>Clear</span>
+          <span data-coreui-picker-toggle>Pick a date</span>
+        </div>`
+
+      for (const config of [{ disabled: true }, { readonly: true }]) {
+        const picker = buildPicker(config, markup)
+        const cleaner = fixtureEl.querySelector('[data-coreui-picker-cleaner]')
+        const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
+
+        expect([cleaner.getAttribute('aria-disabled'), toggle.hasAttribute('aria-disabled')]).toEqual(['true', false])
+        expect([cleaner, toggle].every(action => action.classList.contains('disabled'))).toBeTrue()
+
+        picker.dispose()
+        pickers.length = 0
+        pickers.push(new DatePicker(fixtureEl.querySelector('#picker')))
+
+        expect(cleaner.hasAttribute('aria-disabled')).toBeFalse()
+        expect([cleaner, toggle].some(action => action.classList.contains('disabled'))).toBeFalse()
+
+        pickers.pop().dispose()
+      }
+    })
+
+    it('should keep the value when an adopted cleaner that is not a button is clicked while disabled or readonly', () => {
+      for (const config of [{ disabled: true }, { readonly: true }]) {
+        const picker = buildPicker({ date: new Date(2026, 6, 14), ...config }, `<div id="picker" data-coreui-locale="en-US">
+            <div data-coreui-picker-field></div>
+            <span role="button" tabindex="0" data-coreui-picker-cleaner>Clear</span>
+          </div>`)
+
+        fixtureEl.querySelector('[data-coreui-picker-cleaner]').click()
+
+        expect(picker.getDate()).toEqual(new Date(2026, 6, 14))
+      }
     })
 
     it('should leave the author\'s elements in place on dispose', () => {
