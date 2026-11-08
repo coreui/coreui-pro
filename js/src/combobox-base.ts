@@ -15,6 +15,7 @@ import { focusIfUsable } from './util/focus.js'
 import {
   handleEscape, isComposingKey, isInDescendantParts, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
 } from './util/layers.js'
+import { isTypingKey } from './util/list-navigation.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { escapeHtml } from './util/sanitizer.js'
 import { type SelectionStore } from './util/selection-state.js'
@@ -47,6 +48,7 @@ const CLASS_NAME_LIST_BOX = 'list-box'
 const CLASS_NAME_OPTIONS = 'list-box-options'
 
 const SELECTOR_OPTION = '.list-box-option'
+const SELECTOR_TEXT_ENTRY = 'input, textarea, select, [contenteditable=""], [contenteditable="true"]'
 
 const EVENT_LIST_BOX_ACTION = 'action.coreui.list-box'
 const EVENT_LIST_BOX_CHANGE = 'change.coreui.list-box'
@@ -336,6 +338,16 @@ class ComboboxBase extends BaseComponent {
     this._openingKey = key
     this.show()
     this._openingKey = null
+  }
+
+  _typingField(): HTMLElement | null {
+    return null
+  }
+
+  _routeTyping(event: KeyboardEvent): void {
+    if (!event.defaultPrevented && isTypingKey(event) && !(event.target as HTMLElement).closest(SELECTOR_TEXT_ENTRY)) {
+      this._typingField()?.focus()
+    }
   }
 
   _activateForKey(key: string | null): void {

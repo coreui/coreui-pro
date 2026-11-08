@@ -1,7 +1,7 @@
 import { onTestFinished, vi } from 'vitest'
 import {
   createTypeaheadBuffer, endsEntryWait, findOpeningItem, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, getRevealScrollTop, getVirtualRows,
-  isEntryWaiting, isTypingKey, keepsFocus, rangeBetween, scrollIntoContainer
+  isEntryWaiting, isOpeningF4, isShortcutPress, isTypingKey, keepsFocus, rangeBetween, scrollIntoContainer
 } from '../../../src/util/list-navigation.js'
 import * as Util from '../../../src/util/index.js'
 
@@ -71,16 +71,16 @@ describe('List navigation utilities', () => {
       expect(buffer.push('c')).toBe('bac')
     })
 
-    it('should keep the text for 500 ms when the timeout is left out', () => {
+    it('should keep the text for 1000 ms when the timeout is left out', () => {
       vi.useFakeTimers()
       const buffer = createTypeaheadBuffer()
 
       buffer.push('b')
-      vi.advanceTimersByTime(499)
+      vi.advanceTimersByTime(999)
 
       expect(buffer.push('a')).toBe('ba')
 
-      vi.advanceTimersByTime(500)
+      vi.advanceTimersByTime(1000)
 
       expect(buffer.push('c')).toBe('c')
     })
@@ -141,6 +141,117 @@ describe('List navigation utilities', () => {
     })
   })
 
+  describe('createTypeaheadBuffer search', () => {
+    const textOf = item => item
+    const cities = ['Newark', 'New York', 'Nice']
+    const type = (buffer, text) => {
+      for (const key of text) {
+        buffer.push(key)
+      }
+    }
+
+    it('should return the match for the typed text and keep the text', () => {
+      const buffer = createTypeaheadBuffer()
+
+      expect(buffer.search('n', cities, -1, textOf)).toBe('Newark')
+      expect(buffer.search('i', cities, 0, textOf)).toBe('Nice')
+      expect(buffer.push('c')).toBe('nic')
+    })
+
+    it('should empty the text when nothing matches', () => {
+      const buffer = createTypeaheadBuffer()
+
+      expect(buffer.search('z', cities, -1, textOf)).toBeUndefined()
+      expect(buffer.push('n')).toBe('n')
+    })
+
+    it('should ignore a key that is not one character', () => {
+      const buffer = createTypeaheadBuffer()
+
+      buffer.push('n')
+
+      expect(buffer.search('Enter', cities, -1, textOf)).toBeUndefined()
+      expect(buffer.push('e')).toBe('ne')
+    })
+
+    it('should take the space into running text that an entry continues with it', () => {
+      const buffer = createTypeaheadBuffer()
+
+      type(buffer, 'new')
+
+      expect(buffer.search(' ', cities, 0, textOf)).toBe('New York')
+      expect(buffer.push('y')).toBe('new y')
+    })
+
+    it('should leave the text alone when no entry continues it with the space', () => {
+      const buffer = createTypeaheadBuffer()
+
+      buffer.push('n')
+
+      expect(buffer.search(' ', cities, 0, textOf)).toBeUndefined()
+      expect(buffer.push('i')).toBe('ni')
+    })
+
+    it('should not take the space without running text', () => {
+      const buffer = createTypeaheadBuffer()
+
+      expect(buffer.search(' ', [' leading'], -1, textOf)).toBeUndefined()
+      expect(buffer.push('n')).toBe('n')
+    })
+
+    it('should restart the timer when the space continues the text', () => {
+      vi.useFakeTimers()
+      const buffer = createTypeaheadBuffer(300)
+
+      type(buffer, 'new')
+      vi.advanceTimersByTime(200)
+      buffer.search(' ', cities, 0, textOf)
+      vi.advanceTimersByTime(200)
+
+      expect(buffer.push('y')).toBe('new y')
+    })
+  })
+
+  describe('createTypeaheadBuffer seed', () => {
+    const textOf = item => item
+    const fruit = ['Apple', 'Banana']
+
+    it('should drop the opening key when the next search finds nothing with it', () => {
+      const buffer = createTypeaheadBuffer()
+
+      buffer.seed('x')
+
+      expect(buffer.search('b', fruit, -1, textOf)).toBe('Banana')
+    })
+
+    it('should continue from the opening key when the next search finds something', () => {
+      const buffer = createTypeaheadBuffer()
+
+      buffer.seed('b')
+
+      expect(buffer.search('a', ['Bakery', 'Avocado'], -1, textOf)).toBe('Bakery')
+      expect(buffer.push('k')).toBe('bak')
+    })
+
+    it('should drop the opening key only for the first search', () => {
+      const buffer = createTypeaheadBuffer()
+
+      buffer.seed('x')
+      buffer.search('b', fruit, -1, textOf)
+
+      expect(buffer.search('z', fruit, 1, textOf)).toBeUndefined()
+      expect(buffer.push('a')).toBe('a')
+    })
+
+    it('should ignore a key that is not one character', () => {
+      const buffer = createTypeaheadBuffer()
+
+      buffer.seed('ArrowDown')
+
+      expect(buffer.push('b')).toBe('b')
+    })
+  })
+
   describe('findTypeaheadMatch', () => {
     const items = ['Banana', 'Apple', 'Avocado', 'Blueberry', 'Apricot']
     const textOf = item => item
@@ -149,6 +260,40 @@ describe('List navigation utilities', () => {
       expect(findTypeaheadMatch(items, 1, 'a', textOf)).toBe('Avocado')
       expect(findTypeaheadMatch(items, 4, 'a', textOf)).toBe('Apple')
       expect(findTypeaheadMatch(items, 3, 'b', textOf)).toBe('Banana')
+    })
+
+    it('should match an entry through its text without diacritics', () => {
+      const names = ['Edward', 'Éric', 'Łódź']
+
+      expect(findTypeaheadMatch(names, 0, 'e', textOf)).toBe('Éric')
+      expect(findTypeaheadMatch(names, 0, 'é', textOf)).toBe('Éric')
+      expect(findTypeaheadMatch(names, 1, 'é', textOf)).toBe('Éric')
+      expect(findTypeaheadMatch(names, -1, 'ł', textOf)).toBe('Łódź')
+      expect(findTypeaheadMatch(names, -1, 'l', textOf)).toBeUndefined()
+    })
+
+    it('should match a typed accent against a decomposed label', () => {
+      expect(findTypeaheadMatch(['E\u0301ric'], -1, 'é', textOf)).toBe('E\u0301ric')
+    })
+
+    it('should prefer an entry that starts with the whole repeated text', () => {
+      const cities = ['Aachen', 'Acre', 'Aalborg']
+
+      expect(findTypeaheadMatch(cities, 0, 'aa', textOf)).toBe('Aachen')
+      expect(findTypeaheadMatch(['1', '10', '11'], 1, '11', textOf)).toBe('11')
+    })
+
+    it('should cycle on a repeated character that nothing starts with', () => {
+      const cities = ['Acre', 'Alabama', 'Argentina']
+
+      expect(findTypeaheadMatch(cities, 0, 'aa', textOf)).toBe('Alabama')
+      expect(findTypeaheadMatch(cities, 1, 'aaa', textOf)).toBe('Argentina')
+      expect(findTypeaheadMatch(cities, 2, 'aaaa', textOf)).toBe('Acre')
+    })
+
+    it('should keep the whole text once the characters differ', () => {
+      expect(findTypeaheadMatch(['Aachen', 'Aarhus', 'Argentina'], 0, 'aar', textOf)).toBe('Aarhus')
+      expect(findTypeaheadMatch(['Acre', 'Argentina'], 0, 'aab', textOf)).toBeUndefined()
     })
 
     it('should start at the current entry for longer text', () => {
@@ -206,6 +351,37 @@ describe('List navigation utilities', () => {
       expect(getRemovalNeighbor(['a'], 'a')).toBeNull()
       expect(getRemovalNeighbor([], 'a')).toBeNull()
       expect(getRemovalNeighbor(['a', 'b'], 'z')).toBe('a')
+    })
+  })
+
+  describe('isShortcutPress', () => {
+    const press = init => new KeyboardEvent('keydown', { key: 'a', ...init })
+
+    it('should be a press with Meta or with Ctrl alone', () => {
+      expect(isShortcutPress(press({ metaKey: true }))).toBeTrue()
+      expect(isShortcutPress(press({ ctrlKey: true }))).toBeTrue()
+      expect(isShortcutPress(press({ metaKey: true, altKey: true }))).toBeTrue()
+    })
+
+    it('should leave out AltGr, Option and a plain press', () => {
+      expect(isShortcutPress(press({ ctrlKey: true, altKey: true }))).toBeFalse()
+      expect(isShortcutPress(press({ altKey: true }))).toBeFalse()
+      expect(isShortcutPress(press({ shiftKey: true }))).toBeFalse()
+      expect(isShortcutPress(press({}))).toBeFalse()
+    })
+  })
+
+  describe('isOpeningF4', () => {
+    const press = init => new KeyboardEvent('keydown', { key: 'F4', ...init })
+
+    it('should be F4 pressed alone', () => {
+      expect(isOpeningF4(press({}))).toBeTrue()
+    })
+
+    it('should leave out F4 with a modifier and every other key', () => {
+      for (const init of [{ altKey: true }, { ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { key: 'F3' }]) {
+        expect(isOpeningF4(press(init))).withContext(JSON.stringify(init)).toBeFalse()
+      }
     })
   })
 

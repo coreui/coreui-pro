@@ -339,6 +339,68 @@ describe('ChipSet', () => {
 
       expect(document.activeElement).toEqual(chips[0])
     })
+
+    it('should start the typeahead again after a character that matches nothing', () => {
+      const el = setMarkup(['Alpha', 'Beta', 'Gamma'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].focus()
+      keydown(chips[0], 'z')
+      keydown(chips[0], 'g')
+
+      expect(document.activeElement).toEqual(chips[2])
+    })
+
+    it('should end the typeahead on an arrow key', () => {
+      const el = setMarkup(['Apple', 'Banana', 'Cherry'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].focus()
+      keydown(document.activeElement, 'a')
+      keydown(document.activeElement, 'ArrowRight')
+      keydown(document.activeElement, 'c')
+
+      expect(document.activeElement).toEqual(chips[2])
+    })
+
+    it('should keep the space a chip toggle during a search', () => {
+      const el = setMarkup(['Newark', 'New York'])
+      const chipSet = new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].focus()
+
+      for (const key of 'new') {
+        keydown(document.activeElement, key)
+      }
+
+      const focused = document.activeElement
+      keydown(focused, ' ')
+
+      expect(chipSet.getSelectedValues()).toEqual([focused.textContent.trim()])
+      expect(document.activeElement).toEqual(focused)
+    })
+
+    it('should leave a shortcut out of the typeahead', () => {
+      for (const init of [{ ctrlKey: true }, { metaKey: true }]) {
+        const el = setMarkup(['Alpha', 'Beta', 'Gamma'])
+        const chipSet = new ChipSet(el, { selectable: true })
+
+        const chips = el.querySelectorAll('.chip')
+        chips[0].focus()
+        chips[0].dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'g', bubbles: true, cancelable: true, ...init
+        }))
+
+        expect(document.activeElement).withContext(JSON.stringify(init)).toEqual(chips[0])
+
+        chipSet.dispose()
+      }
+    })
   })
 
   describe('removal', () => {

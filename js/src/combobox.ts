@@ -15,7 +15,7 @@ import {
   alignValueField, configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
 } from './util/form-validation.js'
 import { CARET_ICON } from './util/icons.js'
-import { isTypingKey } from './util/list-navigation.js'
+import { isOpeningF4, isTypingKey } from './util/list-navigation.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
@@ -667,7 +667,7 @@ class Combobox extends ComboboxBase {
       return
     }
 
-    const opens = this._isOpenKey(key) ? !event.ctrlKey && !event.metaKey : this._config.typeahead && !this._searchElement && key.length === 1 && isTypingKey(event)
+    const opens = this._isOpenKey(key) ? !event.ctrlKey && !event.metaKey : isOpeningF4(event) || (this._config.typeahead && !this._searchElement && key.length === 1 && isTypingKey(event))
 
     if (opens) {
       event.preventDefault()

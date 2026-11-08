@@ -3768,6 +3768,25 @@ describe('MultiSelect', () => {
     })
   })
 
+  describe('Enter in the search field with a section label as the tab stop', () => {
+    it('should select the first option, never the label', () => {
+      const groups = [{ label: 'Fruits', options: [{ text: 'Apple', value: 'a' }, { text: 'Pear', value: 'p' }] }]
+
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: groups, optionsGroupsSelectable: true, search: true })
+
+      multiSelect.show()
+      multiSelect._searchElement.focus()
+      expect(multiSelect._menu.querySelector('.list-box-option[tabindex="0"]')).toBeNull()
+
+      const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
+      multiSelect._searchElement.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+    })
+  })
+
   describe('select all indicator', () => {
     const options = [
       { value: '1', text: 'Apple' },
@@ -5800,6 +5819,19 @@ describe('MultiSelect', () => {
       expect(document.activeElement).toBe(multiSelect._searchElement)
     })
 
+    it('should leave a letter typed in a text field of the page inside the panel there', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
+
+      multiSelect.show()
+      const pageField = document.createElement('input')
+      multiSelect._menu.append(pageField)
+      pageField.focus()
+      pageField.dispatchEvent(new KeyboardEvent('keydown', { key: 'r', bubbles: true }))
+
+      expect(document.activeElement).toBe(pageField)
+    })
+
     it('should leave a key of an IME composition on the option', () => {
       fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option><option value="r">React</option></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
@@ -5861,6 +5893,118 @@ describe('MultiSelect', () => {
     }
 
     const focusedText = () => document.activeElement.textContent.trim()
+
+    it('should open on F4 from the closed search field without entering the list', () => {
+      const { field, multiSelect } = mount({ options: fruits(), search: true })
+      const event = press(field, 'F4')
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(multiSelect._isShown()).toBeTrue()
+      expect(document.activeElement).toBe(field)
+    })
+
+    it('should open on F4 from the closed frame', () => {
+      const { field, multiSelect } = mount({ options: fruits() })
+      const event = press(field, 'F4')
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(multiSelect._isShown()).toBeTrue()
+    })
+
+    it('should leave F4 with a modifier to the browser', () => {
+      for (const config of [{ search: true }, {}]) {
+        for (const init of [{ ctrlKey: true }, { altKey: true }, { shiftKey: true }, { metaKey: true }]) {
+          const { field, multiSelect } = mount({ options: fruits(), ...config })
+          const event = press(field, 'F4', init)
+
+          expect(event.defaultPrevented).withContext(JSON.stringify(init)).toBeFalse()
+          expect(multiSelect._isShown()).withContext(JSON.stringify(init)).toBeFalse()
+
+          multiSelect.dispose()
+        }
+      }
+    })
+
+    it('should open on a character typed with AltGr or Option', () => {
+      for (const config of [{ search: true }, {}]) {
+        for (const init of [{ ctrlKey: true, altKey: true }, { altKey: true }]) {
+          const { field, multiSelect } = mount({ options: fruits(), ...config })
+
+          press(field, 'ą', init)
+
+          expect(multiSelect._isShown()).withContext(JSON.stringify({ config, init })).toBeTrue()
+
+          multiSelect.dispose()
+        }
+      }
+    })
+
+    it('should not open on a shortcut', () => {
+      for (const config of [{ search: true }, {}]) {
+        for (const init of [{ ctrlKey: true }, { metaKey: true }]) {
+          const { field, multiSelect } = mount({ options: fruits(), ...config })
+
+          press(field, 'r', init)
+
+          expect(multiSelect._isShown()).withContext(JSON.stringify({ config, init })).toBeFalse()
+
+          multiSelect.dispose()
+        }
+      }
+    })
+
+    it('should put a character typed with AltGr on the native select into the search field', () => {
+      const { multiSelect, selectEl } = mount({ options: fruits(), search: true })
+
+      press(selectEl, 'ą', { ctrlKey: true, altKey: true })
+
+      expect(multiSelect._isShown()).toBeTrue()
+      expect(multiSelect._searchElement.value).toBe('ą')
+    })
+
+    it('should not open or select on Enter of an IME composition in the search field', () => {
+      for (const init of [{ isComposing: true }, { keyCode: 229 }]) {
+        const closed = mount({ options: fruits(), search: true })
+
+        press(closed.field, 'Enter', init)
+
+        expect(closed.multiSelect._isShown()).withContext(JSON.stringify(init)).toBeFalse()
+        closed.multiSelect.dispose()
+
+        const open = mount({ options: fruits(), search: true })
+
+        open.multiSelect.show()
+        press(open.field, 'Enter', init)
+
+        expect(open.multiSelect.getValue()).withContext(JSON.stringify(init)).toEqual([])
+        open.multiSelect.dispose()
+      }
+    })
+
+    it('should keep an arrow of an IME composition in the open search field', () => {
+      const { field, multiSelect } = mount({ options: fruits(), search: true })
+
+      multiSelect.show()
+      press(field, 'ArrowDown', { keyCode: 229 })
+
+      expect(document.activeElement).toBe(field)
+    })
+
+    it('should continue a typed search with the space when an option starts with it', () => {
+      const places = ['Zurich', 'Newark', 'New York'].map(text => ({ text, value: text }))
+      const { field, multiSelect } = mount({ options: places })
+
+      press(field, 'ArrowDown')
+
+      for (const key of 'new') {
+        press(document.activeElement, key)
+      }
+
+      press(document.activeElement, ' ')
+
+      expect(focusedText()).toBe('New York')
+      expect(multiSelect.getValue()).toEqual([])
+    })
 
     it('should enter the list on ArrowDown from the closed search field', () => {
       for (const init of [{}, { altKey: true }]) {

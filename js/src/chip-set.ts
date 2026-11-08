@@ -17,7 +17,7 @@ import {
 import { containsFocus, focusWithTemporaryTabindex } from './util/focus.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
-  createTypeaheadBuffer, findTypeaheadMatch, getRemovalNeighbor, rangeBetween, type TypeaheadBuffer
+  createTypeaheadBuffer, getRemovalNeighbor, isTypingKey, rangeBetween, type TypeaheadBuffer
 } from './util/list-navigation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
@@ -513,6 +513,10 @@ class ChipSet extends BaseComponent {
 
     const rtl = isRTL(this._element)
 
+    if ([ARROW_LEFT_KEY, ARROW_RIGHT_KEY, HOME_KEY, END_KEY].includes(event.key)) {
+      this._typeaheadBuffer.clear()
+    }
+
     switch (event.key) {
       case ARROW_LEFT_KEY: {
         event.preventDefault()
@@ -540,7 +544,9 @@ class ChipSet extends BaseComponent {
       }
 
       default: {
-        this._typeahead(event.key)
+        if (isTypingKey(event)) {
+          this._typeahead(event.key)
+        }
       }
     }
   }
@@ -585,16 +591,14 @@ class ChipSet extends BaseComponent {
   }
 
   _typeahead(key: string): void {
-    const text = this._config.typeahead ? this._typeaheadBuffer.push(key) : null
-
-    if (!text) {
+    if (!this._config.typeahead) {
       return
     }
 
     const chips = this._getFocusableChips()
     const current = chips.indexOf(document.activeElement as HTMLElement)
 
-    findTypeaheadMatch(chips, current, text, chip => this._getChipValue(chip))?.focus()
+    this._typeaheadBuffer.search(key, chips, current, chip => this._getChipValue(chip))?.focus()
   }
 
   _focusSibling(chip: HTMLElement, shouldGetNext: boolean): HTMLElement | null {

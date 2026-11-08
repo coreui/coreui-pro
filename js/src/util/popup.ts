@@ -16,6 +16,7 @@ import FocusTrap from './focustrap.js'
 import {
   handleEscape, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
 } from './layers.js'
+import { isOpeningF4 } from './list-navigation.js'
 import {
   execute, getElement, getTransitionDurationFromElement, isDisabled, isVisible
 } from './index.js'
@@ -442,7 +443,7 @@ class Popup extends Config {
     }
 
     this._anchorKeydownListener = (event: KeyboardEvent) => {
-      const opensPanel = event.key === 'F4' || (event.altKey && event.key === ARROW_DOWN_KEY)
+      const opensPanel = isOpeningF4(event) || (event.altKey && event.key === ARROW_DOWN_KEY)
 
       if (!opensPanel || this._isShown) {
         return

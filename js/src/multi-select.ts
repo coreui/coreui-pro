@@ -20,7 +20,9 @@ import FocusTrap from './util/focustrap.js'
 import { type ValidationState } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { isComposingKey, settleClick } from './util/layers.js'
-import { getRemovalNeighbor, isTypingKey } from './util/list-navigation.js'
+import {
+  getRemovalNeighbor, isOpeningF4, isShortcutPress, isTypingKey
+} from './util/list-navigation.js'
 import { flattenOptions, isOptionGroup } from './util/option-tree.js'
 import {
   type CountLabel, createSelectionStore, fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit,
@@ -60,7 +62,6 @@ const SELECTOR_CLEANER = '.form-control-cleaner'
 const SELECTOR_OPTION = '.list-box-option'
 const SELECTOR_SEARCH = '.multi-select-search'
 const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
-const SELECTOR_TEXT_ENTRY = 'input, textarea, select, [contenteditable=""], [contenteditable="true"]'
 const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
 const SELECTOR_SELECTION = '.multi-select-selection'
 
@@ -387,12 +388,17 @@ class MultiSelect extends ComboboxBase {
   }
 
   _showForFieldKey(event: any): void {
+    if (isComposingKey(event)) {
+      return
+    }
+
     const { key } = event
-    const frameKey = (this._isOpenKey(key) || (isTypingKey(event) && key.length === 1)) &&
-      !event.ctrlKey && !event.metaKey && !isComposingKey(event)
+    const frameKey = this._isOpenKey(key) ? !event.ctrlKey && !event.metaKey : isOpeningF4(event) || (isTypingKey(event) && key.length === 1)
 
     if (this._config.search ? this._isOpeningArrow(event) : frameKey) {
       this._showForKey(event)
+    } else if (this._config.search && isOpeningF4(event)) {
+      this._showForKey(event, null)
     } else if (key === ENTER_KEY && this._config.search) {
       event.preventDefault()
       this.show()
@@ -722,7 +728,7 @@ class MultiSelect extends ComboboxBase {
         if (isField) {
           this._showForFieldKey(event)
         }
-      } else if (isField && (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY)) {
+      } else if (isField && !isComposingKey(event) && (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY)) {
         event.preventDefault()
 
         if (this._listBox?.getActive() === null) {
@@ -732,8 +738,8 @@ class MultiSelect extends ComboboxBase {
 
         this._focusListBox()
         return
-      } else if (event.target === this._searchElement && event.key === ENTER_KEY) {
-        const stop = SelectorEngine.findOne(`${SELECTOR_OPTION}[tabindex="0"]`, this._menu)
+      } else if (event.target === this._searchElement && event.key === ENTER_KEY && !isComposingKey(event)) {
+        const stop = SelectorEngine.findOne(`${SELECTOR_OPTION}[tabindex="0"]`, this._menu) ?? this._listBox?._navigableOptions()[0]
 
         if (stop) {
           event.preventDefault()
@@ -743,24 +749,10 @@ class MultiSelect extends ComboboxBase {
         return
       }
 
-      if (
-        this._routesTypingToSearch() &&
-        isTypingKey(event) &&
-        !event.defaultPrevented
-      ) {
-        this._searchElement.focus()
-      }
+      this._routeTyping(event)
     })
 
-    EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => {
-      if (
-        this._routesTypingToSearch() &&
-        isTypingKey(event) &&
-        !(event.target as HTMLElement).closest(SELECTOR_TEXT_ENTRY)
-      ) {
-        this._searchElement.focus()
-      }
-    })
+    EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => this._routeTyping(event))
 
     // Validation focuses the overlay select; hand its keystrokes to the custom control.
     if (this._nativeKeydownHandler) {
@@ -777,7 +769,7 @@ class MultiSelect extends ComboboxBase {
 
       // The keystroke can't be retargeted mid-event, so inject the character that
       // would otherwise be lost and start filtering on this first press.
-      if (this._config.search && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      if (this._config.search && event.key.length === 1 && !isShortcutPress(event)) {
         this.show()
         this._searchElement.focus()
         this._searchElement.value += event.key
@@ -817,7 +809,7 @@ class MultiSelect extends ComboboxBase {
     })
 
     EventHandler.on(this._searchElement, EVENT_KEYDOWN, (event: any) => {
-      if (!this._isShown() && event.key?.length === 1 && !event.ctrlKey && !event.metaKey) {
+      if (!this._isShown() && event.key?.length === 1 && !isShortcutPress(event)) {
         this.show()
       }
 
@@ -1190,6 +1182,10 @@ class MultiSelect extends ComboboxBase {
 
     this._togglerElement.id ||= getUID(`${this.constructor.NAME}-toggler-`)
     this._menu.setAttribute('aria-labelledby', this._togglerElement.id)
+  }
+
+  override _typingField(): HTMLElement | null {
+    return this._routesTypingToSearch() ? this._searchElement : null
   }
 
   _routesTypingToSearch(): boolean {
