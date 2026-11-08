@@ -1131,6 +1131,36 @@ describe('Autocomplete', () => {
       }
     })
 
+    it('should move the focus to the field when the list button opens the panel', () => {
+      const { autocomplete, input } = mount({ options: fruits(), pickerIcon: true })
+
+      autocomplete._indicatorElement.focus()
+      autocomplete._indicatorElement.click()
+
+      expect(autocomplete._isShown()).toBeTrue()
+      expect(document.activeElement).toBe(input)
+    })
+
+    it('should keep the focus in the field when the list button is pressed', () => {
+      const { autocomplete } = mount({ options: fruits('Banana'), pickerIcon: true })
+      const event = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+
+      autocomplete._indicatorElement.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeTrue()
+    })
+
+    it('should keep the focus on the list button when the page refuses the open', () => {
+      const { autocomplete } = mount({ options: fruits(), pickerIcon: true })
+
+      autocomplete._element.addEventListener('show.coreui.autocomplete', event => event.preventDefault())
+      autocomplete._indicatorElement.focus()
+      autocomplete._indicatorElement.click()
+
+      expect(autocomplete._isShown()).toBeFalse()
+      expect(document.activeElement).toBe(autocomplete._indicatorElement)
+    })
+
     it('should prevent the key when the page refuses the open', () => {
       const { autocomplete, input } = mount({ options: fruits() })
 
@@ -3012,7 +3042,7 @@ describe('Autocomplete', () => {
       autocomplete._indicatorElement.focus()
       await userEvent.keyboard(' ')
 
-      expect(document.activeElement).toBe(autocomplete._indicatorElement)
+      expect(document.activeElement).toBe(autocomplete._inputElement)
       expect(autocomplete._inputElement.value).toBe('')
       expect(autocomplete._isShown()).toBe(true)
     })
@@ -3031,6 +3061,21 @@ describe('Autocomplete', () => {
 
       expect(document.activeElement).toBe(autocomplete._indicatorElement)
       expect(autocomplete._inputElement.value).toBe('')
+    })
+
+    it('should leave a letter typed in a text field of the page inside the panel there', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.show()
+      const pageField = document.createElement('input')
+      autocomplete._menu.append(pageField)
+      pageField.focus()
+      pageField.dispatchEvent(new KeyboardEvent('keydown', { key: 'r', bubbles: true }))
+
+      expect(document.activeElement).toBe(pageField)
     })
 
     it('should move a letter pressed in the panel into the field', () => {

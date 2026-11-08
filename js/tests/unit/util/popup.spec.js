@@ -537,6 +537,18 @@ describe('Popup', () => {
       expect(popup.isShown).toBeTrue()
     })
 
+    it('should leave F4 with a modifier to the browser', () => {
+      for (const init of [{ altKey: true }, { ctrlKey: true }, { metaKey: true }, { shiftKey: true }]) {
+        const popup = buildField()
+
+        press('F4', init)
+
+        expect(popup.isShown).withContext(JSON.stringify(init)).toBeFalse()
+
+        popup.dispose()
+      }
+    })
+
     it('should leave the opening key to the page when onBeforeShow declines', () => {
       const popup = buildField({ onBeforeShow: () => false })
 

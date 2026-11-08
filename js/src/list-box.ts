@@ -9,8 +9,9 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
+import { isComposingKey } from './util/layers.js'
 import {
-  createTypeaheadBuffer, endsEntryWait, type EntryRequest, findOpeningItem, findTypeaheadMatch, isEntryWaiting, keepsFocus, rangeBetween,
+  createTypeaheadBuffer, endsEntryWait, type EntryRequest, findOpeningItem, isEntryWaiting, isShortcutPress, isTypingKey, keepsFocus, rangeBetween,
   scrollIntoContainer, type TypeaheadBuffer
 } from './util/list-navigation.js'
 import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
@@ -1313,24 +1314,23 @@ class ListBox extends BaseComponent {
   }
 
   _seedTypeahead(key: string): void {
-    this._typeaheadBuffer.clear()
-    this._typeaheadBuffer.push(key)
+    this._typeaheadBuffer.seed(key)
   }
 
-  _typeahead(key: string): void {
-    const text = this._config.typeahead ? this._typeaheadBuffer.push(key) : null
-
-    if (!text) {
-      return
+  _typeahead(key: string): boolean {
+    if (!this._config.typeahead) {
+      return false
     }
 
-    const options = this._navigableOptions()
-    const current = options.findIndex(option => this._optionValue(option) === this._active)
-    const match = findTypeaheadMatch(options, current, text, option => this._optionText(option))
+    const items = this._navigable()
+    const current = items.findIndex(item => this._optionValue(item) === this._active)
+    const match = this._typeaheadBuffer.search(key, items, current, item => this._isSectionToggle(item) ? '' : this._optionText(item))
 
     if (match) {
       this._setActive(this._optionValue(match), true)
     }
+
+    return Boolean(match)
   }
 
   _addEventListeners(): void {
@@ -1422,7 +1422,7 @@ class ListBox extends BaseComponent {
   }
 
   _handleKeydown(event: any): void {
-    if (this._config.disabled || (this._field && (!this._list.isConnected || this._list.closest('[inert]')))) {
+    if (this._config.disabled || isComposingKey(event) || (this._field && (!this._list.isConnected || this._list.closest('[inert]')))) {
       return
     }
 
@@ -1443,6 +1443,7 @@ class ListBox extends BaseComponent {
 
     if (key === ARROW_UP_KEY || key === ARROW_DOWN_KEY) {
       event.preventDefault()
+      this._typeaheadBuffer.clear()
       this._handleArrowKey(key === ARROW_DOWN_KEY, event.shiftKey)
       return
     }
@@ -1453,6 +1454,7 @@ class ListBox extends BaseComponent {
       }
 
       event.preventDefault()
+      this._typeaheadBuffer.clear()
       this._handleEdgeKey(key === HOME_KEY ? 0 : -1, event.shiftKey)
       return
     }
@@ -1462,11 +1464,16 @@ class ListBox extends BaseComponent {
         return
       }
 
+      if (key === SPACE_KEY && !isShortcutPress(event) && this._typeahead(key)) {
+        event.preventDefault()
+        return
+      }
+
       this._handleActivationKey(event, key === ENTER_KEY)
       return
     }
 
-    if (!this._fieldTakesText()) {
+    if (!this._fieldTakesText() && isTypingKey(event)) {
       this._typeahead(key)
     }
   }

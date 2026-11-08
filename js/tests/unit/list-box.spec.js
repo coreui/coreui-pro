@@ -1094,6 +1094,164 @@ describe('ListBox', () => {
       expect(listBox.getActive()).toEqual('apple')
     })
 
+    it('should leave a shortcut out of the typeahead', () => {
+      for (const modifiers of [{ ctrlKey: true }, { metaKey: true }]) {
+        const el = setMarkup()
+        const listBox = new ListBox(el)
+        const active = listBox.getActive()
+
+        keydown(list(el), 'o', modifiers)
+
+        expect(listBox.getActive()).withContext(JSON.stringify(modifiers)).toEqual(active)
+
+        listBox.dispose()
+      }
+    })
+
+    it('should take a character typed with AltGr or Option into the typeahead', () => {
+      for (const modifiers of [{ ctrlKey: true, altKey: true }, { altKey: true }]) {
+        const el = setMarkup()
+        const listBox = new ListBox(el)
+
+        keydown(list(el), 'o', modifiers)
+
+        expect(listBox.getActive()).withContext(JSON.stringify(modifiers)).toEqual('onion')
+
+        listBox.dispose()
+      }
+    })
+
+    it('should do nothing on a key of an IME composition', () => {
+      for (const modifiers of [{ isComposing: true }, { keyCode: 229 }]) {
+        for (const key of ['Enter', 'ArrowDown', 'o']) {
+          const el = setMarkup()
+          const listBox = new ListBox(el)
+          const active = listBox.getActive()
+
+          keydown(list(el), key, modifiers)
+
+          expect(listBox.getActive()).withContext(key).toEqual(active)
+          expect(listBox.getSelectedValues()).withContext(key).toEqual([])
+
+          listBox.dispose()
+        }
+      }
+    })
+
+    it('should start the typeahead again after a character that matches nothing', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el)
+
+      keydown(list(el), 'z')
+      keydown(list(el), 'o')
+
+      expect(listBox.getActive()).toEqual('onion')
+    })
+
+    it('should not land the typeahead on a section label', () => {
+      const el = setMarkup('', [])
+      const options = [{ label: 'Greens', options: [{ value: 'lettuce', label: 'Lettuce' }] }]
+      const listBox = new ListBox(el, { options, sectionsSelectable: true, selectionMode: 'multiple' })
+      const active = listBox.getActive()
+
+      keydown(list(el), 'g')
+
+      expect(listBox.getActive()).toEqual(active)
+    })
+
+    it('should search from the position of an active section label and never land on one', () => {
+      const el = setMarkup('', [])
+      const items = [
+        { label: 'Fruits', options: [{ value: 'apple', label: 'Apple' }, { value: 'banana', label: 'Banana' }] },
+        { label: 'Berries', options: [{ value: 'blueberry', label: 'Blueberry' }, { value: 'cranberry', label: 'Cranberry' }] }
+      ]
+      const listBox = new ListBox(el, { options: items, sectionsSelectable: true, selectionMode: 'multiple' })
+
+      keydown(list(el), 'End')
+      keydown(list(el), 'ArrowUp')
+      keydown(list(el), 'ArrowUp')
+      keydown(list(el), 'b')
+
+      expect(listBox.getActive()).toEqual('blueberry')
+    })
+
+    describe('the space during a search', () => {
+      const option = (value, label = value) => `<div class="list-box-option" data-coreui-value="${value}">${label}</div>`
+      const cities = [option('newark', 'Newark'), option('new-york', 'New York'), option('nice', 'Nice')]
+      const fruit = [option('apple', 'Apple'), option('banana', 'Banana'), option('cherry', 'Cherry')]
+      const press = (el, key, modifiers = {}) => {
+        const event = new KeyboardEvent('keydown', {
+          key, bubbles: true, cancelable: true, ...modifiers
+        })
+        list(el).dispatchEvent(event)
+        return event
+      }
+
+      const type = (el, text) => {
+        for (const key of text) {
+          press(el, key)
+        }
+      }
+
+      it('should continue the search when an option starts with the typed text and a space', () => {
+        const el = setMarkup('', cities)
+        const listBox = new ListBox(el, { selectionMode: 'multiple' })
+
+        type(el, 'new')
+        const event = press(el, ' ')
+
+        expect(event.defaultPrevented).toBeTrue()
+        expect(listBox.getActive()).toEqual('new-york')
+        expect(listBox.getSelectedValues()).toEqual([])
+      })
+
+      it('should activate the option when no option continues the search', () => {
+        const el = setMarkup('', fruit)
+        const listBox = new ListBox(el, { selectionMode: 'multiple' })
+
+        type(el, 'b')
+        press(el, ' ')
+
+        expect(listBox.getSelectedValues()).toEqual(['banana'])
+      })
+
+      it('should activate the option after an arrow key ended the search', () => {
+        const el = setMarkup('', cities)
+        const listBox = new ListBox(el, { selectionMode: 'multiple' })
+
+        type(el, 'new')
+        press(el, 'ArrowDown')
+        press(el, ' ')
+
+        expect(listBox.getSelectedValues()).toEqual(['new-york'])
+      })
+
+      it('should activate the option after Home ended the search', () => {
+        const el = setMarkup('', cities)
+        const listBox = new ListBox(el, { selectionMode: 'multiple' })
+
+        type(el, 'new')
+        press(el, 'Home')
+        press(el, ' ')
+
+        expect(listBox.getSelectedValues()).toEqual(['newark'])
+      })
+
+      it('should not continue the search on a shortcut with the space', () => {
+        for (const modifiers of [{ ctrlKey: true }, { metaKey: true }]) {
+          const el = setMarkup('', cities)
+          const listBox = new ListBox(el, { selectionMode: 'multiple' })
+
+          type(el, 'new')
+          press(el, ' ', modifiers)
+
+          expect(listBox.getActive()).withContext(JSON.stringify(modifiers)).toEqual('newark')
+
+          listBox.dispose()
+        }
+      })
+    })
+
     it('should read the typeahead text from the option label', () => {
       const el = setMarkup('', [
         '<div class="list-box-option" data-coreui-value="lettuce"><span class="list-box-option-label">Lettuce</span><span class="list-box-option-description">Crisp</span></div>',

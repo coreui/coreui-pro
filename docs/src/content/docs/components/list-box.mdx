@@ -373,12 +373,12 @@ The option's checkbox indicator is decorative — it is a `<span>` marked `aria-
 | --- | --- |
 | `↓` / `↑` | Move the highlight to the next/previous option; it stops at the ends |
 | `Home` / `End` | Move the highlight to the first/last option; a text `activeDescendant` field keeps them for the caret |
-| `Space` | Toggle the option in `multiple` mode, select it in `single`; a text `activeDescendant` field keeps it for typing |
+| `Space` | Toggle the option in `multiple` mode, select it in `single`; a text `activeDescendant` field keeps it for typing. During a typed search, `Space` continues the search when an option starts with the typed text and a space. |
 | `Enter` | Fire `action`, then select the option (`single`) or toggle it (`multiple`); on a link, follow it |
 | `Shift` + `↓` / `↑` | Extend the selection to the next/previous option |
 | `Shift` + `Home` / `End` | Extend the selection to the first/last option |
 | `Ctrl` / `Cmd` + `A` | Select every option (`multiple` mode) |
-| `A` – `Z` | Move the highlight to the next option whose label starts with what you typed |
+| `A` – `Z` | Move the highlight to the next option whose label starts with what you typed. Repeating a letter moves through the options that start with it, unless an option starts with the repeated letters. A letter without an accent also finds a label whose accent can be removed, so `e` finds "Éric"; a letter like `ł` matches only as typed. |
 | `Tab` | Reach the select-all button; it is not part of the arrow navigation |
 
 ## Usage
@@ -445,7 +445,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `selectedLabel` | string, function | `` (count, total) => `${count}/${total} selected` `` | The header's count text. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |
-| `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
+| `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 1000 ms. |
 
 ### Methods
 

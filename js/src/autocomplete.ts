@@ -17,7 +17,7 @@ import {
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { isComposingKey, settleClick } from './util/layers.js'
-import { isTypingKey } from './util/list-navigation.js'
+import { isOpeningF4 } from './util/list-navigation.js'
 import {
   filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, highlightMatches, isOptionGroup
 } from './util/option-tree.js'
@@ -41,7 +41,6 @@ const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
-const F4_KEY = 'F4'
 const TAB_KEY = 'Tab'
 
 const EVENT_BLUR = `blur${EVENT_KEY}`
@@ -408,6 +407,10 @@ class Autocomplete extends ComboboxBase {
     })
   }
 
+  override _typingField(): HTMLElement | null {
+    return this._config.globalSearch ? this._inputElement : null
+  }
+
   _isExternalSearch(): boolean {
     return this._config.search === 'external'
   }
@@ -455,9 +458,7 @@ class Autocomplete extends ComboboxBase {
         return
       }
 
-      if (this._config.globalSearch && !event.defaultPrevented && isTypingKey(event)) {
-        this._inputElement.focus()
-      }
+      this._routeTyping(event)
 
       if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._store.size() > 0) {
         this._validation.dismiss(this._keySerial)
@@ -471,15 +472,17 @@ class Autocomplete extends ComboboxBase {
       this._keySerial = null
     })
 
-    EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => {
-      if (this._config.globalSearch && !event.defaultPrevented && isTypingKey(event)) {
-        this._inputElement.focus()
-      }
-    })
+    EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => this._routeTyping(event))
+
+    EventHandler.on(this._indicatorElement, EVENT_MOUSEDOWN, (event: any) => event.preventDefault())
 
     EventHandler.on(this._indicatorElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()
       this.toggle()
+
+      if (this._isShown()) {
+        this._inputElement.focus()
+      }
     })
 
     EventHandler.on(this._inputElement, EVENT_BLUR, () => {
@@ -511,7 +514,7 @@ class Autocomplete extends ComboboxBase {
     })
 
     EventHandler.on(this._inputElement, EVENT_KEYDOWN, (event: any) => {
-      const f4 = event.key === F4_KEY && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey
+      const f4 = isOpeningF4(event)
 
       if (!this._isShown() && (f4 || this._isOpeningArrow(event))) {
         this._showForKey(event, f4 ? null : event.key)

@@ -1,50 +1,101 @@
+import { normalizeSearchText } from './option-tree.js'
+
 export { getNextActiveElement } from './index.js'
 
 export type TypeaheadBuffer = {
   clear: () => void
   push: (key: string | undefined) => string | null
+  search: <T>(key: string | undefined, items: readonly T[], current: number, textOf: (item: T) => string) => T | undefined
+  seed: (key: string) => void
 }
 
 /**
  * Creates the buffer a list collects typed characters in for typeahead. Every character extends
  * the text, lowercased, and the text empties once no character has come for the given time.
  *
- * @param timeout - How long, in milliseconds, the text survives without a new character, 500 when
+ * @param timeout - How long, in milliseconds, the text survives without a new character, 1000 when
  * left out
  * @returns `push(key)`, which adds a key value of one character other than the space and returns
- * the text, or returns `null` for any other key or for a key event without a key, and `clear()`,
- * which empties the text and stops the timer
+ * the text, or returns `null` for any other key or for a key event without a key; `search(key, items,
+ * current, textOf)`, which adds the key and returns the entry `findTypeaheadMatch` finds, emptying the
+ * text when there is none, and takes the space only into running text that an entry continues with
+ * it, leaving the text alone otherwise; `seed(key)`, which starts the text with the key that opened the
+ * list and lets the first search drop it when the two together find nothing; and `clear()`, which
+ * empties the text and stops the timer
  */
-export const createTypeaheadBuffer = (timeout = 500): TypeaheadBuffer => {
+export const createTypeaheadBuffer = (timeout = 1000): TypeaheadBuffer => {
   let text = ''
   let timer: ReturnType<typeof setTimeout> | undefined
+  let seeded = false
 
-  return {
-    clear() {
-      clearTimeout(timer)
+  const hold = (next: string): string => {
+    clearTimeout(timer)
+    text = next
+    timer = setTimeout(() => {
       text = ''
-    },
-    push(key) {
-      if (key?.length !== 1 || key === ' ') {
-        return null
+    }, timeout)
+
+    return text
+  }
+
+  const clear = (): void => {
+    clearTimeout(timer)
+    text = ''
+    seeded = false
+  }
+
+  const push = (key: string | undefined): string | null => key?.length !== 1 || key === ' ' ? null : hold(text + key.toLowerCase())
+
+  const search: TypeaheadBuffer['search'] = (key, items, current, textOf) => {
+    if (key === ' ') {
+      const continued = `${text} `
+      const entry = findTypeaheadMatch(items, current, continued, textOf)
+
+      if (entry) {
+        hold(continued)
       }
 
-      clearTimeout(timer)
-      text += key.toLowerCase()
-      timer = setTimeout(() => {
-        text = ''
-      }, timeout)
+      return entry
+    }
 
-      return text
+    const retry = seeded
+    const query = push(key)
+
+    if (!query) {
+      return
+    }
+
+    seeded = false
+
+    const match = findTypeaheadMatch(items, current, query, textOf)
+
+    if (match) {
+      return match
+    }
+
+    clear()
+
+    return retry ? search(key, items, current, textOf) : undefined
+  }
+
+  return {
+    clear,
+    push,
+    search,
+    seed(key) {
+      clear()
+      seeded = push(key) !== null
     }
   }
 }
 
 /**
  * Finds the entry typeahead moves to: the first whose text, trimmed and ignoring case, starts with
- * the typed text, searched in list order from the current entry and wrapping around. A single
- * character starts after the current entry, so typing it again once the buffer has emptied moves to
- * the next entry it starts; longer text starts at the current entry, so typing on refines the match.
+ * the typed text, as written or with its diacritics removed, so `e` finds "Éric" and `é` does not
+ * find "Edward". The search goes in list order from the current entry and wraps around. A single
+ * character starts after the current entry; longer text starts at the current entry, so typing on
+ * refines the match. Text of one repeated character that nothing starts with falls back to that
+ * character from after the current entry, so pressing a letter again cycles through its entries.
  * With no current entry the search starts at the first.
  *
  * @param items - The entries, in order
@@ -55,10 +106,15 @@ export const createTypeaheadBuffer = (timeout = 500): TypeaheadBuffer => {
  */
 export const findTypeaheadMatch = <T>(items: readonly T[], current: number, text: string, textOf: (item: T) => string): T | undefined => {
   const needle = text.toLowerCase()
-  const start = needle.length > 1 ? Math.max(current, 0) : current + 1
-  const ordered = [...items.slice(start), ...items.slice(0, start)]
+  const find = (query: string, start: number): T | undefined => [...items.slice(start), ...items.slice(0, start)].find(item => {
+    const label = textOf(item).normalize()
 
-  return ordered.find(item => textOf(item).trim().toLowerCase().startsWith(needle))
+    return normalizeSearchText(label).startsWith(query) || normalizeSearchText(label, true).startsWith(query)
+  })
+  const [first] = needle
+
+  return find(needle, needle.length > 1 ? Math.max(current, 0) : current + 1) ??
+    ([...needle].every(character => character === first) ? find(first, current + 1) : undefined)
 }
 
 /**
@@ -242,6 +298,16 @@ export const getRemovalNeighbor = <T>(list: readonly T[], item: T): T | null => 
 }
 
 /**
+ * Tells whether a key press is a shortcut rather than text: one with Meta, or with Ctrl but no Alt.
+ * Ctrl with Alt is AltGr on Windows and Alt alone is Option on macOS, and both type a character.
+ *
+ * @param event - The key press
+ * @returns `true` for a shortcut
+ */
+export const isShortcutPress = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'metaKey'>): boolean =>
+  event.metaKey || (event.ctrlKey && !event.altKey)
+
+/**
  * Tells whether a key press types into a text field: Backspace, Delete, a dead key that starts an
  * accent, or a single character other than the space bar. A press with Meta, or with Ctrl but no
  * Alt, is a shortcut instead; Ctrl with Alt is AltGr on Windows and Alt alone is Option on macOS,
@@ -252,12 +318,21 @@ export const getRemovalNeighbor = <T>(list: readonly T[], item: T): T | null => 
  * @returns `true` for a key that types
  */
 export const isTypingKey = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'isComposing' | 'key' | 'metaKey'>): boolean => {
-  if (typeof event.key !== 'string' || event.isComposing || event.metaKey || (event.ctrlKey && !event.altKey)) {
+  if (typeof event.key !== 'string' || event.isComposing || isShortcutPress(event)) {
     return false
   }
 
   return ['Backspace', 'Dead', 'Delete'].includes(event.key) || (event.key.length === 1 && event.key !== ' ')
 }
+
+/**
+ * Tells whether a key press is F4 with no modifier, the key that opens a list from its own field.
+ *
+ * @param event - The key press
+ * @returns `true` for F4 pressed alone
+ */
+export const isOpeningF4 = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'key' | 'metaKey' | 'shiftKey'>): boolean =>
+  event.key === 'F4' && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey
 
 export type EntryRequest = {
   activate?: boolean

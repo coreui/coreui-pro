@@ -560,7 +560,7 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field. |
 | `selectedLabel` | string, function | `` (count) => `${count} selected` `` | What the toggle shows past one selected option in `multiple` mode. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. |
-| `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
+| `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 1000 ms. |
 | `validationState` | string, null | `null` | The state the combobox shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's pick of a different value drops it. See [Validation](#validation). |
 | `value` | string, array, null | `null` | Initially selected values. A string is one value, commas included; pass an array for several. A `.selected` class in the markup does not select an option. |
 
@@ -612,9 +612,10 @@ The focus never enters the list. It stays on the toggle, or on the search field 
 | Key | Action |
 | --- | --- |
 | `↓` / `↑` | Open the panel; once it is open, move the highlight to the next/previous option |
-| `Enter` / `Space` | Open the panel; once it is open, select the highlighted option |
+| `Enter` / `Space` | Open the panel; once it is open, select the highlighted option. During a typed search, `Space` continues the search when an option starts with the typed text and a space. |
+| `F4` | Open the panel; with a modifier held, the key stays with the browser |
 | `Home` / `End` | Once the panel is open, move the highlight to the first/last option; the search field keeps them for the caret |
-| `A` – `Z` | Open the panel on, or move the highlight to, the next option whose label starts with what you typed; with a search field, type in the field once the panel is open |
+| `A` – `Z` | Open the panel on, or move the highlight to, the next option whose label starts with what you typed; with a search field, type in the field once the panel is open. Repeating a letter moves through the options that start with it, unless an option starts with the repeated letters. A letter without an accent also finds a label whose accent can be removed, so `e` finds "Éric"; a letter like `ł` matches only as typed. |
 | `Escape` | Close the panel and return the focus to the toggle |
 | `Tab` | Close the panel and move on |
 

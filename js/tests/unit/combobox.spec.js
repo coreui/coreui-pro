@@ -1257,6 +1257,90 @@ describe('Combobox', () => {
     })
   })
 
+  describe('the space during a search', () => {
+    const press = (target, key) => target.dispatchEvent(new KeyboardEvent('keydown', {
+      key, bubbles: true, cancelable: true
+    }))
+
+    it('should select the option the opening letter found', () => {
+      const combobox = new Combobox(setMarkup(), { options: [{ value: 'ca', label: 'Canada' }, { value: 'cl', label: 'Chile' }] })
+      const toggle = combobox._togglerElement
+
+      toggle.focus()
+      press(toggle, 'c')
+      press(toggle, ' ')
+
+      expect(combobox.getValue()).toEqual('ca')
+      expect(combobox._isShown()).toBeFalse()
+    })
+
+    it('should search again from the next letter when the opening letter found nothing', () => {
+      const combobox = new Combobox(setMarkup(), { options: [{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }] })
+      const toggle = combobox._togglerElement
+
+      toggle.focus()
+      press(toggle, 'x')
+      press(toggle, 'b')
+
+      expect(document.getElementById(toggle.getAttribute('aria-activedescendant')).textContent).toEqual('Banana')
+    })
+
+    it('should keep the panel open and reach a two-word option', () => {
+      const combobox = new Combobox(setMarkup(), { options: [{ value: 'nw', label: 'Newark' }, { value: 'ny', label: 'New York' }] })
+      const toggle = combobox._togglerElement
+
+      toggle.focus()
+
+      for (const key of 'new y') {
+        press(toggle, key)
+      }
+
+      expect(combobox._isShown()).toBeTrue()
+      expect(document.getElementById(toggle.getAttribute('aria-activedescendant')).textContent).toEqual('New York')
+    })
+  })
+
+  describe('F4', () => {
+    const press = (target, key, init = {}) => {
+      const event = new KeyboardEvent('keydown', {
+        key, bubbles: true, cancelable: true, ...init
+      })
+      target.dispatchEvent(event)
+      return event
+    }
+
+    const items = [{ value: 'us', label: 'United States' }, { value: 'ca', label: 'Canada' }]
+
+    it('should open the panel from the toggle', () => {
+      const combobox = new Combobox(setMarkup(), { options: items })
+      const event = press(combobox._togglerElement, 'F4')
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(combobox._isShown()).toBeTrue()
+    })
+
+    it('should highlight the first option when nothing is selected', () => {
+      const combobox = new Combobox(setMarkup(), { options: items })
+      const toggle = combobox._togglerElement
+
+      press(toggle, 'F4')
+
+      expect(document.getElementById(toggle.getAttribute('aria-activedescendant')).textContent).toEqual('United States')
+    })
+
+    it('should leave F4 with a modifier to the browser', () => {
+      for (const init of [{ ctrlKey: true }, { altKey: true }, { shiftKey: true }, { metaKey: true }]) {
+        const combobox = new Combobox(setMarkup(), { options: items })
+        const event = press(combobox._togglerElement, 'F4', init)
+
+        expect(event.defaultPrevented).withContext(JSON.stringify(init)).toBeFalse()
+        expect(combobox._isShown()).withContext(JSON.stringify(init)).toBeFalse()
+
+        combobox.dispose()
+      }
+    })
+  })
+
   describe('options that arrive after the panel opened', () => {
     const countries = [
       { value: 'us', label: 'United States' },
