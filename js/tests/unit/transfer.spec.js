@@ -123,6 +123,7 @@ describe('Transfer', () => {
         selectedLabel: jasmine.any(Function),
         sourceTitle: 'Available',
         targetTitle: 'Chosen',
+        total: null,
         typeahead: true,
         value: []
       })
@@ -1125,6 +1126,20 @@ describe('Transfer', () => {
       transfer.setOptions(users)
 
       expect(list.getSelectedValues()).toEqual([])
+    })
+  })
+
+  describe('total', () => {
+    const text = (transfer, side) => transfer._sides[side].element.querySelector('.list-box-header').textContent
+
+    it('should apply the total to the available list only', () => {
+      const transfer = new Transfer(setMarkup(), { total: 120 })
+
+      expect(text(transfer, 'source')).toContain('/120')
+      expect(text(transfer, 'target')).not.toContain('/120')
+
+      transfer.setTotal(7)
+      expect(text(transfer, 'source')).toContain('/7')
     })
   })
 })

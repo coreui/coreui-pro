@@ -445,6 +445,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `selectedLabel` | string, function | `` (count, total) => `${count}/${total} selected` `` | The header's count text. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |
+| `total` | number, null | `null` | Sets `{total}` of `selectedLabel`. Leave it out to count the options in the list; with external search give the number of records. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 1000 ms. |
 
 ### Methods

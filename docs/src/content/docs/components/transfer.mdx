@@ -377,6 +377,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `selectedLabel` | string, function | `` (count, total) => `${count}/${total} selected` `` | Passed to both list boxes as their header count text. The transfer turns their [counter](/components/list-box/#counter) on. |
 | `sourceTitle` | string | `'Available'` | Title of the source list: its select-all label when the button is empty, and its accessible name. |
 | `targetTitle` | string | `'Chosen'` | Title of the target list. |
+| `total` | number, null | `null` | Sets `{total}` of `selectedLabel`. Leave it out to count the options in the list; with external search give the number of records. Applies to the available list. |
 | `typeahead` | boolean | `true` | Passed to both list boxes: move the highlight to the option matching what the user types. |
 | `value` | array | `[]` | The values of `options` that start in the target list, in the order given. The rest go to the source list. |
 

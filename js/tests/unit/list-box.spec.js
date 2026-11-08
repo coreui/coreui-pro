@@ -111,6 +111,7 @@ describe('ListBox', () => {
         selectedLabel: jasmine.any(Function),
         selectionLimit: null,
         selectionMode: 'single',
+        total: null,
         typeahead: true
       })
     })
@@ -2890,6 +2891,29 @@ describe('ListBox', () => {
       const listBox = new ListBox(setMarkup())
 
       expect(() => listBox.setOptions(null)).not.toThrow()
+    })
+  })
+
+  describe('total', () => {
+    const counter = el => el.querySelector('.list-box-subtitle, .list-box-header')?.textContent
+
+    it('should show the given total in the counter and follow setTotal', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { counter: true, total: 120 })
+
+      expect(counter(el)).toContain('/120')
+
+      listBox.setTotal(7)
+      expect(counter(el)).toContain('/7')
+
+      listBox.setTotal(null)
+      expect(counter(el)).not.toContain('/7')
+    })
+
+    it('should throw a TypeError for a total that is not a number', () => {
+      const listBox = new ListBox(setMarkup())
+
+      expect(() => listBox.setTotal('x')).toThrowError(TypeError)
     })
   })
 })

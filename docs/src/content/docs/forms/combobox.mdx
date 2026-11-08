@@ -560,6 +560,7 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field. |
 | `selectedLabel` | string, function | `` (count) => `${count} selected` `` | What the toggle shows past one selected option in `multiple` mode. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. |
+| `total` | number, null | `null` | Sets `{total}` of `selectedLabel`. Leave it out to count the options in the list; with external search give the number of records. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 1000 ms. |
 | `validationState` | string, null | `null` | The state the combobox shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's pick of a different value drops it. See [Validation](#validation). |
 | `value` | string, array, null | `null` | Initially selected values. A string is one value, commas included; pass an array for several. A `.selected` class in the markup does not select an option. |
