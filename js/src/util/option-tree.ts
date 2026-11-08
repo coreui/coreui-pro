@@ -101,6 +101,16 @@ export const findOptionByLabel = <T extends OptionItem>(options: readonly T[], l
   flattenOptions(options).find(option => getOptionLabel(option).trim().toLowerCase() === label.trim().toLowerCase()) ?? null
 
 /**
+ * Tells whether two sets hold the same values, in any order.
+ *
+ * @param first - One set
+ * @param second - The other set
+ * @returns Whether every value of one is in the other
+ */
+export const hasSameValues = <T>(first: ReadonlySet<T>, second: ReadonlySet<T>): boolean =>
+  first.size === second.size && [...first].every(value => second.has(value))
+
+/**
  * Finds the first option whose value, compared as text, equals a value, so `1` finds an option
  * whose value is `'1'`. An option without a value is found by its label. Groups are not matched.
  *

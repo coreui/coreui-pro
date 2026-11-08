@@ -1140,6 +1140,9 @@ describe('Transfer', () => {
 
       transfer.setTotal(7)
       expect(text(transfer, 'source')).toContain('/7')
+
+      transfer.setTotal(null)
+      expect(text(transfer, 'source')).not.toContain('/7')
     })
   })
 })

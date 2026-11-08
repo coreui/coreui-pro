@@ -2671,6 +2671,9 @@ describe('Combobox', () => {
 
       combobox.setTotal(7)
       expect(combobox._valueElement.textContent).toBe('2/7')
+
+      combobox.setTotal(null)
+      expect(combobox._valueElement.textContent).toBe(`2/${items.length}`)
     })
   })
 })

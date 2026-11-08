@@ -14,7 +14,7 @@ import {
   createTypeaheadBuffer, endsEntryWait, type EntryRequest, findOpeningItem, isEntryWaiting, isShortcutPress, isTypingKey, keepsFocus, rangeBetween,
   scrollIntoContainer, type TypeaheadBuffer
 } from './util/list-navigation.js'
-import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
+import { getOptionValue, hasSameValues, normalizeSearchText } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
   type CountLabel,
@@ -359,7 +359,7 @@ class ListBox extends BaseComponent {
     this._render()
 
     const values = new Set(this._allOptions().map(option => this._optionValue(option)))
-    const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previousValues.size || [...values].some(value => !previousValues.has(value)))
+    const reset = this._config.resetSelectionOnOptionsChange && !hasSameValues(values, previousValues)
     const marked = this._flatOptions().filter(item => item.selected).map(item => item.value)
     const { refused, values: filled } = fillSelection(reset ? [] : previous, marked, this._selectionLimit())
 
@@ -368,7 +368,7 @@ class ListBox extends BaseComponent {
     this._store.commit(filled)
     this.update()
 
-    if (this._store.size() !== previous.length || previous.some(value => !this._store.has(value))) {
+    if (!hasSameValues(new Set(previous), new Set(this._store.values()))) {
       this._triggerChange()
     }
 

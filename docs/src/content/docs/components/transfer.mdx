@@ -397,6 +397,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `moveToSource(values?)` | The same in the other direction. Does nothing with `oneWay`. |
 | `moveToTarget(values?)` | Moves the source list's selection to the target list. Pass an array of values to move exactly those, selected or not. |
 | `setOptions(options)` | Rebuilds both lists from a new `options` array. The values the target holds keep their place as long as the new options still carry them; everything else goes to the source in the order of `options`. Both selections come back empty. |
+| `setTotal(total)` | Sets `{total}` of the available list, the one an external search feeds. `null` goes back to counting its options. |
 | `setLoading(loading, list?)` | Marks a list busy while you fetch: pass `'source'` or `'target'` for one of them, nothing for both. A list left busy keeps its loading row, so release every list you marked. |
 | `update` | Re-reads the DOM: options added or removed reach both list boxes, which re-apply their search and counter, and the move buttons are re-evaluated. |
 

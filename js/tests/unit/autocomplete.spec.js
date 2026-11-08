@@ -664,7 +664,6 @@ describe('Autocomplete', () => {
       ['typing', ({ input }) => typeInto(input, 'x')],
       ['a pick of a different option', ({ autocomplete }) => autocomplete._onOptionSelected('2')],
       ['the cleaner', ({ autocomplete }) => autocomplete._cleanerElement.click()],
-      ['Enter on the cleaner', ({ autocomplete }) => autocomplete._cleanerElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))],
       ['Backspace on the selected option', ({ input }) => input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))],
       ['Delete on the selected option', ({ input }) => input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))]
     ])('should drop a given state and a state class from the markup through %s', (_, act) => {
@@ -956,7 +955,7 @@ describe('Autocomplete', () => {
       expect(element).toHaveClass('is-invalid')
     })
 
-    it('should report the free text a native reset clears, also when the page gives a state right after it', async () => {
+    it('should not report the free text a native reset clears, also when the page gives a state right after it', async () => {
       const { autocomplete, element, form, input } = mountInForm()
       const changes = []
       typeInto(input, 'foo')
@@ -966,7 +965,7 @@ describe('Autocomplete', () => {
       autocomplete.setValidationState('invalid')
       await settle()
 
-      expect(changes).toEqual([null])
+      expect(changes).toEqual([])
       expect(element).toHaveClass('is-invalid')
 
       typeInto(input, 'foo')
@@ -1894,14 +1893,14 @@ describe('Autocomplete', () => {
     })
 
     it.each([
-      ['clear()', autocomplete => autocomplete.clear()],
-      ['the cleaner', autocomplete => autocomplete._cleanerElement.click()],
+      ['clear()', autocomplete => autocomplete.clear(), 'none'],
+      ['the cleaner', autocomplete => autocomplete._cleanerElement.click(), 'none'],
       ['typing', autocomplete => {
         autocomplete._inputElement.value = 'x'
         autocomplete._inputElement.dispatchEvent(new Event('input', { bubbles: true }))
-      }],
-      ['Backspace', autocomplete => autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))]
-    ])('should drop a selected disabled option on %s and report it once', (_, act) => {
+      }, ''],
+      ['Backspace', autocomplete => autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true })), '']
+    ])('should drop a selected disabled option on %s and report it once', (_, act, cleanerDisplay) => {
       const { autocomplete, element } = mount({ cleaner: true, options: [{ label: 'A', value: 'a', disabled: true }, { label: 'B', value: 'b' }], value: 'a' })
       const reported = []
 
@@ -1909,7 +1908,7 @@ describe('Autocomplete', () => {
       act(autocomplete)
 
       expect(autocomplete._selectedOptions()).toEqual([])
-      expect(autocomplete._cleanerElement.style.display).toBe('none')
+      expect(autocomplete._cleanerElement.style.display).toBe(cleanerDisplay)
       expect(reported).toEqual([null])
     })
 
@@ -2850,27 +2849,25 @@ describe('Autocomplete', () => {
       expect(autocomplete._selectedOptions().length).toBe(0)
     })
 
-    it('should trigger change event on Enter with non-matching value when allowOnlyDefinedOptions is false', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-        const autocomplete = new Autocomplete(autocompleteEl, {
-          allowOnlyDefinedOptions: false,
-          options: [{ label: 'Option 1', value: '1' }]
-        })
-
-        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
-          expect(event.value).toBe('custom value')
-          resolve()
-        })
-
-        autocomplete.show()
-        autocomplete._inputElement.value = 'custom value'
-
-        const keydownEvent = createEvent('keydown')
-        keydownEvent.key = 'Enter'
-        autocomplete._inputElement.dispatchEvent(keydownEvent)
+    it('should not report free text on Enter when allowOnlyDefinedOptions is false', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: false,
+        options: [{ label: 'Option 1', value: '1' }]
       })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete.show()
+      autocomplete._inputElement.value = 'custom value'
+
+      const keydownEvent = createEvent('keydown')
+      keydownEvent.key = 'Enter'
+      autocomplete._inputElement.dispatchEvent(keydownEvent)
+
+      expect(changes).toEqual([])
+      expect(autocomplete._inputElement.value).toBe('custom value')
     })
 
     it('should not trigger change event on Enter with non-matching value when allowOnlyDefinedOptions is true', () => {
@@ -3642,7 +3639,7 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputElement.value).toBe('test')
     })
 
-    it('should clear on Enter key press on cleaner button', () => {
+    it('should clear on Enter key press on cleaner button', async () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -3653,15 +3650,15 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.value = 'test'
       holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 
-      const keydownEvent = createEvent('keydown')
-      keydownEvent.key = 'Enter'
-      autocomplete._cleanerElement.dispatchEvent(keydownEvent)
+      autocomplete._updateCleaner()
+      autocomplete._cleanerElement.focus()
+      await userEvent.keyboard('{Enter}')
 
       expect(autocomplete._inputElement.value).toBe('')
       expect(autocomplete._selectedOptions()).toEqual([])
     })
 
-    it('should not clear on Enter key press on cleaner button when disabled', () => {
+    it('should not clear on Enter key press on cleaner button when disabled', async () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -3673,9 +3670,9 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.value = 'test'
       holdSelection(autocomplete, [...autocomplete._selectedOptions(), { label: 'Option 1', value: '1' }])
 
-      const keydownEvent = createEvent('keydown')
-      keydownEvent.key = 'Enter'
-      autocomplete._cleanerElement.dispatchEvent(keydownEvent)
+      autocomplete._cleanerElement.style.removeProperty('display')
+      autocomplete._cleanerElement.focus()
+      await userEvent.keyboard('{Enter}')
 
       expect(autocomplete._inputElement.value).toBe('test')
     })
@@ -3914,7 +3911,7 @@ describe('Autocomplete', () => {
       expect(changes.at(-1)).toBe('react')
     })
 
-    it('should report the clear of a typed value and restart the search', async () => {
+    it('should not report the clear of a typed value and restart the search', async () => {
       fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
       const form = fixtureEl.querySelector('form')
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -3932,7 +3929,7 @@ describe('Autocomplete', () => {
       form.reset()
       await settle()
 
-      expect(changes).toEqual([null])
+      expect(changes).toEqual([])
       expect(searches).toEqual([''])
     })
   })
@@ -4204,23 +4201,22 @@ describe('Autocomplete', () => {
       expect(changed).toBe(false)
     })
 
-    it('should trigger change event with input value on blur when no exact match and allowOnlyDefinedOptions is false', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-        const autocomplete = new Autocomplete(autocompleteEl, {
-          allowOnlyDefinedOptions: false,
-          options: [{ label: 'Option 1', value: '1' }]
-        })
-
-        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
-          expect(event.value).toBe('custom text')
-          resolve()
-        })
-
-        autocomplete._inputElement.value = 'custom text'
-        autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+    it('should not report free text on blur, however often the field is left', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: false,
+        options: [{ label: 'Option 1', value: '1' }]
       })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._inputElement.value = 'custom text'
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+
+      expect(changes).toEqual([])
+      expect(autocomplete._inputElement.value).toBe('custom text')
     })
 
     it('should clear a field that takes only defined options when the typed label names a disabled option', () => {
@@ -4240,7 +4236,7 @@ describe('Autocomplete', () => {
       expect(changes.some(value => value?.value === '3')).toBeFalse()
     })
 
-    it('should report a typed label that names a disabled option as free text', () => {
+    it('should leave a typed label that names a disabled option as unreported free text', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -4252,7 +4248,8 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.value = 'Cherry'
       autocomplete._inputElement.dispatchEvent(createEvent('blur'))
 
-      expect(changes).toEqual(['Cherry'])
+      expect(changes).toEqual([])
+      expect(autocomplete._selectedOptions()).toEqual([])
     })
 
     it('should pick the enabled option when a disabled one shares its label', () => {
@@ -5068,46 +5065,6 @@ describe('Autocomplete', () => {
   })
 
   describe('static methods', () => {
-    describe('autocompleteInterface', () => {
-      it('should create instance and call method', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-
-        Autocomplete.autocompleteInterface(autocompleteEl, {
-          options: [{ label: 'Option 1', value: '1' }]
-        })
-
-        expect(Autocomplete.getInstance(autocompleteEl)).toBeInstanceOf(Autocomplete)
-      })
-
-      it('should call method on existing instance', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-        const autocomplete = new Autocomplete(autocompleteEl, {
-          options: [{ label: 'Option 1', value: '1' }]
-        })
-
-        const spy = spyOn(autocomplete, 'show')
-
-        Autocomplete.autocompleteInterface(autocompleteEl, 'show')
-
-        expect(spy).toHaveBeenCalled()
-      })
-
-      it('should throw error for undefined method', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-
-        const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
-
-        expect(() => {
-          Autocomplete.autocompleteInterface(autocompleteEl, 'undefinedMethod')
-        }).toThrowError(TypeError, 'No method named "undefinedMethod"')
-
-        autocomplete.dispose()
-      })
-    })
-
     describe('jQueryInterface', () => {
       it('should create autocomplete', () => {
         fixtureEl.innerHTML = '<div class="autocomplete"></div>'
@@ -5678,14 +5635,14 @@ describe('Autocomplete', () => {
       expect(autocomplete._options).toEqual([])
     })
 
-    it('should return empty array when options is not an array', () => {
+    it('should return empty array without options', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
         options: null
       })
 
-      expect(autocomplete._getOptionsFromConfig(false)).toEqual([])
+      expect(autocomplete._getOptionsFromConfig(null)).toEqual([])
     })
 
     it('should preserve custom option properties', () => {
@@ -5773,6 +5730,314 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.dispatchEvent(keydownEvent)
 
       expect(autocomplete._search).toBe('custom')
+    })
+  })
+
+  describe('options from outside and the text of the field', () => {
+    const start = (config = {}) => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const element = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(element, { cleaner: true, options: [{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }], ...config })
+      const changes = []
+
+      element.addEventListener('change.coreui.autocomplete', event => changes.push(event.value?.value ?? null))
+
+      return {
+        autocomplete, changes, element, input: autocomplete._inputElement
+      }
+    }
+
+    const type = (input, value, inputType = 'insertText') => {
+      input.value = value
+      input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType }))
+    }
+
+    it('should keep the selection when new options bring other values and the option is off', () => {
+      const { autocomplete, changes } = start({ value: 'a' })
+
+      autocomplete.setOptions([{ label: 'C', value: 'c' }])
+
+      expect(autocomplete._store.values()).toEqual(['a'])
+      expect(changes).toEqual([])
+    })
+
+    it('should empty the selection and its text and report it when new options bring other values', () => {
+      const { autocomplete, changes, input } = start({ resetSelectionOnOptionsChange: true, value: 'a' })
+
+      autocomplete.setOptions([{ label: 'C', value: 'c' }])
+
+      expect(autocomplete._store.size()).toBe(0)
+      expect(input.value).toBe('')
+      expect(changes).toEqual([null])
+    })
+
+    it('should keep the selection when new options bring the same values in another order', () => {
+      const { autocomplete, changes, input } = start({ resetSelectionOnOptionsChange: true, value: 'a' })
+
+      autocomplete.setOptions([{ label: 'B', value: 'b' }, { label: 'A', value: 'a' }])
+
+      expect(autocomplete._store.values()).toEqual(['a'])
+      expect(input.value).toBe('A')
+      expect(changes).toEqual([])
+    })
+
+    it('should keep the text the user typed when new options empty the selection', () => {
+      const { autocomplete, input } = start({ resetSelectionOnOptionsChange: true })
+
+      type(input, 'typed')
+      autocomplete.setOptions([{ label: 'C', value: 'c' }])
+
+      expect(input.value).toBe('typed')
+    })
+
+    it('should take the option the new options mark and report it, also over a given value', () => {
+      const { autocomplete, changes, input } = start({ resetSelectionOnOptionsChange: true, value: 'a' })
+
+      autocomplete.setOptions([{ label: 'C', value: 'c', selected: true }, { label: 'D', value: 'd' }])
+
+      expect(autocomplete._store.values()).toEqual(['c'])
+      expect(input.value).toBe('C')
+      expect(changes).toEqual(['c'])
+    })
+
+    it('should keep a given value that still waits for its option and pick it without an event', () => {
+      const { autocomplete, changes, input } = start({ options: [], resetSelectionOnOptionsChange: true, value: 'b' })
+
+      autocomplete.setOptions([{ label: 'B', value: 'b' }])
+
+      expect(autocomplete._store.values()).toEqual(['b'])
+      expect(input.value).toBe('B')
+      expect(changes).toEqual([])
+    })
+
+    it('should empty the search with the text, so the new options can open', () => {
+      const { autocomplete, input } = start({ clearSearchOnSelect: false, resetSelectionOnOptionsChange: true })
+
+      type(input, 'a')
+      autocomplete._selectOption(autocomplete._options[0], false)
+      autocomplete.setOptions([{ label: 'C', value: 'c' }])
+
+      expect(autocomplete._search).toBe('')
+    })
+
+    it('should report once when new options bring a marked option after a form reset', () => {
+      const { autocomplete, changes } = start({ resetSelectionOnOptionsChange: true })
+
+      autocomplete._reportSeed = true
+      autocomplete.setOptions([{ label: 'C', value: 'c', selected: true }])
+
+      expect(changes).toEqual(['c'])
+    })
+
+    it('should take a marked option the earlier options already carried', () => {
+      const { autocomplete, changes } = start({
+        options: [{ label: 'A', value: 'a', selected: true }, { label: 'B', value: 'b' }],
+        resetSelectionOnOptionsChange: true
+      })
+
+      autocomplete.setOptions([{ label: 'A', value: 'a', selected: true }, { label: 'C', value: 'c' }])
+
+      expect(autocomplete._store.values()).toEqual(['a'])
+      expect(changes).toEqual([])
+    })
+
+    it('should open the panel when a late answer brings options for the typed text', () => {
+      const { autocomplete, input } = start({ options: [], search: 'external' })
+
+      input.focus()
+      type(input, 'a')
+
+      expect(autocomplete._isShown()).toBeFalse()
+
+      autocomplete.setOptions([{ label: 'Alpha', value: 'a' }])
+
+      expect(autocomplete._isShown()).toBeTrue()
+    })
+
+    it('should not open again on the next answer after the late one opened the panel', () => {
+      const { autocomplete, input } = start({ options: [], search: 'external' })
+
+      input.focus()
+      type(input, 'a')
+      autocomplete.setOptions([{ label: 'Alpha', value: 'a' }])
+      autocomplete._hide(false)
+      autocomplete.setOptions([{ label: 'Alpha', value: 'a' }, { label: 'Atlas', value: 'b' }])
+
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should stay closed on a late answer after Escape', () => {
+      const { autocomplete, input } = start({ options: [], search: 'external' })
+
+      input.focus()
+      type(input, 'a')
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      autocomplete.setOptions([{ label: 'Alpha', value: 'a' }])
+
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should stay closed on a late answer after the field was left and entered again', () => {
+      const { autocomplete, input } = start({ options: [], search: 'external' })
+
+      input.focus()
+      type(input, 'a')
+      input.dispatchEvent(createEvent('blur'))
+      autocomplete.setOptions([{ label: 'Alpha', value: 'a' }])
+
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should stay closed on a late answer after Enter confirmed the text', () => {
+      const { autocomplete, input } = start({ clearSearchOnSelect: false, options: [], search: 'external' })
+
+      input.focus()
+      type(input, 'a')
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+      autocomplete.setOptions([{ label: 'Alpha', value: 'a' }])
+
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should stay closed on a late answer after clear()', () => {
+      const { autocomplete, input } = start({ options: [], search: 'external' })
+
+      input.focus()
+      type(input, 'a')
+      autocomplete.clear()
+      autocomplete.setOptions([{ label: 'Alpha', value: 'a' }])
+
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should stay closed on a late answer without the focus', () => {
+      const { autocomplete, input } = start({ options: [], search: 'external' })
+
+      type(input, 'a')
+      autocomplete.setOptions([{ label: 'Alpha', value: 'a' }])
+
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should stay closed on an answer that follows emptying the text', () => {
+      const { autocomplete, input } = start({ options: [], search: 'external' })
+
+      input.focus()
+      type(input, 'a')
+      type(input, '')
+      autocomplete.setOptions([{ label: 'Alpha', value: 'a' }])
+
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should show the cleaner for typed text when free text is allowed', () => {
+      const { autocomplete, input } = start()
+
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
+
+      type(input, 'typed')
+
+      expect(autocomplete._cleanerElement.style.display).toBe('')
+    })
+
+    it('should keep the cleaner out of the Tab order and bring the focus back to the field', () => {
+      const { autocomplete, changes, input } = start()
+
+      input.focus()
+      type(input, 'typed')
+
+      expect(autocomplete._cleanerElement.tabIndex).toBe(-1)
+
+      autocomplete._cleanerElement.focus()
+      autocomplete._cleanerElement.click()
+
+      expect(input.value).toBe('')
+      expect(changes).toEqual([null])
+      expect(document.activeElement).toBe(input)
+    })
+
+    it('should empty the field before it reports the clear', () => {
+      const { autocomplete, element, input } = start()
+      const seen = []
+
+      type(input, 'typed')
+      element.addEventListener('input.coreui.autocomplete', () => seen.push(input.value))
+      autocomplete.clear()
+
+      expect(seen).toEqual([''])
+    })
+
+    it('should keep the cleaner off for typed text when only defined options are allowed', () => {
+      const { autocomplete, input } = start({ allowOnlyDefinedOptions: true })
+
+      type(input, 'typed')
+
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
+    })
+
+    it('should hide the cleaner when the text is emptied by code', () => {
+      const { autocomplete, input } = start()
+
+      type(input, 'typed')
+      autocomplete.clear()
+
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
+    })
+
+    it('should say that the field completes inline only with hints', () => {
+      expect(start().input.getAttribute('aria-autocomplete')).toBe('list')
+      expect(start({ showHints: true }).input.getAttribute('aria-autocomplete')).toBe('both')
+    })
+
+    it('should name the list by what names the field', () => {
+      fixtureEl.innerHTML = '<h2 id="title">Country</h2><div class="autocomplete" aria-labelledby="title"></div>'
+
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), { options: ['Poland'] })
+
+      autocomplete.show()
+
+      expect(autocomplete._menu.querySelector('[role="listbox"]').getAttribute('aria-labelledby')).toBe('title')
+    })
+
+    it('should name the list by the field when the field has no aria-labelledby', () => {
+      const { autocomplete, input } = start()
+
+      autocomplete.show()
+
+      expect(autocomplete._menu.querySelector('[role="listbox"]').getAttribute('aria-labelledby')).toBe(input.id)
+    })
+
+    it('should treat dragging text inside the field as one change', () => {
+      const { autocomplete, element, input } = start({ validationState: 'invalid' })
+
+      element.addEventListener('change.coreui.autocomplete', () => {}, { once: true })
+      type(input, 'ab', 'deleteByDrag')
+      autocomplete.setValidationState('valid')
+      type(input, 'ba', 'insertFromDrop')
+
+      expect(element.classList.contains('is-valid')).toBeTrue()
+    })
+
+    it('should end a drag that left the field when the field loses the focus', () => {
+      const { autocomplete, element, input } = start({ validationState: 'valid' })
+
+      type(input, 'ab', 'deleteByDrag')
+      input.dispatchEvent(createEvent('blur'))
+      autocomplete.setValidationState('invalid')
+      type(input, 'abc', 'insertFromPaste')
+
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should end the drag with its drop, so the next change drops a state again', () => {
+      const { autocomplete, element, input } = start({ validationState: 'invalid' })
+
+      type(input, 'ab', 'deleteByDrag')
+      type(input, 'ba', 'insertFromDrop')
+      autocomplete.setValidationState('valid')
+      type(input, 'bax')
+
+      expect(element.classList.contains('is-valid')).toBeFalse()
     })
   })
 })

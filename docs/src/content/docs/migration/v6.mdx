@@ -1153,6 +1153,18 @@ check, radio, carousel and toggler icons already work:
   the form that changes the selection sends one, as Autocomplete, Chip Input
   and Combobox do.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+  **Autocomplete reports only a selection through `change.coreui.autocomplete`.**
+  `event.value` is the option or `null`. Text that names no option, confirmed
+  with <kbd>Enter</kbd> or left behind on blur, used to fire the event with a
+  string; read it from the field itself. `clear()` and the cleaner still fire it
+  with `null` when they empty that text, and a form reset no longer reports it.
+  The cleaner now also shows for that text unless `allowOnlyDefinedOptions` is
+  on, and it left the Tab order.
+- **With `search` on, Multi Select's search box is the combobox.** `role`,
+  `aria-expanded`, `aria-haspopup` and `aria-controls` moved there from the
+  frame, the element that had no focus. Its name is the name of the control
+  followed by `ariaSearchLabel`.
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Form controls fire their change event once per change of the value, on a
   form reset as well, and never from a value the page gives.** OTP Input's
   `change.coreui.otp-input`, Rating's

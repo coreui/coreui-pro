@@ -468,6 +468,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
 | `setActive(value)` | Moves the highlight without taking the focus and forgets where the last <kbd>Shift</kbd> range started. |
 | `setOptions(options)` | Rebuilds the list from an `options` array. The selection stays as it is, values the new options no longer carry included; options marked `selected` join a multiple selection, or a single one that holds nothing, and `change` fires only when they do. With `resetSelectionOnOptionsChange` new values empty the selection first. |
+| `setTotal(total)` | Sets the number of all results an external search has, for `{total}`. `null` goes back to counting. |
 | `setLoading(loading)` | Turns the loading state on or off; turning it on announces `loadingLabel` while the list is on the page. |
 | `toggle(value)` | Selects the value, or deselects it when it is already selected. |
 | `update` | Re-reads the DOM: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, the empty state and the select-all button are re-evaluated. The selection survives all of it. |

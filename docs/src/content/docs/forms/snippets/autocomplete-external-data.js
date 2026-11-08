@@ -27,10 +27,7 @@ const autocomplete = new coreui.Autocomplete(myAutoCompleteExternalData, {
 let lastQuery = null
 let debounceTimer = null
 
-myAutoCompleteExternalData.addEventListener('show.coreui.autocomplete', async () => {
-  const users = await getUsers()
-  autocomplete.setOptions(users)
-})
+getUsers().then(users => autocomplete.setOptions(users))
 
 myAutoCompleteExternalData.addEventListener('input.coreui.autocomplete', event => {
   const query = event.value

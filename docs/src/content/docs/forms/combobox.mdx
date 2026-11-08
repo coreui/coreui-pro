@@ -578,6 +578,7 @@ A combobox whose list depends on another field, such as the cities of the chosen
 | `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
 | `setLoading(loading)` | Sets `loading` on a live combobox. See [Loading options](#loading-options). |
 | `setOptions(options)` | Rebuilds the list from an `options` array. The value stays, also when the new options no longer carry it, and the toggle keeps the label it had; options marked `selected` join a multiple value, or a single one that is empty. With `resetSelectionOnOptionsChange` new values drop the value first. |
+| `setTotal(total)` | Sets the number of all results an external search has, for `{total}`. `null` goes back to counting. |
 | `setValue(value)` | Replaces the selection with `value` (a string, an array, or `null` to empty it), in the order given and up to `selectionLimit`. A value the list does not carry is skipped unless it is already selected. A disabled option and a disabled combobox take it, as a native select takes a value from a script; only the user is kept out. It fires no change event, since the code that calls it already holds the value. A number is taken as its string, as the `value` option takes it; a value of another type throws the `TypeError` the constructor throws. |
 | `show` | Opens the panel. |
 | `toggle` | Opens the panel, or closes it when it is open. |

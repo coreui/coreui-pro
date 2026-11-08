@@ -1,6 +1,5 @@
 import {
-  disableGroupOptions, filterOptionTree, findOptionByLabel, findOptionByValue, flattenOptions, getOptionLabel, getOptionValue, getSelectableOptions, highlightMatches,
-  isOptionDisabled, isOptionGroup, normalizeSearchText
+  disableGroupOptions, filterOptionTree, findOptionByLabel, findOptionByValue, flattenOptions, getOptionLabel, getOptionValue, getSelectableOptions, hasSameValues, highlightMatches, isOptionDisabled, isOptionGroup, normalizeSearchText
 } from '../../../src/util/option-tree.js'
 
 describe('Option tree utilities', () => {
@@ -209,6 +208,17 @@ describe('Option tree utilities', () => {
       expect(highlightMatches('<b>x</b>', '   ')).toBe('&lt;b&gt;x&lt;/b&gt;')
       expect(highlightMatches('<b>x</b>')).toBe('&lt;b&gt;x&lt;/b&gt;')
       expect(highlightMatches('<b>x</b>', null)).toBe('&lt;b&gt;x&lt;/b&gt;')
+    })
+  })
+
+  describe('hasSameValues', () => {
+    it('should compare two sets without regard to order', () => {
+      expect(hasSameValues(new Set(['a', 'b']), new Set(['b', 'a']))).toBeTrue()
+    })
+
+    it('should tell apart sets of another size or with another value', () => {
+      expect(hasSameValues(new Set(['a']), new Set(['a', 'b']))).toBeFalse()
+      expect(hasSameValues(new Set(['a', 'b']), new Set(['a', 'c']))).toBeFalse()
     })
   })
 })

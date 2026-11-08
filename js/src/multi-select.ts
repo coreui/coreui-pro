@@ -18,18 +18,17 @@ import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import FocusTrap from './util/focustrap.js'
 import { type ValidationState } from './util/form-validation.js'
-import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { isComposingKey, settleClick } from './util/layers.js'
 import {
   getRemovalNeighbor, isOpeningF4, isShortcutPress, isTypingKey
 } from './util/list-navigation.js'
-import { flattenOptions, isOptionGroup } from './util/option-tree.js'
+import { flattenOptions, hasSameValues, isOptionGroup } from './util/option-tree.js'
 import {
   type CountLabel, createSelectionStore, fillSelection, getAriaPressed, getScopeSelectionState, getSelectionLimit,
   resolveCountLabel, type SelectionState
 } from './util/selection-state.js'
 import {
-  DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
+  DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList
 } from './util/sanitizer.js'
 import {
   defineJQueryPlugin, getUID, isRTL, isVisible, jQueryDispatch, writeAttribute
@@ -76,7 +75,6 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_CHIP_REMOVE = 'remove.coreui.chip'
 
 const CLASS_NAME_CHIP = 'chip'
-const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
@@ -359,10 +357,6 @@ class MultiSelect extends ComboboxBase {
 
   // Public
 
-  override _returnFocusTarget(): HTMLElement | null {
-    return this._config.search ? this._searchElement : this._togglerElement
-  }
-
   override _getShowTarget(): HTMLElement {
     return this._wrapperElement
   }
@@ -485,7 +479,7 @@ class MultiSelect extends ComboboxBase {
     this._options = this._getOptionsFromConfig(options)
 
     const values = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
-    const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previous.size || [...values].some(value => !previous.has(value)))
+    const reset = this._config.resetSelectionOnOptionsChange && !hasSameValues(values, previous)
     const marked = this._markedValues()
     const seeded = this._givenValues ? marked.filter(value => !seen.has(value)) : []
     const selected = this._store.values()
@@ -611,11 +605,8 @@ class MultiSelect extends ComboboxBase {
     this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
     this._wrapperElement.classList.toggle(CLASS_NAME_DISABLED, disabled)
     this._togglerElement.classList.toggle(CLASS_NAME_DISABLED, disabled)
-    writeAttribute(this._togglerElement, 'aria-disabled', disabled ? 'true' : null)
 
-    if (!this._config.search) {
-      writeAttribute(this._togglerElement, 'tabindex', disabled ? null : '0')
-    }
+    this._writeFrameState()
 
     if (this._indicatorElement) {
       this._indicatorElement.disabled = disabled
@@ -672,7 +663,7 @@ class MultiSelect extends ComboboxBase {
       }
 
       const target = containsFocus(chip) ?
-        getRemovalNeighbor(this._getChips(), chip) ?? (this._config.search ? this._searchElement : this._togglerElement) :
+        getRemovalNeighbor(this._getChips(), chip) ?? this._getFocusTarget() :
         null
 
       this._removeAsUser(() => this._deselectOption(String(chip.dataset.value)))
@@ -846,14 +837,8 @@ class MultiSelect extends ComboboxBase {
     const _options = []
     for (const option of options) {
       if (isOptionGroup(option)) {
-        const customGroupProperties = { ...option }
-
-        delete customGroupProperties.label
-        delete customGroupProperties.options
-
         _options.push({
-          ...customGroupProperties,
-          label: option.label,
+          ...option,
           options: this._getOptionsFromConfig(option.options, disabled || option.disabled)
         })
 
@@ -868,7 +853,6 @@ class MultiSelect extends ComboboxBase {
 
       const customProperties = typeof option === 'object' ? { ...option } : {}
 
-      delete customProperties.value
       delete customProperties.selected
       delete customProperties.disabled
 
@@ -950,32 +934,54 @@ class MultiSelect extends ComboboxBase {
     this._element.setAttribute('aria-hidden', 'true')
   }
 
-  _wireTogglerAccessibleName(): void {
+  _controlName(): [string, string] | null {
     const labelledBy = this._element.getAttribute('aria-labelledby')
     const ariaLabel = this._element.getAttribute('aria-label')
     const nativeLabel = [...((this._element as HTMLSelectElement).labels ?? [])]
       .find(label => !label.contains(this._element))
 
     if (labelledBy) {
-      this._togglerElement.setAttribute('aria-labelledby', labelledBy)
-    } else if (ariaLabel) {
-      this._togglerElement.setAttribute('aria-label', ariaLabel)
-    } else if (nativeLabel) {
-      if (!nativeLabel.id) {
-        nativeLabel.id = `${this._uniqueId}-label`
-      }
+      return ['aria-labelledby', labelledBy]
+    }
 
-      this._togglerElement.setAttribute('aria-labelledby', nativeLabel.id)
+    if (ariaLabel) {
+      return ['aria-label', ariaLabel]
+    }
+
+    if (!nativeLabel) {
+      return null
+    }
+
+    nativeLabel.id ||= `${this._uniqueId}-label`
+
+    return ['aria-labelledby', nativeLabel.id]
+  }
+
+  _wireTogglerAccessibleName(): void {
+    const name = this._controlName()
+
+    if (name) {
+      const [attribute, value] = name
+      const field = this._getFocusTarget()
+      const suffix = attribute === 'aria-label' ? this._config.ariaSearchLabel : field.id
+
+      field.setAttribute(attribute, this._config.search ? `${value} ${suffix}` : value)
     }
   }
 
-  _getFocusTarget(): HTMLElement {
+  override _getFocusTarget(): HTMLElement {
     return this._config.search ? this._searchElement! : this._togglerElement
   }
 
-  _markRequired(): void {
+  _markField(): void {
+    const field = this._getFocusTarget()
+
+    field.role = 'combobox'
+    field.setAttribute('aria-expanded', 'false')
+    field.setAttribute('aria-haspopup', 'dialog')
+
     if (this._config.required) {
-      (this._config.search ? this._searchElement! : this._togglerElement).setAttribute('aria-required', 'true')
+      field.setAttribute('aria-required', 'true')
     }
   }
 
@@ -1015,7 +1021,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._wireTogglerAccessibleName()
-    this._markRequired()
+    this._markField()
     this._validation.refresh()
 
     this._createOptionsContainer()
@@ -1029,19 +1035,13 @@ class MultiSelect extends ComboboxBase {
     // is the native <select>, which stays as an invisible overlay.)
     const togglerEl = this._wrapperElement
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
-    togglerEl.setAttribute('role', 'combobox')
-    togglerEl.setAttribute('aria-expanded', 'false')
-    togglerEl.setAttribute('aria-haspopup', 'dialog')
     this._togglerElement = togglerEl
 
     if (this._disabled) {
       togglerEl.classList.add(CLASS_NAME_DISABLED)
-      togglerEl.setAttribute('aria-disabled', 'true')
     }
 
-    if (!this._config.search && !this._disabled) {
-      togglerEl.tabIndex = 0
-    }
+    this._writeFrameState()
 
     const selectionEl = document.createElement('div')
     selectionEl.classList.add(CLASS_NAME_SELECTION)
@@ -1066,32 +1066,18 @@ class MultiSelect extends ComboboxBase {
     this._indicatorElement = null
 
     if (this._config.pickerIcon) {
-      const indicator = document.createElement('button')
-      indicator.type = 'button'
-      indicator.classList.add('form-control-action')
-      indicator.disabled = this._disabled
-      indicator.setAttribute('aria-label', this._config.ariaPickerLabel)
-      indicator.innerHTML = sanitizeByConfig(
-        this._config.pickerIcon === true ? PICKER_ICON : this._config.pickerIcon,
-        { ...this._config, allowList: SVGAllowlist }
-      )
-
-      this._togglerElement.append(indicator)
-
-      this._indicatorElement = indicator
+      this._indicatorElement = this._createIndicator()
+      this._indicatorElement.disabled = this._disabled
     }
 
     this._updateSelectionCleaner()
   }
 
-  _createSelectionCleaner(): HTMLElement {
-    const cleaner = document.createElement('button')
-    cleaner.type = 'button'
-    cleaner.classList.add(CLASS_NAME_CLEANER)
-    cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel)
-    cleaner.innerHTML = CLEANER_ICON
-
-    return cleaner
+  _writeFrameState(): void {
+    if (!this._config.search) {
+      writeAttribute(this._togglerElement, 'aria-disabled', this._disabled ? 'true' : null)
+      writeAttribute(this._togglerElement, 'tabindex', this._disabled ? null : '0')
+    }
   }
 
   _createSearchInput(): void {
@@ -1166,22 +1152,12 @@ class MultiSelect extends ComboboxBase {
   }
 
   _nameMenu(): void {
-    const labelledBy = this._togglerElement.getAttribute('aria-labelledby')
+    const field = this._getFocusTarget()
+    const [attribute, value] = this._controlName() ?? (this._config.search ?
+      ['aria-label', this._config.ariaSearchLabel] :
+      ['aria-labelledby', field.id ||= getUID(`${this.constructor.NAME}-toggler-`)])
 
-    if (labelledBy) {
-      this._menu.setAttribute('aria-labelledby', labelledBy)
-      return
-    }
-
-    const label = this._togglerElement.getAttribute('aria-label')
-
-    if (label) {
-      this._menu.setAttribute('aria-label', label)
-      return
-    }
-
-    this._togglerElement.id ||= getUID(`${this.constructor.NAME}-toggler-`)
-    this._menu.setAttribute('aria-labelledby', this._togglerElement.id)
+    this._menu.setAttribute(attribute, value)
   }
 
   override _typingField(): HTMLElement | null {
@@ -1208,14 +1184,8 @@ class MultiSelect extends ComboboxBase {
     return null
   }
 
-  override _getPanelReferences(): Array<[HTMLElement, string]> {
-    const references: Array<[HTMLElement, string]> = [[this._togglerElement, this._menu.id]]
-
-    if (this._searchElement) {
-      references.push([this._searchElement, this._optionsElement.id])
-    }
-
-    return references
+  override _getPanelController(): HTMLElement {
+    return this._getFocusTarget()
   }
 
   override _optionText(option: any): string {
@@ -1448,7 +1418,7 @@ class MultiSelect extends ComboboxBase {
     const previous = new Set(this._store.values())
 
     this._commitSelection(values)
-    this._settle(this._store.size() !== previous.size || this._store.values().some(value => !previous.has(value)), notify)
+    this._settle(!hasSameValues(new Set(this._store.values()), previous), notify)
   }
 
   _settle(changed: boolean, notify = true): void {
@@ -1605,7 +1575,7 @@ class MultiSelect extends ComboboxBase {
     const clearable = !this._disabled && this._selectedOptions().some((option: any) => !option.disabled)
 
     if (clearable && this._selectionCleanerElement === null) {
-      const selectionCleaner = this._createSelectionCleaner()
+      const selectionCleaner = this._createCleaner()
 
       if (this._indicatorElement) {
         this._indicatorElement.before(selectionCleaner)
@@ -1827,18 +1797,6 @@ class MultiSelect extends ComboboxBase {
 
   // Static
 
-  static multiSelectInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = MultiSelect.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any, ...args: any[]): any {
     return jQueryDispatch(this, MultiSelect, config, args)
   }
@@ -1850,7 +1808,7 @@ class MultiSelect extends ComboboxBase {
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const multiSelect of SelectorEngine.find(SELECTOR_DATA_MULTI_SELECT)) {
-    MultiSelect.multiSelectInterface(multiSelect)
+    MultiSelect.getOrCreateInstance(multiSelect)
   }
 })
 
