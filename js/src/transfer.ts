@@ -241,7 +241,9 @@ class Transfer extends BaseComponent {
   }
 
   setOptions(items: ListBoxEntry[]): void {
-    this._entries = Array.isArray(items) ? items : []
+    this._typeCheckConfig({ options: items }, { options: DefaultType.options })
+
+    this._entries = items ?? []
     this._applyItems(this.getTarget())
     this.update()
   }
@@ -440,7 +442,7 @@ class Transfer extends BaseComponent {
 
     if (this._rendered) {
       for (const side of Object.values(this._sides)) {
-        side.listBox.clear()
+        side.listBox._dropSelection()
       }
     }
 

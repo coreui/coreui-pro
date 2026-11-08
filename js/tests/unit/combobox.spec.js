@@ -2649,4 +2649,12 @@ describe('Combobox', () => {
       }).toThrowError(TypeError, 'No method named "noMethod"')
     })
   })
+
+  describe('setOptions input', () => {
+    it('should throw a TypeError for a value that is not an array', () => {
+      const combobox = new Combobox(setMarkup(), { options: [] })
+
+      expect(() => combobox.setOptions('x')).toThrowError(TypeError)
+    })
+  })
 })

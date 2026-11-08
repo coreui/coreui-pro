@@ -583,7 +583,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
 | `pickerIcon` | string, boolean | `true` | The button that toggles the options list: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Clicking the control only opens the list, so without the button a pointer closes it by clicking away. |
 | `placeholder` | string | `'Select...'` | Specifies a short hint that is visible in the input. |
-| `required` | boolean | `false` | Makes the input field required for form validation. |
+| `required` | boolean | `false` | Makes the input field required for form validation. The option decides: a `required` attribute on the `<select>` is overwritten, so set this option or `data-coreui-required`. |
 | `resetSelectionOnOptionsChange` | boolean | `false` | Empties the selection when `setOptions()` brings options with different values, then takes the options marked `selected`. For options that depend on another field. |
 | `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
 | `sanitizeFn` | function, null | `null` | Custom sanitization function. If provided, it will be used instead of the built-in sanitizer. |

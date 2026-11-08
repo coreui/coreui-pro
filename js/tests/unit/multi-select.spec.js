@@ -9581,4 +9581,20 @@ describe('MultiSelect', () => {
       expect(button.textContent).toBe('Select all')
     })
   })
+
+  describe('cleaner with a locked selection', () => {
+    it('should not offer the cleaner when every selected option is disabled', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected disabled>A</option><option value="b">B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { cleaner: true })
+
+      expect(multiSelect._selectionCleanerElement).toBeNull()
+    })
+
+    it('should offer the cleaner when one selected option can be deselected', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected disabled>A</option><option value="b" selected>B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { cleaner: true })
+
+      expect(multiSelect._selectionCleanerElement).not.toBeNull()
+    })
+  })
 })

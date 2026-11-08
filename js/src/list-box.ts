@@ -347,6 +347,8 @@ class ListBox extends BaseComponent {
   }
 
   setOptions(items: ListBoxEntry[]): void {
+    this._typeCheckConfig({ options: items }, { options: DefaultType.options })
+
     const previous = this.getSelectedValues()
     const previousValues = new Set(this._allOptions().map(option => this._optionValue(option)))
 
@@ -1311,6 +1313,11 @@ class ListBox extends BaseComponent {
     } else if (this._config.selectionMode === SELECTION_MODE_SINGLE) {
       this.select(value)
     }
+  }
+
+  _dropSelection(): void {
+    this._store.commit([])
+    this.update()
   }
 
   _seedTypeahead(key: string): void {

@@ -1108,4 +1108,23 @@ describe('Transfer', () => {
       }).toThrowError(TypeError, 'No method named "noMethod"')
     })
   })
+
+  describe('setOptions input', () => {
+    it('should throw a TypeError for a value that is not an array', () => {
+      const transfer = new Transfer(setMarkup())
+
+      expect(() => transfer.setOptions('x')).toThrowError(/Option "options"/)
+    })
+
+    it('should leave nothing selected after setOptions with the same values on a disabled transfer', () => {
+      const users = [{ value: 'ada', label: 'Ada' }, { value: 'bob', label: 'Bob' }]
+      const transfer = new Transfer(setMarkup(), { disabled: true, options: users })
+      const list = transfer._sides.source.listBox
+
+      list._store.commit(['ada'])
+      transfer.setOptions(users)
+
+      expect(list.getSelectedValues()).toEqual([])
+    })
+  })
 })

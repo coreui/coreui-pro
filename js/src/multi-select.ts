@@ -1602,7 +1602,9 @@ class MultiSelect extends ComboboxBase {
       return
     }
 
-    if (this._store.size() > 0 && !this._disabled && this._selectionCleanerElement === null) {
+    const clearable = !this._disabled && this._selectedOptions().some((option: any) => !option.disabled)
+
+    if (clearable && this._selectionCleanerElement === null) {
       const selectionCleaner = this._createSelectionCleaner()
 
       if (this._indicatorElement) {
@@ -1615,7 +1617,7 @@ class MultiSelect extends ComboboxBase {
       return
     }
 
-    if ((this._store.size() === 0 || this._disabled) && this._selectionCleanerElement !== null) {
+    if (!clearable && this._selectionCleanerElement !== null) {
       this._selectionCleanerElement.remove()
       this._selectionCleanerElement = null
     }

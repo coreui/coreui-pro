@@ -2878,4 +2878,18 @@ describe('ListBox', () => {
       }).toThrowError(TypeError, 'No method named "noMethod"')
     })
   })
+
+  describe('setOptions input', () => {
+    it('should throw a TypeError for a value that is not an array', () => {
+      const listBox = new ListBox(setMarkup())
+
+      expect(() => listBox.setOptions('x')).toThrowError(TypeError)
+    })
+
+    it('should take null', () => {
+      const listBox = new ListBox(setMarkup())
+
+      expect(() => listBox.setOptions(null)).not.toThrow()
+    })
+  })
 })
