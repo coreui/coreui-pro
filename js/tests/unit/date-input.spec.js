@@ -1599,6 +1599,25 @@ describe('DateInput', () => {
       expect(dateInput.getDate()).toEqual(new Date('0026-06-15T00:00'))
     })
 
+    it('should read a pasted ISO date whose year fits the day section in ISO order', () => {
+      const dateInput = createDateInput()
+      const [day, month, year] = getSections(dateInput._element)
+
+      paste(day, '0026-06-15')
+
+      expect([day.textContent, month.textContent, year.textContent]).toEqual(['15', '06', '0026'])
+      expect(dateInput.getDate()).toEqual(new Date('0026-06-15T00:00'))
+    })
+
+    it('should read a pasted ISO date in a locale whose date has an extra part', () => {
+      const dateInput = createDateInput({ locale: 'bg-BG' })
+      const [day] = getSections(dateInput._element)
+
+      paste(day, '2026-06-15')
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 5, 15))
+    })
+
     it('should cut the day of a pasted date while the year is being typed', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
       const [day, , year] = getSections(dateInput._element)

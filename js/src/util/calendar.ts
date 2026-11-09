@@ -171,6 +171,8 @@ const ARROW_KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'])
 
 const MODIFIER_KEYS = new Set(['Alt', 'Control', 'Meta', 'Shift'])
 
+const ISO_DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
+
 const GREGORIAN_MONTH_CALENDARS = new Set(['buddhist', 'gregory', 'iso8601', 'japanese', 'roc'])
 
 const yearBeforeMonth = new Map<string, boolean>()
@@ -577,8 +579,8 @@ const getExpectedPartsCount = (patterns: string[]) : number => {
 /**
  * Parses a day, and optionally its time, in the locale's numeric format
  * written with Latin digits and a Gregorian year. When no pattern of the locale
- * matches, a string with separators and at least as many parts as the locale's
- * format goes to the native date parser, unless it starts with a day that does
+ * matches, an ISO date or a string with separators and at least as many parts as
+ * the locale's format goes to the native date parser, unless it starts with a day that does
  * not exist, in ISO order or the locale's.
  *
  * @param dateString - The string to parse
@@ -595,7 +597,7 @@ const parseDayString = (dateString: string, locale: string, includeTime: boolean
     const hasDateSeparators = /[-/.:]/.test(trimmed)
     const parts = trimmed.split(/[-/.\s:]+/).filter(part => part.length > 0)
     const expectedPartsCount = getExpectedPartsCount(patterns)
-    const hasRequiredParts = parts.length >= expectedPartsCount
+    const hasRequiredParts = parts.length >= expectedPartsCount || ISO_DATE_ONLY.test(trimmed)
 
     if (hasDateSeparators && hasRequiredParts) {
       const written = readWrittenDay(trimmed, locale)
@@ -626,7 +628,7 @@ const parseDayString = (dateString: string, locale: string, includeTime: boolean
  */
 const parseLocalDateString = (dateString: string) : Date | null => {
   const trimmed = dateString.trim()
-  const isoDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(trimmed)
+  const isoDateOnly = ISO_DATE_ONLY.test(trimmed)
   const _date = new Date(Date.parse(isoDateOnly ? `${trimmed}T00:00` : dateString))
   if (!Number.isNaN(_date.getTime())) {
     return _date

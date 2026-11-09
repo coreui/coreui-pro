@@ -798,6 +798,7 @@ export const formatSections = (sections: DateSection[]): string =>
 /**
  * Reads pasted text into a copy of the sections by matching names (months,
  * day periods) and then groups of digits to the editable sections in order.
+ * Only a year section takes a group longer than two digits.
  *
  * @param text - The pasted text
  * @param sections - The sections and literals of a field
@@ -838,10 +839,11 @@ export const getSectionsFromString = (text: string, sections: DateSection[]): Da
       continue
     }
 
-    const value = Number.parseInt(digitGroups[groupIndex++], 10)
+    const group = digitGroups[groupIndex++]
+    const value = Number.parseInt(group, 10)
     const { min, max } = getSectionBounds(section)
 
-    if (Number.isNaN(value) || value < min || value > max) {
+    if (Number.isNaN(value) || value < min || value > max || (section.type !== 'year' && group.length > 2)) {
       return null
     }
 
