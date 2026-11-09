@@ -498,7 +498,7 @@ Any other option change (format, size, labels, icons, `name`, `required`, `reado
 
 | v5 | v6 |
 | --- | --- |
-| `changed.coreui.autocomplete` | `change.coreui.autocomplete` |
+| `changed.coreui.autocomplete` | `change.coreui.autocomplete`; `event.value` is the option or `null`, typed text without an option is not reported |
 | `changed.coreui.multi-select` | `change.coreui.multi-select` |
 | `event.values` on `change.coreui.chip-set` and `change.coreui.chip-input` | `event.value` |
 | `cellHover.coreui.calendar` | removed; listen to `mouseover` or `focusin` and read `data-coreui-date` from the cell |

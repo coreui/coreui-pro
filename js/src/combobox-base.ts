@@ -10,6 +10,7 @@ import ListBox from './list-box.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { createAnchoredPosition } from './util/floating-ui.js'
+import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { findOptionByValue, isOptionGroup } from './util/option-tree.js'
 import { focusIfUsable } from './util/focus.js'
 import {
@@ -17,9 +18,9 @@ import {
 } from './util/layers.js'
 import { isTypingKey } from './util/list-navigation.js'
 import { resolvePopupContainer } from './util/popup.js'
-import { escapeHtml } from './util/sanitizer.js'
+import { escapeHtml, sanitizeByConfig, SVGAllowlist } from './util/sanitizer.js'
 import { type SelectionStore } from './util/selection-state.js'
-import { executeAfterTransition, getElement } from './util/index.js'
+import { executeAfterTransition, getElement, writeAttribute } from './util/index.js'
 
 /**
  * Internal shared engine for the combobox-pattern components (Combobox,
@@ -103,7 +104,7 @@ class ComboboxBase extends BaseComponent {
     const showTarget = this._getShowTarget()
     this._mountMenu()
     showTarget.classList.add(CLASS_NAME_SHOW)
-    this._getAriaExpandedTarget().setAttribute('aria-expanded', 'true')
+    this._getFocusTarget().setAttribute('aria-expanded', 'true')
     this._syncPanelReferences()
 
     // The panel carries its own open state, teleported or not: `.popup` keys
@@ -148,7 +149,7 @@ class ComboboxBase extends BaseComponent {
     this._afterHideDispose()
 
     this._getShowTarget().classList.remove(CLASS_NAME_SHOW)
-    this._getAriaExpandedTarget().setAttribute('aria-expanded', 'false')
+    this._getFocusTarget().setAttribute('aria-expanded', 'false')
     this._menu.classList.remove(CLASS_NAME_SHOW)
     this._menu.inert = true
 
@@ -160,7 +161,7 @@ class ComboboxBase extends BaseComponent {
     this._onHideEnd()
 
     if (refocus) {
-      focusIfUsable(this._returnFocusTarget())
+      focusIfUsable(this._getFocusTarget())
     }
 
     this._syncPanelReferences()
@@ -182,7 +183,7 @@ class ComboboxBase extends BaseComponent {
       anchor: () => this._getShowTarget(),
       closesOn: () => true,
       dismiss: reason => this._hideFromLayer(reason),
-      focusTarget: () => this._returnFocusTarget(),
+      focusTarget: () => this._getFocusTarget(),
       isOpen: () => Boolean(this._element) && this._isShown(),
       kind: 'popup',
       parts: () => [this._getShowTarget(), this._menu]
@@ -290,17 +291,15 @@ class ComboboxBase extends BaseComponent {
       field.removeAttribute('aria-activedescendant')
     }
 
-    for (const [element, id] of this._getPanelReferences()) {
-      if (open) {
-        element.setAttribute('aria-controls', id)
-      } else {
-        element.removeAttribute('aria-controls')
-      }
+    const controller = this._getPanelController()
+
+    if (controller) {
+      writeAttribute(controller, 'aria-controls', open ? this._menu.id : null)
     }
   }
 
-  _getPanelReferences(): Array<[HTMLElement, string]> {
-    return []
+  _getPanelController(): HTMLElement | null {
+    return null
   }
 
   _syncMenuWidth(): void {
@@ -309,12 +308,35 @@ class ComboboxBase extends BaseComponent {
     }
   }
 
-  _getAriaExpandedTarget(): HTMLElement {
+  _getFocusTarget(): HTMLElement {
     return this._togglerElement
   }
 
-  _returnFocusTarget(): HTMLElement | null {
-    return this._togglerElement
+  _createButton(className: string, label: string, content: string): HTMLButtonElement {
+    const button = document.createElement('button')
+
+    button.type = 'button'
+    button.classList.add(className)
+    button.setAttribute('aria-label', label)
+    button.innerHTML = content
+
+    return button
+  }
+
+  _createCleaner(): HTMLButtonElement {
+    return this._createButton('form-control-cleaner', this._config.ariaCleanerLabel, CLEANER_ICON)
+  }
+
+  _createIndicator(): HTMLButtonElement {
+    const { ariaPickerLabel, pickerIcon } = this._config
+    const indicator = this._createButton('form-control-action', ariaPickerLabel, sanitizeByConfig(
+      pickerIcon === true ? PICKER_ICON : pickerIcon,
+      { ...this._config, allowList: SVGAllowlist }
+    ))
+
+    this._togglerElement.append(indicator)
+
+    return indicator
   }
 
   // Shared keyboard wiring — the list itself runs the arrows, Home/End and the

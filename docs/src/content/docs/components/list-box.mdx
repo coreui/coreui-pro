@@ -445,6 +445,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `selectedLabel` | string, function | `` (count, total) => `${count}/${total} selected` `` | The header's count text. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |
+| `total` | number, null | `null` | Sets `{total}` of `selectedLabel`. Leave it out to count the options in the list; with external search give the number of records. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 1000 ms. |
 
 ### Methods
@@ -467,6 +468,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
 | `setActive(value)` | Moves the highlight without taking the focus and forgets where the last <kbd>Shift</kbd> range started. |
 | `setOptions(options)` | Rebuilds the list from an `options` array. The selection stays as it is, values the new options no longer carry included; options marked `selected` join a multiple selection, or a single one that holds nothing, and `change` fires only when they do. With `resetSelectionOnOptionsChange` new values empty the selection first. |
+| `setTotal(total)` | Sets the number of all results an external search has, for `{total}`. `null` goes back to counting. |
 | `setLoading(loading)` | Turns the loading state on or off; turning it on announces `loadingLabel` while the list is on the page. |
 | `toggle(value)` | Selects the value, or deselects it when it is already selected. |
 | `update` | Re-reads the DOM: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, the empty state and the select-all button are re-evaluated. The selection survives all of it. |

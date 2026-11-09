@@ -96,6 +96,7 @@ type ComboboxConfig = {
   searchPlaceholder: string
   selectedLabel: CountLabel
   selectionLimit: number | null
+  total: number | null
   typeahead: boolean
   validationState: ValidationState | null
   value: string | string[] | null
@@ -125,6 +126,7 @@ const Default: ComboboxConfig = {
   searchPlaceholder: 'Search',
   selectedLabel: (count: number) => `${count} selected`,
   selectionLimit: null,
+  total: null,
   typeahead: true,
   validationState: null,
   value: null
@@ -154,6 +156,7 @@ const DefaultType: Record<string, string> = {
   searchPlaceholder: 'string',
   selectedLabel: '(string|function)',
   selectionLimit: '(null|number)',
+  total: '(number|null)',
   typeahead: 'boolean',
   validationState: '(string|null|undefined)',
   value: '(string|array|null)'
@@ -244,6 +247,12 @@ class Combobox extends ComboboxBase {
 
     this._labels = new Map((this._listBox?.getSelectedValues() ?? []).map(value => [value, listed.get(value) ?? this._labels.get(value) ?? value]))
     this._listBox?.setOptions(items)
+    this._updateValue()
+  }
+
+  setTotal(total: number | null): void {
+    this._typeCheckConfig({ total }, { total: DefaultType.total })
+    this._config.total = total
     this._updateValue()
   }
 
@@ -560,7 +569,7 @@ class Combobox extends ComboboxBase {
       resolveCountLabel(
         this._config.selectedLabel,
         values.length,
-        new Set([...SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).map(option => this._valueOf(option as HTMLElement)), ...values]).size
+        this._config.total ?? new Set([...SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).map(option => this._valueOf(option as HTMLElement)), ...values]).size
       ) :
       this._optionLabel(values[0])
   }

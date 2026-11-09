@@ -14,7 +14,7 @@ import {
   createTypeaheadBuffer, endsEntryWait, type EntryRequest, findOpeningItem, isEntryWaiting, isShortcutPress, isTypingKey, keepsFocus, rangeBetween,
   scrollIntoContainer, type TypeaheadBuffer
 } from './util/list-navigation.js'
-import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
+import { getOptionValue, hasSameValues, normalizeSearchText } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
   type CountLabel,
@@ -151,6 +151,7 @@ type ListBoxConfig = {
   selectedLabel: CountLabel
   selectionLimit: number | null
   selectionMode: string
+  total: number | null
   typeahead: boolean
 }
 
@@ -177,6 +178,7 @@ const Default: ListBoxConfig = {
   selectedLabel: (count: number, total: number) => `${count}/${total} selected`,
   selectionLimit: null,
   selectionMode: SELECTION_MODE_SINGLE,
+  total: null,
   typeahead: true
 }
 
@@ -203,6 +205,7 @@ const DefaultType: Record<string, string> = {
   selectedLabel: '(string|function)',
   selectionLimit: '(null|number)',
   selectionMode: 'string',
+  total: '(number|null)',
   typeahead: 'boolean'
 }
 
@@ -347,6 +350,8 @@ class ListBox extends BaseComponent {
   }
 
   setOptions(items: ListBoxEntry[]): void {
+    this._typeCheckConfig({ options: items }, { options: DefaultType.options })
+
     const previous = this.getSelectedValues()
     const previousValues = new Set(this._allOptions().map(option => this._optionValue(option)))
 
@@ -354,7 +359,7 @@ class ListBox extends BaseComponent {
     this._render()
 
     const values = new Set(this._allOptions().map(option => this._optionValue(option)))
-    const reset = this._config.resetSelectionOnOptionsChange && (values.size !== previousValues.size || [...values].some(value => !previousValues.has(value)))
+    const reset = this._config.resetSelectionOnOptionsChange && !hasSameValues(values, previousValues)
     const marked = this._flatOptions().filter(item => item.selected).map(item => item.value)
     const { refused, values: filled } = fillSelection(reset ? [] : previous, marked, this._selectionLimit())
 
@@ -363,7 +368,7 @@ class ListBox extends BaseComponent {
     this._store.commit(filled)
     this.update()
 
-    if (this._store.size() !== previous.length || previous.some(value => !this._store.has(value))) {
+    if (!hasSameValues(new Set(previous), new Set(this._store.values()))) {
       this._triggerChange()
     }
 
@@ -377,6 +382,12 @@ class ListBox extends BaseComponent {
 
   getOptions(): ListBoxEntry[] {
     return this._entries ?? []
+  }
+
+  setTotal(total: number | null): void {
+    this._typeCheckConfig({ total }, { total: DefaultType.total })
+    this._config.total = total
+    this._updateCounter()
   }
 
   setLoading(loading: boolean): void {
@@ -650,7 +661,7 @@ class ListBox extends BaseComponent {
     const navigable = this._navigableOptions()
     const count = navigable.filter(option => this._store.has(this._optionValue(option))).length
 
-    this._counter.textContent = resolveCountLabel(this._config.selectedLabel, count, navigable.length)
+    this._counter.textContent = resolveCountLabel(this._config.selectedLabel, count, this._config.total ?? navigable.length)
   }
 
   _resolveSearch(): HTMLInputElement | null {
@@ -1311,6 +1322,11 @@ class ListBox extends BaseComponent {
     } else if (this._config.selectionMode === SELECTION_MODE_SINGLE) {
       this.select(value)
     }
+  }
+
+  _dropSelection(): void {
+    this._store.commit([])
+    this.update()
   }
 
   _seedTypeahead(key: string): void {

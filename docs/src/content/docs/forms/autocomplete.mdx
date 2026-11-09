@@ -49,7 +49,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div class="form-text">Start typing to filter the list.</div>
   </div>`} />
 
-Inside a `<form>`, <kbd>Enter</kbd> with the list closed submits the form. A form reset brings the autocomplete back to the `value` it was created with, or to the first option marked `selected`, or to an empty field, and fires `change.coreui.autocomplete` when that differs from what the field held, typed text included. A reset that a listener cancels changes nothing.
+Inside a `<form>`, <kbd>Enter</kbd> with the list closed submits the form. A form reset brings the autocomplete back to the `value` it was created with, or to the first option marked `selected`, or to an empty field, and fires `change.coreui.autocomplete` when that differs from the selection the field held. A reset that a listener cancels changes nothing.
 
 ## Data source
 
@@ -321,7 +321,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `allowOnlyDefinedOptions` | boolean | `false` | Restricts selection to only predefined options when set to `true`. |
 | `ariaCleanerLabel` | string | `'Clear selection'` | Accessible label for the cleaner button, read by screen readers. |
 | `ariaPickerLabel` | string | `'Toggle options list'` | Accessible label for the picker button, read by screen readers. |
-| `cleaner` | boolean | `false` | Enables the selection cleaner button. |
+| `cleaner` | boolean | `false` | Enables the cleaner button. It shows for a selection and, unless `allowOnlyDefinedOptions` is on, for typed text. It is out of the Tab order and gives the focus back to the field. |
 | `clearSearchOnSelect` | boolean | `true` | Clears the search input when an option is selected. |
 | `container` | string, element, boolean | `false` | Where the panel is mounted while open. `true` means `<body>`; leave it alone and the panel goes next to the toggle unless an ancestor would clip it. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `disabled` | boolean | `false` | Disables the component when set to `true`. |
@@ -339,6 +339,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `pickerIcon` | string, boolean | `false` | The button that opens the options menu: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. |
 | `placeholder` | string, null | `null` | Placeholder text displayed in the input field. |
 | `required` | boolean | `false` | Makes the input field required for form validation. |
+| `resetSelectionOnOptionsChange` | boolean | `false` | Empties the selection when `setOptions()` brings options with different values in any order, then takes the option marked `selected`. Text the user typed stays, and a given value still waiting for its option is kept. For options that depend on another field; leave it off with `search: 'external'`, where every answer brings different values. |
 | `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
 | `sanitizeFn` | function, null | `null` | Custom sanitization function. If provided, it will be used instead of the built-in sanitizer. |
 | `search` | string, null | `null` | `'external'` hands the filtering to your code: the component shows the options you set and reports what the user types through `input.coreui.autocomplete`. |
@@ -361,7 +362,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `disable()` | Disables the field. |
 | `enable()` | Enables the field. |
 | `setLoading(loading)` | Sets `loading` on a live autocomplete. |
-| `setOptions(options)` | Replaces the options, as an array or a comma-separated string. The value stays unless the new options mark another option `selected`, and a value `setValue()` gave that the earlier options lacked is picked without an event; a start value a form reset waits for is reported with `change` when the options bring it. A pick, typing or clearing ends the wait of either value. |
+| `setOptions(options)` | Replaces the options, as an array or a comma-separated string. The value stays, unless `resetSelectionOnOptionsChange` empties it or the new options mark another option `selected`, and a value `setValue()` gave that the earlier options lacked is picked without an event; a start value a form reset waits for is reported with `change` when the options bring it. A pick, typing or clearing ends the wait of either value. |
 | `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
 | `setValue(value)` | Sets the value without firing a change event, also after a form reset; a value the options lack waits for `setOptions()` until the user picks, types or the field is cleared. It replaces the whole selection, a disabled option included, as a native select takes a value from a script. |
 | `show` | Shows the Bootstrap autocomplete dropdown options. |
@@ -373,7 +374,7 @@ The Autocomplete component exposes several events for integrating with applicati
 
 | Event | Description |
 | --- | --- |
-| `change.coreui.autocomplete` | Fires when the user selects an option, types over a selection or clears it, and when `clear()` empties a field that held a value or text. The initial `value`, a preselected option and a `setValue()` call do not fire it. |
+| `change.coreui.autocomplete` | Fires when the user selects an option, types over a selection or clears it, when `clear()` or the cleaner empties a selection or typed text, and when `setOptions()` changes the selection for `resetSelectionOnOptionsChange`. `event.value` is the option or `null`; text the user typed without a matching option is never reported, read it from the field. The initial `value`, a preselected option and a `setValue()` call do not fire it. |
 | `hidden.coreui.autocomplete` | Fired when the dropdown has been hidden and CSS transitions completed. |
 | `hide.coreui.autocomplete` | Event fires immediately when the hide method is called. Call `event.preventDefault()` to keep the menu open. |
 | `input.coreui.autocomplete` | Fires when the search input value changes. |
@@ -420,7 +421,7 @@ Typing opens the list once the text is not empty and something can be shown. <kb
 | <kbd>Arrow Down</kbd> | Open the list on the selected or the first option; once it is open, highlight the next option |
 | <kbd>Arrow Up</kbd> | Open the list on the selected or the last option; once it is open, highlight the previous option |
 | <kbd>F4</kbd> | Open the list without highlighting an option; with a modifier held, the key stays with the browser |
-| <kbd>Enter</kbd> | Select the highlighted option, or commit the typed text; with the list closed, also submit the form |
+| <kbd>Enter</kbd> | Select the highlighted option, or the option whose label is the typed text; with the list closed, also submit the form |
 | <kbd>Escape</kbd> | Close the dropdown; the input keeps focus and the highlighted option clears |
 | <kbd>Tab</kbd> | Accept hint completion (when hints are enabled) |
 | <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Delete one character and search with what's left; a held selection is deselected first |

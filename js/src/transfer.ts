@@ -91,6 +91,7 @@ type TransferConfig = {
   selectedLabel: CountLabel
   sourceTitle: string
   targetTitle: string
+  total: number | null
   typeahead: boolean
   value: string[]
 }
@@ -121,6 +122,7 @@ const Default: TransferConfig = {
   selectedLabel: (count: number, total: number) => `${count}/${total} selected`,
   sourceTitle: 'Available',
   targetTitle: 'Chosen',
+  total: null,
   typeahead: true,
   value: []
 }
@@ -151,6 +153,7 @@ const DefaultType: Record<string, string> = {
   selectedLabel: '(string|function)',
   sourceTitle: 'string',
   targetTitle: 'string',
+  total: '(number|null)',
   typeahead: 'boolean',
   value: 'array'
 }
@@ -241,13 +244,21 @@ class Transfer extends BaseComponent {
   }
 
   setOptions(items: ListBoxEntry[]): void {
-    this._entries = Array.isArray(items) ? items : []
+    this._typeCheckConfig({ options: items }, { options: DefaultType.options })
+
+    this._entries = items ?? []
     this._applyItems(this.getTarget())
     this.update()
   }
 
   getOptions(): ListBoxEntry[] {
     return this._entries ?? []
+  }
+
+  setTotal(total: number | null): void {
+    this._typeCheckConfig({ total }, { total: DefaultType.total })
+    this._config.total = total
+    this._sides[SIDE_SOURCE].listBox.setTotal(total)
   }
 
   setLoading(loading: boolean, side?: string): void {
@@ -320,6 +331,7 @@ class Transfer extends BaseComponent {
         searchPlaceholder: this._config.searchPlaceholder,
         selectedLabel: this._config.selectedLabel,
         selectionMode: 'multiple',
+        total: name === SIDE_SOURCE ? this._config.total : null,
         typeahead: this._config.typeahead
       }) as ListBox,
       name,
@@ -440,7 +452,7 @@ class Transfer extends BaseComponent {
 
     if (this._rendered) {
       for (const side of Object.values(this._sides)) {
-        side.listBox.clear()
+        side.listBox._dropSelection()
       }
     }
 

@@ -114,6 +114,7 @@ describe('Combobox', () => {
         searchPlaceholder: 'Search',
         selectedLabel: jasmine.any(Function),
         selectionLimit: null,
+        total: null,
         typeahead: true,
         validationState: null,
         value: null
@@ -2647,6 +2648,32 @@ describe('Combobox', () => {
       expect(() => {
         jQueryMock.fn.combobox.call(jQueryMock, 'noMethod')
       }).toThrowError(TypeError, 'No method named "noMethod"')
+    })
+  })
+
+  describe('setOptions input', () => {
+    it('should throw a TypeError for a value that is not an array', () => {
+      const combobox = new Combobox(setMarkup(), { options: [] })
+
+      expect(() => combobox.setOptions('x')).toThrowError(TypeError)
+    })
+  })
+
+  describe('total', () => {
+    const items = [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]
+
+    it('should put the given total in the toggle and follow setTotal', () => {
+      const combobox = new Combobox(setMarkup(), {
+        multiple: true, options: items, selectedLabel: '{count}/{total}', total: 120, value: ['a', 'b']
+      })
+
+      expect(combobox._valueElement.textContent).toBe('2/120')
+
+      combobox.setTotal(7)
+      expect(combobox._valueElement.textContent).toBe('2/7')
+
+      combobox.setTotal(null)
+      expect(combobox._valueElement.textContent).toBe(`2/${items.length}`)
     })
   })
 })

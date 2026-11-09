@@ -8627,36 +8627,6 @@ describe('MultiSelect', () => {
   })
 
   describe('static methods', () => {
-    describe('multiSelectInterface', () => {
-      it('should create instance and call method', () => {
-        fixtureEl.innerHTML = '<select></select>'
-        const selectEl = fixtureEl.querySelector('select')
-
-        MultiSelect.multiSelectInterface(selectEl, { options: [] })
-        expect(MultiSelect.getInstance(selectEl)).toBeInstanceOf(MultiSelect)
-      })
-
-      it('should call method on existing instance', () => {
-        fixtureEl.innerHTML = '<select></select>'
-        const selectEl = fixtureEl.querySelector('select')
-        const multiSelect = new MultiSelect(selectEl, { options: [] })
-        const spy = spyOn(multiSelect, 'show')
-
-        MultiSelect.multiSelectInterface(selectEl, 'show')
-        expect(spy).toHaveBeenCalled()
-      })
-
-      it('should throw error for undefined method', () => {
-        fixtureEl.innerHTML = '<select></select>'
-        const selectEl = fixtureEl.querySelector('select')
-        new MultiSelect(selectEl, { options: [] }) // eslint-disable-line no-new
-
-        expect(() => {
-          MultiSelect.multiSelectInterface(selectEl, 'undefinedMethod')
-        }).toThrowError(TypeError, 'No method named "undefinedMethod"')
-      })
-    })
-
     describe('jQueryInterface', () => {
       it('should create multi select', () => {
         fixtureEl.innerHTML = '<select></select>'
@@ -9168,18 +9138,24 @@ describe('MultiSelect', () => {
       expect(selectEl.parentNode.querySelector('.form-control-action').getAttribute('aria-label')).toBe('Toggle options list')
     })
 
-    it('should give the search input an accessible label and point it at the list', () => {
+    it('should make the search input the combobox and point it at the panel', () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, { options: [], search: true })
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'One' }], search: true })
       const input = multiSelect._searchElement
 
+      expect(input.getAttribute('role')).toBe('combobox')
+      expect(input.getAttribute('aria-haspopup')).toBe('dialog')
+      expect(input.getAttribute('aria-expanded')).toBe('false')
       expect(input.getAttribute('aria-label')).toBe('Search')
       expect(input.getAttribute('aria-controls')).toBeNull()
+      expect(multiSelect._togglerElement.hasAttribute('role')).toBeFalse()
+      expect(multiSelect._togglerElement.hasAttribute('aria-expanded')).toBeFalse()
 
       multiSelect.show()
 
-      expect(input.getAttribute('aria-controls')).toBe('test-select-listbox')
+      expect(input.getAttribute('aria-expanded')).toBe('true')
+      expect(input.getAttribute('aria-controls')).toBe(multiSelect._menu.id)
 
       // It filters the list, it does not complete the value: the options take
       // the focus themselves, so nothing writes aria-activedescendant on it.
@@ -9218,7 +9194,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-disabled')).toBeNull()
     })
 
-    it('should point the toggler at the dialog and the search input at the list only while the panel is open', async () => {
+    it('should point the search input at the dialog only while the panel is open', async () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'One' }], search: true })
@@ -9228,10 +9204,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      expect(referrers.map(element => document.getElementById(element.getAttribute('aria-controls')))).toEqual([
-        multiSelect._menu,
-        multiSelect._menu.querySelector('#test-select-listbox')
-      ])
+      expect(referrers.map(element => element.getAttribute('aria-controls'))).toEqual([null, multiSelect._menu.id])
       expect(multiSelect._menu.getAttribute('role')).toBe('dialog')
 
       multiSelect.hide()
@@ -9455,7 +9428,42 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.hasAttribute('aria-labelledby')).toBeFalse()
     })
 
-    it('should leave the search input a name of its own', () => {
+    it('should name the search input from an aria-label and its search label', () => {
+      fixtureEl.innerHTML = '<select aria-label="Fruits"></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Opt 1' }], search: true })
+
+      expect(multiSelect._searchElement.getAttribute('aria-label')).toBe('Fruits Search')
+      expect(multiSelect._togglerElement.hasAttribute('aria-label')).toBeFalse()
+      expect(multiSelect._menu.getAttribute('aria-label')).toBe('Fruits')
+    })
+
+    it('should name the search input from an aria-labelledby and itself', () => {
+      fixtureEl.innerHTML = '<h2 id="title">Fruits</h2><select aria-labelledby="title"></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Opt 1' }], search: true })
+
+      expect(multiSelect._searchElement.getAttribute('aria-labelledby')).toBe(`title ${multiSelect._searchElement.id}`)
+      expect(multiSelect._menu.getAttribute('aria-labelledby')).toBe('title')
+    })
+
+    it('should name the panel by the search label when nothing names the control', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Opt 1' }], search: true })
+
+      expect(multiSelect._menu.getAttribute('aria-label')).toBe('Search')
+      expect(multiSelect._menu.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should keep the combobox on the frame without a search input', () => {
+      fixtureEl.innerHTML = '<label for="plain">Fruits</label><select id="plain"></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Opt 1' }], search: false })
+      const frame = multiSelect._togglerElement
+
+      expect(frame.getAttribute('role')).toBe('combobox')
+      expect(frame.getAttribute('aria-haspopup')).toBe('dialog')
+      expect(frame.getAttribute('aria-labelledby')).toBe(fixtureEl.querySelector('label').id)
+    })
+
+    it('should name the search input from the label and its search label', () => {
       fixtureEl.innerHTML = [
         '<label for="searchable">Choose fruits</label>',
         '<select id="searchable"></select>'
@@ -9466,7 +9474,8 @@ describe('MultiSelect', () => {
       })
 
       expect(multiSelect._searchElement.getAttribute('aria-label')).toBe('Search')
-      expect(multiSelect._searchElement.hasAttribute('aria-labelledby')).toBeFalse()
+      expect(multiSelect._searchElement.getAttribute('aria-labelledby')).toBe(`${fixtureEl.querySelector('label').id} ${multiSelect._searchElement.id}`)
+      expect(multiSelect._togglerElement.hasAttribute('aria-labelledby')).toBeFalse()
     })
 
     it('should mark the focused control as required from the required option only', () => {
@@ -9579,6 +9588,22 @@ describe('MultiSelect', () => {
 
       expect(button.firstElementChild).toHaveClass('list-box-option-indicator')
       expect(button.textContent).toBe('Select all')
+    })
+  })
+
+  describe('cleaner with a locked selection', () => {
+    it('should not offer the cleaner when every selected option is disabled', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected disabled>A</option><option value="b">B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { cleaner: true })
+
+      expect(multiSelect._selectionCleanerElement).toBeNull()
+    })
+
+    it('should offer the cleaner when one selected option can be deselected', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected disabled>A</option><option value="b" selected>B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { cleaner: true })
+
+      expect(multiSelect._selectionCleanerElement).not.toBeNull()
     })
   })
 })

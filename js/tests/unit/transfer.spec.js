@@ -123,6 +123,7 @@ describe('Transfer', () => {
         selectedLabel: jasmine.any(Function),
         sourceTitle: 'Available',
         targetTitle: 'Chosen',
+        total: null,
         typeahead: true,
         value: []
       })
@@ -1106,6 +1107,42 @@ describe('Transfer', () => {
       expect(() => {
         jQueryMock.fn.transfer.call(jQueryMock, 'noMethod')
       }).toThrowError(TypeError, 'No method named "noMethod"')
+    })
+  })
+
+  describe('setOptions input', () => {
+    it('should throw a TypeError for a value that is not an array', () => {
+      const transfer = new Transfer(setMarkup())
+
+      expect(() => transfer.setOptions('x')).toThrowError(/Option "options"/)
+    })
+
+    it('should leave nothing selected after setOptions with the same values on a disabled transfer', () => {
+      const users = [{ value: 'ada', label: 'Ada' }, { value: 'bob', label: 'Bob' }]
+      const transfer = new Transfer(setMarkup(), { disabled: true, options: users })
+      const list = transfer._sides.source.listBox
+
+      list._store.commit(['ada'])
+      transfer.setOptions(users)
+
+      expect(list.getSelectedValues()).toEqual([])
+    })
+  })
+
+  describe('total', () => {
+    const text = (transfer, side) => transfer._sides[side].element.querySelector('.list-box-header').textContent
+
+    it('should apply the total to the available list only', () => {
+      const transfer = new Transfer(setMarkup(), { total: 120 })
+
+      expect(text(transfer, 'source')).toContain('/120')
+      expect(text(transfer, 'target')).not.toContain('/120')
+
+      transfer.setTotal(7)
+      expect(text(transfer, 'source')).toContain('/7')
+
+      transfer.setTotal(null)
+      expect(text(transfer, 'source')).not.toContain('/7')
     })
   })
 })
