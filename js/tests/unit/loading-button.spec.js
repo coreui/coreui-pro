@@ -692,36 +692,6 @@ describe('LoadingButton', () => {
   })
 
   describe('static methods', () => {
-    describe('loadingButtonInterface', () => {
-      it('should create instance and call method', () => {
-        fixtureEl.innerHTML = '<button>Click me</button>'
-        const button = fixtureEl.querySelector('button')
-
-        LoadingButton.loadingButtonInterface(button, {})
-        expect(LoadingButton.getInstance(button)).toBeInstanceOf(LoadingButton)
-      })
-
-      it('should call method on existing instance', () => {
-        fixtureEl.innerHTML = '<button>Click me</button>'
-        const button = fixtureEl.querySelector('button')
-        const loadingButton = new LoadingButton(button)
-        const spy = spyOn(loadingButton, 'start')
-
-        LoadingButton.loadingButtonInterface(button, 'start')
-        expect(spy).toHaveBeenCalled()
-      })
-
-      it('should throw error for undefined method', () => {
-        fixtureEl.innerHTML = '<button>Click me</button>'
-        const button = fixtureEl.querySelector('button')
-        new LoadingButton(button) // eslint-disable-line no-new
-
-        expect(() => {
-          LoadingButton.loadingButtonInterface(button, 'undefinedMethod')
-        }).toThrowError(TypeError, 'No method named "undefinedMethod"')
-      })
-    })
-
     describe('jQueryInterface', () => {
       it('should create loading button', () => {
         fixtureEl.innerHTML = '<button>Click me</button>'
@@ -732,6 +702,18 @@ describe('LoadingButton', () => {
         jQueryMock.fn.loadingButton.call(jQueryMock, {})
 
         expect(LoadingButton.getInstance(button)).not.toBeNull()
+      })
+
+      it('should call a method by its name', () => {
+        fixtureEl.innerHTML = '<button>Click me</button>'
+        const button = fixtureEl.querySelector('button')
+        const spy = spyOn(new LoadingButton(button), 'start')
+
+        jQueryMock.fn.loadingButton = LoadingButton.jQueryInterface
+        jQueryMock.elements = [button]
+        jQueryMock.fn.loadingButton.call(jQueryMock, 'start')
+
+        expect(spy).toHaveBeenCalled()
       })
 
       it('should not re-create loading button', () => {

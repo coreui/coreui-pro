@@ -174,18 +174,6 @@ class Navigation extends BaseComponent {
 
   // Static
 
-  static navigationInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = Navigation.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any): void {
     return jQueryDispatch(this, Navigation, config)
   }
@@ -198,7 +186,7 @@ class Navigation extends BaseComponent {
  */
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_NAVIGATION))) {
-    Navigation.navigationInterface(element)
+    Navigation.getOrCreateInstance(element)
   }
 })
 

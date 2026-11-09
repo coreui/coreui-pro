@@ -1578,25 +1578,6 @@ describe('RangeSlider', () => {
     })
   })
 
-  describe('rangeSliderInterface', () => {
-    it('should create an instance, call a method, and throw on an unknown one', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-
-      RangeSlider.rangeSliderInterface(element, { value: 50 })
-      const rangeSlider = RangeSlider.getInstance(element)
-      expect(rangeSlider).toBeInstanceOf(RangeSlider)
-
-      spyOn(rangeSlider, 'setValue')
-      RangeSlider.rangeSliderInterface(element, 'setValue', 20)
-      expect(rangeSlider.setValue).toHaveBeenCalledWith(20)
-
-      expect(() => {
-        RangeSlider.rangeSliderInterface(element, 'nonExistentMethod')
-      }).toThrowError(TypeError, 'No method named "nonExistentMethod"')
-    })
-  })
-
   describe('jQueryInterface', () => {
     it('should create a range slider and call a method with its arguments', () => {
       fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-value="20"></div>'

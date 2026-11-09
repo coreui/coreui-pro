@@ -683,18 +683,6 @@ class RangeSlider extends BaseComponent {
   }
 
   // Static
-  static rangeSliderInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = RangeSlider.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any, ...args: any[]): any {
     return jQueryDispatch(this, RangeSlider, config, args)
   }
@@ -706,7 +694,7 @@ class RangeSlider extends BaseComponent {
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_RANGE_SLIDER)) {
-    RangeSlider.rangeSliderInterface(element)
+    RangeSlider.getOrCreateInstance(element)
   }
 })
 

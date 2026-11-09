@@ -308,18 +308,6 @@ class Sidebar extends BaseComponent {
 
   // Static
 
-  static sidebarInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = Sidebar.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any): void {
     return jQueryDispatch(this, Sidebar, config)
   }
@@ -333,7 +321,7 @@ class Sidebar extends BaseComponent {
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const element of Array.from(document.querySelectorAll(SELECTOR_SIDEBAR))) {
-    Sidebar.sidebarInterface(element)
+    Sidebar.getOrCreateInstance(element)
   }
 })
 

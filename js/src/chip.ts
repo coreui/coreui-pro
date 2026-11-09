@@ -376,18 +376,6 @@ class Chip extends BaseComponent {
   }
 
   // Static
-  static chipInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = Chip.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any): void {
     return jQueryDispatch(this, Chip, config, element => [element])
   }
@@ -399,7 +387,7 @@ class Chip extends BaseComponent {
 
 EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP)) {
-    Chip.chipInterface(element)
+    Chip.getOrCreateInstance(element)
   }
 })
 

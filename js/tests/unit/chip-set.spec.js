@@ -1324,26 +1324,6 @@ describe('ChipSet', () => {
     })
   })
 
-  describe('chipSetInterface', () => {
-    it('should call a method when config is a string', () => {
-      const el = setMarkup(['First'])
-      const chipSet = new ChipSet(el, { selectable: true })
-      const spy = spyOn(chipSet, 'deselectAll')
-
-      ChipSet.chipSetInterface(el, 'deselectAll')
-
-      expect(spy).toHaveBeenCalled()
-    })
-
-    it('should throw on an undefined method', () => {
-      const el = setMarkup(['First'])
-
-      expect(() => {
-        ChipSet.chipSetInterface(el, 'undefinedMethod')
-      }).toThrowError(TypeError, 'No method named "undefinedMethod"')
-    })
-  })
-
   describe('disabled', () => {
     it('should not add a chip when the set is disabled', () => {
       const el = setMarkup([])

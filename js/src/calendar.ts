@@ -1351,18 +1351,6 @@ class Calendar extends BaseComponent {
 
   // Static
 
-  static calendarInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = Calendar.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any, ...args: any[]): any {
     return jQueryDispatch(this, Calendar, config, args)
   }
@@ -1374,7 +1362,7 @@ class Calendar extends BaseComponent {
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_CALENDAR))) {
-    Calendar.calendarInterface(element)
+    Calendar.getOrCreateInstance(element)
   }
 })
 
