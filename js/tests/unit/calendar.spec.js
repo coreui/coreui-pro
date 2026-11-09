@@ -2055,6 +2055,102 @@ describe('Calendar', () => {
       expect(calendar._endDate).toBeNull()
     })
 
+    it('should keep the end of a range across a disabled date with allowDisabledDatesInRange', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        allowDisabledDatesInRange: true,
+        range: true,
+        calendarDate: new Date(2023, 5, 1),
+        disabledDates: [new Date(2023, 5, 15)]
+      })
+
+      calendar._selectDate(new Date(2023, 5, 10))
+      calendar._selectDate(new Date(2023, 5, 20))
+
+      expect(calendar._startDate).toEqual(new Date(2023, 5, 10))
+      expect(calendar._endDate).toEqual(new Date(2023, 5, 20))
+    })
+
+    it('should keep a start picked across a disabled date with allowDisabledDatesInRange', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        allowDisabledDatesInRange: true,
+        range: true,
+        calendarDate: new Date(2023, 5, 1),
+        startDate: new Date(2023, 5, 10),
+        endDate: new Date(2023, 5, 25),
+        selectEndDate: false,
+        disabledDates: [new Date(2023, 5, 8)]
+      })
+
+      calendar._selectDate(new Date(2023, 5, 5))
+
+      expect(calendar._startDate).toEqual(new Date(2023, 5, 5))
+      expect(calendar._endDate).toEqual(new Date(2023, 5, 25))
+    })
+
+    it('should leave a disabled date in the middle of a range disabled and not selected', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        allowDisabledDatesInRange: true,
+        range: true,
+        calendarDate: new Date(2023, 5, 1),
+        startDate: new Date(2023, 5, 10),
+        endDate: new Date(2023, 5, 20),
+        disabledDates: [new Date(2023, 5, 15)]
+      })
+      const cell = div.querySelector(`td.current[data-coreui-date="${new Date(2023, 5, 15).toDateString()}"]`)
+
+      expect(cell.classList.contains('disabled')).toBeTrue()
+      expect(cell.classList.contains('range')).toBeTrue()
+      expect(cell.getAttribute('aria-disabled')).toEqual('true')
+      expect(cell.hasAttribute('aria-selected')).toBeFalse()
+    })
+
+    it('should not pick a disabled date as an end with allowDisabledDatesInRange', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        allowDisabledDatesInRange: true,
+        range: true,
+        calendarDate: new Date(2023, 5, 1),
+        startDate: new Date(2023, 5, 10),
+        endDate: new Date(2023, 5, 20),
+        disabledDates: [new Date(2023, 5, 15)]
+      })
+
+      calendar._selectDate(new Date(2023, 5, 15))
+
+      expect(calendar._startDate).toEqual(new Date(2023, 5, 10))
+      expect(calendar._endDate).toEqual(new Date(2023, 5, 20))
+    })
+
+    it('should close a range of months across a wholly disabled month with allowDisabledDatesInRange', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        allowDisabledDatesInRange: true,
+        range: true,
+        selectionType: 'month',
+        calendarDate: new Date(2026, 0, 1),
+        disabledDates: [[new Date(2026, 4, 1), new Date(2026, 4, 31)]]
+      })
+
+      calendar._selectDate(new Date(2026, 3, 1))
+      calendar._selectDate(new Date(2026, 5, 1))
+
+      expect(calendar._startDate).not.toBeNull()
+      expect(calendar._endDate).not.toBeNull()
+    })
+
     it('should set startDate directly in non-range mode', () => {
       fixtureEl.innerHTML = '<div></div>'
 
