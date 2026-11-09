@@ -80,49 +80,16 @@ describe('Navigation', () => {
     it('should initialize navigation on elements with data-coreui-navigation', () => {
       fixtureEl.innerHTML = '<nav data-coreui-navigation></nav>'
       const navEl = fixtureEl.querySelector('nav')
-      spyOn(Navigation, 'navigationInterface')
+      spyOn(Navigation, 'getOrCreateInstance')
 
       const loadEvent = new Event('load')
       window.dispatchEvent(loadEvent)
 
-      expect(Navigation.navigationInterface).toHaveBeenCalledWith(navEl)
+      expect(Navigation.getOrCreateInstance).toHaveBeenCalledWith(navEl)
     })
   })
 
   describe('Static methods', () => {
-    describe('navigationInterface', () => {
-      it('should create instance if config is object', () => {
-        fixtureEl.innerHTML = '<nav data-coreui-navigation></nav>'
-        const navEl = fixtureEl.querySelector('nav')
-
-        Navigation.navigationInterface(navEl, {})
-
-        expect(Navigation.getInstance(navEl)).toBeInstanceOf(Navigation)
-      })
-
-      it('should handle method calling via string config', () => {
-        fixtureEl.innerHTML = '<nav data-coreui-navigation></nav>'
-        const navEl = fixtureEl.querySelector('nav')
-        const navigation = new Navigation(navEl) // eslint-disable-line no-unused-vars
-
-        // Since Navigation has no public methods, we just test that the interface works
-        // without throwing errors for valid configurations
-        expect(() => {
-          Navigation.navigationInterface(navEl, {})
-        }).not.toThrow()
-      })
-
-      it('should throw error for non-existent method', () => {
-        fixtureEl.innerHTML = '<nav data-coreui-navigation></nav>'
-        const navEl = fixtureEl.querySelector('nav')
-        const navigation = new Navigation(navEl) // eslint-disable-line no-unused-vars
-
-        const throwError = () => Navigation.navigationInterface(navEl, 'nonExistentMethod')
-
-        expect(throwError).toThrowError(TypeError, 'No method named "nonExistentMethod"')
-      })
-    })
-
     describe('jQueryInterface', () => {
       it('should create instance when jQuery is present', () => {
         fixtureEl.innerHTML = '<nav data-coreui-navigation></nav>'

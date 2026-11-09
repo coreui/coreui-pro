@@ -390,9 +390,17 @@ after the option it changes:
   validation state, `setValidationState()` keeps the value, and Rating and
   Range Slider no longer fall back to the defaults: `rating.setValue(2)` on a
   rating built with `{ itemCount: 3 }` keeps three items.
-- **The setters are reachable the same way everywhere**, including through the
-  static and jQuery dispatchers, which pass the method name and whatever
-  follows it: `coreui.Rating.ratingInterface(el, 'setValue', 2)`.
+- **The setters are reachable the same way everywhere**, and through jQuery on
+  the components that register a plugin, which pass the method name and
+  whatever follows it: `$(el).rating('setValue', 2)`.
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+  **The `*Interface` statics are gone.** `autocompleteInterface`,
+  `calendarInterface`, `chipInterface`, `chipSetInterface`,
+  `datePickerInterface`, `dateRangePickerInterface`, `loadingButtonInterface`,
+  `multiSelectInterface`, `navigationInterface`, `otpInputInterface`,
+  `rangeSliderInterface`, `ratingInterface`, `searchButtonInterface`,
+  `sidebarInterface` and `timePickerInterface` are removed. Call the instance
+  instead: `coreui.Rating.getOrCreateInstance(el).setValue(2)`.
 
 `Toaster.update(id, options)` is unchanged — it rewrites one toast in the store
 rather than reconfiguring the component.

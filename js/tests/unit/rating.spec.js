@@ -1689,54 +1689,6 @@ describe('Rating', () => {
     })
   })
 
-  describe('ratingInterface', () => {
-    it('should pass the arguments to the method', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-      const rating = new Rating(div, { itemCount: 3 })
-      const spy = spyOn(rating, 'setValue')
-
-      Rating.ratingInterface(div, 'setValue', 2)
-
-      expect(spy).toHaveBeenCalledWith(2)
-      rating.dispose()
-    })
-
-    it('should create instance via ratingInterface', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-
-      Rating.ratingInterface(div, { itemCount: 4 })
-
-      const instance = Rating.getInstance(div)
-      expect(instance).not.toBeNull()
-      expect(instance._config.itemCount).toEqual(4)
-    })
-
-    it('should throw error for undefined method via ratingInterface', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-
-      // First create instance
-      Rating.ratingInterface(div)
-
-      expect(() => {
-        Rating.ratingInterface(div, 'nonExistentMethod')
-      }).toThrowError(TypeError, 'No method named "nonExistentMethod"')
-    })
-
-    it('should call a valid method via ratingInterface', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-
-      Rating.ratingInterface(div, { value: 3 })
-      Rating.ratingInterface(div, 'reset')
-
-      const checkedInput = div.querySelector('.rating-item-input:checked')
-      expect(checkedInput).toBeNull()
-    })
-  })
-
   describe('getInstance', () => {
     it('should return rating instance', () => {
       fixtureEl.innerHTML = '<div></div>'

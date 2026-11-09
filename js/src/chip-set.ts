@@ -722,18 +722,6 @@ class ChipSet extends BaseComponent {
   }
 
   // Static
-  static chipSetInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = ChipSet.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any, ...args: any[]): void {
     return jQueryDispatch(this, ChipSet, config, args)
   }
@@ -745,7 +733,7 @@ class ChipSet extends BaseComponent {
 
 EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP_SET)) {
-    ChipSet.chipSetInterface(element)
+    ChipSet.getOrCreateInstance(element)
   }
 })
 

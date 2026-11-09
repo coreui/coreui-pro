@@ -643,18 +643,6 @@ class Rating extends BaseComponent {
   }
 
   // Static
-  static ratingInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = Rating.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any, ...args: any[]): void {
     return jQueryDispatch(this, Rating, config, args)
   }
@@ -667,7 +655,7 @@ class Rating extends BaseComponent {
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   const ratings = SelectorEngine.find(SELECTOR_DATA_RATING)
   for (const rating of ratings) {
-    Rating.ratingInterface(rating)
+    Rating.getOrCreateInstance(rating)
   }
 })
 

@@ -6399,40 +6399,6 @@ describe('Calendar', () => {
     })
   })
 
-  describe('calendarInterface', () => {
-    it('should create a new instance via calendarInterface', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-
-      Calendar.calendarInterface(div, { calendars: 2 })
-
-      const instance = Calendar.getInstance(div)
-      expect(instance).not.toBeNull()
-      expect(instance._config.calendars).toEqual(2)
-    })
-
-    it('should call a method via calendarInterface', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div)
-      const spy = spyOn(calendar, 'refresh').and.callThrough()
-
-      Calendar.calendarInterface(div, 'refresh')
-
-      expect(spy).toHaveBeenCalled()
-    })
-
-    it('should throw error on undefined method via calendarInterface', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-      new Calendar(div) // eslint-disable-line no-new
-
-      expect(() => {
-        Calendar.calendarInterface(div, 'nonExistentMethod')
-      }).toThrowError(TypeError, 'No method named "nonExistentMethod"')
-    })
-  })
-
   describe('jQueryInterface', () => {
     it('should create a calendar via jQueryInterface', () => {
       fixtureEl.innerHTML = '<div data-coreui-calendar></div>'
@@ -7152,6 +7118,17 @@ describe('Calendar', () => {
       })
 
       expect(div.querySelector('.calendar-header-cell-inner img')).toBeNull()
+    })
+  })
+
+  describe('data-api', () => {
+    it('should create a calendar for every element marked in the markup on load', () => {
+      fixtureEl.innerHTML = '<div data-coreui-calendar></div>'
+      const element = fixtureEl.querySelector('div')
+
+      window.dispatchEvent(createEvent('load'))
+
+      expect(Calendar.getInstance(element)).toBeInstanceOf(Calendar)
     })
   })
 })

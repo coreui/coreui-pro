@@ -2276,51 +2276,6 @@ describe('OTPInput', () => {
   })
 
   describe('static methods', () => {
-    describe('otpInputInterface', () => {
-      it('should create instance when not exists', () => {
-        fixtureEl.innerHTML = `
-          <div class="form-otp">
-            <input type="text" class="form-otp-control">
-          </div>
-        `
-
-        const otpContainer = fixtureEl.querySelector('.form-otp')
-        OTPInput.otpInputInterface(otpContainer, {})
-
-        expect(OTPInput.getInstance(otpContainer)).toBeInstanceOf(OTPInput)
-      })
-
-      it('should call method on existing instance', () => {
-        fixtureEl.innerHTML = `
-          <div class="form-otp">
-            <input type="text" class="form-otp-control">
-          </div>
-        `
-
-        const otpContainer = fixtureEl.querySelector('.form-otp')
-        const otpInput = new OTPInput(otpContainer)
-        const spy = spyOn(otpInput, 'clear')
-
-        OTPInput.otpInputInterface(otpContainer, 'clear')
-        expect(spy).toHaveBeenCalled()
-      })
-
-      it('should throw error for undefined method', () => {
-        fixtureEl.innerHTML = `
-          <div class="form-otp">
-            <input type="text" class="form-otp-control">
-          </div>
-        `
-
-        const otpContainer = fixtureEl.querySelector('.form-otp')
-        new OTPInput(otpContainer) // eslint-disable-line no-new
-
-        expect(() => {
-          OTPInput.otpInputInterface(otpContainer, 'undefinedMethod')
-        }).toThrowError(TypeError, 'No method named "undefinedMethod"')
-      })
-    })
-
     describe('jQueryInterface', () => {
       it('should create otp input', () => {
         fixtureEl.innerHTML = `

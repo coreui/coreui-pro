@@ -923,30 +923,6 @@ describe('Chip', () => {
     })
   })
 
-  describe('chipInterface', () => {
-    it('should call a method when config is a string', () => {
-      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
-
-      const chipEl = fixtureEl.querySelector('.chip')
-      const chip = new Chip(chipEl, { selectable: true })
-      const spy = spyOn(chip, 'toggle')
-
-      Chip.chipInterface(chipEl, 'toggle')
-
-      expect(spy).toHaveBeenCalled()
-    })
-
-    it('should throw on an undefined method', () => {
-      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
-
-      const chipEl = fixtureEl.querySelector('.chip')
-
-      expect(() => {
-        Chip.chipInterface(chipEl, 'undefinedMethod')
-      }).toThrowError(TypeError, 'No method named "undefinedMethod"')
-    })
-  })
-
   describe('data-api', () => {
     it('should initialize chip via data attribute', () => {
       fixtureEl.innerHTML = '<span class="chip" data-coreui-chip="true">Tag</span>'

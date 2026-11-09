@@ -745,39 +745,6 @@ describe('SearchButton', () => {
   })
 
   describe('Static methods', () => {
-    describe('searchButtonInterface', () => {
-      it('should create instance if config is object', () => {
-        fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
-        const buttonEl = fixtureEl.querySelector('button')
-
-        SearchButton.searchButtonInterface(buttonEl, {})
-
-        expect(SearchButton.getInstance(buttonEl)).toBeInstanceOf(SearchButton)
-      })
-
-      it('should call method when config is string', () => {
-        fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
-        const buttonEl = fixtureEl.querySelector('button')
-        const searchButton = new SearchButton(buttonEl)
-        const spyTrigger = spyOn(searchButton, 'trigger')
-
-        SearchButton.searchButtonInterface(buttonEl, 'trigger')
-
-        expect(spyTrigger).toHaveBeenCalled()
-      })
-
-      it('should throw error for non-existent method', () => {
-        fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
-        const buttonEl = fixtureEl.querySelector('button')
-        // eslint-disable-next-line no-new
-        new SearchButton(buttonEl)
-
-        expect(() => {
-          SearchButton.searchButtonInterface(buttonEl, 'nonExistentMethod')
-        }).toThrowError(TypeError, 'No method named "nonExistentMethod"')
-      })
-    })
-
     describe('jQueryInterface', () => {
       it('should create instance when jQuery is present', () => {
         fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'

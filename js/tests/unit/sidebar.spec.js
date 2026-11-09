@@ -665,39 +665,6 @@ describe('Sidebar', () => {
   })
 
   describe('Static Methods', () => {
-    describe('sidebarInterface', () => {
-      it('should create instance when config is object', () => {
-        fixtureEl.innerHTML = '<div class="sidebar"></div>'
-        const sidebarEl = fixtureEl.querySelector('.sidebar')
-
-        Sidebar.sidebarInterface(sidebarEl, {})
-
-        expect(Sidebar.getInstance(sidebarEl)).toBeInstanceOf(Sidebar)
-      })
-
-      it('should call method when config is string', () => {
-        fixtureEl.innerHTML = '<div class="sidebar"></div>'
-        const sidebarEl = fixtureEl.querySelector('.sidebar')
-        const sidebar = new Sidebar(sidebarEl)
-        const spyShow = spyOn(sidebar, 'show')
-
-        Sidebar.sidebarInterface(sidebarEl, 'show')
-
-        expect(spyShow).toHaveBeenCalled()
-      })
-
-      it('should throw error for non-existent method', () => {
-        fixtureEl.innerHTML = '<div class="sidebar"></div>'
-        const sidebarEl = fixtureEl.querySelector('.sidebar')
-        // eslint-disable-next-line no-new
-        new Sidebar(sidebarEl)
-
-        expect(() => {
-          Sidebar.sidebarInterface(sidebarEl, 'nonExistentMethod')
-        }).toThrowError(TypeError, 'No method named "nonExistentMethod"')
-      })
-    })
-
     describe('jQueryInterface', () => {
       it('should create instance when jQuery is present', () => {
         fixtureEl.innerHTML = '<div class="sidebar"></div>'
@@ -709,6 +676,18 @@ describe('Sidebar', () => {
 
         expect(Sidebar.getInstance(sidebarEl)).toBeInstanceOf(Sidebar)
       })
+
+      it('should call a method by its name', () => {
+        fixtureEl.innerHTML = '<div class="sidebar"></div>'
+        const sidebarEl = fixtureEl.querySelector('.sidebar')
+        const spy = spyOn(new Sidebar(sidebarEl), 'show')
+
+        jQueryMock.fn.sidebar = Sidebar.jQueryInterface
+        jQueryMock.elements = [sidebarEl]
+        jQueryMock.fn.sidebar.call(jQueryMock, 'show')
+
+        expect(spy).toHaveBeenCalled()
+      })
     })
   })
 
@@ -716,12 +695,12 @@ describe('Sidebar', () => {
     it('should initialize sidebar on elements with .sidebar class on window load', () => {
       fixtureEl.innerHTML = '<div class="sidebar"></div>'
       const sidebarEl = fixtureEl.querySelector('.sidebar')
-      const spySidebarInterface = spyOn(Sidebar, 'sidebarInterface')
+      const spyGetOrCreate = spyOn(Sidebar, 'getOrCreateInstance')
 
       const loadEvent = new Event('load')
       window.dispatchEvent(loadEvent)
 
-      expect(spySidebarInterface).toHaveBeenCalledWith(sidebarEl)
+      expect(spyGetOrCreate).toHaveBeenCalledWith(sidebarEl)
     })
   })
 
@@ -773,12 +752,12 @@ describe('Sidebar', () => {
       fixtureEl.innerHTML = '<div class="sidebar"></div>'
       const sidebarEl = fixtureEl.querySelector('.sidebar')
       const sidebar = new Sidebar(sidebarEl)
-      const spySidebarInterface = spyOn(Sidebar, 'sidebarInterface')
+      const spyGetOrCreate = spyOn(Sidebar, 'getOrCreateInstance')
 
       sidebar.dispose()
       window.dispatchEvent(new Event('load'))
 
-      expect(spySidebarInterface).toHaveBeenCalledWith(sidebarEl)
+      expect(spyGetOrCreate).toHaveBeenCalledWith(sidebarEl)
     })
 
     it('should drop the backdrop and restore body scroll when disposed while shown on mobile', () => {

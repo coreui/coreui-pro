@@ -621,18 +621,6 @@ class OTPInput extends BaseComponent {
   }
 
   // Static
-  static otpInputInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = OTPInput.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any, ...args: any[]): void {
     return jQueryDispatch(this, OTPInput, config, args)
   }
@@ -644,7 +632,7 @@ class OTPInput extends BaseComponent {
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const otp of SelectorEngine.find(SELECTOR_DATA_OTP)) {
-    OTPInput.otpInputInterface(otp)
+    OTPInput.getOrCreateInstance(otp)
   }
 })
 

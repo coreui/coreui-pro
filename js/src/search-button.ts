@@ -348,18 +348,6 @@ class SearchButton extends BaseComponent {
   }
 
   // Static
-  static searchButtonInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = SearchButton.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (config.startsWith('_') || typeof data[config as string] !== 'function') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any): void {
     return jQueryDispatch(this, SearchButton, config)
   }

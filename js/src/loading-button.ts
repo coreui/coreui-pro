@@ -284,18 +284,6 @@ class LoadingButton extends BaseComponent {
 
   // Static
 
-  static loadingButtonInterface(element: string | Element | null, config: any, ...args: any[]): any {
-    const data: any = LoadingButton.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](...args)
-    }
-  }
-
   static jQueryInterface(this: any, config: any): void {
     return jQueryDispatch(this, LoadingButton, config)
   }
