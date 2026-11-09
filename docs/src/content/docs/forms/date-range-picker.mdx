@@ -7,6 +7,7 @@ description: "Create a start and end date field with a multi-month calendar popu
 
 import dateRangePickerRanges from './snippets/date-range-picker-ranges.js?raw'
 import dateRangePickerDisabledDates from './snippets/date-range-picker-disabled-dates.js?raw'
+import dateRangePickerAcrossDisabled from './snippets/date-range-picker-across-disabled.js?raw'
 
 ## Example
 
@@ -162,6 +163,18 @@ calendar are turned off.
   </div>`} sandboxJs={dateRangePickerDisabledDates} />
 
 <Code code={dateRangePickerDisabledDates} lang="js" />
+
+### Ranges across disabled dates
+
+Set `allowDisabledDatesInRange` to let a range run across disabled dates, for example a flight that only needs its two travel days free. A disabled date still cannot be picked as an end, the disabled dates in between stay disabled, and the value holds only the two ends.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div id="myDateRangePickerAcrossDisabled"></div>
+    </div>
+  </div>`} sandboxJs={dateRangePickerAcrossDisabled} />
+
+<Code code={dateRangePickerAcrossDisabled} lang="js" />
 
 ## Validation
 
@@ -328,6 +341,7 @@ and `selectEndDate` are set by the picker itself.
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `allowDisabledDatesInRange` | boolean | `false` | Lets a range run across disabled dates and wholly disabled periods, which otherwise clear it. |
 | `allowList` | object | `SVGAllowlist` | Allowlist used when sanitizing icon markup. |
 | `ariaCleanerLabel` | string | `'Clear date range'` | Accessible label of the cleaner button. |
 | `ariaEndLabel` | string | `'End date'` | Accessible name of the end field when it has no floating label. Both halves are the same control, so naming them apart is what tells a screen reader which end of the range it is on. |

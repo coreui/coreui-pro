@@ -41,7 +41,7 @@ import type {
 import { onLabelClick } from './util/field-label.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
-import { type ValidationState } from './util/form-validation.js'
+import { configureValueField, createValueField, type ValidationState } from './util/form-validation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
 } from './util/index.js'
@@ -81,7 +81,6 @@ const CLASS_NAME_SEPARATOR = 'form-date-time-separator'
 
 const SELECTOR_DATA_DATE_INPUT = '[data-coreui-date-input]'
 const SELECTOR_SECTION = '.form-date-time-section'
-const SELECTOR_VALUE_FIELD = 'textarea'
 
 const ARIA_LABELS: Record<SectionInputType, string> = {
   date: 'Date input',
@@ -443,10 +442,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       this._selectSectionContent(event.target)
     })
 
-    EventHandler.on(this._element, eventName('focusin'), SELECTOR_VALUE_FIELD, () => {
-      this._focusFirstEmptySection()
-    })
-
     EventHandler.on(this._element, eventName('mousedown'), SELECTOR_SECTION, (event: any) => {
       if (this._disabled) {
         return
@@ -514,10 +509,13 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       return
     }
 
-    const sections = this._getSectionElements()
-    const target = sections.find((sectionElement, index) => this._getSection(index).value === null) || sections[0]
+    this._getFirstEmptySection()?.focus()
+  }
 
-    target?.focus()
+  _getFirstEmptySection(): HTMLElement | undefined {
+    const sections = this._getSectionElements()
+
+    return sections.find((sectionElement, index) => this._getSection(index).value === null) || sections[0]
   }
 
   _onKeydown(event: KeyboardEvent): void {
@@ -851,24 +849,11 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       this._element.append(element)
     }
 
-    if (!this._inputElement) {
-      this._inputElement = document.createElement('textarea')
-      this._inputElement.autocomplete = 'off'
-      this._inputElement.tabIndex = -1
-      this._inputElement.setAttribute('aria-hidden', 'true')
-    }
-
+    this._inputElement ??= createValueField('textarea', () => this._getFirstEmptySection())
     this._inputElement.defaultValue = this._isBuilt ? this._getResetValue() : ''
-    this._inputElement.disabled = disabled
-    this._inputElement.readOnly = readonly
-    this._inputElement.required = required
-
-    if (name) {
-      this._inputElement.name = name
-    } else {
-      this._inputElement.removeAttribute('name')
-    }
-
+    configureValueField(this._inputElement, {
+      disabled, name, readOnly: readonly, required
+    })
     this._element.append(this._inputElement)
     this._syncSections()
     this._setTabIndexes()

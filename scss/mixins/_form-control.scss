@@ -43,3 +43,16 @@
   @include focus-ring(true);
 }
 // scss-docs-end form-control-group-focus-mixin
+
+@mixin value-field-overlay() {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  pointer-events: none;
+  border: 0;
+  outline: 0;
+  opacity: 0;
+}

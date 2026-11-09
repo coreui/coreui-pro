@@ -852,6 +852,12 @@ describe('Date Sections Utilities', () => {
       expect(getSectionsFromString('99.99.2026', layout)).toBeNull()
     })
 
+    it('should return null when a section other than the year gets more than two digits', () => {
+      expect(getSectionsFromString('0026-06-15', layout)).toBeNull()
+      expect(getSectionsFromString('015.06.2026', layout)).toBeNull()
+      expect(getSectionsFromString('15.006.2026', layout)).toBeNull()
+    })
+
     it('should match month names in text month layouts', () => {
       const textLayout = getSectionsFromFormat('DD MMMM YYYY', 'en-US')
       const sections = getSectionsFromString('14 July 2026', textLayout)

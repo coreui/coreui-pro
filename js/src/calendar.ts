@@ -57,6 +57,7 @@ import {
   isPeriodDisabled,
   isPeriodInRange,
   isPeriodSelected,
+  isTargetSelected,
   isToday,
   isYearBeforeMonth,
   type KeptDay,
@@ -143,6 +144,7 @@ type CalendarDayCellMeta = CalendarCellMeta & {
 }
 
 type CalendarConfig = {
+  allowDisabledDatesInRange: boolean
   allowList: SanitizerAllowList
   ariaNavNextMonthLabel: string
   ariaNavNextYearLabel: string
@@ -187,6 +189,7 @@ type CalendarConfig = {
 }
 
 const Default: CalendarConfig = {
+  allowDisabledDatesInRange: false,
   allowList: SVGAllowlist,
   ariaNavNextMonthLabel: 'Next month',
   ariaNavNextYearLabel: 'Next year',
@@ -231,6 +234,7 @@ const Default: CalendarConfig = {
 }
 
 const DefaultType: Record<string, string> = {
+  allowDisabledDatesInRange: 'boolean',
   allowList: 'object',
   ariaNavNextMonthLabel: 'string',
   ariaNavNextYearLabel: 'string',
@@ -740,7 +744,7 @@ class Calendar extends BaseComponent {
 
         this._setSelectEndDate(false)
 
-        if (isDisableDateInRange(start, date, this._config.disabledDates, this._cellUnit())) {
+        if (!this._config.allowDisabledDatesInRange && isDisableDateInRange(start, date, this._config.disabledDates, this._cellUnit())) {
           this._setStartDate(null)
           this._setEndDate(null)
           return
@@ -757,7 +761,7 @@ class Calendar extends BaseComponent {
         return
       }
 
-      if (isDisableDateInRange(date, end, this._config.disabledDates, this._cellUnit())) {
+      if (!this._config.allowDisabledDatesInRange && isDisableDateInRange(date, end, this._config.disabledDates, this._cellUnit())) {
         this._setStartDate(null)
         this._setEndDate(null)
         return
@@ -977,7 +981,14 @@ class Calendar extends BaseComponent {
   }
 
   _updateRovingTabIndex(preferred?: HTMLElement): void {
-    setRovingTabIndex(this._element as HTMLElement, this._rovingSelector(), getStartOfView(this._calendarDate as Date, this._view), this._rowsAreTargets(), preferred)
+    setRovingTabIndex(
+      this._element as HTMLElement,
+      this._rovingSelector(),
+      getStartOfView(this._calendarDate as Date, this._view),
+      this._rowsAreTargets(),
+      date => isTargetSelected(date, this._cellUnit(), this._startDate, this._endDate, this._config.selectionType, this._config.firstDayOfWeek),
+      preferred
+    )
   }
 
   _gridLabel(date: Date): string {

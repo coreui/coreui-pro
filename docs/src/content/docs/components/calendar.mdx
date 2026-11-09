@@ -142,7 +142,9 @@ The Bootstrap Calendar component includes functionality to disable specific date
 - A function or an array of functions that take a `Date` object as an argument and return a boolean indicating whether the date should be disabled.
 - A mixed array of `Date` objects and functions.
 
-In month, quarter and year selection a period can be picked unless it lies wholly before `minDate` or after `maxDate`, or `disabledDates` covers every day of it that the limits leave, and a range of periods is cleared only when it spans a period that `disabledDates` covers wholly.
+In month, quarter and year selection a period can be picked unless it lies wholly before `minDate` or after `maxDate`, or `disabledDates` covers every day of it that the limits leave, and a range of periods is cleared only when it spans a period that `disabledDates` covers wholly and `allowDisabledDatesInRange` is off.
+
+Set `allowDisabledDatesInRange` to let a range run across disabled dates, for example a flight that only needs its two travel days free. A disabled date still cannot be picked as an end, the disabled dates in between stay disabled, and the value holds only the two ends.
 
 Without a `calendarDate`, `startDate` or `endDate`, the calendar opens on today, or on the `minDate` or `maxDate` that today falls outside of, and that date takes the focus even when it cannot be picked.
 
@@ -368,6 +370,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags. |
+| `allowDisabledDatesInRange` | boolean | `false` | Lets a range run across disabled dates and wholly disabled periods, which otherwise clear it. |
 | `ariaNavNextMonthLabel` | string | `'Next month'` | A string that provides an accessible label for the button that navigates to the next month in the calendar. This label is read by screen readers to describe the action associated with the button. |
 | `ariaNavNextYearLabel` | string | `'Next year'` | A string that provides an accessible label for the button that navigates to the next year in the calendar. This label is intended for screen readers to help users understand the button's functionality. |
 | `ariaNavNextYearsLabel` | string | `'Next 12 years'` | The accessible label of the button that turns the years view to the next page of years. |

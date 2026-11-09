@@ -43,16 +43,7 @@ $multi-select-tokens: defaults(
   // stylelint-disable-next-line selector-no-qualifying-type
   select.multi-select,
   [data-coreui-multi-select] {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    pointer-events: none;
-    border: 0;
-    outline: 0;
-    opacity: 0;
+    @include value-field-overlay();
   }
 
   .multi-select-selection {

@@ -30,6 +30,16 @@ describe('DateRangePicker', () => {
   }
 
   describe('calendar options', () => {
+    it('should pass allowDisabledDatesInRange to the calendar', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const picker = new DateRangePicker(fixtureEl.querySelector('div'), { allowDisabledDatesInRange: true })
+
+      picker.show()
+
+      expect(picker._calendar._config.allowDisabledDatesInRange).toBeTrue()
+    })
+
     it('should pass the years-view arrow labels to the calendar', () => {
       const picker = buildPicker({
         ariaNavNextYearsLabel: 'Następne 12 lat', ariaNavPrevYearsLabel: 'Poprzednie 12 lat', locale: 'en-US', selectionType: 'year'
