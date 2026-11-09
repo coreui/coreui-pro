@@ -1,5 +1,5 @@
 import {
-  closeValueFieldBubble, followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
+  closeValueFieldBubble, followUserValidities, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
   ownValidationState, setStateValidity, splitIds, type UserValidity, type ValidationState, type ValueField
 } from './form-validation.js'
 import { writeAttribute } from './index.js'
@@ -67,7 +67,6 @@ class FieldValidation {
   protected declare _ariaInvalid: Element[]
   protected declare _described: Map<Element, string[]>
   protected declare _describedBy: string[]
-  protected declare _fields: ValueField[]
   protected declare _frames: Map<Element, string | null>
   protected declare _host: Element
   protected declare _movedDescription: boolean
@@ -96,7 +95,6 @@ class FieldValidation {
     this._ariaInvalid = []
     this._described = new Map()
     this._describedBy = splitIds(host.getAttribute('aria-describedby'))
-    this._fields = []
     this._frames = new Map()
     this._host = host
     this._movedDescription = false
@@ -237,47 +235,26 @@ class FieldValidation {
 
   /**
    * Follows the value fields and takes over the elements the component built, after a build or a
-   * rebuild, and draws the state on them. A field that replaces another at the same position goes on
-   * with the follower of that one, with its report and a reset in progress, and a field that is gone
-   * loses its block. Moves the description the page gave the host to the described targets, unless the host is
+   * rebuild, and draws the state on them. A new field goes on with the follower of a field that is
+   * gone, with its report and a reset in progress, and a field that is gone loses its block. Moves the description the page gave the host to the described targets, unless the host is
    * a value field or keeps it.
    */
   refresh(): void {
     const fields = this._options.fields()
-    const followers = new Map<ValueField, UserValidity>()
 
-    for (const [index, field] of fields.entries()) {
-      const replaced = this._fields[index]
-      let userValidity = this._userValidity.get(field)
-
-      if (!userValidity && replaced !== undefined && !fields.includes(replaced)) {
-        userValidity = this._userValidity.get(replaced)!
-        userValidity.follow(field)
-      }
-
-      followers.set(field, userValidity ?? followUserValidity(field, () => this.update()))
-    }
-
-    const kept = new Set(followers.values())
-
-    for (const [field, userValidity] of this._userValidity) {
+    for (const field of this._userValidity.keys()) {
       if (!fields.includes(field)) {
         setStateValidity(field, false)
       }
-
-      if (!kept.has(userValidity)) {
-        userValidity.stop()
-      }
     }
 
-    this._userValidity = followers
+    this._userValidity = followUserValidities(fields, this._userValidity, () => this.update())
 
     if (!this._movedDescription && !fields.includes(this._host as ValueField) && !this._options.pageDescribed?.(false).includes(this._host)) {
       this._movedDescription = true
       writeAttribute(this._host, 'aria-describedby', null)
     }
 
-    this._fields = fields
     this._release()
     this._release = ownValidationState(...(this._options.owned?.() ?? fields))
     this.update()

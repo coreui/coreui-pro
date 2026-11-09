@@ -1451,6 +1451,28 @@ describe('Rating', () => {
       rating.dispose()
     })
 
+    it('should give the radios values without floating point noise', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 1, precision: 0.1 })
+
+      expect(div.querySelectorAll('.rating-item-input')[2].value).toBe('0.3')
+      rating.dispose()
+    })
+
+    it('should use the title of the star for a fractional value when tooltips is an array', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3, precision: 0.25, tooltips: ['Bad', 'OK', 'Good'] })
+      const shown = tipEvent(div, 'shown')
+
+      div.querySelectorAll('.rating-item-label')[8].dispatchEvent(createEvent('mouseover'))
+      await shown
+
+      expect(tipText()).toBe('Good')
+      rating.dispose()
+    })
+
     it('should hide tooltip on mouseleave', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

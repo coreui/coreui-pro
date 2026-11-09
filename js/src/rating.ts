@@ -422,7 +422,7 @@ class Rating extends BaseComponent {
         const { value } = SelectorEngine.findOne<HTMLInputElement>(SELECTOR_RATING_ITEM_INPUT, anchor)!
 
         if (Array.isArray(tooltips)) {
-          return tooltips[Number(value) - 1]
+          return tooltips[Math.ceil(Number(value)) - 1]
         }
 
         return typeof tooltips === 'object' ? tooltips[value] : value
@@ -553,7 +553,7 @@ class Rating extends BaseComponent {
     Array.from({ length: numberOfRadios }, (_, _index) => {
       const ratingItemId = getUID(`${this.constructor.NAME}${index}`).toString()
       const isNotLastItem = _index + 1 < numberOfRadios
-      const value = numberOfRadios === 1 ? index + 1 : ((_index + 1) * (Number(this._config.precision))) + index
+      const value = Number((index + ((_index + 1) * this._config.precision)).toFixed(10))
 
       // Create label
       const ratingItemLabelElement = document.createElement('label')
