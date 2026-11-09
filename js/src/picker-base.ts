@@ -167,7 +167,7 @@ abstract class PickerBase extends BaseComponent {
           return
         }
 
-        this._runAsUser(() => this.clear())
+        this._runAsUser(() => this._clearValue(true))
 
         if (this._element && [this._cleanerElement, document.body].includes(document.activeElement as HTMLElement)) {
           SelectorEngine.findOne(SELECTOR_SECTION, this._popupAnchor())?.focus()
@@ -286,6 +286,16 @@ abstract class PickerBase extends BaseComponent {
       this._source = previous
     }
   }
+
+  _clearValue(report: boolean): void {
+    this._emptyValue()
+
+    if (report) {
+      EventHandler.trigger(this._element, this.constructor.eventName('clear'))
+    }
+  }
+
+  abstract _emptyValue(): void
 
   _syncParts(): void {}
 

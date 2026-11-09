@@ -209,6 +209,10 @@ class DatePicker extends PickerBase {
   }
 
   clear(): void {
+    this._clearValue(this.getDate() !== null)
+  }
+
+  override _emptyValue(): void {
     this._write(null)
   }
 

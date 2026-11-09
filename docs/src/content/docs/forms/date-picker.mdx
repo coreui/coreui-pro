@@ -536,6 +536,7 @@ context.disabled         // disabled state
 
 | Event | Description |
 | --- | --- |
+| `clear.coreui.date-picker` | Fires after `dateChange.coreui.date-picker` when the cleaner empties the field, an incomplete or rejected entry included, and when `clear()` or a clear action in the footer removes a date. `preventDefault()` has no effect. |
 | `dateChange.coreui.date-picker` | Fired when the value changes — from the calendar, the field, or a context action. `event.date` is the validated `Date`, or `null`; `event.formattedDate` is the same value in the shape of `selectionType` (`2026-01`, `2026W03`, `2026Q1`, `2026`, or the `Date` itself for `day`), with the year in at least four digits (`0026-01`). |
 | `hidden.coreui.date-picker` | Fired once the popup has finished its exit transition and left the page. Skipped when the popup reopens first. |
 | `hide.coreui.date-picker` | Fired immediately when `hide` is called — by the API, the indicator, Escape, an outside click, another menu or picker opening, or the dropdown or dialog the picker sits in closing. Call `event.preventDefault()` to keep the popup open. |

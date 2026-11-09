@@ -225,6 +225,10 @@ class DateRangePicker extends PickerBase {
   }
 
   clear(): void {
+    this._clearValue((this.getStartDate() ?? this.getEndDate()) !== null)
+  }
+
+  override _emptyValue(): void {
     this._input.clear()
     this._setSelectEndDate(false)
   }

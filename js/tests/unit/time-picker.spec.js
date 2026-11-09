@@ -1604,4 +1604,61 @@ describe('TimePicker', () => {
       expect([...document.querySelectorAll("[aria-label^=\"Select\"]")].length).toEqual(3)
     })
   })
+
+  describe('clear event', () => {
+    const start = time => {
+      fixtureEl.innerHTML = '<div></div>'
+      const element = fixtureEl.querySelector('div')
+      const picker = new TimePicker(element, { locale: 'en-US', time })
+      const seen = []
+
+      for (const name of ['timeChange', 'clear']) {
+        element.addEventListener(`${name}.coreui.time-picker`, () => seen.push(name))
+      }
+
+      return { picker, seen }
+    }
+
+    it('should fire after timeChange when clear() removes a time', () => {
+      const { picker, seen } = start(new Date(2026, 0, 15, 10, 30))
+
+      picker.clear()
+
+      expect(seen).toEqual(['timeChange', 'clear'])
+    })
+
+    it('should fire from the cleaner on a field with no time', () => {
+      const { picker, seen } = start(null)
+
+      picker._cleanerElement.click()
+
+      expect(seen).toContain('clear')
+    })
+
+    it('should not fire without a time', () => {
+      const { picker, seen } = start(null)
+
+      picker.clear()
+
+      expect(seen).not.toContain('clear')
+    })
+
+    it('should fire from the cleaner and from a clear action in the footer', () => {
+      for (const click of [picker => picker._cleanerElement.click(), picker => {
+        picker.show()
+        document.querySelector('[data-coreui-picker-action="clear"]').click()
+      }]) {
+        fixtureEl.innerHTML = '<div id="x"><template data-coreui-template="footer"><button type="button" data-coreui-picker-action="clear">Clear</button></template></div>'
+        const element = fixtureEl.querySelector('#x')
+        const picker = new TimePicker(element, { locale: 'en-US', time: new Date(2026, 0, 15, 10, 30) })
+        const seen = []
+
+        element.addEventListener('clear.coreui.time-picker', () => seen.push('clear'))
+        click(picker)
+
+        expect(seen).toEqual(['clear'])
+        picker.dispose()
+      }
+    })
+  })
 })
