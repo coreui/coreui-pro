@@ -1,5 +1,6 @@
 @use "functions/defaults" as *;
 @use "mixins/focus-ring" as *;
+@use "mixins/form-control" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
 
@@ -27,6 +28,16 @@ $chip-set-tokens: defaults(
 
     &:focus-visible {
       @include focus-ring();
+    }
+  }
+
+  .chip-filter {
+    position: relative;
+
+    > textarea {
+      @include value-field-overlay();
+
+      resize: none;
     }
   }
 }

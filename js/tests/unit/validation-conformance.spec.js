@@ -1,4 +1,5 @@
 import Autocomplete from '../../src/autocomplete.js'
+import ChipFilter from '../../src/chip-filter.js'
 import ChipInput from '../../src/chip-input.js'
 import Combobox from '../../src/combobox.js'
 import DateInput from '../../src/date-input.js'
@@ -95,6 +96,20 @@ const ADAPTERS = [
     },
     changeEvents: t => [[t.root.querySelector('.combobox-toggle'), 'change.coreui.combobox'], ...nativeChange(t.instance._valueField)],
     changeFromCode: t => t.instance.setValue('ca'),
+    required: { required: true }
+  },
+  {
+    name: 'ChipFilter',
+    markup: attributes => `<div${attributes('chip-filter')}><span class="chip">one</span><span class="chip">two</span></div>${FEEDBACK}`,
+    create: (root, config) => new ChipFilter(root.querySelector('.chip-filter'), { name: 'tags', ...config }),
+    serverClassElement: t => t.root.querySelector('.chip-filter'),
+    blockers: t => [t.instance._valueField],
+    frames: t => [t.root.querySelector('.chip-filter')],
+    invalidTargets: t => [t.root.querySelector('.chip-filter')],
+    describedTargets: t => [t.root.querySelector('.chip-filter')],
+    changeAsUser: t => t.root.querySelector('.chip').click(),
+    changeEvents: t => [[t.root.querySelector('.chip-filter'), 'change.coreui.chip-filter'], ...nativeChange(t.instance._valueField)],
+    changeFromCode: t => t.instance.selectChip(t.root.querySelector('.chip')),
     required: { required: true }
   },
   {

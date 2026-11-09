@@ -443,14 +443,14 @@ Every getter now carries the noun it returns:
 + listBox.getSelectedValues()
 
 - chipSet.getSelected()
-+ chipSet.getSelectedValues()
++ chipFilter.getSelectedValues()
 
 - transfer.getSelected('source')
 + transfer.getSelectedValues('source')
 ```
 
-Chip Set's `getValues()` and `getSelectedValues()` are unchanged and are now
-the whole selection API: the element list behind them is internal. A chip
+Selection on chips now lives in [Chip Filter](/forms/chip-filter/), see
+[Chip Filter takes the selection](#chip-filter-takes-the-selection). A chip
 carries a value of its own — `data-coreui-chip-value`, falling back to the
 chip's text — so values, not nodes, are what the rest of the plugin works
 with.
@@ -596,9 +596,8 @@ the selected options for Multi Select, the chip values for Chip Set and Chip
 Input. Transfer's value is its target list, with the source list alongside as
 `event.source`; `event.target` stays the `.transfer` element.
 
-Two events keep their own names because they answer a different question.
-`select.coreui.chip-set` still carries `selected` — membership and selection are
-separate in a chip set — and `move`/`moved.coreui.transfer` still carry
+One event keeps its own name because it answers a different question.
+`move`/`moved.coreui.transfer` still carry
 `direction` and the `values` that are moving, which is the change itself rather
 than the state after it.
 
@@ -2317,6 +2316,28 @@ own stylesheet re-squared those corners as a workaround, the override is no
 longer needed. A rule of yours that relied on the group losing to a component
 now loses to the group instead; give it a layer of its own if you need it back.
 
+#### Chip Filter takes the selection
+
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+
+Chips now come in three patterns, each with its own component: [Chip Set](/components/chip-set/) for static or removable chips, [Chip Filter](/forms/chip-filter/) for choosing from a fixed list, and [Chip Input](/forms/chip-input/) for typing values. `selectable`, `filter`, `selectionMode` and `selectedIcon` left Chip Set and Chip Input, together with `selectChip()`, `selectAll()`, `deselectAll()`, `getSelectedValues()` and `select.coreui.*`. `removeSelected()` and `clearSelection()` are gone.
+
+```diff
+- <div class="chip-set" data-coreui-chip-set data-coreui-selectable="true">
++ <div class="chip-set chip-filter" data-coreui-chip-filter>
+```
+
+```diff
+- el.addEventListener('select.coreui.chip-set', event => save(event.selected))
++ el.addEventListener('change.coreui.chip-filter', event => save(event.value))
+```
+
+A chip filter always shows the check icon on a selected chip, and a chip cannot be both selected and removed: `removable` is ignored on a selectable chip. `selectable` stays on a standalone [Chip](/components/chip/).
+
+#### Chips have new roles
+
+A static Chip Set is now a `list` of `listitem` chips. A removable Chip Set and the chips of a Chip Input are a `grid` of `gridcell` chips, each inside a new `.chip-row` wrapper, with a real remove button in place of the old hidden indicator; a Chip Input holds them in a `.chip-input-grid`, and its `aria-label` moves there. Both wrappers use `display: contents`, so the layout does not change, but a selector like `.chip-set > .chip` or `.chip-input > .chip` no longer matches. A standalone removable chip no longer takes focus itself: its remove button is the tab stop. `removable` is ignored on a chip that is a `<button>` or `<a href>`. A `data-coreui-chip` chip inside a Chip Set now follows the set.
+
 #### Chip Input keeps focus among the chips after a removal
 
 Removing the focused chip used to send focus back to the text field. It now
@@ -3007,15 +3028,15 @@ field behind that kept submitting.
   `-1` on the others and moves it with the focus, so <kbd>Tab</kbd> enters and
   leaves the set once and the arrow keys move between the chips. Every
   interactive chip used to be a tab stop of its own.
-- **Chips expose real roles now.** A selectable chip set is a horizontal
+- **Chips expose real roles now.** A Chip Filter is a horizontal
   `role="listbox"` (with `aria-multiselectable` in multiple mode) whose chips
   are `role="option"` elements carrying `aria-selected`; a standalone
   selectable chip is a toggle button (`role="button"`) reflecting its state
-  via **`aria-pressed` instead of `aria-selected`**; a non-selectable set is a
-  `role="group"`. `aria-disabled` is only stamped on chips that carry a role —
+  via **`aria-pressed` instead of `aria-selected`**; a static chip set is a
+  `role="list"`, a removable one a `role="grid"`. `aria-disabled` is only stamped on chips that carry a role —
   on a role-less chip the attribute was invalid and is now removed.
-- **`clear()` and `removeSelected()` report the change once.** Chip set and Chip
-  input fired `change` and `select` (`.coreui.chip-set`/`.coreui.chip-input`), and
+- **`clear()` reports the change once.** Chip set and Chip
+  input fired `change` (`.coreui.chip-set`/`.coreui.chip-input`), and
   Chip input its native `input` and `change`, once for every chip removed; they
   fire once now, after the last chip is gone, and not at all when the chips did
   not change.
@@ -3033,11 +3054,9 @@ field behind that kept submitting.
   the text out, such as `data-coreui-aria-remove-label="Remove React"`, now repeats
   it, so drop it or use `{label}`. A `.chip-remove` button you write yourself keeps
   its `aria-label`, and gets one from `ariaRemoveLabel` when it has none.
-- **A selectable chip hides its remove affordance.** A chip with a role — a
-  selectable chip, which is a toggle button, or an option in a selectable set —
-  gets a `<span aria-hidden="true">` instead of a `<button>` inside it, so its name
-  is its text and a control is no longer nested in a button. <kbd>Backspace</kbd> /
-  <kbd>Delete</kbd> remove it from the keyboard, the affordance from the pointer.
+- **A selectable chip takes no remove button.** `removable` is ignored on a
+  selectable chip, so a control is no longer nested in a toggle button. A chip
+  in a removable Chip Set is a `role="gridcell"` with a real remove `<button>`.
 - **Chip input: `aria-disabled`/`aria-readonly` are no longer stamped on the
   container.** The container is a generic element, so those attributes were
   invalid on it (axe `aria-allowed-attr`); the native `disabled`/`readonly`

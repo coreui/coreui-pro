@@ -1,19 +1,14 @@
 const chipSelectableElement = document.querySelector('#chipSelectable')
 const chipSelectableOutput = document.querySelector('#chipSelectableOutput')
 
-const chipSelectable = new coreui.ChipInput(chipSelectableElement, {
-  placeholder: 'Add team role...',
-  selectable: true
-})
+const chipSelectable = new coreui.ChipFilter(chipSelectableElement)
 
 const updateSelectedOutput = selected => {
   chipSelectableOutput.textContent = selected.length > 0 ? selected.join(', ') : 'None'
 }
 
-chipSelectableElement.addEventListener('select.coreui.chip-input', event => {
-  updateSelectedOutput(event.selected)
+chipSelectableElement.addEventListener('change.coreui.chip-filter', event => {
+  updateSelectedOutput(event.value)
 })
 
-chipSelectable.add('Frontend')
-chipSelectable.add('Security')
 updateSelectedOutput(chipSelectable.getSelectedValues())

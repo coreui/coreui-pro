@@ -129,6 +129,8 @@
       to: /forms/autocomplete/
     - title: Checkbox
       to: /forms/checkbox/
+    - title: Chip filter
+      to: /forms/chip-filter/
     - title: Chip input
       to: /forms/chip-input/
     - title: Combobox

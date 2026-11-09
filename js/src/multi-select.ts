@@ -256,6 +256,10 @@ class MultiSelectChipSet extends ChipSet {
   override _containerRole(): null {
     return null
   }
+
+  override _chipRole(): null {
+    return null
+  }
 }
 
 class MultiSelect extends ComboboxBase {
@@ -1204,6 +1208,7 @@ class MultiSelect extends ComboboxBase {
     new Chip(chip, {
       ariaRemoveLabel: this._config.ariaTagDeleteLabel ?? this._config.ariaChipRemoveLabel,
       disabled: disabled === true,
+      owned: true,
       removable: !this._disabled && disabled !== true
     })
 

@@ -188,6 +188,10 @@ $chip-outline-tokens: defaults(
     }
   }
 
+  .chip-row {
+    display: contents;
+  }
+
   .chip-remove {
     display: flex;
     flex-shrink: 0;

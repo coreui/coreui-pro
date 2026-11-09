@@ -34,6 +34,7 @@ const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
 const SELECTOR_CHIP_CHECK = '.chip-check'
 const SELECTOR_CHIP_REMOVE = '.chip-remove'
+const SELECTOR_CHIP_ROW = '.chip-row'
 const SELECTOR_DATA_CHIP = '[data-coreui-chip]'
 
 const CLASS_NAME_CHIP_CHECK = 'chip-check'
@@ -47,6 +48,7 @@ type ChipConfig = {
   ariaRemoveLabel: ChipRemoveLabel
   disabled: boolean
   filter: boolean
+  owned: boolean
   removable: boolean
   removeIcon: string
   sanitize: boolean
@@ -61,6 +63,7 @@ const Default: ChipConfig = {
   ariaRemoveLabel: 'Remove',
   disabled: false,
   filter: false,
+  owned: false,
   removable: false,
   removeIcon: REMOVE_ICON,
   sanitize: true,
@@ -75,6 +78,7 @@ const DefaultType = {
   ariaRemoveLabel: '(string|function)',
   disabled: 'boolean',
   filter: 'boolean',
+  owned: 'boolean',
   removable: 'boolean',
   removeIcon: 'string',
   sanitize: 'boolean',
@@ -205,6 +209,10 @@ class Chip extends BaseComponent {
       config.selectable = true
     }
 
+    if (config.selectable || this._element.matches('a[href], button')) {
+      config.removable = false
+    }
+
     return config
   }
 
@@ -232,6 +240,10 @@ class Chip extends BaseComponent {
       event.stopPropagation()
 
       if (this._config.removable && !this._disabled) {
+        if (this._element.getAttribute('role') === 'gridcell' && document.activeElement === document.body) {
+          this._element.focus()
+        }
+
         this.remove()
       }
     })
@@ -241,9 +253,9 @@ class Chip extends BaseComponent {
   // selectable chip set the set stamps role="option" (listbox pattern) before
   // initializing the chip; a standalone selectable chip is a toggle button.
   _applyRole(): void {
-    const option = this._element.getAttribute('role') === 'option'
+    const role = this._config.owned ? this._element.getAttribute('role') : null
 
-    writeAttribute(this._element, 'role', option ? 'option' : (this._config.selectable ? 'button' : null))
+    writeAttribute(this._element, 'role', role ?? (this._config.selectable ? 'button' : null))
   }
 
   _applyState(): void {
@@ -254,7 +266,7 @@ class Chip extends BaseComponent {
     // aria-disabled is not allowed on a generic element — only stamp it when
     // the chip carries a role; a role-less chip conveys the state through the
     // disabled class and the removed interactivity.
-    if (this._disabled && this._element.hasAttribute('role')) {
+    if (this._disabled && this._element.hasAttribute('role') && this._element.getAttribute('role') !== 'listitem') {
       this._element.setAttribute('aria-disabled', 'true')
     } else {
       this._element.removeAttribute('aria-disabled')
@@ -290,19 +302,14 @@ class Chip extends BaseComponent {
   }
 
   _createRemoveControl(): HTMLElement {
-    if (this._element.hasAttribute('role')) {
-      const indicator = document.createElement('span')
-      indicator.className = CLASS_NAME_CHIP_REMOVE
-      indicator.setAttribute('aria-hidden', 'true')
-      indicator.innerHTML = sanitizeByConfig(this._config.removeIcon, this._config)
-      return indicator
-    }
-
     const button = document.createElement('button')
     button.type = 'button'
     button.className = CLASS_NAME_CHIP_REMOVE
     button.setAttribute('aria-label', this._getRemoveLabel())
-    button.setAttribute('tabindex', '-1')
+    if (this._config.owned) {
+      button.setAttribute('tabindex', '-1')
+    }
+
     button.innerHTML = sanitizeByConfig(this._config.removeIcon, this._config)
     return button
   }
@@ -323,6 +330,10 @@ class Chip extends BaseComponent {
         existing.setAttribute('aria-label', this._getRemoveLabel())
       }
 
+      if (this._config.owned) {
+        existing.setAttribute('tabindex', '-1')
+      }
+
       return
     }
 
@@ -331,7 +342,11 @@ class Chip extends BaseComponent {
   }
 
   _makeFocusable(): void {
-    const focusable = !this._disabled && (this._config.selectable || this._config.removable)
+    const focusable = !this._disabled && (
+      this._config.selectable ||
+      this._element.getAttribute('role') === 'gridcell' ||
+      (this._config.owned && this._config.removable)
+    )
     writeAttribute(this._element, 'tabindex', focusable ? '0' : null)
     writeAttribute(this._element, 'data-coreui-chip-focusable', focusable ? 'true' : null)
   }
@@ -371,7 +386,9 @@ class Chip extends BaseComponent {
 
   _destroyElement(): void {
     EventHandler.trigger(this._element, EVENT_REMOVED)
-    this._element.remove()
+
+    const row = this._element.closest(SELECTOR_CHIP_ROW) ?? this._element
+    row.remove()
     this.dispose()
   }
 

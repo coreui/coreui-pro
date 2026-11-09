@@ -53,10 +53,11 @@ describe('ChipSet', () => {
     it('should return default configuration', () => {
       expect(ChipSet.Default).toEqual(jasmine.objectContaining({
         disabled: false,
-        removable: false,
-        selectable: false,
-        selectionMode: 'multiple'
+        removable: false
       }))
+      expect(ChipSet.Default).not.toEqual(jasmine.objectContaining({ selectable: false }))
+      expect(Object.keys(ChipSet.Default)).not.toContain('filter')
+      expect(Object.keys(ChipSet.Default)).not.toContain('selectionMode')
     })
   })
 
@@ -70,22 +71,25 @@ describe('ChipSet', () => {
     it('should instantiate each child chip', () => {
       const el = setMarkup()
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el)
 
       for (const chip of el.querySelectorAll('.chip')) {
         expect(Chip.getInstance(chip)).not.toBeNull()
       }
     })
 
-    it('should not override an already instantiated chip', () => {
+    it('should take over a chip the page set up, which then follows the set', () => {
       const el = setMarkup()
       const firstChip = el.querySelector('.chip')
       const chip = new Chip(firstChip, { selectable: true })
 
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: false })
+      new ChipSet(el, { removable: true })
 
-      expect(Chip.getInstance(firstChip)).toEqual(chip)
+      expect(Chip.getInstance(firstChip)).not.toEqual(chip)
+      expect(firstChip.getAttribute('role')).toEqual('gridcell')
+      expect(firstChip.hasAttribute('aria-pressed')).toBeFalse()
+      expect(firstChip.closest('.chip-row')).not.toBeNull()
     })
 
     it('should let a chip opt out of a set-level option via its own data attribute', () => {
@@ -124,7 +128,7 @@ describe('ChipSet', () => {
     it('should focus previous chip on ArrowLeft', () => {
       const el = setMarkup(['First', 'Second'])
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[1].focus()
@@ -136,7 +140,7 @@ describe('ChipSet', () => {
     it('should focus next chip on ArrowRight', () => {
       const el = setMarkup(['First', 'Second'])
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[0].focus()
@@ -148,7 +152,7 @@ describe('ChipSet', () => {
     it('should not move focus past the last chip on ArrowRight', () => {
       const el = setMarkup(['First', 'Second'])
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[1].focus()
@@ -162,7 +166,7 @@ describe('ChipSet', () => {
 
       const el = setMarkup(['First', 'Second'])
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[0].focus()
@@ -179,7 +183,7 @@ describe('ChipSet', () => {
     it('should mirror arrow keys by the direction of the chip set, not of the document', () => {
       const el = setMarkup(['First', 'Second'], ' dir="rtl"')
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[0].focus()
@@ -191,7 +195,7 @@ describe('ChipSet', () => {
     it('should focus first chip on Home key', () => {
       const el = setMarkup()
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[2].focus()
@@ -203,7 +207,7 @@ describe('ChipSet', () => {
     it('should focus last chip on End key', () => {
       const el = setMarkup()
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[0].focus()
@@ -223,7 +227,7 @@ describe('ChipSet', () => {
 
       const el = fixtureEl.querySelector('.chip-set')
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[0].focus()
@@ -238,88 +242,10 @@ describe('ChipSet', () => {
       chip.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, ...options }))
     }
 
-    it('should select every chip on Ctrl+A', () => {
-      const el = setMarkup(['First', 'Second', 'Third'])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      const chips = el.querySelectorAll('.chip')
-      chips[0].focus()
-      keydown(chips[0], 'a', { ctrlKey: true })
-
-      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third'])
-    })
-
-    it('should leave Ctrl+A alone in single selection mode', () => {
-      const el = setMarkup(['First', 'Second'])
-      const chipSet = new ChipSet(el, { selectable: true, selectionMode: 'single' })
-
-      const chips = el.querySelectorAll('.chip')
-      keydown(chips[0], 'a', { ctrlKey: true })
-
-      expect(chipSet.getSelectedValues()).toEqual([])
-    })
-
-    it('should extend the selection with Shift and an arrow key', () => {
-      const el = setMarkup(['First', 'Second', 'Third'])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      const chips = el.querySelectorAll('.chip')
-      chips[0].click()
-      keydown(chips[0], 'ArrowRight', { shiftKey: true })
-
-      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second'])
-    })
-
-    it('should extend the selection to the edge with Shift+End', () => {
-      const el = setMarkup(['First', 'Second', 'Third'])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      const chips = el.querySelectorAll('.chip')
-      chips[0].click()
-      keydown(chips[0], 'End', { shiftKey: true })
-
-      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third'])
-    })
-
-    it('should select a range on Shift+click without toggling the clicked chip twice', () => {
-      const el = setMarkup(['First', 'Second', 'Third'])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      const chips = el.querySelectorAll('.chip')
-      chips[0].click()
-      chips[2].dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }))
-
-      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third'])
-    })
-
-    it('should keep the anchor for the next Shift+click after a range', () => {
-      const el = setMarkup(['First', 'Second', 'Third', 'Fourth', 'Fifth'])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      const chips = el.querySelectorAll('.chip')
-      chips[0].click()
-      chips[2].dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }))
-      chips[4].dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }))
-
-      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third', 'Fourth', 'Fifth'])
-    })
-
-    it('should keep the anchor for a Shift+click after the selection is cleared', () => {
-      const el = setMarkup(['First', 'Second', 'Third'])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      const chips = el.querySelectorAll('.chip')
-      chips[0].click()
-      chipSet.clearSelection()
-      chips[2].dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }))
-
-      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third'])
-    })
-
     it('should move focus to the chip matching the typed characters', () => {
       const el = setMarkup(['Alpha', 'Beta', 'Gamma'])
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[0].focus()
@@ -331,7 +257,7 @@ describe('ChipSet', () => {
     it('should not move focus when typeahead is off', () => {
       const el = setMarkup(['Alpha', 'Beta', 'Gamma'])
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true, typeahead: false })
+      new ChipSet(el, { removable: true, typeahead: false })
 
       const chips = el.querySelectorAll('.chip')
       chips[0].focus()
@@ -343,7 +269,7 @@ describe('ChipSet', () => {
     it('should start the typeahead again after a character that matches nothing', () => {
       const el = setMarkup(['Alpha', 'Beta', 'Gamma'])
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[0].focus()
@@ -356,7 +282,7 @@ describe('ChipSet', () => {
     it('should end the typeahead on an arrow key', () => {
       const el = setMarkup(['Apple', 'Banana', 'Cherry'])
       // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
+      new ChipSet(el, { removable: true })
 
       const chips = el.querySelectorAll('.chip')
       chips[0].focus()
@@ -367,28 +293,10 @@ describe('ChipSet', () => {
       expect(document.activeElement).toEqual(chips[2])
     })
 
-    it('should keep the space a chip toggle during a search', () => {
-      const el = setMarkup(['Newark', 'New York'])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      const chips = el.querySelectorAll('.chip')
-      chips[0].focus()
-
-      for (const key of 'new') {
-        keydown(document.activeElement, key)
-      }
-
-      const focused = document.activeElement
-      keydown(focused, ' ')
-
-      expect(chipSet.getSelectedValues()).toEqual([focused.textContent.trim()])
-      expect(document.activeElement).toEqual(focused)
-    })
-
     it('should leave a shortcut out of the typeahead', () => {
       for (const init of [{ ctrlKey: true }, { metaKey: true }]) {
         const el = setMarkup(['Alpha', 'Beta', 'Gamma'])
-        const chipSet = new ChipSet(el, { selectable: true })
+        const chipSet = new ChipSet(el, { removable: true })
 
         const chips = el.querySelectorAll('.chip')
         chips[0].focus()
@@ -404,21 +312,6 @@ describe('ChipSet', () => {
   })
 
   describe('removal', () => {
-    it('should keep the remove control out of the listbox option', () => {
-      const el = setMarkup(['First', 'Second'])
-      // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true, removable: true })
-
-      const chip = el.querySelector('.chip')
-      const control = chip.querySelector('.chip-remove')
-
-      expect(chip.getAttribute('role')).toEqual('option')
-      expect(control.tagName).toEqual('SPAN')
-      expect(control.getAttribute('aria-hidden')).toEqual('true')
-      expect(control.hasAttribute('tabindex')).toBeFalse()
-      expect(control.getAttribute('aria-label')).toBeNull()
-    })
-
     it.each([
       ['a {label} template', 'Usuń {label}', 'Usuń First'],
       ['a function', label => `${label} entfernen`, 'First entfernen']
@@ -430,7 +323,7 @@ describe('ChipSet', () => {
       expect(el.querySelector('.chip-remove').getAttribute('aria-label')).toEqual(expected)
     })
 
-    it('should move focus past a chip that takes no focus after a removal', () => {
+    it('should keep a chip that cannot be removed in the focus order after a removal', () => {
       fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span><span class="chip" data-coreui-removable="false">Fixed</span><span class="chip">Last</span></div>'
       const el = fixtureEl.querySelector('.chip-set')
       // eslint-disable-next-line no-new
@@ -440,11 +333,13 @@ describe('ChipSet', () => {
       first.focus()
       first.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))
 
-      expect(fixed.hasAttribute('data-coreui-chip-focusable')).toBeFalse()
-      expect(document.activeElement).toEqual(last)
+      expect(fixed.hasAttribute('data-coreui-chip-focusable')).toBeTrue()
+      expect(fixed.querySelector('.chip-remove')).toBeNull()
+      expect(document.activeElement).toEqual(fixed)
+      expect(last.isConnected).toBeTrue()
     })
 
-    it('should keep a real button when the set is not a listbox', () => {
+    it('should keep a real named button out of the tab order in a removable set', () => {
       const el = setMarkup(['First', 'Second'])
       // eslint-disable-next-line no-new
       new ChipSet(el, { removable: true })
@@ -452,19 +347,10 @@ describe('ChipSet', () => {
       const chip = el.querySelector('.chip')
       const control = chip.querySelector('.chip-remove')
 
-      expect(chip.getAttribute('role')).toBeNull()
       expect(control.tagName).toEqual('BUTTON')
       expect(control.getAttribute('aria-label')).toEqual('Remove First')
-    })
-
-    it('should remove the chip when the aria-hidden control is clicked', () => {
-      const el = setMarkup(['First', 'Second'])
-      // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true, removable: true })
-
-      el.querySelector('.chip .chip-remove').click()
-
-      expect(el.querySelectorAll('.chip')).toHaveSize(1)
+      expect(control.getAttribute('tabindex')).toEqual('-1')
+      expect(control.hasAttribute('aria-hidden')).toBeFalse()
     })
 
     it('should move focus to the next chip after removing a focused chip', () => {
@@ -673,93 +559,7 @@ describe('ChipSet', () => {
     })
   })
 
-  describe('selection', () => {
-    it('should allow multiple selected chips by default', () => {
-      const el = setMarkup(['First', 'Second'])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      const chips = el.querySelectorAll('.chip')
-      Chip.getInstance(chips[0]).select()
-      Chip.getInstance(chips[1]).select()
-
-      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second'])
-    })
-
-    it('should deselect siblings in single selection mode', () => {
-      const el = setMarkup(['First', 'Second'])
-      const chipSet = new ChipSet(el, { selectable: true, selectionMode: 'single' })
-
-      const chips = el.querySelectorAll('.chip')
-      Chip.getInstance(chips[0]).select()
-      Chip.getInstance(chips[1]).select()
-
-      expect(chipSet.getSelectedValues()).toEqual(['Second'])
-    })
-
-    it('should emit select.coreui.chip-set on selection change', () => {
-      return new Promise(resolve => {
-        const el = setMarkup(['First'])
-        // eslint-disable-next-line no-new
-        new ChipSet(el, { selectable: true })
-
-        const chip = el.querySelector('.chip')
-
-        el.addEventListener('select.coreui.chip-set', event => {
-          expect(event.selected).toEqual(['First'])
-          resolve()
-        })
-
-        Chip.getInstance(chip).select()
-      })
-    })
-
-    it('should forward filter so a selected chip shows a check icon', () => {
-      const el = setMarkup(['First'])
-      // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true, filter: true })
-
-      const chip = el.querySelector('.chip')
-      expect(chip.querySelector('.chip-check')).toBeNull()
-
-      Chip.getInstance(chip).select()
-
-      expect(chip.querySelector('.chip-check')).not.toBeNull()
-    })
-
-    it('should select and deselect all chips', () => {
-      const el = setMarkup(['First', 'Second'])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      chipSet.selectAll()
-      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second'])
-
-      chipSet.deselectAll()
-      expect(chipSet.getSelectedValues()).toEqual([])
-    })
-  })
-
   describe('chip management', () => {
-    it('should select a specific chip with selectChip', () => {
-      const el = setMarkup(['First', 'Second'])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      const chips = el.querySelectorAll('.chip')
-      chipSet.selectChip(chips[1])
-
-      expect(chipSet.getSelectedValues()).toEqual(['Second'])
-    })
-
-    it('should ignore selectChip for an element outside the set', () => {
-      const el = setMarkup(['First'])
-      const chipSet = new ChipSet(el, { selectable: true })
-      const outside = document.createElement('span')
-      outside.className = 'chip'
-
-      chipSet.selectChip(outside)
-
-      expect(chipSet.getSelectedValues()).toEqual([])
-    })
-
     it('should append a chip element with add', () => {
       const el = setMarkup(['First'])
       const chipSet = new ChipSet(el)
@@ -814,49 +614,18 @@ describe('ChipSet', () => {
       expect(el.querySelectorAll('.chip')).toHaveSize(0)
     })
 
-    it('should remove only selected chips with removeSelected', () => {
-      const el = setMarkup(['First', 'Second', 'Third'])
-      const chipSet = new ChipSet(el, { selectable: true, removable: true })
-
-      const chips = el.querySelectorAll('.chip')
-      Chip.getInstance(chips[0]).select()
-      Chip.getInstance(chips[2]).select()
-
-      chipSet.removeSelected()
-
-      const remaining = el.querySelectorAll('.chip')
-      expect(remaining).toHaveSize(1)
-      expect(remaining[0].textContent).toContain('Second')
-    })
-
     it('should report clear once, after every chip is gone, and each removal on its own', () => {
       const el = setMarkup(['First', 'Second', 'Third'])
       const chipSet = new ChipSet(el, { removable: true })
       const changes = []
-      const selects = []
       const removals = []
 
       el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
-      el.addEventListener('select.coreui.chip-set', event => selects.push(event.selected))
       el.addEventListener('remove.coreui.chip-set', event => removals.push(event.value))
       chipSet.clear()
 
       expect(changes).toEqual([[]])
-      expect(selects).toEqual([[]])
       expect(removals).toEqual(['First', 'Second', 'Third'])
-    })
-
-    it('should report removeSelected once', () => {
-      const el = setMarkup(['First', 'Second', 'Third'])
-      const chipSet = new ChipSet(el, { selectable: true, removable: true })
-      const changes = []
-
-      Chip.getInstance(el.querySelectorAll('.chip')[0]).select()
-      Chip.getInstance(el.querySelectorAll('.chip')[2]).select()
-      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
-      chipSet.removeSelected()
-
-      expect(changes).toEqual([['Second']])
     })
 
     it('should report clear once with the chip a listener kept', () => {
@@ -890,9 +659,8 @@ describe('ChipSet', () => {
 
     it('should report only the change of a chip a listener adds while it keeps every chip', () => {
       const el = setMarkup(['First', 'Second'])
-      const chipSet = new ChipSet(el, { selectable: true, removable: true })
+      const chipSet = new ChipSet(el, { removable: true })
       const changes = []
-      const selects = []
       let added = false
 
       el.addEventListener('remove.coreui.chip-set', event => {
@@ -904,11 +672,9 @@ describe('ChipSet', () => {
         }
       })
       el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
-      el.addEventListener('select.coreui.chip-set', event => selects.push(event.selected))
       chipSet.clear()
 
       expect(changes).toEqual([['First', 'Second', 'Third']])
-      expect(selects).toEqual([])
     })
 
     it('should not report clear when nothing is removed', () => {
@@ -920,43 +686,6 @@ describe('ChipSet', () => {
       chipSet.clear()
 
       expect(changes).toEqual([])
-    })
-
-    it('should report removeSelected for a chip the set did not add', () => {
-      const el = setMarkup([])
-      const chipSet = new ChipSet(el, { selectable: true, removable: true })
-      const selects = []
-
-      el.insertAdjacentHTML('beforeend', '<span class="chip active" data-coreui-chip-value="X">X</span>')
-      el.addEventListener('select.coreui.chip-set', event => selects.push(event.selected))
-      chipSet.removeSelected()
-
-      expect(el.querySelectorAll('.chip')).toHaveSize(0)
-      expect(selects).toEqual([[]])
-    })
-
-    it('should report a clear a listener runs inside removeSelected as part of it, once', () => {
-      const el = setMarkup(['First', 'Second', 'Third'])
-      const chipSet = new ChipSet(el, { selectable: true, removable: true })
-      const changes = []
-      const removals = []
-      let nested = false
-
-      Chip.getInstance(el.querySelectorAll('.chip')[0]).select()
-      Chip.getInstance(el.querySelectorAll('.chip')[1]).select()
-      el.addEventListener('remove.coreui.chip-set', event => {
-        removals.push(event.value)
-
-        if (!nested) {
-          nested = true
-          chipSet.clear()
-        }
-      })
-      el.addEventListener('change.coreui.chip-set', event => changes.push(event.value))
-      chipSet.removeSelected()
-
-      expect(changes).toEqual([[]])
-      expect(removals.filter(value => value === 'Second')).toHaveSize(1)
     })
 
     it('should report a chip a listener removes or adds during clear with the clear, once', () => {
@@ -1086,6 +815,20 @@ describe('ChipSet', () => {
   })
 
   describe('data-api', () => {
+    it('should take over chips that start with their own data attribute', () => {
+      fixtureEl.innerHTML = '<div class="chip-set" data-coreui-chip-set data-coreui-removable="true"><span class="chip" data-coreui-chip data-coreui-removable="true">First</span><span class="chip" data-coreui-chip data-coreui-removable="true">Second</span></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      const [first, second] = el.querySelectorAll('.chip')
+
+      document.dispatchEvent(new Event('DOMContentLoaded'))
+
+      expect(el.getAttribute('role')).toEqual('grid')
+      expect(first.getAttribute('role')).toEqual('gridcell')
+      expect(first.getAttribute('tabindex')).toEqual('0')
+      expect(second.getAttribute('tabindex')).toEqual('-1')
+      expect(first.querySelector('.chip-remove').getAttribute('tabindex')).toEqual('-1')
+    })
+
     it('should initialize chip set via data attribute', () => {
       const el = setMarkup(['First'], ' data-coreui-chip-set')
 
@@ -1098,7 +841,7 @@ describe('ChipSet', () => {
   describe('dispose', () => {
     it('should dispose a chip set and stop handling navigation', () => {
       const el = setMarkup(['First', 'Second'])
-      const chipSet = new ChipSet(el, { selectable: true })
+      const chipSet = new ChipSet(el, { removable: true })
 
       expect(ChipSet.getInstance(el)).not.toBeNull()
 
@@ -1126,16 +869,17 @@ describe('ChipSet', () => {
       }
     })
 
-    it('should leave a chip the page initialized itself', () => {
+    it('should dispose a chip it took over from the page', () => {
       const el = setMarkup(['First', 'Second'])
       const [first] = el.querySelectorAll('.chip')
-      const ownChip = new Chip(first, { removable: true })
+      // eslint-disable-next-line no-new
+      new Chip(first, { removable: true })
       const chipSet = new ChipSet(el, { removable: true })
 
       chipSet.dispose()
 
-      expect(Chip.getInstance(first)).toEqual(ownChip)
-      expect(first.querySelector('.chip-remove')).not.toBeNull()
+      expect(Chip.getInstance(first)).toBeNull()
+      expect(first.querySelector('.chip-remove')).toBeNull()
     })
 
     it('should keep the chips added with add() in the document', () => {
@@ -1204,31 +948,16 @@ describe('ChipSet', () => {
     it('should leave its roles to the next instance, which writes them from its own options', () => {
       const el = setMarkup(['First', 'Second'])
 
-      new ChipSet(el, { selectable: true }).dispose()
-      ChipSet.getOrCreateInstance(el, { selectable: false })
+      new ChipSet(el, { removable: true }).dispose()
+      ChipSet.getOrCreateInstance(el, { removable: false })
 
-      expect(el.getAttribute('role')).toEqual('group')
-      expect(el.hasAttribute('aria-multiselectable')).toBeFalse()
-      expect(el.hasAttribute('aria-orientation')).toBeFalse()
+      expect(el.getAttribute('role')).toEqual('list')
+      expect(el.querySelector('.chip-row')).toBeNull()
 
       for (const chip of el.querySelectorAll('.chip')) {
-        expect(chip.hasAttribute('role')).toBeFalse()
-        expect(chip.hasAttribute('aria-selected')).toBeFalse()
+        expect(chip.getAttribute('role')).toEqual('listitem')
         expect(chip.hasAttribute('tabindex')).toBeFalse()
       }
-    })
-
-    it('should take the option role off its chips on dispose, so a chip on its own becomes a button', () => {
-      const el = setMarkup(['First'])
-      const chip = el.querySelector('.chip')
-
-      new ChipSet(el, { selectable: true, removable: true }).dispose()
-      // eslint-disable-next-line no-new
-      new Chip(chip, { selectable: true, removable: true })
-
-      expect(chip.getAttribute('role')).toEqual('button')
-      expect(chip.hasAttribute('aria-selected')).toBeFalse()
-      expect(chip.querySelector('.chip-remove').getAttribute('aria-hidden')).toEqual('true')
     })
     it('should drop the tabindex it added to hold focus once the focus leaves, also after dispose', () => {
       fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span></div><button type="button">Next</button>'
@@ -1300,13 +1029,13 @@ describe('ChipSet', () => {
 
     it('should call a method via jQueryInterface', () => {
       const el = setMarkup(['First'])
-      const chipSet = new ChipSet(el, { selectable: true })
-      const spy = spyOn(chipSet, 'deselectAll')
+      const chipSet = new ChipSet(el, { removable: true })
+      const spy = spyOn(chipSet, 'clear')
 
       jQueryMock.fn.chipSet = ChipSet.jQueryInterface
       jQueryMock.elements = [el]
 
-      jQueryMock.fn.chipSet.call(jQueryMock, 'deselectAll')
+      jQueryMock.fn.chipSet.call(jQueryMock, 'clear')
 
       expect(spy).toHaveBeenCalled()
     })
@@ -1357,64 +1086,282 @@ describe('ChipSet', () => {
   })
 
   describe('accessibility roles', () => {
-    it('should expose a selectable set as a horizontal multiselectable listbox of options', () => {
-      const el = setMarkup(['First', 'Second'])
-      // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
-
-      expect(el.getAttribute('role')).toEqual('listbox')
-      expect(el.getAttribute('aria-orientation')).toEqual('horizontal')
-      expect(el.getAttribute('aria-multiselectable')).toEqual('true')
-
-      for (const chip of el.querySelectorAll('.chip')) {
-        expect(chip.getAttribute('role')).toEqual('option')
-        expect(chip.getAttribute('aria-selected')).toEqual('false')
-      }
-    })
-
-    it('should not set aria-multiselectable in single selection mode', () => {
-      const el = setMarkup(['First'])
-      // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true, selectionMode: 'single' })
-
-      expect(el.getAttribute('role')).toEqual('listbox')
-      expect(el.hasAttribute('aria-multiselectable')).toBeFalse()
-    })
-
-    it('should expose a non-selectable set as a group', () => {
-      const el = setMarkup(['First'])
-      // eslint-disable-next-line no-new
-      new ChipSet(el)
-
-      expect(el.getAttribute('role')).toEqual('group')
-      expect(el.querySelector('.chip').hasAttribute('role')).toBeFalse()
-    })
-
     it('should write the roles of the set and its chips from its options over the markup', () => {
-      fixtureEl.innerHTML = '<div class="chip-set" role="list"><span class="chip" role="listitem">First</span></div>'
+      fixtureEl.innerHTML = '<div class="chip-set" role="group"><span class="chip" role="button">First</span></div>'
       const el = fixtureEl.querySelector('.chip-set')
       // eslint-disable-next-line no-new
       new ChipSet(el)
 
-      expect(el.getAttribute('role')).toEqual('group')
-      expect(el.querySelector('.chip').hasAttribute('role')).toBeFalse()
+      expect(el.getAttribute('role')).toEqual('list')
+      expect(el.querySelector('.chip').getAttribute('role')).toEqual('listitem')
     })
 
-    it('should leave the role of a chip that already has an instance to that instance', () => {
+    it('should expose a static set as a list of items that take no focus', () => {
+      const el = setMarkup(['First'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el)
+
+      expect(el.getAttribute('role')).toEqual('list')
+      expect(el.querySelector('.chip').getAttribute('role')).toEqual('listitem')
+      expect(el.querySelector('.chip').hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should give an empty static set no role', () => {
+      const el = setMarkup([])
+      // eslint-disable-next-line no-new
+      new ChipSet(el)
+
+      expect(el.hasAttribute('role')).toBeFalse()
+    })
+
+    it('should expose a removable set as a grid of rows holding focusable cells', () => {
+      const el = setMarkup(['First', 'Second'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      expect(el.getAttribute('role')).toEqual('grid')
+
+      for (const chip of el.querySelectorAll('.chip')) {
+        expect(chip.getAttribute('role')).toEqual('gridcell')
+        expect(chip.parentElement.getAttribute('role')).toEqual('row')
+        expect(chip.parentElement.classList.contains('chip-row')).toBeTrue()
+        expect(chip.hasAttribute('data-coreui-chip-focusable')).toBeTrue()
+      }
+    })
+
+    it('should make the first chip added to an empty removable set a cell of a grid', () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el, { removable: true })
+
+      expect(el.getAttribute('role')).toEqual('group')
+
+      const chip = chipSet.add('Fresh')
+
+      expect(el.getAttribute('role')).toEqual('grid')
+      expect(chip.getAttribute('role')).toEqual('gridcell')
+      expect(chip.parentElement.getAttribute('role')).toEqual('row')
+    })
+
+    it('should turn a grid with nothing left to focus into a group before focus moves to it', () => {
+      const el = setMarkup(['First'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+      let roleAtFocus = null
+
+      el.addEventListener('focusin', event => {
+        if (event.target === el) {
+          roleAtFocus = el.getAttribute('role')
+        }
+      })
+
+      const chip = el.querySelector('.chip')
+      chip.focus()
+      chip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))
+
+      expect(roleAtFocus).toEqual('group')
+      expect(el.getAttribute('role')).toEqual('group')
+      expect(el.querySelector('.chip-row')).toBeNull()
+    })
+
+    it('should turn a grid into a group when code removes its last chip', () => {
+      const el = setMarkup(['First'])
+      const chipSet = new ChipSet(el, { removable: true })
+
+      chipSet.remove('First')
+
+      expect(el.getAttribute('role')).toEqual('group')
+    })
+
+    it('should treat a set of only disabled chips as a group with plain chips', () => {
+      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip" data-coreui-disabled="true">First</span></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      expect(el.getAttribute('role')).toEqual('group')
+      expect(el.querySelector('.chip').hasAttribute('role')).toBeFalse()
+      expect(el.querySelector('.chip-row').hasAttribute('role')).toBeFalse()
+    })
+
+    it('should leave the name of a chip to its content', () => {
+      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip"><img alt="Jan" src="data:,">Kowalski</span></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      const chip = el.querySelector('.chip')
+
+      expect(chip.hasAttribute('aria-label')).toBeFalse()
+      expect(chip.querySelector('img')).not.toBeNull()
+    })
+
+    it('should unwrap its rows on dispose', () => {
       const el = setMarkup(['First'])
       const chip = el.querySelector('.chip')
-      // eslint-disable-next-line no-new
-      new Chip(chip, { selectable: true })
-      // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
 
-      expect(chip.getAttribute('role')).toEqual('button')
-      expect(chip.hasAttribute('aria-selected')).toBeFalse()
+      new ChipSet(el, { removable: true }).dispose()
+
+      expect(chip.parentElement).toEqual(el)
+      expect(el.querySelector('.chip-row')).toBeNull()
+      expect(chip.hasAttribute('role')).toBeFalse()
+    })
+
+    it('should take the row away with a removed chip', () => {
+      const el = setMarkup(['First', 'Second'])
+      const chipSet = new ChipSet(el, { removable: true })
+
+      chipSet.remove('First')
+
+      expect(el.querySelectorAll('.chip-row')).toHaveSize(1)
+    })
+
+    it('should take the row away with a chip removed by value before it has an instance', () => {
+      const el = setMarkup(['First'])
+      const chipSet = new ChipSet(el, { removable: true })
+      const raw = document.createElement('span')
+
+      raw.className = 'chip'
+      raw.textContent = 'Manual'
+      el.append(raw)
+      chipSet.add(raw)
+      Chip.getInstance(raw).dispose()
+      chipSet.remove('Manual')
+
+      expect(el.querySelectorAll('.chip-row')).toHaveSize(1)
+    })
+
+    it('should ignore a removable attribute on a chip of a static set', () => {
+      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip" data-coreui-removable="true">First</span></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el)
+
+      expect(el.querySelector('.chip-remove')).toBeNull()
+      expect(el.querySelector('.chip').hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should ignore the selection attributes of a chip in a set', () => {
+      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip" data-coreui-selectable="true" data-coreui-filter="true" data-coreui-selected="true">First</span></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      const chip = el.querySelector('.chip')
+
+      chip.click()
+
+      expect(chip.hasAttribute('aria-pressed')).toBeFalse()
+      expect(chip.classList.contains('active')).toBeFalse()
+      expect(chip.querySelector('.chip-check')).toBeNull()
+    })
+
+    it('should move between the chips of a grid with the up and down keys', () => {
+      const el = setMarkup(['First', 'Second'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      const [first, second] = el.querySelectorAll('.chip')
+
+      first.focus()
+      first.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+
+      expect(document.activeElement).toEqual(second)
+
+      second.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }))
+
+      expect(document.activeElement).toEqual(first)
+    })
+
+    it('should count a press on the remove button as focus in the chip', () => {
+      fixtureEl.innerHTML = '<input type="text"><div class="chip-set"><span class="chip">First</span><span class="chip">Second</span></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      document.activeElement.blur()
+      el.querySelector('.chip-remove').click()
+
+      expect(document.activeElement).toEqual(el.querySelector('.chip'))
+      expect(document.activeElement.textContent).toContain('Second')
+    })
+
+    it('should take the cell state off the chips of a set no chip can take focus in', () => {
+      const el = setMarkup(['First'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { disabled: true, removable: true })
+
+      expect(el.getAttribute('role')).toBe('group')
+      expect(el.querySelector('.chip').hasAttribute('role')).toBeFalse()
+      expect(el.querySelector('.chip').hasAttribute('aria-disabled')).toBeFalse()
+    })
+
+    it('should write aria-disabled on the host of a disabled removable set', () => {
+      const el = setMarkup(['First'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { disabled: true, removable: true })
+
+      expect(el.getAttribute('aria-disabled')).toEqual('true')
+    })
+
+    it('should keep a link chip a link in a static set, with the list item on its row', () => {
+      fixtureEl.innerHTML = '<div class="chip-set"><a class="chip" href="#x">First</a></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el)
+      const chip = el.querySelector('.chip')
+
+      expect(chip.hasAttribute('role')).toBeFalse()
+      expect(chip.parentElement.classList.contains('chip-row')).toBeTrue()
+      expect(chip.parentElement.getAttribute('role')).toEqual('listitem')
+    })
+
+    it('should give a link chip in a removable set no cell and no row', () => {
+      fixtureEl.innerHTML = '<div class="chip-set"><a class="chip" href="#x">First</a><span class="chip">Second</span></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+      const chip = el.querySelector('a.chip')
+
+      expect(chip.hasAttribute('role')).toBeFalse()
+      expect(chip.closest('.chip-row')).toBeNull()
+      expect(el.querySelector('span.chip').getAttribute('role')).toEqual('gridcell')
+    })
+
+    it('should adopt a chip from another set, leave no empty row and keep removing', () => {
+      fixtureEl.innerHTML = '<div class="chip-set" id="a"><span class="chip">One</span><span class="chip">Two</span></div><div class="chip-set" id="b"></div>'
+      const elementA = fixtureEl.querySelector('#a')
+      const elementB = fixtureEl.querySelector('#b')
+      const setA = new ChipSet(elementA, { removable: true })
+      const setB = new ChipSet(elementB, { removable: true })
+      const moved = elementA.querySelector('.chip')
+
+      setB.add(moved)
+
+      expect(moved.parentElement.getAttribute('role')).toEqual('row')
+      expect(moved.parentElement.parentElement).toEqual(elementB)
+      expect(elementA.querySelectorAll('.chip-row').length).toEqual(1)
+
+      elementA.querySelector('.chip-remove').click()
+
+      expect(setA.getValues()).not.toContain('Two')
+    })
+
+    it('should leave the focus in another field when the remove button is pressed', () => {
+      fixtureEl.innerHTML = '<input type="text"><div class="chip-set"><span class="chip">First</span><span class="chip">Second</span></div>'
+      const el = fixtureEl.querySelector('.chip-set')
+      const input = fixtureEl.querySelector('input')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      input.focus()
+      el.querySelector('.chip-remove').click()
+
+      expect(document.activeElement).toEqual(input)
     })
 
     it('should keep one tab stop in a set and move it with the focus', () => {
       const el = setMarkup(['First', 'Second', 'Third'])
-      const chipSet = new ChipSet(el, { selectable: true })
+      const chipSet = new ChipSet(el, { removable: true })
       const tabStops = () => [...el.querySelectorAll('.chip')].map(chip => chip.getAttribute('tabindex'))
 
       expect(tabStops()).toEqual(['0', '-1', '-1'])
@@ -1426,31 +1373,6 @@ describe('ChipSet', () => {
       chipSet.add('Fourth')
 
       expect(tabStops()).toEqual(['-1', '-1', '0', '-1'])
-    })
-
-    it('should start the chips marked data-coreui-selected as selected', () => {
-      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span><span class="chip" data-coreui-selected="true">Second</span></div>'
-      const chipSet = new ChipSet(fixtureEl.querySelector('.chip-set'), { selectable: true })
-
-      expect(chipSet.getSelectedValues()).toEqual(['Second'])
-    })
-    it('should make every chip of a selectable set an option, whatever role the markup gave it', () => {
-      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip" role="button">First</span></div>'
-
-      const el = fixtureEl.querySelector('.chip-set')
-      // eslint-disable-next-line no-new
-      new ChipSet(el, { selectable: true })
-
-      expect(el.querySelector('.chip').getAttribute('role')).toEqual('option')
-    })
-
-    it('should stamp role option on chips added to a selectable set', () => {
-      const el = setMarkup([])
-      const chipSet = new ChipSet(el, { selectable: true })
-
-      const chip = chipSet.add('Fresh')
-
-      expect(chip.getAttribute('role')).toEqual('option')
     })
   })
 

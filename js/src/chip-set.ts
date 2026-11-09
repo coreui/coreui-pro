@@ -15,9 +15,9 @@ import {
   type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement, resolveChipClassName
 } from './util/chip-values.js'
 import { containsFocus, focusWithTemporaryTabindex } from './util/focus.js'
-import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
+import { REMOVE_ICON } from './util/icons.js'
 import {
-  createTypeaheadBuffer, getRemovalNeighbor, isTypingKey, rangeBetween, type TypeaheadBuffer
+  createTypeaheadBuffer, getRemovalNeighbor, isTypingKey, type TypeaheadBuffer
 } from './util/list-navigation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
@@ -35,32 +35,29 @@ const DATA_API_KEY = '.data-api'
 const EVENT_ADD = 'add'
 const EVENT_REMOVE = 'remove'
 const EVENT_CHANGE = 'change'
-const EVENT_SELECT = 'select'
-const EVENT_CLICK = 'click'
 const EVENT_FOCUSIN = 'focusin'
 const EVENT_KEYDOWN = 'keydown'
 
-const A_KEY = 'a'
+const ARROW_DOWN_KEY = 'ArrowDown'
 const ARROW_LEFT_KEY = 'ArrowLeft'
 const ARROW_RIGHT_KEY = 'ArrowRight'
+const ARROW_UP_KEY = 'ArrowUp'
 const END_KEY = 'End'
 const HOME_KEY = 'Home'
 
-const EVENT_CHIP_SELECTED = 'selected.coreui.chip'
-const EVENT_CHIP_DESELECTED = 'deselected.coreui.chip'
 const EVENT_CHIP_REMOVE = 'remove.coreui.chip'
 const EVENT_CHIP_REMOVED = 'removed.coreui.chip'
 
 const SELECTOR_DATA_CHIP_SET = '[data-coreui-chip-set]'
 const SELECTOR_CHIP = '.chip'
-const SELECTOR_CHIP_ACTIVE = `${SELECTOR_CHIP}.active`
 const SELECTOR_CHIP_REMOVE = '.chip-remove'
+const SELECTOR_CHIP_ROW = '.chip-row'
 const SELECTOR_FOCUSABLE_ITEMS = '.chip[data-coreui-chip-focusable]'
+const SELECTOR_NATIVE_HOST = 'a[href], button'
 
 const CLASS_NAME_CHIP = 'chip'
+const CLASS_NAME_CHIP_ROW = 'chip-row'
 const CLASS_NAME_DISABLED = 'disabled'
-
-const SELECTION_MODE_SINGLE = 'single'
 
 export type ChipSetConfig = {
   ariaAddedAnnouncement: ChipAnnouncement
@@ -68,13 +65,9 @@ export type ChipSetConfig = {
   ariaRemovedAnnouncement: ChipAnnouncement
   chipClassName: string | ((value: string) => string) | null
   disabled: boolean
-  filter: boolean
   maxChips: number | null
   removable: boolean
   removeIcon: string
-  selectable: boolean
-  selectedIcon: string
-  selectionMode: 'multiple' | 'single'
   typeahead: boolean
   unique: boolean
 }
@@ -85,13 +78,9 @@ const Default: ChipSetConfig = {
   ariaRemovedAnnouncement: 'removed',
   chipClassName: null,
   disabled: false,
-  filter: false,
   maxChips: null,
   removable: false,
   removeIcon: REMOVE_ICON,
-  selectable: false,
-  selectedIcon: CHECK_ICON,
-  selectionMode: 'multiple',
   typeahead: true,
   unique: false
 }
@@ -102,13 +91,9 @@ const DefaultType: Record<string, string> = {
   ariaRemovedAnnouncement: '(string|function)',
   chipClassName: '(string|function|null)',
   disabled: 'boolean',
-  filter: 'boolean',
   maxChips: '(number|null)',
   removable: 'boolean',
   removeIcon: 'string',
-  selectable: 'boolean',
-  selectedIcon: 'string',
-  selectionMode: 'string',
   typeahead: 'boolean',
   unique: 'boolean'
 }
@@ -123,7 +108,6 @@ class ChipSet extends BaseComponent {
   protected declare _chips: string[]
   protected declare _ownedChips: Map<HTMLElement, Chip>
   protected declare _input: HTMLElement | null
-  protected declare _anchor: HTMLElement | null
   protected declare _typeaheadBuffer: TypeaheadBuffer
   protected declare _announcedFrom: string[] | null
   protected declare _batch: { added: boolean, removed: boolean } | null
@@ -136,14 +120,13 @@ class ChipSet extends BaseComponent {
     this._pendingFocus = null
     this._chips = []
     this._ownedChips = new Map()
-    this._anchor = null
     this._typeaheadBuffer = createTypeaheadBuffer()
     this._announcedFrom = null
     this._batch = null
     this._settled = false
 
-    this._applyAccessibilityRoles()
     this._initChips()
+    this._syncRoles()
     this._moveTabStop()
     this._addEventListeners()
     queueMicrotask(() => {
@@ -195,8 +178,12 @@ class ChipSet extends BaseComponent {
     }
 
     const element = isElement ? chip : this._createChip(value)
+    const previousRow = element.closest(SELECTOR_CHIP_ROW)
+
     this._appendChip(element)
+    previousRow?.remove()
     this._setupChip(element)
+    this._syncRoles()
     this._moveTabStop()
     this._noteChange()
     this._chips.push(value)
@@ -244,58 +231,21 @@ class ChipSet extends BaseComponent {
     if (instance) {
       instance.remove()
     } else {
-      chip.remove()
+      const row = this._chipRoot(chip)
+
+      row.remove()
       this._handleChipRemoval(chip, value)
     }
 
     return !chip.isConnected
   }
 
-  removeSelected(): void {
-    this._removeChips(this._getSelectedChipElements())
-  }
-
   clear(): void {
     this._removeChips(this._getChipElements())
   }
 
-  selectChip(chip: HTMLElement): void {
-    if (!this._getChipElements().includes(chip)) {
-      return
-    }
-
-    Chip.getInstance(chip)?.select()
-  }
-
-  selectAll(): void {
-    if (!this._config.selectable) {
-      return
-    }
-
-    for (const chip of this._getChipElements()) {
-      Chip.getInstance(chip)?.select()
-    }
-  }
-
-  deselectAll(): void {
-    for (const chip of this._getSelectedChipElements()) {
-      Chip.getInstance(chip)?.deselect()
-    }
-  }
-
-  clearSelection(): void {
-    this.deselectAll()
-    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
-      selected: this.getSelectedValues()
-    })
-  }
-
   getValues(): string[] {
     return [...this._chips]
-  }
-
-  getSelectedValues(): string[] {
-    return this._getSelectedChipElements().map(chip => this._getChipValue(chip))
   }
 
   override dispose(): void {
@@ -311,9 +261,12 @@ class ChipSet extends BaseComponent {
       }
     }
 
-    if (this._containerRole() === 'listbox') {
+    if (this._chipRole()) {
       for (const chip of this._getChipElements()) {
         chip.removeAttribute('role')
+
+        const row = chip.closest(SELECTOR_CHIP_ROW)
+        row?.replaceWith(chip)
       }
     }
 
@@ -323,15 +276,6 @@ class ChipSet extends BaseComponent {
   }
 
   // Private
-  override _configAfterMerge(config: any): any {
-    // Filter chips are selectable by definition.
-    if (config.filter) {
-      config.selectable = true
-    }
-
-    return config
-  }
-
   _canModify(): boolean {
     return !this._disabled
   }
@@ -342,10 +286,6 @@ class ChipSet extends BaseComponent {
 
   _getChipElements(): HTMLElement[] {
     return SelectorEngine.find(SELECTOR_CHIP, this._element as ParentNode)
-  }
-
-  _getSelectedChipElements(): HTMLElement[] {
-    return SelectorEngine.find(SELECTOR_CHIP_ACTIVE, this._element as ParentNode)
   }
 
   _findChipByValue(value: string): HTMLElement | undefined {
@@ -366,6 +306,10 @@ class ChipSet extends BaseComponent {
     return clone.textContent?.trim() || ''
   }
 
+  _chipRoot(chip: HTMLElement): Element {
+    return chip.closest(SELECTOR_CHIP_ROW) ?? chip
+  }
+
   _getFocusableChips(): HTMLElement[] {
     return SelectorEngine.find(SELECTOR_FOCUSABLE_ITEMS, this._element as ParentNode)
   }
@@ -382,26 +326,49 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  // A selectable set is a horizontal listbox: the set element gets the
-  // listbox role and each chip becomes an option, so the chips' selection and
-  // disabled states are expressed on roles that allow them. A non-selectable
-  // set is a plain group (which also legitimizes the documented aria-label).
-  _containerRole(): string | null {
-    return this._config.selectable ? 'listbox' : 'group'
+  _containerRole(leaving: HTMLElement | null = null): string | null {
+    const hasOther = (chips: HTMLElement[]): boolean => chips.some(chip => chip !== leaving)
+
+    if (!this._config.removable) {
+      return hasOther(this._getChipElements()) ? 'list' : null
+    }
+
+    return hasOther(this._getFocusableChips()) ? 'grid' : 'group'
   }
 
-  _applyAccessibilityRoles(): void {
-    const role = this._containerRole()
+  _chipRole(): string | null {
+    return this._config.removable ? 'gridcell' : 'listitem'
+  }
 
-    if (!role) {
+  _roleElement(): HTMLElement | null {
+    return this._element
+  }
+
+  _syncRoles(leaving: HTMLElement | null = null): void {
+    const element = this._roleElement()
+
+    if (!element) {
       return
     }
 
-    const listbox = role === 'listbox'
+    const role = this._containerRole(leaving)
 
-    this._element.setAttribute('role', role)
-    writeAttribute(this._element, 'aria-orientation', listbox ? 'horizontal' : null)
-    writeAttribute(this._element, 'aria-multiselectable', listbox && this._config.selectionMode === 'multiple' ? 'true' : null)
+    writeAttribute(element, 'role', role)
+    writeAttribute(element, 'aria-disabled', this._disabled && ['grid', 'group', 'listbox'].includes(role as string) ? 'true' : null)
+
+    if (this._chipRole() !== 'gridcell') {
+      return
+    }
+
+    for (const chip of this._getChipElements()) {
+      const row = chip.closest(SELECTOR_CHIP_ROW)
+
+      if (row) {
+        writeAttribute(row, 'role', role === 'grid' ? 'row' : null)
+        writeAttribute(chip, 'role', role === 'grid' ? 'gridcell' : null)
+        Chip.getInstance(chip)?._applyState()
+      }
+    }
   }
 
   _moveTabStop(stop: HTMLElement | null = null): void {
@@ -444,26 +411,51 @@ class ChipSet extends BaseComponent {
   }
 
   _setupChip(chip: HTMLElement): void {
-    if (!Chip.getInstance(chip)) {
-      if (this._containerRole() === 'listbox') {
-        chip.setAttribute('role', 'option')
+    const existing = Chip.getInstance(chip)
+
+    if (existing && (this._ownedChips.get(chip) === existing || this._chipRole() === null)) {
+      return
+    }
+
+    existing?.dispose()
+
+    const role = this._chipRole()
+    const isNative = chip.matches(SELECTOR_NATIVE_HOST)
+
+    if (role && (!isNative || role === 'option')) {
+      chip.setAttribute('role', role)
+    }
+
+    if ((role === 'gridcell' && !isNative) || (role === 'listitem' && isNative)) {
+      const row = document.createElement('span')
+
+      row.className = CLASS_NAME_CHIP_ROW
+
+      if (isNative) {
+        row.setAttribute('role', role)
       }
 
-      this._ownedChips.set(chip, new Chip(chip, this._getChipConfig(chip)))
+      chip.replaceWith(row)
+      row.append(chip)
     }
+
+    this._ownedChips.set(chip, new Chip(chip, this._getChipConfig(chip)))
   }
 
   _getChipConfig(chip: HTMLElement): Record<string, any> {
-    // A chip's own data attributes override the set's options.
+    const {
+      filter: _filter, removable, selectable: _selectable, ...attributes
+    } = this._removeDisallowed(Manipulator.getDataAttributes(chip))
+
     return {
       ariaRemoveLabel: this._config.ariaRemoveLabel,
       disabled: this._disabled,
-      filter: this._config.filter,
-      removable: this._config.removable,
+      filter: false,
+      owned: true,
       removeIcon: this._config.removeIcon,
-      selectable: this._config.selectable,
-      selectedIcon: this._config.selectedIcon,
-      ...this._removeDisallowed(Manipulator.getDataAttributes(chip))
+      selectable: false,
+      ...attributes,
+      removable: Boolean(this._config.removable) && removable !== false
     }
   }
 
@@ -487,11 +479,8 @@ class ChipSet extends BaseComponent {
 
   _addEventListeners(): void {
     EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN), SELECTOR_CHIP, event => this._handleKeydown(event))
-    EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), SELECTOR_CHIP, event => this._handleClick(event))
     EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN), SELECTOR_CHIP, event => this._moveTabStop(event.delegateTarget))
 
-    EventHandler.on(this._element, EVENT_CHIP_SELECTED, SELECTOR_CHIP, event => this._handleSelectionChange(event))
-    EventHandler.on(this._element, EVENT_CHIP_DESELECTED, SELECTOR_CHIP, event => this._handleSelectionChange(event))
     EventHandler.on(this._element, EVENT_CHIP_REMOVE, SELECTOR_CHIP, event => this._handleChipRemove(event))
     EventHandler.on(this._element, EVENT_CHIP_REMOVED, SELECTOR_CHIP, event => this._handleChipRemoved(event))
   }
@@ -502,18 +491,13 @@ class ChipSet extends BaseComponent {
       return
     }
 
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === A_KEY) {
-      if (this._selectsRange()) {
-        event.preventDefault()
-        this.selectAll()
-      }
-
+    if (this._handleCommandKey(event)) {
       return
     }
 
     const rtl = isRTL(this._element)
 
-    if ([ARROW_LEFT_KEY, ARROW_RIGHT_KEY, HOME_KEY, END_KEY].includes(event.key)) {
+    if ([ARROW_DOWN_KEY, ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, HOME_KEY, END_KEY].includes(event.key)) {
       this._typeaheadBuffer.clear()
     }
 
@@ -521,25 +505,35 @@ class ChipSet extends BaseComponent {
       case ARROW_LEFT_KEY: {
         event.preventDefault()
         // In RTL the visual direction is mirrored, so ArrowLeft moves to the next chip.
-        this._moveFocus(this._focusSibling(chip as HTMLElement, rtl), event.shiftKey)
+        this._moveFocus(this._focusSibling(chip as HTMLElement, rtl), event.shiftKey, chip as HTMLElement)
         break
       }
 
       case ARROW_RIGHT_KEY: {
         event.preventDefault()
-        this._moveFocus(this._focusSibling(chip as HTMLElement, !rtl), event.shiftKey)
+        this._moveFocus(this._focusSibling(chip as HTMLElement, !rtl), event.shiftKey, chip as HTMLElement)
+        break
+      }
+
+      case ARROW_DOWN_KEY:
+      case ARROW_UP_KEY: {
+        if (this._chipRole() === 'gridcell') {
+          event.preventDefault()
+          this._moveFocus(this._focusSibling(chip as HTMLElement, event.key === ARROW_DOWN_KEY), event.shiftKey, chip as HTMLElement)
+        }
+
         break
       }
 
       case HOME_KEY: {
         event.preventDefault()
-        this._moveFocus(this._navigateToEdge(0), event.shiftKey)
+        this._moveFocus(this._navigateToEdge(0), event.shiftKey, chip as HTMLElement)
         break
       }
 
       case END_KEY: {
         event.preventDefault()
-        this._moveFocus(this._navigateToEdge(-1), event.shiftKey)
+        this._moveFocus(this._navigateToEdge(-1), event.shiftKey, chip as HTMLElement)
         break
       }
 
@@ -551,44 +545,11 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  _handleClick(event: any): void {
-    const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP) as HTMLElement | null
-    if (!chip || chip.classList.contains(CLASS_NAME_DISABLED) || (event.target as HTMLElement).closest(SELECTOR_CHIP_REMOVE)) {
-      return
-    }
-
-    if (event.shiftKey && this._selectsRange()) {
-      this._selectRange(this._anchor ?? chip, chip)
-      return
-    }
-
-    this._anchor = chip
+  _handleCommandKey(_event: any): boolean {
+    return false
   }
 
-  _selectsRange(): boolean {
-    return this._config.selectable && this._config.selectionMode !== SELECTION_MODE_SINGLE
-  }
-
-  _moveFocus(target: HTMLElement | null, extend: boolean): void {
-    if (!target) {
-      return
-    }
-
-    if (extend && this._selectsRange()) {
-      this._selectRange(this._anchor ?? target, target)
-      return
-    }
-
-    this._anchor = target
-  }
-
-  _selectRange(from: HTMLElement, to: HTMLElement): void {
-    const chips = this._getFocusableChips()
-
-    for (const chip of rangeBetween(chips, chips.indexOf(from), chips.indexOf(to))) {
-      Chip.getInstance(chip)?.select()
-    }
-  }
+  _moveFocus(_target: HTMLElement | null, _extend: boolean, _origin: HTMLElement): void {}
 
   _typeahead(key: string): void {
     if (!this._config.typeahead) {
@@ -632,25 +593,6 @@ class ChipSet extends BaseComponent {
     return target
   }
 
-  _handleSelectionChange(event: any): void {
-    const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP)
-    if (this._config.selectionMode === SELECTION_MODE_SINGLE && chip?.matches(SELECTOR_CHIP_ACTIVE)) {
-      this._enforceSingleSelection(chip as HTMLElement)
-    }
-
-    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
-      selected: this.getSelectedValues()
-    })
-  }
-
-  _enforceSingleSelection(selectedChip: HTMLElement): void {
-    for (const chip of this._getSelectedChipElements()) {
-      if (chip !== selectedChip) {
-        Chip.getInstance(chip)?.deselect()
-      }
-    }
-  }
-
   _handleChipRemove(event: any): void {
     const chip = (event.target as HTMLElement).closest<HTMLElement>(SELECTOR_CHIP)
     this._pendingFocus = chip ? this._getRemovalFocusTarget(chip) : null
@@ -663,6 +605,7 @@ class ChipSet extends BaseComponent {
 
     if (target && containsFocus(chip)) {
       if (target === this._element) {
+        this._syncRoles(chip)
         focusWithTemporaryTabindex(this._element)
       } else {
         target.focus()
@@ -674,6 +617,7 @@ class ChipSet extends BaseComponent {
 
   _handleChipRemoval(chip: HTMLElement, value: string): void {
     this._ownedChips.delete(chip)
+    this._syncRoles(chip)
     this._moveTabStop()
 
     const index = this._chips.indexOf(value)
@@ -685,7 +629,7 @@ class ChipSet extends BaseComponent {
     if (this._batch) {
       this._batch.removed = true
     } else {
-      this._reportRemoval()
+      this._triggerChange()
     }
   }
 
@@ -705,20 +649,11 @@ class ChipSet extends BaseComponent {
       if (outer) {
         this._batch = null
 
-        if (batch.removed) {
-          this._reportRemoval()
-        } else if (batch.added) {
+        if (batch.removed || batch.added) {
           this._triggerChange()
         }
       }
     }
-  }
-
-  _reportRemoval(): void {
-    this._triggerChange()
-    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
-      selected: this.getSelectedValues()
-    })
   }
 
   // Static
