@@ -14,6 +14,7 @@ import chipSelectable from './snippets/chip-selectable.js?raw'
 The CoreUI **Bootstrap Chip Input component** lets users enter multiple values as chips inside a single field. Use it as a tag input, multi-value selector, or token field for skills, categories, email recipients, and more. The chip input component supports keyboard-friendly entry, chip removal, and optional selection for bulk actions.
 
 - Type values and press `Enter` (or a separator) to create chips.
+- Text stays in the field until a chip is made from it, so a duplicate, a value past `maxChips` or one the page refuses can be corrected.
 - Chips can be removable and selectable.
 - The input stays inline and grows as you type.
 - Full form integration through a hidden field with a configurable `name`, which the browser validates like any field.
@@ -217,7 +218,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `ariaRemovedAnnouncement` | string, function | `'removed'` | Wording appended to the values of the removed chips when their removal is announced. A function receives the removed values and returns the whole message. |
 | `chipClassName` | string \| function \| null | `null` | Adds classes to chips. Use a string for all chips or a function `(value) => className` for per-chip styling. |
 | `create` | boolean | `true` | Turns typed text into chips. Set to `false` for the controlled mode: chips come only from `add()` — a host component's selection, say — typing never creates one, and no hidden field is rendered (the host owns the value). |
-| `createOnBlur` | boolean | `true` | Create a chip from the input value when the input loses focus. |
+| `createOnBlur` | boolean | `true` | Create chips from the input value when the input loses focus; a piece no chip comes from stays. |
 | `disabled` | boolean | `false` | Disables the input and marks managed chips as non-interactive. |
 | `filter` | boolean | `false` | Turns the chips into filter chips: a check icon is shown on the selected ones. Implies `selectable`. |
 | `id` | string \| null | auto-generated | Custom id for the generated hidden field. |
@@ -272,7 +273,7 @@ chipInput.clear()
 
 | Event | Description |
 | --- | --- |
-| `add.coreui.chip-input` | Fired before a chip is added. Call `event.preventDefault()` to cancel; a value confirmed with <kbd>Enter</kbd> or by leaving the field then stays in it, as it does when `maxChips` or `unique` turns the value down. |
+| `add.coreui.chip-input` | Fired before a chip is added. Call `event.preventDefault()` to cancel; a value then stays in the field, whether confirmed with <kbd>Enter</kbd>, by leaving the field, with a separator or in a paste, as it does when `maxChips` or `unique` turns the value down. |
 | `change.coreui.chip-input` | Fired after any chip is added or removed; `event.value` is the array of chip values. `clear()` and `removeSelected()` fire it once, after the last chip is gone and only when the chips changed, and the value field sends one native `input` and `change` when its value changed, while `remove.coreui.chip-input` still fires for every chip. |
 | `input.coreui.chip-input` | Fired when the inline input value changes; `event.value` is the typed text, not the chips. Contains `relatedTarget`. |
 | `remove.coreui.chip-input` | Fired before a chip is removed. Call `event.preventDefault()` to cancel. |
@@ -306,7 +307,7 @@ The Bootstrap Chip Input component follows WAI-ARIA patterns to ensure the chip 
 - Chips are focusable and keyboard navigable when initialized by the plugin.
 - Each remove button the component creates is named with `ariaRemoveLabel` and the chip's label, `Remove <label>` by default.
 - Adding and removing chips is announced through [`announce()`](/accessibility/screen-readers/#announcing-messages) in the live region of the page, or of the modal dialog around the set, one message per update: the values the set did not hold before, or else the values it no longer holds, joined with commas as in `Vue, Svelte added`, and nothing while the set is hidden; customize the wording with the `ariaAddedAnnouncement` and `ariaRemovedAnnouncement` options. A function in place of the word receives the values and returns the whole message, so a page can put the word first, agree it with the number of chips or give a count for a long list, as in `(values) => values.length > 3 ? values.length + ' chips added' : values.join(', ') + ' added'`.
-- Use a descriptive `aria-label` or `<label>` on the chip input container to communicate its purpose (e.g., "Add skills" or "Recipients").
+- Use a descriptive `aria-label` on the chip input, which also names the field it creates, or a `<label>` to communicate its purpose (e.g., "Add skills" or "Recipients").
 - An `aria-describedby` on the chip input element moves to the text field, after the field's own ids, and the element gets it back on dispose; while the state is `'invalid'` the error message follows it.
 
 ### Keyboard support
@@ -315,8 +316,8 @@ The Bootstrap Chip Input component follows WAI-ARIA patterns to ensure the chip 
 
 | Key | Action |
 | --- | --- |
-| `Enter` | Create chip from current input value |
-| `,` (or separator) | Create chip from current input value |
+| `Enter` | Create a chip from each piece of the input value; a piece no chip comes from stays |
+| `,` (or separator) | Create a chip from the piece the separator completes; a piece no chip comes from stays |
 | `Backspace` / `Delete` | When input is empty, move focus to the last chip |
 | `←` | When cursor is at start, move focus to the last chip |
 | `Escape` | Clear selection, clear input, and blur |

@@ -52,6 +52,83 @@ export const splitChipText = (text: string, separator?: string | null): string[]
   separator && text.includes(separator) ? text.split(separator) : null
 
 /**
+ * Filters a list without some values, each taken out once, so a repeated piece keeps its other copies.
+ *
+ * @param pieces - The list
+ * @param values - The values to take out
+ * @param read - What of a piece is compared, the piece itself by default
+ * @returns The pieces left, in their order
+ */
+export const withoutEach = (pieces: readonly string[], values: readonly string[], read: (piece: string) => string = piece => piece): string[] => {
+  const left = [...values]
+
+  return pieces.filter(piece => {
+    const index = left.indexOf(read(piece))
+
+    if (index === -1) {
+      return true
+    }
+
+    left.splice(index, 1)
+    return false
+  })
+}
+
+/**
+ * Takes the pieces that became chips out of the text of a chip field, each once, with their
+ * separators. Pieces no chip came from stay as they are.
+ *
+ * @param text - The text of the field
+ * @param added - The values of the chips the text became
+ * @param separator - The separator, `null` or left out for none
+ * @returns The text left in the field
+ */
+export const removeChipText = (text: string, added: readonly string[], separator?: string | null): string => {
+  const kept = withoutEach(splitChipText(text, separator) ?? [text], added, piece => piece.trim())
+
+  return kept.some(piece => piece.trim()) ?
+    kept.filter((piece, index) => piece.trim() || index === kept.length - 1).join(separator ?? '') :
+    ''
+}
+
+/**
+ * Finds the pieces of a chip field's text that a newly typed separator completed. A piece that was
+ * complete before is not one of them, so a refused piece is not asked for again, and editing text
+ * without adding a separator completes nothing.
+ *
+ * @param text - The text of the field now
+ * @param previous - The text it held before
+ * @param separator - The separator, `null` or left out for none
+ * @returns The completed pieces, untrimmed
+ */
+export const getNewChipPieces = (text: string, previous: string, separator?: string | null): string[] => {
+  const parts = splitChipText(text, separator)
+  const before = splitChipText(previous, separator) ?? [previous]
+
+  if (!parts || parts.length <= before.length) {
+    return []
+  }
+
+  return withoutEach(parts.slice(0, -1), before.slice(0, -1))
+}
+
+/**
+ * Tells which requested texts a page took, from how its values changed. A text counts when a new
+ * value equals it, letter case aside, so a page that lowercases what it takes still empties the
+ * field and a value that came from somewhere else does not.
+ *
+ * @param requested - The texts asked for
+ * @param previous - The values before the change
+ * @param next - The values after it
+ * @returns The requested texts that became chips
+ */
+export const takeAcceptedChipText = (requested: readonly string[], previous: readonly string[], next: readonly string[]): string[] => {
+  const added = new Set(next.filter(value => !previous.includes(value)).map(value => value.toLowerCase()))
+
+  return requested.filter(text => added.has(text.toLowerCase()))
+}
+
+/**
  * Resolves the extra class of a chip: the string itself, or what a function returns for the
  * chip's value when that is a string.
  *

@@ -10,7 +10,7 @@ import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { splitChipText } from './util/chip-values.js'
+import { getNewChipPieces, removeChipText, splitChipText } from './util/chip-values.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
@@ -99,6 +99,7 @@ class ChipInput extends ChipSet {
   protected declare _uniqueId: string
   protected declare _valueField: HTMLTextAreaElement | null
   protected declare _input: HTMLInputElement
+  private _text = ''
   protected declare _initialChips: HTMLElement[]
   protected declare _removingByCode: boolean
   protected declare _validation: FieldValidation
@@ -274,6 +275,8 @@ class ChipInput extends ChipSet {
 
   _restoreChips(): void {
     const values = this.getValues().join(',')
+
+    this._text = ''
     let hadFocus = false
 
     for (const chip of this._getChipElements()) {
@@ -372,6 +375,14 @@ class ChipInput extends ChipSet {
       this._labelledFor = label
     }
 
+    for (const name of ['aria-label', 'aria-labelledby']) {
+      const value = this._element.getAttribute(name)
+
+      if (value) {
+        input.setAttribute(name, value)
+      }
+    }
+
     this._input = input
     this._setInputSize()
     this._element.append(input)
@@ -398,16 +409,37 @@ class ChipInput extends ChipSet {
       return
     }
 
-    const value = this._input.value.trim()
-    const count = this._chips.length
-    if (value) {
-      this._validation.runAsUser(() => this.add(value))
-    }
+    const text = this._input.value
 
-    if (this._chips.length > count) {
-      this._input.value = ''
-      this._setInputSize()
+    if (text.trim()) {
+      this._addPieces(splitChipText(text, this._config.separator) ?? [text], text)
+    } else {
+      this._writeText('')
     }
+  }
+
+  _addPieces(pieces: string[], text: string): void {
+    const added: string[] = []
+
+    this._validation.runAsUser(() => {
+      for (const piece of pieces) {
+        const count = this._chips.length
+
+        this.add(piece)
+
+        if (this._chips.length > count) {
+          added.push(piece.trim())
+        }
+      }
+    })
+
+    this._writeText(removeChipText(text, added, this._config.separator))
+  }
+
+  _writeText(text: string): void {
+    this._input.value = text
+    this._text = text
+    this._setInputSize()
   }
 
   _applyInteractionState(): void {
@@ -458,7 +490,7 @@ class ChipInput extends ChipSet {
       }
 
       case 'Escape': {
-        this._input.value = ''
+        this._writeText('')
         this._input.blur()
         break
       }
@@ -472,21 +504,15 @@ class ChipInput extends ChipSet {
       return
     }
 
-    const parts = this._config.create ? splitChipText(event.target.value, this._config.separator) : null
+    const text = event.target.value
+    const pieces = this._config.create ? getNewChipPieces(text, this._text, this._config.separator) : []
 
-    if (parts) {
-      const rest = parts.pop() as string
-
-      this._validation.runAsUser(() => {
-        for (const part of parts) {
-          this.add(part)
-        }
-      })
-
-      this._input.value = rest
+    if (pieces.length > 0) {
+      this._addPieces(pieces, text)
+    } else {
+      this._writeText(text)
     }
 
-    this._setInputSize()
     EventHandler.trigger(this._element, EVENT_INPUT, {
       value: this._input.value,
       relatedTarget: this._input
@@ -502,12 +528,7 @@ class ChipInput extends ChipSet {
 
     if (parts) {
       event.preventDefault()
-
-      this._validation.runAsUser(() => {
-        for (const part of parts) {
-          this.add(part)
-        }
-      })
+      this._addPieces(parts, [this._input.value, ...parts].filter(Boolean).join(this._config.separator))
     }
   }
 

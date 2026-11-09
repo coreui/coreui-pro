@@ -2053,4 +2053,165 @@ describe('ChipInput', () => {
       expect(document.activeElement).toEqual(chip)
     })
   })
+
+  describe('text no chip came from', () => {
+    const start = (config = {}) => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, config)
+
+      return { chipInput, element, input: chipInput._input }
+    }
+
+    const type = (input, value) => {
+      input.value = value
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
+    const paste = (input, text) => {
+      const event = new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: new DataTransfer() })
+
+      event.clipboardData.setData('text/plain', text)
+      input.dispatchEvent(event)
+    }
+
+    it('should keep a refused piece in the field at a separator', () => {
+      const { chipInput, element, input } = start()
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        if (event.value === 'no') {
+          event.preventDefault()
+        }
+      })
+      type(input, 'no,yes,')
+
+      expect(chipInput.getValues()).toEqual(['yes'])
+      expect(input.value).toBe('no,')
+    })
+
+    it('should keep what stands in the field and the refused pieces on a paste', () => {
+      const { chipInput, input } = start({ maxChips: 1 })
+
+      input.value = 'draft'
+      paste(input, 'one,two')
+
+      expect(chipInput.getValues()).toEqual(['one'])
+      expect(input.value).toBe('draft,two')
+    })
+
+    it('should add every piece on Enter and keep the refused one', () => {
+      const { chipInput, element, input } = start()
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        if (event.value === 'no') {
+          event.preventDefault()
+        }
+      })
+      input.value = 'no,yes'
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual(['yes'])
+      expect(input.value).toBe('no')
+    })
+
+    it('should not ask again for a refused piece on every key', () => {
+      const { element, input } = start()
+      const asked = []
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        asked.push(event.value)
+        event.preventDefault()
+      })
+      type(input, 'no,')
+      type(input, 'no,a')
+      type(input, 'no,ab')
+      type(input, 'no,ab,')
+
+      expect(asked).toEqual(['no', 'ab'])
+    })
+
+    it('should leave nothing behind for a bare separator or a blank piece', () => {
+      const { chipInput, input } = start()
+
+      type(input, ',')
+      expect(input.value).toBe('')
+
+      paste(input, 'a, b, ')
+      expect(chipInput.getValues()).toEqual(['a', 'b'])
+      expect(input.value).toBe('')
+    })
+
+    it('should add every piece when the field is left and keep the refused one', () => {
+      const { chipInput, element, input } = start()
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        if (event.value === 'no') {
+          event.preventDefault()
+        }
+      })
+      input.value = 'no,yes'
+      input.dispatchEvent(new FocusEvent('blur'))
+
+      expect(chipInput.getValues()).toEqual(['yes'])
+      expect(input.value).toBe('no')
+    })
+
+    it('should count separators from the start again after a form reset', async () => {
+      fixtureEl.innerHTML = '<form><div class="form-control-group chip-input"></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element)
+      let refuse = true
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        if (refuse) {
+          event.preventDefault()
+        }
+      })
+      type(chipInput._input, 'x,y,')
+      refuse = false
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      type(chipInput._input, 'a,b,')
+
+      expect(chipInput.getValues()).toEqual(['a', 'b'])
+    })
+
+    it('should name the field it creates by the name given to the component, also after a new start', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input" aria-label="Skills"></div>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element)
+
+      expect(chipInput._input.getAttribute('aria-label')).toBe('Skills')
+
+      chipInput.dispose()
+
+      expect(new ChipInput(element)._input.getAttribute('aria-label')).toBe('Skills')
+    })
+
+    it('should empty a field holding only spaces on Enter', () => {
+      const { input } = start()
+
+      input.value = '  '
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(input.value).toBe('')
+    })
+
+    it('should treat a separator after Escape as a new one', () => {
+      const { chipInput, element, input } = start()
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        if (event.value === 'no') {
+          event.preventDefault()
+        }
+      })
+      type(input, 'no,')
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      type(input, 'c,')
+
+      expect(chipInput.getValues()).toEqual(['c'])
+    })
+  })
 })
