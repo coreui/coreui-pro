@@ -119,14 +119,62 @@ describe('Chip', () => {
       expect(chipEl.getAttribute('tabindex')).toEqual('0')
     })
 
-    it('should add tabindex when removable', () => {
+    it('should leave the tab stop of a chip on its own to the remove button', () => {
       fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
       new Chip(chipEl, { removable: true })
 
+      expect(chipEl.hasAttribute('tabindex')).toBeFalse()
+      expect(chipEl.hasAttribute('data-coreui-chip-focusable')).toBeFalse()
+      expect(chipEl.querySelector('.chip-remove').hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should give a chip with an owner the focus and keep its button out of the tab order', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl, { owned: true, removable: true })
+
       expect(chipEl.getAttribute('tabindex')).toEqual('0')
+      expect(chipEl.querySelector('.chip-remove').getAttribute('tabindex')).toEqual('-1')
+    })
+
+    it('should take a button the page wrote out of the tab order of a chip with an owner', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag<button type="button" class="chip-remove"></button></span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl, { owned: true, removable: true })
+
+      expect(chipEl.querySelector('.chip-remove').getAttribute('tabindex')).toEqual('-1')
+    })
+
+    it.each([
+      ['a button', '<button type="button" class="chip">Tag</button>'],
+      ['a link', '<a class="chip" href="#x">Tag</a>']
+    ])('should not nest a remove button in a chip on %s', (_, markup) => {
+      fixtureEl.innerHTML = markup
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl, { removable: true })
+
+      expect(chipEl.querySelector('.chip-remove')).toBeNull()
+    })
+
+    it('should remove a chip on its own with Delete on its button', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      const chip = new Chip(chipEl, { removable: true })
+      spyOn(chip, 'remove')
+
+      chipEl.querySelector('.chip-remove').dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))
+
+      expect(chip.remove).toHaveBeenCalled()
     })
 
     it('should write the button role of a selectable chip over a role in the markup', () => {
@@ -250,22 +298,19 @@ describe('Chip', () => {
       expect([...fixtureEl.querySelectorAll('.chip-remove')].map(button => button.getAttribute('aria-label'))).toEqual(['Remove Tag', 'Drop'])
     })
 
-    it('should hide the remove affordance of a chip with a role, which Backspace still removes', () => {
+    it('should ignore removable on a selectable chip, which is a toggle button', () => {
       fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       const chip = new Chip(chipEl, { removable: true, selectable: true })
-      const control = chipEl.querySelector('.chip-remove')
       spyOn(chip, 'remove')
 
       expect(chipEl.getAttribute('role')).toEqual('button')
-      expect(control.tagName).toEqual('SPAN')
-      expect(control.getAttribute('aria-hidden')).toEqual('true')
-      expect(control.hasAttribute('aria-label')).toBeFalse()
+      expect(chipEl.querySelector('.chip-remove')).toBeNull()
 
       chipEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
 
-      expect(chip.remove).toHaveBeenCalled()
+      expect(chip.remove).not.toHaveBeenCalled()
     })
 
     it('should name the remove button from a data attribute template', () => {
@@ -491,11 +536,16 @@ describe('Chip', () => {
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
       new Chip(chipEl, {
-        selected: true, removable: true, selectable: true, filter: true
+        selected: true, selectable: true, filter: true
       })
 
-      expect(chipEl.querySelector('.chip-remove svg line')).not.toBeNull()
       expect(chipEl.querySelector('.chip-check svg path')).not.toBeNull()
+
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+      // eslint-disable-next-line no-new
+      new Chip(fixtureEl.querySelector('.chip'), { removable: true })
+
+      expect(fixtureEl.querySelector('.chip-remove svg line')).not.toBeNull()
     })
 
     it('should not disable sanitization via a data attribute', () => {
@@ -526,7 +576,7 @@ describe('Chip', () => {
       fixtureEl.innerHTML = '<span class="chip" role="option">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
-      const chip = new Chip(chipEl, { selectable: true })
+      const chip = new Chip(chipEl, { owned: true, selectable: true })
 
       chip.select()
 
@@ -881,12 +931,12 @@ describe('Chip', () => {
       expect(chipEl.hasAttribute('aria-selected')).toBe(false)
     })
 
-    it('should keep an author-provided role and use aria-selected on role option', () => {
+    it('should keep the role its owner wrote and use aria-selected on role option', () => {
       fixtureEl.innerHTML = '<span class="chip" role="option">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
-      new Chip(chipEl, { selectable: true })
+      new Chip(chipEl, { owned: true, selectable: true })
 
       expect(chipEl.getAttribute('role')).toEqual('option')
       expect(chipEl.getAttribute('aria-selected')).toEqual('false')
@@ -917,7 +967,7 @@ describe('Chip', () => {
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
-      new Chip(chipEl)
+      new Chip(chipEl, { owned: true })
 
       expect(chipEl.getAttribute('aria-selected')).toEqual('false')
     })

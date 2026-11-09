@@ -8,9 +8,8 @@
 import Chip from './chip.js'
 import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { splitChipText } from './util/chip-values.js'
+import { getNewChipPieces, removeChipText, splitChipText } from './util/chip-values.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
@@ -32,7 +31,6 @@ const DATA_API_KEY = '.data-api'
 
 const EVENT_BLUR = `blur${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
-const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_PASTE = `paste${EVENT_KEY}`
@@ -41,9 +39,11 @@ const SELECTOR_DATA_CHIP_INPUT = '[data-coreui-chip-input]'
 const SELECTOR_CHIP = '.chip'
 const SELECTOR_CHIP_INPUT_LABEL = '.chip-input-label'
 const SELECTOR_CHIP_REMOVE = '.chip-remove'
+const SELECTOR_CHIP_ROW = '.chip-row'
 
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_CHIP_INPUT_FIELD = 'chip-input-field'
+const CLASS_NAME_CHIP_INPUT_GRID = 'chip-input-grid'
 const CLASS_NAME_GROUP = 'form-control-group'
 
 type ChipInputConfig = ChipSetConfig & {
@@ -99,11 +99,15 @@ class ChipInput extends ChipSet {
   protected declare _uniqueId: string
   protected declare _valueField: HTMLTextAreaElement | null
   protected declare _input: HTMLInputElement
+  private _text = ''
   protected declare _initialChips: HTMLElement[]
   protected declare _removingByCode: boolean
   protected declare _validation: FieldValidation
   private _createdInput = false
   private _labelledFor: Element | null = null
+  private _hostName: Array<[string, string]> = []
+  private _gridName: Array<[string, string]> = []
+  protected declare _grid: HTMLElement
 
   constructor(element?: string | Element | null, config?: Partial<ChipInputConfig> | null) {
     super(element, config)
@@ -133,6 +137,7 @@ class ChipInput extends ChipSet {
     }
 
     this._applyInteractionState()
+    this._createGrid()
 
     // In the controlled mode (`create: false`) the chips come from the host —
     // a listbox selection, say — so typed text never becomes a chip and the
@@ -182,6 +187,11 @@ class ChipInput extends ChipSet {
   override dispose(): void {
     this._validation.dispose()
 
+    this._grid.replaceWith(...this._grid.childNodes)
+    for (const [name, value] of this._hostName) {
+      this._element.setAttribute(name, value)
+    }
+
     EventHandler.off(this._input, EVENT_KEY)
     this._valueField?.remove()
 
@@ -203,11 +213,28 @@ class ChipInput extends ChipSet {
     this._validation.configure({ validationState: config.validationState })
   }
 
-  // The container mixes a label, the text input and chips — it is neither a
-  // listbox nor a plain group, so no container role is stamped and the chips
-  // stay generic (their remove buttons carry the actions).
-  override _containerRole(): null {
-    return null
+  override _containerRole(leaving: HTMLElement | null = null): string | null {
+    return this._getFocusableChips().some(chip => chip !== leaving) ? 'grid' : null
+  }
+
+  override _chipRole(): string | null {
+    return this._canModify() && this._config.removable ? 'gridcell' : null
+  }
+
+  override _roleElement(): HTMLElement | null {
+    return this._grid ?? null
+  }
+
+  override _syncRoles(leaving: HTMLElement | null = null): void {
+    super._syncRoles(leaving)
+
+    if (this._grid) {
+      const isNamed = this._grid.hasAttribute('role')
+
+      for (const [name, value] of this._gridName) {
+        writeAttribute(this._grid, name, isNamed ? value : null)
+      }
+    }
   }
 
   override _canModify(): boolean {
@@ -216,21 +243,16 @@ class ChipInput extends ChipSet {
 
   // Chips live before the text field, not at the end of the set.
   override _appendChip(chip: HTMLElement): void {
-    this._element.insertBefore(chip, this._input)
+    this._grid.append(chip)
   }
 
   // Per-chip configuration based on the chip value and the input's
   // disabled/readonly state.
   override _getChipConfig(chip: HTMLElement): Record<string, any> {
-    const disabled = this._disabled || Manipulator.getDataAttribute(chip, 'disabled') === true
+    const config = super._getChipConfig(chip)
+    const disabled = this._disabled || config.disabled
 
-    return {
-      ariaRemoveLabel: this._config.ariaRemoveLabel,
-      disabled,
-      removable: this._config.removable && !this._config.readonly && !disabled,
-      removeIcon: this._config.removeIcon,
-      selectable: this._config.selectable
-    }
+    return { ...config, disabled, removable: config.removable && !this._config.readonly && !disabled }
   }
 
   // Keep the inherited chip instantiation and sync the remove button.
@@ -274,6 +296,8 @@ class ChipInput extends ChipSet {
 
   _restoreChips(): void {
     const values = this.getValues().join(',')
+
+    this._text = ''
     let hadFocus = false
 
     for (const chip of this._getChipElements()) {
@@ -281,20 +305,24 @@ class ChipInput extends ChipSet {
         hadFocus ||= containsFocus(chip)
         Chip.getInstance(chip)?.dispose()
         this._ownedChips.delete(chip)
-        chip.remove()
+
+        const row = this._chipRoot(chip)
+        row.remove()
       }
     }
 
-    let anchor: HTMLElement = this._input
+    let anchor: Element | null = null
 
     for (const chip of this._initialChips.toReversed()) {
       if (!this._element.contains(chip)) {
-        this._element.insertBefore(chip, anchor)
+        this._grid.insertBefore(chip, anchor)
         this._setupChip(chip)
       }
 
-      anchor = chip
+      anchor = this._chipRoot(chip)
     }
+
+    this._syncRoles()
 
     this._chips = this._initialChips.map(chip => this._getChipValue(chip))
     this._setInputSize()
@@ -333,7 +361,6 @@ class ChipInput extends ChipSet {
     EventHandler.on(this._input, EVENT_KEYDOWN, event => this._handleInputKeydown(event))
     EventHandler.on(this._input, EVENT_INPUT, event => this._handleInput(event))
     EventHandler.on(this._input, EVENT_PASTE, event => this._handlePaste(event))
-    EventHandler.on(this._input, EVENT_FOCUS, () => this.clearSelection())
 
     if (this._config.createOnBlur) {
       EventHandler.on(this._input, EVENT_BLUR, (event: any) => {
@@ -372,9 +399,44 @@ class ChipInput extends ChipSet {
       this._labelledFor = label
     }
 
+    for (const name of ['aria-label', 'aria-labelledby']) {
+      const value = this._element.getAttribute(name)
+
+      if (value) {
+        input.setAttribute(name, value)
+      }
+    }
+
     this._input = input
     this._setInputSize()
     this._element.append(input)
+  }
+
+  _createGrid(): void {
+    const grid = document.createElement('div')
+    const label = SelectorEngine.findOne(SELECTOR_CHIP_INPUT_LABEL, this._element as ParentNode)
+
+    grid.className = CLASS_NAME_CHIP_INPUT_GRID
+
+    for (const name of ['aria-label', 'aria-labelledby']) {
+      const value = this._element.getAttribute(name)
+
+      if (value) {
+        this._gridName.push([name, value])
+        this._hostName.push([name, value])
+        this._element.removeAttribute(name)
+      }
+    }
+
+    if (label && this._hostName.length === 0) {
+      label.id ||= getUID(`${NAME}-label`)
+      this._gridName.push(['aria-labelledby', label.id])
+    }
+
+    this._element.insertBefore(grid, this._input)
+    grid.append(...SelectorEngine.find(`${SELECTOR_CHIP_ROW}, ${SELECTOR_CHIP}`, this._element as ParentNode).filter(element => element.parentElement === this._element))
+    this._grid = grid
+    this._syncRoles()
   }
 
   _createValueField(): void {
@@ -398,16 +460,37 @@ class ChipInput extends ChipSet {
       return
     }
 
-    const value = this._input.value.trim()
-    const count = this._chips.length
-    if (value) {
-      this._validation.runAsUser(() => this.add(value))
-    }
+    const text = this._input.value
 
-    if (this._chips.length > count) {
-      this._input.value = ''
-      this._setInputSize()
+    if (text.trim()) {
+      this._addPieces(splitChipText(text, this._config.separator) ?? [text], text)
+    } else {
+      this._writeText('')
     }
+  }
+
+  _addPieces(pieces: string[], text: string): void {
+    const added: string[] = []
+
+    this._validation.runAsUser(() => {
+      for (const piece of pieces) {
+        const count = this._chips.length
+
+        this.add(piece)
+
+        if (this._chips.length > count) {
+          added.push(piece.trim())
+        }
+      }
+    })
+
+    this._writeText(removeChipText(text, added, this._config.separator))
+  }
+
+  _writeText(text: string): void {
+    this._input.value = text
+    this._text = text
+    this._setInputSize()
   }
 
   _applyInteractionState(): void {
@@ -458,7 +541,7 @@ class ChipInput extends ChipSet {
       }
 
       case 'Escape': {
-        this._input.value = ''
+        this._writeText('')
         this._input.blur()
         break
       }
@@ -472,21 +555,15 @@ class ChipInput extends ChipSet {
       return
     }
 
-    const parts = this._config.create ? splitChipText(event.target.value, this._config.separator) : null
+    const text = event.target.value
+    const pieces = this._config.create ? getNewChipPieces(text, this._text, this._config.separator) : []
 
-    if (parts) {
-      const rest = parts.pop() as string
-
-      this._validation.runAsUser(() => {
-        for (const part of parts) {
-          this.add(part)
-        }
-      })
-
-      this._input.value = rest
+    if (pieces.length > 0) {
+      this._addPieces(pieces, text)
+    } else {
+      this._writeText(text)
     }
 
-    this._setInputSize()
     EventHandler.trigger(this._element, EVENT_INPUT, {
       value: this._input.value,
       relatedTarget: this._input
@@ -502,12 +579,7 @@ class ChipInput extends ChipSet {
 
     if (parts) {
       event.preventDefault()
-
-      this._validation.runAsUser(() => {
-        for (const part of parts) {
-          this.add(part)
-        }
-      })
+      this._addPieces(parts, [this._input.value, ...parts].filter(Boolean).join(this._config.separator))
     }
   }
 

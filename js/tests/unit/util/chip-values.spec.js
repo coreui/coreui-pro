@@ -1,5 +1,5 @@
 import {
-  appendChipValues, getChipAnnouncement, getChipRemoveLabel, getChipValues, resolveChipClassName, splitChipText
+  appendChipValues, getChipAnnouncement, getChipRemoveLabel, getChipValues, getNewChipPieces, removeChipText, resolveChipClassName, takeAcceptedChipText, withoutEach, splitChipText
 } from '../../../src/util/chip-values.js'
 
 describe('Chip value utilities', () => {
@@ -131,6 +131,77 @@ describe('Chip value utilities', () => {
 
     it('trims the name when the label is empty', () => {
       expect(getChipRemoveLabel('Remove', '')).toBe('Remove')
+    })
+  })
+
+  describe('removeChipText', () => {
+    it('should take out the pieces that became chips with their separators', () => {
+      expect(removeChipText('a,b,c', ['a', 'c'], ',')).toBe('b')
+      expect(removeChipText('a,', ['a'], ',')).toBe('')
+    })
+
+    it('should take a repeated piece out once', () => {
+      expect(removeChipText('a,a', ['a'], ',')).toBe('a')
+    })
+
+    it('should compare without the spaces around a piece', () => {
+      expect(removeChipText(' a ,b', ['a'], ',')).toBe('b')
+    })
+
+    it('should treat the whole text as one piece without a separator', () => {
+      expect(removeChipText('a,b', ['a,b'], null)).toBe('')
+    })
+
+    it('should leave nothing for blank pieces and keep the piece being typed', () => {
+      expect(removeChipText(',', [], ',')).toBe('')
+      expect(removeChipText('a, ,b', ['a'], ',')).toBe('b')
+      expect(removeChipText('no,', [], ',')).toBe('no,')
+    })
+  })
+
+  describe('withoutEach', () => {
+    it('should take each value out once', () => {
+      expect(withoutEach(['a', 'a', 'b'], ['a'])).toEqual(['a', 'b'])
+    })
+
+    it('should compare what read returns', () => {
+      expect(withoutEach([' a ', 'b'], ['a'], piece => piece.trim())).toEqual(['b'])
+    })
+  })
+
+  describe('getNewChipPieces', () => {
+    it('should return the pieces a new separator completed', () => {
+      expect(getNewChipPieces('a,b,', '', ',')).toEqual(['a', 'b'])
+    })
+
+    it('should skip a piece that was complete before', () => {
+      expect(getNewChipPieces('no,a,', 'no,a', ',')).toEqual(['a'])
+      expect(getNewChipPieces('a,a,', 'a,', ',')).toEqual(['a'])
+    })
+
+    it('should complete nothing without a new separator', () => {
+      expect(getNewChipPieces('V,', 'React,', ',')).toEqual([])
+      expect(getNewChipPieces('ab', 'a', ',')).toEqual([])
+      expect(getNewChipPieces('a,', '', null)).toEqual([])
+    })
+  })
+
+  describe('takeAcceptedChipText', () => {
+    it('should take the texts found among the new values', () => {
+      expect(takeAcceptedChipText(['a', 'b'], [], ['b'])).toEqual(['b'])
+    })
+
+    it('should match a value the page changed the letter case of', () => {
+      expect(takeAcceptedChipText(['Foo', 'Bar'], ['x'], ['x', 'foo'])).toEqual(['Foo'])
+    })
+
+    it('should not take a request for a value from somewhere else', () => {
+      expect(takeAcceptedChipText(['bad'], [], ['other'])).toEqual([])
+    })
+
+    it('should take nothing when no value is new', () => {
+      expect(takeAcceptedChipText(['a'], ['x'], ['x'])).toEqual([])
+      expect(takeAcceptedChipText(['x'], ['x'], ['x'])).toEqual([])
     })
   })
 })

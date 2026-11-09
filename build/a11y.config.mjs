@@ -292,6 +292,30 @@ export const a11yComponents = [
     ]
   },
   {
+    component: 'forms/chip-filter',
+    html: `<div class="chip-set chip-filter" aria-label="Departments" data-coreui-chip-filter>
+    <span class="chip">Design</span>
+    <span class="chip" data-coreui-selected="true">Development</span>
+  </div>`,
+    criteria: [
+      {
+        criterion: '2.1.1',
+        status: 'partial',
+        note: 'Arrow keys and Home/End move focus across chips, and Enter or Space toggles selection; Shift ranges and Ctrl or Cmd + A extend it in multiple mode.'
+      },
+      {
+        criterion: '4.1.2',
+        status: 'built-in',
+        note: 'A horizontal listbox of option chips with aria-selected; aria-required and aria-invalid are on the listbox.'
+      },
+      {
+        criterion: '1.4.1',
+        status: 'built-in',
+        note: 'A selected chip shows a check icon, so the state does not rest on color.'
+      }
+    ]
+  },
+  {
     component: 'forms/chip-input',
     criteria: [
       {
@@ -334,9 +358,9 @@ export const a11yComponents = [
   },
   {
     component: 'components/chip-set',
-    // Audit a representative labelled, selectable, removable set — that is
+    // Audit a representative labelled, removable set — that is
     // what exercises the component's own role/announcement wiring.
-    html: `<div class="chip-set" aria-label="Applied filters" data-coreui-chip-set data-coreui-selectable="true" data-coreui-removable="true">
+    html: `<div class="chip-set" aria-label="Applied filters" data-coreui-chip-set data-coreui-removable="true">
     <span class="chip">Alpha</span>
     <span class="chip">Beta</span>
   </div>`,
@@ -352,17 +376,17 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         status: 'partial',
-        note: 'Arrow keys and Home/End move focus across chips, Enter or Space toggles selection, and Backspace or Delete removes a chip.'
+        note: 'Arrow keys and Home/End move focus across chips, and Backspace or Delete removes a chip.'
       },
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'A selectable set is exposed as a horizontal listbox of role=option chips (aria-selected/aria-disabled valid there); a standalone selectable chip is a toggle button with aria-pressed; a non-selectable set is a role=group, which also legitimizes the documented aria-label.'
+        note: 'A removable set is a grid of gridcell chips in rows, with a real named remove button; a static set is a list of listitem chips; a standalone selectable chip is a toggle button with aria-pressed.'
       },
       {
         criterion: '1.3.1',
         status: 'built-in',
-        note: 'The listbox contains only option children; additions and removals are announced through the live region of the page, not from inside the set.'
+        note: 'The grid contains only rows and the list only items; additions and removals are announced through the live region of the page, not from inside the set.'
       },
       {
         criterion: '4.1.3',

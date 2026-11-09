@@ -44,6 +44,9 @@ execFile('java', ['-version'], (error, stdout, stderr) => {
     // CoreUI custom controls (chip input, OTP) build their labelled <input> in JS on
     // init, so the static markup the validator sees has a `for` with no target yet.
     'The value of the “for” attribute of the “label” element must be the ID of a non-hidden form control.',
+    // Chip Set and Chip Filter write their role in JS on init, so the static markup
+    // the validator sees has an `aria-label` on an element with no role yet.
+    'Possible misuse of .aria-label.*',
     // Astro 6's `redirects` config emits the docs-root redirect as
     // <meta http-equiv="refresh" content="0;url=..."> — valid HTML, but the validator
     // wants a space after the semicolon, and Astro's output isn't configurable.

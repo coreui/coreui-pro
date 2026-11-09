@@ -52,7 +52,7 @@ $chip-input-tokens: defaults(
     position: relative;
     flex-wrap: wrap;
 
-    &.disabled > .chip {
+    &.disabled .chip {
       opacity: var(--#{$prefix}control-group-disabled-opacity);
 
       .chip-remove {
@@ -65,6 +65,10 @@ $chip-input-tokens: defaults(
 
       resize: none;
     }
+  }
+
+  .chip-input-grid {
+    display: contents;
   }
 
   .chip-input-field {

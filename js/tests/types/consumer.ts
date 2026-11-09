@@ -11,7 +11,7 @@
 // type that does not survive declaration emit.
 
 import {
-  Alert, Autocomplete, Calendar, Chip, ChipInput, ChipSet, Combobox, ContextMenu, DateInput, DatePicker, DateRangeInput,
+  Alert, Autocomplete, Calendar, Chip, ChipFilter, ChipInput, ChipSet, Combobox, ContextMenu, DateInput, DatePicker, DateRangeInput,
   DateRangePicker, Dialog, Drawer, Dropdown, Form, ListBox, LoadingButton, Menu, Modal, MultiSelect, Navigation,
   Offcanvas, OTPInput, Popover, Range, RangeSlider, Rating, SearchButton, Stepper, Tab, TimeInput, TimePicker, Toast,
   Toaster, Tooltip, Transfer
@@ -202,7 +202,8 @@ const unknownOptions = [
 // Every component with options type-checks them.
 const otherOptions = [
   new Autocomplete(element, { optionsTemplate: option => `<b>${option.text}</b>`, globalSearch: false, search: 'external' }),
-  new ChipInput(element, { maxChips: 3, selectionMode: 'single' }),
+  new ChipFilter(element, { selectionMode: 'single' }),
+  new ChipInput(element, { maxChips: 3 }),
   new ContextMenu(element, { autoClose: 'outside' }),
   new Dialog(element, { backdrop: 'static' }),
   new Drawer(element, { scroll: true }),
@@ -255,7 +256,7 @@ const otherOptions = [
   // @ts-expect-error — not a submenu trigger
   new Menu(element, { submenuTrigger: 'hovr' }),
   // @ts-expect-error — not a chip selection mode
-  new ChipInput(element, { selectionMode: 'singel' }),
+  new ChipFilter(element, { selectionMode: 'singel' }),
   // @ts-expect-error — a multi select takes a list of options or false
   new MultiSelect(element, { options: true }),
   // @ts-expect-error — not a spinner type

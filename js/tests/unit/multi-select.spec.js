@@ -5577,6 +5577,22 @@ describe('MultiSelect', () => {
         expect(chip(multiSelect, '1').tabIndex).toEqual(-1)
       })
 
+      it('should keep its chips without grid roles, in the focus order, and off the up and down keys', () => {
+        const multiSelect = create()
+        const [first, second] = multiSelect._getChips()
+
+        expect(first).toBeDefined()
+        expect(first.hasAttribute('role')).toBeFalse()
+        expect(first.closest('.chip-row')).toBeNull()
+        expect(first.hasAttribute('tabindex')).toBeTrue()
+        expect(first.querySelector('.chip-remove').getAttribute('tabindex')).toEqual('-1')
+
+        first.focus()
+        first.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+
+        expect(document.activeElement).not.toEqual(second)
+      })
+
       it('should leave focus where it is when a chip without focus is removed', () => {
         const multiSelect = create()
         multiSelect._searchElement.focus()

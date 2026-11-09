@@ -26,6 +26,10 @@ const pages = {
 const pending = {}
 
 const inherited = {
+  chip: {
+    keys: ['owned'],
+    reason: 'set by the component that owns the chip, ChipSet, ChipInput, MultiSelect and ChipFilter; a page sets the behaviour on those'
+  },
   dropdown: {
     keys: ['submenuDelay', 'submenuTrigger'],
     reason: 'inherited from Menu; the dropdown markup has no `.submenu > .menu-item` for them to act on'

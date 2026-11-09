@@ -122,6 +122,7 @@ const sources = (entry, seen = new Set()) => {
 
 const plugins = {
   button: 'buttons',
+  'chip-filter': 'chip-set',
   'chip-input': 'forms/chip-input',
   collapse: 'transitions',
   'context-menu': 'menu',

@@ -16,6 +16,148 @@ describe('ChipInput', () => {
     clearFixture()
   })
 
+  describe('grid', () => {
+    const tick = () => new Promise(resolve => {
+      setTimeout(resolve)
+    })
+
+    const start = (markup = '<span class="chip">One</span><span class="chip">Two</span>', attrs = '', config = {}) => {
+      fixtureEl.innerHTML = `<form><div class="chip-input"${attrs}>${markup}</div></form>`
+
+      const element = fixtureEl.querySelector('.chip-input')
+
+      return { element, form: fixtureEl.querySelector('form'), chipInput: new ChipInput(element, config) }
+    }
+
+    it('should put its chips in a grid inside a host with no role, and leave the field beside it', () => {
+      const { element, chipInput } = start()
+      const grid = element.querySelector('.chip-input-grid')
+
+      expect(element.hasAttribute('role')).toBeFalse()
+      expect(grid.getAttribute('role')).toEqual('grid')
+      expect(grid.nextElementSibling).toEqual(chipInput._input)
+      expect(grid.contains(chipInput._input)).toBeFalse()
+
+      for (const chip of element.querySelectorAll('.chip')) {
+        expect(chip.getAttribute('role')).toEqual('gridcell')
+        expect(chip.parentElement.getAttribute('role')).toEqual('row')
+        expect(chip.parentElement.parentElement).toEqual(grid)
+      }
+    })
+
+    it('should give a grid with nothing to focus no role and no name', () => {
+      const { element } = start('', ' aria-label="Skills"')
+      const grid = element.querySelector('.chip-input-grid')
+
+      expect(grid.hasAttribute('role')).toBeFalse()
+    })
+
+    it('should give the grid its role when the first chip arrives', () => {
+      const { element, chipInput } = start('')
+      const grid = element.querySelector('.chip-input-grid')
+
+      chipInput.add('One')
+
+      expect(grid.getAttribute('role')).toEqual('grid')
+      expect(grid.querySelector('.chip-row .chip')).not.toBeNull()
+    })
+
+    it('should keep the chips of a read-only input out of the grid roles and the focus order', () => {
+      const { element } = start(undefined, '', { readonly: true })
+      const chip = element.querySelector('.chip')
+
+      expect(element.querySelector('.chip-input-grid').hasAttribute('role')).toBeFalse()
+      expect(chip.hasAttribute('role')).toBeFalse()
+      expect(chip.hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should put back a removed chip inside the grid on a reset', async () => {
+      const { element, form, chipInput } = start(undefined, '', { name: 'tags' })
+      const grid = element.querySelector('.chip-input-grid')
+      const [one, two] = element.querySelectorAll('.chip')
+
+      chipInput.remove('One')
+      chipInput.add('Three')
+      form.reset()
+      await tick()
+
+      expect([...element.querySelectorAll('.chip')]).toEqual([one, two])
+      expect(one.parentElement.parentElement).toEqual(grid)
+      expect(one.parentElement.getAttribute('role')).toEqual('row')
+      expect(grid.querySelectorAll('.chip-row')).toHaveSize(2)
+      expect([...new FormData(form).entries()]).toEqual([['tags', 'One,Two']])
+    })
+
+    it('should give the grid back to its chips on dispose', () => {
+      const { element, chipInput } = start()
+      const [one] = element.querySelectorAll('.chip')
+
+      chipInput.dispose()
+
+      expect(element.querySelector('.chip-input-grid')).toBeNull()
+      expect(one.parentElement).toEqual(element)
+      expect(element.querySelector('.chip-row')).toBeNull()
+    })
+
+    it('should name the grid with the name of the host, which comes back on dispose', () => {
+      const { element, chipInput } = start(undefined, ' aria-label="Skills"')
+      const grid = element.querySelector('.chip-input-grid')
+
+      expect(grid.getAttribute('aria-label')).toEqual('Skills')
+      expect(element.hasAttribute('aria-label')).toBeFalse()
+      expect(chipInput._input.getAttribute('aria-label')).toEqual('Skills')
+
+      chipInput.dispose()
+
+      expect(element.getAttribute('aria-label')).toEqual('Skills')
+    })
+
+    it('should name a new instance after dispose with the same name', () => {
+      const { element, chipInput } = start(undefined, ' aria-labelledby="heading"')
+
+      chipInput.dispose()
+
+      const next = new ChipInput(element)
+
+      expect(element.querySelector('.chip-input-grid').getAttribute('aria-labelledby')).toEqual('heading')
+      expect(next._input.getAttribute('aria-labelledby')).toEqual('heading')
+    })
+
+    it('should name the grid with its visible label', () => {
+      const { element } = start('<label class="chip-input-label">Skills</label><span class="chip">One</span>')
+      const label = element.querySelector('.chip-input-label')
+
+      expect(label.id).not.toEqual('')
+      expect(element.querySelector('.chip-input-grid').getAttribute('aria-labelledby')).toEqual(label.id)
+    })
+
+    it('should not copy the name of the host onto a field of the page', () => {
+      const { element } = start('<span class="chip">Vue</span><input type="text" id="own" class="chip-input-field">', ' aria-label="Skills"')
+
+      expect(element.querySelector('#own').hasAttribute('aria-label')).toBeFalse()
+      expect(element.querySelector('.chip-input-grid').getAttribute('aria-label')).toEqual('Skills')
+    })
+
+    it('should ignore the selection attributes of a chip', () => {
+      const { element } = start('<span class="chip" data-coreui-selectable="true" data-coreui-filter="true" data-coreui-selected="true">One</span>')
+      const chip = element.querySelector('.chip')
+
+      chip.click()
+
+      expect(chip.classList.contains('active')).toBeFalse()
+      expect(chip.hasAttribute('aria-pressed')).toBeFalse()
+      expect(chip.querySelector('.chip-check')).toBeNull()
+    })
+
+    it('should not offer selection', () => {
+      const { chipInput } = start()
+
+      expect(chipInput.getSelectedValues).toBeUndefined()
+      expect(chipInput.selectAll).toBeUndefined()
+      expect(chipInput.removeSelected).toBeUndefined()
+    })
+  })
+
   describe('form payload', () => {
     it('should not submit a field the page did not name', () => {
       fixtureEl.innerHTML = '<form id="form"><div class="chip-input"></div></form>'
@@ -534,7 +676,6 @@ describe('ChipInput', () => {
         disabled: false,
         readonly: false,
         removable: true,
-        selectable: false,
         separator: ','
       }))
     })
@@ -545,8 +686,7 @@ describe('ChipInput', () => {
       expect(ChipInput.DefaultType).toEqual(jasmine.objectContaining({
         disabled: 'boolean',
         readonly: 'boolean',
-        removable: 'boolean',
-        selectable: 'boolean'
+        removable: 'boolean'
       }))
     })
   })
@@ -663,22 +803,6 @@ describe('ChipInput', () => {
       new ChipInput(el, { create: false, required: true })
 
       expect(input.hasAttribute('aria-required')).toBeFalse()
-    })
-
-    it('should make its selectable chips toggle buttons with a hidden remove affordance', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"><span class="chip">Design</span><span class="chip" data-coreui-selected="true">QA</span></div>'
-      const el = fixtureEl.querySelector('.chip-input')
-      const chipInput = new ChipInput(el, { selectable: true })
-      const [design, qa] = el.querySelectorAll('.chip')
-
-      expect(el.hasAttribute('role')).toBeFalse()
-      expect(design.getAttribute('role')).toEqual('button')
-      expect(design.getAttribute('aria-pressed')).toEqual('false')
-      expect(design.hasAttribute('aria-selected')).toBeFalse()
-      expect(design.querySelector('button.chip-remove')).toBeNull()
-      expect(design.querySelector('.chip-remove').getAttribute('aria-hidden')).toEqual('true')
-      expect(qa.getAttribute('aria-pressed')).toEqual('true')
-      expect(chipInput.getSelectedValues()).toEqual(['QA'])
     })
     it('should leave the disabled state to the option, not a class in the markup', () => {
       fixtureEl.innerHTML = '<div class="chip-input disabled"></div>'
@@ -1285,129 +1409,6 @@ describe('ChipInput', () => {
     })
   })
 
-  describe('getSelectedValues', () => {
-    it('should return empty array when no chips are selected', () => {
-      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
-
-      const el = fixtureEl.querySelector('.chip-input')
-      const chipInput = new ChipInput(el, { selectable: true })
-
-      chipInput.add('First')
-      chipInput.add('Second')
-
-      expect(chipInput.getSelectedValues()).toEqual([])
-    })
-
-    it('should return values of selected chips', () => {
-      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
-
-      const el = fixtureEl.querySelector('.chip-input')
-      const chipInput = new ChipInput(el, { selectable: true })
-
-      chipInput.add('First')
-      chipInput.add('Second')
-
-      const chips = el.querySelectorAll('.chip')
-      Chip.getInstance(chips[0])?.select()
-
-      expect(chipInput.getSelectedValues()).toEqual(['First'])
-    })
-  })
-
-  describe('clearSelection', () => {
-    it('should deselect all selected chips', () => {
-      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
-
-      const el = fixtureEl.querySelector('.chip-input')
-      const chipInput = new ChipInput(el, { selectable: true })
-
-      chipInput.add('First')
-      chipInput.add('Second')
-
-      const chips = el.querySelectorAll('.chip')
-      Chip.getInstance(chips[0])?.select()
-      Chip.getInstance(chips[1])?.select()
-
-      chipInput.clearSelection()
-
-      expect(chipInput.getSelectedValues()).toEqual([])
-    })
-
-    it('should trigger select event with empty array', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
-
-        const el = fixtureEl.querySelector('.chip-input')
-        const chipInput = new ChipInput(el, { selectable: true })
-
-        chipInput.add('First')
-        const chips = el.querySelectorAll('.chip')
-        Chip.getInstance(chips[0])?.select()
-
-        el.addEventListener('select.coreui.chip-input', event => {
-          expect(event.selected).toEqual([])
-          resolve()
-        })
-
-        chipInput.clearSelection()
-      })
-    })
-  })
-
-  describe('selectChip', () => {
-    it('should select a chip element', () => {
-      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
-
-      const el = fixtureEl.querySelector('.chip-input')
-      const chipInput = new ChipInput(el, { selectable: true })
-
-      chipInput.add('JavaScript')
-      const chipEl = el.querySelector('.chip')
-
-      chipInput.selectChip(chipEl)
-
-      expect(chipEl).toHaveClass('active')
-    })
-
-    it('should not select a chip not belonging to this input', () => {
-      fixtureEl.innerHTML = [
-        '<div class="form-control-group chip-input"></div>',
-        '<span class="chip" tabindex="0">External</span>'
-      ].join('')
-
-      const el = fixtureEl.querySelector('.chip-input')
-      const chipInput = new ChipInput(el, { selectable: true })
-      const externalChip = fixtureEl.querySelector('span.chip')
-      // eslint-disable-next-line no-new
-      new Chip(externalChip, { selectable: true })
-
-      chipInput.selectChip(externalChip)
-
-      expect(externalChip).not.toHaveClass('active')
-    })
-  })
-
-  describe('removeSelected', () => {
-    it('should remove all selected chips', () => {
-      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
-
-      const el = fixtureEl.querySelector('.chip-input')
-      const chipInput = new ChipInput(el, { selectable: true })
-
-      chipInput.add('First')
-      chipInput.add('Second')
-      chipInput.add('Third')
-
-      const chips = el.querySelectorAll('.chip')
-      Chip.getInstance(chips[0])?.select()
-      Chip.getInstance(chips[2])?.select()
-
-      chipInput.removeSelected()
-
-      expect(chipInput.getValues()).toEqual(['Second'])
-    })
-  })
-
   describe('focus', () => {
     it('should focus the text input', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
@@ -1710,50 +1711,6 @@ describe('ChipInput', () => {
     })
   })
 
-  describe('selection events', () => {
-    it('should trigger select event when chip is selected', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
-
-        const el = fixtureEl.querySelector('.chip-input')
-        const chipInput = new ChipInput(el, { selectable: true })
-
-        chipInput.add('JavaScript')
-
-        el.addEventListener('select.coreui.chip-input', event => {
-          expect(event.selected).toContain('JavaScript')
-          resolve()
-        })
-
-        Chip.getInstance(el.querySelector('.chip'))?.select()
-      })
-    })
-
-    it('should trigger select event when chip is deselected', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
-
-        const el = fixtureEl.querySelector('.chip-input')
-        const chipInput = new ChipInput(el, { selectable: true })
-
-        chipInput.add('JavaScript')
-        const chipInstance = Chip.getInstance(el.querySelector('.chip'))
-        chipInstance?.select()
-
-        let callCount = 0
-        el.addEventListener('select.coreui.chip-input', event => {
-          callCount++
-          if (callCount === 1) {
-            expect(event.selected).toEqual([])
-            resolve()
-          }
-        })
-
-        chipInstance?.deselect()
-      })
-    })
-  })
-
   describe('disabled state', () => {
     it('should prevent chip removal when disabled', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
@@ -2051,6 +2008,197 @@ describe('ChipInput', () => {
 
       expect(errors).toEqual([])
       expect(document.activeElement).toEqual(chip)
+    })
+  })
+
+  describe('disabled chip in the grid', () => {
+    it('should bring aria-disabled back when the grid returns', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"><span class="chip" data-coreui-disabled="true">Admin</span><span class="chip">Vue</span></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'))
+      const admin = fixtureEl.querySelector('.chip')
+
+      chipInput.remove('Vue')
+      expect(admin.hasAttribute('aria-disabled')).toBeFalse()
+
+      chipInput.add('React')
+      expect(admin.getAttribute('role')).toEqual('gridcell')
+      expect(admin.getAttribute('aria-disabled')).toEqual('true')
+    })
+  })
+
+  describe('grid name', () => {
+    it('should name the grid while it has a chip to focus and drop the name when it has none', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input" aria-label="Skills"><span class="chip">Vue</span></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'))
+      const grid = fixtureEl.querySelector('.chip-input-grid')
+
+      expect(grid.getAttribute('aria-label')).toBe('Skills')
+
+      chipInput.remove('Vue')
+
+      expect(grid.hasAttribute('role')).toBeFalse()
+      expect(grid.hasAttribute('aria-label')).toBeFalse()
+    })
+  })
+
+  describe('text no chip came from', () => {
+    const start = (config = {}) => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, config)
+
+      return { chipInput, element, input: chipInput._input }
+    }
+
+    const type = (input, value) => {
+      input.value = value
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
+    const paste = (input, text) => {
+      const event = new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: new DataTransfer() })
+
+      event.clipboardData.setData('text/plain', text)
+      input.dispatchEvent(event)
+    }
+
+    it('should keep a refused piece in the field at a separator', () => {
+      const { chipInput, element, input } = start()
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        if (event.value === 'no') {
+          event.preventDefault()
+        }
+      })
+      type(input, 'no,yes,')
+
+      expect(chipInput.getValues()).toEqual(['yes'])
+      expect(input.value).toBe('no,')
+    })
+
+    it('should keep what stands in the field and the refused pieces on a paste', () => {
+      const { chipInput, input } = start({ maxChips: 1 })
+
+      input.value = 'draft'
+      paste(input, 'one,two')
+
+      expect(chipInput.getValues()).toEqual(['one'])
+      expect(input.value).toBe('draft,two')
+    })
+
+    it('should add every piece on Enter and keep the refused one', () => {
+      const { chipInput, element, input } = start()
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        if (event.value === 'no') {
+          event.preventDefault()
+        }
+      })
+      input.value = 'no,yes'
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual(['yes'])
+      expect(input.value).toBe('no')
+    })
+
+    it('should not ask again for a refused piece on every key', () => {
+      const { element, input } = start()
+      const asked = []
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        asked.push(event.value)
+        event.preventDefault()
+      })
+      type(input, 'no,')
+      type(input, 'no,a')
+      type(input, 'no,ab')
+      type(input, 'no,ab,')
+
+      expect(asked).toEqual(['no', 'ab'])
+    })
+
+    it('should leave nothing behind for a bare separator or a blank piece', () => {
+      const { chipInput, input } = start()
+
+      type(input, ',')
+      expect(input.value).toBe('')
+
+      paste(input, 'a, b, ')
+      expect(chipInput.getValues()).toEqual(['a', 'b'])
+      expect(input.value).toBe('')
+    })
+
+    it('should add every piece when the field is left and keep the refused one', () => {
+      const { chipInput, element, input } = start()
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        if (event.value === 'no') {
+          event.preventDefault()
+        }
+      })
+      input.value = 'no,yes'
+      input.dispatchEvent(new FocusEvent('blur'))
+
+      expect(chipInput.getValues()).toEqual(['yes'])
+      expect(input.value).toBe('no')
+    })
+
+    it('should count separators from the start again after a form reset', async () => {
+      fixtureEl.innerHTML = '<form><div class="form-control-group chip-input"></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element)
+      let refuse = true
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        if (refuse) {
+          event.preventDefault()
+        }
+      })
+      type(chipInput._input, 'x,y,')
+      refuse = false
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      type(chipInput._input, 'a,b,')
+
+      expect(chipInput.getValues()).toEqual(['a', 'b'])
+    })
+
+    it('should name the field it creates by the name given to the component, also after a new start', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input" aria-label="Skills"></div>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element)
+
+      expect(chipInput._input.getAttribute('aria-label')).toBe('Skills')
+
+      chipInput.dispose()
+
+      expect(new ChipInput(element)._input.getAttribute('aria-label')).toBe('Skills')
+    })
+
+    it('should empty a field holding only spaces on Enter', () => {
+      const { input } = start()
+
+      input.value = '  '
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(input.value).toBe('')
+    })
+
+    it('should treat a separator after Escape as a new one', () => {
+      const { chipInput, element, input } = start()
+
+      element.addEventListener('add.coreui.chip-input', event => {
+        if (event.value === 'no') {
+          event.preventDefault()
+        }
+      })
+      type(input, 'no,')
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      type(input, 'c,')
+
+      expect(chipInput.getValues()).toEqual(['c'])
     })
   })
 })

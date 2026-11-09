@@ -1,0 +1,170 @@
+---
+title: "Bootstrap 6 Chip Filter"
+name: "Chip filter"
+description: "Bootstrap Chip Filter component for CoreUI — filter chips and choice chips that select values from a fixed list, with keyboard support and form integration."
+---
+
+import chipSelectable from './snippets/chip-selectable.js?raw'
+
+## Overview
+
+The CoreUI **Bootstrap Chip Filter component** turns a fixed list of chips into filter chips: the user picks one or more values and the selection travels with the form. A selected chip shows a check icon. Single selection gives you choice chips.
+
+- Pick one value or many with the `selectionMode` option.
+- Arrow-key navigation, <kbd>Shift</kbd> ranges and <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>A</kbd> in multiple mode.
+- Form integration through a hidden field with a configurable `name`, which the browser validates like any field.
+
+Chips in a filter cannot be removed by the user. To show values the user can take away, use a removable [Chip set](/components/chip-set/#removable-chips), and to let the user type them, use [Chip input](/forms/chip-input/).
+
+## When to use Chip Filter
+
+Use the Bootstrap Chip Filter component when you need:
+
+- **Filter chips** that narrow a list or search results
+- **Choice chips** for picking one option, such as a size
+- A compact **multi-value selector** with every option in view, submitted with an HTML form
+
+## Basic example
+
+Add `data-coreui-chip-filter` to the container. Mark the chips that start selected with `data-coreui-selected="true"`; an `active` class in the markup does not select a chip.
+
+<Example code={`<div class="chip-set chip-filter" aria-label="Departments" data-coreui-chip-filter>
+    <span class="chip">Design</span>
+    <span class="chip" data-coreui-selected="true">Development</span>
+    <span class="chip">Marketing</span>
+    <span class="chip" data-coreui-selected="true">Sales</span>
+  </div>`} />
+
+## Choice chips
+
+Use `data-coreui-selection-mode="single"` to keep at most one chip selected. Selecting a chip deselects the others.
+
+<Example code={`<div class="chip-set chip-filter" aria-label="Size" data-coreui-chip-filter data-coreui-selection-mode="single">
+    <span class="chip" data-coreui-selected="true">Small</span>
+    <span class="chip">Medium</span>
+    <span class="chip">Large</span>
+  </div>`} />
+
+## Reading the selection
+
+`change.coreui.chip-filter` fires once for each change of the selection, with the selected values in `event.value`.
+
+<Example code={`<div id="chipSelectable" class="chip-set chip-filter" aria-label="Team roles">
+    <span class="chip" data-coreui-chip-value="design">Design</span>
+    <span class="chip" data-coreui-chip-value="backend">Backend</span>
+    <span class="chip" data-coreui-chip-value="qa" data-coreui-selected="true">QA</span>
+    <span class="chip" data-coreui-chip-value="devops" data-coreui-selected="true">DevOps</span>
+  </div>
+  <p class="form-text mt-3 mb-0">Selected chips: <span id="chipSelectableOutput">None</span></p>`} sandboxJs={chipSelectable} />
+
+## Forms
+
+Give the filter a `name` and its selection is submitted with the form, in a hidden `<textarea>`, the values separated by commas. A `<label for>` pointing at the filter's `id` names it and moves focus to it.
+
+<Example code={`<form class="row g-3" data-coreui-validate novalidate>
+    <div class="col-12">
+      <label class="form-label" for="chipFilterTopics">Topics</label>
+      <div id="chipFilterTopics" class="chip-set chip-filter" data-coreui-chip-filter data-coreui-name="topics" data-coreui-required="true">
+        <span class="chip">News</span>
+        <span class="chip">Sport</span>
+        <span class="chip">Culture</span>
+      </div>
+      <div class="invalid-feedback">Choose at least one topic.</div>
+    </div>
+    <div class="col-12">
+      <button class="btn btn-primary" type="submit">Submit</button>
+    </div>
+  </form>`} />
+
+The state comes from `validationState`, from `.is-invalid` or `.is-valid` written in the markup, or from a validation that reports the field invalid, as on the [other form fields](/forms/chip-input/#validation). A native reset of the form puts back the selection the filter started with, limited to the options it still lists.
+
+## Usage
+
+### Via data attributes
+
+Add `data-coreui-chip-filter` to initialize the component. Options can be passed as `data-coreui-*` attributes.
+
+```html
+<div class="chip-set chip-filter" aria-label="Size" data-coreui-chip-filter data-coreui-selection-mode="single">
+  <span class="chip">One</span>
+  <span class="chip">Two</span>
+</div>
+```
+
+### Via JavaScript
+
+```js
+const chipFilterElement = document.querySelector('.chip-filter')
+const chipFilter = coreui.ChipFilter.getOrCreateInstance(chipFilterElement, {
+  name: 'sizes',
+  selectionMode: 'single'
+})
+```
+
+### Options
+
+Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-selection-mode="single"`.
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `chipClassName` | string, function, null | `null` | CSS class(es) added to chips created through `add`. A function receives the chip value and returns the class string. |
+| `disabled` | boolean | `false` | Disables interactions and focus for the chips. |
+| `id` | string \| null | `null` | Sets the `id` of the filter, which a `<label for>` can point at. |
+| `maxChips` | number, null | `null` | Maximum number of chips allowed. `null` means no limit. |
+| `name` | string \| null | `null` | Name for the generated hidden field. Without a name the selection is not submitted. |
+| `required` | boolean | `false` | Makes the hidden field required and marks the listbox `aria-required`. |
+| `selectedIcon` | string | SVG | HTML string used as the check icon on selected chips. |
+| `selectionMode` | string | `'multiple'` | Selection behavior: `'multiple'` allows several selected chips, `'single'` keeps at most one. |
+| `typeahead` | boolean | `true` | Moves focus to the chip whose value starts with the typed characters. |
+| `unique` | boolean | `false` | Prevents adding a chip whose value already exists. |
+| `validationState` | string \| null | `null` | The state the filter shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. |
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `add(chip)` | Adds an option. Accepts a `.chip` element or a label string. Returns the chip element or `null` if rejected. |
+| `clear()` | Removes every option. |
+| `deselectAll()` | Deselects every selected chip. |
+| `dispose()` | Destroys the instance and the chip instances it created, and removes the hidden field. The chips stay in the document. |
+| `getInstance(element)` | Static method that returns the instance associated with a DOM element, or `null`. |
+| `getOrCreateInstance(element, config)` | Static method that returns the instance associated with a DOM element, creating it when there is none. |
+| `getSelectedValues()` | Returns the values of the selected chips. |
+| `getValues()` | Returns the values of every option. |
+| `remove(chipOrValue)` | Removes an option by element or value. |
+| `selectAll()` | Selects every chip. |
+| `selectChip(chip)` | Selects a chip element belonging to the filter. |
+| `setValidationState(state)` | Gives the field a validation state, or drops it with `null`. |
+
+### Events
+
+| Event | Description |
+| --- | --- |
+| `add.coreui.chip-filter` | Fires immediately before an option is added through `add`. Cancelable. Carries the `value`. |
+| `change.coreui.chip-filter` | Fired once for each change of the selection; `event.value` is the array of selected values. A change of the list that leaves the selection alone does not fire it. |
+| `remove.coreui.chip-filter` | Fires immediately before an option is removed through `remove`. Cancelable. Carries the `value` and `chip` element. |
+
+## Accessibility
+
+- The filter is a `role="listbox"` with `aria-orientation="horizontal"`, and `aria-multiselectable` in multiple mode. Each chip is a `role="option"` with `aria-selected`.
+- Name the listbox with `aria-label`, `aria-labelledby`, or a `<label for>` pointing at its `id`.
+- `required` puts `aria-required` on the listbox; a validation state puts `aria-invalid` on it and links the message with `aria-describedby`. A submit blocked by an empty filter sends focus to its tab stop.
+- The check icon shows the selected state without relying on color, also in forced colors.
+
+### Keyboard support
+
+| Key | Action |
+| --- | --- |
+| `Enter` / `Space` | Toggle selection of the focused chip |
+| `←` / `→` | Move focus to the previous or next chip |
+| `Home` / `End` | Move focus to the first or last chip |
+| `Shift` + `←` / `→` | Move focus and select every chip from where the range started to the one it lands on |
+| `Shift` + `Home` / `End` | Select every chip from where the range started to the first or last chip |
+| `Ctrl` / `Cmd` + `A` | Select every chip |
+| a printable character | Move focus to the next chip whose value starts with what you typed (`typeahead`) |
+
+`Shift` + click selects every chip between the last one you interacted with and the one you clicked. The selection keys apply when `selectionMode` is `multiple`. They add to the selection and never clear it. Disabled chips are skipped while navigating.
+
+## Customizing
+
+A chip filter uses the layout of [Chip set](/components/chip-set/#customizing) and the [chip tokens](/components/chip/#customizing).
