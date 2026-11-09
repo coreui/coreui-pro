@@ -22,10 +22,10 @@ export type UserValidity = {
 export type ValueField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 
 export type ValueFieldOptions = {
-  disabled?: boolean
+  disabled: boolean
   name?: string | null
   readOnly?: boolean
-  required?: boolean
+  required: boolean
 }
 
 type FormControl = HTMLElement & {
@@ -71,6 +71,8 @@ const STATE_INVALID_MESSAGE = 'Invalid value.'
 const ownedControls = new WeakSet<Element>()
 let stateSerial = 0
 const stateMessages = new WeakMap<Element, string>()
+
+const armedValueFields = new WeakMap<ValueField, () => void>()
 
 /**
  * Creates the record of what the marking functions added to one control.
@@ -816,6 +818,46 @@ export const setStateValidity = (control: FormControl, invalid: boolean): void =
 }
 
 /**
+ * Closes the browser's validation message of a value field armed by `armValueFieldBubble`.
+ * Firefox starts listening for `blur` only after the `focus()` that shows the message returns, by
+ * which time the field has handed its focus on, so the field receives the event here. Does nothing
+ * for a field that is not armed.
+ *
+ * @param field - The value field
+ */
+export const closeValueFieldBubble = (field: ValueField | null | undefined): void => {
+  armedValueFields.get(field as ValueField)?.()
+}
+
+/**
+ * Arms a value field that has just handed its focus on: when the focus leaves the host, the
+ * browser's validation message closes. A field already armed stays as it is.
+ *
+ * @param field - The value field
+ * @param host - The element the focus has to leave
+ */
+export const armValueFieldBubble = (field: ValueField, host: Element): void => {
+  if (armedValueFields.has(field)) {
+    return
+  }
+
+  const close = () => {
+    host.removeEventListener('focusout', handleFocusOut)
+    armedValueFields.delete(field)
+    field.dispatchEvent(new Event('blur'))
+  }
+
+  const handleFocusOut = (event: Event) => {
+    if (!host.contains((event as FocusEvent).relatedTarget as Node | null)) {
+      close()
+    }
+  }
+
+  host.addEventListener('focusout', handleFocusOut)
+  armedValueFields.set(field, close)
+}
+
+/**
  * Creates the field that carries a component's value into its form: a native control the browser
  * validates and submits, left out of the accessibility tree and the tab order, which hands the
  * focus it gets, from a validation or an extension, to the element the user works in. The
@@ -825,18 +867,23 @@ export const setStateValidity = (control: FormControl, invalid: boolean): void =
  * @param tagName - `textarea` for one text value, `select` for a choice from a list, `input` where
  * the value needs a `pattern`
  * @param getFocusTarget - Returns the element that takes the focus instead of the field
+ * @param host - The element the focus has to leave for the browser's message to close
  * @returns The field, not yet in the document
  */
 export const createValueField = <K extends 'input' | 'select' | 'textarea'>(
   tagName: K,
-  getFocusTarget: () => HTMLElement | null | undefined
+  getFocusTarget: () => HTMLElement | null | undefined,
+  host: Element
 ): HTMLElementTagNameMap[K] => {
   const field = document.createElement(tagName)
 
   field.tabIndex = -1
   field.setAttribute('aria-hidden', 'true')
-  field.setAttribute('autocomplete', 'off')
-  field.addEventListener('focus', () => getFocusTarget()?.focus())
+  field.autocomplete = 'off'
+  field.addEventListener('focus', () => {
+    getFocusTarget()?.focus()
+    armValueFieldBubble(field, host)
+  })
 
   return field
 }
@@ -851,7 +898,7 @@ export const createValueField = <K extends 'input' | 'select' | 'textarea'>(
  */
 export const configureValueField = (
   field: ValueField,
-  { disabled = false, name = null, readOnly = false, required = false }: ValueFieldOptions = {}
+  { disabled, name, readOnly = false, required }: ValueFieldOptions
 ): void => {
   field.disabled = disabled
   field.required = required

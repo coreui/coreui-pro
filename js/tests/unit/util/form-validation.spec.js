@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  alignValueField, clearValidationState, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidity,
+  alignValueField, armValueFieldBubble, clearValidationState, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidity,
   getFeedbackIds, getFeedbackText, getServerState, getStateClasses, getUserValidity, getValidationState, isFormValid,
   nextStateSerial, ownValidationState, setStateValidity, splitIds, updateValidationState, validateForm,
   writeValueField
@@ -948,7 +948,7 @@ describe('Form validation utilities', () => {
     it('should create a field the browser validates, out of the accessibility tree and the tab order, that hands its focus on', () => {
       fixtureEl.innerHTML = '<form><button type="button">Target</button></form>'
       const target = fixtureEl.querySelector('button')
-      const field = createValueField('textarea', () => target)
+      const field = createValueField('textarea', () => target, fixtureEl)
 
       fixtureEl.querySelector('form').append(field)
       field.focus()
@@ -957,6 +957,7 @@ describe('Form validation utilities', () => {
       expect(field.getAttribute('aria-hidden')).toBe('true')
       expect(field.tabIndex).toBe(-1)
       expect(field.getAttribute('autocomplete')).toBe('off')
+      expect(createValueField('select', () => null, fixtureEl).getAttribute('autocomplete')).toBe('off')
       expect(field.willValidate).toBeTrue()
       expect(document.activeElement).toBe(target)
     })
@@ -973,7 +974,7 @@ describe('Form validation utilities', () => {
       expect([textarea.disabled, textarea.readOnly, textarea.required, textarea.name]).toEqual([true, true, true, 'tags'])
       expect([select.disabled, select.required, select.name, select.hasAttribute('readonly')]).toEqual([false, false, 'country', false])
 
-      configureValueField(textarea)
+      configureValueField(textarea, {})
 
       expect([textarea.disabled, textarea.readOnly, textarea.required, textarea.hasAttribute('name')]).toEqual([false, false, false, false])
     })
@@ -1024,6 +1025,149 @@ describe('Form validation utilities', () => {
 
       expect([fieldRect.top, fieldRect.height, fieldRect.width]).toEqual([targetRect.top, targetRect.height, 1])
       expect(fieldRect[edge]).toBe(targetRect[edge])
+    })
+
+    describe('validation message of a field that hands its focus on', () => {
+      const setup = () => {
+        fixtureEl.innerHTML = '<form><div><button type="button"></button><button type="button"></button></div><a href="#"></a></form>'
+        const form = fixtureEl.querySelector('form')
+        const host = form.querySelector('div')
+        const [target, sibling] = host.querySelectorAll('button')
+        const outside = form.querySelector('a')
+        const field = createValueField('textarea', () => target, host)
+        const synthetic = []
+
+        host.append(field)
+        field.addEventListener('blur', event => {
+          if (!event.isTrusted) {
+            synthetic.push(event)
+          }
+        })
+
+        return {
+          field, form, host, outside, sibling, synthetic, target
+        }
+      }
+
+      it('should send one blur to the field when the focus leaves the host', () => {
+        const { field, outside, synthetic } = setup()
+
+        field.focus()
+        outside.focus()
+
+        expect(synthetic.length).toBe(1)
+      })
+
+      it('should send one blur when the focus leaves for nothing', () => {
+        const { field, synthetic } = setup()
+
+        field.focus()
+        document.activeElement.blur()
+
+        expect(synthetic.length).toBe(1)
+      })
+
+      it('should send no blur while the focus moves inside the host', () => {
+        const { field, sibling, synthetic } = setup()
+
+        field.focus()
+        sibling.focus()
+
+        expect(synthetic.length).toBe(0)
+      })
+
+      it('should follow the focus inside the host and send the blur when it leaves from another element', () => {
+        const { field, outside, sibling, synthetic } = setup()
+
+        field.focus()
+        sibling.focus()
+        outside.focus()
+
+        expect(synthetic.length).toBe(1)
+      })
+
+      it('should keep one listener when the field takes the focus again from the target', () => {
+        const { field, outside, synthetic, target } = setup()
+
+        field.focus()
+        expect(document.activeElement).toBe(target)
+        field.focus()
+        outside.focus()
+
+        expect(synthetic.length).toBe(1)
+      })
+
+      it('should arm again after the message closed', () => {
+        const { field, outside, synthetic } = setup()
+
+        field.focus()
+        outside.focus()
+        field.focus()
+        outside.focus()
+
+        expect(synthetic.length).toBe(2)
+      })
+
+      it('should send a blur that a capturing form listener hears and a bubbling one does not', () => {
+        const { field, form, outside } = setup()
+        const seen = { bubble: 0, capture: 0 }
+
+        field.focus()
+        form.addEventListener('blur', event => {
+          if (!event.isTrusted) {
+            seen.capture++
+          }
+        }, true)
+        form.addEventListener('blur', event => {
+          if (!event.isTrusted) {
+            seen.bubble++
+          }
+        })
+        outside.focus()
+
+        expect(seen).toEqual({ bubble: 0, capture: 1 })
+      })
+
+      it('should close an armed field and stop listening to the host', () => {
+        const { field, outside, synthetic } = setup()
+
+        field.focus()
+        closeValueFieldBubble(field)
+        outside.focus()
+
+        expect(synthetic.length).toBe(1)
+      })
+
+      it('should do nothing for a field that is not armed or missing', () => {
+        const { field, synthetic } = setup()
+
+        closeValueFieldBubble(field)
+        closeValueFieldBubble(null)
+        closeValueFieldBubble(undefined)
+
+        expect(synthetic.length).toBe(0)
+      })
+
+      it('should arm a field that hands the focus on by itself', () => {
+        const { host, outside, target } = setup()
+        const select = document.createElement('select')
+        const synthetic = []
+
+        host.append(select)
+        select.addEventListener('blur', event => {
+          if (!event.isTrusted) {
+            synthetic.push(event)
+          }
+        })
+        select.addEventListener('focus', () => {
+          target.focus()
+          armValueFieldBubble(select, host)
+        })
+        select.focus()
+        outside.focus()
+
+        expect(synthetic.length).toBe(1)
+      })
     })
 
     it('should send input and change from a field', () => {

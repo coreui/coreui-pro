@@ -395,13 +395,12 @@ class ChipFilter extends ChipSet {
   }
 
   _createValueField(): HTMLTextAreaElement {
-    const field = createValueField('textarea', () => this._focusTarget())
+    const field = createValueField('textarea', () => this._focusTarget(), this._element)
     const value = this.getSelectedValues()
 
     configureValueField(field, {
       disabled: this._disabled,
       name: this._config.name,
-      readOnly: false,
       required: this._config.required
     })
     field.defaultValue = value.join(',')

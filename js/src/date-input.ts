@@ -849,7 +849,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       this._element.append(element)
     }
 
-    this._inputElement ??= createValueField('textarea', () => this._getFirstEmptySection())
+    this._inputElement ??= createValueField('textarea', () => this._getFirstEmptySection(), this._element)
     this._inputElement.defaultValue = this._isBuilt ? this._getResetValue() : ''
     configureValueField(this._inputElement, {
       disabled, name, readOnly: readonly, required
