@@ -409,7 +409,7 @@ class OTPInput extends BaseComponent {
   }
 
   _createValueField(): void {
-    const field = createValueField('input', () => this._getFirstEmptySlot())
+    const field = createValueField('input', () => this._getFirstEmptySlot(), this._element)
     this._resetCode = this._extractValidChars(String(this._config.value ?? '')) ? this._readSlots() : null
     field.defaultValue = this._resetCode ?? this._getInputs().map(input => input.defaultValue).join('')
     this._value = this._readSlots()

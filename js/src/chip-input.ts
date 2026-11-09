@@ -440,7 +440,7 @@ class ChipInput extends ChipSet {
   }
 
   _createValueField(): void {
-    const field = createValueField('textarea', () => this._input)
+    const field = createValueField('textarea', () => this._input, this._element)
 
     field.id = this._uniqueId
     configureValueField(field, {

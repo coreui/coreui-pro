@@ -17,7 +17,7 @@ import { type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement } from
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import FocusTrap from './util/focustrap.js'
-import { type ValidationState } from './util/form-validation.js'
+import { armValueFieldBubble, closeValueFieldBubble, type ValidationState } from './util/form-validation.js'
 import { isComposingKey, settleClick } from './util/layers.js'
 import {
   getRemovalNeighbor, isOpeningF4, isShortcutPress, isTypingKey
@@ -287,8 +287,6 @@ class MultiSelect extends ComboboxBase {
   protected declare _searchElement: any
   protected declare _wrapperElement: any
   protected declare _focustrap: any
-  protected declare _nativeFocusHandler: any
-  protected declare _nativeKeydownHandler: any
 
   constructor(element?: string | Element | null, config?: Partial<MultiSelectConfig> | null) {
     super(element, config)
@@ -317,8 +315,6 @@ class MultiSelect extends ComboboxBase {
 
     this._wrapperElement = null
     this._menu = null
-    this._nativeFocusHandler = null
-    this._nativeKeydownHandler = null
     this._initialSelection = []
     this._known = new Map()
     this._seenValues = new Set()
@@ -367,6 +363,8 @@ class MultiSelect extends ComboboxBase {
   }
 
   override _afterShow(): void {
+    closeValueFieldBubble(this._element as HTMLSelectElement)
+
     if (!this._isShown()) {
       return
     }
@@ -752,11 +750,7 @@ class MultiSelect extends ComboboxBase {
     EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => this._routeTyping(event))
 
     // Validation focuses the overlay select; hand its keystrokes to the custom control.
-    if (this._nativeKeydownHandler) {
-      EventHandler.off(this._element, EVENT_KEYDOWN, this._nativeKeydownHandler)
-    }
-
-    this._nativeKeydownHandler = (event: any) => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
       if (!event.key || event.key === TAB_KEY || event.key === ESCAPE_KEY) {
         return
       }
@@ -780,19 +774,12 @@ class MultiSelect extends ComboboxBase {
       } else if (this._config.search) {
         this._searchElement.focus()
       }
-    }
+    })
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, this._nativeKeydownHandler)
-
-    if (this._nativeFocusHandler) {
-      EventHandler.off(this._element, EVENT_FOCUS, this._nativeFocusHandler)
-    }
-
-    this._nativeFocusHandler = () => {
+    EventHandler.on(this._element, EVENT_FOCUS, () => {
       this._getFocusTarget().focus()
-    }
-
-    EventHandler.on(this._element, EVENT_FOCUS, this._nativeFocusHandler)
+      armValueFieldBubble(this._element as HTMLSelectElement, this._wrapperElement)
+    })
 
     EventHandler.on(this._indicatorElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()

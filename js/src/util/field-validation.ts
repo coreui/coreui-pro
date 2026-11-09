@@ -1,5 +1,5 @@
 import {
-  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
+  closeValueFieldBubble, followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
   ownValidationState, setStateValidity, splitIds, type UserValidity, type ValidationState, type ValueField
 } from './form-validation.js'
 import { writeAttribute } from './index.js'
@@ -364,6 +364,7 @@ class FieldValidation {
     }
 
     for (const field of this._options.fields()) {
+      closeValueFieldBubble(field)
       setStateValidity(field, false)
     }
 

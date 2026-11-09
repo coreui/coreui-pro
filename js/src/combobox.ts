@@ -12,7 +12,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import ListBox, { type ListBoxEntry } from './list-box.js'
 import FieldValidation from './util/field-validation.js'
 import {
-  alignValueField, configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
+  alignValueField, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
 } from './util/form-validation.js'
 import { CARET_ICON } from './util/icons.js'
 import { isOpeningF4, isTypingKey } from './util/list-navigation.js'
@@ -409,7 +409,7 @@ class Combobox extends ComboboxBase {
   }
 
   _createValueField(): void {
-    const field = createValueField('select', () => this._element)
+    const field = createValueField('select', () => this._element, this._element)
 
     field.classList.add(CLASS_NAME_SELECT, CLASS_NAME_INPUT_GROUP_IGNORE)
     field.multiple = this._config.multiple
@@ -588,6 +588,7 @@ class Combobox extends ComboboxBase {
   }
 
   override _mountMenu(): void {
+    closeValueFieldBubble(this._valueField)
     this._listBox?._requestEntry({ preferSelected: true })
     super._mountMenu()
   }
