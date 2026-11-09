@@ -46,6 +46,7 @@ import {
   isPeriodSelected,
   isSameInstantAs,
   isSameDateAs,
+  isTargetSelected,
   isToday,
   isYearBeforeMonth,
   parseToDateString,
@@ -792,43 +793,96 @@ describe('Calendar Utilities', () => {
     })
   })
 
+  describe('isTargetSelected', () => {
+    const start = new Date(2026, 6, 14)
+    const end = new Date(2026, 8, 2)
+
+    it('should compare a day with the ends of the selection', () => {
+      expect(isTargetSelected(new Date(2026, 6, 14), 'days', start, end, 'day', 1)).toBeTrue()
+      expect(isTargetSelected(new Date(2026, 6, 15), 'days', start, end, 'day', 1)).toBeFalse()
+    })
+
+    it('should read a week row by the week its days stand for', () => {
+      expect(isTargetSelected(new Date(2026, 6, 13), 'weeks', start, end, 'week', 1)).toBeTrue()
+      expect(isTargetSelected(new Date(2026, 6, 20), 'weeks', start, end, 'week', 1)).toBeFalse()
+      expect(isTargetSelected(new Date(2026, 6, 12), 'weeks', start, end, 'week', 0)).toBeTrue()
+      expect(isTargetSelected(new Date(2026, 6, 17), 'weeks', start, end, 'week', 0)).toBeTrue()
+      expect(isTargetSelected(new Date(2026, 7, 31), 'weeks', start, end, 'week', 1)).toBeTrue()
+    })
+
+    it('should compare a month, a quarter or a year with the period of each end', () => {
+      expect(isTargetSelected(new Date(2026, 6, 1), 'months', start, end, 'month', 1)).toBeTrue()
+      expect(isTargetSelected(new Date(2026, 7, 1), 'months', start, end, 'month', 1)).toBeFalse()
+      expect(isTargetSelected(new Date(2026, 3, 1), 'quarters', new Date(2026, 4, 1), null, 'quarter', 1)).toBeTrue()
+      expect(isTargetSelected(new Date(2025, 0, 1), 'years', start, null, 'year', 1)).toBeFalse()
+      expect(isTargetSelected(new Date(2026, 8, 1), 'months', start, end, 'month', 1)).toBeTrue()
+    })
+
+    it('should read the month that shows the row of a selected week', () => {
+      expect(isTargetSelected(new Date(2026, 8, 1), 'months', new Date(2026, 7, 31), null, 'week', 2)).toBeTrue()
+      expect(isTargetSelected(new Date(2026, 7, 1), 'months', new Date(2026, 7, 31), null, 'week', 2)).toBeFalse()
+    })
+  })
+
   describe('setRovingTabIndex', () => {
     const selector = 'td[data-coreui-selectable]'
     const panel = cells => `<div class="calendar"><table><tbody><tr>${cells}</tr></tbody></table></div>`
     const cell = (date, attributes = '') => `<td data-coreui-selectable data-coreui-date="${date.toDateString()}" ${attributes}></td>`
     const stops = () => [...fixtureEl.querySelectorAll('[tabindex="0"]')]
+    const none = () => false
+    const on = day => date => date.getTime() === day.getTime()
 
     it('should give the stop to the preferred target, else the selected one, else the closest, else the first', () => {
-      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1)) + cell(new Date(2026, 6, 10)) + cell(new Date(2026, 6, 20), 'class="selected"'))
+      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1)) + cell(new Date(2026, 6, 10)) + cell(new Date(2026, 6, 20)))
       const [first, tenth, selected] = getSelectableDates(fixtureEl, selector)
 
-      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false, tenth)
+      const twentieth = on(new Date(2026, 6, 20))
+
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false, twentieth, tenth)
       expect(stops()).toEqual([tenth])
       expect([first.tabIndex, selected.tabIndex]).toEqual([-1, -1])
 
-      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false)
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false, twentieth)
       expect(stops()).toEqual([selected])
 
-      selected.classList.remove('selected')
-      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false)
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false, none)
       expect(stops()).toEqual([tenth])
 
-      setRovingTabIndex(fixtureEl, selector, null, false)
+      setRovingTabIndex(fixtureEl, selector, null, false, none)
       expect(stops()).toEqual([first])
     })
 
     it('should give the stop to an end of a range, not to a day between the ends', () => {
-      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1), 'aria-selected="true"') + cell(new Date(2026, 6, 10), 'class="selected" aria-selected="true"'))
+      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1), 'aria-selected="true"') + cell(new Date(2026, 6, 10), 'aria-selected="true"'))
       const [, end] = getSelectableDates(fixtureEl, selector)
 
-      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false)
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false, on(new Date(2026, 6, 10)))
       expect(stops()).toEqual([end])
+    })
+
+    it('should not read the selection from a class on the target', () => {
+      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1)) + cell(new Date(2026, 6, 20), 'class="selected"'))
+      const [first] = getSelectableDates(fixtureEl, selector)
+
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false, none)
+      expect(stops()).toEqual([first])
+    })
+
+    it('should ask about the date of the first day cell of a week row', () => {
+      fixtureEl.innerHTML = '<div class="calendar"><table><tbody><tr tabindex="-1" data-coreui-row><td data-coreui-date="Mon Jul 13 2026"></td></tr></tbody></table></div>'
+      const seen = []
+
+      setRovingTabIndex(fixtureEl, 'tr[data-coreui-row]', null, true, date => {
+        seen.push(date.getDate())
+        return true
+      })
+      expect(seen).toEqual([13])
     })
 
     it('should keep one stop per panel', () => {
       fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1))) + panel(cell(new Date(2026, 7, 1)))
 
-      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false)
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false, none)
       expect(stops()).toEqual(getSelectableDates(fixtureEl, selector))
     })
 
@@ -836,17 +890,17 @@ describe('Calendar Utilities', () => {
       fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1))) + panel(cell(new Date(2026, 7, 1)) + cell(new Date(2026, 7, 2)))
       const [july, , second] = getSelectableDates(fixtureEl, selector)
 
-      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false, second)
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false, none, second)
       expect(stops()).toEqual([july, second])
     })
 
     it('should give the grids the stop while no panel has a target and take it back once one has', () => {
       fixtureEl.innerHTML = panel('<td></td>') + panel('<td></td>')
-      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false)
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false, none)
       expect(stops().map(element => element.tagName)).toEqual(['TABLE', 'TABLE'])
 
       fixtureEl.querySelector('td').outerHTML = cell(new Date(2026, 6, 1))
-      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false)
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false, none)
       expect(stops().map(element => element.tagName)).toEqual(['TD'])
     })
 
@@ -854,7 +908,7 @@ describe('Calendar Utilities', () => {
       fixtureEl.innerHTML = panel(`<td tabindex="0"></td>${cell(new Date(2026, 6, 1))}`)
       const [stale] = fixtureEl.querySelectorAll('td')
 
-      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false)
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false, none)
       expect(stale.tabIndex).toBe(-1)
       expect(stops()).toEqual(getSelectableDates(fixtureEl, selector))
     })

@@ -1175,7 +1175,7 @@ export const getMonthDetails = (year: number, month: number, firstDayOfWeek: num
  * @param rows - Whether the targets are week rows, which may start in an adjacent month
  * @returns The closest target, or `undefined` when none qualifies
  */
-const getClosestTarget = <T extends TabStopTarget>(targets: T[], anchor: Date, rows: boolean) : T | undefined => {
+const getClosestTarget = <T extends Omit<TabStopTarget, 'selected'>>(targets: T[], anchor: Date, rows: boolean) : T | undefined => {
   let closest: T | undefined
   let closestGap = Number.POSITIVE_INFINITY
 
@@ -1251,8 +1251,7 @@ export const getClosestSelectable = (elements: HTMLElement[], anchor: Date, rows
         date: position,
         element,
         end: parseToDateString(last),
-        position,
-        selected: element.classList.contains('selected')
+        position
       })
     }
   }
@@ -1262,18 +1261,19 @@ export const getClosestSelectable = (elements: HTMLElement[], anchor: Date, rows
 
 /**
  * Moves the roving tab stop in each `.calendar` panel of a calendar: to
- * `preferred` when the panel holds it, else to the selected target (the one
- * with the `selected` class, which in a range marks its ends, not the days
- * between them), else to the target closest to `anchor`, else to the first.
+ * `preferred` when the panel holds it, else to the target `isSelected` accepts
+ * (in a range its ends, not the days between them), else to the target closest
+ * to `anchor`, else to the first.
  * When no panel has a target, the grids themselves take the stop.
  *
  * @param element - The calendar holding the panels
  * @param selector - The selector of a cell or row that can take the focus
  * @param anchor - The date the stop falls back to, usually the calendar date cut to the unit the view shows
  * @param rows - Whether the targets are week rows
+ * @param isSelected - Whether the date of a cell, or of a week row's first day cell, is selected
  * @param preferred - The target that should keep the stop, usually the focused one
  */
-export const setRovingTabIndex = (element: HTMLElement, selector: string, anchor: Date | null, rows: boolean, preferred?: HTMLElement | null) : void => {
+export const setRovingTabIndex = (element: HTMLElement, selector: string, anchor: Date | null, rows: boolean, isSelected: (date: Date) => boolean, preferred?: HTMLElement | null) : void => {
   const empty = !element.querySelector(selector)
 
   for (const panel of element.querySelectorAll<HTMLElement>('.calendar')) {
@@ -1297,7 +1297,10 @@ export const setRovingTabIndex = (element: HTMLElement, selector: string, anchor
     }
 
     const active = (preferred && targets.includes(preferred) ? preferred : undefined) ??
-      targets.find(target => target.classList.contains('selected')) ??
+      targets.find(target => {
+        const value = (rows ? target.querySelector<HTMLElement>('td[data-coreui-date]') : target)?.dataset.coreuiDate
+        return value && isSelected(parseToDateString(value))
+      }) ??
       (anchor ? getClosestSelectable(targets, anchor, rows) : undefined) ??
       targets[0]
 
@@ -2082,6 +2085,30 @@ export const isPeriodInRange = (date: Date, view: PeriodTypes, start: Date | nul
  */
 export const isPeriodSelected = (date: Date, view: PeriodTypes, start: Date | null, end: Date | null) : boolean =>
   [start, end].some(value => value !== null && getPeriod(value, view) === getPeriod(date, view))
+
+/**
+ * Tells whether a cell or week row of a calendar grid shows an end of the
+ * selection, by the rule that draws its selected state.
+ *
+ * @param date - The date of the cell, or any day of the week row
+ * @param unit - The unit the grid picks
+ * @param start - The selected start
+ * @param end - The selected end
+ * @param selectionType - The unit a selected string names
+ * @param firstDayOfWeek - The day the week rows start on, `0` for Sunday to `6` for Saturday
+ * @returns `true` when the target holds an end of the selection
+ */
+export const isTargetSelected = (date: Date, unit: ViewTypes | 'weeks', start: Date | null, end: Date | null, selectionType: SelectionTypes | undefined, firstDayOfWeek: number) : boolean => {
+  if (unit === 'days') {
+    return isDateSelected(date, start, end)
+  }
+
+  if (unit === 'weeks') {
+    return isPeriodSelected(getWeekRowDate(getStartOfWeek(date, firstDayOfWeek)), unit, start, end)
+  }
+
+  return isPeriodSelected(date, unit, convertToShownDate(start, selectionType, firstDayOfWeek), convertToShownDate(end, selectionType, firstDayOfWeek))
+}
 
 /**
  * Tells whether two dates are the same moment, down to the millisecond.

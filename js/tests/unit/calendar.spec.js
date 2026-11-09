@@ -6647,6 +6647,17 @@ describe('Calendar', () => {
       }
     })
 
+    it('should put the tab stop on the selected month, not on the month the calendar opens on', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'month', startDate: new Date(2026, 2, 10) }) // eslint-disable-line no-new
+      const stop = div.querySelector('td[tabindex="0"]')
+
+      expect(stop.dataset.coreuiDate).toEqual(new Date(2026, 2, 1).toDateString())
+      expect(stop.classList.contains('selected')).toBeTrue()
+    })
+
     it('should disable a week row only when every day of its week is disabled', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -6749,6 +6760,7 @@ describe('Calendar', () => {
         div.querySelector('.btn-month').click()
 
         expect([month(new Date(2026, 7, 1)), month(new Date(2026, 8, 1))]).toEqual([august, !august])
+        expect(div.querySelector('td[tabindex="0"]').classList.contains('selected')).toBeTrue()
       }
     })
 

@@ -57,6 +57,7 @@ import {
   isPeriodDisabled,
   isPeriodInRange,
   isPeriodSelected,
+  isTargetSelected,
   isToday,
   isYearBeforeMonth,
   type KeptDay,
@@ -977,7 +978,14 @@ class Calendar extends BaseComponent {
   }
 
   _updateRovingTabIndex(preferred?: HTMLElement): void {
-    setRovingTabIndex(this._element as HTMLElement, this._rovingSelector(), getStartOfView(this._calendarDate as Date, this._view), this._rowsAreTargets(), preferred)
+    setRovingTabIndex(
+      this._element as HTMLElement,
+      this._rovingSelector(),
+      getStartOfView(this._calendarDate as Date, this._view),
+      this._rowsAreTargets(),
+      date => isTargetSelected(date, this._cellUnit(), this._startDate, this._endDate, this._config.selectionType, this._config.firstDayOfWeek),
+      preferred
+    )
   }
 
   _gridLabel(date: Date): string {
