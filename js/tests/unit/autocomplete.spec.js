@@ -6040,4 +6040,74 @@ describe('Autocomplete', () => {
       expect(element.classList.contains('is-valid')).toBeFalse()
     })
   })
+
+  describe('clear event', () => {
+    const start = () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const element = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(element, { cleaner: true, options: [{ label: 'A', value: 'a' }] })
+      const seen = []
+
+      for (const name of ['change', 'clear']) {
+        element.addEventListener(`${name}.coreui.autocomplete`, () => seen.push(name))
+      }
+
+      return { autocomplete, input: autocomplete._inputElement, seen }
+    }
+
+    it('should fire after change when clear() empties typed text', () => {
+      const { autocomplete, input, seen } = start()
+
+      input.value = 'typed'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      autocomplete.clear()
+
+      expect(seen).toEqual(['change', 'clear'])
+    })
+
+    it('should fire when the cleaner empties a selection', () => {
+      const { autocomplete, seen } = start()
+
+      autocomplete.setValue('a')
+      autocomplete._cleanerElement.click()
+
+      expect(seen).toEqual(['change', 'clear'])
+    })
+
+    it('should not fire on an empty field', () => {
+      const { autocomplete, seen } = start()
+
+      autocomplete.clear()
+
+      expect(seen).toEqual([])
+    })
+
+    it('should report only change when the user types over a selection', () => {
+      const { autocomplete, input, seen } = start()
+
+      autocomplete.setValue('a')
+      input.value = 'Ax'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(seen).toEqual(['change'])
+    })
+
+    it('should report only change when leaving empties a field that takes only defined options', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const element = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(element, { allowOnlyDefinedOptions: true, options: [{ label: 'A', value: 'a' }] })
+      const seen = []
+
+      for (const name of ['change', 'clear']) {
+        element.addEventListener(`${name}.coreui.autocomplete`, () => seen.push(name))
+      }
+
+      autocomplete._inputElement.value = 'xyz'
+      autocomplete._inputElement.dispatchEvent(new Event('input', { bubbles: true }))
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+
+      expect(autocomplete._inputElement.value).toBe('')
+      expect(seen).toEqual(['change'])
+    })
+  })
 })

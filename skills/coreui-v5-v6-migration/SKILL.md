@@ -504,7 +504,7 @@ Any other option change (format, size, labels, icons, `name`, `required`, `reado
 | `cellHover.coreui.calendar` | removed; listen to `mouseover` or `focusin` and read `data-coreui-date` from the cell |
 | `event.dateObject ?? event.date` on picker `dateChange`, `startDateChange`, `endDateChange` | `event.date` (always a `Date` or `null`); the formatted value is `event.formattedDate` |
 
-Change events now fire only when the value changes. Code that relied on an event from `clear()`, `reset()` or a repeated pick of the same value must not expect one.
+Change events now fire only when the value changes. Code that relied on a change event from `clear()`, `reset()` or a repeated pick of the same value when nothing changed must not expect one.
 
 ### Renamed and removed methods
 

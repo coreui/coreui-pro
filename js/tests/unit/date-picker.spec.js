@@ -2836,4 +2836,77 @@ describe('DatePicker', () => {
       expect(picker.getDate().getMinutes()).toEqual(10)
     })
   })
+
+  describe('clear event', () => {
+    const start = date => {
+      fixtureEl.innerHTML = '<div></div>'
+      const element = fixtureEl.querySelector('div')
+      const picker = new DatePicker(element, { date })
+      const seen = []
+
+      for (const name of ['dateChange', 'clear']) {
+        element.addEventListener(`${name}.coreui.date-picker`, () => seen.push(name))
+      }
+
+      return { picker, seen }
+    }
+
+    it('should fire after dateChange when clear() removes a date', () => {
+      const { picker, seen } = start(new Date(2026, 0, 15))
+
+      picker.clear()
+
+      expect(seen).toEqual(['dateChange', 'clear'])
+    })
+
+    it('should not fire without a date', () => {
+      const { picker, seen } = start(null)
+
+      picker.clear()
+
+      expect(seen).not.toContain('clear')
+    })
+
+    it('should fire from the cleaner for a given date the field rejects', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const element = fixtureEl.querySelector('div')
+      const picker = new DatePicker(element, { date: new Date(2026, 0, 15), minDate: new Date(2026, 5, 1) })
+      const seen = []
+
+      element.addEventListener('clear.coreui.date-picker', () => seen.push('clear'))
+      picker._cleanerElement.click()
+
+      expect(seen).toEqual(['clear'])
+    })
+
+    it('should not fire from clear() for a given date the field rejects', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const element = fixtureEl.querySelector('div')
+      const picker = new DatePicker(element, { date: new Date(2026, 0, 15), minDate: new Date(2026, 5, 1) })
+      const seen = []
+
+      element.addEventListener('clear.coreui.date-picker', () => seen.push('clear'))
+      picker.clear()
+
+      expect(seen).toEqual([])
+    })
+
+    it('should fire from the cleaner and from a clear action in the footer', () => {
+      for (const click of [picker => picker._cleanerElement.click(), picker => {
+        picker.show()
+        document.querySelector('[data-coreui-picker-action="clear"]').click()
+      }]) {
+        fixtureEl.innerHTML = '<div id="x"><template data-coreui-template="footer"><button type="button" data-coreui-picker-action="clear">Clear</button></template></div>'
+        const element = fixtureEl.querySelector('#x')
+        const picker = new DatePicker(element, { date: new Date(2026, 0, 15) })
+        const seen = []
+
+        element.addEventListener('clear.coreui.date-picker', () => seen.push('clear'))
+        click(picker)
+
+        expect(seen).toEqual(['clear'])
+        picker.dispose()
+      }
+    })
+  })
 })

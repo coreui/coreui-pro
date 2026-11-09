@@ -170,6 +170,10 @@ class TimePicker extends PickerBase {
   }
 
   clear(): void {
+    this._clearValue(this.getTime() !== null)
+  }
+
+  override _emptyValue(): void {
     this._write(null)
   }
 

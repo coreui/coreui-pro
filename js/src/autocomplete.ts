@@ -45,6 +45,7 @@ const TAB_KEY = 'Tab'
 
 const EVENT_BLUR = `blur${EVENT_KEY}`
 const EVENT_CHANGE = `change${EVENT_KEY}`
+const EVENT_CLEAR = `clear${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
@@ -317,17 +318,8 @@ class Autocomplete extends ComboboxBase {
   }
 
   clear(): void {
-    const isChanged = this._store.size() > 0 || this._shownText !== ''
-
-    this._valueApplied = true
-    this._clearSelection()
-    this._setText('')
-    this.search('')
-    this._filterOptionsList()
-    this._validation.update()
-
-    if (isChanged) {
-      this._triggerChangeEvent(null)
+    if (this._emptyField()) {
+      EventHandler.trigger(this._element, EVENT_CLEAR)
     }
   }
 
@@ -539,7 +531,8 @@ class Autocomplete extends ComboboxBase {
       }
 
       if (this._config.allowOnlyDefinedOptions) {
-        this._clearByUser()
+        this._dismissForClear()
+        this._emptyField()
       }
     })
 
@@ -873,12 +866,32 @@ class Autocomplete extends ComboboxBase {
     return this._selectedOptions().some((option: any) => option.label.trim() === text.trim())
   }
 
+  _emptyField(): boolean {
+    const isChanged = this._store.size() > 0 || this._shownText !== ''
+
+    this._valueApplied = true
+    this._clearSelection()
+    this._setText('')
+    this.search('')
+    this._filterOptionsList()
+    this._validation.update()
+
+    if (isChanged) {
+      this._triggerChangeEvent(null)
+    }
+
+    return isChanged
+  }
+
   _clearByUser(): void {
+    this._dismissForClear()
+    this.clear()
+  }
+
+  _dismissForClear(): void {
     if (this._store.size() > 0 || this._inputElement.value !== '') {
       this._validation.dismiss()
     }
-
-    this.clear()
   }
 
   _emptyByUser(): void {

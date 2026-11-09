@@ -65,6 +65,7 @@ const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
 const SELECTOR_SELECTION = '.multi-select-selection'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
+const EVENT_CLEAR = `clear${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
@@ -687,6 +688,7 @@ class MultiSelect extends ComboboxBase {
         settleClick(event)
         event.stopPropagation()
         this._removeAsUser(() => this.deselectAll())
+        EventHandler.trigger(this._element, EVENT_CLEAR)
 
         if (refocus) {
           this._getFocusTarget().focus()

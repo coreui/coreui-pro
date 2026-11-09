@@ -256,7 +256,7 @@ Add `.form-floating-always` to the wrapper, or to any ancestor, to keep the labe
 
 ## Cleaner functionality
 
-Enable a cleaner button to quickly clear input element:
+Enable a cleaner button to quickly clear input element. When it empties a selection or typed text, the component fires `change.coreui.autocomplete` with `null` and then `clear.coreui.autocomplete`, so a page can tell a clear from typing over a selection:
 
 <Example pro code={`<div data-coreui-autocomplete data-coreui-cleaner="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="With cleaner button..."></div>`} />
 
@@ -375,6 +375,7 @@ The Autocomplete component exposes several events for integrating with applicati
 | Event | Description |
 | --- | --- |
 | `change.coreui.autocomplete` | Fires when the user selects an option, types over a selection or clears it, when `clear()` or the cleaner empties a selection or typed text, and when `setOptions()` changes the selection for `resetSelectionOnOptionsChange`. `event.value` is the option or `null`; text the user typed without a matching option is never reported, read it from the field. The initial `value`, a preselected option and a `setValue()` call do not fire it. |
+| `clear.coreui.autocomplete` | Fires after `change.coreui.autocomplete` when `clear()` or the cleaner empties a selection or typed text. Typing over a selection, or leaving a field that takes only defined options, does not fire it. An empty field fires nothing, and `preventDefault()` has no effect. |
 | `hidden.coreui.autocomplete` | Fired when the dropdown has been hidden and CSS transitions completed. |
 | `hide.coreui.autocomplete` | Event fires immediately when the hide method is called. Call `event.preventDefault()` to keep the menu open. |
 | `input.coreui.autocomplete` | Fires when the search input value changes. |

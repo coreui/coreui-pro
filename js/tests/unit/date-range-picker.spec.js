@@ -1556,4 +1556,79 @@ describe('DateRangePicker', () => {
       expect(el.querySelectorAll('.form-control-action')).toHaveLength(1)
     })
   })
+
+  describe('clear event', () => {
+    const start = config => {
+      fixtureEl.innerHTML = '<div></div>'
+      const element = fixtureEl.querySelector('div')
+      const picker = new DateRangePicker(element, config)
+      const seen = []
+
+      element.addEventListener('clear.coreui.date-range-picker', () => seen.push('clear'))
+
+      return { picker, seen }
+    }
+
+    it('should fire when clear() removes a range, also one with only an end', () => {
+      const whole = start({ endDate: new Date(2026, 0, 20), startDate: new Date(2026, 0, 15) })
+
+      whole.picker.clear()
+      expect(whole.seen).toEqual(['clear'])
+
+      const endOnly = start({ endDate: new Date(2026, 0, 20) })
+
+      endOnly.picker.clear()
+      expect(endOnly.seen).toEqual(['clear'])
+    })
+
+    it('should fire from the cleaner on a field with no date', () => {
+      const { picker, seen } = start({})
+
+      picker._cleanerElement.click()
+
+      expect(seen).toEqual(['clear'])
+    })
+
+    it('should not fire without a range', () => {
+      const { picker, seen } = start({})
+
+      picker.clear()
+
+      expect(seen).toEqual([])
+    })
+
+    it('should fire after the date change events', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const element = fixtureEl.querySelector('div')
+      const picker = new DateRangePicker(element, { endDate: new Date(2026, 0, 20), startDate: new Date(2026, 0, 15) })
+      const seen = []
+
+      for (const name of ['startDateChange', 'endDateChange', 'clear']) {
+        element.addEventListener(`${name}.coreui.date-range-picker`, () => seen.push(name))
+      }
+
+      picker.clear()
+
+      expect(seen.at(-1)).toBe('clear')
+      expect(seen.length).toBeGreaterThan(1)
+    })
+
+    it('should fire from the cleaner and from a clear action in the footer', () => {
+      for (const click of [picker => picker._cleanerElement.click(), picker => {
+        picker.show()
+        document.querySelector('[data-coreui-picker-action="clear"]').click()
+      }]) {
+        fixtureEl.innerHTML = '<div id="x"><template data-coreui-template="footer"><button type="button" data-coreui-picker-action="clear">Clear</button></template></div>'
+        const element = fixtureEl.querySelector('#x')
+        const picker = new DateRangePicker(element, { endDate: new Date(2026, 0, 20), startDate: new Date(2026, 0, 15) })
+        const seen = []
+
+        element.addEventListener('clear.coreui.date-range-picker', () => seen.push('clear'))
+        click(picker)
+
+        expect(seen).toEqual(['clear'])
+        picker.dispose()
+      }
+    })
+  })
 })

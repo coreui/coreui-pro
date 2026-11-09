@@ -9606,4 +9606,21 @@ describe('MultiSelect', () => {
       expect(multiSelect._selectionCleanerElement).not.toBeNull()
     })
   })
+
+  describe('clear event', () => {
+    it('should fire after change when the cleaner removes the selection', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const select = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(select, { multiple: true, options: [{ value: '1', text: 'One', selected: true }] })
+      const seen = []
+
+      for (const name of ['change', 'clear']) {
+        select.addEventListener(`${name}.coreui.multi-select`, () => seen.push(name))
+      }
+
+      multiSelect._selectionCleanerElement.click()
+
+      expect(seen).toEqual(['change', 'clear'])
+    })
+  })
 })
