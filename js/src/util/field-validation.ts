@@ -2,6 +2,7 @@ import {
   closeValueFieldBubble, followUserValidities, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
   ownValidationState, setStateValidity, splitIds, type UserValidity, type ValidationState, type ValueField
 } from './form-validation.js'
+import { resolveFieldState } from './field-state.js'
 import { writeAttribute } from './index.js'
 
 export type FieldValidationConfig = {
@@ -140,31 +141,14 @@ class FieldValidation {
   }
 
   /**
-   * Takes the validation options of a `setConfig` call the component has already type-checked and
-   * stored: the state classes from the markup are no longer the given state, and a call that holds
-   * validation options alone is drawn in place.
-   *
-   * @param config - The options passed to `setConfig`
-   * @returns `true` when the call held validation options only, so the component has nothing to
-   * rebuild
+   * Takes the validation state the component has already type-checked and stored in its
+   * configuration: the state classes from the markup are no longer the given state, and the state
+   * is drawn in place.
    */
-  configure(config: object | null): boolean {
-    const keys = Object.keys(config ?? {})
-    const isValidationOption = (key: string) => key === 'validationState' || Boolean(this._options.aliases && (key === 'invalid' || key === 'valid'))
-
-    if (!keys.some(isValidationOption)) {
-      return false
-    }
-
+  configure(): void {
     this._serverClasses.clear()
     this._serial = nextStateSerial()
-
-    if (keys.every(isValidationOption)) {
-      this.update()
-      return true
-    }
-
-    return false
+    this.update()
   }
 
   /**
@@ -268,7 +252,7 @@ class FieldValidation {
    * while the component can block, so the block takes the message the page and the stylesheet show
    * for them. The message in the description is the feedback of the first field that carries the
    * block, else of the first focus target. The given state is the component's own, else the one
-   * its owners were given; the shown state comes from `_shownState()`. An error of the owner's own
+   * its owners were given; the shown state comes from `resolveFieldState()`. An error of the owner's own
    * marks the focus targets invalid and describes them with the message, but leaves the state class
    * to the owner unless the component shows `'invalid'` itself. Focus and described targets the
    * component no longer lists lose what the controller wrote there. An owner draws its parts after
@@ -289,10 +273,16 @@ class FieldValidation {
    */
   _draw(): void {
     const config = this._options.config()
-    const givenState = this._givenState(config) ?? this._owner?._inheritedState()
     const fields = this._options.fields()
     const blockers = this._options.blockers?.() ?? fields
-    const blocked = givenState === 'invalid' && (this._options.canBlock?.() ?? !config.disabled) ? blockers : []
+    const facts = {
+      canBlock: this._options.canBlock?.() ?? !config.disabled,
+      given: this._givenState(config),
+      inherited: this._owner?._inheritedState(),
+      ownError: this._hasError(),
+      ownerError: Boolean(this._owner?._options.ownError?.())
+    }
+    const blocked = resolveFieldState(facts).blocks ? blockers : []
 
     for (const field of fields) {
       if (!blocked.includes(field)) {
@@ -300,9 +290,8 @@ class FieldValidation {
       }
     }
 
-    const shownState = this._shownState(givenState)
-    const isInvalid = shownState === 'invalid' || Boolean(this._owner?._options.ownError?.())
-    const state = isInvalid && shownState !== 'invalid' ? undefined : shownState
+    const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
+    const { invalid: isInvalid, state } = resolveFieldState({ ...facts, reported: reported.includes('invalid'), user: reported.find(Boolean) })
 
     this._drawStateClass(state ? `is-${state}` : null)
 
@@ -360,24 +349,6 @@ class FieldValidation {
 
       writeAttribute(this._host, 'aria-describedby', [...new Set([...this._describedBy, ...ids])].join(' ') || null)
     }
-  }
-
-  /**
-   * Reads the state the component shows: `'invalid'` for an error of its own or of a part at any
-   * depth, else the given state, else `'invalid'` when a validation reported a field whose value is
-   * invalid, else what the stylesheet shows for the fields.
-   *
-   * @param givenState - The state the component or one of its owners was given
-   * @returns The state to show, or `undefined` for none
-   */
-  _shownState(givenState: ValidationState | undefined): ValidationState | undefined {
-    if (this._hasError()) {
-      return 'invalid'
-    }
-
-    const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
-
-    return givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
   }
 
   /**

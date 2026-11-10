@@ -345,7 +345,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
   setValidationState(validationState: ValidationState | null): void {
     this._config = this._getConfig({ ...this._config, validationState })
-    this._validation.configure({ validationState })
+    this._validation.configure()
   }
 
   override dispose(): void {

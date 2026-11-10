@@ -360,7 +360,7 @@ class DateRangeInput extends BaseComponent {
     }
 
     this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._validation.configure({ validationState: config.validationState })
+    this._validation.configure()
   }
 
   _createDateRangeInput(): void {

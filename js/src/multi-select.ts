@@ -79,8 +79,6 @@ const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SELECT = 'multi-select'
 const HOST_ATTRIBUTES = ['id', 'name']
 const CLASS_NAME_SELECT_FILLED = 'multi-select-filled'
@@ -543,7 +541,7 @@ class MultiSelect extends ComboboxBase {
     const state = { invalid: false, valid: false, validationState }
 
     this._config = this._getConfig({ ...this._config, ...state })
-    this._validation.configure(state)
+    this._validation.configure()
   }
 
   setValue(value: MultiSelectConfig['value']): void {
@@ -984,11 +982,7 @@ class MultiSelect extends ComboboxBase {
 
     this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
 
-    for (const className of this._element.classList) {
-      if (className !== CLASS_NAME_IS_INVALID && className !== CLASS_NAME_IS_VALID) {
-        wrapper.classList.add(className)
-      }
-    }
+    wrapper.classList.add(...this._element.classList)
 
     this._wrapperElement = wrapper
     // The wrapper takes the native select's place, then the select moves inside it
