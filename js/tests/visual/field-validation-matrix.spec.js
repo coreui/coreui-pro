@@ -38,7 +38,7 @@ const COMPONENTS = {
   autocomplete: '<div data-coreui-autocomplete data-coreui-id="field" data-coreui-name="v" data-coreui-options="Alpha, Beta" data-coreui-required="true"></div>',
   combobox: '<button class="form-control combobox-toggle" type="button" id="field" data-coreui-toggle="combobox" data-coreui-name="v" data-coreui-required="true"></button><div class="popup combobox-popup"><div class="list-box"><div class="list-box-options" role="listbox" aria-label="Field"><div class="list-box-option" data-coreui-value="a">Alpha</div><div class="list-box-option" data-coreui-value="b">Beta</div></div></div></div>',
   multiselect: '<select id="field" data-coreui-multi-select multiple data-coreui-required="true" name="v"><option value="a">Alpha</option><option value="b">Beta</option></select>',
-  chipinput: '<div id="field" class="chip-input" data-coreui-chip-input data-coreui-name="v" data-coreui-required="true"></div>',
+  chipinput: '<div id="field" class="chip-input" data-coreui-chip-input data-coreui-name="v" data-coreui-required="true"><label class="chip-input-label" for="field-input">Field</label></div>',
   chipfilter: '<div id="field" class="chip-set chip-filter" aria-labelledby="lbl" data-coreui-chip-filter data-coreui-name="v" data-coreui-required="true"><span class="chip">Alpha</span><span class="chip">Beta</span></div>',
   dateinput: '<div id="field" class="form-control form-date-time" data-coreui-date-input data-coreui-locale="en-US" data-coreui-name="v" data-coreui-required="true" aria-labelledby="lbl"></div>',
   timeinput: '<div id="field" class="form-control form-date-time" data-coreui-time-input data-coreui-locale="en-US" data-coreui-name="v" data-coreui-required="true" aria-labelledby="lbl"></div>',
@@ -131,7 +131,6 @@ const sourceCell = cell => CUSTOM.includes(cell.component) && cell.mode === 'm2'
 const COVERAGE = new Map([...RULES.map(([title, applies]) => [title, applies]), ...SOURCE_RULES.map(title => [title, sourceCell])])
 
 const KNOWN_FAILURES = [
-  ['submit: the focused element has an accessible name', ['chipinput'], ALL_MODES, ['']],
   ['submit m1/m2: invalid colour in the field', ['chipfilter', 'rating'], ['m1', 'm2'], ['']],
   ['submit m2: the focused element is invalid for assistive technology', ['chipfilter'], ['m2'], ['']],
   ['submit m2: the focused element is described by BAD', ['chipfilter'], ['m2'], ['']],
