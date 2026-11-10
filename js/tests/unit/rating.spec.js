@@ -2388,12 +2388,18 @@ describe('Rating', () => {
       expect(form.checkValidity()).toBeFalse()
     })
 
-    it('should keep a given valid state over what the form plugin reports', () => {
-      const { element, form } = mountInForm({ required: true, validationState: 'valid' })
+    it('should show what the form plugin reports over a given valid state, and the given state again once the value is valid', () => {
+      const { element, form, rating } = mountInForm({ required: true, validationState: 'valid' })
 
       form.setAttribute('data-coreui-validate', '')
       form.noValidate = true
       Form.getOrCreateInstance(form).validate()
+
+      expect(element).toHaveClass('is-invalid')
+      expect(element).not.toHaveClass('is-valid')
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
+
+      rating.setValue(3)
 
       expect(element).toHaveClass('is-valid')
       expect(element.hasAttribute('aria-invalid')).toBeFalse()

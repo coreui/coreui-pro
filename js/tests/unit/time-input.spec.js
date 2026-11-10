@@ -76,6 +76,43 @@ describe('TimeInput', () => {
       expect(hour.hasAttribute('aria-invalid')).toBeFalse()
       expect(form.checkValidity()).toBeTrue()
     })
+
+    it('should block the submit of an optional field while the user enters a time outside minDate and maxDate, and lift the block once the time is corrected', () => {
+      for (const [config, feedback, message, typed, corrected] of [
+        [{ maxDate: '17:00' }, '<div class="invalid-feedback">Pick a time before 17:00.</div>', 'Pick a time before 17:00.', '1830', '16'],
+        [{ minDate: '09:00' }, '', 'Invalid value.', '0830', '10']
+      ]) {
+        fixtureEl.innerHTML = `<form><div class="time-input"></div>${feedback}</form>`
+        const form = fixtureEl.querySelector('form')
+        const timeInput = new TimeInput(fixtureEl.querySelector('.time-input'), { format: 'HH:mm', name: 'at', ...config })
+        const field = fixtureEl.querySelector('.form-date-time > textarea')
+        const [hour] = getSections(timeInput._element)
+
+        hour.focus()
+
+        for (const key of typed) {
+          pressKey(document.activeElement, key)
+        }
+
+        expect(timeInput._element.classList.contains('is-invalid')).toBeTrue()
+        expect(form.checkValidity()).toBeFalse()
+        expect(field.validity.customError).toBeTrue()
+        expect(field.validationMessage).toEqual(message)
+
+        hour.focus()
+
+        for (const key of corrected) {
+          pressKey(hour, key)
+        }
+
+        expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, Number(corrected), 30))
+        expect(form.checkValidity()).toBeTrue()
+        expect(field.validity.valid).toBeTrue()
+        expect(timeInput._element.classList.contains('is-invalid')).toBeFalse()
+        expect([...getSections(timeInput._element)].map(section => section.hasAttribute('aria-invalid'))).toEqual([false, false])
+        timeInput.dispose()
+      }
+    })
   })
 
   describe('setters', () => {

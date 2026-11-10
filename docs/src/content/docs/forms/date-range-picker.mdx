@@ -157,8 +157,9 @@ calendar are turned off.
 ## Disabled dates
 
 <Example pro code={`<div class="row">
-    <div class="col-lg-7">
+    <div class="col-lg-7 form-field">
       <div id="myDateRangePickerDisabledDates"></div>
+      <div class="invalid-feedback">We are closed on this date.</div>
     </div>
   </div>`} sandboxJs={dateRangePickerDisabledDates} />
 
@@ -169,8 +170,9 @@ calendar are turned off.
 Set `allowDisabledDatesInRange` to let a range run across disabled dates, for example a flight that only needs its two travel days free. A disabled date still cannot be picked as an end, the disabled dates in between stay disabled, and the value holds only the two ends.
 
 <Example pro code={`<div class="row">
-    <div class="col-lg-7">
+    <div class="col-lg-7 form-field">
       <div id="myDateRangePickerAcrossDisabled"></div>
+      <div class="invalid-feedback">There is no flight on this date.</div>
     </div>
   </div>`} sandboxJs={dateRangePickerAcrossDisabled} />
 
@@ -178,7 +180,7 @@ Set `allowDisabledDatesInRange` to let a range run across disabled dates, for ex
 
 ## Validation
 
-The picker takes its validation state the way the [date range input](/forms/date-range-input/#validation) does: an end before the start makes the frame invalid while it stands and keeps both fields from being drawn valid, and a state you give lands on the frame and on both ends. You give it with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases) or with an `.is-invalid` or `.is-valid` class written on the picker element, the server-side route, which is read once, when the picker starts; the option wins over the class. While the given state is `'invalid'`, every section of both fields carries `aria-invalid="true"` and is described by the message after the picker, and both ends block the submit with its text, or `Invalid value.` when there is none.
+The picker takes its validation state the way the [date range input](/forms/date-range-input/#validation) does: an end before the start makes the frame invalid and blocks the submit while it stands and keeps both fields from being drawn valid, an error a validation reports for an end shows on that end and on the picker element also over a given `'valid'` or custom state, and a state you give lands on the frame and on both ends. You give it with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases) or with an `.is-invalid` or `.is-valid` class written on the picker element, the server-side route, which is read once, when the picker starts; the option wins over the class. While the given state is `'invalid'`, every section of both fields carries `aria-invalid="true"` and is described by the message after the picker, and both ends block the submit with its text, or `Invalid value.` when there is none.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7 form-field">
@@ -191,7 +193,7 @@ A given state is a verdict on the range it was given for, so the next change of 
 
 ### Blocking the submit
 
-A `required` end that is empty, incomplete or rejected by the limits blocks the submit by itself. An end before the start does not, since both ends hold dates the browser accepts, and neither does an optional end that is empty, incomplete or rejected, which submits no date. Check the range in your `submit` listener; `getStartDate()` and `getEndDate()` return `null` for an end that is empty, incomplete or rejected, so one condition covers both:
+An end before the start blocks the submit on both ends, and an end its limits reject blocks it on its own field, required or not, with the text of the message after the frame, or `Invalid value.` when there is none. Render that message for every range, since any range can be typed out of order: without it a form with `novalidate` gives the user no reason at all. Correcting the date lifts the block without another interaction. A `required` end that is empty or incomplete blocks as well. An optional end that is empty or incomplete does not block and submits no date, so to ask for both ends without `required`, check them in your `submit` listener; `getStartDate()` and `getEndDate()` return `null` for an end that is empty, incomplete or rejected:
 
 ```js
 const element = document.querySelector('#stayRange')
@@ -201,7 +203,7 @@ element.closest('form').addEventListener('submit', event => {
   const start = range.getStartDate()
   const end = range.getEndDate()
 
-  if (!start || !end || end < start) {
+  if (!start || !end) {
     event.preventDefault()
   }
 })

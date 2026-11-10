@@ -1913,6 +1913,45 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('.date-picker-popup [data-coreui-picker-action="today"]').disabled).toBeTrue()
     })
 
+    it('should block the submit of an optional picker while the user types a date its limits or disabledDates reject, and lift the block once the date is corrected', () => {
+      for (const [config, feedback, message, corrected] of [
+        [{ maxDate: new Date(2026, 0, 10) }, '<div class="invalid-feedback">Pick a date before the 11th.</div>', 'Pick a date before the 11th.', '05'],
+        [{ disabledDates: [new Date(2026, 0, 15)] }, '', 'Invalid value.', '16']
+      ]) {
+        const picker = buildPicker({
+          format: 'dd.MM.yyyy', locale: 'en-GB', name: 'when', ...config
+        }, `<form><div id="picker"></div>${feedback}</form>`)
+        const form = fixtureEl.querySelector('form')
+        const field = fixtureEl.querySelector('.form-date-time > textarea')
+        const [day] = fixtureEl.querySelectorAll('.form-date-time-section')
+        const type = keys => {
+          for (const key of keys) {
+            document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+          }
+        }
+
+        day.focus()
+        type('15012026')
+
+        expect(picker.getDate()).toBeNull()
+        expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
+        expect(form.checkValidity()).toBeFalse()
+        expect(field.validity.customError).toBeTrue()
+        expect(field.validationMessage).toEqual(message)
+
+        day.focus()
+        type(corrected)
+
+        expect(picker.getDate()).toEqual(new Date(2026, 0, Number(corrected)))
+        expect(form.checkValidity()).toBeTrue()
+        expect(field.validity.valid).toBeTrue()
+        expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-invalid')).toBeFalse()
+        expect([...fixtureEl.querySelectorAll('.form-date-time-section')].map(section => section.hasAttribute('aria-invalid'))).toEqual([false, false, false])
+        picker.dispose()
+        pickers.length = 0
+      }
+    })
+
     it('should select a programmatic date within range without an event', () => {
       const picker = buildPicker({ maxDate: new Date(2026, 6, 31) })
       const el = fixtureEl.querySelector('#picker')

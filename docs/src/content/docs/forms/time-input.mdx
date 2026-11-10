@@ -82,11 +82,14 @@ Set the initial time with the `data-coreui-date` attribute — a time string lik
 
 ## Min and max times
 
-Constrain the selectable range with `minDate` and `maxDate` — time strings work here too. A completed time outside the range gets the `.is-invalid` class and the component reports `null`, and submits no time, until the value is corrected.
+Constrain the selectable range with `minDate` and `maxDate` — time strings work here too. A completed time outside the range gets the `.is-invalid` class and blocks the submit of the form, and the component reports `null`, and submits no time, until the value is corrected. The invalid feedback of the field is the message of that block, so render one for a field with limits: without it the browser says only `Invalid value.`, and a form with `novalidate` gives the user no reason at all.
 
-<Example pro code={`<label class="form-label" id="timeInputBusinessHours09001700Label">Business hours (09:00–17:00)</label>
-  <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30"
-       data-coreui-min-date="09:00" data-coreui-max-date="17:00" aria-labelledby="timeInputBusinessHours09001700Label"></div>`} />
+<Example pro code={`<div class="form-field">
+    <label class="form-label" id="timeInputBusinessHours09001700Label">Business hours (09:00–17:00)</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30"
+         data-coreui-min-date="09:00" data-coreui-max-date="17:00" aria-labelledby="timeInputBusinessHours09001700Label"></div>
+    <div class="invalid-feedback">Pick a time from 09:00 to 17:00.</div>
+  </div>`} />
 
 ## Custom formats
 
@@ -104,7 +107,7 @@ The built-in token parser covers dayjs, moment, date-fns, and luxon format strin
 
 ## Validation
 
-The field takes its validation state [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` makes it invalid whatever else is set, then the `validationState` option or an `.is-invalid`/`.is-valid` class written on the element in the markup, then a validation that reported the field, and in a form with `data-coreui-validate` the `:user-invalid` state of its value field, with `data-coreui-validate="valid"` also its `:user-valid` state. A given state drops on the next change the user makes to the time and stays through changes your code makes; `setValidationState()` sets it again without re-rendering the field. A given `'invalid'` blocks the submit with the text of the linked message, or `Invalid value.` when there is none. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control, and while the field is invalid the error message describes every section.
+The field takes its validation state [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` makes it invalid whatever else is set and blocks the submit, required or not, then a given `'invalid'`, through the `validationState` option or an `.is-invalid` class written on the element in the markup, then a validation that reported the field and, in a form with `data-coreui-validate`, the `:user-invalid` state of its value field, which show also over a given `'valid'` or custom state, then that state, and with `data-coreui-validate="valid"` the `:user-valid` state of the value field. A given state drops on the next change the user makes to the time and stays through changes your code makes; `setValidationState()` sets it again without re-rendering the field. A given `'invalid'` and a time outside the limits block the submit with the text of the linked message, or `Invalid value.` when there is none. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control, and while the field is invalid the error message describes every section.
 
 <Example pro code={`<div class="mb-4 form-field">
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30" data-coreui-validation-state="valid"></div>

@@ -18,12 +18,14 @@ export type FieldState = {
 
 /**
  * Resolves what a form field shows from the facts its edition collected, without reading the DOM:
- * an error of the component's own shows `'invalid'`, else the state it was given, else the state its
- * owner was given, else `'invalid'` when a validation reported its value, else the state the user's
+ * an error of the component's own, a given `'invalid'`, a value a validation reported and a value
+ * the user's interaction left invalid all show `'invalid'`, whatever else the field was given, else
+ * it shows the state it was given, else the state its owner was given, else the state the user's
  * interaction produced. An error of the owner's own marks the field invalid for assistive
- * technologies without a state class of its own. The state the field goes by, its own, else its
- * owner's when it has none, blocks the submit when it is `'invalid'` and the field can block, so an
- * owner's `'invalid'` blocks only a field without a state of its own.
+ * technologies without a state class of its own. While the field can block, it blocks the submit for
+ * an error of its own or of its owner's, and when the state it goes by, its own, else its owner's
+ * when it has none, is `'invalid'`, so an owner's `'invalid'` blocks only a field without a state of
+ * its own. Whatever blocks the submit shows the field invalid.
  *
  * @param input - The facts: `given` and `inherited` from options, props or server markup, an empty
  * string counting as none; `ownError` and `ownerError` from the component and its owner; `reported`
@@ -35,12 +37,12 @@ export type FieldState = {
 export const resolveFieldState = ({
   canBlock = true, given, inherited, ownError = false, ownerError = false, reported = false, user
 }: FieldStateInput): FieldState => {
-  const givenState = given || inherited || undefined
-  const shown = ownError ? 'invalid' : (givenState ?? (reported ? 'invalid' : user || undefined))
+  const givenState = given || inherited
+  const shown = ownError || reported || user === 'invalid' ? 'invalid' : givenState || user || undefined
   const invalid = shown === 'invalid' || ownerError
 
   return {
-    blocks: givenState === 'invalid' && canBlock,
+    blocks: (givenState === 'invalid' || ownError || ownerError) && canBlock,
     invalid,
     state: invalid && shown !== 'invalid' ? undefined : shown
   }

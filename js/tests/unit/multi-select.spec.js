@@ -812,13 +812,19 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-invalid')).toBe('true')
     })
 
-    it('should let a given state win over a reported one', () => {
+    it('should let a reported error win over a given state other than invalid, and show the given state again once the value is valid', () => {
       fixtureEl.innerHTML = '<form novalidate><select></select></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
 
       selectEl.form.checkValidity()
       multiSelect.setValidationState('valid')
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(multiSelect._wrapperElement.classList.contains('is-valid')).toBeFalse()
+      expect(multiSelect._togglerElement.getAttribute('aria-invalid')).toBe('true')
+
+      multiSelect.setValue(['1'])
 
       expect(multiSelect._wrapperElement.classList.contains('is-valid')).toBeTrue()
       expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()

@@ -1148,14 +1148,21 @@ describe('RangeSlider', () => {
       expect(inputsOf(element)[0].validationMessage).toEqual('Pick a budget.')
     })
 
-    it('should keep a given valid state over a validity the page sets on a handle when the form plugin validates', () => {
-      const { element, form } = mountInForm({ validationState: 'valid', value: [20, 80] })
+    it('should show a validity the page sets on a handle over a given valid state when the form plugin validates, and the given state again once the page clears it and gives the state again', () => {
+      const { element, form, rangeSlider } = mountInForm({ validationState: 'valid', value: [20, 80] })
       const [, second] = inputsOf(element)
 
       form.setAttribute('data-coreui-validate', '')
       form.noValidate = true
       second.setCustomValidity('Too wide.')
       Form.getOrCreateInstance(form).validate()
+
+      expect(element).toHaveClass('is-invalid')
+      expect(element).not.toHaveClass('is-valid')
+      expect(inputsOf(element).every(input => input.getAttribute('aria-invalid') === 'true')).toBeTrue()
+
+      second.setCustomValidity('')
+      rangeSlider.setValidationState('valid')
 
       expect(element).toHaveClass('is-valid')
       expect(inputsOf(element).some(input => input.classList.contains('is-invalid') || input.hasAttribute('aria-invalid'))).toBeFalse()

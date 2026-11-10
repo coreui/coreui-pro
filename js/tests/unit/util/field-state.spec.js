@@ -8,9 +8,21 @@ describe('Field state', () => {
       })
     })
 
-    it('should show the given state over a reported error and block on a given invalid', () => {
-      expect(resolveFieldState({ given: 'valid', reported: true })).toEqual({
-        blocks: false, invalid: false, state: 'valid'
+    it('should show a reported or user invalid value over a given state other than invalid', () => {
+      for (const given of ['valid', 'warning']) {
+        expect(resolveFieldState({ given, reported: true })).toEqual({
+          blocks: false, invalid: true, state: 'invalid'
+        })
+        expect(resolveFieldState({ given, user: 'invalid' })).toEqual({
+          blocks: false, invalid: true, state: 'invalid'
+        })
+        expect(resolveFieldState({ inherited: given, reported: true }).state).toBe('invalid')
+      }
+    })
+
+    it('should show the given state over a valid user interaction and block on a given invalid', () => {
+      expect(resolveFieldState({ given: 'warning', user: 'valid' })).toEqual({
+        blocks: false, invalid: false, state: 'warning'
       })
       expect(resolveFieldState({ given: 'invalid' })).toEqual({
         blocks: true, invalid: true, state: 'invalid'
@@ -33,10 +45,12 @@ describe('Field state', () => {
       expect(resolveFieldState({ inherited: 'invalid' }).blocks).toBeTrue()
     })
 
-    it('should show an error of its own over a given state, without blocking', () => {
+    it('should show an error of its own over a given state and block with it while the field can block', () => {
       expect(resolveFieldState({ given: 'valid', ownError: true })).toEqual({
-        blocks: false, invalid: true, state: 'invalid'
+        blocks: true, invalid: true, state: 'invalid'
       })
+      expect(resolveFieldState({ ownError: true }).blocks).toBeTrue()
+      expect(resolveFieldState({ canBlock: false, ownError: true }).blocks).toBeFalse()
     })
 
     it('should show a reported error over the state of the user interaction', () => {
@@ -46,10 +60,11 @@ describe('Field state', () => {
       })
     })
 
-    it('should mark the field invalid for an error of its owner without a state class of its own', () => {
+    it('should mark the field invalid and block for an error of its owner without a state class of its own', () => {
       expect(resolveFieldState({ ownerError: true })).toEqual({
-        blocks: false, invalid: true, state: undefined
+        blocks: true, invalid: true, state: undefined
       })
+      expect(resolveFieldState({ canBlock: false, ownerError: true }).blocks).toBeFalse()
       expect(resolveFieldState({ ownerError: true, user: 'valid' }).state).toBeUndefined()
       expect(resolveFieldState({ ownerError: true, reported: true }).state).toBe('invalid')
     })

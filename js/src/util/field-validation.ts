@@ -16,8 +16,8 @@ export type FieldValidationConfig = {
  * How a component tells `FieldValidation` about itself.
  *
  * - `aliases`: the component takes the `invalid` and `valid` aliases of `validationState`.
- * - `blockers`: the value fields that carry the block of a given `'invalid'`; all of `fields` by default.
- * - `canBlock`: whether a given `'invalid'` may block the submit now; by default while not `disabled`.
+ * - `blockers`: the value fields that carry the block; all of `fields` by default.
+ * - `canBlock`: whether the component may block the submit now; by default while not `disabled`.
  * - `config`: the live configuration object of the component, which the controller writes when it
  *   drops the given state.
  * - `describedTargets`: the elements that get the page's description and the invalid feedback;
@@ -28,7 +28,7 @@ export type FieldValidationConfig = {
  * - `owned`: the elements the form utilities leave to the component; `fields` by default.
  * - `ownError`: whether the component has an error of its own, such as a value outside its limits
  *   or a range in the wrong order, which it shows as `'invalid'` over the given and the reported
- *   state without blocking.
+ *   state and which blocks the submit, on its fields and on those of its parts, while it can block.
  * - `pageDescribed`: the described targets that carry the description the page gave the host, given
  *   whether the state is `'invalid'`, and the host itself when it keeps that description, which the
  *   other targets then get as well, as the host had it at the start. By default the first described
@@ -56,10 +56,10 @@ export type FieldValidationOptions = {
 /**
  * Keeps the validation state of a component that carries a form value: the state it was given, by
  * an option or by a state class its markup carried, the state a validation reported for its value
- * fields, the block a given `'invalid'` puts on the submit, the state class, `aria-invalid` and the
- * invalid feedback in `aria-describedby`, and a native reset of the form. The component describes
- * where these go, marks the actions of the user and tells the controller when its value changes; it
- * writes none of these itself. The controller takes back what it wrote and gives back what it
+ * fields, the block a given `'invalid'` or an error of its own puts on the submit, the state class,
+ * `aria-invalid` and the invalid feedback in `aria-describedby`, and a native reset of the form. The
+ * component describes where these go, marks the actions of the user and tells the controller when
+ * its value changes; it writes none of these itself. The controller takes back what it wrote and gives back what it
  * overwrote, and when it drops the given state, it clears it in the component's configuration.
  */
 class FieldValidation {
@@ -245,19 +245,20 @@ class FieldValidation {
   }
 
   /**
-   * Draws the state: lifts the block from the fields that no longer carry it, puts the state class on
-   * the frames, `aria-invalid` on the focus targets, and the page's description and the invalid
-   * feedback on the described targets, the description where `pageDescribed` puts it, next to the
-   * ids others put there, and only then the block of a given `'invalid'` on the fields that carry it
-   * while the component can block, so the block takes the message the page and the stylesheet show
-   * for them. The message in the description is the feedback of the first field that carries the
-   * block, else of the first focus target. The given state is the component's own, else the one
-   * its owners were given; the shown state comes from `resolveFieldState()`. An error of the owner's own
-   * marks the focus targets invalid and describes them with the message, but leaves the state class
-   * to the owner unless the component shows `'invalid'` itself. Focus and described targets the
-   * component no longer lists lose what the controller wrote there. An owner draws its parts after
-   * itself, and a part draws the whole tree from its topmost owner, since an owner shows the errors
-   * of its parts.
+   * Draws the state: lifts every block in the tree, so what the browser shows for the fields is read
+   * without one, puts the state class on the frames, `aria-invalid` on the focus targets, and the
+   * page's description and the invalid feedback on the described targets, the description where
+   * `pageDescribed` puts it, next to the ids others put there, and only then the block of a given
+   * `'invalid'` or of an error of its own or of its owner's on the fields that carry it while the
+   * component can block, so the block takes the message the page and the stylesheet show for them.
+   * The message in the description is the feedback of the first field that carries the block, else
+   * of the first focus target. The given state is the component's own, else the one its owners were
+   * given; the shown state comes from `resolveFieldState()`. An error of the owner's own marks the
+   * focus targets invalid and describes them with the message, but leaves the state class to the
+   * owner unless the component shows `'invalid'` itself. Focus and described targets the component
+   * no longer lists lose what the controller wrote there. An owner draws its parts after itself, and
+   * a part draws the whole tree from its topmost owner, since an owner shows the errors of its parts
+   * and the state the browser shows for their fields.
    */
   update(): void {
     if (this._owner) {
@@ -265,6 +266,7 @@ class FieldValidation {
       return
     }
 
+    this._liftBlocks()
     this._draw()
   }
 
@@ -273,25 +275,17 @@ class FieldValidation {
    */
   _draw(): void {
     const config = this._options.config()
-    const fields = this._options.fields()
-    const blockers = this._options.blockers?.() ?? fields
-    const facts = {
+    const blockers = this._options.blockers?.() ?? this._options.fields()
+    const reported = this._readUserValidity()
+    const { blocks, invalid: isInvalid, state } = resolveFieldState({
       canBlock: this._options.canBlock?.() ?? !config.disabled,
       given: this._givenState(config),
       inherited: this._owner?._inheritedState(),
       ownError: this._hasError(),
-      ownerError: Boolean(this._owner?._options.ownError?.())
-    }
-    const blocked = resolveFieldState(facts).blocks ? blockers : []
-
-    for (const field of fields) {
-      if (!blocked.includes(field)) {
-        setStateValidity(field, false)
-      }
-    }
-
-    const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
-    const { invalid: isInvalid, state } = resolveFieldState({ ...facts, reported: reported.includes('invalid'), user: reported.find(Boolean) })
+      ownerError: this._owner?._options.ownError?.(),
+      reported: reported.includes('invalid'),
+      user: reported.find(Boolean)
+    })
 
     this._drawStateClass(state ? `is-${state}` : null)
 
@@ -300,12 +294,26 @@ class FieldValidation {
     this._markInvalid(invalidTargets, isInvalid)
     this._describeTargets(invalidTargets, (blockers[0] ?? invalidTargets[0]) as ValueField | undefined, isInvalid)
 
-    for (const field of blocked) {
+    for (const field of blocks ? blockers : []) {
       setStateValidity(field, true)
     }
 
     for (const part of this._parts) {
       part._draw()
+    }
+  }
+
+  /**
+   * Lifts the block from the value fields of the component and of its parts, at any depth, so what
+   * the browser shows for them can be read without it; `_draw()` puts back the blocks that stay.
+   */
+  _liftBlocks(): void {
+    for (const field of this._options.fields()) {
+      setStateValidity(field, false)
+    }
+
+    for (const part of this._parts) {
+      part._liftBlocks()
     }
   }
 
@@ -358,6 +366,16 @@ class FieldValidation {
    */
   _hasError(): boolean {
     return Boolean(this._options.ownError?.()) || this._parts.some(part => part._hasError())
+  }
+
+  /**
+   * Reads the state the browser shows for the value fields of the component and of its parts, at
+   * any depth, as `followUserValidity()` follows it.
+   *
+   * @returns The states, those of the component's own fields first
+   */
+  _readUserValidity(): Array<ValidationState | undefined> {
+    return [...[...this._userValidity.values()].map(userValidity => userValidity.read()), ...this._parts.flatMap(part => part._readUserValidity())]
   }
 
   /**

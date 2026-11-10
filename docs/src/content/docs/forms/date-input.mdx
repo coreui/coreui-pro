@@ -149,19 +149,25 @@ A field holds what its format shows. A date given with a time of day to a field 
 
 ## Min and max dates
 
-Constrain the selectable range with `minDate` and `maxDate`. A completed date outside the range gets the `.is-invalid` class and the component reports `null` until the value is corrected. A date field compares the limits by the day. A field with a time compares them to the smallest unit it shows, and there a `maxDate` without a time of day covers its whole day.
+Constrain the selectable range with `minDate` and `maxDate`. A completed date outside the range gets the `.is-invalid` class, blocks the submit of the form and makes the component report `null` until the value is corrected. A date field compares the limits by the day. A field with a time compares them to the smallest unit it shows, and there a `maxDate` without a time of day covers its whole day. The invalid feedback of the field is the message of that block, so render one for a field with limits: without it the browser says only `Invalid value.`, and a form with `novalidate` gives the user no reason at all.
 
-<Example pro code={`<label class="form-label" id="dateInputDateInJuly2026Label">Date in July 2026</label>
-  <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31" aria-labelledby="dateInputDateInJuly2026Label"></div>`} />
+<Example pro code={`<div class="form-field">
+    <label class="form-label" id="dateInputDateInJuly2026Label">Date in July 2026</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31" aria-labelledby="dateInputDateInJuly2026Label"></div>
+    <div class="invalid-feedback">Pick a date in July 2026.</div>
+  </div>`} />
 
 ## Disabled dates
 
-Beyond a simple range, the `disabledDates` option excludes specific dates — single `Date`s, `[start, end]` ranges, or a matcher function. Unlike in the [date picker](/forms/date-picker/#disabled-dates), there is no calendar to gray out: a completed date that hits a disabled entry gets the `.is-invalid` class and the component reports `null` until the value is corrected.
+Beyond a simple range, the `disabledDates` option excludes specific dates — single `Date`s, `[start, end]` ranges, or a matcher function. Unlike in the [date picker](/forms/date-picker/#disabled-dates), there is no calendar to gray out: a completed date that hits a disabled entry gets the `.is-invalid` class, blocks the submit of the form and makes the component report `null` until the value is corrected.
 
 In this example July 4–7 and July 16 can't be entered — try typing one of them:
 
-<Example pro code={`<label class="form-label" id="dateInputDeliveryDateLabel2">Delivery date</label>
-  <div class="form-control form-date-time" id="myDateInputDisabledDates" aria-labelledby="dateInputDeliveryDateLabel2"></div>`} sandboxJs={dateInputDisabledDates} />
+<Example pro code={`<div class="form-field">
+    <label class="form-label" id="dateInputDeliveryDateLabel2">Delivery date</label>
+    <div class="form-control form-date-time" id="myDateInputDisabledDates" aria-labelledby="dateInputDeliveryDateLabel2"></div>
+    <div class="invalid-feedback">We do not deliver on this date.</div>
+  </div>`} sandboxJs={dateInputDisabledDates} />
 
 <Code code={dateInputDisabledDates} lang="js" />
 
@@ -169,8 +175,11 @@ In this example July 4–7 and July 16 can't be entered — try typing one of th
 
 Pass a function to disable dates by rule — here Saturdays and Sundays:
 
-<Example pro code={`<label class="form-label" id="dateInputBusinessDayLabel">Business day</label>
-  <div class="form-control form-date-time" id="myDateInputDisabledDates2" aria-labelledby="dateInputBusinessDayLabel"></div>`} sandboxJs={dateInputDisabledDates2} />
+<Example pro code={`<div class="form-field">
+    <label class="form-label" id="dateInputBusinessDayLabel">Business day</label>
+    <div class="form-control form-date-time" id="myDateInputDisabledDates2" aria-labelledby="dateInputBusinessDayLabel"></div>
+    <div class="invalid-feedback">Pick a day from Monday to Friday.</div>
+  </div>`} sandboxJs={dateInputDisabledDates2} />
 
 <Code code={dateInputDisabledDates2} lang="js" />
 
@@ -205,15 +214,15 @@ Localized formats work the same way — the section names come from the componen
 
 ## Validation
 
-The field shows its validation state on the element and on its sections, and links the message that follows it, the way the [form plugin](/forms/validation/) does for a native field. It keeps its value in a `<textarea>` laid invisibly over the field, which takes part in native constraint validation: a `required` field that is empty, incomplete or holds a rejected date blocks the submit, and the browser, or the [form plugin](/forms/validation/#usage), puts focus on its first empty section, the browser with its own message over the field. A field that is not required does not block, and submits no date while it rejects one.
+The field shows its validation state on the element and on its sections, and links the message that follows it, the way the [form plugin](/forms/validation/) does for a native field. It keeps its value in a `<textarea>` laid invisibly over the field, which takes part in native constraint validation: a `required` field that is empty, incomplete or holds a rejected date blocks the submit, and the browser, or the [form plugin](/forms/validation/#usage), puts focus on its first empty section, the browser with its own message over the field. A field that is not required does not block while it is empty or incomplete, but a date it rejects blocks the submit, as the limits below say.
 
-The state comes from five places, in this order:
+The state comes from these places, in this order:
 
-- The limits: a completed date outside `minDate`/`maxDate`/`disabledDates` makes the field invalid until it is corrected, whatever else is set, and until then the value field submits no date, as `getDate()` returns none; a read-only field holding such a date submits none either. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
-- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`.
-- An `.is-invalid` or `.is-valid` class written on the element in the markup, for example by a server that has already checked the date. It is read once, when the component starts.
-- A validation that reports the field invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the field shows it invalid whenever its date is invalid, until a native reset of the form.
-- In a form with `data-coreui-validate`, the `:user-invalid` and `:user-valid` states of the value field, the same states the stylesheet reads on a native field. A field becomes `.is-valid` after a submit only when the form opts into success styling with `data-coreui-validate="valid"`.
+- The limits: a completed date outside `minDate`/`maxDate`/`disabledDates` makes the field invalid until it is corrected, whatever else is set, and blocks the submit with the text of the linked message, or `Invalid value.` when there is none, also when the field is not `required`. Until then `getDate()` returns no date and the value field holds none. Once the date is corrected, the block and the error go without another interaction. A disabled or read-only field holding such a date does not block and submits no date. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
+- A given `'invalid'`, through the `validationState` option or an `.is-invalid` class written on the element in the markup, for example by a server that has already checked the date. The class is read once, when the component starts.
+- A validation that reports the field invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the field shows it invalid whenever its date is invalid, until a native reset of the form. In a form with `data-coreui-validate`, the `:user-invalid` state of the value field counts the same way. Such an error shows also over a given `'valid'` or other state.
+- Any other given state: `'valid'` or a state you added to `$form-validation-states`, through the option or an `.is-valid` class in the markup.
+- In a form with `data-coreui-validate="valid"`, the `:user-valid` state of the value field, the same state the stylesheet reads on a native field. A field becomes `.is-valid` after a submit only when the form opts into success styling this way.
 
 A state you give, with the option or with the class, is a verdict on the date it was given for, so the next change of the date the user makes drops it: a typed digit or letter, an arrow, <kbd>Backspace</kbd> or <kbd>Delete</kbd>, a paste or a cut that changes what the field holds. A key that leaves the field as it is keeps the state. A change your own code makes, with `setDate()`, `clear()` or `reset()`, keeps it. To set it again, from a `dateChange.coreui.date-input` or `change` listener or after a server response, call `setValidationState()`. It updates the state without rebuilding the field and replaces a class written on the element, so `setValidationState(null)` withdraws that class. A class or an `aria-invalid` written on the element after the component starts is not read. While the given state is `'invalid'`, the field blocks the submit like any invalid field, with the text of the linked message, or `Invalid value.` when there is none; a custom validity you set on the value field yourself stays as it is, and a disabled or read-only field does not block. A native form reset returns the field to the date it was created with and drops the state; a `reset` listener that calls `preventDefault()` cancels the whole reset.
 

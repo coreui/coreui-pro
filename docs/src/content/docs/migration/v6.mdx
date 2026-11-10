@@ -2222,6 +2222,19 @@ state the same way, described under
 - **A given `'invalid'` blocks the submit**, with the text of the component's
   invalid feedback as the browser's message, until the user changes the value
   or the form is reset, which removes the state.
+- **A given `'valid'` no longer hides an error the browser reported.** After
+  a submit finds an empty `required` field, or `:user-invalid` marks it, the
+  component shows `'invalid'` and its invalid feedback whatever state you gave
+  it. The user's change that corrects the value drops your state, so it shows
+  again only when the value turns valid through a method of the component or
+  you set it again. The date range input
+  and the date range picker show that error on their own element as well.
+- **A date or time outside `minDate`, `maxDate` or `disabledDates`, and a range
+  whose end is before its start, block the submit**, required or not, with the
+  text of the invalid feedback as the browser's message, or `Invalid value.`,
+  until the user corrects the value. A form with an optional date outside its
+  limits, or with a range out of order, used to submit without that date or
+  with both dates; it now stays on the page.
 - **The form plugin and the stepper leave the field that carries a component's
   value to the component**, which shows the state they report on its frame.
 - **After taking the result over** with `preventDefault()` on

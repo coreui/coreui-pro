@@ -875,6 +875,109 @@ describe('DateRangeInput', () => {
       expect(fields().every(field => field.classList.contains('is-valid'))).toBeTrue()
     })
 
+    it('should show a reported error of an end on the frame over a given valid state, and drop the state once the user fills both ends', () => {
+      build({ required: true, validationState: 'valid' }, '<form><div id="range"></div></form>')
+      const form = fixtureEl.querySelector('form')
+
+      expect(root().classList.contains('is-valid')).toBeTrue()
+      expect(form.checkValidity()).toBeFalse()
+      expect(root().classList.contains('is-valid')).toBeFalse()
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+      expect(fields().every(field => field.classList.contains('is-invalid'))).toBeTrue()
+
+      for (const field of fields()) {
+        for (const section of field.querySelectorAll('.form-date-time-section')) {
+          section.focus()
+          section.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
+        }
+      }
+
+      expect(form.checkValidity()).toBeTrue()
+      expect(root().classList.contains('is-invalid')).toBeFalse()
+      expect(root().classList.contains('is-valid')).toBeFalse()
+      expect(fields().some(field => field.classList.contains('is-invalid'))).toBeFalse()
+    })
+
+    it('should show a reported error of an end on the frame when no state was given', () => {
+      build({ required: true }, '<form><div id="range"></div></form>')
+
+      fixtureEl.querySelector('form').checkValidity()
+
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+      expect(fields().every(field => field.classList.contains('is-invalid'))).toBeTrue()
+    })
+
+    it('should take the error off the frame once a given invalid state a validation reported goes', () => {
+      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20), validationState: 'invalid' }, '<form><div id="range"></div></form>')
+      const form = fixtureEl.querySelector('form')
+
+      expect(form.checkValidity()).toBeFalse()
+
+      range.setValidationState(null)
+
+      expect(root().classList.contains('is-invalid')).toBeFalse()
+      expect(fields().some(field => field.classList.contains('is-invalid'))).toBeFalse()
+
+      range.setValidationState('invalid')
+      form.checkValidity()
+      typeIn(fields()[0])
+
+      expect(form.checkValidity()).toBeTrue()
+      expect(root().classList.contains('is-invalid')).toBeFalse()
+      expect(fields().some(field => field.classList.contains('is-invalid'))).toBeFalse()
+    })
+
+    it('should block the submit on both value fields while the end is before the start, and lift both once the user corrects either end', () => {
+      for (const [index, keys] of [[0, '10'], [1, '25']]) {
+        build({ startDate: new Date(2026, 6, 20), endDate: new Date(2026, 6, 14) }, '<form><div id="range"></div><div class="invalid-feedback">Check-out has to be on or after check-in.</div></form>')
+        const form = fixtureEl.querySelector('form')
+
+        expect(hiddenInputs().map(input => input.validationMessage)).toEqual(Array.from({ length: 2 }, () => 'Check-out has to be on or after check-in.'))
+        expect(form.checkValidity()).toBeFalse()
+
+        const [day] = fields()[index].querySelectorAll('.form-date-time-section')
+
+        day.focus()
+
+        for (const key of keys) {
+          day.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+        }
+
+        expect(hiddenInputs().map(input => input.validity.customError)).toEqual([false, false])
+        expect(form.checkValidity()).toBeTrue()
+        expect(root().classList.contains('is-invalid')).toBeFalse()
+        expect(sectionsInvalid()).toEqual(Array.from({ length: 6 }, () => null))
+      }
+    })
+
+    it('should block the submit on the end alone while the user types an end the limits reject, and lift the block once the end is corrected', () => {
+      const range = build({ endDate: new Date(2026, 6, 20), maxDate: new Date(2026, 6, 25), startDate: new Date(2026, 6, 14) }, '<form><div id="range"></div><div class="invalid-feedback">Check-out has to be in July, by the 25th.</div></form>')
+      const form = fixtureEl.querySelector('form')
+      const [day] = fields()[1].querySelectorAll('.form-date-time-section')
+      const type = keys => {
+        for (const key of keys) {
+          day.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+        }
+      }
+
+      day.focus()
+      type('30')
+
+      expect(range.getEndDate()).toBeNull()
+      expect(form.checkValidity()).toBeFalse()
+      expect(hiddenInputs().map(input => input.validity.customError)).toEqual([false, true])
+      expect(hiddenInputs()[1].validationMessage).toEqual('Check-out has to be in July, by the 25th.')
+
+      day.focus()
+      type('22')
+
+      expect(range.getEndDate()).toEqual(new Date(2026, 6, 22))
+      expect(form.checkValidity()).toBeTrue()
+      expect(hiddenInputs().every(input => input.validity.valid)).toBeTrue()
+      expect(root().classList.contains('is-invalid')).toBeFalse()
+      expect(sectionsInvalid()).toEqual(Array.from({ length: 6 }, () => null))
+    })
+
     it('should describe every section of both fields with the message after the frame while the end is before the start', () => {
       const range = build({ startDate: new Date(2026, 6, 20), endDate: new Date(2026, 6, 14) }, '<div id="range"></div><div class="invalid-feedback">Check-out has to be on or after check-in.</div>')
       const feedback = fixtureEl.querySelector('.invalid-feedback')

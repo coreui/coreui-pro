@@ -173,8 +173,9 @@ the time selects work on today moved into the limits. A limit without a time of
 day covers its whole day.
 
 <Example pro code={`<div class="row">
-    <div class="col-lg-5">
+    <div class="col-lg-5 form-field">
       <div data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-min-date="2026-10-15T09:30" data-coreui-max-date="2026-10-30T17:00" data-coreui-date-picker></div>
+      <div class="invalid-feedback">Pick a time from October 15, 9:30 AM to October 30, 5:00 PM.</div>
     </div>
   </div>`} />
 
@@ -267,14 +268,16 @@ calendar are turned off.
 The `disabledDates` option excludes specific dates — single `Date`s,
 `[start, end]` ranges, or a matcher function. The calendar grays them out and
 the field refuses them: a completed date that hits a disabled entry gets the
-`.is-invalid` class and the picker reports `null`, and submits no date, until it is corrected.
+`.is-invalid` class and blocks the submit of the form, and the picker reports `null`, and submits no date, until it is corrected.
+The invalid feedback after the picker is the message of that block, so render one for a picker with limits: without it the browser says only `Invalid value.`, and a form with `novalidate` gives the user no reason at all.
 In week, month, quarter and year selection the calendar and the field judge the
 whole period: it is refused only when it lies wholly before `minDate` or after
 `maxDate`, or `disabledDates` covers every day of it that the limits leave. In week selection the limits count as whole weeks, so for a week that is all seven days.
 
 <Example pro code={`<div class="row">
-    <div class="col-lg-5">
+    <div class="col-lg-5 form-field">
       <div id="myDatePickerDisabledDates"></div>
+      <div class="invalid-feedback">We are closed on this date.</div>
     </div>
   </div>`} sandboxJs={datePickerDisabledDates} />
 
@@ -285,8 +288,9 @@ whole period: it is refused only when it lies wholly before `minDate` or after
 Pass a function to disable every date that matches a rule.
 
 <Example pro code={`<div class="row">
-    <div class="col-lg-5">
+    <div class="col-lg-5 form-field">
       <div id="myDatePickerWeekends"></div>
+      <div class="invalid-feedback">Pick a day from Monday to Friday.</div>
     </div>
   </div>`} sandboxJs={datePickerWeekends} />
 
@@ -294,9 +298,9 @@ Pass a function to disable every date that matches a rule.
 
 ## Validation
 
-The picker shows its validation state on the frame and on the sections of its field, which the message after the picker describes, the way the [form plugin](/forms/validation/) does for a native field. The field keeps its value in a `<textarea>` laid invisibly over it, so a `required` picker that is empty, incomplete or holds a rejected date blocks the submit, as the [date input](/forms/date-input/#validation) does.
+The picker shows its validation state on the frame and on the sections of its field, which the message after the picker describes, the way the [form plugin](/forms/validation/) does for a native field. The field keeps its value in a `<textarea>` laid invisibly over it, so a `required` picker that is empty or incomplete blocks the submit, and so does any picker that holds a date its limits reject, as the [date input](/forms/date-input/#validation) does. An error a validation reports shows also over a given `'valid'` or custom state.
 
-You give a state with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases) or with an `.is-invalid` or `.is-valid` class written on the picker element, the server-side route, which is read once, when the picker starts; the option wins over the class. A given state is a verdict on the date it was given for, so the next change of the date the user makes drops it: a day picked in the calendar, a time picked with `timepicker`, the cleaner, a footer button that changes the date through the context, or typing in the field. An action that leaves the date as it is keeps the state. A change your own code makes, with `setDate()`, `clear()`, `reset()` or `today()`, keeps it. `setValidationState()` sets it again without rebuilding the picker. A class or an `aria-invalid` written on the picker element after it starts is not read. While the given state is `'invalid'`, the picker blocks the submit with the text of the message after it, or `Invalid value.` when there is none. A native form reset puts back the date the picker started with and drops the state.
+You give a state with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases) or with an `.is-invalid` or `.is-valid` class written on the picker element, the server-side route, which is read once, when the picker starts; the option wins over the class. A given state is a verdict on the date it was given for, so the next change of the date the user makes drops it: a day picked in the calendar, a time picked with `timepicker`, the cleaner, a footer button that changes the date through the context, or typing in the field. An action that leaves the date as it is keeps the state. A change your own code makes, with `setDate()`, `clear()`, `reset()` or `today()`, keeps it. `setValidationState()` sets it again without rebuilding the picker. A class or an `aria-invalid` written on the picker element after it starts is not read. While the given state is `'invalid'` or the date is outside the limits, the picker blocks the submit with the text of the message after it, or `Invalid value.` when there is none. A native form reset puts back the date the picker started with and drops the state.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5 form-field">

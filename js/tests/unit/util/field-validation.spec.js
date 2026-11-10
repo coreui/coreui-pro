@@ -221,21 +221,79 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
-    it('should show an error of its own as invalid over a given state, without blocking', () => {
+    it('should show an error of its own as invalid over a given state and block with the feedback text until it goes', () => {
       let hasError = true
       const { field, form, host, state, targets, validation } = mount({ config: { validationState: 'valid' }, ownError: () => hasError })
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
       expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
-      expect(form.checkValidity()).toBe(true)
+      expect(form.checkValidity()).toBe(false)
+      expect(field.validationMessage).toBe('Fix it.')
 
       hasError = false
+      validation.update()
+
+      expect(stateClasses(host)).toEqual(['is-valid'])
+      expect(form.checkValidity()).toBe(true)
+
+      hasError = true
       state.config.validationState = null
+      validation.update()
+
+      expect(form.checkValidity()).toBe(false)
+
+      hasError = false
       field.required = true
       form.checkValidity()
       validation.update()
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(field.validity.customError).toBe(false)
+    })
+
+    it('should not block for an error of its own while it cannot block', () => {
+      const { field, form, host } = mount({ canBlock: () => false, ownError: () => true })
+
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(field.validity.customError).toBe(false)
+      expect(form.checkValidity()).toBe(true)
+    })
+
+    it('should show on an owner the state the browser shows for the fields of its parts, read without their blocks', () => {
+      const { field, form, host, state, validation } = mount({ config: { validationState: 'invalid' } })
+      const range = mountOwner({ config: { validationState: 'valid' }, frames: true })
+
+      range.validation.adopt(validation)
+      field.required = true
+      form.checkValidity()
+
+      expect(stateClasses(range.host)).toEqual(['is-invalid'])
+
+      state.config.validationState = null
+      validation.update()
+
+      expect(stateClasses(range.host)).toEqual(['is-invalid'])
+
+      field.value = 'x'
+      validation.update()
+
+      expect(stateClasses(range.host)).toEqual(['is-valid'])
+
+      range.state.config.validationState = null
+      state.config.validationState = 'invalid'
+      validation.update()
+      form.checkValidity()
+
+      expect(field.validity.customError).toBe(true)
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(stateClasses(range.host)).toEqual([])
+
+      state.config.validationState = null
+      validation.update()
+
+      expect(stateClasses(host)).toEqual([])
+      expect(stateClasses(range.host)).toEqual([])
+      expect(field.validity.customError).toBe(false)
     })
 
     it('should take the state of its owners after its own, mark the owner\'s error without the class, and tell the owners every drop', () => {

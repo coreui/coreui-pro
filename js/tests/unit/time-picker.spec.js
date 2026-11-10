@@ -1236,6 +1236,38 @@ describe('TimePicker', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
     })
 
+    it('should block the submit of an optional picker while the user types a time outside minDate and maxDate, and lift the block once the time is corrected', () => {
+      const picker = buildPicker({
+        locale: 'en-GB', maxDate: '17:00', minDate: '09:30', seconds: false
+      }, '<form><div id="picker"></div><div class="invalid-feedback">Pick a time within business hours.</div></form>')
+      const form = fixtureEl.querySelector('form')
+      const field = fixtureEl.querySelector('.form-date-time > textarea')
+      const [hour] = fixtureEl.querySelectorAll('.form-date-time-section')
+      const type = keys => {
+        for (const key of keys) {
+          document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+        }
+      }
+
+      hour.focus()
+      type('1830')
+
+      expect(picker.getTime()).toBeNull()
+      expect(fixtureEl.querySelector('.form-date-time')).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+      expect(field.validity.customError).toBeTrue()
+      expect(field.validationMessage).toEqual('Pick a time within business hours.')
+
+      hour.focus()
+      type('10')
+
+      expect(picker.getTime().getHours()).toEqual(10)
+      expect(form.checkValidity()).toBeTrue()
+      expect(field.validity.valid).toBeTrue()
+      expect(fixtureEl.querySelector('.form-date-time')).not.toHaveClass('is-invalid')
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
+    })
+
     it('should draw a given state on the field and leave the picker element without a state class', () => {
       buildPicker({ time: '10:30:00', validationState: 'invalid' })
 

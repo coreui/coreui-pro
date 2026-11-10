@@ -222,6 +222,52 @@ describe('DateInput', () => {
       expect(document.activeElement).toEqual(month)
     })
 
+    it('should block the submit of an optional field while the user enters a date outside the limits, with the message shown for the field, and lift the block once the date is corrected', () => {
+      for (const [config, feedback, message] of [
+        [{ maxDate: new Date(2026, 0, 10) }, '<div class="invalid-feedback">Pick a date before the 11th.</div>', 'Pick a date before the 11th.'],
+        [{ minDate: new Date(2026, 0, 20) }, '', 'Invalid value.']
+      ]) {
+        fixtureEl.innerHTML = `<form data-coreui-validate><div class="date-input"></div>${feedback}</form>`
+        const form = fixtureEl.querySelector('form')
+        const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy', name: 'when', ...config })
+        const field = fixtureEl.querySelector('.form-date-time > textarea')
+        const [day] = getSections(dateInput._element)
+        let submits = 0
+        form.addEventListener('submit', event => {
+          submits++
+          event.preventDefault()
+        })
+
+        day.focus()
+
+        for (const key of '15012026') {
+          pressKey(document.activeElement, key)
+        }
+
+        expect(field.validity.customError).toBeTrue()
+        expect(field.validationMessage).toEqual(message)
+        expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+
+        form.requestSubmit()
+
+        expect(submits).toEqual(0)
+
+        day.focus()
+        pressKey(day, config.maxDate ? '0' : '2')
+        pressKey(day, '5')
+
+        expect(dateInput.getDate()).toEqual(new Date(2026, 0, config.maxDate ? 5 : 25))
+        expect(field.validity.valid).toBeTrue()
+        expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+        expect([...getSections(dateInput._element)].map(section => section.hasAttribute('aria-invalid'))).toEqual([false, false, false])
+
+        form.requestSubmit()
+
+        expect(submits).toEqual(1)
+        dateInput.dispose()
+      }
+    })
+
     it('should make an incomplete required field block the form', () => {
       const { form } = mountForm({ required: true })
       const [day] = fixtureEl.querySelectorAll('.form-date-time-section')
@@ -1766,20 +1812,23 @@ describe('DateInput', () => {
       expect(field.validationMessage).toEqual('Taken.')
     })
 
-    it('should draw a given valid state over a reported error, while the browser still blocks the submit', () => {
+    it('should draw a reported error over a given valid state, and the given state again once the value is valid', () => {
       const dateInput = createInForm({ required: true })
       const form = fixtureEl.querySelector('form')
 
       form.requestSubmit()
+      dateInput.setValidationState('valid')
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+      expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
+      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-invalid'))).toEqual(['true', 'true', 'true'])
+      expect(form.checkValidity()).toBeFalse()
 
-      dateInput.setValidationState('valid')
+      dateInput.setDate(new Date(2026, 6, 14))
 
       expect(dateInput._element.classList.contains('is-valid')).toBeTrue()
       expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
       expect([...getSections(dateInput._element)].map(section => section.hasAttribute('aria-invalid'))).toEqual([false, false, false])
-      expect(form.checkValidity()).toBeFalse()
     })
 
     it('should take a state class the markup carries as the given state and block with it', () => {

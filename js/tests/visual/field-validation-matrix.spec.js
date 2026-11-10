@@ -77,6 +77,7 @@ const givenInvalid = cell => cell.given === 'invalid'
 const givenValid = cell => cell.given === 'valid'
 const givenInvalidComponent = cell => givenInvalid(cell) && !NATIVE.has(cell.component)
 const givenValidSubmit = cell => givenValid(cell) && required(cell)
+const givenValidReported = cell => givenValidSubmit(cell) && cell.mode !== 'm0'
 const always = () => true
 
 const RULES = [
@@ -110,10 +111,10 @@ const RULES = [
   ['given valid at load: OK shown', givenValid, ({ load }) => ok(load)],
   ['given valid at load: no invalid colour', givenValid, ({ load }) => !red(load)],
   ['given valid at load: no BAD', givenValid, ({ load }) => !bad(load)],
-  ['given valid, empty required, after submit: no invalid colour', givenValidSubmit, ({ submit }) => !red(submit)],
-  ['given valid, empty required, after submit: no BAD', givenValidSubmit, ({ submit }) => !bad(submit)],
-  ['given valid, empty required, after submit: valid colour', givenValidSubmit, ({ submit }) => green(submit)],
-  ['given valid, empty required, after submit: OK shown', givenValidSubmit, ({ submit }) => ok(submit)]
+  ['given valid, empty required, after submit m1/m2: invalid colour', givenValidReported, ({ submit }) => red(submit)],
+  ['given valid, empty required, after submit m1/m2: BAD shown', givenValidReported, ({ submit }) => bad(submit)],
+  ['given valid, empty required, after submit: no valid colour', givenValidSubmit, ({ submit }) => !green(submit)],
+  ['given valid, empty required, after submit: no OK', givenValidSubmit, ({ submit }) => !ok(submit)]
 ]
 
 const SOURCES = {
@@ -138,11 +139,10 @@ const KNOWN_FAILURES = [
   ['reset after submit, no given state: no BAD', ['checkbox', 'radio', 'switch'], ['m1'], ['']],
   ['given invalid at load: invalid colour', ['chipfilter', 'rangeslider', 'rating'], ALL_MODES, ['invalid']],
   ['given valid at load: valid colour', ['chipfilter', 'rangeslider', 'rating'], ALL_MODES, ['valid']],
-  ['given valid, empty required, after submit: no invalid colour', ['autocomplete', 'checkbox', 'input', 'multiselect', 'number', 'otp', 'password', 'radio', 'select', 'switch', 'textarea'], ['m1', 'm2'], ['valid']],
-  ['given valid, empty required, after submit: no BAD', ['autocomplete', 'checkbox', 'chipinput', 'combobox', 'input', 'multiselect', 'number', 'otp', 'password', 'radio', 'select', 'switch', 'textarea'], ['m1', 'm2'], ['valid']],
-  ['given valid, empty required, after submit: valid colour', ['autocomplete', 'checkbox', 'input', 'multiselect', 'number', 'password', 'radio', 'select', 'switch', 'textarea'], ['m1', 'm2'], ['valid']],
-  ['given valid, empty required, after submit: valid colour', ['chipfilter', 'otp', 'rating'], ALL_MODES, ['valid']],
-  ['given valid, empty required, after submit: OK shown', ['autocomplete', 'chipinput', 'datepicker', 'daterangeinput', 'daterangepicker', 'multiselect', 'number', 'password', 'timepicker'], ['m1', 'm2'], ['valid']]
+  ['given valid, empty required, after submit m1/m2: invalid colour', ['chipfilter', 'rating'], ['m1', 'm2'], ['valid']],
+  ['given valid, empty required, after submit: no valid colour', ['checkbox', 'input', 'number', 'password', 'radio', 'select', 'switch', 'textarea'], ['m0'], ['valid']],
+  ['given valid, empty required, after submit: no OK', ['checkbox', 'input', 'radio', 'select', 'switch', 'textarea'], ALL_MODES, ['valid']],
+  ['given valid, empty required, after submit: no OK', ['number', 'password'], ['m0'], ['valid']]
 ]
 
 const isKnownFailure = (title, { component, given, mode }) => KNOWN_FAILURES.some(([rule, components, modes, givens]) =>

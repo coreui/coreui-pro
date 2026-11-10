@@ -1100,6 +1100,95 @@ describe('DateRangePicker', () => {
       expect(element).toHaveClass('is-valid')
     })
 
+    it('should show a reported error of an end on the picker element over a given valid state, and drop the state once the user fills both ends', () => {
+      buildPicker({
+        format: 'dd.MM.yyyy', locale: 'en-US', required: true, validationState: 'valid'
+      }, '<form><div id="picker"></div></form>')
+      const element = fixtureEl.querySelector('#picker')
+      const form = fixtureEl.querySelector('form')
+
+      expect(element).toHaveClass('is-valid')
+      expect(form.checkValidity()).toBeFalse()
+      expect(element).toHaveClass('is-invalid')
+      expect(element).not.toHaveClass('is-valid')
+      expect(fixtureEl.querySelector('.form-date-range')).toHaveClass('is-invalid')
+      expect(sectionStates().map(([ariaInvalid]) => ariaInvalid)).toEqual(Array.from({ length: 6 }, () => 'true'))
+
+      for (const section of fixtureEl.querySelectorAll('.form-date-time-section')) {
+        section.focus()
+        section.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
+      }
+
+      expect(form.checkValidity()).toBeTrue()
+      expect(element).not.toHaveClass('is-invalid')
+      expect(element).not.toHaveClass('is-valid')
+      expect(sectionStates().map(([ariaInvalid]) => ariaInvalid)).toEqual(Array.from({ length: 6 }, () => null))
+    })
+
+    it('should block the submit on both value fields while the user types an end before the start, and lift both once the end is corrected', () => {
+      const picker = buildPicker({
+        endDate: new Date(2026, 6, 21), format: 'dd.MM.yyyy', locale: 'en-US', startDate: new Date(2026, 6, 20)
+      }, '<form><div id="picker"></div><div class="invalid-feedback">Check-out has to be on or after check-in.</div></form>')
+      const form = fixtureEl.querySelector('form')
+      const valueFields = [...fixtureEl.querySelectorAll('.form-date-time > textarea')]
+      const [day] = fixtureEl.querySelectorAll('[data-coreui-range-end] .form-date-time-section')
+      const type = keys => {
+        for (const key of keys) {
+          day.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+        }
+      }
+
+      day.focus()
+      type('14')
+
+      expect(picker.getEndDate()).toEqual(new Date(2026, 6, 14))
+      expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+      expect(valueFields.map(field => field.validity.customError)).toEqual([true, true])
+      expect(valueFields.map(field => field.validationMessage)).toEqual(Array.from({ length: 2 }, () => 'Check-out has to be on or after check-in.'))
+
+      day.focus()
+      type('25')
+
+      expect(picker.getEndDate()).toEqual(new Date(2026, 6, 25))
+      expect(form.checkValidity()).toBeTrue()
+      expect(valueFields.every(field => field.validity.valid)).toBeTrue()
+      expect(fixtureEl.querySelector('#picker')).not.toHaveClass('is-invalid')
+      expect(sectionStates().map(([ariaInvalid]) => ariaInvalid)).toEqual(Array.from({ length: 6 }, () => null))
+    })
+
+    it('should block the submit on the end alone while the user types an end the limits reject, and lift the block once the end is corrected', () => {
+      const picker = buildPicker({
+        endDate: new Date(2026, 6, 20), format: 'dd.MM.yyyy', locale: 'en-US', maxDate: new Date(2026, 6, 25), startDate: new Date(2026, 6, 14)
+      }, '<form><div id="picker"></div><div class="invalid-feedback">Check-out has to be in July, by the 25th.</div></form>')
+      const form = fixtureEl.querySelector('form')
+      const valueFields = [...fixtureEl.querySelectorAll('.form-date-time > textarea')]
+      const [day] = fixtureEl.querySelectorAll('[data-coreui-range-end] .form-date-time-section')
+      const type = keys => {
+        for (const key of keys) {
+          day.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+        }
+      }
+
+      day.focus()
+      type('30')
+
+      expect(picker.getEndDate()).toBeNull()
+      expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+      expect(valueFields.map(field => field.validity.customError)).toEqual([false, true])
+      expect(valueFields[1].validationMessage).toEqual('Check-out has to be in July, by the 25th.')
+
+      day.focus()
+      type('22')
+
+      expect(picker.getEndDate()).toEqual(new Date(2026, 6, 22))
+      expect(form.checkValidity()).toBeTrue()
+      expect(valueFields.every(field => field.validity.valid)).toBeTrue()
+      expect(fixtureEl.querySelector('#picker')).not.toHaveClass('is-invalid')
+      expect(sectionStates().map(([ariaInvalid]) => ariaInvalid)).toEqual(Array.from({ length: 6 }, () => null))
+    })
+
     it('should treat what the page does in a change listener during a template action as a change made by code', () => {
       const picker = buildPicker({
         endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'invalid'
