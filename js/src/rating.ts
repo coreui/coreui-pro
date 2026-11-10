@@ -126,7 +126,6 @@ class Rating extends BaseComponent {
   protected declare _disabled: boolean
   protected declare _items: HTMLElement[]
   protected declare _name: string
-  protected declare _sizeClassName: string | null
   protected declare _startValue: number | string | null
   protected declare _tooltip: Tooltip | null
   protected declare _validation: FieldValidation
@@ -135,6 +134,13 @@ class Rating extends BaseComponent {
     super(element)
 
     this._items = []
+    this._config = this._getConfig(config)
+    this._currentValue = this._config.value
+    this._disabled = this._config.disabled
+    this._startValue = this._config.value
+    this._name = this._config.name || getUID(`${this.constructor.NAME}-name-`).toString()
+    this._items = Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index))
+    this._currentValue = this._starValue(this._currentValue)
     this._validation = new FieldValidation(this._element, {
       blockers: () => {
         const blocked = this._blockedRadio()
@@ -151,12 +157,6 @@ class Rating extends BaseComponent {
       restore: () => this._restoreValue()
     })
 
-    this._sizeClassName = null
-    this._config = this._getConfig(config)
-    this._currentValue = this._config.value
-    this._disabled = this._config.disabled
-    this._startValue = this._config.value
-    this._name = this._config.name || getUID(`${this.constructor.NAME}-name-`).toString()
     this._tooltip = null
 
     this._createRating()
@@ -193,20 +193,21 @@ class Rating extends BaseComponent {
 
   setValue(value: RatingConfig['value']): void {
     this._typeCheckConfig({ value }, { value: DefaultType.value })
-    this._currentValue = value
+    this._currentValue = this._starValue(value)
     this._paintValue()
   }
 
   reset(value: number | null = null): void {
+    const starValue = this._starValue(value)
     // eslint-disable-next-line eqeqeq
-    const isChanged = value != this._currentValue
+    const isChanged = starValue != this._currentValue
 
-    this._currentValue = value
+    this._currentValue = starValue
     this._paintValue()
 
     if (isChanged) {
       EventHandler.trigger(this._element, EVENT_CHANGE, {
-        value
+        value: starValue
       })
     }
   }
@@ -216,7 +217,7 @@ class Rating extends BaseComponent {
       return
     }
 
-    this._validation.dispose()
+    this._validation?.dispose()
     this._removeRating()
     this._tooltip?.dispose()
     super.dispose()
@@ -256,10 +257,6 @@ class Rating extends BaseComponent {
       }
     }
 
-    if (!checked) {
-      this._currentValue = null
-    }
-
     this._highlightLabels(checked)
     this._updateTabStop()
     this._validation.update()
@@ -275,17 +272,14 @@ class Rating extends BaseComponent {
     return radios.find(radio => radio.checked) ?? radios[0]
   }
 
-  _removeRating(): ChildNode | null {
+  _removeRating(): void {
     this._tooltip?.hide()
-
-    const anchor = this._items.at(-1)?.nextSibling ?? null
 
     for (const item of this._items) {
       item.remove()
     }
 
     this._items = []
-    return anchor
   }
 
   _addEventListeners(): void {
@@ -470,42 +464,32 @@ class Rating extends BaseComponent {
     }
   }
 
-  _createRating(anchor: ChildNode | null = null): void {
+  _createRating(): void {
     this._element.classList.add(CLASS_NAME_RATING)
     this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
     this._element.classList.toggle(CLASS_NAME_READONLY, Boolean(this._config.readonly))
 
     this._element.classList.remove(...SIZE_CLASS_NAMES)
 
-    if (this._sizeClassName) {
-      this._element.classList.remove(this._sizeClassName)
-    }
-
-    this._sizeClassName = null
-
     if (this._config.size) {
-      const sizeClassName = `rating-${this._config.size}`
-      this._element.classList.add(sizeClassName)
-      this._sizeClassName = sizeClassName
+      this._element.classList.add(`rating-${this._config.size}`)
     }
 
     this._element.setAttribute('role', 'radiogroup')
     writeAttribute(this._element, 'aria-readonly', this._config.readonly ? 'true' : null)
     writeAttribute(this._element, 'aria-required', this._isRequired() ? 'true' : null)
 
-    this._items = Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index))
-
-    for (const item of this._items) {
-      this._element.insertBefore(item, anchor)
-    }
-
-    if (!this._items.some(item => item.querySelector(`${SELECTOR_RATING_ITEM_INPUT}:checked`))) {
-      this._currentValue = null
-      this._resetLabels()
-    }
-
+    this._element.append(...this._items)
     this._updateTabStop()
     this._validation.refresh()
+  }
+
+  _starValue(value: number | string | null): number | string | null {
+    if (value !== null && value !== 0 && !this._items.some(item => item.querySelector(`${SELECTOR_RATING_ITEM_INPUT}[value="${value}"]`))) {
+      throw new TypeError(`${NAME.toUpperCase()}: Option "value" provided value "${value}" but expected the value of a star.`)
+    }
+
+    return value || null
   }
 
   _isRequired(): boolean {

@@ -209,7 +209,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |
 | `tooltips` | array, boolean, object, string | `false` | Enable tooltips with default values or set specific labels for each icon, as an array or a comma-separated string. A read-only rating shows none. |
 | `validationState` | string, null | `null` | The validation state, rendered as the `is-{state}` class on the rating; `'invalid'` also sets `aria-invalid` and blocks the submit. Any custom state declared in the `$form-validation-states` Sass map is accepted. See [Validation](#validation). |
-| `value` | number, null | `null` |  The default `value` of component. |
+| `value` | number, null | `null` | The default `value` of component: `null` or `0` for no rating, or the value of a star, such as `0.3` at a `precision` of `0.1`. Any other value throws a `TypeError` and leaves the element as it was; on the data API it also stops the ratings after it from initializing. |
 
 ### Methods
 
@@ -218,11 +218,11 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `dispose` | Destroys a rating instance and removes the items with their radios, so the form no longer submits the value, and the `aria-invalid` it wrote. The classes, `role`, `aria-readonly` and `aria-required` stay until a new instance writes them from its options. A state class the server wrote and the user did not dismiss stays. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the rating instance associated to a DOM element, you can use it like this: `coreui.Rating.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a rating instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Rating.getOrCreateInstance(element)` |
-| `reset` | Reset the value to `null` or to provided value, firing `change.coreui.rating` when that changes the value. |
+| `reset` | Reset the value to `null` or to provided value, firing `change.coreui.rating` when that changes the value. Takes `null`, `0` or the value of a star; any other value throws a `TypeError`. |
 | `disable()` | Disables the rating. |
 | `enable()` | Enables the rating. |
 | `setValidationState(state)` | Gives the rating a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
-| `setValue(value)` | Sets the value without firing a change event. |
+| `setValue(value)` | Sets the value without firing a change event. Takes `null`, `0` or the value of a star; any other value throws a `TypeError`. |
 
 ### Events
 
