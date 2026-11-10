@@ -97,7 +97,7 @@ class ChipFilter extends ChipSet {
   protected declare _reported: string
   protected declare _unlistenLabel: () => void
   protected declare _validation: FieldValidation
-  protected declare _valueField: HTMLTextAreaElement | null
+  protected declare _valueField: HTMLTextAreaElement
 
   constructor(element?: string | Element | null, config?: Partial<ChipFilterConfig> | null) {
     super(element, config as any)
@@ -112,10 +112,9 @@ class ChipFilter extends ChipSet {
     this._valueField = this._createValueField()
     this._validation = new FieldValidation(this._element, {
       config: () => this._config,
-      fields: () => (this._valueField ? [this._valueField] : []),
+      fields: () => [this._valueField],
       frames: () => [this._element],
       invalidTargets: () => [this._element],
-      owned: () => [this._valueField].filter(Boolean) as Element[],
       restore: () => this._restoreSelection()
     })
 
@@ -167,13 +166,13 @@ class ChipFilter extends ChipSet {
 
   setValidationState(validationState: ValidationState | null): void {
     this._config = this._getConfig({ ...this._config, validationState })
-    this._validation.configure({ validationState })
+    this._validation.configure()
   }
 
   override dispose(): void {
     this._validation.dispose()
     this._unlistenLabel()
-    this._valueField?.remove()
+    this._valueField.remove()
 
     super.dispose()
   }
@@ -290,7 +289,7 @@ class ChipFilter extends ChipSet {
 
     this._reported = key
 
-    const isChanged = this._valueField ? writeValueField(this._valueField, value) : false
+    const isChanged = writeValueField(this._valueField, value)
 
     if (!this._byCode) {
       this._validation.runAsUser(() => this._validation.change())
@@ -300,7 +299,7 @@ class ChipFilter extends ChipSet {
     EventHandler.trigger(this._element, EVENT_CHANGE, { value })
 
     if (isChanged) {
-      dispatchValueChange(this._valueField!)
+      dispatchValueChange(this._valueField)
     }
   }
 
@@ -374,9 +373,7 @@ class ChipFilter extends ChipSet {
       }
     }))
 
-    if (this._valueField) {
-      writeValueField(this._valueField, this.getSelectedValues())
-    }
+    writeValueField(this._valueField, this.getSelectedValues())
   }
 
   _focusTarget(): HTMLElement | null {

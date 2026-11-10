@@ -618,11 +618,33 @@ describe('Form validation utilities', () => {
       expect(getUserValidity(fixtureEl.querySelector('#filled'))).toBe('valid')
       expect(getUserValidity(fixtureEl.querySelector('#plainEmpty'))).toBeUndefined()
     })
+
+    it('should read no state in an engine that does not know :user-invalid', () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><input id="empty" required></form>'
+      const form = fixtureEl.querySelector('form')
+      const control = fixtureEl.querySelector('#empty')
+
+      form.addEventListener('submit', event => event.preventDefault())
+      form.requestSubmit()
+      vi.spyOn(control, 'matches').mockImplementation(() => {
+        throw new SyntaxError('unknown pseudo-class')
+      })
+
+      expect(getUserValidity(control)).toBeUndefined()
+    })
   })
 
   describe('splitIds', () => {
     it('should be the id list splitter of the util index', () => {
       expect(splitIds).toBe(splitIdsFromIndex)
+    })
+  })
+
+  describe('nextStateSerial', () => {
+    it('should give out a higher serial each time', () => {
+      const first = nextStateSerial()
+
+      expect(nextStateSerial()).toBeGreaterThan(first)
     })
   })
 
@@ -788,8 +810,7 @@ describe('Form validation utilities', () => {
     it('should forget the report after a native reset, unless the reset was cancelled', async () => {
       fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
       const control = fixtureEl.querySelector('#value')
-      const resets = []
-      const validity = followUserValidity(control, () => {}, () => resets.push(validity.read()))
+      const validity = followUserValidity(control, () => {})
       const nextTask = () => new Promise(resolve => {
         setTimeout(resolve)
       })
@@ -801,33 +822,12 @@ describe('Form validation utilities', () => {
       await nextTask()
 
       expect(validity.read()).toBe('invalid')
-      expect(resets).toEqual([])
 
       control.form.removeEventListener('reset', cancel)
       control.form.reset()
       await nextTask()
 
       expect(validity.read()).toBeUndefined()
-      expect(resets).toEqual([undefined])
-
-      validity.stop()
-    })
-
-    it('should hand the reset the serial of the last state given out before it', async () => {
-      fixtureEl.innerHTML = '<form novalidate><input id="value"></form>'
-      const control = fixtureEl.querySelector('#value')
-      const serials = []
-      const validity = followUserValidity(control, () => {}, serial => serials.push(serial))
-      const before = nextStateSerial()
-
-      control.form.reset()
-      const after = nextStateSerial()
-      await new Promise(resolve => {
-        setTimeout(resolve)
-      })
-
-      expect(after).toBeGreaterThan(before)
-      expect(serials).toEqual([before])
 
       validity.stop()
     })
@@ -859,8 +859,8 @@ describe('Form validation utilities', () => {
     it('should drop the task of a reset in progress when it stops', async () => {
       fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
       const control = fixtureEl.querySelector('#value')
-      const resets = []
-      const validity = followUserValidity(control, () => {}, serial => resets.push(serial))
+      const updates = []
+      const validity = followUserValidity(control, state => updates.push(state))
 
       control.form.reset()
       validity.stop()
@@ -868,7 +868,7 @@ describe('Form validation utilities', () => {
         setTimeout(resolve)
       })
 
-      expect(resets).toEqual([])
+      expect(updates).toEqual([])
     })
 
     it('should follow a reset in a shadow root and one whose propagation a listener stops', async () => {
@@ -879,7 +879,7 @@ describe('Form validation utilities', () => {
       fixtureEl.insertAdjacentHTML('beforeend', '<form id="stopped" novalidate><input id="light" required></form>')
       const resets = []
       const followers = [shadowRoot.querySelector('#value'), fixtureEl.querySelector('#light')]
-        .map(control => followUserValidity(control, () => {}, () => resets.push(control.id)))
+        .map(control => followUserValidity(control, () => resets.push(control.id)))
 
       fixtureEl.querySelector('#stopped').addEventListener('reset', event => event.stopPropagation())
       shadowRoot.querySelector('form').reset()

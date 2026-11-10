@@ -212,7 +212,7 @@ describe('FieldValidation', () => {
       await userEvent.type(first, 'x')
       await userEvent.tab()
       state.config.validationState = null
-      validation.configure({ validationState: null })
+      validation.configure()
 
       expect(stateClasses(host)).toEqual(['is-valid'])
 
@@ -378,17 +378,9 @@ describe('FieldValidation', () => {
       expect(state.config).toEqual({ invalid: false, valid: false, validationState: null })
 
       state.config.valid = true
+      validation.configure()
 
-      expect(validation.configure({ invalid: false, valid: true })).toBe(true)
       expect(stateClasses(host)).toEqual(['is-valid'])
-
-      const server = mount({ classes: ' is-invalid' })
-
-      expect(server.validation.configure({ invalid: true })).toBe(false)
-
-      server.validation.update()
-
-      expect(stateClasses(server.host)).toEqual(['is-invalid'])
     })
 
     it('should leave a state class the page put on a frame, and take its own off a frame no longer listed', () => {
@@ -525,27 +517,16 @@ describe('FieldValidation', () => {
   })
 
   describe('configure', () => {
-    it('should apply options of validation alone in place and forget the state class from the markup', () => {
+    it('should draw the stored state in place and forget the state class from the markup', () => {
       const { host, state, validation } = mount({ classes: ' is-invalid' })
 
       state.config.validationState = 'valid'
+      validation.configure()
 
-      expect(validation.configure({ validationState: 'valid' })).toBe(true)
       expect(stateClasses(host)).toEqual(['is-valid'])
 
       state.config.validationState = null
       validation.update()
-
-      expect(stateClasses(host)).toEqual([])
-    })
-
-    it('should forget the state class from the markup but leave the drawing to a rebuild for mixed options', () => {
-      const { host, validation } = mount({ classes: ' is-invalid' })
-
-      expect(validation.configure({ placeholder: 'x', validationState: null })).toBe(false)
-      expect(stateClasses(host)).toEqual(['is-invalid'])
-
-      validation.refresh()
 
       expect(stateClasses(host)).toEqual([])
     })
@@ -555,22 +536,11 @@ describe('FieldValidation', () => {
 
       field.form.checkValidity()
       state.config.validationState = null
-      validation.configure({ validationState: null })
+      validation.configure()
 
       expect(field.validity.valid).toBe(true)
       expect(stateClasses(host)).toEqual([])
       expect(targets.some(target => target.hasAttribute('aria-invalid'))).toBe(false)
-    })
-
-    it('should leave the state alone for options without a validation option', () => {
-      const { host, validation } = mount({ classes: ' is-invalid' })
-
-      expect(validation.configure({ placeholder: 'x' })).toBe(false)
-      expect(validation.configure(null)).toBe(false)
-
-      validation.update()
-
-      expect(stateClasses(host)).toEqual(['is-invalid'])
     })
   })
 
@@ -623,7 +593,7 @@ describe('FieldValidation', () => {
       const later = nextStateSerial()
 
       state.config.validationState = 'invalid'
-      validation.configure({ validationState: 'invalid' })
+      validation.configure()
       validation.dismiss(later)
       validation.update()
 
@@ -895,7 +865,7 @@ describe('FieldValidation', () => {
 
       form.addEventListener('reset', () => {
         state.config.validationState = 'invalid'
-        validation.configure({ validationState: 'invalid' })
+        validation.configure()
       })
       form.reset()
       await tick()

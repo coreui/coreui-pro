@@ -312,7 +312,7 @@ class Combobox extends ComboboxBase {
     }
 
     this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._validation.configure({ validationState: config.validationState })
+    this._validation.configure()
   }
 
   override _getConfig(config?: any): any {

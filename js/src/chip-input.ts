@@ -210,7 +210,7 @@ class ChipInput extends ChipSet {
     }
 
     this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._validation.configure({ validationState: config.validationState })
+    this._validation.configure()
   }
 
   override _containerRole(leaving: HTMLElement | null = null): string | null {
