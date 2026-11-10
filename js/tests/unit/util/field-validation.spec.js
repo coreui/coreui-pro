@@ -694,7 +694,7 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual([])
     })
 
-    it('should carry a report by position through partial replacements, and give none to a field put in front', () => {
+    it('should carry a report through partial replacements, and hand a field put in front the follower of a field that is gone', () => {
       fixtureEl.innerHTML = '<form><div id="host" class="form-control-group"></div></form>'
       const host = fixtureEl.querySelector('#host')
       const make = (required = true) => {

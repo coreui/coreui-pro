@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  alignValueField, armValueFieldBubble, clearValidationState, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidity,
+  alignValueField, armValueFieldBubble, clearValidationState, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidities, followUserValidity,
   getFeedbackIds, getFeedbackText, getServerState, getStateClasses, getUserValidity, getValidationState, isFormValid,
   nextStateSerial, ownValidationState, setStateValidity, splitIds, updateValidationState, validateForm,
   writeValueField
@@ -626,6 +626,115 @@ describe('Form validation utilities', () => {
     })
   })
 
+  describe('followUserValidities', () => {
+    const stopAll = followers => {
+      for (const follower of followers.values()) {
+        follower.stop()
+      }
+    }
+
+    it('should keep the follower of a control that stays', () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required></form>'
+      const a = fixtureEl.querySelector('#a')
+      const b = fixtureEl.querySelector('#b')
+      const followers = followUserValidities([a], new Map(), () => {})
+      const next = followUserValidities([a, b], followers, () => {})
+
+      expect(next.get(a)).toBe(followers.get(a))
+      expect([...next.keys()]).toEqual([a, b])
+
+      stopAll(next)
+    })
+
+    it('should go on with the report of a control that is gone', () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required></form>'
+      const a = fixtureEl.querySelector('#a')
+      const b = fixtureEl.querySelector('#b')
+      const followers = followUserValidities([a], new Map(), () => {})
+
+      a.checkValidity()
+      a.remove()
+
+      const next = followUserValidities([b], followers, () => {})
+
+      expect(next.get(b)).toBe(followers.get(a))
+      expect(next.get(b).read()).toBe('invalid')
+
+      stopAll(next)
+    })
+
+    it('should hand the report of a control that is gone to a new control at another position', () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required><input id="c" required></form>'
+      const a = fixtureEl.querySelector('#a')
+      const b = fixtureEl.querySelector('#b')
+      const c = fixtureEl.querySelector('#c')
+      const followers = followUserValidities([a, b], new Map(), () => {})
+
+      b.checkValidity()
+      b.remove()
+
+      const next = followUserValidities([c, a], followers, () => {})
+
+      expect(next.get(c)).toBe(followers.get(b))
+      expect(next.get(c).read()).toBe('invalid')
+      expect(next.get(a).read()).toBeUndefined()
+
+      stopAll(next)
+    })
+
+    it('should start without a report for a control that replaces nothing', () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required></form>'
+      const a = fixtureEl.querySelector('#a')
+      const b = fixtureEl.querySelector('#b')
+      const followers = followUserValidities([a], new Map(), () => {})
+
+      a.checkValidity()
+
+      const next = followUserValidities([a, b], followers, () => {})
+
+      expect(next.get(a).read()).toBe('invalid')
+      expect(next.get(b).read()).toBeUndefined()
+
+      stopAll(next)
+    })
+
+    it('should stop the follower of a control that is gone', () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required></form>'
+      const a = fixtureEl.querySelector('#a')
+      const b = fixtureEl.querySelector('#b')
+      const followers = followUserValidities([a, b], new Map(), () => {})
+      const stop = spyOn(followers.get(b), 'stop')
+      const next = followUserValidities([a], followers, () => {})
+
+      expect(stop).toHaveBeenCalledTimes(1)
+      expect(next.size).toBe(1)
+
+      stopAll(next)
+    })
+
+    it('should forget a report once a reset in progress ends on the replacing control', async () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required></form>'
+      const form = fixtureEl.querySelector('form')
+      const a = fixtureEl.querySelector('#a')
+      const b = fixtureEl.querySelector('#b')
+      const followers = followUserValidities([a], new Map(), () => {})
+
+      a.checkValidity()
+      form.reset()
+      a.remove()
+
+      const next = followUserValidities([b], followers, () => {})
+
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(next.get(b).read()).toBeUndefined()
+
+      stopAll(next)
+    })
+  })
+
   describe('followUserValidity', () => {
     it('should report a control invalid once a validation reports it, until its value is valid', () => {
       fixtureEl.innerHTML = '<form novalidate><select id="value" required><option value="">None</option><option value="1">One</option></select><input id="other" required></form>'
@@ -674,18 +783,6 @@ describe('Form validation utilities', () => {
       expect(validity.read()).toBeUndefined()
 
       validity.stop()
-    })
-
-    it('should start from a report the control it replaces had', () => {
-      fixtureEl.innerHTML = '<form novalidate><select id="value" required><option value="">None</option></select></form>'
-      const control = fixtureEl.querySelector('#value')
-      const fresh = followUserValidity(control, () => {})
-      const carried = followUserValidity(control, () => {}, undefined, true)
-
-      expect([fresh.read(), carried.read()]).toEqual([undefined, 'invalid'])
-
-      fresh.stop()
-      carried.stop()
     })
 
     it('should forget the report after a native reset, unless the reset was cancelled', async () => {

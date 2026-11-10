@@ -222,6 +222,74 @@ describe('Rating', () => {
     })
   })
 
+  describe('value', () => {
+    for (const [config, title] of [
+      [{ value: 4.3 }, 'off the precision'],
+      [{ itemCount: 5, value: 9 }, 'above itemCount'],
+      [{ precision: 0.5, value: 1.25 }, 'off a fractional precision'],
+      [{ value: -1 }, 'negative'],
+      [{ value: Number.NaN }, 'that is not a number'],
+      [{ precision: 0.1, value: 3 * 0.1 }, 'with float noise']
+    ]) {
+      it(`should throw on a value ${title}`, () => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+
+        expect(() => new Rating(div, config)).toThrow(new TypeError(`RATING: Option "value" provided value "${config.value}" but expected the value of a star.`))
+      })
+    }
+
+    it('should leave the element as it was when it throws', () => {
+      fixtureEl.innerHTML = '<form><div class="is-invalid"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      let fired = false
+
+      div.addEventListener('change.coreui.rating', () => {
+        fired = true
+      })
+
+      expect(() => new Rating(div, { value: 4.3 })).toThrow(TypeError)
+      expect(div.children).toHaveLength(0)
+      expect(div.hasAttribute('role')).toBe(false)
+      expect(div.className).toBe('is-invalid')
+
+      form.reset()
+
+      expect(fired).toBe(false)
+    })
+
+    it('should be created again after a value no star has', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+
+      expect(() => new Rating(div, { value: 4.3 })).toThrow(TypeError)
+      expect(() => new Rating(div, { value: 4 })).not.toThrow()
+      expect(div.querySelector('input:checked').value).toBe('4')
+    })
+
+    it('should accept the value of a fractional star', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { precision: 0.1, value: 0.3 })
+
+      expect(rating._currentValue).toBe(0.3)
+      expect(div.querySelector('input:checked').value).toBe('0.3')
+    })
+
+    for (const value of [0, null]) {
+      it(`should start without a rating on ${value}`, () => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        const rating = new Rating(div, { value })
+
+        expect(rating._currentValue).toBeNull()
+        expect(div.querySelector('input:checked')).toBeNull()
+        expect(div.querySelector('.rating-item-label.active')).toBeNull()
+      })
+    }
+  })
+
   describe('size', () => {
     it('should add size class when size is provided', () => {
       fixtureEl.innerHTML = '<div></div>'
@@ -637,12 +705,23 @@ describe('Rating', () => {
       expect(radios.some(radio => radio.disabled)).toBeFalse()
     })
 
-    it('should drop a value setValue gives that no star has', () => {
+    it('should throw on a value setValue gives that no star has and keep the current one', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 5, value: 2 })
 
-      rating.setValue(9)
+      expect(() => rating.setValue(9)).toThrow(new TypeError('RATING: Option "value" provided value "9" but expected the value of a star.'))
+      expect(rating._currentValue).toBe(2)
+      expect(div.querySelector('input:checked').value).toBe('2')
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveLength(2)
+    })
+
+    it('should treat 0 given to setValue as no rating', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 5, value: 2 })
+
+      rating.setValue(0)
 
       expect(rating._currentValue).toBeNull()
       expect(div.querySelector('input:checked')).toBeNull()
@@ -738,16 +817,6 @@ describe('Rating', () => {
       expect(div).not.toHaveClass('rating-lg')
     })
 
-    it('should drop a value the options cannot show', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const div = fixtureEl.querySelector('div')
-      // eslint-disable-next-line no-new
-      new Rating(div, { itemCount: 3, value: 5 })
-
-      expect(div.querySelector('.rating-item-input:checked')).toBeNull()
-      expect(div.querySelector('.rating-item-label.active')).toBeNull()
-    })
-
     it('should recover from a size it cannot apply', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -788,7 +857,7 @@ describe('Rating', () => {
       input.checked = true
       input.dispatchEvent(createEvent('change', { bubbles: true }))
 
-      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveLength(2)
     })
 
     it('should drop the tooltip and the hover highlight when disable() runs over a hovered star', async () => {
@@ -809,7 +878,7 @@ describe('Rating', () => {
       label.dispatchEvent(createEvent('mouseout'))
       await hidden
 
-      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveLength(2)
       expect(document.querySelector('.tooltip')).toBeNull()
 
       label.dispatchEvent(createEvent('mouseover'))
@@ -823,6 +892,51 @@ describe('Rating', () => {
   })
 
   describe('reset', () => {
+    it('should treat 0 as no rating and fire nothing when there was none', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+      let fired = false
+
+      div.addEventListener('change.coreui.rating', () => {
+        fired = true
+      })
+
+      rating.reset(0)
+
+      expect(fired).toBe(false)
+    })
+
+    it('should report no rating when 0 clears a value', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { value: 2 })
+      let reported
+
+      div.addEventListener('change.coreui.rating', event => {
+        reported = event.value
+      })
+
+      rating.reset(0)
+
+      expect(reported).toBeNull()
+    })
+
+    it('should throw on a value no star has, keep the current one and fire nothing', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 5, value: 2 })
+      let fired = false
+
+      div.addEventListener('change.coreui.rating', () => {
+        fired = true
+      })
+
+      expect(() => rating.reset(9)).toThrow(TypeError)
+      expect(rating._currentValue).toBe(2)
+      expect(fired).toBe(false)
+    })
+
     it('should keep content the page put in the element through a reset and dispose', () => {
       fixtureEl.innerHTML = '<div><span class="rating-note">12 reviews</span></div>'
       const div = fixtureEl.querySelector('div')
@@ -1129,7 +1243,7 @@ describe('Rating', () => {
 
       expect(click.defaultPrevented).toBeTrue()
       expect(div.querySelector('.rating-item-input:checked').value).toEqual('2')
-      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveLength(2)
       expect(changeSpy).not.toHaveBeenCalled()
     })
 
@@ -1192,7 +1306,7 @@ describe('Rating', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       // eslint-disable-next-line no-new
-      new Rating(div, { readonly: true, value: 4.3 })
+      new Rating(div, { readonly: true, value: 0 })
 
       expect([...div.querySelectorAll('.rating-item-input')].map(input => input.tabIndex)).toEqual([0, -1, -1, -1, -1])
     })
@@ -1445,6 +1559,28 @@ describe('Rating', () => {
       const shown = tipEvent(div, 'shown')
 
       div.querySelectorAll('.rating-item-label')[2].dispatchEvent(createEvent('mouseover'))
+      await shown
+
+      expect(tipText()).toBe('Good')
+      rating.dispose()
+    })
+
+    it('should give the radios values without floating point noise', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 1, precision: 0.1 })
+
+      expect(div.querySelectorAll('.rating-item-input')[2].value).toBe('0.3')
+      rating.dispose()
+    })
+
+    it('should use the title of the star for a fractional value when tooltips is an array', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3, precision: 0.25, tooltips: ['Bad', 'OK', 'Good'] })
+      const shown = tipEvent(div, 'shown')
+
+      div.querySelectorAll('.rating-item-label')[8].dispatchEvent(createEvent('mouseover'))
       await shown
 
       expect(tipText()).toBe('Good')
@@ -1770,7 +1906,7 @@ describe('Rating', () => {
       await wait()
 
       expect(new FormData(form).get('score')).toEqual('2')
-      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveLength(2)
       expect(changeSpy).toHaveBeenCalledTimes(1)
       expect(changeSpy.calls.mostRecent().args[0].value).toEqual('2')
     })
@@ -1854,21 +1990,6 @@ describe('Rating', () => {
       await wait()
 
       expect(document.activeElement).toBe(input)
-    })
-
-    it('should not fire a change for a value it cannot show', async () => {
-      fixtureEl.innerHTML = '<form><div></div></form>'
-      const form = fixtureEl.querySelector('form')
-      const div = fixtureEl.querySelector('div')
-      const changeSpy = jasmine.createSpy('change')
-      // eslint-disable-next-line no-new
-      new Rating(div, { value: 2.5 })
-
-      div.addEventListener('change.coreui.rating', changeSpy)
-      form.reset()
-      await wait()
-
-      expect(changeSpy).not.toHaveBeenCalled()
     })
 
     it('should clear a rating without an initial value when the form resets', async () => {
@@ -2700,7 +2821,7 @@ describe('Rating', () => {
 
       // Leave
       labels[3].dispatchEvent(createEvent('mouseout'))
-      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveLength(2)
 
       // Hover 1st star
       labels[0].dispatchEvent(createEvent('mouseover'))
@@ -2708,7 +2829,7 @@ describe('Rating', () => {
 
       // Leave
       labels[0].dispatchEvent(createEvent('mouseout'))
-      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveLength(2)
     })
 
     it('should update active state after clicking and then hovering', () => {

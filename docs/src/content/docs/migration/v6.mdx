@@ -2962,6 +2962,12 @@ field behind that kept submitting.
   they stay enabled, the mouse and the keyboard cannot change them, only the
   checked star takes focus, and the group carries `aria-readonly="true"`. A
   read-only rating without `name` still submits nothing.
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span> **A value no star has throws a `TypeError`.** `value`, `setValue()` and
+  `reset()` take `null`, `0` for no rating, or the value of a star, such as
+  `0.3` at a `precision` of `0.1`. Anything else used to leave the rating empty
+  without a word. On the data API the error also stops the ratings after it
+  from initializing. To show an average such as `4.33`, set `precision` to
+  `0.1` and round it to one decimal.
 - **A star with keyboard focus shows the focus ring.**
 - **The setters keep the value the user picked and the stars.** `setValue()`,
   `disable()` and `enable()` change their part in place; any option change

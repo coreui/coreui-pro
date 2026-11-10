@@ -674,8 +674,6 @@ export const nextStateSerial = (): number => ++stateSerial
  * @param onUpdate - Called with the state after every event that may change it
  * @param onReset - Called in the task after a native reset of the control's form that was not
  * cancelled, before `onUpdate`, with the last `nextStateSerial()` given out before the reset
- * @param wasReported - Whether a validation already reported the control, for a control that
- * replaces one a validation reported
  * @returns `read()` for the current state, `follow(control)` to go on with a control that replaces
  * this one, with its report and a reset whose task has not run yet, and `stop()` to remove the
  * listeners
@@ -683,13 +681,12 @@ export const nextStateSerial = (): number => ++stateSerial
 export const followUserValidity = (
   control: FormControl,
   onUpdate: (state: ValidationState | undefined) => void,
-  onReset?: (serial: number) => void,
-  wasReported = false
+  onReset?: (serial: number) => void
 ): UserValidity => {
   const root = control.getRootNode()
   const roots = root instanceof ShadowRoot ? [control.ownerDocument, root] : [control.ownerDocument]
   let current = control
-  let reported = wasReported
+  let reported = false
   let reportedSinceReset = false
   let resetTimeout: ReturnType<typeof setTimeout> | undefined
   const read = () => (reported && !current.validity.valid ? 'invalid' : getUserValidity(current))
@@ -756,6 +753,42 @@ export const followUserValidity = (
       }
     }
   }
+}
+
+/**
+ * Follows the user validity of a list of controls after a build or a rebuild: a control already
+ * followed keeps its follower, a new control goes on with the follower of a control that is gone,
+ * in their order, with its report and a reset in progress, and the followers no control took stop.
+ *
+ * @param controls - The controls of the build
+ * @param followers - The followers of the previous build, with their controls as keys
+ * @param onUpdate - Called by a new follower when the state of its control may have changed
+ * @returns The followers of the build, in its order
+ */
+export const followUserValidities = <T extends FormControl>(
+  controls: T[],
+  followers: Map<T, UserValidity>,
+  onUpdate: () => void
+): Map<T, UserValidity> => {
+  const gone = [...followers.keys()].filter(control => !controls.includes(control))
+  const next = new Map<T, UserValidity>()
+
+  for (const control of controls) {
+    let userValidity = followers.get(control)
+
+    if (!userValidity && gone.length > 0) {
+      userValidity = followers.get(gone.shift()!)!
+      userValidity.follow(control)
+    }
+
+    next.set(control, userValidity ?? followUserValidity(control, onUpdate))
+  }
+
+  for (const control of gone) {
+    followers.get(control)!.stop()
+  }
+
+  return next
 }
 
 /**
