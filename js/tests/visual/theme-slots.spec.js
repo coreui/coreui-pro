@@ -176,6 +176,43 @@ describe('theme slots', () => {
     expect(style('#alert').borderTopLeftRadius).toBe(style('#stop').borderTopLeftRadius)
   })
 
+  it('should mark the active nav link with the subtle slot and a hovered one with the muted slot', async () => {
+    mount('<ul class="nav theme-primary"><li class="nav-item"><a class="nav-link active" href="#">a</a></li><li class="nav-item"><a class="nav-link" href="#">b</a></li></ul>')
+    const [active, other] = container.querySelectorAll('.nav-link')
+
+    expect(getComputedStyle(active).backgroundColor).toBe(slot('theme-primary', 'bg-subtle'))
+    expect(getComputedStyle(active).color).toBe(slot('theme-primary', 'fg'))
+
+    await userEvent.hover(other)
+
+    expect(getComputedStyle(other).backgroundColor).toBe(slot('theme-primary', 'bg-muted'))
+    expect(getComputedStyle(other).color).toBe(slot('theme-primary', 'fg-emphasis'))
+  })
+
+  it('should darken a nav link focused from the keyboard and set its ring off by a pixel', async () => {
+    mount('<ul class="nav theme-primary"><li class="nav-item"><a class="nav-link" href="#">a</a></li></ul>')
+    const link = container.querySelector('.nav-link')
+
+    await userEvent.tab()
+
+    expect(document.activeElement).toBe(link)
+    expect(getComputedStyle(link).color).toBe(slot('theme-primary', 'fg-emphasis'))
+    expect(getComputedStyle(link).backgroundColor).toBe(slot('theme-primary', 'bg-muted'))
+    expect(getComputedStyle(link).outlineOffset).toBe('1px')
+  })
+
+  it('should leave the underline navs without a fill on hover under a theme', async () => {
+    mount('<ul class="nav nav-underline theme-primary"><li class="nav-item"><a class="nav-link" href="#">a</a></li></ul><ul class="nav nav-underline-border theme-primary"><li class="nav-item"><a class="nav-link" href="#">b</a></li></ul>')
+
+    for (const link of container.querySelectorAll('.nav-link')) {
+      // eslint-disable-next-line no-await-in-loop
+      await userEvent.hover(link)
+
+      expect(getComputedStyle(link).backgroundColor).toBe('rgba(0, 0, 0, 0)')
+      expect(getComputedStyle(link).borderBottomColor).toBe(getComputedStyle(link).color)
+    }
+  })
+
   it('should tint the active step indicator with a theme on the step', () => {
     mount(`<div class="stepper"><ol class="stepper-steps"><li class="stepper-step">
       <button type="button" class="stepper-step-button active theme-danger"><span class="stepper-step-indicator" id="el">1</span></button>
