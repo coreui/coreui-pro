@@ -2837,6 +2837,16 @@ field behind that kept submitting.
   and the two underline variants take no fill on hover or when active: they mark
   their state with a line, and a radius curves that line's ends while a fill says
   the same thing twice.
+- **A plain link and a pill take a transparent border** of
+  `--cui-nav-link-border-width` (the global border width), so the plain, pill,
+  tab and both underline navs draw their links at one height. Each link grows by
+  twice the border width in both directions, so a stacked or vertical nav grows
+  once per link. The navbar brand and `.navbar-text` grow with it, so a navbar is
+  as tall with links as without them. Links in `.header-nav` take no border. The
+  token is declared on `.nav` and `.navbar-nav`, so set it to `0` there, and on
+  `.navbar` for the brand, or in `$nav-tokens`, to keep the old size. In forced
+  colors mode the border shows as a frame, and a disabled link draws its frame
+  and text in `GrayText`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.nav-tabs` draws its line with an inset `box-shadow`, not a border.** The
   links no longer pull themselves over the container's border with a negative
@@ -2849,7 +2859,7 @@ field behind that kept submitting.
   `--cui-nav-tabs-border-color`. `.card-header-tabs` compensates with a deeper
   negative margin instead of zeroing the border.
 - **`--cui-nav-gap` is new**, declared on `.nav` and defaulting to `0`, so the
-  base nav renders exactly as it did. It gives the token a home on the component
+  token adds no space between links by itself. It gives the token a home on the component
   whose name it carries: `.navbar-nav` already overrode it, and `.nav-underline`
   keeps its own `--cui-nav-underline-gap`.
 
