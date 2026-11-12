@@ -23,6 +23,11 @@
     }
   }
 
+  .btn-loading.is-loading.disabled:not(a) {
+    pointer-events: auto;
+    cursor: default;
+  }
+
   .btn-loading.is-loading.disabled:focus-visible {
     opacity: 1;
   }
