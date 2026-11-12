@@ -7,7 +7,7 @@
 
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
-import { announce, type AnnouncePriority } from './util/announce.js'
+import { announce, holdAnnouncements, type AnnouncePriority } from './util/announce.js'
 import {
   defineJQueryPlugin, jQueryDispatch
 } from './util/index.js'
@@ -111,6 +111,7 @@ class LoadingButton extends BaseComponent {
 
     this._createSpinner()
     this._state = 'loading'
+    holdAnnouncements(100)
 
     this._startTimeout = setTimeout(() => {
       this._element.classList.add(CLASS_NAME_IS_LOADING)
@@ -140,14 +141,15 @@ class LoadingButton extends BaseComponent {
 
     this._clearTimeouts()
     this._element.classList.remove(CLASS_NAME_IS_LOADING)
+    const announced = Boolean(this._announcement)
+    this._announcement?.()
+    this._announcement = null
     const stoped = () => {
       this._removeSpinner()
       this._state = 'idle'
       this._unblock()
 
-      if (this._announcement) {
-        this._announcement()
-        this._announcement = null
+      if (announced) {
         this._announce(this._getName(), 'normal')
       }
 

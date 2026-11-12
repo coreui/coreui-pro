@@ -171,6 +171,31 @@ describe('announce', () => {
     expect(messages(document.body, 'assertive')).toEqual(['Failed', 'Saved'])
   })
 
+  it('should hold for the time it is given', () => {
+    announce('Before')
+    vi.advanceTimersByTime(100)
+    holdAnnouncements(100)
+    announce('Saved')
+    vi.advanceTimersByTime(99)
+    expect(messages(document.body)).toEqual(['Before'])
+
+    vi.advanceTimersByTime(1)
+    expect(messages(document.body)).toEqual(['Before', 'Saved'])
+  })
+
+  it('should not shorten a longer hold', () => {
+    announce('Before')
+    vi.advanceTimersByTime(100)
+    holdAnnouncements()
+    holdAnnouncements(100)
+    announce('Saved')
+    vi.advanceTimersByTime(499)
+    expect(messages(document.body)).toEqual(['Before'])
+
+    vi.advanceTimersByTime(1)
+    expect(messages(document.body)).toEqual(['Before', 'Saved'])
+  })
+
   it('should add the same text again as a new message', () => {
     announce('Saved')
     announce('Saved')
@@ -239,6 +264,19 @@ describe('announce', () => {
 
     holdAnnouncements()
     vi.advanceTimersByTime(499)
+    expect(messages(document.body)).toEqual([])
+
+    vi.advanceTimersByTime(1)
+    expect(messages(document.body)).toEqual(['First'])
+  })
+
+  it('should add the waiting messages after a hold of the time it is given, when their timer was lost', () => {
+    announce('First')
+    vi.useRealTimers()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance', 'Date'] })
+
+    holdAnnouncements(100)
+    vi.advanceTimersByTime(99)
     expect(messages(document.body)).toEqual([])
 
     vi.advanceTimersByTime(1)
