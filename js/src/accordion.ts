@@ -20,7 +20,9 @@ const DATA_KEY = 'coreui.accordion'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
+const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
+const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_TOGGLE_DATA_API = `toggle${EVENT_KEY}${DATA_API_KEY}`
@@ -30,7 +32,7 @@ const ATTRIBUTE_NAME = 'data-coreui-accordion-name'
 
 const SELECTOR_ACCORDION = '.accordion'
 const SELECTOR_HEADER = '.accordion-header'
-const SELECTOR_INTERACTIVE = 'a, button, input, select, textarea'
+const SELECTOR_INTERACTIVE = 'a, button, input, label, select, textarea'
 const SELECTOR_ITEM = 'details.accordion-item'
 
 /**
@@ -38,6 +40,16 @@ const SELECTOR_ITEM = 'details.accordion-item'
  */
 
 class Accordion extends BaseComponent {
+  protected declare _moving: Map<HTMLDetailsElement, Promise<void>>
+  protected declare _ownToggles: Set<HTMLDetailsElement>
+
+  constructor(element?: string | Element | null, config?: Record<string, unknown> | null) {
+    super(element, config)
+
+    this._moving = new Map()
+    this._ownToggles = new Set()
+  }
+
   // Getters
   static override get NAME(): string {
     return NAME
@@ -57,31 +69,52 @@ class Accordion extends BaseComponent {
   async show(item: Element | number): Promise<void> {
     const details = this._resolve(item)
 
-    if (!details || details.open || details.hasAttribute(ATTRIBUTE_ANIMATING)) {
+    if (!details || details.open || this._moving.has(details)) {
+      return
+    }
+
+    const siblings = this._openSiblings(details)
+
+    if (siblings.some(([accordion, sibling]) => accordion._moving.has(sibling))) {
+      return
+    }
+
+    if (EventHandler.trigger(details, EVENT_SHOW).defaultPrevented) {
       return
     }
 
     // Not awaited: the siblings collapse while this item expands, the way the
-    // native exclusive accordion swaps them in the same frame.
-    this._hideSiblings(details)
+    // native exclusive accordion swaps them in the same frame. A sibling that
+    // stays open keeps this one shut, since the browser would close it anyway.
+    for (const [accordion, sibling] of siblings) {
+      accordion.hide(sibling)
+
+      if (!accordion._moving.has(sibling)) {
+        return
+      }
+    }
 
     const from = this._collapsedSize(details)
-    details.open = true
+    this._setOpen(details, true)
 
-    await this._animate(details, from, details.getBoundingClientRect().height)
+    await this._animate(details, from, details.getBoundingClientRect().height, EVENT_SHOWN)
   }
 
   async hide(item: Element | number): Promise<void> {
     const details = this._resolve(item)
 
-    if (!details || !details.open || details.hasAttribute(ATTRIBUTE_ANIMATING)) {
+    if (!details || !details.open || this._moving.has(details)) {
+      return
+    }
+
+    if (EventHandler.trigger(details, EVENT_HIDE).defaultPrevented) {
       return
     }
 
     const from = details.getBoundingClientRect().height
 
-    await this._animate(details, from, this._collapsedSize(details), () => {
-      details.open = false
+    await this._animate(details, from, this._collapsedSize(details), EVENT_HIDDEN, () => {
+      this._setOpen(details, false)
     })
   }
 
@@ -99,12 +132,14 @@ class Accordion extends BaseComponent {
       }
     }
 
+    await Promise.all(this._moving.values())
     await Promise.all(items.map(item => this.show(item)))
   }
 
   async hideAll(): Promise<void> {
     const items = this._items()
 
+    await Promise.all(this._moving.values())
     await Promise.all(items.map(item => this.hide(item)))
 
     // Restoring the group while more than one item is still open would leave
@@ -129,6 +164,22 @@ class Accordion extends BaseComponent {
   }
 
   // Private
+  _setOpen(details: HTMLDetailsElement, open: boolean): void {
+    if (details.open !== open) {
+      this._ownToggles.add(details)
+      details.open = open
+    }
+  }
+
+  _reportToggle(details: HTMLDetailsElement): void {
+    if (this._ownToggles.delete(details) || this._moving.has(details)) {
+      return
+    }
+
+    EventHandler.trigger(details, details.open ? EVENT_SHOW : EVENT_HIDE)
+    this._settle(details, details.open ? EVENT_SHOWN : EVENT_HIDDEN)
+  }
+
   _items(): HTMLDetailsElement[] {
     return SelectorEngine.children<HTMLDetailsElement>(this._element, SELECTOR_ITEM)
   }
@@ -158,43 +209,55 @@ class Accordion extends BaseComponent {
   }
 
   // Name groups are document-wide, so a sibling can sit in another accordion.
-  _hideSiblings(details: HTMLDetailsElement): void {
-    const { name } = details
-
-    if (!name) {
-      return
+  _openSiblings(details: HTMLDetailsElement): Array<[Accordion, HTMLDetailsElement]> {
+    if (!details.name) {
+      return []
     }
 
-    const siblings = SelectorEngine.find<HTMLDetailsElement>(`details[name="${CSS.escape(name)}"][open]`)
-      .filter(element => element !== details)
-
-    for (const sibling of siblings) {
-      const container = sibling.closest(SELECTOR_ACCORDION)
-
-      if (container) {
-        Accordion.getOrCreateInstance(container).hide(sibling)
-      }
-    }
+    return SelectorEngine.find<HTMLDetailsElement>(`details[name="${CSS.escape(details.name)}"][open]`)
+      .filter(element => element !== details && element.closest(SELECTOR_ACCORDION))
+      .map(element => [Accordion.getOrCreateInstance(element.closest(SELECTOR_ACCORDION)), element])
   }
 
-  async _animate(details: HTMLDetailsElement, from: number, to: number, onFinish?: () => void): Promise<void> {
+  _animate(details: HTMLDetailsElement, from: number, to: number, eventName: string, onFinish?: () => void): Promise<void> {
+    let moved: Promise<void>
+
     // Where the panel is animated by CSS, running this one too would drive the
     // same expansion from both ends.
     if (supportsInterpolateSize()) {
       onFinish?.()
-      return
+      moved = this._settle(details, eventName)
+    } else {
+      details.setAttribute(ATTRIBUTE_ANIMATING, '')
+      startSizeTransition(details, 'blockSize', from, to)
+
+      moved = this._queueCallback(() => {
+        onFinish?.()
+
+        details.style.blockSize = ''
+        details.removeAttribute(ATTRIBUTE_ANIMATING)
+        this._moving.delete(details)
+        EventHandler.trigger(details, eventName)
+      }, details, true)
     }
 
-    details.setAttribute(ATTRIBUTE_ANIMATING, '')
+    this._moving.set(details, moved)
+    return moved
+  }
 
-    startSizeTransition(details, 'blockSize', from, to)
+  // No `transitionend` reaches a listener for the `::details-content` transition, so its length is read.
+  _settle(details: HTMLDetailsElement, eventName: string): Promise<void> {
+    const duration = Number.parseFloat(window.getComputedStyle(details, '::details-content').transitionDuration) * 1000
+    const settled = new Promise<void>(resolve => {
+      setTimeout(resolve, duration + 5)
+    }).then(() => {
+      if (this._element) {
+        this._moving.delete(details)
+        EventHandler.trigger(details, eventName)
+      }
+    })
 
-    await this._queueCallback(() => {
-      onFinish?.()
-
-      details.style.blockSize = ''
-      details.removeAttribute(ATTRIBUTE_ANIMATING)
-    }, details, true)
+    return settled
   }
 
   // Static
@@ -207,10 +270,17 @@ class Accordion extends BaseComponent {
  * Data API implementation
  */
 
-// The CoreUI events mirror the native `toggle`, which does not bubble and so
-// cannot be delegated. Registered for every item, whichever path opened it, so
-// the event surface does not depend on the browser.
+// The native `toggle` does not bubble and so cannot be delegated; listened to
+// for every item, so a change from outside the component is reported too.
 EventHandler.on(document, EVENT_TOGGLE_DATA_API, SELECTOR_ITEM, function (this: HTMLDetailsElement) {
+  const container = this.closest(SELECTOR_ACCORDION)
+
+  if (container) {
+    Accordion.getOrCreateInstance(container)._reportToggle(this)
+    return
+  }
+
+  EventHandler.trigger(this, this.open ? EVENT_SHOW : EVENT_HIDE)
   EventHandler.trigger(this, this.open ? EVENT_SHOWN : EVENT_HIDDEN)
 })
 
@@ -219,8 +289,7 @@ EventHandler.on(document, EVENT_TOGGLE_DATA_API, SELECTOR_ITEM, function (this: 
 // here and preventing the click would not hold the item shut the way it does
 // natively.
 EventHandler.on(document, EVENT_CLICK_DATA_API, (event: Event) => {
-  // Where CSS can animate the panel, the element is left to toggle itself.
-  if (supportsInterpolateSize() || event.defaultPrevented) {
+  if (event.defaultPrevented) {
     return
   }
 
@@ -241,7 +310,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, (event: Event) => {
 
   // Outside an accordion there is nothing to hold the item's tokens either, so
   // it is left to open the way the browser does it, without the animation.
-  if (!container) {
+  if (item.parentElement !== container) {
     return
   }
 
