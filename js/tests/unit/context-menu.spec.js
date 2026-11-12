@@ -923,6 +923,45 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should close and reopen when right-clicking the trigger again', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const calls = []
+
+      for (const type of ['hide', 'hidden', 'show', 'shown']) {
+        area.addEventListener(`${type}.coreui.context-menu`, () => calls.push(type))
+      }
+
+      area.addEventListener('shown.coreui.context-menu', () => {
+        calls.length = 0
+        rightClick(area, 300, 200)
+      }, { once: true })
+
+      rightClick(area, 50, 50)
+
+      expect(calls).toEqual(['hide', 'hidden', 'show', 'shown'])
+    })
+
+    it('should stay closed when the page prevents the show of a second right-click', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const hiddenSpy = jasmine.createSpy('hidden')
+      area.addEventListener('hidden.coreui.context-menu', hiddenSpy)
+
+      area.addEventListener('shown.coreui.context-menu', () => {
+        area.addEventListener('show.coreui.context-menu', event => event.preventDefault())
+        rightClick(area, 300, 200)
+      }, { once: true })
+
+      rightClick(area, 50, 50)
+
+      expect(hiddenSpy).toHaveBeenCalledTimes(1)
+      expect(menu).not.toHaveClass('show')
+    })
+
     it('should keep the menu open on contextmenu inside it', () => {
       fixtureEl.innerHTML = markup()
 
@@ -1507,6 +1546,36 @@ describe('ContextMenu', () => {
       await shown
 
       expect(document.activeElement).toEqual(field)
+    })
+
+    it('should ignore the open keys inside the open menu', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" tabindex="0" data-coreui-toggle="context-menu">',
+        '  <div class="menu"><a class="menu-item" href="#">Item 1</a></div>',
+        '</div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const item = fixtureEl.querySelector('.menu-item')
+      const hideSpy = jasmine.createSpy('hide')
+      area.addEventListener('hide.coreui.context-menu', hideSpy)
+
+      const shown = whenShown(area, () => {})
+      area.focus()
+      area.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true, cancelable: true, key: 'F10', shiftKey: true
+      }))
+      await shown
+
+      item.focus()
+      item.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true, cancelable: true, key: 'F10', shiftKey: true
+      }))
+      item.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ContextMenu' }))
+
+      expect(hideSpy).not.toHaveBeenCalled()
+      expect(fixtureEl.querySelector('.menu')).toHaveClass('show')
+      expect(document.activeElement).toEqual(item)
     })
 
     it('should take the field the keyboard opens the menu from again while it is open', async () => {

@@ -316,10 +316,14 @@ class ContextMenu extends Menu {
       return
     }
 
+    const instance = ContextMenu.getOrCreateInstance(this)
+    if (instance._menu.contains(event.target as Node)) {
+      return
+    }
+
     event.preventDefault()
     event.stopPropagation()
 
-    const instance = ContextMenu.getOrCreateInstance(this)
     if (instance._isShown()) {
       instance.hide()
     }
