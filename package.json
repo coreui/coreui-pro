@@ -267,6 +267,16 @@
         "default": "./js/dist/util/panel-control.js"
       }
     },
+    "./utils/password-strength": {
+      "import": {
+        "types": "./js/dist/util/password-strength.d.mts",
+        "default": "./js/dist/util/password-strength.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/password-strength.d.ts",
+        "default": "./js/dist/util/password-strength.js"
+      }
+    },
     "./utils/press": {
       "import": {
         "types": "./js/dist/util/press.d.mts",
