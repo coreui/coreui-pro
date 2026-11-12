@@ -51,10 +51,11 @@ const ADAPTERS = [
       options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2' }],
       ...config
     }),
-    serverClassElement: t => t.root.querySelector('select'),
+    host: t => t.root.querySelector('select'),
     valueFields: t => [t.instance._element],
     verdictField: t => t.form.elements.tech,
     frames: t => [t.instance._wrapperElement],
+    hostClassCopies: t => [t.instance._wrapperElement],
     invalidTargets: t => [t.instance._getFocusTarget()],
     describedTargets: t => [t.instance._getFocusTarget()],
     changeAsUser: t => t.instance._optionsElement.querySelector('[data-coreui-value="1"]').click(),
@@ -80,7 +81,7 @@ const ADAPTERS = [
       options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }],
       ...config
     }),
-    serverClassElement: t => t.root.querySelector('.autocomplete'),
+    host: t => t.root.querySelector('.autocomplete'),
     valueFields: t => [t.instance._inputElement],
     verdictField: t => t.form.elements.country,
     frames: t => [t.root.querySelector('.autocomplete')],
@@ -120,7 +121,7 @@ const ADAPTERS = [
       FEEDBACK
     ].join(''),
     create: (root, config) => new Combobox(root.querySelector('.combobox-toggle'), { name: 'country', ...config }),
-    serverClassElement: t => t.root.querySelector('.combobox-toggle'),
+    host: t => t.root.querySelector('.combobox-toggle'),
     valueFields: t => [t.instance._valueField],
     verdictField: t => t.form.elements.country,
     frames: t => [t.root.querySelector('.combobox-toggle')],
@@ -144,7 +145,7 @@ const ADAPTERS = [
     name: 'ChipFilter',
     markup: attributes => `<div${attributes('chip-filter')}><span class="chip">one</span><span class="chip">two</span></div>${FEEDBACK}`,
     create: (root, config) => new ChipFilter(root.querySelector('.chip-filter'), { name: 'tags', ...config }),
-    serverClassElement: t => t.root.querySelector('.chip-filter'),
+    host: t => t.root.querySelector('.chip-filter'),
     valueFields: t => [t.instance._valueField],
     verdictField: t => t.form.elements.tags,
     frames: t => [t.root.querySelector('.chip-filter')],
@@ -167,7 +168,7 @@ const ADAPTERS = [
     name: 'ChipInput',
     markup: attributes => `<div${attributes('chip-input')}></div>${FEEDBACK}`,
     create: (root, config) => new ChipInput(root.querySelector('.chip-input'), { name: 'tags', ...config }),
-    serverClassElement: t => t.root.querySelector('.chip-input'),
+    host: t => t.root.querySelector('.chip-input'),
     valueFields: t => [t.instance._valueField],
     verdictField: t => t.form.elements.tags,
     frames: t => [t.root.querySelector('.chip-input')],
@@ -192,7 +193,7 @@ const ADAPTERS = [
       format: 'dd.MM.yyyy', locale: 'en-US', name: 'when', ...config
     }),
     filled: { date: new Date(2026, 6, 14) },
-    serverClassElement: t => t.root.querySelector('#field'),
+    host: t => t.root.querySelector('#field'),
     valueFields: t => [t.instance._inputElement],
     verdictField: t => t.form.elements.when,
     frames: t => [t.root.querySelector('#field')],
@@ -217,7 +218,7 @@ const ADAPTERS = [
       format: 'HH:mm', locale: 'en-US', name: 'at', ...config
     }),
     filled: { date: '10:30:00' },
-    serverClassElement: t => t.root.querySelector('#field'),
+    host: t => t.root.querySelector('#field'),
     valueFields: t => [t.instance._inputElement],
     verdictField: t => t.form.elements.at,
     frames: t => [t.root.querySelector('#field')],
@@ -242,7 +243,7 @@ const ADAPTERS = [
       format: 'dd.MM.yyyy', locale: 'en-US', startName: 'from', endName: 'to', ...config
     }),
     filled: { startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) },
-    serverClassElement: t => t.root.querySelector('#field'),
+    host: t => t.root.querySelector('#field'),
     valueFields: t => [t.instance._startInput._inputElement, t.instance._endInput._inputElement],
     verdictField: t => t.form.elements.from,
     frames: t => [...t.root.querySelectorAll('.form-date-time')],
@@ -267,7 +268,7 @@ const ADAPTERS = [
     markup: attributes => `<div id="field"${attributes()}></div>${FEEDBACK}`,
     create: (root, config) => new DatePicker(root.querySelector('#field'), { locale: 'en-US', name: 'when', ...config }),
     filled: { date: new Date(2026, 6, 14) },
-    serverClassElement: t => t.root.querySelector('#field'),
+    host: t => t.root.querySelector('#field'),
     valueFields: t => [t.instance._input._inputElement],
     verdictField: t => t.form.elements.when,
     frames: t => [t.instance._input._element],
@@ -290,7 +291,7 @@ const ADAPTERS = [
     markup: attributes => `<div id="field"${attributes()}></div>${FEEDBACK}`,
     create: (root, config) => new TimePicker(root.querySelector('#field'), { locale: 'en-US', name: 'at', ...config }),
     filled: { time: '10:30:00' },
-    serverClassElement: t => t.root.querySelector('#field'),
+    host: t => t.root.querySelector('#field'),
     valueFields: t => [t.instance._input._inputElement],
     verdictField: t => t.form.elements.at,
     frames: t => [t.instance._input._element],
@@ -315,7 +316,7 @@ const ADAPTERS = [
       locale: 'en-US', startName: 'from', endName: 'to', ...config
     }),
     filled: { startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) },
-    serverClassElement: t => t.root.querySelector('#field'),
+    host: t => t.root.querySelector('#field'),
     valueFields: t => [t.instance._input._startInput._inputElement, t.instance._input._endInput._inputElement],
     verdictField: t => t.form.elements.from,
     frames: t => [...t.root.querySelectorAll('.form-date-time')],
@@ -339,7 +340,7 @@ const ADAPTERS = [
     name: 'OTPInput',
     markup: attributes => `<div${attributes('form-otp')}><input class="form-otp-control"></div>${FEEDBACK}`,
     create: (root, config) => new OTPInput(root.querySelector('.form-otp'), { name: 'code', ...config }),
-    serverClassElement: t => t.root.querySelector('.form-otp'),
+    host: t => t.root.querySelector('.form-otp'),
     valueFields: t => [t.instance._inputElement],
     verdictField: t => t.form.elements.code,
     frames: t => [t.root.querySelector('.form-otp')],
@@ -361,7 +362,7 @@ const ADAPTERS = [
     name: 'RangeSlider',
     markup: attributes => `<div id="field"${attributes()}></div>${FEEDBACK}`,
     create: (root, config) => new RangeSlider(root.querySelector('#field'), { name: 'budget', value: [20, 80], ...config }),
-    serverClassElement: t => t.root.querySelector('#field'),
+    host: t => t.root.querySelector('#field'),
     valueFields: t => [...t.root.querySelectorAll('.form-range-input')],
     verdictField: t => t.form.elements['budget-0'],
     frames: t => [t.root.querySelector('#field'), ...t.root.querySelectorAll('.form-range-input')],
@@ -391,7 +392,7 @@ const ADAPTERS = [
     name: 'Rating',
     markup: attributes => `<div id="field"${attributes()}></div>${FEEDBACK}`,
     create: (root, config) => new Rating(root.querySelector('#field'), { name: 'score', ...config }),
-    serverClassElement: t => t.root.querySelector('#field'),
+    host: t => t.root.querySelector('#field'),
     valueFields: t => [...t.root.querySelectorAll('.rating-item-input')],
     verdictField: t => t.form.querySelector('input[name="score"]:checked') ?? t.form.querySelector('input[name="score"]'),
     frames: t => [t.root.querySelector('#field')],
@@ -422,11 +423,11 @@ describe('validation conformance', () => {
     setTimeout(resolve)
   })
 
-  const mount = (adapter, { config = {}, serverClass = '' } = {}) => {
+  const mount = (adapter, { config = {}, data = '', pageClass = '' } = {}) => {
     const attributes = (base = '') => {
-      const classes = [base, serverClass].filter(Boolean).join(' ')
+      const classes = [base, pageClass].filter(Boolean).join(' ')
 
-      return `${classes ? ` class="${classes}"` : ''} aria-describedby="hint"`
+      return `${classes ? ` class="${classes}"` : ''}${data} aria-describedby="hint"`
     }
 
     fixtureEl.innerHTML = `<div id="hint">Pick carefully.</div><form>${adapter.markup(attributes)}<button type="submit">Send</button></form>`
@@ -489,19 +490,19 @@ describe('validation conformance', () => {
     clearFixture()
   })
 
-  describe('a state class in the markup', () => {
-    conform('serverClass', 'should show it on the frame, let the form submit and give it back on dispose', adapter => {
-      const t = mount(adapter, { serverClass: 'is-invalid' })
+  describe('a state given with a data attribute', () => {
+    conform('dataState', 'should show it on the frame, let the form submit and take it off on dispose', adapter => {
+      const t = mount(adapter, { data: ' data-coreui-validation-state="invalid"' })
 
       expectFrames(adapter, t, ['is-invalid'])
       expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
+      expect(describesFeedback(adapter, t)).toBe(true)
       expect(hasCustomError(adapter, t)).toBe(false)
       expect(t.form.checkValidity()).toBe(true)
 
-      const element = adapter.serverClassElement(t)
       dispose(t)
 
-      expect(stateClasses(element)).toEqual(['is-invalid'])
+      expect(shownStates(t)).toEqual([])
     })
   })
 
@@ -572,19 +573,14 @@ describe('validation conformance', () => {
   })
 
   describe('a rejected setValidationState', () => {
-    conform('rejectedState', 'should keep a state class from the markup through a state of the wrong type', adapter => {
-      const t = mount(adapter, { serverClass: 'is-invalid' })
+    conform('rejectedState', 'should keep a given state through a state of the wrong type', adapter => {
+      const t = mount(adapter, { config: { validationState: 'invalid' } })
 
       expect(() => t.instance.setValidationState(1)).toThrowError(TypeError)
       adapter.changeFromCode(t)
 
       expectFrames(adapter, t, ['is-invalid'])
       expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
-
-      const element = adapter.serverClassElement(t)
-      dispose(t)
-
-      expect(stateClasses(element)).toEqual(['is-invalid'])
     })
   })
 
@@ -838,7 +834,7 @@ describe('validation conformance', () => {
 
     conform('disposeDescription', 'should give the host the description the page gave it', adapter => {
       const t = mount(adapter, { config: { validationState: 'invalid' } })
-      const host = adapter.serverClassElement(t)
+      const host = adapter.host(t)
 
       dispose(t)
 
@@ -934,8 +930,42 @@ describe('validation conformance', () => {
     })
   })
 
-  describe('a state class the page puts on a frame', () => {
-    conform('pageClass', 'should stay when the given state goes', adapter => {
+  describe('a state class the page writes', () => {
+    const pageClassElements = (adapter, t) => [adapter.host(t), ...(adapter.hostClassCopies?.(t) ?? [])]
+    const otherFrames = (adapter, t) => adapter.frames(t).filter(frame => !pageClassElements(adapter, t).includes(frame))
+
+    conform('pageClassRead', 'should not be read from the element of the component', adapter => {
+      const t = mount(adapter, { pageClass: 'is-invalid' })
+
+      expect(pageClassElements(adapter, t).map(stateClasses)).toEqual(pageClassElements(adapter, t).map(() => ['is-invalid']))
+      expect(otherFrames(adapter, t).map(stateClasses)).toEqual(otherFrames(adapter, t).map(() => []))
+      expect(ariaInvalid(t)).toHaveLength(0)
+      expect(describesFeedback(adapter, t)).toBe(false)
+    })
+
+    conform('pageClassWithdrawn', 'should stay on the element of the component when its given state is withdrawn', adapter => {
+      const t = mount(adapter, { config: { validationState: 'invalid' }, pageClass: 'is-invalid' })
+
+      expectFrames(adapter, t, ['is-invalid'])
+
+      t.instance.setValidationState(null)
+
+      expect(pageClassElements(adapter, t).map(stateClasses)).toEqual(pageClassElements(adapter, t).map(() => ['is-invalid']))
+      expect(otherFrames(adapter, t).map(stateClasses)).toEqual(otherFrames(adapter, t).map(() => []))
+      expect(ariaInvalid(t)).toHaveLength(0)
+    })
+
+    conform('pageClassDispose', 'should not come back on dispose once the page took it off', adapter => {
+      const t = mount(adapter, { pageClass: 'is-invalid' })
+      const host = adapter.host(t)
+
+      host.classList.remove('is-invalid')
+      dispose(t)
+
+      expect(stateClasses(host)).toEqual([])
+    })
+
+    conform('pageClass', 'should stay on a frame when the given state goes', adapter => {
       const t = mount(adapter)
       const [frame] = adapter.frames(t)
 

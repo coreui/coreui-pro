@@ -1246,12 +1246,12 @@ check, radio, carousel and toggler icons already work:
   **Validation state comes from `validationState`.** `invalid` and `valid` are
   deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
   `validationState` also takes a state from `$form-validation-states`. A given
-  `'invalid'`, from the options or from an `.is-invalid` class in the markup,
-  shows the error without blocking the submit and stays until the page changes
-  it with `setValidationState()`, through the user's changes of the value and a
-  native form reset. The markup class is read once, when the component starts,
-  so it no longer comes back when the text returns to the value it started
-  with, and a class written later is not read. A validation that reports the input, from a
+  `'invalid'` (`data-coreui-validation-state="invalid"` in the markup) shows
+  the error without blocking the submit and stays until the page changes it
+  with `setValidationState()`, through the user's changes of the value and a
+  native form reset. An `.is-invalid` or `.is-valid` class on the autocomplete
+  is not read: it stays as you wrote it and gives the input no `aria-invalid`
+  and no linked message. A validation that reports the input, from a
   submit or the page's own `checkValidity()`, now shows on the frame, and the
   autocomplete is the only one that writes `aria-invalid` and the message link on
   its input: the form plugin and the stepper leave the input to it. See
@@ -1770,9 +1770,11 @@ deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
 `validationState` also takes a state from `$form-validation-states`. A given
 `'invalid'` shows the error without blocking the submit and stays until the
 page changes it with `setValidationState()`, through the user's changes of the
-value and a native form reset. An `.is-invalid` or `.is-valid` class on the
-picker element is read once, when the picker starts. An `aria-invalid` on it is
-not read at all; remove it, since the date range picker makes its element a
+value and a native form reset. In the markup, give it with
+`data-coreui-validation-state` on the picker element. An `.is-invalid` or
+`.is-valid` class there is not read and stays as you wrote it, without
+`aria-invalid` or a linked message on the field. An `aria-invalid` on it is
+not read either; remove it, since the date range picker makes its element a
 group and the attribute would be announced on that group. Set the state after
 start with `setValidationState()`. See the Validation sections of the
 [date picker](/forms/date-picker/#validation),
@@ -2166,8 +2168,10 @@ remove to reset the form's appearance.
 - **Success styling is opt-in.** `data-coreui-validate` alone shows only
   invalid styling; set `data-coreui-validate="valid"` to also color the
   valid fields.
-- **Server-side validation is unchanged** — `.is-invalid` / `.is-valid` keep
-  working globally, without the attribute.
+- **Server-side validation of native controls is unchanged** — `.is-invalid` /
+  `.is-valid` on a native control keep working without the attribute. A form
+  component takes its state from `data-coreui-validation-state` instead, see
+  [Form components share one validation state](#form-components-share-one-validation-state).
 - **Feedback of a check, a radio, a switch, a `.form-control` or `.form-select`
   in an input group, or a control placed directly in a component frame belongs
   to the [`.form-field`](/forms/field/) around it.** The field shows it while
@@ -2215,10 +2219,15 @@ time fields, the pickers and the autocomplete take and show their validation
 state the same way, described under
 [Form components](/forms/validation/#form-components):
 
-- **The state comes from the `validationState` option**, or from `.is-invalid`
-  or `.is-valid` on the component's element, read once when the component
-  starts. A class or an `aria-invalid` written on the element later is not
-  read; set the state with `setValidationState()`.
+- **The state comes from the `validationState` option**, which the markup sets
+  with `data-coreui-validation-state`, and from `setValidationState()`. An
+  `.is-invalid` or `.is-valid` class or an `aria-invalid` written on the
+  component's element is not read, at start or later. The class stays as you
+  wrote it, as on a native control: where the stylesheet paints that element
+  it colours the frame and shows the message after it, but the field gets no
+  `aria-invalid` and no linked message, so a screen reader hears nothing. Move
+  a server-rendered `class="is-invalid"` on a component to
+  `data-coreui-validation-state="invalid"`.
 - **A given `'invalid'` shows the error and blocks neither the submit nor the
   stepper's next step.** The component shows the state class, `aria-invalid`
   and the linked message, which a screen reader reads when the user reaches the
@@ -2456,10 +2465,12 @@ submit.
   watched.** `invalid` and `valid` are deprecated aliases of
   `validationState: 'invalid'` and `'valid'`, and `validationState` also takes a
   state from `$form-validation-states`. A given `'invalid'` shows the error
-  without blocking the submit and stays until the page changes it. An `.is-invalid`
-  or `.is-valid` class on the select is read once, when the component starts, and
-  moves to the frame; a class or `aria-invalid` written on the select later is not
-  read, so set the state with `setValidationState()`. A native form
+  without blocking the submit and stays until the page changes it. In the
+  markup, give it with `data-coreui-validation-state` on the select. An
+  `.is-invalid` or `.is-valid` class or `aria-invalid` on the select is not
+  read; a class there is copied to the frame with the select's other classes
+  and stays, without `aria-invalid` or a linked message, so set the state with
+  `data-coreui-validation-state` or `setValidationState()`. A native form
   reset restores the selection the control started with. See
   [Validation](/forms/multi-select/#validation).
 - **<kbd>Backspace</kbd> in the empty search box focuses the last chip.** It
@@ -2668,10 +2679,10 @@ field behind that kept submitting.
   A `role` written on the element is replaced with `group`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The range slider takes a validation state.** The new `validationState`
-  option, or `.is-invalid`/`.is-valid` on the slider element read once when it
-  starts, shows on the element and on the handles until the page changes it
-  with `setValidationState()`. It does not block the submit. A class written on the element later is not read; set
-  the state with `setValidationState()`. See
+  option (`data-coreui-validation-state`) shows on the element and on the
+  handles until the page changes it with `setValidationState()`. It does not
+  block the submit. An `.is-invalid` or `.is-valid` class written on the
+  element is not read. See
   [Validation](/forms/range-slider/#validation).
 - **Range slider interaction follows the native control.** Pressing a handle no
   longer moves it a step; a press on the track or a clickable tick moves the
@@ -2961,11 +2972,11 @@ field behind that kept submitting.
   needs `.form-otp > input:not(.form-otp-control)`, a slot no longer gets
   `required`, and a `data-coreui-invalid-feedback` written on the slots goes
   on the `.form-otp` element.
-- **The code takes a validation state.** The new `validationState` option, or
-  an `.is-invalid`/`.is-valid` class on the `.form-otp` element or on a slot in
-  the markup, shows the state on the group and the slots, and `'invalid'` does
-  not block the submit. A class on one slot, which used to color only that slot, now
-  marks the whole code. The state stays until `setValidationState()` changes
+- **The code takes a validation state.** The new `validationState` option
+  (`data-coreui-validation-state` on the `.form-otp` element) shows the state
+  on the group and the slots, and `'invalid'` does not block the submit. An
+  `.is-invalid` or `.is-valid` class on the `.form-otp` element or on a slot is
+  not read and stays as you wrote it. The state stays until `setValidationState()` changes
   it, and a native form reset puts back the
   code the field started with. A change of the code sends `input` and `change`
   from the input that holds the value.
@@ -3016,12 +3027,11 @@ field behind that kept submitting.
   through `update()` used to render the stars again and reset the rating to its
   initial value.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **The rating takes a validation state.** The new `validationState` option,
-  or `.is-invalid`/`.is-valid` on the rating element read once when it starts,
-  colors the focus ring, and a given `'invalid'` sets
-  `aria-invalid` on the group, without blocking the submit, until the page
-  changes it with `setValidationState()`. A class written on the element later is
-  not read; set the state with `setValidationState()`. See
+  **The rating takes a validation state.** The new `validationState` option
+  (`data-coreui-validation-state`) colors the focus ring, and a given
+  `'invalid'` sets `aria-invalid` on the group, without blocking the submit,
+  until the page changes it with `setValidationState()`. An `.is-invalid` or
+  `.is-valid` class written on the element is not read. See
   [Validation](/forms/rating/#validation).
 - **The rating can be required.** `required` makes every radio required and
   gives the group `aria-required="true"`.

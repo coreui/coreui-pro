@@ -181,7 +181,7 @@ class Rating extends BaseComponent {
 
   setValidationState(validationState: ValidationState | null): void {
     this._config = this._getConfig({ ...this._config, validationState })
-    this._validation.configure()
+    this._validation.update()
   }
 
   setValue(value: RatingConfig['value']): void {

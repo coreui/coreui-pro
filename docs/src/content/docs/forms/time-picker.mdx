@@ -111,11 +111,11 @@ Constrain the times the user can pick with `minDate` and `maxDate`, given as tim
 
 ## Validation
 
-The picker takes its validation state [the way the date picker does](/forms/date-picker/#validation): the `validationState` option (with `invalid` and `valid` as deprecated aliases) or an `.is-invalid` or `.is-valid` class written on the picker element, read once when the picker starts. A given state stays until you change it, through the user's changes of the time, a native form reset and `setTime()`, `clear()`, `reset()` and `now()` called by your code. Every change of the time the user makes fires `timeChange.coreui.time-picker`: a time picked in the panel, the cleaner, a footer button that changes the time through the context, or typing in the field. To clear the state then, call `setValidationState(null)` in a `timeChange.coreui.time-picker` listener. A listener there also clears the state on a native form reset and on `clear()`, `reset()` and `now()`, which fire `timeChange.coreui.time-picker` when they change the time; `setTime()` fires nothing. `setValidationState()` changes the state. While the given state is `'invalid'`, the sections of the field carry `aria-invalid="true"` and are described by the message after the picker. A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field, `form.elements[name]`, see [Form components](/forms/validation/#form-components).
+The picker takes its validation state [the way the date picker does](/forms/date-picker/#validation): the `validationState` option (with `invalid` and `valid` as deprecated aliases), `data-coreui-validation-state` on the picker element in the markup; a `.is-invalid` or `.is-valid` class written there is not read and stays yours. A given state stays until you change it, through the user's changes of the time, a native form reset and `setTime()`, `clear()`, `reset()` and `now()` called by your code. Every change of the time the user makes fires `timeChange.coreui.time-picker`: a time picked in the panel, the cleaner, a footer button that changes the time through the context, or typing in the field. To clear the state then, call `setValidationState(null)` in a `timeChange.coreui.time-picker` listener. A listener there also clears the state on a native form reset and on `clear()`, `reset()` and `now()`, which fire `timeChange.coreui.time-picker` when they change the time; `setTime()` fires nothing. `setValidationState()` changes the state. While the given state is `'invalid'`, the sections of the field carry `aria-invalid="true"` and are described by the message after the picker. A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field, `form.elements[name]`, see [Form components](/forms/validation/#form-components).
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4 form-field">
-      <div class="is-invalid" data-coreui-time-picker data-coreui-locale="en-US" data-coreui-time="12:30:00"></div>
+      <div data-coreui-time-picker data-coreui-validation-state="invalid" data-coreui-locale="en-US" data-coreui-time="12:30:00"></div>
       <div class="invalid-feedback">The room is taken at this time.</div>
     </div>
   </div>`} />
@@ -210,7 +210,7 @@ Clicking a label that names the field, through `aria-labelledby` or a `<label fo
 
 An `aria-label`, `aria-labelledby` or `aria-describedby` on the picker element moves to the field, so a screen reader announces the name and the description when focus enters it, and the picker element gets them back on dispose. Point `aria-labelledby` at the visible label, as the examples on this page do; it names the field over `floatingLabel` and an `ariaLabel` in `inputOptions`, the way the browser ranks names.
 
-While the picker shows an invalid state, the sections of its field carry `aria-invalid="true"` and are described by the error message after the picker, see [Validation](#validation). An `aria-invalid` written on the picker element is not read; give the state with `validationState` or with the class.
+While the picker shows an invalid state, the sections of its field carry `aria-invalid="true"` and are described by the error message after the picker, see [Validation](#validation). An `aria-invalid` or a state class written on the picker element is not read; give the state with `validationState` or `setValidationState()`.
 
 ### Keyboard support
 

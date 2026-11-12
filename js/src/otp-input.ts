@@ -120,8 +120,7 @@ class OTPInput extends BaseComponent {
       frames: () => [this._element],
       invalidTargets: () => this._getInputs(),
       owned: () => [this._inputElement!, ...this._getInputs()],
-      restore: () => this._restoreValue(),
-      serverClassSources: () => [this._element, ...this._getInputs()]
+      restore: () => this._restoreValue()
     })
 
     this._element.setAttribute('role', 'group')
@@ -189,7 +188,7 @@ class OTPInput extends BaseComponent {
 
   setValidationState(validationState: ValidationState | null): void {
     this._config = this._getConfig({ ...this._config, validationState })
-    this._validation.configure()
+    this._validation.update()
   }
 
   setValue(value: OtpInputConfig['value']): void {

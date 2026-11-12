@@ -383,7 +383,7 @@ class Autocomplete extends ComboboxBase {
   setValidationState(validationState: ValidationState | null): void {
     const state = { invalid: false, valid: false, validationState }
     this._config = this._getConfig({ ...this._config, ...state })
-    this._validation.configure()
+    this._validation.update()
   }
 
   setValue(value: AutocompleteConfig['value']): void {

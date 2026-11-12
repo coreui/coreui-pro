@@ -1226,8 +1226,8 @@ describe('TimePicker', () => {
     const sectionStates = () => [...fixtureEl.querySelectorAll('.form-date-time-section')]
       .map(section => [section.getAttribute('aria-invalid'), section.getAttribute('aria-describedby')])
 
-    it('should take a state class the markup carries on the picker element as the given state, with the message after it, and let a valid time submit', () => {
-      buildPicker({ time: '10:30:00' }, '<form><div id="picker" class="is-invalid"></div><div class="invalid-feedback">Already booked.</div></form>')
+    it('should take a state the markup gives on the picker element with a data attribute as the given state, with the message after it, and let a valid time submit', () => {
+      buildPicker({ time: '10:30:00' }, '<form><div id="picker" data-coreui-invalid="true"></div><div class="invalid-feedback">Already booked.</div></form>')
       const { id } = fixtureEl.querySelector('.invalid-feedback')
       const count = fixtureEl.querySelectorAll('.form-date-time-section').length
 
@@ -1265,7 +1265,7 @@ describe('TimePicker', () => {
     })
 
     it('should keep the given state when the user types in the field, and through a native form reset', async () => {
-      buildPicker({ time: '10:30:00' }, '<form><div id="picker" class="is-invalid"></div><div id="second" data-coreui-validation-state="invalid"></div></form>')
+      buildPicker({ time: '10:30:00' }, '<form><div id="picker" data-coreui-validation-state="invalid"></div><div id="second" data-coreui-validation-state="invalid"></div></form>')
       const form = fixtureEl.querySelector('form')
       const [hour] = fixtureEl.querySelectorAll('#picker .form-date-time-section')
 
@@ -1308,7 +1308,7 @@ describe('TimePicker', () => {
         fixtureEl.querySelector('.form-control-cleaner').click()
       }]
     ])('should keep the given state when the user %s and through changes made by code', (_, act) => {
-      const picker = buildPicker({ time: '10:30:00' }, '<form><div id="picker" class="is-invalid"></div></form>')
+      const picker = buildPicker({ time: '10:30:00' }, '<form><div id="picker" data-coreui-validation-state="invalid"></div></form>')
 
       picker.setTime('11:45:00')
       picker.clear()

@@ -1912,7 +1912,7 @@ describe('OTPInput', () => {
     it.each([
       ['on the group', '<div class="form-otp is-invalid"><input class="form-otp-control"><input class="form-otp-control"></div>'],
       ['on a slot', '<div class="form-otp"><input class="form-otp-control is-invalid"><input class="form-otp-control"></div>']
-    ])('should take a state class the server wrote %s, and give it back on dispose, also after a change', (_, markup) => {
+    ])('should not take a state class the page wrote %s as a state, and leave it through a change and dispose', (_, markup) => {
       for (const changed of [false, true]) {
         fixtureEl.innerHTML = `<form>${markup}</form><div class="invalid-feedback">This code has expired.</div>`
         fixtureEl.querySelector('form').append(fixtureEl.querySelector('.invalid-feedback'))
@@ -1920,19 +1920,18 @@ describe('OTPInput', () => {
         const marked = fixtureEl.querySelector('.is-invalid')
         const otpInput = new OTPInput(group)
         const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
-        const { id } = fixtureEl.querySelector('.invalid-feedback')
 
-        expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
-        expect(group.className).toBe('form-otp is-invalid')
-        expect(slots.some(slot => slot.classList.contains('is-invalid'))).toBeFalse()
+        expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+        expect(marked.classList.contains('is-invalid')).toBeTrue()
+        expect(fixtureEl.querySelectorAll('.is-invalid')).toHaveSize(1)
         expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
 
         if (changed) {
           type(slots[0], '1')
           type(slots[1], '2')
 
-          expect(group).toHaveClass('is-invalid')
-          expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
+          expect(marked.classList.contains('is-invalid')).toBeTrue()
+          expect(slotStates(slots)).toEqual([[null, null], [null, null]])
         }
 
         otpInput.dispose()
@@ -1943,45 +1942,7 @@ describe('OTPInput', () => {
       }
     })
 
-    it('should take a valid class the server wrote, and give it back on dispose', () => {
-      fixtureEl.innerHTML = '<form><div class="form-otp is-valid"><input class="form-otp-control"></div></form>'
-      const group = fixtureEl.querySelector('.form-otp')
-      const otpInput = new OTPInput(group)
-
-      expect(group.className).toBe('form-otp is-valid')
-
-      otpInput.dispose()
-
-      expect(group.className).toBe('form-otp is-valid')
-    })
-
-    it('should let validationState, given at start or later, replace the server class', () => {
-      fixtureEl.innerHTML = '<form><div class="form-otp is-invalid"><input class="form-otp-control"></div></form>'
-      const group = fixtureEl.querySelector('.form-otp')
-
-      new OTPInput(group, { validationState: 'valid' }).dispose()
-
-      expect(group.className).toBe('form-otp is-invalid')
-
-      const shown = new OTPInput(group, { validationState: 'valid' })
-
-      expect(group.className).toBe('form-otp is-valid')
-
-      shown.dispose()
-
-      const otpInput = new OTPInput(group)
-
-      otpInput.setValidationState(null)
-
-      expect(group).not.toHaveClass('is-invalid')
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
-
-      otpInput.dispose()
-
-      expect(group).not.toHaveClass('is-invalid')
-    })
-
-    it('should not take a class or aria-invalid the page writes after start, and let the state decide aria-invalid on a slot over its markup', async () => {
+    it('should not take a class or aria-invalid the page writes, and let the state decide aria-invalid on a slot over its markup', async () => {
       const { form, otpInput, slots } = mountForm({}, '', '<input class="form-otp-control" aria-invalid="true"><input class="form-otp-control">')
       const group = fixtureEl.querySelector('.form-otp')
 

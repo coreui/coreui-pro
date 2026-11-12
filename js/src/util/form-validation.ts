@@ -598,25 +598,6 @@ export const getValidationState = (validationState?: ValidationState | null, val
   validationState || (invalid ? 'invalid' : (valid ? 'valid' : undefined))
 
 /**
- * Reads the state classes, `.is-invalid` and `.is-valid`, an element carries.
- *
- * @param element - The element of a component, read at build
- * @returns The state classes it carries, `.is-invalid` first
- */
-export const getStateClasses = (element: Element): string[] =>
-  STATE_CLASSES.filter(name => element.classList.contains(name))
-
-/**
- * Resolves the state the server gave a component through the `.is-invalid` and `.is-valid` classes
- * its markup carried at build, `'invalid'` first.
- *
- * @param classes - The classes the component took from its markup
- * @returns The state, or `undefined` when neither class is among them
- */
-export const getServerState = (classes: string[]): ValidationState | undefined =>
-  getValidationState(null, classes.includes(CLASS_NAME_IS_VALID), classes.includes(CLASS_NAME_IS_INVALID))
-
-/**
  * Tells whether a selector matches an element, treating a selector the browser does not know as
  * no match.
  *

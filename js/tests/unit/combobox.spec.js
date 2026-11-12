@@ -748,11 +748,8 @@ describe('Combobox', () => {
     })
 
     it('should show a given state on the toggle with its message, let the form submit, and give back what it took on dispose', () => {
-      const toggle = setMarkupInForm(' aria-describedby="hint"', null, '<div id="hint">Ships in a week.</div><div class="invalid-feedback">Pick a country.</div>')
+      const toggle = setMarkupInForm(' aria-describedby="hint" data-coreui-validation-state="invalid"', null, '<div id="hint">Ships in a week.</div><div class="invalid-feedback">Pick a country.</div>')
       const form = fixtureEl.querySelector('form')
-
-      toggle.classList.add('is-invalid')
-
       const feedback = fixtureEl.querySelector('.invalid-feedback')
       const combobox = new Combobox(toggle)
 
@@ -763,7 +760,7 @@ describe('Combobox', () => {
 
       combobox.dispose()
 
-      expect(toggle.classList.contains('is-invalid')).toBeTrue()
+      expect(toggle.classList.contains('is-invalid')).toBeFalse()
       expect(toggle.hasAttribute('aria-invalid')).toBeFalse()
       expect(toggle.getAttribute('aria-describedby')).toBe('hint')
       expect(fixtureEl.querySelector('.combobox-select')).toBeNull()
@@ -776,26 +773,6 @@ describe('Combobox', () => {
 
       expect([...toggle.classList].some(name => name.startsWith('is-'))).toBeFalse()
       expect(combobox._valueField.validity.valid).toBeTrue()
-    })
-
-    it('should let the option win over a class from the markup', () => {
-      const toggle = setMarkupInForm()
-
-      toggle.classList.add('is-valid')
-
-      const combobox = new Combobox(toggle, { validationState: 'invalid' })
-
-      expect(toggle.classList.contains('is-invalid')).toBeTrue()
-      expect(toggle.classList.contains('is-valid')).toBeFalse()
-
-      combobox.setValidationState('valid')
-
-      expect(toggle.classList.contains('is-valid')).toBeTrue()
-
-      combobox.setValidationState(null)
-
-      expect(toggle.classList.contains('is-valid')).toBeFalse()
-      expect(toggle.classList.contains('is-invalid')).toBeFalse()
     })
 
     it('should not expose setConfig', () => {
@@ -825,23 +802,19 @@ describe('Combobox', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it.each([['a class in the markup', true], ['the option', false]])('should keep a state given through %s through a pick in the list', (_, fromClass) => {
-      const toggle = setMarkupInForm()
-
-      if (fromClass) {
-        toggle.classList.add('is-invalid')
-      }
-
-      const combobox = new Combobox(toggle, fromClass ? {} : { validationState: 'invalid' })
+    it.each([['a data attribute', true], ['the option', false]])('should keep a state given through %s through a pick in the list', (_, fromAttribute) => {
+      const toggle = setMarkupInForm(fromAttribute ? ' data-coreui-validation-state="invalid"' : '')
+      const combobox = new Combobox(toggle, fromAttribute ? {} : { validationState: 'invalid' })
 
       pick(combobox, 'ca')
 
       expect(toggle.classList.contains('is-invalid')).toBeTrue()
+      expect(toggle.getAttribute('aria-invalid')).toBe('true')
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
 
       combobox.dispose()
 
-      expect(toggle.classList.contains('is-invalid')).toBe(fromClass)
+      expect(toggle.classList.contains('is-invalid')).toBeFalse()
     })
 
     it('should keep a state given when the user takes an option off in the list', () => {

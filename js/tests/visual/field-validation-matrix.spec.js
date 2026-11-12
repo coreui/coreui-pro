@@ -3,9 +3,14 @@
  * read at load, after submitting the empty required field and after a native
  * reset, then held to the same rules, one observable per rule. Each field
  * also holds a valid value with a given invalid state and is submitted. The
- * custom components also take their state from a server class and from
- * `setValidationState()`, and have to read as with the option, and keep a
- * given state through a change of the user until the page clears it. What a field
+ * custom components also take their state from `setValidationState()`, and
+ * have to read as with the option, and keep a given state through a change of
+ * the user until the page clears it. A state class the page writes on a custom
+ * component gives no state: no `aria-invalid` and no linked message, also after
+ * `setValidationState()`. It shows the messages as the option does, and colours
+ * the frame of a component that has one; the range slider, which shows the
+ * option on its handles, and the rating have their own specs. A state given
+ * by the attribute shows only once the component starts. What a field
  * shows is decided by the stylesheet, `:user-invalid` and the accessibility
  * tree, which only a real browser has. A combination listed in KNOWN_FAILURES
  * has to keep failing its rule, so the list shrinks with every fix.
@@ -162,14 +167,31 @@ const FILLED_RULES = [
   ['valid value, given invalid, after submit: aria-invalid on a visible element (components)', custom, ({ submit }) => submit.ariaInvalid.some(item => !item.includes('('))]
 ]
 
-const SOURCES = {
-  'server class': (host, given) => host.classList.add(`is-${given}`),
-  'setValidationState()': (host, given) => instanceOf(host).setValidationState(given)
-}
-
 const SOURCE_RULES = [
-  ...Object.keys(SOURCES).flatMap(source => STATE_READINGS.map(reading => `${source}: ${reading} as with the option`)),
+  ...STATE_READINGS.map(reading => `setValidationState(): ${reading} as with the option`),
   ...STATE_READINGS.map(reading => `setValidationState(null): ${reading} as with no state`)
+]
+
+const UNFRAMED = new Set(['chipfilter', 'rangeslider', 'rating'])
+const pageClass = ({ given }, step) => (given === 'invalid' ? step.isInvalid : step.isValid).length > 0
+const sameReadings = (step, option, readings) => readings.every(reading => JSON.stringify(step[reading]) === JSON.stringify(option[reading]))
+const messagesAsOption = (step, option) => sameReadings(step, option, ['invalidFeedback', 'validFeedback'])
+const colouredAsOption = (step, option) => (red(option) || green(option)) && sameReadings(step, option, ['green', 'red'])
+const framed = cell => !UNFRAMED.has(cell.component)
+
+const PAGE_CLASS_RULES = [
+  ['page class: no console or page errors', always, ({ errors }) => errors.length === 0],
+  ['page class: the class stays', always, ({ load }, cell) => pageClass(cell, load)],
+  ['page class: messages as with the option', always, ({ load, option }) => messagesAsOption(load, option)],
+  ['page class: frame colour as with the option (components with a frame)', framed, ({ load, option }) => colouredAsOption(load, option)],
+  ['page class: no aria-invalid', always, ({ load }) => load.ariaInvalid.length === 0],
+  ['page class: no message linked', always, ({ load }) => load.linked.length === 0],
+  ['page class, given invalid by setValidationState(): aria-invalid on a visible element', givenInvalid, ({ set }) => set.ariaInvalid.some(item => !item.includes('('))],
+  ['page class, then setValidationState(null): the class stays', always, ({ cleared }, cell) => pageClass(cell, cleared)],
+  ['page class, then setValidationState(null): messages as with the option', always, ({ cleared, option }) => messagesAsOption(cleared, option)],
+  ['page class, then setValidationState(null): frame colour as with the option (components with a frame)', framed, ({ cleared, option }) => colouredAsOption(cleared, option)],
+  ['page class, then setValidationState(null): no aria-invalid', always, ({ cleared }) => cleared.ariaInvalid.length === 0],
+  ['page class, then setValidationState(null): no message linked', always, ({ cleared }) => cleared.linked.length === 0]
 ]
 
 const sourceCell = cell => CUSTOM.includes(cell.component) && cell.mode === 'm2' && STATES.has(cell.given)
@@ -218,6 +240,7 @@ const USER_CHANGE_RULES = [
 const COVERAGE = new Map([
   ...RULES.map(([title, applies]) => [title, applies]),
   ...SOURCE_RULES.map(title => [title, sourceCell]),
+  ...PAGE_CLASS_RULES.map(([title, applies]) => [title, cell => sourceCell(cell) && applies(cell)]),
   ...FILLED_RULES.map(([title, applies]) => [title, cell => givenInvalid(cell) && applies(cell)]),
   ...USER_CHANGE_RULES.map(([title, applies]) => [title, cell => CUSTOM.includes(cell.component) && STATES.has(cell.given) && applies(cell)])
 ])
@@ -283,6 +306,7 @@ const read = form => {
     invalidFeedback: feedback('.invalid-feedback, .invalid-tooltip'),
     isInvalid: [...form.querySelectorAll('.is-invalid')].map(describeElement),
     isValid: [...form.querySelectorAll('.is-valid')].map(describeElement),
+    linked: [...form.querySelectorAll('.invalid-feedback, .valid-feedback')].filter(element => element.id && form.querySelector(`[aria-describedby~="${element.id}"]`)).map(element => element.textContent.trim()),
     names: [...form.elements].filter(element => element.name).map(element => element.name),
     red: coloured(borderColour('ref-invalid')),
     submits,
@@ -358,7 +382,12 @@ const unmount = () => {
   container = null
 }
 
-const mount = ({ component, filled, given, mode }, source = 'option') => {
+const start = () => {
+  document.dispatchEvent(new Event('DOMContentLoaded'))
+  window.dispatchEvent(new Event('load'))
+}
+
+const mount = ({ component, filled, given, mode }, source = 'option', started = true) => {
   unmount()
   container = document.createElement('div')
   container.style.padding = '40px'
@@ -376,15 +405,16 @@ const mount = ({ component, filled, given, mode }, source = 'option') => {
     }
   }
 
-  if (given && source === 'server class') {
-    SOURCES[source](host, given)
+  if (given && source === 'page class') {
+    host.classList.add(`is-${given}`)
   }
 
-  document.dispatchEvent(new Event('DOMContentLoaded'))
-  window.dispatchEvent(new Event('load'))
+  if (started) {
+    start()
+  }
 
   if (given && source === 'setValidationState()') {
-    SOURCES[source](host, given)
+    instanceOf(host).setValidationState(given)
   }
 
   return { form: container.querySelector('form'), host }
@@ -435,6 +465,22 @@ const runUserChangeCell = async cell => {
 }
 
 const loadReading = async (cell, source) => settled(mount(cell, source).form)
+
+const runPageClassCell = async cell => {
+  const option = await loadReading(cell)
+  const { form, host } = mount(cell, 'page class')
+  const load = await settled(form)
+
+  instanceOf(host).setValidationState(cell.given)
+  const set = await settled(form)
+
+  instanceOf(host).setValidationState(null)
+  const cleared = await settled(form)
+
+  return {
+    cleared, errors: [...errors], load, option, set
+  }
+}
 
 const expectRule = (title, cell, passed, details) => {
   const known = isKnownFailure(title, cell)
@@ -544,12 +590,13 @@ describe('field validation matrix', () => {
     for (const given of STATES) {
       const cell = { component, given, mode: 'm2' }
 
-      it(`${component} given ${given} by a server class reads as with the option`, async () => {
-        const expected = await loadReading(cell)
-        const actual = await loadReading(cell, 'server class')
+      it(`${component} with a ${given} state class the page wrote takes no state from it`, async () => {
+        const run = await runPageClassCell(cell)
 
-        for (const reading of STATE_READINGS) {
-          expectRule(`server class: ${reading} as with the option`, cell, JSON.stringify(actual[reading]) === JSON.stringify(expected[reading]), { actual, expected })
+        for (const [title, applies, passes] of PAGE_CLASS_RULES) {
+          if (applies(cell)) {
+            expectRule(title, cell, passes(run, cell), run)
+          }
         }
       })
 
@@ -571,5 +618,18 @@ describe('field validation matrix', () => {
         }
       })
     }
+  }
+
+  for (const component of ['dateinput', 'multiselect']) {
+    it(`${component} shows a state given by the attribute only once the component starts`, async () => {
+      const { form } = mount({ component, given: 'invalid', mode: 'm0' }, 'option', false)
+      const before = await settled(form)
+
+      start()
+      const after = await settled(form)
+
+      expect({ bad: bad(before), red: red(before) }).toEqual({ bad: false, red: false })
+      expect({ bad: bad(after), red: red(after) }).toEqual({ bad: true, red: true })
+    })
   }
 })

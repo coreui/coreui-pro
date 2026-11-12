@@ -10,7 +10,7 @@ Here's how form validation works with Bootstrap:
 
 - **Client-side validation** uses CSS pseudo-classes scoped behind the `data-coreui-validate` attribute. Add `data-coreui-validate` to your `<form>` to opt in to `:user-invalid` styling—validation styles only appear **after the user interacts** with a control (e.g., typing and blurring, or attempting to submit), so required fields don't show up as invalid on page load.
 - By default, **client-side validation only shows invalid styling.** To also show success styling for valid fields, set `data-coreui-validate="valid"`.
-- **Server-side validation** uses the `.is-invalid` and `.is-valid` classes to indicate field state without requiring user interaction. These work globally—no `data-coreui-validate` attribute needed.
+- **Server-side validation** uses the `.is-invalid` and `.is-valid` classes to indicate the state of a native control without requiring user interaction. They work without the `data-coreui-validate` attribute. A [form component](#form-components) does not read these classes and takes its state from `data-coreui-validation-state` instead.
 - Custom validation states beyond `valid`/`invalid` (e.g., `warning`) are supported via the `.is-*` class pattern and the `$form-validation-states` Sass map. There are no generated pseudo-classes for custom states.
 - With `novalidate` as well, the [form plugin](#usage) handles the submit: it stops an invalid form, marks its invalid controls with `.is-invalid` and `aria-invalid="true"`, links the message of each to it with `aria-describedby` and moves focus to the first.
 - Feedback shows when it follows the control. For a check, a radio, a switch, a `.form-control` or `.form-select` in an input group, or a control placed directly in a component frame, it can sit anywhere in the [`.form-field`](/forms/field/) around the control.
@@ -155,6 +155,8 @@ In a form the [form plugin](#usage) validates, a `.is-invalid` or `.is-valid` yo
 
 For a validated input group, wrap the group in a [`.form-field`](/forms/field/) and place the feedback outside the group, so it renders under the whole frame.
 
+A [form component](#form-components) takes a state the server rendered from `data-coreui-validation-state="invalid"` on its element, not from a class there. The stylesheet does not read that attribute, so the state and its message appear when the component starts: on `DOMContentLoaded` for a chip input and a chip filter, and on the `load` event of the window for the others.
+
 <Example code={`<form class="row g-4">
     <div class="col-md-4 form-field">
       <label for="validationServer01" class="form-label">First name</label>
@@ -231,7 +233,9 @@ A [multi select](/forms/multi-select/#validation), a [chip input](/forms/chip-in
 3. the state a validation reports for its field: a submit, the [form plugin](#usage), the [stepper](/forms/stepper/#form-validation), or your own `checkValidity()` or `reportValidity()` call;
 4. `:user-invalid` or `:user-valid` of its field, in a form with `data-coreui-validate`.
 
-Give a state with the `validationState` option (`data-coreui-validation-state`), or with `.is-invalid` or `.is-valid` on the component's element in the HTML the server renders. The autocomplete, the multi select and the pickers also take the deprecated `invalid` and `valid` options. The class is read once, when the component starts; after that, set the state with `setValidationState('invalid')`, since a class or an `aria-invalid` written on the element later is not read. Put the message on the page before you set the state, or call `setValidationState()` once it is there: a message added later, with no change of state, is not linked to the field.
+Give a state with the `validationState` option, which the HTML the server renders sets with `data-coreui-validation-state`, and change it with `setValidationState()`. The autocomplete, the multi select and the pickers also take the deprecated `invalid` and `valid` options (`data-coreui-invalid`, `data-coreui-valid`). Put the message on the page before you set the state, or call `setValidationState()` once it is there: a message added later, with no change of state, is not linked to the field.
+
+The component does not read `.is-invalid`, `.is-valid` or `aria-invalid` written on its element, at start or later. A state class there is yours, as on a native control: the component neither removes it nor puts it back on dispose. Where the stylesheet paints that element, the class colours the frame and shows the message after it, but the field gets no `aria-invalid` and no linked message, so a screen reader hears nothing. A range slider shows its state on the handles, which a class on the slider element leaves uncoloured. The component draws the class of its own state only on a frame that does not already carry it, and takes off only a class it drew. The one exception: a class you write on a frame that already shows the same state, after the component drew it, comes off with the component's when the state changes and on dispose.
 
 A given state only shows: the state class and, for `'invalid'`, `aria-invalid` and the linked message, which a screen reader reads when the user reaches the field. It does not stop the submit or the [stepper](/forms/stepper/#form-validation)'s next step, since the browser checks only the constraints of the field that carries the value: a valid value is submitted under a given `'invalid'`, and an empty `required` field keeps blocking under a given `'valid'`, which shows over the reported error. A given state stays until you change it: the user's changes of the value, a native form reset and the methods of the component keep it. Clear it with `setValidationState(null)` once your verdict no longer holds, for example in a `reset` listener on the form, or in the change event of the component, which every change the user makes fires, apart from typing with no option selected in an autocomplete, which fires only `input.coreui.autocomplete` (its [recipe](/forms/autocomplete/#validation) clears the state once the text changes). The component then shows the state of the value at once. The change event also fires on a native reset and on the methods of the component that change the value, as the page of each component lists, so a listener there clears the state on them as well.
 
@@ -445,7 +449,7 @@ With the form plugin (`data-coreui-validate` on a form with `novalidate`), a fai
 - sets `aria-invalid="true"` on every invalid control and adds the `id` of its invalid feedback to its `aria-describedby`, keeping the ids the page set; the next validation takes both off a control that is valid again;
 - moves focus to the first invalid control that can take it. When focus is already there, or no invalid control can take focus, its message is announced in the page's live region instead.
 
-With the browser's own validation (no `novalidate`), the browser shows and reads its own messages. For server-side feedback (`.is-invalid` in the markup), associate the message with the field through `aria-describedby` yourself, as described in [Server side](#server-side).
+With the browser's own validation (no `novalidate`), the browser shows and reads its own messages. For server-side feedback (`.is-invalid` in the markup), associate the message with the field through `aria-describedby` yourself, as described in [Server side](#server-side). A [form component](#form-components) does that for a state given with `data-coreui-validation-state`, not for a class.
 
 ## Customizing
 

@@ -248,7 +248,7 @@ class RangeSlider extends BaseComponent {
 
   setValidationState(validationState: ValidationState | null): void {
     this._config = this._getConfig({ ...this._config, validationState }) as RangeSliderConfig
-    this._validation.configure()
+    this._validation.update()
   }
 
   setValue(value: RangeSliderConfig['value']): void {

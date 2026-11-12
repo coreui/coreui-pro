@@ -50,10 +50,10 @@ const DATE_LAYOUTS = {
   'after a date picker': [DatePicker, `<div data-test></div>${FEEDBACK}`],
   'after a date range': [DateRangeInput, `<div data-test></div>${FEEDBACK}`],
   'after a date range picker': [DateRangePicker, `<div data-test></div>${FEEDBACK}`],
-  'after a date picker the page marks invalid': [DatePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}],
-  'after a time picker the page marks invalid': [TimePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}],
-  'after a date range picker the page marks invalid': [DateRangePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}],
-  'next to a date range picker the page marks invalid, outside a field': [DateRangePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}, false]
+  'after a date picker the page also marks invalid': [DatePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`],
+  'after a time picker the page also marks invalid': [TimePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`],
+  'after a date range picker the page also marks invalid': [DateRangePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`],
+  'next to a date range picker the page also marks invalid, outside a field': [DateRangePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, { validationState: 'invalid' }, false]
 }
 
 let container
@@ -273,13 +273,14 @@ describe('messages of a form field', () => {
       instance.dispose()
     })
 
-    it('shows the error after the group for a slot the server marked invalid, and gives the state to every slot', () => {
+    it('shows the error after the group for a slot the page marks invalid, and gives no slot a state', () => {
       const form = mount(OTP.replace('form-otp-control', 'form-otp-control is-invalid'), '')
       const instance = new OTPInput(container.querySelector('.form-otp'))
       const slots = [...container.querySelectorAll('.form-otp-control')]
 
       expect(displayOf('.invalid-feedback')).toBe('block')
-      expect(slots.map(slot => slot.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+      expect(slots.map(slot => slot.getAttribute('aria-invalid'))).toEqual([null, null])
+      expect(slots.map(slot => slot.hasAttribute('aria-describedby'))).toEqual([false, false])
       expect(form.checkValidity()).toBeTrue()
 
       instance.dispose()

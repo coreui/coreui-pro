@@ -134,7 +134,7 @@ describe('validation feedback next to a frame', () => {
   })
 
   it('keeps the success message away while the frame itself is invalid', () => {
-    mount('<div id="host" class="is-valid"></div><div class="valid-feedback">Looks good!</div>')
+    mount('<div id="host" data-coreui-validation-state="valid"></div><div class="valid-feedback">Looks good!</div>')
 
     instance.setRange(new Date(2026, 6, 20), new Date(2026, 6, 14))
 

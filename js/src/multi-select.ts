@@ -540,7 +540,7 @@ class MultiSelect extends ComboboxBase {
     const state = { invalid: false, valid: false, validationState }
 
     this._config = this._getConfig({ ...this._config, ...state })
-    this._validation.configure()
+    this._validation.update()
   }
 
   setValue(value: MultiSelectConfig['value']): void {

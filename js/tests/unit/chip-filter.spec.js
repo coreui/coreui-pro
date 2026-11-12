@@ -591,7 +591,7 @@ describe('ChipFilter', () => {
     })
 
     it('should put the state and its message on the listbox', () => {
-      fixtureEl.innerHTML = '<form><div class="chip-filter is-invalid"><span class="chip">First</span></div><div class="invalid-feedback" id="tags-error">Pick one.</div></form>'
+      fixtureEl.innerHTML = '<form><div class="chip-filter" data-coreui-validation-state="invalid"><span class="chip">First</span></div><div class="invalid-feedback" id="tags-error">Pick one.</div></form>'
       const el = fixtureEl.querySelector('.chip-filter')
       const chipFilter = new ChipFilter(el, { name: 'tags' })
 
@@ -604,7 +604,7 @@ describe('ChipFilter', () => {
     })
 
     it('should keep a given state on a change the user makes and on one from code', () => {
-      fixtureEl.innerHTML = '<form><div class="chip-filter is-invalid"><span class="chip">First</span><span class="chip">Second</span></div></form>'
+      fixtureEl.innerHTML = '<form><div class="chip-filter" data-coreui-validation-state="invalid"><span class="chip">First</span><span class="chip">Second</span></div></form>'
       const el = fixtureEl.querySelector('.chip-filter')
       const chipFilter = new ChipFilter(el, { name: 'tags' })
       const form = fixtureEl.querySelector('form')

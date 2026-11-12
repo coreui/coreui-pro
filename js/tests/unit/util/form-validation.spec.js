@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import {
   alignValueField, armValueFieldBubble, clearValidationState, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidities, followUserValidity,
-  getFeedbackIds, getFeedbackText, getServerState, getStateClasses, getUserValidity, getValidationState, isFormValid,
+  getFeedbackIds, getFeedbackText, getUserValidity, getValidationState, isFormValid,
   ownValidationState, splitIds, updateValidationState, validateForm,
   writeValueField
 } from '../../../src/util/form-validation.js'
@@ -581,25 +581,6 @@ describe('Form validation utilities', () => {
       expect(getValidationState(undefined, true, false)).toBe('valid')
       expect(getValidationState(null, false, false)).toBeUndefined()
       expect(getValidationState('', true, false)).toBe('valid')
-    })
-  })
-
-  describe('getStateClasses', () => {
-    it('should read the state classes an element carries, invalid first', () => {
-      fixtureEl.innerHTML = '<div class="is-valid custom is-invalid"></div><div class="is-warning"></div>'
-      const [both, other] = fixtureEl.querySelectorAll('div')
-
-      expect(getStateClasses(both)).toEqual(['is-invalid', 'is-valid'])
-      expect(getStateClasses(other)).toEqual([])
-    })
-  })
-
-  describe('getServerState', () => {
-    it('should resolve the state classes to a state, invalid over valid', () => {
-      expect(getServerState(['is-valid', 'is-invalid'])).toBe('invalid')
-      expect(getServerState(['is-invalid'])).toBe('invalid')
-      expect(getServerState(['is-valid'])).toBe('valid')
-      expect(getServerState([])).toBeUndefined()
     })
   })
 

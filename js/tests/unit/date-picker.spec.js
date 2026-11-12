@@ -1554,8 +1554,8 @@ describe('DatePicker', () => {
       .map(section => [section.getAttribute('aria-invalid'), section.getAttribute('aria-describedby')])
     const footer = '<template data-coreui-template="footer"><button type="button" data-coreui-picker-action="today">Today</button><button type="button" data-coreui-picker-action="clear">Clear</button><button type="button" data-coreui-picker-action="close">OK</button></template>'
 
-    it('should take a state class the markup carries on the picker element as the given state, with the message after it, and let a valid date submit', () => {
-      buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div><div class="invalid-feedback">Already booked.</div></form>')
+    it('should take a state the markup gives on the picker element with a data attribute as the given state, with the message after it, and let a valid date submit', () => {
+      buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" data-coreui-validation-state="invalid"></div><div class="invalid-feedback">Already booked.</div></form>')
       const { id } = fixtureEl.querySelector('.invalid-feedback')
       const count = fixtureEl.querySelectorAll('.form-date-time-section').length
 
@@ -1582,7 +1582,7 @@ describe('DatePicker', () => {
     })
 
     it('should change the state through setValidationState and leave the other options as they are', () => {
-      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div></form>')
+      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" data-coreui-validation-state="invalid"></div></form>')
 
       picker.setValidationState('valid')
 
@@ -1635,8 +1635,8 @@ describe('DatePicker', () => {
         section.focus()
         section.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
       }]
-    ])('should keep the given state and the class the markup carried when the user %s, and give the class back on dispose', (_, act) => {
-      for (const [markup, field] of [['class="is-invalid"', ''], ['data-coreui-validation-state="invalid"', ''], ['', '<div data-coreui-picker-field class="is-invalid"></div>']]) {
+    ])('should keep the given state when the user %s, and leave a state class the markup carried', (_, act) => {
+      for (const [markup, field] of [['class="is-invalid" data-coreui-validation-state="invalid"', ''], ['data-coreui-invalid="true"', ''], ['data-coreui-validation-state="invalid"', '<div data-coreui-picker-field class="is-invalid"></div>']]) {
         const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, `<form><div id="picker" ${markup}>${field}${footer}</div></form>`)
         const element = fixtureEl.querySelector('#picker')
 
@@ -1647,13 +1647,13 @@ describe('DatePicker', () => {
 
         picker.dispose()
 
-        expect(element.classList.contains('is-invalid')).toBe(markup === 'class="is-invalid"')
-        expect(Boolean(fixtureEl.querySelector('.is-invalid'))).toBe(!markup.startsWith('data-'))
+        expect(element.classList.contains('is-invalid')).toBe(markup.startsWith('class='))
+        expect(Boolean(fixtureEl.querySelector('.is-invalid'))).toBe(markup.startsWith('class=') || field !== '')
       }
     })
 
     it('should keep a state given before a native reset and one the page gives after it started', async () => {
-      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div></form>')
+      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" data-coreui-validation-state="invalid"></div></form>')
       const form = fixtureEl.querySelector('form')
       const nextTask = () => new Promise(resolve => {
         setTimeout(resolve)
@@ -1724,7 +1724,7 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
-    it('should leave a state class the page put on the picker element after start', () => {
+    it('should leave a state class the page put on the picker element', () => {
       const picker = buildPicker({ locale: 'en-US' })
       const element = fixtureEl.querySelector('#picker')
 
@@ -1735,12 +1735,12 @@ describe('DatePicker', () => {
       expect(element.classList.contains('is-invalid')).toBeTrue()
     })
 
-    it('should give a state class the markup carried back on dispose when an option overrode it', () => {
+    it('should leave a state class the markup carried next to the state of an option, and on dispose', () => {
       const picker = buildPicker({ locale: 'en-US', validationState: 'valid' }, '<div id="picker" class="is-invalid"></div>')
       const element = fixtureEl.querySelector('#picker')
 
       expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-valid')).toBeTrue()
-      expect(element.classList.contains('is-invalid')).toBeFalse()
+      expect(element.classList.contains('is-invalid')).toBeTrue()
 
       picker.dispose()
 
@@ -1758,15 +1758,6 @@ describe('DatePicker', () => {
       picker.reset()
 
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
-    })
-
-    it('should give a state class the markup carried back on dispose', () => {
-      const picker = buildPicker({ locale: 'en-US' }, '<div id="picker" class="is-invalid"></div>')
-      const element = fixtureEl.querySelector('#picker')
-
-      picker.dispose()
-
-      expect(element.classList.contains('is-invalid')).toBeTrue()
     })
 
     it('should keep the message on the sections while the popup with time selects is open and after it closes', async () => {

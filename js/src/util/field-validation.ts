@@ -1,6 +1,6 @@
 import {
-  closeValueFieldBubble, followUserValidities, getFeedbackIds, getServerState, getStateClasses, getValidationState, ownValidationState,
-  splitIds, type UserValidity, type ValidationState, type ValueField
+  closeValueFieldBubble, followUserValidities, getFeedbackIds, getValidationState, ownValidationState, splitIds, type UserValidity,
+  type ValidationState, type ValueField
 } from './form-validation.js'
 import { resolveFieldState } from './field-state.js'
 import { writeAttribute } from './index.js'
@@ -30,8 +30,6 @@ export type FieldValidationConfig = {
  *   other targets then get as well, as the host had it at the start. By default the first described
  *   target, and every described target while the state is `'invalid'`.
  * - `restore`: puts back the value the component had when it was built, on a native reset.
- * - `serverClassSources`: the elements whose state class in the markup counts as the given state;
- *   the host by default.
  */
 export type FieldValidationOptions = {
   aliases?: boolean
@@ -44,17 +42,17 @@ export type FieldValidationOptions = {
   ownError?: () => boolean
   pageDescribed?: (isInvalid: boolean) => Element[]
   restore?: () => void
-  serverClassSources?: () => Element[]
 }
 
 /**
- * Keeps the validation state of a component that carries a form value: the state it was given, by
- * an option or by a state class its markup carried, the state a validation reported for its value
- * fields, the state class, `aria-invalid` and the invalid feedback in `aria-describedby`, and a
- * native reset of the form. It leaves the validity of the value fields to the browser and the page,
- * and the given state to the page, which changes it with the component's setter. The component
- * describes where these go and tells the controller when its value or its state changes; it writes
- * none of these itself. The controller takes back what it wrote and gives back what it overwrote.
+ * Keeps the validation state of a component that carries a form value: the state its options give
+ * it, the state a validation reported for its value fields, the state class, `aria-invalid` and the
+ * invalid feedback in `aria-describedby`, and a native reset of the form. A state class the page
+ * wrote on an element of the component is the page's: it is not read, and it stays. It leaves the
+ * validity of the value fields to the browser and the page, and the given state to the page, which
+ * changes it with the component's setter. The component describes where these go and tells the
+ * controller when its value or its state changes; it writes none of these itself. The controller
+ * takes back what it wrote and gives back what it overwrote.
  */
 class FieldValidation {
   protected declare _ariaInvalid: Element[]
@@ -70,13 +68,11 @@ class FieldValidation {
   protected declare _release: () => void
   protected declare _resetRoots: Node[]
   protected declare _resetTimeout: ReturnType<typeof setTimeout> | undefined
-  protected declare _serverClasses: Map<Element, string[]>
   protected declare _userValidity: Map<ValueField, UserValidity>
 
   /**
-   * Takes the state classes the server sources carry in their markup as the state the component was
-   * given, takes them off, and starts following native resets of the form ahead of the fields. Call
-   * `refresh()` once the component has built its fields.
+   * Starts following native resets of the form ahead of the fields. Call `refresh()` once the
+   * component has built its fields.
    *
    * @param host - The element of the component
    * @param options - How the component describes itself, see `FieldValidationOptions`
@@ -97,16 +93,6 @@ class FieldValidation {
     this._release = () => {}
     this._resetRoots = root instanceof ShadowRoot ? [host.ownerDocument, root] : [host.ownerDocument]
     this._resetTimeout = undefined
-    this._serverClasses = new Map()
-
-    for (const element of options.serverClassSources?.() ?? [host]) {
-      const classes = getStateClasses(element)
-
-      if (classes.length > 0) {
-        element.classList.remove(...classes)
-        this._serverClasses.set(element, classes)
-      }
-    }
 
     for (const node of this._resetRoots) {
       node.addEventListener('reset', this._onReset, true)
@@ -125,16 +111,6 @@ class FieldValidation {
   adopt(part: FieldValidation): void {
     part._owner = this
     this._parts.push(part)
-    this.update()
-  }
-
-  /**
-   * Takes the validation state the component has already type-checked and stored in its
-   * configuration: the state classes from the markup are no longer the given state, and the state
-   * is drawn in place.
-   */
-  configure(): void {
-    this._serverClasses.clear()
     this.update()
   }
 
@@ -208,9 +184,8 @@ class FieldValidation {
 
   /**
    * Hands everything back: leaves its owner, stops following the fields and the form, takes off what
-   * it drew and the `aria-invalid` it wrote, gives the server sources the state classes of their
-   * markup, unless the setter gave a state meanwhile, and adds the page's description back to the
-   * host next to what the host carries now. Call it before the component takes its elements apart.
+   * it drew and the `aria-invalid` it wrote, and adds the page's description back to the host next to
+   * what the host carries now. Call it before the component takes its elements apart.
    */
   dispose(): void {
     this._owner?._parts.splice(this._owner._parts.indexOf(this), 1)
@@ -234,10 +209,6 @@ class FieldValidation {
     this._drawStateClass(null)
     this._markInvalid([], false)
     this._describe([])
-
-    for (const [element, classes] of this._serverClasses) {
-      element.classList.add(...classes)
-    }
 
     if (this._movedDescription) {
       const ids = splitIds(this._host.getAttribute('aria-describedby'))
@@ -266,8 +237,7 @@ class FieldValidation {
   }
 
   /**
-   * Reads the state the component was given: by its options, else by the state classes its markup
-   * carried.
+   * Reads the state the options of the component give it.
    *
    * @param config - The configuration of the component
    * @returns The given state, or `undefined` when none was given
@@ -275,12 +245,13 @@ class FieldValidation {
   _givenState(config: FieldValidationConfig): ValidationState | undefined {
     const { aliases } = this._options
 
-    return getValidationState(config.validationState, aliases && config.valid, aliases && config.invalid) ?? getServerState([...this._serverClasses.values()].flat())
+    return getValidationState(config.validationState, aliases && config.valid, aliases && config.invalid)
   }
 
   /**
    * Puts a state class on the frames, taking off only the classes the controller added itself, also
-   * from frames the component no longer lists.
+   * from frames the component no longer lists. A frame that already carries the class keeps it as
+   * someone else's, so it stays when the state goes.
    *
    * @param stateClass - The class to show, or `null` for none
    */

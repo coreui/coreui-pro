@@ -207,15 +207,14 @@ Localized formats work the same way — the section names come from the componen
 
 The field shows its validation state on the element and on its sections, and links the message that follows it, the way the [form plugin](/forms/validation/) does for a native field. It keeps its value in a `<textarea>` laid invisibly over the field, which takes part in native constraint validation: a `required` field that is empty, incomplete or holds a rejected date blocks the submit, and the browser, or the [form plugin](/forms/validation/#usage), puts focus on its first empty section, the browser with its own message over the field. A field that is not required does not block, and submits no date while it rejects one.
 
-The state comes from five places, in this order:
+The state comes from four places, in this order:
 
 - The limits: a completed date outside `minDate`/`maxDate`/`disabledDates` makes the field invalid until it is corrected, whatever else is set, and until then the value field submits no date, as `getDate()` returns none; a read-only field holding such a date submits none either. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
-- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`.
-- An `.is-invalid` or `.is-valid` class written on the element in the markup, for example by a server that has already checked the date. It is read once, when the component starts.
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. In the markup, for example from a server that has already checked the date, set it with `data-coreui-validation-state`.
 - A validation that reports the field invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the field shows it invalid whenever its date is invalid, until a native reset of the form.
 - In a form with `data-coreui-validate`, the `:user-invalid` and `:user-valid` states of the value field, the same states the stylesheet reads on a native field. A field becomes `.is-valid` after a submit only when the form opts into success styling with `data-coreui-validate="valid"`.
 
-A state you give, with the option or with the class, stays until you change it: the user's edits, a native form reset and a change your own code makes, with `setDate()`, `clear()` or `reset()`, keep it. Every edit that changes the date fires `dateChange.coreui.date-input`, so to clear the state when the user changes the date, call `setValidationState(null)` in a `dateChange.coreui.date-input` listener. A listener there also clears the state on a native form reset and on `clear()` and `reset()`, which fire `dateChange.coreui.date-input` when they change the date; `setDate()` fires it only with `triggerChange`. To change it, there or after a server response, call `setValidationState()`. It updates the state without rebuilding the field and replaces a class written on the element, so `setValidationState(null)` withdraws that class. A class or an `aria-invalid` written on the element after the component starts is not read. A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field, `form.elements[name]`, which the component leaves as it is, see [Form components](/forms/validation/#form-components). A native form reset returns the field to the date it was created with and keeps the state; a `reset` listener that calls `preventDefault()` cancels the whole reset.
+A state you give stays until you change it: the user's edits, a native form reset and a change your own code makes, with `setDate()`, `clear()` or `reset()`, keep it. Every edit that changes the date fires `dateChange.coreui.date-input`, so to clear the state when the user changes the date, call `setValidationState(null)` in a `dateChange.coreui.date-input` listener. A listener there also clears the state on a native form reset and on `clear()` and `reset()`, which fire `dateChange.coreui.date-input` when they change the date; `setDate()` fires it only with `triggerChange`. To change it, there or after a server response, call `setValidationState()`. It updates the state without rebuilding the field. A `.is-invalid` or `.is-valid` class or an `aria-invalid` written on the element is not read, at start or later; the class stays yours and paints the field without giving the sections `aria-invalid` or a linked message, see [Form components](/forms/validation/#form-components). A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field, `form.elements[name]`, which the component leaves as it is, see [Form components](/forms/validation/#form-components). A native form reset returns the field to the date it was created with and keeps the state; a `reset` listener that calls `preventDefault()` cancels the whole reset.
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control. While the field is invalid, its error message, an `.invalid-feedback` or `.invalid-tooltip` after the field, after the frame around it or in its `.form-field`, describes every section, so a screen reader reads the error with the field. A message placed anywhere else can be named in `data-coreui-invalid-feedback` on the field, and one with the `hidden` attribute is left out, so an `errorChange` listener can show the message that matches `event.error` and hide the rest. A message the page adds later, while the field stays invalid, is picked up the next time the field changes, or right away when it is added in an `errorChange` listener.
 
@@ -224,7 +223,7 @@ Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other fo
     <div class="valid-feedback">Looks good!</div>
   </div>
   <div class="form-field">
-    <div class="form-control form-date-time is-invalid" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-20"></div>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-20" data-coreui-validation-state="invalid"></div>
     <div class="invalid-feedback">We have no delivery slots left on this date.</div>
   </div>`} />
 
@@ -249,7 +248,7 @@ Add `.form-floating-always` to the wrapper, or to any ancestor, to keep the labe
 
 ## Sizing
 
-The field renders as a `.form-control`, so the standard sizing classes work — add `.form-control-sm` or `.form-control-lg` to the container. Validation states (`.is-invalid` set automatically for out-of-range dates, or your own `.is-valid`) and input groups work the same way.
+The field renders as a `.form-control`, so the standard sizing classes work — add `.form-control-sm` or `.form-control-lg` to the container. Validation states (`.is-invalid` set automatically for out-of-range dates, or a state you give with `data-coreui-validation-state` or `setValidationState()`) and input groups work the same way.
 
 <Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateInputLargeLabel">Large</label>

@@ -387,7 +387,7 @@ Set the button's accessible name with the `ariaToggleLabel` option. Pass custom 
 1. Replace `.needs-validation` on the `<form>` with `data-coreui-validate`. Keep `novalidate`.
 2. Delete the starter script that added `.was-validated`. The Form plugin stops an invalid submit and marks the controls.
 3. Add `data-coreui-validate="valid"` to also show valid styling.
-4. Keep server-side `.is-invalid` and `.is-valid`. They work without the attribute.
+4. Keep server-side `.is-invalid` and `.is-valid` on native controls. They work without the attribute. On a form component (Autocomplete, Multi Select, Combobox, Chip Input, Chip Filter, OTP Input, Rating, Range Slider, date and time fields and pickers) write `data-coreui-validation-state="invalid"` instead: the component does not read the class. The class still shows the message after the element and colours the frame where there is one, without `aria-invalid` or a linked message; on a Range Slider it colours no handle.
 
 ```html
 <!-- v5 -->
@@ -558,7 +558,7 @@ Change events now fire only when the value changes. Code that relied on a change
 1. **Time Picker `hours`.** The list is 0 to 23 in every locale. A v5 list written for a 12-hour locale, such as `hours: [1, 3, 5, 7]`, must name both halves: `[1, 3, 5, 7, 13, 15, 17, 19]`.
 2. **Calendar cell selectors.** Replace `.calendar-cell[tabindex="0"]` with `.calendar-cell[data-coreui-selectable]`. Day cells write `data-coreui-date` as `date.toDateString()`, so select them with `[data-coreui-date="${date.toDateString()}"]`.
 3. **Unnamed fields are not submitted.** Autocomplete, Multi Select, Chip Input and the pickers no longer generate a `name`. Set the `name` option on every one whose value the form must send.
-4. **Validation state is read once.** Set it after start with `setValidationState()`, not by adding `.is-invalid` or `aria-invalid` to the element.
+4. **Validation state comes only from the option.** Give it with `data-coreui-validation-state` and change it with `setValidationState()`. A component does not read `.is-invalid`, `.is-valid` or `aria-invalid` on its element, at start or later.
 5. **Hidden value inputs.** Replace `input[type="hidden"]` selectors: `.chip-input > textarea` for Chip Input, `.form-otp > input:not(.form-otp-control)` for OTP Input.
 6. **Loading Button.** `disabledOnLoading` sets `aria-disabled="true"` and `.disabled`, not the `disabled` attribute. Replace `:disabled` checks with `[aria-disabled="true"]`.
 7. **Range Slider events.** The inner `changed.coreui.range` is gone. Listen to `input.coreui.range-slider` and `change.coreui.range-slider` on the slider element.

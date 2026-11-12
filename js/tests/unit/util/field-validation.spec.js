@@ -12,8 +12,8 @@ describe('FieldValidation', () => {
     setTimeout(resolve)
   })
 
-  const mount = ({ attributes = '', classes = '', config = {}, root = null, targetClasses = '', ...options } = {}) => {
-    const markup = `<form><div id="host" class="form-control-group${classes}"${attributes}><textarea name="value"></textarea><span id="target" class="${targetClasses}"></span><span id="second"></span></div><div class="invalid-feedback" id="feedback">Fix it.</div></form>`
+  const mount = ({ attributes = '', classes = '', config = {}, root = null, ...options } = {}) => {
+    const markup = `<form><div id="host" class="form-control-group${classes}"${attributes}><textarea name="value"></textarea><span id="target"></span><span id="second"></span></div><div class="invalid-feedback" id="feedback">Fix it.</div></form>`
     const container = root ?? fixtureEl
 
     container.innerHTML = markup
@@ -72,16 +72,46 @@ describe('FieldValidation', () => {
   })
 
   describe('a given state', () => {
-    it('should take a state class from the markup as the given state, draw it without blocking and give it back on dispose', () => {
-      const { field, host, targets, validation } = mount({ classes: ' is-invalid' })
+    it('should not take a state class from the markup as the given state, and leave it through a given state and dispose', () => {
+      const { host, state, targets, validation } = mount({ classes: ' is-invalid' })
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual([null, null])
+      expect(targets.map(describedBy)).toEqual([null, null])
+
+      state.config.validationState = 'invalid'
+      validation.update()
+
       expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
-      expect(field.validity.customError).toBe(false)
+
+      state.config.validationState = null
+      validation.update()
+
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual([null, null])
 
       validation.dispose()
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
+    })
+
+    it('should take off the class it drew when the state goes, also after the page wrote the same class', () => {
+      const { host, state, validation } = mount({ config: { validationState: 'invalid' } })
+
+      host.classList.add('is-invalid')
+      state.config.validationState = null
+      validation.update()
+
+      expect(stateClasses(host)).toEqual([])
+    })
+
+    it('should take off on dispose the class it drew, also after the page wrote the same class', () => {
+      const { host, validation } = mount({ config: { validationState: 'invalid' } })
+
+      host.classList.add('is-invalid')
+      validation.dispose()
+
+      expect(stateClasses(host)).toEqual([])
     })
 
     it('should draw the state on the frames, aria-invalid on the targets and the feedback in their description', () => {
@@ -110,7 +140,7 @@ describe('FieldValidation', () => {
 
       field.setCustomValidity('Taken.')
       state.config.validationState = 'invalid'
-      validation.configure()
+      validation.update()
 
       expect(blocks()).toEqual(['Taken.', false])
 
@@ -222,7 +252,7 @@ describe('FieldValidation', () => {
       await userEvent.type(first, 'x')
       await userEvent.tab()
       state.config.validationState = null
-      validation.configure()
+      validation.update()
 
       expect(stateClasses(host)).toEqual(['is-valid'])
 
@@ -386,7 +416,7 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
 
       state.config.invalid = false
-      validation.configure()
+      validation.update()
 
       expect(stateClasses(host)).toEqual(['is-valid'])
     })
@@ -420,17 +450,6 @@ describe('FieldValidation', () => {
   })
 
   describe('what it writes', () => {
-    it('should take the state classes of every server source and give each its own back', () => {
-      const { host, targets, validation } = mount({ classes: ' is-valid', targetClasses: 'is-invalid', serverClassSources: () => [fixtureEl.querySelector('#host'), fixtureEl.querySelector('#target')] })
-
-      expect(stateClasses(targets[0])).toEqual([])
-
-      validation.dispose()
-
-      expect(stateClasses(host)).toEqual(['is-valid'])
-      expect(stateClasses(targets[0])).toEqual(['is-invalid'])
-    })
-
     it('should add its ids after the ones someone else put on a target, and take back only its own', () => {
       const { field, host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"' })
 
@@ -509,27 +528,13 @@ describe('FieldValidation', () => {
     })
   })
 
-  describe('configure', () => {
-    it('should draw the stored state in place and forget the state class from the markup', () => {
-      const { host, state, validation } = mount({ classes: ' is-invalid' })
-
-      state.config.validationState = 'valid'
-      validation.configure()
-
-      expect(stateClasses(host)).toEqual(['is-valid'])
-
-      state.config.validationState = null
-      validation.update()
-
-      expect(stateClasses(host)).toEqual([])
-    })
-
+  describe('update', () => {
     it('should draw no state once the given invalid goes, also on a field a validation reported because of it', () => {
       const { field, host, state, targets, validation } = mount({ config: { validationState: 'invalid' } })
 
       field.form.checkValidity()
       state.config.validationState = null
-      validation.configure()
+      validation.update()
 
       expect(field.validity.valid).toBe(true)
       expect(stateClasses(host)).toEqual([])
@@ -549,7 +554,7 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
 
       state.config.validationState = null
-      validation.configure()
+      validation.update()
 
       expect(stateClasses(host)).toEqual([])
     })
@@ -756,7 +761,7 @@ describe('FieldValidation', () => {
 
       form.addEventListener('reset', () => {
         state.config.validationState = 'invalid'
-        validation.configure()
+        validation.update()
       })
       form.reset()
       await tick()

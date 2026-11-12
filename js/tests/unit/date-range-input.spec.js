@@ -574,8 +574,8 @@ describe('DateRangeInput', () => {
       expect([...end.querySelectorAll('.form-date-time-section')].map(element => element.getAttribute('aria-invalid'))).toEqual(['true', 'true', 'true'])
     })
 
-    it('should announce a claim of invalid written on the frame on both fields', () => {
-      build({ endDate: new Date(2026, 6, 20), startDate: new Date(2026, 6, 14) }, '<div id="range" class="is-invalid"></div>')
+    it('should announce an invalid state the markup gives on both fields', () => {
+      build({ endDate: new Date(2026, 6, 20), startDate: new Date(2026, 6, 14) }, '<div id="range" data-coreui-validation-state="invalid"></div>')
 
       expect(root().classList.contains('is-invalid')).toBeTrue()
       expect(fields().flatMap(field => [...field.querySelectorAll('.form-date-time-section')]).map(element => element.getAttribute('aria-invalid'))).toEqual(Array.from({ length: 6 }, () => 'true'))
@@ -640,8 +640,8 @@ describe('DateRangeInput', () => {
       section.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
     }
 
-    it('should take a state class the markup carries on the frame as the given state of both ends, and let a valid range submit', () => {
-      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" class="is-invalid"></div></form>')
+    it('should take a state the markup gives with a data attribute as the given state of both ends, and let a valid range submit', () => {
+      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" data-coreui-validation-state="invalid"></div></form>')
       const form = fixtureEl.querySelector('form')
 
       expect(root().classList.contains('is-invalid')).toBeTrue()
@@ -659,7 +659,7 @@ describe('DateRangeInput', () => {
 
     it('should keep the given state on both ends and the frame when the user edits one end', () => {
       for (const config of [{}, { validationState: 'invalid' }]) {
-        build({ ...config, startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, `<form><div id="range"${Object.keys(config).length > 0 ? '' : ' class="is-invalid"'}></div></form>`)
+        build({ ...config, startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, `<form><div id="range"${Object.keys(config).length > 0 ? '' : ' data-coreui-validation-state="invalid"'}></div></form>`)
 
         typeIn(fields()[0])
 
@@ -670,8 +670,8 @@ describe('DateRangeInput', () => {
       }
     })
 
-    it('should keep a valid class the markup carried and drop it when the order breaks', () => {
-      const range = build({}, '<div id="range" class="is-valid"></div>')
+    it('should keep a valid state the markup gave and drop it when the order breaks', () => {
+      const range = build({}, '<div id="range" data-coreui-validation-state="valid"></div>')
 
       expect(root().classList.contains('is-valid')).toBeTrue()
 
@@ -682,19 +682,14 @@ describe('DateRangeInput', () => {
       expect(fields().some(field => field.classList.contains('is-valid'))).toBeFalse()
     })
 
-    it('should let validationState win over a class the markup carries, and take no state from invalid or valid', () => {
-      build({ validationState: 'valid' }, '<div id="range" class="is-invalid"></div>')
-
-      expect(root().classList.contains('is-valid')).toBeTrue()
-      expect(root().classList.contains('is-invalid')).toBeFalse()
-
+    it('should take no state from invalid or valid', () => {
       build({ invalid: true, valid: true })
 
       expect(root().classList.contains('is-valid')).toBeFalse()
       expect(root().classList.contains('is-invalid')).toBeFalse()
     })
 
-    it('should give a state class the markup carried back on dispose, also after a change of the user, and remove the one it added', () => {
+    it('should leave a state class the markup carried through a change of the user and dispose, and remove the one it added', () => {
       const markup = build({}, '<div id="range" class="is-valid"></div>')
       const marked = root()
 
@@ -764,8 +759,8 @@ describe('DateRangeInput', () => {
       expect(() => range.dispose()).not.toThrow()
     })
 
-    it('should change the state through setValidationState without rebuilding, leave the other options as they are, and drop the class the markup carried', () => {
-      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" class="is-invalid"></div></form>')
+    it('should change the state through setValidationState without rebuilding, leave the other options as they are, and drop the state the markup gave', () => {
+      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" data-coreui-validation-state="invalid"></div></form>')
       const [day] = root().querySelectorAll('.form-date-time-section')
 
       range.setValidationState('valid')
@@ -788,7 +783,7 @@ describe('DateRangeInput', () => {
     })
 
     it('should keep the given state through a native form reset', async () => {
-      fixtureEl.innerHTML = '<form><div id="range" class="is-invalid"></div></form>'
+      fixtureEl.innerHTML = '<form><div id="range" data-coreui-validation-state="invalid"></div></form>'
       const range = new DateRangeInput(root(), {
         format: 'dd.MM.yyyy', locale: 'en-US', startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20)
       })
@@ -804,7 +799,7 @@ describe('DateRangeInput', () => {
     })
 
     it('should keep a state the page gives after a native reset started', async () => {
-      fixtureEl.innerHTML = '<form><div id="range" class="is-valid"></div></form>'
+      fixtureEl.innerHTML = '<form><div id="range" data-coreui-validation-state="valid"></div></form>'
       const range = new DateRangeInput(root(), {
         format: 'dd.MM.yyyy', locale: 'en-US', startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20)
       })
@@ -861,8 +856,8 @@ describe('DateRangeInput', () => {
       expect(fields().every(field => field.classList.contains('is-valid'))).toBeTrue()
     })
 
-    it('should keep the submit verdict off the fields under a frame the markup marks invalid, also after the user edits the range, until the page clears it', () => {
-      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form data-coreui-validate="valid" novalidate><div id="range" class="is-invalid"></div></form>')
+    it('should keep the submit verdict off the fields under an invalid state the markup gives, also after the user edits the range, until the page clears it', () => {
+      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form data-coreui-validate="valid" novalidate><div id="range" data-coreui-validation-state="invalid"></div></form>')
       const form = fixtureEl.querySelector('form')
 
       form.addEventListener('submit', event => event.preventDefault())

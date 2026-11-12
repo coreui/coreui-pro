@@ -394,7 +394,7 @@ describe('DateInput', () => {
       expect(element.classList.contains('disabled')).toBeFalse()
     })
 
-    it('should give back a state class and a label the markup carried', () => {
+    it('should leave a state class and give back a label the markup carried', () => {
       fixtureEl.innerHTML = '<div class="form-date-time is-invalid my-own" id="start" aria-label="Start date"></div>'
       const dateInputEl = fixtureEl.querySelector('#start')
       const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
@@ -1771,9 +1771,9 @@ describe('DateInput', () => {
       expect(form.checkValidity()).toBeFalse()
     })
 
-    it('should take a state class the markup carries as the given state, and let a valid date submit', () => {
-      fixtureEl.innerHTML = '<form><div class="is-invalid"></div><div class="invalid-feedback">Already booked.</div></form>'
-      const dateInput = new DateInput(fixtureEl.querySelector('.is-invalid'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
+    it('should take a state the markup gives with a data attribute, and let a valid date submit', () => {
+      fixtureEl.innerHTML = '<form><div data-coreui-validation-state="invalid"></div><div class="invalid-feedback">Already booked.</div></form>'
+      const dateInput = new DateInput(fixtureEl.querySelector('form > div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
       expect(getSections(dateInput._element)[0].getAttribute('aria-invalid')).toEqual('true')
@@ -1781,7 +1781,7 @@ describe('DateInput', () => {
     })
 
     it('should keep a given state through changes made by code', () => {
-      fixtureEl.innerHTML = '<div class="is-invalid"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-validation-state="invalid"></div>'
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
 
       dateInput.setDate(new Date(2026, 6, 15))
@@ -1816,10 +1816,10 @@ describe('DateInput', () => {
         pressKey(section, 'a', { ctrlKey: true })
         pressKey(section, 'Backspace')
       }]
-    ])('should keep a given state and a state class the markup carried on %s', (_, edit) => {
-      for (const markup of ['<div class="is-invalid"></div>', '<div></div>']) {
+    ])('should keep a state given in the markup or by the option on %s', (_, edit) => {
+      for (const markup of ['<div data-coreui-validation-state="invalid"></div>', '<div></div>']) {
         fixtureEl.innerHTML = `<form>${markup}</form>`
-        const dateInput = new DateInput(fixtureEl.querySelector('form > div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', ...(markup.includes('is-invalid') ? {} : { validationState: 'invalid' }) })
+        const dateInput = new DateInput(fixtureEl.querySelector('form > div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', ...(markup.includes('validation-state') ? {} : { validationState: 'invalid' }) })
 
         edit(getSections(dateInput._element)[0])
 
@@ -1845,8 +1845,8 @@ describe('DateInput', () => {
     })
 
     it('should keep the given state through user actions that leave the date as it is', () => {
-      fixtureEl.innerHTML = '<form><div class="is-invalid"></div><div class="date-input"></div></form>'
-      const dated = new DateInput(fixtureEl.querySelector('.is-invalid'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
+      fixtureEl.innerHTML = '<form><div data-coreui-validation-state="invalid"></div><div class="date-input"></div></form>'
+      const dated = new DateInput(fixtureEl.querySelector('[data-coreui-validation-state]'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
       const empty = new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy', validationState: 'invalid' })
       const paste = new Event('paste', { bubbles: true, cancelable: true })
       paste.clipboardData = { getData: () => '14.07.2026' }
@@ -1870,16 +1870,6 @@ describe('DateInput', () => {
       dateInput.setValidationState(null)
 
       expect(dateInput._element.classList.contains('is-warning')).toBeTrue()
-    })
-
-    it('should let the options win over a class the markup carries, and read a valid class too', () => {
-      fixtureEl.innerHTML = '<div id="first" class="is-invalid"></div><div id="second" class="is-valid"></div>'
-      const first = new DateInput(fixtureEl.querySelector('#first'), { format: 'dd.MM.yyyy', validationState: 'valid' })
-      const second = new DateInput(fixtureEl.querySelector('#second'), { format: 'dd.MM.yyyy' })
-
-      expect(first._element.classList.contains('is-valid')).toBeTrue()
-      expect(first._element.classList.contains('is-invalid')).toBeFalse()
-      expect(second._element.classList.contains('is-valid')).toBeTrue()
     })
 
     it('should show what a native control shows after a submit with formnovalidate', () => {
@@ -1912,7 +1902,7 @@ describe('DateInput', () => {
       expect(element.classList.contains('is-warning')).toBeTrue()
     })
 
-    it('should give a state class the markup carried back on dispose after a change of the user', () => {
+    it('should leave a state class the markup carried through a change of the user and dispose', () => {
       fixtureEl.innerHTML = '<div class="is-invalid my-own"></div>'
       const element = fixtureEl.querySelector('div')
       const dateInput = new DateInput(element, { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
@@ -1925,8 +1915,8 @@ describe('DateInput', () => {
       expect(element.classList.contains('my-own')).toBeTrue()
     })
 
-    it('should change the state through setValidationState without rebuilding the field, and drop the class the markup carried', () => {
-      fixtureEl.innerHTML = '<div class="is-invalid"></div>'
+    it('should change the state through setValidationState without rebuilding the field, and drop the state the markup gave', () => {
+      fixtureEl.innerHTML = '<div data-coreui-validation-state="invalid"></div>'
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
       const [day] = getSections(dateInput._element)
 
@@ -1960,7 +1950,7 @@ describe('DateInput', () => {
     })
 
     it('should keep a given state through a native form reset', async () => {
-      fixtureEl.innerHTML = '<form><div class="is-invalid"></div></form>'
+      fixtureEl.innerHTML = '<form><div data-coreui-validation-state="invalid"></div></form>'
       const form = fixtureEl.querySelector('form')
       const dateInput = new DateInput(fixtureEl.querySelector('form > div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
 
@@ -1974,7 +1964,7 @@ describe('DateInput', () => {
     })
 
     it.each([['in a reset listener', true], ['in the same task', false]])('should keep a state the page gives after a native reset started, %s', async (_, inListener) => {
-      fixtureEl.innerHTML = '<form><div class="is-valid"></div></form>'
+      fixtureEl.innerHTML = '<form><div data-coreui-validation-state="valid"></div></form>'
       const form = fixtureEl.querySelector('form')
       const dateInput = new DateInput(fixtureEl.querySelector('form > div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
 

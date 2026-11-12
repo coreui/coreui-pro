@@ -972,16 +972,16 @@ describe('RangeSlider', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should read the server class of the element once, when it starts', () => {
+    it('should not read a state class written on the element, at start or later', () => {
       const { element } = mountInForm({ value: 40 }, 'class="is-invalid"')
 
       expect(element).toHaveClass('is-invalid')
-      expect(inputsOf(element)[0].getAttribute('aria-invalid')).toBe('true')
+      expect(inputsOf(element)[0].hasAttribute('aria-invalid')).toBeFalse()
 
       element.classList.add('is-valid')
       inputsOf(element)[0].dispatchEvent(createEvent('focusout'))
 
-      expect(inputsOf(element)[0].getAttribute('aria-invalid')).toBe('true')
+      expect(inputsOf(element)[0].hasAttribute('aria-invalid')).toBeFalse()
       expect(inputsOf(element)[0]).not.toHaveClass('is-valid')
     })
 
@@ -1007,12 +1007,13 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
     })
 
-    it('should keep the server class when the user moves a handle', () => {
-      const { element, form } = mountInForm({ value: 40 }, 'class="is-invalid"')
+    it('should keep a state the markup gives when the user moves a handle', () => {
+      const { element, form } = mountInForm({ value: 40 }, 'data-coreui-validation-state="invalid"')
 
       move(inputsOf(element)[0], 50)
 
       expect(element).toHaveClass('is-invalid')
+      expect(inputsOf(element)[0].getAttribute('aria-invalid')).toBe('true')
       expect(form.checkValidity()).toBeTrue()
     })
 
@@ -1151,7 +1152,7 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).some(input => input.classList.contains('is-invalid') || input.hasAttribute('aria-invalid'))).toBeFalse()
     })
 
-    it('should give back the server class and the description on dispose, also after the user moved a handle', () => {
+    it('should leave a state class the markup carried and give back the description on dispose, also after the user moved a handle', () => {
       const { element, rangeSlider } = mountInForm({ value: 40 }, 'class="is-invalid" aria-describedby="budgetHelp"')
 
       rangeSlider.dispose()

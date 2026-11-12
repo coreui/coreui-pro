@@ -127,7 +127,7 @@ abstract class PickerBase extends BaseComponent {
     }
 
     this._config = this._getConfig({ ...this._config, ...config })
-    this._validation.configure()
+    this._validation.update()
   }
 
   _createPopup(): void {

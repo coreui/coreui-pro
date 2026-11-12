@@ -273,8 +273,8 @@ describe('ChipInput', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should show a given state on the frame and the text field with its message, let the form submit, and give the class back on dispose', () => {
-      fixtureEl.innerHTML = '<form><div class="chip-input is-invalid"><input type="text" class="chip-input-field" aria-describedby="hint"></div><div id="hint">Up to five.</div><div class="invalid-feedback">Pick a tag.</div></form>'
+    it('should show a given state on the frame and the text field with its message, let the form submit, and take it off on dispose', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input" data-coreui-validation-state="invalid"><input type="text" class="chip-input-field" aria-describedby="hint"></div><div id="hint">Up to five.</div><div class="invalid-feedback">Pick a tag.</div></form>'
       const form = fixtureEl.querySelector('form')
       const element = fixtureEl.querySelector('.chip-input')
       const feedback = fixtureEl.querySelector('.invalid-feedback')
@@ -288,7 +288,7 @@ describe('ChipInput', () => {
 
       chipInput.dispose()
 
-      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(element.classList.contains('is-invalid')).toBeFalse()
       expect(input.hasAttribute('aria-invalid')).toBeFalse()
       expect(input.getAttribute('aria-describedby')).toBe('hint')
       expect(form.checkValidity()).toBeTrue()
@@ -317,17 +317,8 @@ describe('ChipInput', () => {
       expect(element.classList.contains('is-valid')).toBeFalse()
     })
 
-    it('should let the option win over a class from the markup', () => {
-      fixtureEl.innerHTML = '<form><div class="chip-input is-valid"></div></form>'
-      const element = fixtureEl.querySelector('.chip-input')
-      const chipInput = new ChipInput(element, { validationState: 'invalid' }) // eslint-disable-line no-unused-vars
-
-      expect(element.classList.contains('is-invalid')).toBeTrue()
-      expect(element.classList.contains('is-valid')).toBeFalse()
-    })
-
-    it('should change only the state with setValidationState, and withdraw a class from the markup with null', () => {
-      fixtureEl.innerHTML = '<form><div class="chip-input is-invalid"></div></form>'
+    it('should change only the state with setValidationState, and withdraw a state the markup gave with null', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input" data-coreui-validation-state="invalid"></div></form>'
       const element = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(element, { placeholder: 'Tags' })
       const input = chipInput._input

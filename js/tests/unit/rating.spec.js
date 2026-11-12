@@ -2102,16 +2102,16 @@ describe('Rating', () => {
       }
     })
 
-    it('should read the server class of the element once, when it starts', () => {
+    it('should not read a state class written on the element, at start or later', () => {
       const { element } = mountInForm({}, 'class="is-invalid"')
 
       expect(element).toHaveClass('is-invalid')
-      expect(element.getAttribute('aria-invalid')).toEqual('true')
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
 
       element.classList.add('is-valid')
       radiosOf(element)[0].dispatchEvent(createEvent('focusout'))
 
-      expect(element.getAttribute('aria-invalid')).toEqual('true')
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
 
       const { element: valid } = mountInForm({}, 'class="is-valid"')
 
@@ -2410,7 +2410,7 @@ describe('Rating', () => {
       expect(marked.hasAttribute('aria-required')).toBeFalse()
     })
 
-    it('should give back the server class and the description, also after the user picked a star, and take off the aria-invalid it wrote on dispose', () => {
+    it('should leave a state class the markup carried and give back the description, also after the user picked a star, and take off the aria-invalid it wrote on dispose', () => {
       const { element, rating } = mountInForm({ required: true }, 'class="is-invalid" aria-describedby="scoreHelp"')
 
       rating.dispose()
