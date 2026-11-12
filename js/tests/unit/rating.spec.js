@@ -2119,49 +2119,49 @@ describe('Rating', () => {
 
       valid.querySelectorAll('.rating-item-label')[1].click()
 
-      expect(valid).not.toHaveClass('is-valid')
+      expect(valid).toHaveClass('is-valid')
     })
 
-    it('should drop a given state when the user picks a star, before the change event', () => {
+    it('should keep a given state when the user picks a star, at the change event and after', () => {
       const { element, form } = mountInForm({ validationState: 'invalid' })
       const seen = []
 
       element.addEventListener('change.coreui.rating', () => seen.push(element.classList.contains('is-invalid'), form.checkValidity()))
       element.querySelectorAll('.rating-item-label')[3].click()
 
-      expect(seen).toEqual([false, true])
-      expect(element.hasAttribute('aria-invalid')).toBeFalse()
-      expect(radiosOf(element).some(radio => radio.hasAttribute('aria-describedby'))).toBeFalse()
+      expect(seen).toEqual([true, true])
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
+      expect(radiosOf(element).some(radio => radio.hasAttribute('aria-describedby'))).toBeTrue()
     })
 
-    it('should drop a given state before listeners on the rating see the native input event', () => {
+    it('should keep a given state while listeners on the rating see the native input event', () => {
       const { element } = mountInForm({ validationState: 'invalid' })
       const seen = []
 
       element.addEventListener('input', () => seen.push(element.classList.contains('is-invalid'), element.getAttribute('aria-invalid')), true)
       element.querySelectorAll('.rating-item-label')[3].click()
 
-      expect(seen).toEqual([false, null])
+      expect(seen).toEqual([true, 'true'])
     })
 
-    it('should drop a given valid state when the user picks a star', () => {
+    it('should keep a given valid state when the user picks a star', () => {
       const { element } = mountInForm({ validationState: 'valid' })
 
       element.querySelectorAll('.rating-item-label')[3].click()
 
-      expect(element).not.toHaveClass('is-valid')
+      expect(element).toHaveClass('is-valid')
     })
 
-    it('should drop a given state when the user clears the rating', () => {
+    it('should keep a given state when the user clears the rating', () => {
       const { element, form } = mountInForm({ allowClear: true, validationState: 'invalid', value: 3 })
       const seen = []
 
       element.addEventListener('change.coreui.rating', () => seen.push(element.classList.contains('is-invalid')))
       element.querySelectorAll('.rating-item-label')[2].click()
 
-      expect(seen).toEqual([false])
+      expect(seen).toEqual([true])
       expect(radiosOf(element).some(radio => radio.checked)).toBeFalse()
-      expect(element).not.toHaveClass('is-invalid')
+      expect(element).toHaveClass('is-invalid')
       expect(form.checkValidity()).toBeTrue()
     })
 
@@ -2191,7 +2191,7 @@ describe('Rating', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should drop a state given before a native reset, also when a reset listener disables and enables the rating', async () => {
+    it('should keep a state given before a native reset, also when a reset listener disables and enables the rating', async () => {
       const { element, form, rating } = mountInForm({ validationState: 'invalid' })
 
       form.addEventListener('reset', () => {
@@ -2201,22 +2201,23 @@ describe('Rating', () => {
       form.reset()
       await wait()
 
-      expect(element).not.toHaveClass('is-invalid')
+      expect(element).toHaveClass('is-invalid')
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should drop a state on a native reset of the form the rating was put in after it started', async () => {
+    it('should answer a native reset of the form the rating was put in after it started', async () => {
       fixtureEl.innerHTML = '<form></form>'
       const form = fixtureEl.querySelector('form')
       const element = document.createElement('div')
-      // eslint-disable-next-line no-new
-      new Rating(element, { name: 'score', validationState: 'invalid' })
+      const rating = new Rating(element, { name: 'score', validationState: 'invalid', value: 2 })
 
       form.append(element)
+      element.querySelectorAll('.rating-item-label')[3].click()
       form.reset()
       await wait()
 
-      expect(element).not.toHaveClass('is-invalid')
+      expect(String(rating._currentValue)).toEqual('2')
+      expect(element).toHaveClass('is-invalid')
       expect(form.checkValidity()).toBeTrue()
     })
 
@@ -2225,13 +2226,14 @@ describe('Rating', () => {
       fixtureEl.append(host)
       host.attachShadow({ mode: 'open' }).innerHTML = '<form><div></div></form>'
       const shadowed = host.shadowRoot.querySelector('div')
-      // eslint-disable-next-line no-new
-      new Rating(shadowed, { name: 'score', validationState: 'invalid' })
+      const rating = new Rating(shadowed, { name: 'score', validationState: 'invalid', value: 2 })
 
+      shadowed.querySelectorAll('.rating-item-label')[3].click()
       host.shadowRoot.querySelector('form').reset()
       await wait()
 
-      expect(shadowed).not.toHaveClass('is-invalid')
+      expect(String(rating._currentValue)).toEqual('2')
+      expect(shadowed).toHaveClass('is-invalid')
     })
 
     it('should let a change listener of a reset dispose the rating', async () => {
@@ -2408,7 +2410,7 @@ describe('Rating', () => {
       expect(marked.hasAttribute('aria-required')).toBeFalse()
     })
 
-    it('should give back the server class it still holds and the description, and take off the aria-invalid it wrote on dispose', () => {
+    it('should give back the server class and the description, also after the user picked a star, and take off the aria-invalid it wrote on dispose', () => {
       const { element, rating } = mountInForm({ required: true }, 'class="is-invalid" aria-describedby="scoreHelp"')
 
       rating.dispose()
@@ -2417,12 +2419,12 @@ describe('Rating', () => {
       expect(element.getAttribute('aria-describedby')).toEqual('scoreHelp')
       expect(element.hasAttribute('aria-invalid')).toBeFalse()
 
-      const { element: picked, rating: dismissed } = mountInForm({}, 'class="is-invalid"')
+      const { element: picked, rating: edited } = mountInForm({}, 'class="is-invalid"')
 
       picked.querySelectorAll('.rating-item-label')[1].click()
-      dismissed.dispose()
+      edited.dispose()
 
-      expect(picked).not.toHaveClass('is-invalid')
+      expect(picked).toHaveClass('is-invalid')
 
       const { element: plain, rating: given } = mountInForm({ validationState: 'invalid' })
 

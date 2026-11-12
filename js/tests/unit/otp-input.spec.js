@@ -1912,8 +1912,8 @@ describe('OTPInput', () => {
     it.each([
       ['on the group', '<div class="form-otp is-invalid"><input class="form-otp-control"><input class="form-otp-control"></div>'],
       ['on a slot', '<div class="form-otp"><input class="form-otp-control is-invalid"><input class="form-otp-control"></div>']
-    ])('should take a state class the server wrote %s, and give it back on dispose until a change drops it', (_, markup) => {
-      for (const drop of [false, true]) {
+    ])('should take a state class the server wrote %s, and give it back on dispose, also after a change', (_, markup) => {
+      for (const changed of [false, true]) {
         fixtureEl.innerHTML = `<form>${markup}</form><div class="invalid-feedback">This code has expired.</div>`
         fixtureEl.querySelector('form').append(fixtureEl.querySelector('.invalid-feedback'))
         const group = fixtureEl.querySelector('.form-otp')
@@ -1927,18 +1927,18 @@ describe('OTPInput', () => {
         expect(slots.some(slot => slot.classList.contains('is-invalid'))).toBeFalse()
         expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
 
-        if (drop) {
+        if (changed) {
           type(slots[0], '1')
           type(slots[1], '2')
 
-          expect(group).not.toHaveClass('is-invalid')
-          expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+          expect(group).toHaveClass('is-invalid')
+          expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
         }
 
         otpInput.dispose()
 
-        expect(marked.classList.contains('is-invalid')).toBe(!drop)
-        expect(fixtureEl.querySelectorAll('.is-invalid')).toHaveSize(drop ? 0 : 1)
+        expect(marked.classList.contains('is-invalid')).toBeTrue()
+        expect(fixtureEl.querySelectorAll('.is-invalid')).toHaveSize(1)
         expect(slotStates(slots)).toEqual([[null, null], [null, null]])
       }
     })
@@ -2036,13 +2036,13 @@ describe('OTPInput', () => {
         slots[0].dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData }))
       }],
       ['an autofill', slots => type(slots[1], '34')]
-    ])('should drop a given state through %s', (_, act) => {
+    ])('should keep a given state through %s', (_, act) => {
       const { form, slots } = mountForm({ validationState: 'invalid', value: '9' })
 
       act(slots)
 
-      expect(fixtureEl.querySelector('.form-otp')).not.toHaveClass('is-invalid')
-      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+      expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
+      expect(slotStates(slots).every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
       expect(form.checkValidity()).toBe(slots.every(slot => slot.value) || slots.every(slot => !slot.value))
     })
 
@@ -2068,22 +2068,21 @@ describe('OTPInput', () => {
       ['change.coreui.otp-input', ({ group }) => group, 'change.coreui.otp-input'],
       ['input', ({ valueField }) => valueField, 'input'],
       ['change', ({ valueField }) => valueField, 'change']
-    ])('should drop the state before %s and treat what the page does there as code', (_, getTarget, type_) => {
-      const { form, otpInput, slots, valueField } = mountForm({ validationState: 'invalid', value: '1' })
+    ])('should keep the state at %s and drop it at once when the page clears it there', (_, getTarget, type_) => {
+      const { otpInput, slots, valueField } = mountForm({ validationState: 'invalid', value: '1' })
       const group = fixtureEl.querySelector('.form-otp')
       const seen = []
 
-      form.addEventListener('input', event => {
-        if (event.target === valueField) {
-          seen.push(group.classList.contains('is-invalid'))
-        }
-      }, true)
-      getTarget({ group, valueField }).addEventListener(type_, () => otpInput.setValidationState('invalid'), { once: true })
+      getTarget({ group, valueField }).addEventListener(type_, () => {
+        seen.push(group.classList.contains('is-invalid'))
+        otpInput.setValidationState(null)
+        seen.push(group.classList.contains('is-invalid'))
+      }, { once: true })
       type(slots[1], '2')
 
-      expect(seen).toEqual([false])
-      expect(group).toHaveClass('is-invalid')
-      expect(slots.every(slot => slot.getAttribute('aria-invalid') === 'true')).toBeTrue()
+      expect(seen).toEqual([true, false])
+      expect(group).not.toHaveClass('is-invalid')
+      expect(slots.every(slot => !slot.hasAttribute('aria-invalid'))).toBeTrue()
     })
 
     it('should send input and change from the value field when the code changes', () => {
@@ -2126,7 +2125,7 @@ describe('OTPInput', () => {
       expect(events).toEqual([['input', '12'], ['change', '12'], ['change.coreui.otp-input', '12']])
     })
 
-    it.each([['before the reset', 'before', false], ['in a reset listener', 'listener', true], ['right after form.reset()', 'after', true]])('should put back the code it started with on a native reset and treat a state given %s as the reset says', async (_, when, kept) => {
+    it.each([['before the reset', 'before'], ['in a reset listener', 'listener'], ['right after form.reset()', 'after']])('should put back the code it started with on a native reset and keep a state given %s', async (_, when) => {
       const { form, otpInput, slots, valueField } = mountForm({ value: '4' }, '', '<input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control">')
       const giveState = () => otpInput.setValidationState('invalid')
 
@@ -2152,7 +2151,7 @@ describe('OTPInput', () => {
       expect(slots.map(slot => slot.value)).toEqual(['4', '', ''])
       expect(valueField.value).toBe('4')
       expect(slots.map(slot => slot.tabIndex)).toEqual([-1, -1, 0])
-      expect(fixtureEl.querySelector('.form-otp').classList.contains('is-invalid')).toBe(kept)
+      expect(fixtureEl.querySelector('.form-otp').classList.contains('is-invalid')).toBeTrue()
     })
 
     it('should put back the markup defaults, not what the slots held before start, on a native reset', async () => {
@@ -2298,7 +2297,7 @@ describe('OTPInput', () => {
       })
       document.removeEventListener('reset', listener, true)
 
-      expect(otpInput._element.classList.contains('is-invalid')).toBe(false)
+      expect(otpInput._element.classList.contains('is-invalid')).toBe(true)
       expect(slots.map(slot => slot.value)).toEqual(['1', '2'])
     })
 

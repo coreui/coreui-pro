@@ -59,7 +59,7 @@ describe('TimeInput', () => {
   })
 
   describe('validation', () => {
-    it('should take the state from validationState without blocking a valid time, and drop it when the user edits the time', () => {
+    it('should take the state from validationState without blocking a valid time, and keep it when the user edits the time', () => {
       fixtureEl.innerHTML = '<form><div class="time-input"></div></form>'
       const form = fixtureEl.querySelector('form')
       const timeInput = new TimeInput(fixtureEl.querySelector('.time-input'), { date: '10:30', format: 'HH:mm', validationState: 'invalid' })
@@ -72,8 +72,8 @@ describe('TimeInput', () => {
       hour.focus()
       pressKey(hour, 'ArrowUp')
 
-      expect(timeInput._element.classList.contains('is-invalid')).toBeFalse()
-      expect(hour.hasAttribute('aria-invalid')).toBeFalse()
+      expect(timeInput._element.classList.contains('is-invalid')).toBeTrue()
+      expect(hour.getAttribute('aria-invalid')).toEqual('true')
     })
   })
 

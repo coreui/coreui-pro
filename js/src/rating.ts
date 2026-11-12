@@ -30,7 +30,6 @@ const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
 const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`
 const EVENT_HOVER = `hover${EVENT_KEY}`
-const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`
@@ -294,18 +293,11 @@ class Rating extends BaseComponent {
         this._currentValue = null
         target.checked = false
         this._resetLabels()
-        this._validation.dismiss()
         this._validation.update()
 
         EventHandler.trigger(this._element, EVENT_CHANGE, {
           value: null
         })
-      }
-    })
-
-    EventHandler.on(this._element, EVENT_INPUT, SELECTOR_RATING_ITEM_INPUT, () => {
-      if (!this._disabled && !this._config.readonly) {
-        this._validation.dismiss()
       }
     })
 

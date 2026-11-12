@@ -1816,20 +1816,20 @@ describe('DateInput', () => {
         pressKey(section, 'a', { ctrlKey: true })
         pressKey(section, 'Backspace')
       }]
-    ])('should drop a given state and a state class the markup carried on %s', (_, edit) => {
+    ])('should keep a given state and a state class the markup carried on %s', (_, edit) => {
       for (const markup of ['<div class="is-invalid"></div>', '<div></div>']) {
         fixtureEl.innerHTML = `<form>${markup}</form>`
         const dateInput = new DateInput(fixtureEl.querySelector('form > div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', ...(markup.includes('is-invalid') ? {} : { validationState: 'invalid' }) })
 
         edit(getSections(dateInput._element)[0])
 
-        expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+        expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
         expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
         dateInput.dispose()
       }
     })
 
-    it('should drop a given state on a paste that inputDateParse reads', () => {
+    it('should keep a given state on a paste that inputDateParse reads', () => {
       fixtureEl.innerHTML = '<form><div></div></form>'
       const dateInput = new DateInput(fixtureEl.querySelector('form > div'), {
         date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', inputDateParse: () => new Date(2026, 6, 20), validationState: 'invalid'
@@ -1840,7 +1840,7 @@ describe('DateInput', () => {
       getSections(dateInput._element)[0].dispatchEvent(paste)
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 20))
-      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
@@ -1894,7 +1894,7 @@ describe('DateInput', () => {
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
     })
 
-    it('should drop the given state before the change events, so a state the page sets in them stays', () => {
+    it('should leave the value field valid at the change events under a given state, and keep a state the page sets in them', () => {
       fixtureEl.innerHTML = '<form><div></div></form>'
       const element = fixtureEl.querySelector('form > div')
       const dateInput = new DateInput(element, { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', validationState: 'invalid' })
@@ -1912,7 +1912,7 @@ describe('DateInput', () => {
       expect(element.classList.contains('is-warning')).toBeTrue()
     })
 
-    it('should not give a state class back on dispose once the user dropped it', () => {
+    it('should give a state class the markup carried back on dispose after a change of the user', () => {
       fixtureEl.innerHTML = '<div class="is-invalid my-own"></div>'
       const element = fixtureEl.querySelector('div')
       const dateInput = new DateInput(element, { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
@@ -1921,7 +1921,7 @@ describe('DateInput', () => {
       pressKey(getSections(element)[0], 'ArrowUp')
       dateInput.dispose()
 
-      expect(element.classList.contains('is-invalid')).toBeFalse()
+      expect(element.classList.contains('is-invalid')).toBeTrue()
       expect(element.classList.contains('my-own')).toBeTrue()
     })
 
@@ -1959,7 +1959,7 @@ describe('DateInput', () => {
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
     })
 
-    it('should drop a given state on a native form reset', async () => {
+    it('should keep a given state through a native form reset', async () => {
       fixtureEl.innerHTML = '<form><div class="is-invalid"></div></form>'
       const form = fixtureEl.querySelector('form')
       const dateInput = new DateInput(fixtureEl.querySelector('form > div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
@@ -1969,7 +1969,7 @@ describe('DateInput', () => {
         setTimeout(resolve)
       })
 
-      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
       expect(form.checkValidity()).toBeTrue()
     })
 

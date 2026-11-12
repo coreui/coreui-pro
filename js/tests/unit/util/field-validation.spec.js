@@ -1,7 +1,7 @@
 import { userEvent } from 'vitest/browser'
 import { vi } from 'vitest'
 import FieldValidation from '../../../src/util/field-validation.js'
-import { nextStateSerial, updateValidationState } from '../../../src/util/form-validation.js'
+import { updateValidationState } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('FieldValidation', () => {
@@ -104,7 +104,7 @@ describe('FieldValidation', () => {
       }
     })
 
-    it('should leave a custom validity the page set on a value field through a given state, a redraw, a change of the user and dispose', () => {
+    it('should leave a custom validity the page set on a value field through a given state, a redraw, an input of the user and dispose', () => {
       const { field, form, state, validation } = mount()
       const blocks = () => [field.validationMessage, form.checkValidity()]
 
@@ -118,9 +118,9 @@ describe('FieldValidation', () => {
 
       expect(blocks()).toEqual(['Taken.', false])
 
-      validation.runAsUser(() => validation.change())
+      field.dispatchEvent(new Event('input', { bubbles: true }))
 
-      expect(state.config.validationState).toBeNull()
+      expect(state.config.validationState).toBe('invalid')
       expect(blocks()).toEqual(['Taken.', false])
 
       validation.dispose()
@@ -248,7 +248,7 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
-    it('should take the state of its owners after its own, mark the owner\'s error without the class, and tell the owners every drop', () => {
+    it('should take the state of its owners after its own and mark the owner\'s error without the class', () => {
       const { host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"' })
       const range = mountOwner({ frames: true })
       const picker = mountOwner({ config: { validationState: 'invalid' } })
@@ -273,29 +273,32 @@ describe('FieldValidation', () => {
       expect(targets.map(describedBy)).toEqual(['hint feedback', 'hint feedback'])
 
       range.state.error = false
-      validation.dismiss()
+      state.config.validationState = null
+      validation.update()
 
-      expect([state.config.validationState, picker.state.config.validationState]).toEqual([null, null])
-      expect(stateClasses(host)).toEqual([])
-      expect(stateClasses(range.host)).toEqual([])
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(stateClasses(range.host)).toEqual(['is-invalid'])
     })
 
-    it('should drop the state from itself up to the owner whose user action it changes in, and draw the tree from the top', () => {
-      const { host, validation } = mount()
+    it('should keep the states given to it and its owners through an input of the user, and draw the tree from the top', () => {
+      const { field, host, state, validation } = mount({ config: { validationState: 'warning' } })
       const range = mountOwner({ config: { validationState: 'invalid' }, frames: true })
       const picker = mountOwner({ config: { validationState: 'invalid' }, frames: true })
 
       picker.validation.adopt(range.validation)
       range.validation.adopt(validation)
-      validation.change()
+      field.dispatchEvent(new Event('input', { bubbles: true }))
+      field.dispatchEvent(new Event('change', { bubbles: true }))
 
-      expect(stateClasses(range.host)).toEqual(['is-invalid'])
+      expect([state.config.validationState, range.state.config.validationState, picker.state.config.validationState]).toEqual(['warning', 'invalid', 'invalid'])
+      expect([host, range.host, picker.host].map(stateClasses)).toEqual([['is-warning'], ['is-invalid'], ['is-invalid']])
 
-      picker.validation.runAsUser(() => validation.change())
+      state.config.validationState = null
+      range.state.config.validationState = null
+      picker.state.config.validationState = 'valid'
+      validation.update()
 
-      expect([range.state.config.validationState, picker.state.config.validationState]).toEqual([null, null])
-      expect([host, range.host, picker.host].map(stateClasses)).toEqual([[], [], []])
-      expect(picker.validation.userAction).toBe(false)
+      expect([host, range.host, picker.host].map(stateClasses)).toEqual([['is-valid'], ['is-valid'], ['is-valid']])
 
       range.state.error = true
       validation.update()
@@ -382,11 +385,7 @@ describe('FieldValidation', () => {
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
 
-      validation.runAsUser(() => validation.change())
-
-      expect(state.config).toEqual({ invalid: false, valid: false, validationState: null })
-
-      state.config.valid = true
+      state.config.invalid = false
       validation.configure()
 
       expect(stateClasses(host)).toEqual(['is-valid'])
@@ -539,84 +538,20 @@ describe('FieldValidation', () => {
   })
 
   describe('a change of the value', () => {
-    it('should drop the given state at the first change of a user action and keep a state given after it', () => {
-      const { field, host, state, validation } = mount({ classes: ' is-valid', config: { validationState: 'invalid' } })
+    it('should keep a given state through the input and change events of its value fields, until the page gives another', () => {
+      const { field, host, state, validation } = mount({ config: { validationState: 'invalid' } })
 
-      const changeValue = () => {
-        validation.change()
-        validation.update()
-      }
+      field.value = 'changed'
+      field.dispatchEvent(new Event('input', { bubbles: true }))
+      field.dispatchEvent(new Event('change', { bubbles: true }))
 
-      validation.runAsUser(() => {
-        changeValue()
-        state.config.validationState = 'invalid'
-        changeValue()
-      })
-
+      expect(state.config.validationState).toBe('invalid')
       expect(stateClasses(host)).toEqual(['is-invalid'])
 
-      validation.runAsUser(() => validation.change())
-
-      expect(field.validity.customError).toBe(false)
-      expect(stateClasses(host)).toEqual([])
-    })
-
-    it('should draw the component without the state it dropped, and leave the configuration alone when none was given', () => {
-      const { host, state, validation } = mount({ config: { validationState: 'invalid' } })
-
-      validation.dismiss()
-
-      expect(state.config.validationState).toBeNull()
-      expect(stateClasses(host)).toEqual([])
-
-      state.config.validationState = undefined
-      validation.dismiss()
-
-      expect(state.config.validationState).toBeUndefined()
-    })
-
-    it('should drop a state given before the moment a serial stands for, and keep one given after it', () => {
-      const { host, state, validation } = mount({ config: { validationState: 'invalid' } })
-      const serial = nextStateSerial()
-
-      validation.dismiss(serial)
-      validation.update()
-
-      expect(stateClasses(host)).toEqual([])
-
-      const later = nextStateSerial()
-
-      state.config.validationState = 'invalid'
+      state.config.validationState = null
       validation.configure()
-      validation.dismiss(later)
-      validation.update()
 
-      expect(stateClasses(host)).toEqual(['is-invalid'])
-    })
-
-    it('should keep the given state for a change made by code, and end a user action that changed nothing', () => {
-      const { host, validation } = mount({ config: { validationState: 'invalid' } })
-
-      validation.change()
-      validation.runAsUser(() => {})
-      validation.change()
-
-      expect(validation.userAction).toBe(false)
-      expect(stateClasses(host)).toEqual(['is-invalid'])
-    })
-
-    it('should keep a user action open through an inner action that changed nothing, and close it once one changed the value', () => {
-      const { validation } = mount({ config: { validationState: 'invalid' } })
-      const seen = []
-
-      validation.runAsUser(() => {
-        validation.runAsUser(() => {})
-        seen.push(validation.userAction)
-        validation.runAsUser(() => validation.change())
-        seen.push(validation.userAction)
-      })
-
-      expect(seen).toEqual([true, false])
+      expect(stateClasses(host)).toEqual([])
     })
   })
 
@@ -708,7 +643,7 @@ describe('FieldValidation', () => {
   })
 
   describe('a native reset', () => {
-    it('should drop a state given before it and restore the value', async () => {
+    it('should keep a given state and restore the value', async () => {
       const restore = vi.fn()
       const { form, host } = mount({ config: { validationState: 'invalid' }, restore })
 
@@ -716,7 +651,7 @@ describe('FieldValidation', () => {
       await tick()
 
       expect(restore).toHaveBeenCalledTimes(1)
-      expect(stateClasses(host)).toEqual([])
+      expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
     it('should answer the reset of its form when another form resets in the same task', async () => {
@@ -730,19 +665,7 @@ describe('FieldValidation', () => {
       await tick()
 
       expect(restore).toHaveBeenCalledTimes(1)
-      expect(stateClasses(host)).toEqual([])
-    })
-
-    it('should draw the dropped state before the value is restored', async () => {
-      const seen = []
-      let onRestore = () => {}
-      const { form, host } = mount({ config: { validationState: 'invalid' }, restore: () => onRestore() })
-
-      onRestore = () => seen.push(stateClasses(host))
-      form.reset()
-      await tick()
-
-      expect(seen).toEqual([[]])
+      expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
     it('should follow a reset while a reset listener that runs before its own builds new fields', async () => {
@@ -752,7 +675,8 @@ describe('FieldValidation', () => {
 
       document.addEventListener('reset', listener, true)
 
-      const { form, host, validation } = mount({ config: { validationState: 'invalid' }, fields })
+      const restore = vi.fn()
+      const { form, host, validation } = mount({ config: { validationState: 'invalid' }, fields, restore })
 
       rebuild = () => {
         const [field] = fields()
@@ -765,7 +689,8 @@ describe('FieldValidation', () => {
       await tick()
       document.removeEventListener('reset', listener, true)
 
-      expect(stateClasses(host)).toEqual([])
+      expect(restore).toHaveBeenCalledTimes(1)
+      expect(stateClasses(host)).toEqual(['is-invalid'])
       expect(form.checkValidity()).toBe(true)
     })
 
@@ -826,22 +751,6 @@ describe('FieldValidation', () => {
       expect(errors).toEqual([])
     })
 
-    it('should tell the owner the serial of a reset', async () => {
-      const { form, validation } = mount()
-      const range = mountOwner({ config: { validationState: 'invalid' }, frames: true })
-      const before = nextStateSerial()
-      const dismiss = vi.spyOn(range.validation, 'dismiss')
-
-      range.validation.adopt(validation)
-      form.reset()
-      await tick()
-
-      expect(dismiss).toHaveBeenCalledTimes(1)
-      expect(dismiss.mock.calls[0][0]).toBeGreaterThan(before)
-      expect(Number.isFinite(dismiss.mock.calls[0][0])).toBe(true)
-      expect(stateClasses(range.host)).toEqual([])
-    })
-
     it('should keep a state given in a reset listener of the form', async () => {
       const { form, host, state, validation } = mount()
 
@@ -883,12 +792,14 @@ describe('FieldValidation', () => {
       fixtureEl.append(shadowHost)
 
       const root = shadowHost.attachShadow({ mode: 'open' })
-      const { form, host } = mount({ config: { validationState: 'invalid' }, root })
+      const restore = vi.fn()
+      const { form, host } = mount({ config: { validationState: 'invalid' }, restore, root })
 
       form.reset()
       await tick()
 
-      expect(stateClasses(host)).toEqual([])
+      expect(restore).toHaveBeenCalledTimes(1)
+      expect(stateClasses(host)).toEqual(['is-invalid'])
     })
   })
 })

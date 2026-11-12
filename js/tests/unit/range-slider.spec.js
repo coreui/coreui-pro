@@ -985,15 +985,15 @@ describe('RangeSlider', () => {
       expect(inputsOf(element)[0]).not.toHaveClass('is-valid')
     })
 
-    it('should drop a given state when the user moves a handle, before the input event', () => {
+    it('should keep a given state when the user moves a handle, at the input event and after', () => {
       const { element, form } = mountInForm({ validationState: 'invalid', value: [20, 80] })
       const seen = []
 
       element.addEventListener('input.coreui.range-slider', () => seen.push(element.classList.contains('is-invalid'), form.checkValidity()))
       move(inputsOf(element)[1], 70)
 
-      expect(seen).toEqual([false, true])
-      expect(inputsOf(element).some(input => input.hasAttribute('aria-invalid'))).toBeFalse()
+      expect(seen).toEqual([true, true])
+      expect(inputsOf(element).every(input => input.getAttribute('aria-invalid') === 'true')).toBeTrue()
     })
 
     it('should keep a given state when the distance keeps a moved handle in place', () => {
@@ -1007,12 +1007,12 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
     })
 
-    it('should drop the server class when the user moves a handle', () => {
+    it('should keep the server class when the user moves a handle', () => {
       const { element, form } = mountInForm({ value: 40 }, 'class="is-invalid"')
 
       move(inputsOf(element)[0], 50)
 
-      expect(element).not.toHaveClass('is-invalid')
+      expect(element).toHaveClass('is-invalid')
       expect(form.checkValidity()).toBeTrue()
     })
 
@@ -1042,7 +1042,7 @@ describe('RangeSlider', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should drop a state given before a native reset', async () => {
+    it('should keep a state given before a native reset', async () => {
       const { element, form } = mountInForm({ validationState: 'invalid', value: 40 })
 
       form.reset()
@@ -1050,11 +1050,11 @@ describe('RangeSlider', () => {
         setTimeout(resolve)
       })
 
-      expect(element).not.toHaveClass('is-invalid')
+      expect(element).toHaveClass('is-invalid')
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should drop a state given before a native reset when the page rebuilds the slider in the reset', async () => {
+    it('should keep a state given before a native reset when the page rebuilds the slider in the reset', async () => {
       const { element, form, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] })
 
       form.addEventListener('reset', () => {
@@ -1065,8 +1065,8 @@ describe('RangeSlider', () => {
         setTimeout(resolve)
       })
 
-      expect(element).not.toHaveClass('is-invalid')
-      expect(inputsOf(element).some(input => input.classList.contains('is-invalid'))).toBeFalse()
+      expect(element).toHaveClass('is-invalid')
+      expect(inputsOf(element).every(input => input.classList.contains('is-invalid'))).toBeTrue()
       expect(form.checkValidity()).toBeTrue()
     })
 
@@ -1151,7 +1151,7 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).some(input => input.classList.contains('is-invalid') || input.hasAttribute('aria-invalid'))).toBeFalse()
     })
 
-    it('should give back the server class it still holds and the description on dispose', () => {
+    it('should give back the server class and the description on dispose, also after the user moved a handle', () => {
       const { element, rangeSlider } = mountInForm({ value: 40 }, 'class="is-invalid" aria-describedby="budgetHelp"')
 
       rangeSlider.dispose()
@@ -1159,12 +1159,12 @@ describe('RangeSlider', () => {
       expect(element).toHaveClass('is-invalid')
       expect(element.getAttribute('aria-describedby')).toEqual('budgetHelp')
 
-      const { element: moved, rangeSlider: dismissed } = mountInForm({ value: 40 }, 'class="is-invalid"')
+      const { element: moved, rangeSlider: edited } = mountInForm({ value: 40 }, 'class="is-invalid"')
 
       move(inputsOf(moved)[0], 50)
-      dismissed.dispose()
+      edited.dispose()
 
-      expect(moved).not.toHaveClass('is-invalid')
+      expect(moved).toHaveClass('is-invalid')
     })
   })
 

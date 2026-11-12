@@ -68,7 +68,6 @@ const SELECTOR_USER_VALID = '[data-coreui-validate~="valid"] :user-valid'
 const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
 
 const ownedControls = new WeakSet<Element>()
-let stateSerial = 0
 
 const armedValueFields = new WeakMap<ValueField, () => void>()
 
@@ -648,14 +647,6 @@ export const getUserValidity = (control: Element): ValidationState | undefined =
 
   return matchesSafely(control, SELECTOR_USER_VALID) ? 'valid' : undefined
 }
-
-/**
- * Numbers a validation state a component was given, so a native reset that started before it can
- * tell the state apart from the ones it has to take back.
- *
- * @returns The serial of the state, higher than every serial before it
- */
-export const nextStateSerial = (): number => ++stateSerial
 
 /**
  * Follows the state a form shows for the control a component carries its value in. From the first

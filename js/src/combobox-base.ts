@@ -54,7 +54,6 @@ const SELECTOR_TEXT_ENTRY = 'input, textarea, select, [contenteditable=""], [con
 const EVENT_LIST_BOX_ACTION = 'action.coreui.list-box'
 const EVENT_LIST_BOX_CHANGE = 'change.coreui.list-box'
 const EVENT_LIST_BOX_DESELECT = 'deselect.coreui.list-box'
-const EVENT_LIST_BOX_DESELECTED = 'deselected.coreui.list-box'
 const EVENT_LIST_BOX_SELECT = 'select.coreui.list-box'
 const EVENT_LIST_BOX_SELECTED = 'selected.coreui.list-box'
 const EVENT_LIST_BOX_SELECTION_LIMIT = 'selectionLimit.coreui.list-box'
@@ -539,10 +538,6 @@ class ComboboxBase extends BaseComponent {
       this._onOptionSelected(String(event.value))
     })
 
-    EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_DESELECTED, (event: any) => {
-      this._onOptionDeselected(String(event.value))
-    })
-
     // `change` and `select` are native event names, so EventHandler registers the
     // listener under the bare type while the list dispatches the namespaced one.
     this._listBoxChangeHandler = () => this._onSelectionChange()
@@ -556,8 +551,6 @@ class ComboboxBase extends BaseComponent {
   }
 
   _onOptionSelected(value: string): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
-
-  _onOptionDeselected(value: string): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
 
   _onSelectionChange(): void {}
 

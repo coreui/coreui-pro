@@ -185,8 +185,8 @@ class TimePicker extends PickerBase {
     return {
       ...this._baseContext(),
       isTimeSelectable: (time: Date | null) => this._input.isDateSelectable(time),
-      now: () => this._runAsUser(() => this.now()),
-      setTime: (time: Date | null) => this._runAsUser(() => this._write(time)),
+      now: () => this.now(),
+      setTime: (time: Date | null) => this._write(time),
       time: this.getTime()
     }
   }
@@ -246,7 +246,7 @@ class TimePicker extends PickerBase {
     }, {
       ...this._config.selectionOptions,
       ...(hourCycle && { hourCycle }),
-      onChange: (time: Date | null) => this._runAsUser(() => this._applyTime(time && constrainDateTime(time, minDate, maxDate), time)),
+      onChange: (time: Date | null) => this._applyTime(time && constrainDateTime(time, minDate, maxDate), time),
       time: this.getTime()
     }))
   }

@@ -281,7 +281,7 @@ class OTPInput extends BaseComponent {
       const value = inputs.map((input: HTMLInputElement) => input.value).join('')
 
       if (value !== (this._inputElement ? this._inputElement.value : '')) {
-        this._setValue(value, true)
+        this._setValue(value)
       }
 
       if (target!.value.length === 1) {
@@ -366,7 +366,7 @@ class OTPInput extends BaseComponent {
     inputs[nextEmptyIndex < inputs.length ? nextEmptyIndex : inputs.length - 1].focus()
 
     // Read the value back from the slots so already-filled ones are preserved.
-    this._setValue(inputs.map((input: HTMLInputElement) => input.value).join(''), true)
+    this._setValue(inputs.map((input: HTMLInputElement) => input.value).join(''))
     this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
     this._checkAutoSubmit(inputs)
@@ -473,7 +473,7 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _setValue(value: string | null, byUser = false): void {
+  _setValue(value: string | null): void {
     if (!this._inputElement) {
       return
     }
@@ -483,11 +483,6 @@ class OTPInput extends BaseComponent {
 
     this._value = code
     writeValueField(this._inputElement, code)
-
-    if (isChanged && byUser) {
-      this._validation.dismiss()
-    }
-
     this._validation.update()
 
     if (!isChanged) {

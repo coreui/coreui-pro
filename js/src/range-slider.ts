@@ -204,12 +204,8 @@ class RangeSlider extends BaseComponent {
 
       if (this._inputs.includes(input)) {
         this._constrain(input)
-
-        if (input.value !== this._shownValues[this._inputs.indexOf(input)]) {
-          this._validation.dismiss()
-        }
-
         this._update()
+        this._validation.update()
         EventHandler.trigger(this._element, EVENT_INPUT, { value: this._values() })
       }
     }

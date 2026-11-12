@@ -2,7 +2,7 @@ import { vi } from 'vitest'
 import {
   alignValueField, armValueFieldBubble, clearValidationState, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidities, followUserValidity,
   getFeedbackIds, getFeedbackText, getServerState, getStateClasses, getUserValidity, getValidationState, isFormValid,
-  nextStateSerial, ownValidationState, splitIds, updateValidationState, validateForm,
+  ownValidationState, splitIds, updateValidationState, validateForm,
   writeValueField
 } from '../../../src/util/form-validation.js'
 import { splitIds as splitIdsFromIndex } from '../../../src/util/index.js'
@@ -637,14 +637,6 @@ describe('Form validation utilities', () => {
   describe('splitIds', () => {
     it('should be the id list splitter of the util index', () => {
       expect(splitIds).toBe(splitIdsFromIndex)
-    })
-  })
-
-  describe('nextStateSerial', () => {
-    it('should give out a higher serial each time', () => {
-      const first = nextStateSerial()
-
-      expect(nextStateSerial()).toBeGreaterThan(first)
     })
   })
 

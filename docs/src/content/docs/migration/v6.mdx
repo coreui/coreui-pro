@@ -1247,12 +1247,11 @@ check, radio, carousel and toggler icons already work:
   deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
   `validationState` also takes a state from `$form-validation-states`. A given
   `'invalid'`, from the options or from an `.is-invalid` class in the markup,
-  shows the error without blocking the submit, and the next change the user
-  makes to the value drops it,
-  while a change from code keeps it. The markup class is read once, when the
-  component starts, so it no longer comes back when the text returns to the
-  value it started with, a native form reset drops it, and a class written later
-  is not read. A validation that reports the input, from a
+  shows the error without blocking the submit and stays until the page changes
+  it with `setValidationState()`, through the user's changes of the value and a
+  native form reset. The markup class is read once, when the component starts,
+  so it no longer comes back when the text returns to the value it started
+  with, and a class written later is not read. A validation that reports the input, from a
   submit or the page's own `checkValidity()`, now shows on the frame, and the
   autocomplete is the only one that writes `aria-invalid` and the message link on
   its input: the form plugin and the stepper leave the input to it. See
@@ -1769,10 +1768,9 @@ behaviour, v5 is the reference. Mapping:
 `invalid` and `valid` on `DatePicker`, `DateRangePicker` and `TimePicker` are
 deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
 `validationState` also takes a state from `$form-validation-states`. A given
-`'invalid'` shows the error without blocking the submit, and the next change of the value the user
-makes (a pick in the panel, the cleaner, a footer or custom-range button that
-changes the value, typing in the field) drops it; closing the popup and a
-change your code makes keep it. An `.is-invalid` or `.is-valid` class on the
+`'invalid'` shows the error without blocking the submit and stays until the
+page changes it with `setValidationState()`, through the user's changes of the
+value and a native form reset. An `.is-invalid` or `.is-valid` class on the
 picker element is read once, when the picker starts. An `aria-invalid` on it is
 not read at all; remove it, since the date range picker makes its element a
 group and the attribute would be announced on that group. Set the state after
@@ -2224,8 +2222,10 @@ state the same way, described under
 - **A given `'invalid'` shows the error and blocks neither the submit nor the
   stepper's next step.** The component shows the state class, `aria-invalid`
   and the linked message, which a screen reader reads when the user reaches the
-  field. The user's change of the value or a native form reset removes the
-  state. To stop a submit on your own verdict, call `setCustomValidity()` on the
+  field. The state stays until the page changes it: the user's change of the
+  value and a native form reset keep it, so clear it with
+  `setValidationState(null)` in the component's change event or in a `reset`
+  listener. To stop a submit on your own verdict, call `setCustomValidity()` on the
   field that carries the value, and clear it with an empty string once the
   verdict no longer holds; to stop a step, set it in a
   `stepValidationComplete.coreui.stepper` listener. Nothing announces a refused
@@ -2456,8 +2456,7 @@ submit.
   watched.** `invalid` and `valid` are deprecated aliases of
   `validationState: 'invalid'` and `'valid'`, and `validationState` also takes a
   state from `$form-validation-states`. A given `'invalid'` shows the error
-  without blocking the submit, and the next change the user makes to the
-  selection drops it. An `.is-invalid`
+  without blocking the submit and stays until the page changes it. An `.is-invalid`
   or `.is-valid` class on the select is read once, when the component starts, and
   moves to the frame; a class or `aria-invalid` written on the select later is not
   read, so set the state with `setValidationState()`. A native form
@@ -2670,8 +2669,8 @@ field behind that kept submitting.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The range slider takes a validation state.** The new `validationState`
   option, or `.is-invalid`/`.is-valid` on the slider element read once when it
-  starts, shows on the element and on the handles until the user moves a handle
-  or the form is reset. It does not block the submit. A class written on the element later is not read; set
+  starts, shows on the element and on the handles until the page changes it
+  with `setValidationState()`. It does not block the submit. A class written on the element later is not read; set
   the state with `setValidationState()`. See
   [Validation](/forms/range-slider/#validation).
 - **Range slider interaction follows the native control.** Pressing a handle no
@@ -2966,8 +2965,8 @@ field behind that kept submitting.
   an `.is-invalid`/`.is-valid` class on the `.form-otp` element or on a slot in
   the markup, shows the state on the group and the slots, and `'invalid'` does
   not block the submit. A class on one slot, which used to color only that slot, now
-  marks the whole code. The user's next change of the code drops it, `setValidationState()` sets it
-  again, and a native form reset puts back the
+  marks the whole code. The state stays until `setValidationState()` changes
+  it, and a native form reset puts back the
   code the field started with. A change of the code sends `input` and `change`
   from the input that holds the value.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
@@ -3020,8 +3019,8 @@ field behind that kept submitting.
   **The rating takes a validation state.** The new `validationState` option,
   or `.is-invalid`/`.is-valid` on the rating element read once when it starts,
   colors the focus ring, and a given `'invalid'` sets
-  `aria-invalid` on the group, without blocking the submit, until the user picks
-  or clears a star or the form is reset. A class written on the element later is
+  `aria-invalid` on the group, without blocking the submit, until the page
+  changes it with `setValidationState()`. A class written on the element later is
   not read; set the state with `setValidationState()`. See
   [Validation](/forms/rating/#validation).
 - **The rating can be required.** `required` makes every radio required and

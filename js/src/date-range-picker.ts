@@ -244,7 +244,7 @@ class DateRangePicker extends PickerBase {
       ...this._baseContext(),
       endDate: this.getEndDate(),
       isDateSelectable: (date: Date | null) => this._input.isDateSelectable(date),
-      setRange: (startDate: Date | null, endDate: Date | null) => this._runAsUser(() => this._applyRange(() => this._input.setRange(startDate, endDate, true))),
+      setRange: (startDate: Date | null, endDate: Date | null) => this._applyRange(() => this._input.setRange(startDate, endDate, true)),
       startDate: this.getStartDate()
     }
   }
@@ -384,11 +384,11 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._runAsUser(() => this._input.setRange(event.dateObject, this.getEndDate(), true))
+      this._input.setRange(event.dateObject, this.getEndDate(), true)
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
-      this._runAsUser(() => this._input.setRange(this.getStartDate(), event.dateObject, true))
+      this._input.setRange(this.getStartDate(), event.dateObject, true)
 
       if (this.getEndDate() && this.getStartDate() && !this._footerTemplate) {
         this.hide()

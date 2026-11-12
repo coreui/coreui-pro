@@ -666,7 +666,7 @@ class MultiSelect extends ComboboxBase {
         getRemovalNeighbor(this._getChips(), chip) ?? this._getFocusTarget() :
         null
 
-      this._removeAsUser(() => this._deselectOption(String(chip.dataset.value)))
+      this._removeAndAnnounce(() => this._deselectOption(String(chip.dataset.value)))
       target?.focus()
     })
 
@@ -686,7 +686,7 @@ class MultiSelect extends ComboboxBase {
         event.preventDefault()
         settleClick(event)
         event.stopPropagation()
-        this._removeAsUser(() => this.deselectAll())
+        this._removeAndAnnounce(() => this.deselectAll())
         EventHandler.trigger(this._element, EVENT_CLEAR)
 
         if (refocus) {
@@ -813,7 +813,7 @@ class MultiSelect extends ComboboxBase {
         event.stopPropagation()
 
         if (!this._disabled) {
-          this._validation.runAsUser(() => this._toggleSelectAll())
+          this._toggleSelectAll()
         }
       })
     }
@@ -1246,7 +1246,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   override _onSelectionChange(): void {
-    this._validation.runAsUser(() => this._settle(true))
+    this._settle(true)
 
     if (!this._config) {
       return
@@ -1335,7 +1335,7 @@ class MultiSelect extends ComboboxBase {
     const last = this._selectedOptions().findLast((option: any) => option.disabled !== true)
 
     if (last) {
-      this._removeAsUser(() => this._deselectOption(last.value))
+      this._removeAndAnnounce(() => this._deselectOption(last.value))
     }
   }
 
@@ -1366,10 +1366,10 @@ class MultiSelect extends ComboboxBase {
     return true
   }
 
-  _removeAsUser(remove: () => void): void {
+  _removeAndAnnounce(remove: () => void): void {
     const before = this._selectedOptions()
 
-    this._validation.runAsUser(remove)
+    remove()
 
     const after = new Set(this._store.values())
     const removed = before.filter((option: any) => !after.has(String(option.value))).map((option: any) => option.text)
@@ -1411,10 +1411,6 @@ class MultiSelect extends ComboboxBase {
   _settle(changed: boolean, notify = true): void {
     const element = this._element
 
-    if (changed) {
-      this._validation.change()
-    }
-
     this._render()
 
     if (changed && notify) {
@@ -1438,7 +1434,6 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._syncNativeSelection(options)
-    this._validation.userAction = false
     this._updateSelection()
     this._updateSelectionCleaner()
     this._updateSearch()
@@ -1715,10 +1710,10 @@ class MultiSelect extends ComboboxBase {
 
   _getSelectionActions(): any {
     return {
-      selectAll: () => this._validation.runAsUser(() => this.selectAll()),
-      deselectAll: () => this._validation.runAsUser(() => this.deselectAll()),
-      selectFiltered: () => this._validation.runAsUser(() => this.selectFiltered()),
-      deselectFiltered: () => this._validation.runAsUser(() => this.deselectFiltered())
+      selectAll: () => this.selectAll(),
+      deselectAll: () => this.deselectAll(),
+      selectFiltered: () => this.selectFiltered(),
+      deselectFiltered: () => this.deselectFiltered()
     }
   }
 

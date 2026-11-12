@@ -15,6 +15,7 @@ import TimePicker from '../../src/time-picker.js'
 import { clearFixture, getFixture } from '../helpers/fixture.js'
 
 const FEEDBACK = '<div class="invalid-feedback" id="feedback">Fix this field.</div>'
+const GIVEN_STATES = ['invalid', 'valid', 'warning']
 const VALIDATION_ONLY = 'its only setter of an option is setValidationState'
 
 const sectionsOf = t => [...t.root.querySelectorAll('.form-date-time-section')]
@@ -30,9 +31,16 @@ const typeInto = (input, value) => {
 
 const nativeChange = field => [[field, 'input'], [field, 'change']]
 
+const noop = () => {}
+
 const disableAndEnable = t => {
   t.instance.disable()
   t.instance.enable()
+}
+
+const clearAndReset = t => {
+  t.instance.clear()
+  t.instance.reset()
 }
 
 const ADAPTERS = [
@@ -51,7 +59,15 @@ const ADAPTERS = [
     describedTargets: t => [t.instance._getFocusTarget()],
     changeAsUser: t => t.instance._optionsElement.querySelector('[data-coreui-value="1"]').click(),
     changeEvents: t => [[t.instance._element, 'change.coreui.multi-select'], ...nativeChange(t.instance._element)],
+    changeMethods: [
+      ['selectAll()', t => t.instance.selectAll()],
+      ['deselectAll()', t => t.instance.deselectAll()],
+      ['selectFiltered()', t => t.instance.selectFiltered()],
+      ['deselectFiltered()', t => t.instance.deselectFiltered()]
+    ],
     changeFromCode: t => t.instance.selectAll(),
+    clearFromCode: t => t.instance.deselectAll(),
+    value: t => t.instance.getValue(),
     reconfigure: disableAndEnable,
     pageOwnsValueField: true,
     required: { required: true }
@@ -83,7 +99,13 @@ const ADAPTERS = [
         t.instance._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
       }, 'focus']
     ],
+    changeMethods: [
+      ['clear()', t => t.instance.clear()],
+      ['setOptions() with resetSelectionOnOptionsChange', t => t.instance.setOptions([{ label: 'Option 3', value: '3' }]), { config: { resetSelectionOnOptionsChange: true, value: '1' }, prepare: noop }]
+    ],
     changeFromCode: t => t.instance.setValue('2'),
+    clearFromCode: t => t.instance.clear(),
+    value: t => t.instance._inputElement.value,
     reconfigure: disableAndEnable,
     required: { required: true }
   },
@@ -109,7 +131,13 @@ const ADAPTERS = [
       t.instance._menu.querySelector('[data-coreui-value="ca"]').click()
     },
     changeEvents: t => [[t.root.querySelector('.combobox-toggle'), 'change.coreui.combobox'], ...nativeChange(t.instance._valueField)],
+    changeMethods: [
+      ['clear()', t => t.instance.clear()],
+      ['setOptions() with resetSelectionOnOptionsChange', t => t.instance.setOptions([{ label: 'Mexico', value: 'mx' }]), { config: { resetSelectionOnOptionsChange: true } }]
+    ],
     changeFromCode: t => t.instance.setValue('ca'),
+    clearFromCode: t => t.instance.clear(),
+    value: t => t.instance.getValue(),
     required: { required: true }
   },
   {
@@ -124,7 +152,15 @@ const ADAPTERS = [
     describedTargets: t => [t.root.querySelector('.chip-filter')],
     changeAsUser: t => t.root.querySelector('.chip').click(),
     changeEvents: t => [[t.root.querySelector('.chip-filter'), 'change.coreui.chip-filter'], ...nativeChange(t.instance._valueField)],
+    changeMethods: [
+      ['selectChip()', t => t.instance.selectChip(t.root.querySelectorAll('.chip')[1])],
+      ['selectAll()', t => t.instance.selectAll()],
+      ['deselectAll()', t => t.instance.deselectAll()],
+      ['clear()', t => t.instance.clear()]
+    ],
     changeFromCode: t => t.instance.selectChip(t.root.querySelector('.chip')),
+    clearFromCode: t => t.instance.clear(),
+    value: t => t.instance.getSelectedValues(),
     required: { required: true }
   },
   {
@@ -139,7 +175,14 @@ const ADAPTERS = [
     describedTargets: t => [t.instance._input],
     changeAsUser: t => typeInto(t.instance._input, 'two,'),
     changeEvents: t => [[t.root.querySelector('.chip-input'), 'change.coreui.chip-input'], ...nativeChange(t.instance._valueField)],
+    changeMethods: [
+      ['add()', t => t.instance.add('three')],
+      ['remove()', t => t.instance.remove('two')],
+      ['clear()', t => t.instance.clear()]
+    ],
     changeFromCode: t => t.instance.add('two'),
+    clearFromCode: t => t.instance.clear(),
+    value: t => t.instance.getValues(),
     required: { required: true }
   },
   {
@@ -157,7 +200,13 @@ const ADAPTERS = [
     describedTargets: sectionsOf,
     changeAsUser: t => pressArrowUp(sectionsOf(t)[0]),
     changeEvents: t => [[t.root.querySelector('#field'), 'dateChange.coreui.date-input'], ...nativeChange(t.instance._inputElement)],
+    changeMethods: [
+      ['clear()', t => t.instance.clear()],
+      ['reset()', t => t.instance.reset()]
+    ],
     changeFromCode: t => t.instance.setDate(new Date(2026, 6, 15)),
+    clearFromCode: clearAndReset,
+    value: t => t.instance.getDate(),
     reconfigure: disableAndEnable,
     required: { required: true }
   },
@@ -176,7 +225,13 @@ const ADAPTERS = [
     describedTargets: sectionsOf,
     changeAsUser: t => pressArrowUp(sectionsOf(t)[0]),
     changeEvents: t => [[t.root.querySelector('#field'), 'timeChange.coreui.time-input'], ...nativeChange(t.instance._inputElement)],
+    changeMethods: [
+      ['clear()', t => t.instance.clear()],
+      ['reset()', t => t.instance.reset()]
+    ],
     changeFromCode: t => t.instance.setDate('11:45:00'),
+    clearFromCode: clearAndReset,
+    value: t => t.instance.getDate(),
     reconfigure: disableAndEnable,
     required: { required: true }
   },
@@ -198,7 +253,13 @@ const ADAPTERS = [
       [t.root.querySelector('#field'), 'startDateChange.coreui.date-range-input'],
       ...nativeChange(t.instance._startInput._inputElement)
     ],
+    changeMethods: [
+      ['clear()', t => t.instance.clear()],
+      ['reset()', t => t.instance.reset()]
+    ],
     changeFromCode: t => t.instance.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21)),
+    clearFromCode: clearAndReset,
+    value: t => [t.instance.getStartDate(), t.instance.getEndDate()],
     required: { required: true }
   },
   {
@@ -214,7 +275,14 @@ const ADAPTERS = [
     describedTargets: sectionsOf,
     changeAsUser: t => t.root.querySelector('.form-control-cleaner').click(),
     changeEvents: t => [[t.root.querySelector('#field'), 'dateChange.coreui.date-picker'], ...nativeChange(t.instance._input._inputElement)],
+    changeMethods: [
+      ['clear()', t => t.instance.clear(), { prepare: noop }],
+      ['reset()', t => t.instance.reset()],
+      ['today()', t => t.instance.today()]
+    ],
     changeFromCode: t => t.instance.setDate(new Date(2026, 6, 15)),
+    clearFromCode: clearAndReset,
+    value: t => t.instance.getDate(),
     required: { required: true }
   },
   {
@@ -230,7 +298,14 @@ const ADAPTERS = [
     describedTargets: sectionsOf,
     changeAsUser: t => t.root.querySelector('.form-control-cleaner').click(),
     changeEvents: t => [[t.root.querySelector('#field'), 'timeChange.coreui.time-picker'], ...nativeChange(t.instance._input._inputElement)],
+    changeMethods: [
+      ['clear()', t => t.instance.clear(), { prepare: noop }],
+      ['reset()', t => t.instance.reset()],
+      ['now()', t => t.instance.now()]
+    ],
     changeFromCode: t => t.instance.setTime('11:45:00'),
+    clearFromCode: clearAndReset,
+    value: t => t.instance.getTime(),
     required: { required: true }
   },
   {
@@ -251,7 +326,13 @@ const ADAPTERS = [
       [t.root.querySelector('#field'), 'startDateChange.coreui.date-range-picker'],
       ...nativeChange(t.instance._input._startInput._inputElement)
     ],
+    changeMethods: [
+      ['clear()', t => t.instance.clear(), { prepare: noop }],
+      ['reset()', t => t.instance.reset()]
+    ],
     changeFromCode: t => t.instance.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21)),
+    clearFromCode: clearAndReset,
+    value: t => [t.instance.getStartDate(), t.instance.getEndDate()],
     required: { required: true }
   },
   {
@@ -266,7 +347,13 @@ const ADAPTERS = [
     describedTargets: t => [...t.root.querySelectorAll('.form-otp-control')],
     changeAsUser: t => typeInto(t.root.querySelector('.form-otp-control'), '1'),
     changeEvents: t => [[t.root.querySelector('.form-otp'), 'change.coreui.otp-input'], ...nativeChange(t.instance._inputElement)],
+    changeMethods: [
+      ['clear()', t => t.instance.clear()],
+      ['reset()', t => t.instance.reset()]
+    ],
     changeFromCode: t => t.instance.setValue('1'),
+    clearFromCode: clearAndReset,
+    value: t => t.instance._value,
     reconfigure: disableAndEnable,
     required: { required: true }
   },
@@ -281,13 +368,21 @@ const ADAPTERS = [
     invalidTargets: t => [...t.root.querySelectorAll('.form-range-input')],
     describedTargets: t => [...t.root.querySelectorAll('.form-range-input')],
     pageDescribed: t => [...t.root.querySelectorAll('.form-range-input')],
-    changeAsUser: t => typeInto(t.root.querySelector('.form-range-input'), '30'),
+    changeAsUser(t) {
+      const handle = t.root.querySelector('.form-range-input')
+
+      typeInto(handle, '30')
+      handle.dispatchEvent(new Event('change', { bubbles: true }))
+    },
     changeEvents: t => [[t.root.querySelector('#field'), 'input.coreui.range-slider']],
+    stateEvents: t => [[t.root.querySelector('#field'), 'change.coreui.range-slider']],
     changeFromCode: t => t.instance.setValue([30, 70]),
+    value: t => t.instance._values(),
     reconfigure: disableAndEnable,
     required: null,
     makeInvalid: t => t.root.querySelector('.form-range-input').setCustomValidity('Pick a higher budget.'),
     notApplicable: {
+      givenMethods: 'it has no clear() or reset() method',
       reportedReconfigure: 'its rebuild replaces the handles and leaves the validity the page set on the old ones behind',
       reportedResetReconfigure: 'its rebuild replaces the handles and leaves the validity the page set on the old ones behind'
     }
@@ -305,12 +400,15 @@ const ADAPTERS = [
     pageDescribed: t => [t.root.querySelector('#field')],
     changeAsUser: t => t.root.querySelectorAll('.rating-item-label')[3].click(),
     changeEvents: t => [[t.root.querySelector('#field'), 'change.coreui.rating']],
+    changeMethods: [['reset()', t => t.instance.reset()]],
     verdictEvents: t => [[t.root.querySelector('#field'), 'change.coreui.rating']],
     verdictChanges: [
       ['a pick', { value: 2 }, t => t.root.querySelectorAll('.rating-item-label')[3].click(), 'now'],
       ['allowClear', { allowClear: true, value: 2 }, t => t.root.querySelectorAll('.rating-item-input')[1].click(), 'focus']
     ],
     changeFromCode: t => t.instance.setValue(4),
+    clearFromCode: t => t.instance.reset(),
+    value: t => t.instance._currentValue,
     reconfigure: disableAndEnable,
     required: { required: true }
   }
@@ -356,9 +454,15 @@ describe('validation conformance', () => {
     expect(adapter.frames(t).map(stateClasses)).toEqual(adapter.frames(t).map(() => classes))
   }
 
+  const givenClasses = element => [...element.classList].filter(name => /^is-(invalid|valid|warning)$/.test(name))
+  const givenReading = (adapter, t) => [adapter.frames(t).map(givenClasses), ariaInvalid(t).length]
+  const givenExpected = (adapter, t, given) => [adapter.frames(t).map(() => [`is-${given}`]), given === 'invalid' ? adapter.invalidTargets(t).length : 0]
+  const stateEvents = (adapter, t) => adapter.stateEvents?.(t) ?? adapter.verdictEvents?.(t) ?? adapter.changeEvents(t).slice(0, 1)
+
   const reasonFor = (adapter, rule) => adapter.notApplicable?.[rule] ??
     (rule.endsWith('Reconfigure') && !adapter.reconfigure ? VALIDATION_ONLY : null) ??
-    (rule === 'pageValueField' && !adapter.pageOwnsValueField ? 'its value field is built by the component' : null)
+    (rule === 'pageValueField' && !adapter.pageOwnsValueField ? 'its value field is built by the component' : null) ??
+    (rule === 'pageClearsOnMethods' && !adapter.changeMethods ? 'none of its methods fires the change event' : null)
 
   const conform = (rule, title, test) => {
     for (const adapter of ADAPTERS) {
@@ -495,19 +599,44 @@ describe('validation conformance', () => {
       return seen
     }
 
-    conform('userChange', 'should drop a given state when the user makes it, before the change events', adapter => {
-      const t = mount(adapter, { config: { ...adapter.filled, validationState: 'invalid' } })
-      const seen = record(adapter, t, () => [shownStates(t), ariaInvalid(t).length, describesFeedback(adapter, t)])
+    for (const given of GIVEN_STATES) {
+      conform('givenUserChange', `should keep a given ${given} state through a change of the user, at the change events and after`, adapter => {
+        const t = mount(adapter, { config: { ...adapter.filled, validationState: given } })
+        const seen = record(adapter, t, () => givenReading(adapter, t))
 
-      adapter.changeAsUser(t)
+        adapter.changeAsUser(t)
 
-      expect(seen.length).toBeGreaterThan(0)
-      expect(seen).toEqual(seen.map(([type]) => [type, [], 0, false]))
-      expect(shownStates(t)).toEqual([])
+        expect(seen.length).toBeGreaterThan(0)
+        expect(seen).toEqual(seen.map(([type]) => [type, ...givenExpected(adapter, t, given)]))
+        expect(givenReading(adapter, t)).toEqual(givenExpected(adapter, t, given))
+      })
+    }
+
+    conform('pageClears', 'should drop a given state at once when the page sets it to null in the change event', adapter => {
+      for (const [, config, act] of adapter.verdictChanges ?? [['', {}, adapter.changeAsUser]]) {
+        const t = mount(adapter, { config: { ...adapter.filled, ...config, validationState: 'invalid' } })
+        const seen = []
+
+        t.verdictField = adapter.verdictField(t)
+
+        for (const [target, type] of stateEvents(adapter, t)) {
+          target.addEventListener(type, () => {
+            t.instance.setValidationState(null)
+            seen.push([shownStates(t), ariaInvalid(t).length, describesFeedback(adapter, t)])
+          })
+        }
+
+        act(t)
+
+        expect(seen.length).toBeGreaterThan(0)
+        expect(seen).toEqual(seen.map(() => [[], 0, false]))
+        expect(shownStates(t)).toEqual([])
+        dispose(t)
+      }
     })
 
     conform('userChangeReported', 'should show the state of the new value at the change events of a reported field', adapter => {
-      const t = mount(adapter, { config: { ...adapter.filled, ...adapter.required, validationState: 'invalid' } })
+      const t = mount(adapter, { config: { ...adapter.filled, ...adapter.required } })
       const fieldStates = () => {
         const frames = adapter.frames(t)
         const fields = adapter.valueFields(t)
@@ -542,17 +671,87 @@ describe('validation conformance', () => {
       expectFrames(adapter, t, ['is-invalid'])
       expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
     })
+
+    for (const given of GIVEN_STATES) {
+      conform('givenMethods', `should keep a given ${given} state through clear() and reset()`, adapter => {
+        const t = mount(adapter, { config: { ...adapter.filled, validationState: given } })
+
+        adapter.clearFromCode(t)
+
+        expect(givenReading(adapter, t)).toEqual(givenExpected(adapter, t, given))
+      })
+    }
+
+    conform('pageClearsOnMethods', 'fires the change event on its methods that change the value, so a page that clears the state there clears it on them', adapter => {
+      for (const [, act, { config = {}, prepare = adapter.changeAsUser } = {}] of adapter.changeMethods) {
+        const t = mount(adapter, { config: { ...adapter.filled, ...config, validationState: 'invalid' } })
+        const seen = []
+
+        prepare(t)
+
+        for (const [target, type] of stateEvents(adapter, t)) {
+          target.addEventListener(type, () => {
+            seen.push(type)
+            t.instance.setValidationState(null)
+          })
+        }
+
+        act(t)
+
+        expect(seen.length).toBeGreaterThan(0)
+        expect(shownStates(t)).toEqual([])
+        expect(ariaInvalid(t)).toEqual([])
+        dispose(t)
+      }
+    })
   })
 
   describe('a native reset', () => {
-    conform('reset', 'should drop a state given before it', async adapter => {
+    for (const given of GIVEN_STATES) {
+      conform('givenReset', `should keep a given ${given} state`, async adapter => {
+        const t = mount(adapter, { config: { ...adapter.filled, validationState: given } })
+
+        t.form.reset()
+        await tick()
+
+        expect(givenReading(adapter, t)).toEqual(givenExpected(adapter, t, given))
+      })
+    }
+
+    conform('pageClearsOnReset', 'fires the change event on a native reset, so a page that clears the state there clears it on reset', async adapter => {
       const t = mount(adapter, { config: { ...adapter.filled, validationState: 'invalid' } })
+      const seen = []
+
+      adapter.changeAsUser(t)
+
+      for (const [target, type] of stateEvents(adapter, t)) {
+        target.addEventListener(type, () => {
+          seen.push(type)
+          t.instance.setValidationState(null)
+        })
+      }
 
       t.form.reset()
       await tick()
 
+      expect(seen.length).toBeGreaterThan(0)
       expect(shownStates(t)).toEqual([])
-      expect(ariaInvalid(t)).toHaveLength(0)
+      expect(ariaInvalid(t)).toEqual([])
+    })
+
+    conform('resetValue', 'should put back the value the component was built with after a change of the user', async adapter => {
+      const t = mount(adapter, { config: { ...adapter.filled, validationState: 'invalid' } })
+      const built = JSON.stringify(adapter.value(t))
+
+      adapter.changeAsUser(t)
+
+      expect(JSON.stringify(adapter.value(t))).not.toBe(built)
+
+      t.form.reset()
+      await tick()
+
+      expect(JSON.stringify(adapter.value(t))).toBe(built)
+      expect(givenReading(adapter, t)).toEqual(givenExpected(adapter, t, 'invalid'))
     })
 
     conform('reset', 'should keep a state given in a reset listener of the form', async adapter => {
@@ -577,15 +776,15 @@ describe('validation conformance', () => {
       expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
     })
 
-    conform('resetReconfigure', 'should drop a state given before it after a setter of another option', async adapter => {
+    conform('resetReconfigure', 'should keep a state given before it after a setter of another option', async adapter => {
       const t = mount(adapter, { config: { ...adapter.filled, validationState: 'invalid' } })
 
       adapter.reconfigure(t)
       t.form.reset()
       await tick()
 
-      expect(shownStates(t)).toEqual([])
-      expect(ariaInvalid(t)).toHaveLength(0)
+      expectFrames(adapter, t, ['is-invalid'])
+      expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
     })
   })
 

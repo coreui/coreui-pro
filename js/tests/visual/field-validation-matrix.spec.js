@@ -4,7 +4,8 @@
  * reset, then held to the same rules, one observable per rule. Each field
  * also holds a valid value with a given invalid state and is submitted. The
  * custom components also take their state from a server class and from
- * `setValidationState()`, and have to read as with the option. What a field
+ * `setValidationState()`, and have to read as with the option, and keep a
+ * given state through a change of the user until the page clears it. What a field
  * shows is decided by the stylesheet, `:user-invalid` and the accessibility
  * tree, which only a real browser has. A combination listed in KNOWN_FAILURES
  * has to keep failing its rule, so the list shrinks with every fix.
@@ -104,6 +105,7 @@ const givenInvalid = cell => cell.given === 'invalid'
 const givenValid = cell => cell.given === 'valid'
 const givenInvalidComponent = cell => givenInvalid(cell) && !NATIVE.has(cell.component)
 const givenValidSubmit = cell => givenValid(cell) && required(cell)
+const givenValidComponent = cell => givenValid(cell) && !NATIVE.has(cell.component)
 const always = () => true
 
 const RULES = [
@@ -140,7 +142,11 @@ const RULES = [
   ['given valid, empty required, after submit: no invalid colour', givenValidSubmit, ({ submit }) => !red(submit)],
   ['given valid, empty required, after submit: no BAD', givenValidSubmit, ({ submit }) => !bad(submit)],
   ['given valid, empty required, after submit: valid colour', givenValidSubmit, ({ submit }) => green(submit)],
-  ['given valid, empty required, after submit: OK shown', givenValidSubmit, ({ submit }) => ok(submit)]
+  ['given valid, empty required, after submit: OK shown', givenValidSubmit, ({ submit }) => ok(submit)],
+  ['given invalid, after reset: BAD shown', givenInvalid, ({ reset }) => bad(reset)],
+  ['given invalid, after reset: aria-invalid on a visible element (components)', givenInvalidComponent, ({ reset }) => reset.ariaInvalid.some(item => !item.includes('('))],
+  ['given valid, after reset: is-valid class (components)', givenValidComponent, ({ reset }) => reset.isValid.length > 0],
+  ['given valid, after reset: no BAD (components)', givenValidComponent, ({ reset }) => !bad(reset)]
 ]
 
 const bordered = cell => !CHECKS.has(cell.component)
@@ -168,10 +174,52 @@ const SOURCE_RULES = [
 
 const sourceCell = cell => CUSTOM.includes(cell.component) && cell.mode === 'm2' && STATES.has(cell.given)
 
+const press = key => async element => {
+  element.focus()
+  await userEvent.keyboard(key)
+}
+
+const pick = (open, option) => async host => {
+  await userEvent.click(open(host))
+  await userEvent.click(host.closest('.probe-field').querySelector(option))
+}
+
+const firstSection = host => host.closest('.probe-field').querySelector('.form-date-time-section')
+
+const USER_CHANGES = {
+  autocomplete: host => press('B')(instanceOf(host)._inputElement),
+  combobox: pick(host => host, '.list-box-option[data-coreui-value="b"]'),
+  multiselect: pick(host => instanceOf(host)._wrapperElement, '.list-box-option[data-coreui-value="b"]'),
+  chipinput: host => press('Gamma{Enter}')(instanceOf(host)._input),
+  chipfilter: host => userEvent.click(host.querySelectorAll('.chip')[1]),
+  dateinput: host => press('{ArrowDown}')(firstSection(host)),
+  timeinput: host => press('{ArrowDown}')(firstSection(host)),
+  daterangeinput: host => press('{ArrowDown}')(firstSection(host)),
+  datepicker: host => press('{ArrowDown}')(firstSection(host)),
+  daterangepicker: host => press('{ArrowDown}')(firstSection(host)),
+  timepicker: host => press('{ArrowDown}')(firstSection(host)),
+  otp: host => press('9')(host.querySelector('.form-otp-control')),
+  rating: host => userEvent.click(host.querySelectorAll('.rating-item-label')[4]),
+  rangeslider: host => press('{ArrowRight}')(host.querySelector('.form-range-input'))
+}
+
+const USER_CHANGE_RULES = [
+  ['user change, given state: no console or page errors', always, ({ errors }) => errors.length === 0],
+  ['user change, given state: the submitted value changed', always, ({ changed, load }) => JSON.stringify(changed.values) !== JSON.stringify(load.values)],
+  ['user change, given invalid: is-invalid class stays', givenInvalid, ({ changed }) => changed.isInvalid.length > 0],
+  ['user change, given invalid: BAD shown', givenInvalid, ({ changed }) => bad(changed)],
+  ['user change, given invalid: aria-invalid on a visible element', givenInvalid, ({ changed }) => changed.ariaInvalid.some(item => !item.includes('('))],
+  ['user change, given valid: is-valid class stays', givenValid, ({ changed }) => changed.isValid.length > 0],
+  ['user change, given valid: no BAD', givenValid, ({ changed }) => !bad(changed)],
+  ['user change, then setValidationState(null): no state class', always, ({ cleared }) => cleared.isInvalid.length === 0 && cleared.isValid.length === 0],
+  ['user change, then setValidationState(null): no aria-invalid', always, ({ cleared }) => cleared.ariaInvalid.length === 0]
+]
+
 const COVERAGE = new Map([
   ...RULES.map(([title, applies]) => [title, applies]),
   ...SOURCE_RULES.map(title => [title, sourceCell]),
-  ...FILLED_RULES.map(([title, applies]) => [title, cell => givenInvalid(cell) && applies(cell)])
+  ...FILLED_RULES.map(([title, applies]) => [title, cell => givenInvalid(cell) && applies(cell)]),
+  ...USER_CHANGE_RULES.map(([title, applies]) => [title, cell => CUSTOM.includes(cell.component) && STATES.has(cell.given) && applies(cell)])
 ])
 
 const KNOWN_FAILURES = [
@@ -370,6 +418,22 @@ const runFilledCell = async cell => {
   return { errors: [...errors], load, submit }
 }
 
+const runUserChangeCell = async cell => {
+  const { form, host } = mount(cell)
+  const values = () => [...new FormData(form).values()].map(String)
+  const load = { ...await settled(form), values: values() }
+
+  await USER_CHANGES[cell.component](host)
+  const changed = { ...await settled(form), values: values() }
+
+  instanceOf(host).setValidationState(null)
+  const cleared = await settled(form)
+
+  return {
+    changed, cleared, errors: [...errors], load
+  }
+}
+
 const loadReading = async (cell, source) => settled(mount(cell, source).form)
 
 const expectRule = (title, cell, passed, details) => {
@@ -453,6 +517,26 @@ describe('field validation matrix', () => {
           }
         }
       })
+    }
+  }
+
+  for (const component of CUSTOM) {
+    for (const mode of ALL_MODES) {
+      for (const given of STATES) {
+        const cell = {
+          component, filled: true, given, mode
+        }
+
+        it(`${component} in ${mode} keeps a given ${given} state through a change of the user`, async () => {
+          const run = await runUserChangeCell(cell)
+
+          for (const [title, applies, passes] of USER_CHANGE_RULES) {
+            if (applies(cell)) {
+              expectRule(title, cell, passes(run, cell), run)
+            }
+          }
+        })
+      }
     }
   }
 

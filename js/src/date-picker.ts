@@ -229,8 +229,8 @@ class DatePicker extends PickerBase {
       ...this._baseContext(),
       date: this.getDate(),
       isDateSelectable: (date: Date | null) => this._input.isDateSelectable(date),
-      setDate: (date: Date | null) => this._runAsUser(() => this._write(date)),
-      today: () => this._runAsUser(() => this.today())
+      setDate: (date: Date | null) => this._write(date),
+      today: () => this.today()
     }
   }
 
@@ -327,7 +327,7 @@ class DatePicker extends PickerBase {
     }))
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._runAsUser(() => this._write(this._withCurrentTime(event.dateObject), 'calendar'))
+      this._write(this._withCurrentTime(event.dateObject), 'calendar')
 
       if (!this._config.timepicker) {
         this.hide()
@@ -345,7 +345,7 @@ class DatePicker extends PickerBase {
     }, {
       ...this._config.selectionOptions,
       ...(hourCycle && { hourCycle }),
-      onChange: (time: Date | null) => this._runAsUser(() => this._applyTime(time)),
+      onChange: (time: Date | null) => this._applyTime(time),
       time: this.getDate()
     }))
   }

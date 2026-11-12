@@ -604,14 +604,6 @@ class Combobox extends ComboboxBase {
     }
   }
 
-  override _onOptionSelected(): void {
-    this._validation.dismiss()
-  }
-
-  override _onOptionDeselected(): void {
-    this._validation.dismiss()
-  }
-
   override _onSelectionChange(): void {
     this._commitValue()
 

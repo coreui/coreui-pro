@@ -1,6 +1,6 @@
 import {
-  closeValueFieldBubble, followUserValidities, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
-  ownValidationState, splitIds, type UserValidity, type ValidationState, type ValueField
+  closeValueFieldBubble, followUserValidities, getFeedbackIds, getServerState, getStateClasses, getValidationState, ownValidationState,
+  splitIds, type UserValidity, type ValidationState, type ValueField
 } from './form-validation.js'
 import { resolveFieldState } from './field-state.js'
 import { writeAttribute } from './index.js'
@@ -15,8 +15,7 @@ export type FieldValidationConfig = {
  * How a component tells `FieldValidation` about itself.
  *
  * - `aliases`: the component takes the `invalid` and `valid` aliases of `validationState`.
- * - `config`: the live configuration object of the component, which the controller writes when it
- *   drops the given state.
+ * - `config`: the live configuration object of the component, which holds the given state.
  * - `describedTargets`: the elements that get the page's description and the invalid feedback;
  *   `invalidTargets` by default.
  * - `fields`: the value fields, in order; the first one gives the invalid feedback.
@@ -52,15 +51,12 @@ export type FieldValidationOptions = {
  * Keeps the validation state of a component that carries a form value: the state it was given, by
  * an option or by a state class its markup carried, the state a validation reported for its value
  * fields, the state class, `aria-invalid` and the invalid feedback in `aria-describedby`, and a
- * native reset of the form. It leaves the validity of the value fields to the browser and the page.
- * The component describes where these go, marks the actions of the user and tells the controller
- * when its value changes; it writes none of these itself. The controller takes back what it wrote
- * and gives back what it overwrote, and when it drops the given state, it clears it in the
- * component's configuration.
+ * native reset of the form. It leaves the validity of the value fields to the browser and the page,
+ * and the given state to the page, which changes it with the component's setter. The component
+ * describes where these go and tells the controller when its value or its state changes; it writes
+ * none of these itself. The controller takes back what it wrote and gives back what it overwrote.
  */
 class FieldValidation {
-  /** A user action runs that has not changed the value yet; only `runAsUser()` opens it. */
-  declare userAction: boolean
   protected declare _ariaInvalid: Element[]
   protected declare _described: Map<Element, string[]>
   protected declare _describedBy: string[]
@@ -74,7 +70,6 @@ class FieldValidation {
   protected declare _release: () => void
   protected declare _resetRoots: Node[]
   protected declare _resetTimeout: ReturnType<typeof setTimeout> | undefined
-  protected declare _serial: number
   protected declare _serverClasses: Map<Element, string[]>
   protected declare _userValidity: Map<ValueField, UserValidity>
 
@@ -102,7 +97,6 @@ class FieldValidation {
     this._release = () => {}
     this._resetRoots = root instanceof ShadowRoot ? [host.ownerDocument, root] : [host.ownerDocument]
     this._resetTimeout = undefined
-    this._serial = nextStateSerial()
     this._serverClasses = new Map()
 
     for (const element of options.serverClassSources?.() ?? [host]) {
@@ -119,14 +113,12 @@ class FieldValidation {
     }
 
     this._userValidity = new Map()
-    this.userAction = false
   }
 
   /**
    * Makes this controller the owner of the controller of a part, such as a field of a picker or an
    * end of a range: the part takes the owner's given state after its own, shows the owner's error
-   * of its own on its focus targets, and tells the owner every drop of its state. Draws the owner
-   * and its parts.
+   * of its own on its focus targets. Draws the owner and its parts.
    *
    * @param part - The controller of the part
    */
@@ -143,74 +135,7 @@ class FieldValidation {
    */
   configure(): void {
     this._serverClasses.clear()
-    this._serial = nextStateSerial()
     this.update()
-  }
-
-  /**
-   * Runs an action as the user's: the first change of the value it makes drops the given state.
-   *
-   * @param action - The action
-   */
-  runAsUser(action: () => void): void {
-    const pending = this.userAction
-    this.userAction = true
-
-    try {
-      action()
-    } finally {
-      this.userAction = pending && this.userAction
-    }
-  }
-
-  /**
-   * Records a change of the value: the first change of a user action, of the component or of an
-   * owner up the chain, ends that action and drops the given state from the component up. The
-   * component calls `update()` before each change event it sends, once its value fields hold the
-   * new value.
-   *
-   * @returns `true` when the change ended a user action
-   */
-  change(): boolean {
-    if (!this.userAction && !this._owner?.change()) {
-      return false
-    }
-
-    this.userAction = false
-    this.dismiss()
-    return true
-  }
-
-  /**
-   * Drops the given state, in the component's configuration and as a state class from the markup,
-   * unless the state was given after the moment the serial stands for, tells the owner with the same
-   * serial, and then draws the tree without the state it dropped. A component that knows a change is
-   * the user's calls it directly, before its change events.
-   *
-   * @param serial - The serial taken at the moment that drops the state, such as the start of a
-   * key press or a native reset; any state given before it is dropped by default
-   */
-  dismiss(serial: number = Number.POSITIVE_INFINITY): void {
-    const config = this._options.config()
-
-    const isDropped = this._serial <= serial && this._givenState(config) !== undefined
-
-    if (isDropped) {
-      config.validationState = null
-
-      if (this._options.aliases) {
-        config.invalid = false
-        config.valid = false
-      }
-
-      this._serverClasses.clear()
-    }
-
-    this._owner?.dismiss(serial)
-
-    if (isDropped) {
-      this.update()
-    }
   }
 
   /**
@@ -284,7 +209,7 @@ class FieldValidation {
   /**
    * Hands everything back: leaves its owner, stops following the fields and the form, takes off what
    * it drew and the `aria-invalid` it wrote, gives the server sources the state classes of their
-   * markup, unless that state was dropped meanwhile, and adds the page's description back to the
+   * markup, unless the setter gave a state meanwhile, and adds the page's description back to the
    * host next to what the host carries now. Call it before the component takes its elements apart.
    */
   dispose(): void {
@@ -453,9 +378,9 @@ class FieldValidation {
 
   /**
    * Answers a native reset of the form of a value field: in the next task, unless a listener
-   * cancelled it, drops a state given before the reset, then restores the value; of several resets of
-   * the form in one task, the last decides. The followers of the fields draw the state of the
-   * restored value right after, in their own tasks for the same reset.
+   * cancelled it, restores the value; of several resets of the form in one task, the last decides.
+   * The given state stays. The followers of the fields draw the state of the restored value right
+   * after, in their own tasks for the same reset.
    *
    * @param event - The `reset` event
    */
@@ -464,12 +389,9 @@ class FieldValidation {
       return
     }
 
-    const serial = nextStateSerial()
-
     clearTimeout(this._resetTimeout)
     this._resetTimeout = setTimeout(() => {
       if (!event.defaultPrevented) {
-        this.dismiss(serial)
         this._options.restore?.()
       }
     })

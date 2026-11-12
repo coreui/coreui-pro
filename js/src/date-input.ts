@@ -242,7 +242,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   protected declare _reports: number
   declare _validation: FieldValidation
   protected declare _validationError: string | null
-  protected declare _valueKey: string
 
   constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
@@ -277,7 +276,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._applyValidationState()
     this._reportedDate = this._date
     this._announceError()
-    this._valueKey = this._getValueKey(this._sections)
     this._inputElement!.defaultValue = this._getResetValue()
     this._isBuilt = true
     this._addEventListeners()
@@ -409,10 +407,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._maxDate = this._convertDate(maxDate)
     this._sections = setSectionsFromDate(sections, date ? this._convertDate(date) : null)
     this._draft = ''
-  }
-
-  _getValueKey(sections: DateSection[]): string {
-    return JSON.stringify(sections.map(section => section.value))
   }
 
   _addEventListeners(): void {
@@ -551,7 +545,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       event.preventDefault()
       section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY ? 1 : -1, this._getSectionMax(section))
       this._draft = ''
-      this._runAsUser(() => this._commitSections())
+      this._commitSections()
       return
     }
 
@@ -565,7 +559,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
       section.value = null
       this._draft = ''
-      this._runAsUser(() => this._commitSections())
+      this._commitSections()
       return
     }
 
@@ -618,7 +612,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
     this._draft = result.completed ? '' : result.draft
     section.value = result.value
-    this._runAsUser(() => this._commitSections())
+    this._commitSections()
 
     if (result.completed) {
       this._focusSibling(sectionElement, true)
@@ -630,7 +624,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   _clearAndFocus(): HTMLElement {
     this._setAllSelected(false)
     this._draft = ''
-    this._runAsUser(() => this._commitSections(setSectionsFromDate(this._sections, null)))
+    this._commitSections(setSectionsFromDate(this._sections, null))
     const [firstSection] = this._getSectionElements()
     firstSection.focus()
     return firstSection
@@ -646,7 +640,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     const sections = this._config.inputDateParse ? null : getSectionsFromString(text, this._sections)
 
     if (sections) {
-      this._runAsUser(() => this._commitSections(sections))
+      this._commitSections(sections)
       return
     }
 
@@ -655,7 +649,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       getLocalDateFromString(text, this._config.locale)
 
     if (date instanceof Date && !Number.isNaN(date.getTime())) {
-      this._runAsUser(() => this._commitSections(setSectionsFromDate(this._sections, date)))
+      this._commitSections(setSectionsFromDate(this._sections, date))
     }
   }
 
@@ -674,15 +668,10 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   }
 
   _commitSections(sections: DateSection[] = this._sections, notify = true): void {
-    if (this._getValueKey(sections) !== this._valueKey) {
-      this._validation.change()
-    }
-
     this._sections = sections
     this._syncSections()
 
     const value = this._applyValidationState()
-    this._valueKey = this._getValueKey(this._sections)
 
     try {
       if (notify) {
@@ -769,10 +758,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   _holdErrors(hold: boolean): void {
     this._errorHolds += hold ? 1 : -1
     this._announceError()
-  }
-
-  _runAsUser(action: () => void): void {
-    this._validation.runAsUser(action)
   }
 
   _getValidationError(date: Date | null, isFilled: boolean): string | null {
