@@ -273,7 +273,7 @@ describe('ChipInput', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should show a given state on the frame and the text field, block the submit with its message, and give the class back on dispose', () => {
+    it('should show a given state on the frame and the text field with its message, let the form submit, and give the class back on dispose', () => {
       fixtureEl.innerHTML = '<form><div class="chip-input is-invalid"><input type="text" class="chip-input-field" aria-describedby="hint"></div><div id="hint">Up to five.</div><div class="invalid-feedback">Pick a tag.</div></form>'
       const form = fixtureEl.querySelector('form')
       const element = fixtureEl.querySelector('.chip-input')
@@ -284,8 +284,7 @@ describe('ChipInput', () => {
       expect(element.classList.contains('is-invalid')).toBeTrue()
       expect(input.getAttribute('aria-invalid')).toBe('true')
       expect(input.getAttribute('aria-describedby')).toBe(`hint ${feedback.id}`)
-      expect(chipInput._valueField.validationMessage).toBe('Pick a tag.')
-      expect(form.checkValidity()).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
 
       chipInput.dispose()
 
@@ -403,17 +402,17 @@ describe('ChipInput', () => {
 
       expect(chipInput.getValues()).toEqual([])
       expect(element.classList.contains('is-invalid')).toBeTrue()
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(chipInput._input.getAttribute('aria-invalid')).toBe('true')
     })
 
-    it('should lift the block before change.coreui.chip-input and treat what the page does there as code', () => {
+    it('should drop the state before change.coreui.chip-input and treat what the page does there as code', () => {
       fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
       const element = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(element, { validationState: 'invalid' })
       const seen = []
 
       element.addEventListener('change.coreui.chip-input', () => {
-        seen.push([chipInput._valueField.value, chipInput._valueField.validity.valid, element.classList.contains('is-invalid')])
+        seen.push([chipInput._valueField.value, element.classList.contains('is-invalid')])
 
         if (seen.length === 1) {
           chipInput.setValidationState('invalid')
@@ -422,10 +421,10 @@ describe('ChipInput', () => {
       chipInput._input.value = 'one,two,'
       chipInput._input.dispatchEvent(new Event('input', { bubbles: true }))
 
-      expect(seen[0]).toEqual(['one', true, false])
+      expect(seen[0]).toEqual(['one', false])
       expect(chipInput.getValues()).toEqual(['one', 'two'])
       expect(element.classList.contains('is-invalid')).toBeTrue()
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(chipInput._input.getAttribute('aria-invalid')).toBe('true')
     })
 
     it('should send input and change from the value field when the chips change', () => {
@@ -480,7 +479,6 @@ describe('ChipInput', () => {
       const feedback = fixtureEl.querySelector('.invalid-feedback')
 
       expect(chipInput._input.getAttribute('aria-describedby')).toBe(feedback.id)
-      expect(chipInput._valueField.validationMessage).toBe('Add a tag.')
     })
 
     it('should hand the focus the value field gets to the text field', () => {
@@ -536,7 +534,7 @@ describe('ChipInput', () => {
       await tick()
 
       expect(element.classList.contains('is-invalid')).toBe(kept)
-      expect(form.checkValidity()).toBe(!kept)
+      expect(chipInput._input.hasAttribute('aria-invalid')).toBe(kept)
     })
 
     it('should write the chips it restores into the value field and report the change, also after a change from code in the same task', async () => {

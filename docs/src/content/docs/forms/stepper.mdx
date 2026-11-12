@@ -340,7 +340,7 @@ Use a Non-linear Bootstrap Stepper when users should have full control over navi
 
 The Stepper Component includes native HTML5 validation for each step. Before allowing the user to move to the next step, the associated form (if present) is validated automatically.
 
-If a form is invalid, the stepper blocks navigation and displays validation messages. Going back to an earlier step does not validate the current one. Every validation triggers `stepValidationComplete.coreui.stepper` first, before the browser's `invalid` events and before the stepper decides, with `event.isValid` telling whether every control passed. A validity the handler sets with `setCustomValidity()`, for example when two passwords differ, counts for the step; clear it with `setCustomValidity('')` once the rule holds, or the step stays blocked. `preventDefault()` on the event has no effect.
+If a form is invalid, the stepper blocks navigation and displays validation messages. Going back to an earlier step does not validate the current one. Every validation triggers `stepValidationComplete.coreui.stepper` first, before the browser's `invalid` events and before the stepper decides, with `event.isValid` telling whether every control passed. A validity the handler sets with `setCustomValidity()`, for example when two passwords differ, counts for the step; clear it with `setCustomValidity('')` once the rule holds, or the step stays blocked. A validation state given to a [form component](/forms/validation/#form-components) in the step only shows and does not stop the step, so set the validity of the field that carries its value here to stop it. `preventDefault()` on the event has no effect.
 
 ```js
 const stepperElement = document.getElementById('myStepper')

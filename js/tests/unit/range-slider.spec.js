@@ -2,6 +2,7 @@ import EventHandler from '../../src/dom/event-handler.js'
 import Form from '../../src/form.js'
 import Range from '../../src/range.js'
 import RangeSlider from '../../src/range-slider.js'
+import { getFeedbackIds } from '../../src/util/form-validation.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -928,24 +929,15 @@ describe('RangeSlider', () => {
       return { element, form: fixtureEl.querySelector('form'), rangeSlider: new RangeSlider(element, config) }
     }
 
-    it('should show a given state on the element and every handle and block the submit through the first handle', () => {
+    it('should show a given state on the element and every handle, describe them with the message, and let the form submit', () => {
       const { element, form } = mountInForm({ validationState: 'invalid', value: [20, 80] })
-      const [first, second] = inputsOf(element)
       const feedback = form.querySelector('.invalid-feedback')
 
       expect(element).toHaveClass('is-invalid')
       expect(inputsOf(element).every(input => input.classList.contains('is-invalid'))).toBeTrue()
       expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
       expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual([feedback.id, feedback.id])
-      expect(first.validationMessage).toEqual('Pick a budget.')
-      expect(second.validity.valid).toBeTrue()
-      expect(form.checkValidity()).toBeFalse()
-    })
-
-    it('should block with a generic message without a feedback', () => {
-      const { element } = mountInForm({ validationState: 'invalid', value: 40 }, '', '')
-
-      expect(inputsOf(element)[0].validationMessage).toEqual('Invalid value.')
+      expect(form.checkValidity()).toBeTrue()
     })
 
     it('should write aria-invalid="true" over another value on a handle once the state is invalid', () => {
@@ -959,7 +951,7 @@ describe('RangeSlider', () => {
       expect(input.getAttribute('aria-invalid')).toEqual('true')
     })
 
-    it('should not block for a valid or a custom state', () => {
+    it('should show a valid or a custom state without aria-invalid', () => {
       const { element, form, rangeSlider } = mountInForm({ validationState: 'valid', value: 40 })
 
       expect(element).toHaveClass('is-valid')
@@ -981,15 +973,15 @@ describe('RangeSlider', () => {
     })
 
     it('should read the server class of the element once, when it starts', () => {
-      const { element, form } = mountInForm({ value: 40 }, 'class="is-invalid"')
+      const { element } = mountInForm({ value: 40 }, 'class="is-invalid"')
 
       expect(element).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(inputsOf(element)[0].getAttribute('aria-invalid')).toBe('true')
 
       element.classList.add('is-valid')
       inputsOf(element)[0].dispatchEvent(createEvent('focusout'))
 
-      expect(form.checkValidity()).toBeFalse()
+      expect(inputsOf(element)[0].getAttribute('aria-invalid')).toBe('true')
       expect(inputsOf(element)[0]).not.toHaveClass('is-valid')
     })
 
@@ -1005,14 +997,14 @@ describe('RangeSlider', () => {
     })
 
     it('should keep a given state when the distance keeps a moved handle in place', () => {
-      const { element, form } = mountInForm({ distance: 5, validationState: 'invalid', value: [50, 55] })
+      const { element } = mountInForm({ distance: 5, validationState: 'invalid', value: [50, 55] })
       const [first] = inputsOf(element)
 
       move(first, 53)
 
       expect(first.value).toEqual('50')
       expect(element).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
     })
 
     it('should drop the server class when the user moves a handle', () => {
@@ -1025,12 +1017,12 @@ describe('RangeSlider', () => {
     })
 
     it('should keep a given state when the value changes from code', () => {
-      const { element, form, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] })
+      const { element, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] })
 
       rangeSlider.setValue([30, 70])
 
       expect(element).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
     })
 
     it('should change the state on setValidationState without building the handles again', () => {
@@ -1041,7 +1033,7 @@ describe('RangeSlider', () => {
 
       expect(inputsOf(element)).toEqual(before)
       expect(element).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
 
       rangeSlider.setValidationState(null)
 
@@ -1088,7 +1080,7 @@ describe('RangeSlider', () => {
       })
 
       expect(element).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true'])
     })
 
     it('should keep the description of the page on every handle and add the feedback only while invalid', () => {
@@ -1102,11 +1094,19 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp'])
     })
 
+    it('should describe every handle with the feedback of the first handle', () => {
+      const { element } = mountInForm({ validationState: 'invalid', value: [20, 80] })
+      const inputs = inputsOf(element)
+      const feedbackIds = getFeedbackIds(inputs[0])
+
+      expect(feedbackIds).toEqual([fixtureEl.querySelector('.invalid-feedback').id])
+      expect(inputs.map(input => input.getAttribute('aria-describedby'))).toEqual(inputs.map(() => feedbackIds.join(' ')))
+    })
+
     it('should find the feedback named in data-coreui-invalid-feedback on the element', () => {
       const { element } = mountInForm({ validationState: 'invalid', value: [20, 80] }, 'data-coreui-invalid-feedback="budgetError"', '<p><span id="budgetError">Pick a budget.</span></p>')
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetError', 'budgetError'])
-      expect(inputsOf(element)[0].validationMessage).toEqual('Pick a budget.')
     })
 
     it('should show the state a validation reports for a handle the page sets a validity on', () => {
@@ -1136,16 +1136,6 @@ describe('RangeSlider', () => {
       second.dispatchEvent(new Event('focusout'))
 
       expect(element).toHaveClass('is-invalid')
-    })
-
-    it('should block with the feedback the page linked through the description of the element', () => {
-      const { element, rangeSlider } = mountInForm({ validationState: 'invalid', value: 40 }, 'aria-describedby="budgetError"', '<div class="invalid-feedback" id="budgetError">Pick a budget.</div>')
-
-      fixtureEl.querySelector('form').before(fixtureEl.querySelector('#budgetError'))
-
-      rangeSlider.setValue([40, 60])
-
-      expect(inputsOf(element)[0].validationMessage).toEqual('Pick a budget.')
     })
 
     it('should keep a given valid state over a validity the page sets on a handle when the form plugin validates', () => {
@@ -1283,22 +1273,6 @@ describe('RangeSlider', () => {
 
       expect(inputsOf(element).map(input => input.value)).toEqual(['25', '60'])
       expect(rangeSlider._press).toBeNull()
-    })
-
-    it('should block the submit once enable() runs on a slider built disabled and invalid, and stop again on disable()', () => {
-      fixtureEl.innerHTML = '<form><div></div></form>'
-      const form = fixtureEl.querySelector('form')
-      const rangeSlider = new RangeSlider(fixtureEl.querySelector('div'), { disabled: true, validationState: 'invalid', value: 40 })
-
-      expect(form.checkValidity()).toBeTrue()
-
-      rangeSlider.enable()
-
-      expect(form.checkValidity()).toBeFalse()
-
-      rangeSlider.disable()
-
-      expect(form.checkValidity()).toBeTrue()
     })
 
     it('should go back to the start value on a form reset after setValue', () => {

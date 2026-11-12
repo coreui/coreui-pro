@@ -640,21 +640,21 @@ describe('DateRangeInput', () => {
       section.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
     }
 
-    it('should take a state class the markup carries on the frame as the given state of both ends, and block with it', () => {
+    it('should take a state class the markup carries on the frame as the given state of both ends, and let a valid range submit', () => {
       const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" class="is-invalid"></div></form>')
       const form = fixtureEl.querySelector('form')
 
       expect(root().classList.contains('is-invalid')).toBeTrue()
       expect(fields().every(field => field.classList.contains('is-invalid'))).toBeTrue()
       expect(sectionsInvalid()).toEqual(Array.from({ length: 6 }, () => 'true'))
-      expect(form.checkValidity()).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
 
       range.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21))
       range.clear()
       range.reset()
 
       expect(root().classList.contains('is-invalid')).toBeTrue()
-      expect(form.checkValidity()).toBeFalse()
+      expect(sectionsInvalid()).toEqual(Array.from({ length: 6 }, () => 'true'))
     })
 
     it('should drop the given state from both ends and the frame when the user edits one end', () => {

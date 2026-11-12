@@ -214,7 +214,6 @@ class Autocomplete extends ComboboxBase {
     this._shownText = ''
     this._validation = new FieldValidation(this._element, {
       aliases: true,
-      canBlock: () => !this._disabled,
       config: () => this._config,
       fields: () => [this._inputElement],
       frames: () => [this._element],

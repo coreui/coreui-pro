@@ -66,11 +66,9 @@ const SELECTOR_RATING = '.rating'
 const SELECTOR_USER_INVALID = '[data-coreui-validate] :user-invalid'
 const SELECTOR_USER_VALID = '[data-coreui-validate~="valid"] :user-valid'
 const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
-const STATE_INVALID_MESSAGE = 'Invalid value.'
 
 const ownedControls = new WeakSet<Element>()
 let stateSerial = 0
-const stateMessages = new WeakMap<Element, string>()
 
 const armedValueFields = new WeakMap<ValueField, () => void>()
 
@@ -803,45 +801,6 @@ export const ownValidationState = (...controls: Element[]): (() => void) => {
       ownedControls.delete(control)
     }
   }
-}
-
-/**
- * Makes a control block the submit while a component shows it invalid by a state it was given, with
- * the text of its invalid feedback as the message, or a generic one when it has none. A custom
- * validity the page set is left as it is: it is not overwritten while it stands, and clearing takes
- * back only a message this function set and the page has not replaced since. While the control is
- * barred from validation, disabled or read-only, its message cannot be read, so a message this
- * function set counts as its own, and a custom validity the page sets meanwhile may be replaced.
- *
- * @param control - The control that carries the value
- * @param invalid - Whether the given state is `'invalid'`
- */
-export const setStateValidity = (control: FormControl, invalid: boolean): void => {
-  const ownMessage = stateMessages.get(control)
-  const isOwn = ownMessage !== undefined && control.validity.customError &&
-    (!control.willValidate || control.validationMessage === ownMessage)
-
-  if (ownMessage !== undefined && !isOwn) {
-    stateMessages.delete(control)
-  }
-
-  if (!invalid) {
-    if (isOwn) {
-      control.setCustomValidity('')
-      stateMessages.delete(control)
-    }
-
-    return
-  }
-
-  if (control.validity.customError && !isOwn) {
-    return
-  }
-
-  const message = getFeedbackText(control) || STATE_INVALID_MESSAGE
-
-  control.setCustomValidity(message)
-  stateMessages.set(control, control.willValidate ? control.validationMessage : message)
 }
 
 /**

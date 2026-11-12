@@ -2,7 +2,7 @@ import { vi } from 'vitest'
 import {
   alignValueField, armValueFieldBubble, clearValidationState, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidities, followUserValidity,
   getFeedbackIds, getFeedbackText, getServerState, getStateClasses, getUserValidity, getValidationState, isFormValid,
-  nextStateSerial, ownValidationState, setStateValidity, splitIds, updateValidationState, validateForm,
+  nextStateSerial, ownValidationState, splitIds, updateValidationState, validateForm,
   writeValueField
 } from '../../../src/util/form-validation.js'
 import { splitIds as splitIdsFromIndex } from '../../../src/util/index.js'
@@ -958,86 +958,6 @@ describe('Form validation utilities', () => {
 
       expect(select.getAttribute('aria-invalid')).toBe('true')
       expect(search.classList.contains('is-valid')).toBeTrue()
-    })
-  })
-
-  describe('setStateValidity', () => {
-    it('should block the control with its invalid feedback, or a generic message, and clear only its own validity', () => {
-      fixtureEl.innerHTML = '<form><input id="described" required value="x"><div class="invalid-feedback">Taken.</div><input id="bare"><input id="page"></form>'
-      const described = fixtureEl.querySelector('#described')
-      const bare = fixtureEl.querySelector('#bare')
-      const page = fixtureEl.querySelector('#page')
-
-      setStateValidity(described, true)
-      setStateValidity(bare, true)
-      page.setCustomValidity('Ours.')
-      setStateValidity(page, false)
-
-      expect(described.validationMessage).toBe('Taken.')
-      expect(bare.validationMessage).toBe('Invalid value.')
-      expect(page.validationMessage).toBe('Ours.')
-
-      setStateValidity(described, false)
-
-      expect(described.checkValidity()).toBeTrue()
-    })
-
-    it('should take its validity back from a control that is also missing its value', () => {
-      fixtureEl.innerHTML = '<form><input id="empty" required></form>'
-      const empty = fixtureEl.querySelector('#empty')
-
-      setStateValidity(empty, true)
-      setStateValidity(empty, false)
-
-      expect(empty.validity.customError).toBeFalse()
-      expect(empty.validity.valueMissing).toBeTrue()
-    })
-
-    it('should set and take back its validity while the control is barred from validation, as in a disabled fieldset', () => {
-      fixtureEl.innerHTML = '<form><fieldset><input id="cleared" value="x"><input id="blocked" value="x"></fieldset><input id="readonly" value="x" readonly></form>'
-      const fieldset = fixtureEl.querySelector('fieldset')
-      const cleared = fixtureEl.querySelector('#cleared')
-      const blocked = fixtureEl.querySelector('#blocked')
-      const readonly = fixtureEl.querySelector('#readonly')
-
-      setStateValidity(cleared, true)
-      fieldset.disabled = true
-      setStateValidity(cleared, false)
-      setStateValidity(blocked, true)
-      fieldset.disabled = false
-
-      setStateValidity(readonly, true)
-      readonly.readOnly = false
-
-      expect(cleared.validity.valid).toBeTrue()
-      expect(blocked.validationMessage).toBe('Invalid value.')
-      expect(readonly.validationMessage).toBe('Invalid value.')
-
-      setStateValidity(readonly, false)
-
-      expect(readonly.validity.valid).toBeTrue()
-    })
-
-    it('should leave a validity the page set before or after it', () => {
-      fixtureEl.innerHTML = '<form><input id="before"><input id="after"></form>'
-      const before = fixtureEl.querySelector('#before')
-      const after = fixtureEl.querySelector('#after')
-
-      before.setCustomValidity('Page rule.')
-      setStateValidity(before, true)
-
-      expect(before.validationMessage).toBe('Page rule.')
-
-      setStateValidity(before, false)
-
-      expect(before.validationMessage).toBe('Page rule.')
-
-      setStateValidity(after, true)
-      after.setCustomValidity('Page rule.')
-      setStateValidity(after, true)
-      setStateValidity(after, false)
-
-      expect(after.validationMessage).toBe('Page rule.')
     })
   })
 

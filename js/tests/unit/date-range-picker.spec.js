@@ -1004,14 +1004,14 @@ describe('DateRangePicker', () => {
     const sectionStates = () => [...fixtureEl.querySelectorAll('.form-date-time-section')]
       .map(section => [section.getAttribute('aria-invalid'), section.getAttribute('aria-describedby')])
 
-    it('should take a state class the markup carries on the picker element as the given state of both ends, with the message after it, and block with it', () => {
+    it('should take a state class the markup carries on the picker element as the given state of both ends, with the message after it, and let a valid range submit', () => {
       buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div class="form-field"><div id="picker" class="is-invalid"></div><div class="invalid-feedback">Already booked.</div></div></form>')
       const { id } = fixtureEl.querySelector('.invalid-feedback')
 
       expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', id]))
       expect(fixtureEl.querySelector('.form-date-range')).toHaveClass('is-invalid')
       expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
     it('should show a state given by the option or by setValidationState on the picker element, with the message after it', () => {
@@ -1022,7 +1022,6 @@ describe('DateRangePicker', () => {
 
       expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
       expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
-      expect(fixtureEl.querySelector('textarea').validationMessage).toEqual('Already booked.')
 
       picker.setValidationState('valid')
       picker.setValidationState('invalid')
@@ -1112,7 +1111,7 @@ describe('DateRangePicker', () => {
       picker.getContext().setRange(new Date(2026, 6, 1), new Date(2026, 6, 7))
 
       expect(picker.getStartDate()).toEqual(new Date(2026, 6, 2))
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it('should drop the given state when a template action picks a range, and keep it when code sets one', () => {
@@ -1123,7 +1122,7 @@ describe('DateRangePicker', () => {
 
       picker.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21))
 
-      expect(form.checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
 
       picker.getContext().setRange(new Date(2026, 6, 1), new Date(2026, 6, 7))
 
@@ -1212,7 +1211,7 @@ describe('DateRangePicker', () => {
 
       expect(fixtureEl.querySelector('#picker').classList.contains('is-invalid')).toEqual(cancel)
       expect(fixtureEl.querySelector('.form-date-range').classList.contains('is-invalid')).toEqual(cancel)
-      expect(form.checkValidity()).toEqual(!cancel)
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === (cancel ? 'true' : null))).toBeTrue()
     })
 
     it('should show the restored order to the date change listeners of a native reset', async () => {
@@ -1245,23 +1244,22 @@ describe('DateRangePicker', () => {
       })
 
       expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it('should change the state through setValidationState and keep it through changes made by code', () => {
       const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker"></div></form>')
-      const form = fixtureEl.querySelector('form')
 
       picker.setValidationState('invalid')
       picker.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21))
       picker.clear()
       picker.reset()
 
-      expect(form.checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
 
       picker.setValidationState(null)
 
-      expect(form.checkValidity()).toBeTrue()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
     })
   })
 

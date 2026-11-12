@@ -178,7 +178,7 @@ Set `allowDisabledDatesInRange` to let a range run across disabled dates, for ex
 
 ## Validation
 
-The picker takes its validation state the way the [date range input](/forms/date-range-input/#validation) does: an end before the start makes the frame invalid while it stands and keeps both fields from being drawn valid, and a state you give lands on the frame and on both ends. You give it with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases) or with an `.is-invalid` or `.is-valid` class written on the picker element, the server-side route, which is read once, when the picker starts; the option wins over the class. While the given state is `'invalid'`, every section of both fields carries `aria-invalid="true"` and is described by the message after the picker, and both ends block the submit with its text, or `Invalid value.` when there is none.
+The picker takes its validation state the way the [date range input](/forms/date-range-input/#validation) does: an end before the start makes the frame invalid while it stands and keeps both fields from being drawn valid, and a state you give lands on the frame and on both ends. You give it with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases) or with an `.is-invalid` or `.is-valid` class written on the picker element, the server-side route, which is read once, when the picker starts; the option wins over the class. While the given state is `'invalid'`, every section of both fields carries `aria-invalid="true"` and is described by the message after the picker. A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field of an end, `form.elements[startName]` or `form.elements[endName]`, see [Form components](/forms/validation/#form-components).
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7 form-field">
@@ -375,7 +375,7 @@ and `selectEndDate` are set by the picker itself.
 | `startFloatingLabel` | string, null | `null` | Renders a floating label over the start field, which also becomes that field's accessible name. |
 | `startName` | string, null | `null` | Name of the start value input. Without it the start date is not submitted with the form. |
 | `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
-| `validationState` | string, null | `null` | The validation state of the range, shown on the frame and on both ends: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change the user makes to the range clears it, see [Validation](#validation). |
+| `validationState` | string, null | `null` | The validation state of the range, shown on the frame and on both ends: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` does not block the submit. The next change the user makes to the range clears it, see [Validation](#validation). |
 
 ### Methods
 

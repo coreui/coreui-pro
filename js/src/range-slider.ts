@@ -186,8 +186,6 @@ class RangeSlider extends BaseComponent {
     this._ticks = null
     this._tooltips = []
     this._validation = new FieldValidation(this._element, {
-      blockers: () => this._inputs.slice(0, 1),
-      canBlock: () => !this._disabled,
       config: () => this._config,
       fields: () => this._inputs,
       frames: () => [this._element, ...this._inputs],

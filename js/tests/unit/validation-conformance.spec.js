@@ -44,7 +44,8 @@ const ADAPTERS = [
       ...config
     }),
     serverClassElement: t => t.root.querySelector('select'),
-    blockers: t => [t.instance._element],
+    valueFields: t => [t.instance._element],
+    verdictField: t => t.form.elements.tech,
     frames: t => [t.instance._wrapperElement],
     invalidTargets: t => [t.instance._getFocusTarget()],
     describedTargets: t => [t.instance._getFocusTarget()],
@@ -64,12 +65,24 @@ const ADAPTERS = [
       ...config
     }),
     serverClassElement: t => t.root.querySelector('.autocomplete'),
-    blockers: t => [t.instance._inputElement],
+    valueFields: t => [t.instance._inputElement],
+    verdictField: t => t.form.elements.country,
     frames: t => [t.root.querySelector('.autocomplete')],
     invalidTargets: t => [t.instance._inputElement],
     describedTargets: t => [t.instance._inputElement],
     changeAsUser: t => typeInto(t.instance._inputElement, 'x'),
     changeEvents: t => [[t.root.querySelector('.autocomplete'), 'input.coreui.autocomplete']],
+    verdictEvents: t => [[t.root.querySelector('.autocomplete'), 'change.coreui.autocomplete'], [t.root.querySelector('.autocomplete'), 'input.coreui.autocomplete']],
+    verdictChanges: [
+      ['typing', {}, t => typeInto(t.instance._inputElement, 'x'), 'now'],
+      ['a pick', { value: '1' }, t => t.instance._optionsElement.querySelector('[data-coreui-value="2"]').click(), 'focus'],
+      ['the cleaner', { cleaner: true, value: '1' }, t => t.instance._cleanerElement.click(), 'now'],
+      ['Escape that empties the field', { allowOnlyDefinedOptions: true, value: '1' }, t => {
+        typeInto(t.instance._inputElement, 'Op')
+        t.verdictField.setCustomValidity('The page says no.')
+        t.instance._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      }, 'focus']
+    ],
     changeFromCode: t => t.instance.setValue('2'),
     reconfigure: disableAndEnable,
     required: { required: true }
@@ -86,7 +99,8 @@ const ADAPTERS = [
     ].join(''),
     create: (root, config) => new Combobox(root.querySelector('.combobox-toggle'), { name: 'country', ...config }),
     serverClassElement: t => t.root.querySelector('.combobox-toggle'),
-    blockers: t => [t.instance._valueField],
+    valueFields: t => [t.instance._valueField],
+    verdictField: t => t.form.elements.country,
     frames: t => [t.root.querySelector('.combobox-toggle')],
     invalidTargets: t => [t.root.querySelector('.combobox-toggle')],
     describedTargets: t => [t.root.querySelector('.combobox-toggle')],
@@ -103,7 +117,8 @@ const ADAPTERS = [
     markup: attributes => `<div${attributes('chip-filter')}><span class="chip">one</span><span class="chip">two</span></div>${FEEDBACK}`,
     create: (root, config) => new ChipFilter(root.querySelector('.chip-filter'), { name: 'tags', ...config }),
     serverClassElement: t => t.root.querySelector('.chip-filter'),
-    blockers: t => [t.instance._valueField],
+    valueFields: t => [t.instance._valueField],
+    verdictField: t => t.form.elements.tags,
     frames: t => [t.root.querySelector('.chip-filter')],
     invalidTargets: t => [t.root.querySelector('.chip-filter')],
     describedTargets: t => [t.root.querySelector('.chip-filter')],
@@ -117,7 +132,8 @@ const ADAPTERS = [
     markup: attributes => `<div${attributes('chip-input')}></div>${FEEDBACK}`,
     create: (root, config) => new ChipInput(root.querySelector('.chip-input'), { name: 'tags', ...config }),
     serverClassElement: t => t.root.querySelector('.chip-input'),
-    blockers: t => [t.instance._valueField],
+    valueFields: t => [t.instance._valueField],
+    verdictField: t => t.form.elements.tags,
     frames: t => [t.root.querySelector('.chip-input')],
     invalidTargets: t => [t.instance._input],
     describedTargets: t => [t.instance._input],
@@ -134,7 +150,8 @@ const ADAPTERS = [
     }),
     filled: { date: new Date(2026, 6, 14) },
     serverClassElement: t => t.root.querySelector('#field'),
-    blockers: t => [t.instance._inputElement],
+    valueFields: t => [t.instance._inputElement],
+    verdictField: t => t.form.elements.when,
     frames: t => [t.root.querySelector('#field')],
     invalidTargets: sectionsOf,
     describedTargets: sectionsOf,
@@ -152,7 +169,8 @@ const ADAPTERS = [
     }),
     filled: { date: '10:30:00' },
     serverClassElement: t => t.root.querySelector('#field'),
-    blockers: t => [t.instance._inputElement],
+    valueFields: t => [t.instance._inputElement],
+    verdictField: t => t.form.elements.at,
     frames: t => [t.root.querySelector('#field')],
     invalidTargets: sectionsOf,
     describedTargets: sectionsOf,
@@ -170,7 +188,8 @@ const ADAPTERS = [
     }),
     filled: { startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) },
     serverClassElement: t => t.root.querySelector('#field'),
-    blockers: t => [t.instance._startInput._inputElement, t.instance._endInput._inputElement],
+    valueFields: t => [t.instance._startInput._inputElement, t.instance._endInput._inputElement],
+    verdictField: t => t.form.elements.from,
     frames: t => [...t.root.querySelectorAll('.form-date-time')],
     invalidTargets: sectionsOf,
     describedTargets: sectionsOf,
@@ -188,7 +207,8 @@ const ADAPTERS = [
     create: (root, config) => new DatePicker(root.querySelector('#field'), { locale: 'en-US', name: 'when', ...config }),
     filled: { date: new Date(2026, 6, 14) },
     serverClassElement: t => t.root.querySelector('#field'),
-    blockers: t => [t.instance._input._inputElement],
+    valueFields: t => [t.instance._input._inputElement],
+    verdictField: t => t.form.elements.when,
     frames: t => [t.instance._input._element],
     invalidTargets: sectionsOf,
     describedTargets: sectionsOf,
@@ -203,7 +223,8 @@ const ADAPTERS = [
     create: (root, config) => new TimePicker(root.querySelector('#field'), { locale: 'en-US', name: 'at', ...config }),
     filled: { time: '10:30:00' },
     serverClassElement: t => t.root.querySelector('#field'),
-    blockers: t => [t.instance._input._inputElement],
+    valueFields: t => [t.instance._input._inputElement],
+    verdictField: t => t.form.elements.at,
     frames: t => [t.instance._input._element],
     invalidTargets: sectionsOf,
     describedTargets: sectionsOf,
@@ -220,7 +241,8 @@ const ADAPTERS = [
     }),
     filled: { startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) },
     serverClassElement: t => t.root.querySelector('#field'),
-    blockers: t => [t.instance._input._startInput._inputElement, t.instance._input._endInput._inputElement],
+    valueFields: t => [t.instance._input._startInput._inputElement, t.instance._input._endInput._inputElement],
+    verdictField: t => t.form.elements.from,
     frames: t => [...t.root.querySelectorAll('.form-date-time')],
     invalidTargets: sectionsOf,
     describedTargets: sectionsOf,
@@ -237,7 +259,8 @@ const ADAPTERS = [
     markup: attributes => `<div${attributes('form-otp')}><input class="form-otp-control"></div>${FEEDBACK}`,
     create: (root, config) => new OTPInput(root.querySelector('.form-otp'), { name: 'code', ...config }),
     serverClassElement: t => t.root.querySelector('.form-otp'),
-    blockers: t => [t.instance._inputElement],
+    valueFields: t => [t.instance._inputElement],
+    verdictField: t => t.form.elements.code,
     frames: t => [t.root.querySelector('.form-otp')],
     invalidTargets: t => [...t.root.querySelectorAll('.form-otp-control')],
     describedTargets: t => [...t.root.querySelectorAll('.form-otp-control')],
@@ -252,7 +275,8 @@ const ADAPTERS = [
     markup: attributes => `<div id="field"${attributes()}></div>${FEEDBACK}`,
     create: (root, config) => new RangeSlider(root.querySelector('#field'), { name: 'budget', value: [20, 80], ...config }),
     serverClassElement: t => t.root.querySelector('#field'),
-    blockers: t => [t.root.querySelector('.form-range-input')],
+    valueFields: t => [...t.root.querySelectorAll('.form-range-input')],
+    verdictField: t => t.form.elements['budget-0'],
     frames: t => [t.root.querySelector('#field'), ...t.root.querySelectorAll('.form-range-input')],
     invalidTargets: t => [...t.root.querySelectorAll('.form-range-input')],
     describedTargets: t => [...t.root.querySelectorAll('.form-range-input')],
@@ -273,13 +297,19 @@ const ADAPTERS = [
     markup: attributes => `<div id="field"${attributes()}></div>${FEEDBACK}`,
     create: (root, config) => new Rating(root.querySelector('#field'), { name: 'score', ...config }),
     serverClassElement: t => t.root.querySelector('#field'),
-    blockers: t => [t.root.querySelector('.rating-item-input:checked') ?? t.root.querySelector('.rating-item-input')],
+    valueFields: t => [...t.root.querySelectorAll('.rating-item-input')],
+    verdictField: t => t.form.querySelector('input[name="score"]:checked') ?? t.form.querySelector('input[name="score"]'),
     frames: t => [t.root.querySelector('#field')],
     invalidTargets: t => [t.root.querySelector('#field')],
     describedTargets: t => [...t.root.querySelectorAll('.rating-item-input')],
     pageDescribed: t => [t.root.querySelector('#field')],
     changeAsUser: t => t.root.querySelectorAll('.rating-item-label')[3].click(),
     changeEvents: t => [[t.root.querySelector('#field'), 'change.coreui.rating']],
+    verdictEvents: t => [[t.root.querySelector('#field'), 'change.coreui.rating']],
+    verdictChanges: [
+      ['a pick', { value: 2 }, t => t.root.querySelectorAll('.rating-item-label')[3].click(), 'now'],
+      ['allowClear', { allowClear: true, value: 2 }, t => t.root.querySelectorAll('.rating-item-input')[1].click(), 'focus']
+    ],
     changeFromCode: t => t.instance.setValue(4),
     reconfigure: disableAndEnable,
     required: { required: true }
@@ -318,7 +348,7 @@ describe('validation conformance', () => {
   const stateClasses = element => [...element.classList].filter(name => /^is-(invalid|valid)$/.test(name))
   const shownStates = t => [...t.root.querySelectorAll('.is-invalid, .is-valid')].map(stateClasses)
   const ariaInvalid = t => [...t.root.querySelectorAll('[aria-invalid]')]
-  const isBlocked = (adapter, t) => adapter.blockers(t).map(field => field.validity.customError)
+  const hasCustomError = (adapter, t) => adapter.valueFields(t).some(field => field.validity.customError)
   const describedBy = element => (element.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean)
   const describesFeedback = (adapter, t) => adapter.describedTargets(t).some(target => describedBy(target).includes('feedback'))
 
@@ -356,11 +386,13 @@ describe('validation conformance', () => {
   })
 
   describe('a state class in the markup', () => {
-    conform('serverClass', 'should show it on the frame, block with it and give it back on dispose', adapter => {
+    conform('serverClass', 'should show it on the frame, let the form submit and give it back on dispose', adapter => {
       const t = mount(adapter, { serverClass: 'is-invalid' })
 
       expectFrames(adapter, t, ['is-invalid'])
-      expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
+      expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
+      expect(hasCustomError(adapter, t)).toBe(false)
+      expect(t.form.checkValidity()).toBe(true)
 
       const element = adapter.serverClassElement(t)
       dispose(t)
@@ -370,13 +402,14 @@ describe('validation conformance', () => {
   })
 
   describe('a given invalid state', () => {
-    conform('given', 'should show it on the frame and block with the message', adapter => {
-      const t = mount(adapter, { config: { validationState: 'invalid' } })
+    conform('given', 'should show it on the frame, describe the targets with the message and let the form submit', adapter => {
+      const t = mount(adapter, { config: { ...adapter.filled, validationState: 'invalid' } })
 
       expectFrames(adapter, t, ['is-invalid'])
-      expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
-      expect(adapter.blockers(t).map(field => field.validationMessage)).toEqual(adapter.blockers(t).map(() => 'Fix this field.'))
-      expect(t.form.checkValidity()).toBe(false)
+      expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
+      expect(describesFeedback(adapter, t)).toBe(true)
+      expect(hasCustomError(adapter, t)).toBe(false)
+      expect(t.form.checkValidity()).toBe(true)
     })
 
     conform('aria', 'should put aria-invalid on the focus targets only and add the message to their description', adapter => {
@@ -408,27 +441,28 @@ describe('validation conformance', () => {
   })
 
   describe('setValidationState', () => {
-    conform('setValidationState', 'should move between invalid, valid and none in place, blocking only while invalid', adapter => {
+    conform('setValidationState', 'should move between invalid, valid and none in place, without blocking the submit', adapter => {
       const t = mount(adapter)
-      const nodes = [...adapter.frames(t), ...adapter.blockers(t), ...adapter.describedTargets(t)]
-      const inPlace = () => [...adapter.frames(t), ...adapter.blockers(t), ...adapter.describedTargets(t)].every((node, index) => node === nodes[index])
+      const nodes = [...adapter.frames(t), ...adapter.valueFields(t), ...adapter.describedTargets(t)]
+      const inPlace = () => [...adapter.frames(t), ...adapter.valueFields(t), ...adapter.describedTargets(t)].every((node, index) => node === nodes[index])
 
       t.instance.setValidationState('invalid')
 
       expectFrames(adapter, t, ['is-invalid'])
-      expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
+      expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
+      expect(hasCustomError(adapter, t)).toBe(false)
+      expect(t.form.checkValidity()).toBe(true)
 
       t.instance.setValidationState('valid')
 
       expectFrames(adapter, t, ['is-valid'])
-      expect(isBlocked(adapter, t).some(Boolean)).toBe(false)
       expect(ariaInvalid(t)).toHaveLength(0)
       expect(describesFeedback(adapter, t)).toBe(false)
 
       t.instance.setValidationState(null)
 
       expect(shownStates(t)).toEqual([])
-      expect(isBlocked(adapter, t).some(Boolean)).toBe(false)
+      expect(hasCustomError(adapter, t)).toBe(false)
       expect(inPlace()).toBe(true)
     })
   })
@@ -441,7 +475,7 @@ describe('validation conformance', () => {
       adapter.changeFromCode(t)
 
       expectFrames(adapter, t, ['is-invalid'])
-      expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
+      expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
 
       const element = adapter.serverClassElement(t)
       dispose(t)
@@ -463,12 +497,12 @@ describe('validation conformance', () => {
 
     conform('userChange', 'should drop a given state when the user makes it, before the change events', adapter => {
       const t = mount(adapter, { config: { ...adapter.filled, validationState: 'invalid' } })
-      const seen = record(adapter, t, () => [shownStates(t), isBlocked(adapter, t).some(Boolean), ariaInvalid(t).length, describesFeedback(adapter, t)])
+      const seen = record(adapter, t, () => [shownStates(t), ariaInvalid(t).length, describesFeedback(adapter, t)])
 
       adapter.changeAsUser(t)
 
       expect(seen.length).toBeGreaterThan(0)
-      expect(seen).toEqual(seen.map(([type]) => [type, [], false, 0, false]))
+      expect(seen).toEqual(seen.map(([type]) => [type, [], 0, false]))
       expect(shownStates(t)).toEqual([])
     })
 
@@ -476,14 +510,24 @@ describe('validation conformance', () => {
       const t = mount(adapter, { config: { ...adapter.filled, ...adapter.required, validationState: 'invalid' } })
       const fieldStates = () => {
         const frames = adapter.frames(t)
-        const fields = adapter.blockers(t)
+        const fields = adapter.valueFields(t)
 
         return frames.map((_, index) => ((frames.length === fields.length ? [fields[index]] : fields).some(field => !field.validity.valid) ? ['is-invalid'] : []))
       }
 
       const seen = record(adapter, t, () => [adapter.frames(t).map(stateClasses), fieldStates()])
+      const reported = adapter.valueFields(t)
+
+      for (const field of reported) {
+        field.setCustomValidity('Reported.')
+      }
 
       t.form.checkValidity()
+
+      for (const field of reported) {
+        field.setCustomValidity('')
+      }
+
       adapter.changeAsUser(t)
 
       expect(seen.length).toBeGreaterThan(0)
@@ -496,7 +540,7 @@ describe('validation conformance', () => {
       adapter.changeFromCode(t)
 
       expectFrames(adapter, t, ['is-invalid'])
-      expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
+      expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
     })
   })
 
@@ -509,7 +553,6 @@ describe('validation conformance', () => {
 
       expect(shownStates(t)).toEqual([])
       expect(ariaInvalid(t)).toHaveLength(0)
-      expect(isBlocked(adapter, t).some(Boolean)).toBe(false)
     })
 
     conform('reset', 'should keep a state given in a reset listener of the form', async adapter => {
@@ -520,7 +563,7 @@ describe('validation conformance', () => {
       await tick()
 
       expectFrames(adapter, t, ['is-invalid'])
-      expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
+      expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
     })
 
     conform('reset', 'should keep a state given right after it', async adapter => {
@@ -531,7 +574,7 @@ describe('validation conformance', () => {
       await tick()
 
       expectFrames(adapter, t, ['is-invalid'])
-      expect(isBlocked(adapter, t).every(Boolean)).toBe(true)
+      expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
     })
 
     conform('resetReconfigure', 'should drop a state given before it after a setter of another option', async adapter => {
@@ -543,7 +586,6 @@ describe('validation conformance', () => {
 
       expect(shownStates(t)).toEqual([])
       expect(ariaInvalid(t)).toHaveLength(0)
-      expect(isBlocked(adapter, t).some(Boolean)).toBe(false)
     })
   })
 
@@ -585,7 +627,7 @@ describe('validation conformance', () => {
   })
 
   describe('dispose', () => {
-    conform('dispose', 'should leave no state class, aria-invalid or block behind', adapter => {
+    conform('dispose', 'should leave no state class, aria-invalid or custom validity behind', adapter => {
       const t = mount(adapter, { config: { validationState: 'invalid' } })
 
       dispose(t)
@@ -606,7 +648,7 @@ describe('validation conformance', () => {
 
     conform('pageValueField', 'should leave a custom validity the page set on its value field', adapter => {
       const t = mount(adapter, { config: { validationState: 'invalid' } })
-      const [field] = adapter.blockers(t)
+      const [field] = adapter.valueFields(t)
 
       field.setCustomValidity('The page says no.')
       dispose(t)
@@ -619,7 +661,7 @@ describe('validation conformance', () => {
     for (const [moment, given] of [['before', false], ['after', true]]) {
       conform('pageValidity', `should stay on the value field when the page sets it ${moment} the given state`, adapter => {
         const t = mount(adapter, { config: given ? { validationState: 'invalid' } : {} })
-        const [field] = adapter.blockers(t)
+        const [field] = adapter.valueFields(t)
 
         field.setCustomValidity('The page says no.')
         t.instance.setValidationState('invalid')
@@ -628,6 +670,69 @@ describe('validation conformance', () => {
         expect(field.validationMessage).toBe('The page says no.')
       })
     }
+
+    conform('pageValidity', 'should keep blocking the submit with it through a given state, a change from code and a change of the user, and stay after dispose', adapter => {
+      const t = mount(adapter, { config: { ...adapter.filled, validationState: 'invalid' } })
+      const [field] = adapter.valueFields(t)
+      const blocks = () => [field.validationMessage, t.form.checkValidity()]
+
+      field.setCustomValidity('The page says no.')
+
+      expect(blocks()).toEqual(['The page says no.', false])
+
+      adapter.changeFromCode(t)
+
+      expect(blocks()).toEqual(['The page says no.', false])
+
+      adapter.changeAsUser(t)
+
+      expect(blocks()).toEqual(['The page says no.', false])
+
+      dispose(t)
+
+      expect(field.validationMessage).toBe('The page says no.')
+    })
+  })
+
+  describe('a verdict of the page', () => {
+    conform('pageVerdict', 'should stop the submit with a custom validity and let it through once the page clears it on the documented event', adapter => {
+      for (const [, config, act, shown] of adapter.verdictChanges ?? [['', {}, adapter.changeAsUser, 'now']]) {
+        const t = mount(adapter, { config: { ...adapter.filled, ...config } })
+        const field = adapter.verdictField(t)
+        const drawn = () => adapter.frames(t).some(frame => frame.classList.contains('is-invalid')) || ariaInvalid(t).length > 0
+        let cleared = 0
+        const clear = () => {
+          cleared += 1
+          field.setCustomValidity('')
+        }
+
+        t.verdictField = field
+        field.setCustomValidity('The page says no.')
+
+        expect(t.form.checkValidity()).toBe(false)
+        expect(drawn()).toBe(true)
+
+        t.form.addEventListener('input', clear, true)
+
+        for (const [target, type] of adapter.verdictEvents?.(t) ?? []) {
+          target.addEventListener(type, clear)
+        }
+
+        act(t)
+
+        expect(cleared).toBeGreaterThan(0)
+        expect(t.form.checkValidity()).toBe(true)
+        expect(drawn()).toBe(shown !== 'now')
+
+        if (shown === 'focus') {
+          field.focus()
+          t.form.querySelector('button').focus()
+        }
+
+        expect(drawn()).toBe(false)
+        dispose(t)
+      }
+    })
   })
 
   describe('a state class the page puts on a frame', () => {

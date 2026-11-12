@@ -1246,8 +1246,9 @@ check, radio, carousel and toggler icons already work:
   **Validation state comes from `validationState`.** `invalid` and `valid` are
   deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
   `validationState` also takes a state from `$form-validation-states`. A given
-  `'invalid'`, from the options or from an `.is-invalid` class in the markup, now
-  blocks the submit, and the next change the user makes to the value drops it,
+  `'invalid'`, from the options or from an `.is-invalid` class in the markup,
+  shows the error without blocking the submit, and the next change the user
+  makes to the value drops it,
   while a change from code keeps it. The markup class is read once, when the
   component starts, so it no longer comes back when the text returns to the
   value it started with, a native form reset drops it, and a class written later
@@ -1768,7 +1769,7 @@ behaviour, v5 is the reference. Mapping:
 `invalid` and `valid` on `DatePicker`, `DateRangePicker` and `TimePicker` are
 deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
 `validationState` also takes a state from `$form-validation-states`. A given
-`'invalid'` now blocks the submit, and the next change of the value the user
+`'invalid'` shows the error without blocking the submit, and the next change of the value the user
 makes (a pick in the panel, the cleaner, a footer or custom-range button that
 changes the value, typing in the field) drops it; closing the popup and a
 change your code makes keep it. An `.is-invalid` or `.is-valid` class on the
@@ -2220,9 +2221,17 @@ state the same way, described under
   or `.is-valid` on the component's element, read once when the component
   starts. A class or an `aria-invalid` written on the element later is not
   read; set the state with `setValidationState()`.
-- **A given `'invalid'` blocks the submit**, with the text of the component's
-  invalid feedback as the browser's message, until the user changes the value
-  or the form is reset, which removes the state.
+- **A given `'invalid'` shows the error and blocks neither the submit nor the
+  stepper's next step.** The component shows the state class, `aria-invalid`
+  and the linked message, which a screen reader reads when the user reaches the
+  field. The user's change of the value or a native form reset removes the
+  state. To stop a submit on your own verdict, call `setCustomValidity()` on the
+  field that carries the value, and clear it with an empty string once the
+  verdict no longer holds; to stop a step, set it in a
+  `stepValidationComplete.coreui.stepper` listener. Nothing announces a refused
+  submit by itself, so a page that refuses one in its own handler moves the
+  focus to the field or announces the reason, as
+  [Form components](/forms/validation/#form-components) shows.
 - **The form plugin and the stepper leave the field that carries a component's
   value to the component**, which shows the state they report on its frame.
 - **After taking the result over** with `preventDefault()` on
@@ -2446,8 +2455,9 @@ submit.
 - **Validation state comes from `validationState`, and the select is no longer
   watched.** `invalid` and `valid` are deprecated aliases of
   `validationState: 'invalid'` and `'valid'`, and `validationState` also takes a
-  state from `$form-validation-states`. A given `'invalid'` now blocks the submit,
-  and the next change the user makes to the selection drops it. An `.is-invalid`
+  state from `$form-validation-states`. A given `'invalid'` shows the error
+  without blocking the submit, and the next change the user makes to the
+  selection drops it. An `.is-invalid`
   or `.is-valid` class on the select is read once, when the component starts, and
   moves to the frame; a class or `aria-invalid` written on the select later is not
   read, so set the state with `setValidationState()`. A native form
@@ -2660,9 +2670,8 @@ field behind that kept submitting.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The range slider takes a validation state.** The new `validationState`
   option, or `.is-invalid`/`.is-valid` on the slider element read once when it
-  starts, shows on the element and on the handles, and a given `'invalid'`
-  blocks the submit through the first handle until the user moves a handle or
-  the form is reset. A class written on the element later is not read; set
+  starts, shows on the element and on the handles until the user moves a handle
+  or the form is reset. It does not block the submit. A class written on the element later is not read; set
   the state with `setValidationState()`. See
   [Validation](/forms/range-slider/#validation).
 - **Range slider interaction follows the native control.** Pressing a handle no
@@ -2955,8 +2964,8 @@ field behind that kept submitting.
   on the `.form-otp` element.
 - **The code takes a validation state.** The new `validationState` option, or
   an `.is-invalid`/`.is-valid` class on the `.form-otp` element or on a slot in
-  the markup, shows the state on the group and the slots, and `'invalid'` blocks
-  the submit. A class on one slot, which used to color only that slot, now
+  the markup, shows the state on the group and the slots, and `'invalid'` does
+  not block the submit. A class on one slot, which used to color only that slot, now
   marks the whole code. The user's next change of the code drops it, `setValidationState()` sets it
   again, and a native form reset puts back the
   code the field started with. A change of the code sends `input` and `change`
@@ -3011,8 +3020,8 @@ field behind that kept submitting.
   **The rating takes a validation state.** The new `validationState` option,
   or `.is-invalid`/`.is-valid` on the rating element read once when it starts,
   colors the focus ring, and a given `'invalid'` sets
-  `aria-invalid` on the group and blocks the submit until the user picks or
-  clears a star or the form is reset. A class written on the element later is
+  `aria-invalid` on the group, without blocking the submit, until the user picks
+  or clears a star or the form is reset. A class written on the element later is
   not read; set the state with `setValidationState()`. See
   [Validation](/forms/rating/#validation).
 - **The rating can be required.** `required` makes every radio required and

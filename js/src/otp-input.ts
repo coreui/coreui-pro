@@ -115,7 +115,6 @@ class OTPInput extends BaseComponent {
     this._resetCode = null
     this._value = ''
     this._validation = new FieldValidation(this._element, {
-      canBlock: () => !this._disabled,
       config: () => this._config,
       fields: () => (this._inputElement ? [this._inputElement] : []),
       frames: () => [this._element],

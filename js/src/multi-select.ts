@@ -294,7 +294,6 @@ class MultiSelect extends ComboboxBase {
     this._validation = new FieldValidation(this._element, {
       aliases: true,
       config: () => this._config,
-      canBlock: () => !this._disabled,
       fields: () => [this._element as HTMLSelectElement],
       frames: () => [this._wrapperElement],
       invalidTargets: () => [this._getFocusTarget()],

@@ -1226,14 +1226,14 @@ describe('TimePicker', () => {
     const sectionStates = () => [...fixtureEl.querySelectorAll('.form-date-time-section')]
       .map(section => [section.getAttribute('aria-invalid'), section.getAttribute('aria-describedby')])
 
-    it('should take a state class the markup carries on the picker element as the given state, with the message after it, and block with it', () => {
+    it('should take a state class the markup carries on the picker element as the given state, with the message after it, and let a valid time submit', () => {
       buildPicker({ time: '10:30:00' }, '<form><div id="picker" class="is-invalid"></div><div class="invalid-feedback">Already booked.</div></form>')
       const { id } = fixtureEl.querySelector('.invalid-feedback')
       const count = fixtureEl.querySelectorAll('.form-date-time-section').length
 
       expect(count).toBeGreaterThan(0)
       expect(sectionStates()).toEqual(Array.from({ length: count }, () => ['true', id]))
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
     it('should draw a given state on the field and leave the picker element without a state class', () => {
@@ -1257,11 +1257,11 @@ describe('TimePicker', () => {
 
       picker.setValidationState('invalid')
 
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
 
       picker.setValidationState(null)
 
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
     })
 
     it('should drop the given state when the user types in the field, and through a native form reset', async () => {
@@ -1277,14 +1277,14 @@ describe('TimePicker', () => {
 
       pickers.push(new TimePicker(fixtureEl.querySelector('#second'), { locale: 'en-US', time: '10:30:00' }))
 
-      expect(form.checkValidity()).toBeFalse()
+      expect([...fixtureEl.querySelectorAll('#second .form-date-time-section')].every(section => section.getAttribute('aria-invalid') === 'true')).toBeTrue()
 
       form.reset()
       await new Promise(resolve => {
         setTimeout(resolve)
       })
 
-      expect(form.checkValidity()).toBeTrue()
+      expect([...fixtureEl.querySelectorAll('#second .form-date-time-section')].every(section => !section.hasAttribute('aria-invalid'))).toBeTrue()
     })
 
     it('should treat what the page does in a native change listener during a user pick as a change made by code', () => {
@@ -1298,7 +1298,7 @@ describe('TimePicker', () => {
       picker.show()
       fixtureEl.querySelector('.time-picker-popup').querySelectorAll('[data-coreui-minutes]')[15].click()
 
-      expect(form.checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it.each([
@@ -1311,17 +1311,15 @@ describe('TimePicker', () => {
       }]
     ])('should drop the given state when the user %s, and keep it through changes made by code', (_, act) => {
       const picker = buildPicker({ time: '10:30:00' }, '<form><div id="picker" class="is-invalid"></div></form>')
-      const form = fixtureEl.querySelector('form')
 
       picker.setTime('11:45:00')
       picker.clear()
       picker.reset()
 
-      expect(form.checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
 
       act(picker)
 
-      expect(form.checkValidity()).toBeTrue()
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
     })
   })

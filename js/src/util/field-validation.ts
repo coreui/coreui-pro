@@ -1,12 +1,11 @@
 import {
   closeValueFieldBubble, followUserValidities, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
-  ownValidationState, setStateValidity, splitIds, type UserValidity, type ValidationState, type ValueField
+  ownValidationState, splitIds, type UserValidity, type ValidationState, type ValueField
 } from './form-validation.js'
 import { resolveFieldState } from './field-state.js'
 import { writeAttribute } from './index.js'
 
 export type FieldValidationConfig = {
-  disabled?: boolean
   invalid?: boolean
   valid?: boolean
   validationState?: ValidationState | null
@@ -16,19 +15,17 @@ export type FieldValidationConfig = {
  * How a component tells `FieldValidation` about itself.
  *
  * - `aliases`: the component takes the `invalid` and `valid` aliases of `validationState`.
- * - `blockers`: the value fields that carry the block of a given `'invalid'`; all of `fields` by default.
- * - `canBlock`: whether a given `'invalid'` may block the submit now; by default while not `disabled`.
  * - `config`: the live configuration object of the component, which the controller writes when it
  *   drops the given state.
  * - `describedTargets`: the elements that get the page's description and the invalid feedback;
  *   `invalidTargets` by default.
- * - `fields`: the value fields, in order.
+ * - `fields`: the value fields, in order; the first one gives the invalid feedback.
  * - `frames`: the elements that get the state class.
  * - `invalidTargets`: the elements that get `aria-invalid`.
  * - `owned`: the elements the form utilities leave to the component; `fields` by default.
  * - `ownError`: whether the component has an error of its own, such as a value outside its limits
  *   or a range in the wrong order, which it shows as `'invalid'` over the given and the reported
- *   state without blocking.
+ *   state.
  * - `pageDescribed`: the described targets that carry the description the page gave the host, given
  *   whether the state is `'invalid'`, and the host itself when it keeps that description, which the
  *   other targets then get as well, as the host had it at the start. By default the first described
@@ -39,8 +36,6 @@ export type FieldValidationConfig = {
  */
 export type FieldValidationOptions = {
   aliases?: boolean
-  blockers?: () => ValueField[]
-  canBlock?: () => boolean
   config: () => FieldValidationConfig
   describedTargets?: () => Element[]
   fields: () => ValueField[]
@@ -56,11 +51,12 @@ export type FieldValidationOptions = {
 /**
  * Keeps the validation state of a component that carries a form value: the state it was given, by
  * an option or by a state class its markup carried, the state a validation reported for its value
- * fields, the block a given `'invalid'` puts on the submit, the state class, `aria-invalid` and the
- * invalid feedback in `aria-describedby`, and a native reset of the form. The component describes
- * where these go, marks the actions of the user and tells the controller when its value changes; it
- * writes none of these itself. The controller takes back what it wrote and gives back what it
- * overwrote, and when it drops the given state, it clears it in the component's configuration.
+ * fields, the state class, `aria-invalid` and the invalid feedback in `aria-describedby`, and a
+ * native reset of the form. It leaves the validity of the value fields to the browser and the page.
+ * The component describes where these go, marks the actions of the user and tells the controller
+ * when its value changes; it writes none of these itself. The controller takes back what it wrote
+ * and gives back what it overwrote, and when it drops the given state, it clears it in the
+ * component's configuration.
  */
 class FieldValidation {
   /** A user action runs that has not changed the value yet; only `runAsUser()` opens it. */
@@ -169,9 +165,9 @@ class FieldValidation {
 
   /**
    * Records a change of the value: the first change of a user action, of the component or of an
-   * owner up the chain, ends that action and drops the given state, with its block, from the
-   * component up. The component calls `update()` before each change event it sends, once its value
-   * fields hold the new value.
+   * owner up the chain, ends that action and drops the given state from the component up. The
+   * component calls `update()` before each change event it sends, once its value fields hold the
+   * new value.
    *
    * @returns `true` when the change ended a user action
    */
@@ -220,17 +216,11 @@ class FieldValidation {
   /**
    * Follows the value fields and takes over the elements the component built, after a build or a
    * rebuild, and draws the state on them. A new field goes on with the follower of a field that is
-   * gone, with its report and a reset in progress, and a field that is gone loses its block. Moves the description the page gave the host to the described targets, unless the host is
-   * a value field or keeps it.
+   * gone, with its report and a reset in progress. Moves the description the page gave the host to
+   * the described targets, unless the host is a value field or keeps it.
    */
   refresh(): void {
     const fields = this._options.fields()
-
-    for (const field of this._userValidity.keys()) {
-      if (!fields.includes(field)) {
-        setStateValidity(field, false)
-      }
-    }
 
     this._userValidity = followUserValidities(fields, this._userValidity, () => this.update())
 
@@ -245,19 +235,16 @@ class FieldValidation {
   }
 
   /**
-   * Draws the state: lifts the block from the fields that no longer carry it, puts the state class on
-   * the frames, `aria-invalid` on the focus targets, and the page's description and the invalid
-   * feedback on the described targets, the description where `pageDescribed` puts it, next to the
-   * ids others put there, and only then the block of a given `'invalid'` on the fields that carry it
-   * while the component can block, so the block takes the message the page and the stylesheet show
-   * for them. The message in the description is the feedback of the first field that carries the
-   * block, else of the first focus target. The given state is the component's own, else the one
-   * its owners were given; the shown state comes from `resolveFieldState()`. An error of the owner's own
-   * marks the focus targets invalid and describes them with the message, but leaves the state class
-   * to the owner unless the component shows `'invalid'` itself. Focus and described targets the
-   * component no longer lists lose what the controller wrote there. An owner draws its parts after
-   * itself, and a part draws the whole tree from its topmost owner, since an owner shows the errors
-   * of its parts.
+   * Draws the state: puts the state class on the frames, `aria-invalid` on the focus targets, and the
+   * page's description and the invalid feedback on the described targets, the description where
+   * `pageDescribed` puts it, next to the ids others put there. The message in the description is the
+   * feedback of the first value field, else of the first focus target. The given state is the
+   * component's own, else the one its owners were given; the shown state comes from
+   * `resolveFieldState()`. An error of the owner's own marks the focus targets invalid and describes
+   * them with the message, but leaves the state class to the owner unless the component shows
+   * `'invalid'` itself. Focus and described targets the component no longer lists lose what the
+   * controller wrote there. An owner draws its parts after itself, and a part draws the whole tree
+   * from its topmost owner, since an owner shows the errors of its parts.
    */
   update(): void {
     if (this._owner) {
@@ -272,37 +259,22 @@ class FieldValidation {
    * Draws the component as `update()` describes, then its parts.
    */
   _draw(): void {
-    const config = this._options.config()
-    const fields = this._options.fields()
-    const blockers = this._options.blockers?.() ?? fields
-    const facts = {
-      canBlock: this._options.canBlock?.() ?? !config.disabled,
-      given: this._givenState(config),
+    const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
+    const { invalid: isInvalid, state } = resolveFieldState({
+      given: this._givenState(this._options.config()),
       inherited: this._owner?._inheritedState(),
       ownError: this._hasError(),
-      ownerError: Boolean(this._owner?._options.ownError?.())
-    }
-    const blocked = resolveFieldState(facts).blocks ? blockers : []
-
-    for (const field of fields) {
-      if (!blocked.includes(field)) {
-        setStateValidity(field, false)
-      }
-    }
-
-    const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
-    const { invalid: isInvalid, state } = resolveFieldState({ ...facts, reported: reported.includes('invalid'), user: reported.find(Boolean) })
+      ownerError: Boolean(this._owner?._options.ownError?.()),
+      reported: reported.includes('invalid'),
+      user: reported.find(Boolean)
+    })
 
     this._drawStateClass(state ? `is-${state}` : null)
 
     const invalidTargets = this._options.invalidTargets()
 
     this._markInvalid(invalidTargets, isInvalid)
-    this._describeTargets(invalidTargets, (blockers[0] ?? invalidTargets[0]) as ValueField | undefined, isInvalid)
-
-    for (const field of blocked) {
-      setStateValidity(field, true)
-    }
+    this._describeTargets(invalidTargets, (this._options.fields()[0] ?? invalidTargets[0]) as ValueField | undefined, isInvalid)
 
     for (const part of this._parts) {
       part._draw()
@@ -310,11 +282,10 @@ class FieldValidation {
   }
 
   /**
-   * Hands everything back: leaves its owner, stops following the fields and the form, lifts the
-   * block, takes off what it drew and the `aria-invalid` it wrote, gives the server
-   * sources the state classes of their markup, unless that state was dropped meanwhile, and adds the
-   * page's description back to the host next to what the host carries now. Call it before the
-   * component takes its elements apart.
+   * Hands everything back: leaves its owner, stops following the fields and the form, takes off what
+   * it drew and the `aria-invalid` it wrote, gives the server sources the state classes of their
+   * markup, unless that state was dropped meanwhile, and adds the page's description back to the
+   * host next to what the host carries now. Call it before the component takes its elements apart.
    */
   dispose(): void {
     this._owner?._parts.splice(this._owner._parts.indexOf(this), 1)
@@ -331,7 +302,6 @@ class FieldValidation {
 
     for (const field of this._options.fields()) {
       closeValueFieldBubble(field)
-      setStateValidity(field, false)
     }
 
     this._userValidity.clear()

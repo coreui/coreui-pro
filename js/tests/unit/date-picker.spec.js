@@ -1554,7 +1554,7 @@ describe('DatePicker', () => {
       .map(section => [section.getAttribute('aria-invalid'), section.getAttribute('aria-describedby')])
     const footer = '<template data-coreui-template="footer"><button type="button" data-coreui-picker-action="today">Today</button><button type="button" data-coreui-picker-action="clear">Clear</button><button type="button" data-coreui-picker-action="close">OK</button></template>'
 
-    it('should take a state class the markup carries on the picker element as the given state, with the message after it, and block with it', () => {
+    it('should take a state class the markup carries on the picker element as the given state, with the message after it, and let a valid date submit', () => {
       buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div><div class="invalid-feedback">Already booked.</div></form>')
       const { id } = fixtureEl.querySelector('.invalid-feedback')
       const count = fixtureEl.querySelectorAll('.form-date-time-section').length
@@ -1562,7 +1562,7 @@ describe('DatePicker', () => {
       expect(count).toBeGreaterThan(0)
       expect(sectionStates()).toEqual(Array.from({ length: count }, () => ['true', id]))
       expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
     it('should draw a given state on the field and leave the picker element without a state class', () => {
@@ -1593,7 +1593,7 @@ describe('DatePicker', () => {
       picker.setValidationState('invalid')
 
       expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
 
       picker.setValidationState(null)
 
@@ -1669,7 +1669,7 @@ describe('DatePicker', () => {
       picker.setValidationState('invalid')
       await nextTask()
 
-      expect(form.checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it('should keep the given state when the user picks the day it already holds', () => {
@@ -1678,7 +1678,6 @@ describe('DatePicker', () => {
       picker.show()
       fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Tue Jul 14 2026"]').click()
 
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
@@ -1710,7 +1709,7 @@ describe('DatePicker', () => {
       fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
 
       expect(picker.getDate()).toEqual(new Date(2026, 6, 21))
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it('should leave the validation options of inputOptions out, so the picker owns the state', () => {
@@ -1758,7 +1757,7 @@ describe('DatePicker', () => {
       picker.clear()
       picker.reset()
 
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it('should give a state class the markup carried back on dispose', () => {

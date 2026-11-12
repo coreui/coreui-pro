@@ -612,7 +612,7 @@ describe('ChipFilter', () => {
       chipFilter.selectChip(el.querySelectorAll('.chip')[1])
 
       expect(el.classList.contains('is-invalid')).toBeTrue()
-      expect(form.checkValidity()).toBeFalse()
+      expect(el.getAttribute('aria-invalid')).toBe('true')
 
       el.querySelector('.chip').click()
 

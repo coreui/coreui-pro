@@ -1,5 +1,6 @@
 // stepper.spec.js
 import { vi } from 'vitest'
+import MultiSelect from '../../src/multi-select.js'
 import Stepper from '../../src/stepper.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
@@ -2102,6 +2103,33 @@ describe('Stepper', () => {
       expect(events).toEqual([true])
       expect(fixtureEl.querySelector('#step1')).toHaveClass('active')
       expect(filled).not.toHaveClass('is-invalid')
+    })
+
+    it('should block a step whose step validation handler sets a custom validity on a component, whether the browser validates the form or not', () => {
+      for (const formAttributes of ['novalidate', '']) {
+        fixtureEl.innerHTML = validationFixture(formAttributes)
+        const form = fixtureEl.querySelector('#step1 form')
+        form.innerHTML = '<select name="tech"><option value="1">One</option><option value="2">Two</option></select>'
+        const multiSelect = new MultiSelect(form.querySelector('select'), { validationState: 'invalid' })
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement)
+        let verdict = 'Pick another one.'
+
+        stepperElement.addEventListener('stepValidationComplete.coreui.stepper', () => {
+          form.elements.tech.setCustomValidity(verdict)
+        })
+        stepper.next()
+
+        expect(fixtureEl.querySelector('#step1')).toHaveClass('active')
+
+        verdict = ''
+        stepper.next()
+
+        expect(fixtureEl.querySelector('#step2')).toHaveClass('active')
+
+        multiSelect.dispose()
+        stepper.dispose()
+      }
     })
 
     it('should fire stepValidationComplete once when next() or finish() passes a step', () => {

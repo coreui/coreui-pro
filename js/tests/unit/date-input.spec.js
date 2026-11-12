@@ -1722,28 +1722,17 @@ describe('DateInput', () => {
       }
     })
 
-    it('should block the submit while the given state is invalid, with the message shown for the field', () => {
+    it('should describe the field with the message shown for it while the given state is invalid, and let a valid date submit', () => {
       fixtureEl.innerHTML = '<form><div class="date-input"></div><div class="invalid-feedback">Already booked.</div></form>'
       const form = fixtureEl.querySelector('form')
       const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', validationState: 'invalid' })
       const field = fixtureEl.querySelector('.form-date-time > textarea')
+      const { id } = fixtureEl.querySelector('.invalid-feedback')
 
-      expect(form.checkValidity()).toBeFalse()
-      expect(field.validationMessage).toEqual('Already booked.')
-
-      for (const state of ['valid', 'warning', undefined]) {
-        dateInput.setValidationState(state)
-
-        expect(form.checkValidity()).toBeTrue()
-      }
-    })
-
-    it('should block with a generic message when the field shows none', () => {
-      fixtureEl.innerHTML = '<form><div class="date-input"></div></form>'
-      // eslint-disable-next-line no-new
-      new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy', validationState: 'invalid' })
-
-      expect(fixtureEl.querySelector('.form-date-time > textarea').validationMessage).toEqual('Invalid value.')
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+      expect([...getSections(dateInput._element)].every(section => section.getAttribute('aria-describedby') === id)).toBeTrue()
+      expect(field.validity.customError).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
     })
 
     it('should show a given invalid state on a disabled field without blocking the submit', () => {
@@ -1782,13 +1771,13 @@ describe('DateInput', () => {
       expect(form.checkValidity()).toBeFalse()
     })
 
-    it('should take a state class the markup carries as the given state and block with it', () => {
+    it('should take a state class the markup carries as the given state, and let a valid date submit', () => {
       fixtureEl.innerHTML = '<form><div class="is-invalid"></div><div class="invalid-feedback">Already booked.</div></form>'
       const dateInput = new DateInput(fixtureEl.querySelector('.is-invalid'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
       expect(getSections(dateInput._element)[0].getAttribute('aria-invalid')).toEqual('true')
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
     it('should keep a given state through changes made by code', () => {
@@ -1872,44 +1861,6 @@ describe('DateInput', () => {
 
       expect(dated._element.classList.contains('is-invalid')).toBeTrue()
       expect(empty._element.classList.contains('is-invalid')).toBeTrue()
-    })
-
-    it('should not block with a given invalid state while the field is read-only or disabled, and stop blocking once the state goes', () => {
-      fixtureEl.innerHTML = '<form id="readonly"><div></div></form><form id="editable"><div></div></form>'
-      const [readonlyForm, editableForm] = fixtureEl.querySelectorAll('form')
-      const config = { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', validationState: 'invalid' }
-      const readonlyInput = new DateInput(readonlyForm.querySelector('div'), { ...config, readonly: true })
-      const dateInput = new DateInput(editableForm.querySelector('div'), config)
-
-      expect(readonlyInput._element.classList.contains('is-invalid')).toBeTrue()
-      expect(readonlyForm.checkValidity()).toBeTrue()
-      expect(editableForm.checkValidity()).toBeFalse()
-
-      dateInput.disable()
-
-      expect(editableForm.checkValidity()).toBeTrue()
-
-      dateInput.enable()
-      dateInput.setValidationState(null)
-
-      expect(editableForm.checkValidity()).toBeTrue()
-    })
-
-    it('should settle a given state set while a fieldset around it is disabled, as an async submit does', () => {
-      fixtureEl.innerHTML = '<form><fieldset><div id="cleared"></div><div id="blocked"></div></fieldset></form>'
-      const form = fixtureEl.querySelector('form')
-      const fieldset = fixtureEl.querySelector('fieldset')
-      const cleared = new DateInput(fixtureEl.querySelector('#cleared'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', validationState: 'invalid' })
-      const blocked = new DateInput(fixtureEl.querySelector('#blocked'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
-
-      fieldset.disabled = true
-      cleared.setValidationState(null)
-      blocked.setValidationState('invalid')
-      fieldset.disabled = false
-
-      expect(cleared._element.querySelector('textarea').validity.valid).toBeTrue()
-      expect(blocked._element.querySelector('textarea').validity.valid).toBeFalse()
-      expect(form.checkValidity()).toBeFalse()
     })
 
     it('should leave a state class of its own that the markup carried', () => {
@@ -2040,7 +1991,7 @@ describe('DateInput', () => {
       })
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
-      expect(form.checkValidity()).toBeFalse()
+      expect(getSections(dateInput._element)[0].getAttribute('aria-invalid')).toEqual('true')
     })
 
     it('should keep the form plugin off its value field and show what it reports on the field', () => {
@@ -3154,22 +3105,6 @@ describe('DateInput', () => {
       pressKey(day, 'ArrowUp')
 
       expect(log).toEqual(['date:null', 'error:maxDate'])
-    })
-
-    it('should block the submit once enable() runs on a field built disabled and invalid, and stop again on disable()', () => {
-      fixtureEl.innerHTML = '<form><div></div></form>'
-      const form = fixtureEl.querySelector('form')
-      const dateInput = new DateInput(form.querySelector('div'), { disabled: true, validationState: 'invalid' })
-
-      expect(form.checkValidity()).toBeTrue()
-
-      dateInput.enable()
-
-      expect(form.checkValidity()).toBeFalse()
-
-      dateInput.disable()
-
-      expect(form.checkValidity()).toBeTrue()
     })
 
     it('should go back to the start date on a form reset after setDate, and report it', async () => {

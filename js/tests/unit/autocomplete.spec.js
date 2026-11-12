@@ -607,15 +607,14 @@ describe('Autocomplete', () => {
       expect(seen).toEqual([[false, null]])
     })
 
-    it('should show validationState on the frame and the field, and block the submit with the message while it is invalid', () => {
+    it('should show validationState on the frame and the field, describe the field with the message while it is invalid, and let the form submit', () => {
       const { autocomplete, element, form, input } = mountInForm({ validationState: 'invalid' })
       const { id } = fixtureEl.querySelector('.invalid-feedback')
 
       expect(element).toHaveClass('is-invalid')
       expect(input.getAttribute('aria-invalid')).toBe('true')
       expect(input.getAttribute('aria-describedby')).toBe(id)
-      expect(form.checkValidity()).toBeFalse()
-      expect(input.validationMessage).toBe('Pick a country.')
+      expect(form.checkValidity()).toBeTrue()
 
       autocomplete.setValidationState('warning')
 
@@ -710,7 +709,7 @@ describe('Autocomplete', () => {
     })
 
     it('should keep a given state through changes from code and through user actions that change nothing', () => {
-      const { autocomplete, element, form } = mountInForm({ value: '1', validationState: 'invalid' }, { classes: 'is-invalid' })
+      const { autocomplete, element, input } = mountInForm({ value: '1', validationState: 'invalid' }, { classes: 'is-invalid' })
 
       autocomplete._onOptionSelected('1')
       autocomplete.setOptions([...OPTIONS, { label: 'Option 3', value: '3' }])
@@ -719,26 +718,26 @@ describe('Autocomplete', () => {
       autocomplete.deselectAll()
 
       expect(element).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(input.getAttribute('aria-invalid')).toBe('true')
 
       autocomplete.dispose()
 
       expect(element).toHaveClass('is-invalid')
     })
 
-    it('should lift the block before change.coreui.autocomplete and treat what the page does there as code', () => {
-      const { autocomplete, element, form, input } = mountInForm({ validationState: 'invalid' })
+    it('should drop the state before change.coreui.autocomplete and treat what the page does there as code', () => {
+      const { autocomplete, element, input } = mountInForm({ validationState: 'invalid' })
       const seen = []
 
       element.addEventListener('change.coreui.autocomplete', () => {
-        seen.push(input.validity.valid)
+        seen.push(element.classList.contains('is-invalid'))
         autocomplete.setValidationState('invalid')
       }, { once: true })
       autocomplete._onOptionSelected('2')
 
-      expect(seen).toEqual([true])
+      expect(seen).toEqual([false])
       expect(element).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(input.getAttribute('aria-invalid')).toBe('true')
     })
 
     it('should keep a state the page gives on the change Backspace reports through the input of the same key', async () => {
@@ -784,8 +783,12 @@ describe('Autocomplete', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
-    it('should block the submit for a state class from the markup', () => {
-      expect(mountInForm({}, { classes: 'is-invalid' }).form.checkValidity()).toBeFalse()
+    it('should show a state class from the markup on the frame and the input without blocking the submit', () => {
+      const { element, form, input } = mountInForm({}, { classes: 'is-invalid' })
+
+      expect(element).toHaveClass('is-invalid')
+      expect(input.getAttribute('aria-invalid')).toBe('true')
+      expect(form.checkValidity()).toBeTrue()
     })
 
     it('should keep the description the page gives its input and add the message only while it is invalid', () => {
@@ -815,7 +818,6 @@ describe('Autocomplete', () => {
       const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), { options: OPTIONS, validationState: 'invalid' })
 
       expect(autocomplete._inputElement.getAttribute('aria-describedby')).toBe('ac-message')
-      expect(autocomplete._inputElement.validationMessage).toBe('Pick a country.')
     })
 
     it.each([['leaving the field', 'blur'], ['Enter', 'enter']])('should keep a given state when %s picks the option the text already names', (_, how) => {
@@ -919,14 +921,14 @@ describe('Autocomplete', () => {
       expect(element).not.toHaveClass('is-invalid')
     })
 
-    it('should lift the block before input.coreui.autocomplete when the cleaner empties the field', () => {
+    it('should drop the state before input.coreui.autocomplete when the cleaner empties the field', () => {
       const { autocomplete, element, input } = mountInForm({ cleaner: true, value: '1', validationState: 'invalid' })
       const seen = []
 
-      element.addEventListener('input.coreui.autocomplete', () => seen.push([input.validity.valid, element.classList.contains('is-invalid'), input.getAttribute('aria-invalid')]))
+      element.addEventListener('input.coreui.autocomplete', () => seen.push([element.classList.contains('is-invalid'), input.getAttribute('aria-invalid')]))
       autocomplete._cleanerElement.click()
 
-      expect(seen[0]).toEqual([true, false, null])
+      expect(seen[0]).toEqual([false, null])
     })
 
     it('should keep a state the page gives on input.coreui.autocomplete when Escape empties a field that takes only defined options', async () => {
@@ -1981,21 +1983,6 @@ describe('Autocomplete', () => {
       autocomplete._togglerElement.click()
 
       expect(autocomplete._isShown()).toBeTrue()
-    })
-
-    it('should block the submit once enable() runs on a field built disabled and invalid, and stop again on disable()', () => {
-      const { autocomplete, form } = mount({ disabled: true, validationState: 'invalid' })
-
-      expect(form.checkValidity()).toBeTrue()
-
-      autocomplete.enable()
-
-      expect(form.checkValidity()).toBeFalse()
-
-      autocomplete.disable()
-
-      expect(form.checkValidity()).toBeTrue()
-      expect(autocomplete._inputElement.validity.customError).toBeFalse()
     })
 
     it('should not take a gesture in an open list once disable() runs', () => {

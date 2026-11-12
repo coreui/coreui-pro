@@ -72,25 +72,60 @@ describe('FieldValidation', () => {
   })
 
   describe('a given state', () => {
-    it('should take a state class from the markup as the given state, block with it and give it back on dispose', () => {
-      const { field, host, validation } = mount({ classes: ' is-invalid' })
+    it('should take a state class from the markup as the given state, draw it without blocking and give it back on dispose', () => {
+      const { field, host, targets, validation } = mount({ classes: ' is-invalid' })
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
-      expect(field.validationMessage).toBe('Fix it.')
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+      expect(field.validity.customError).toBe(false)
 
       validation.dispose()
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
-      expect(field.validity.customError).toBe(false)
     })
 
     it('should draw the state on the frames, aria-invalid on the targets and the feedback in their description', () => {
-      const { field, host, targets } = mount({ config: { validationState: 'invalid' } })
+      const { host, targets } = mount({ config: { validationState: 'invalid' } })
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
       expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
       expect(targets.map(describedBy)).toEqual(['feedback', 'feedback'])
-      expect(field.form.checkValidity()).toBe(false)
+    })
+
+    it('should draw a given invalid without a custom validity on the value fields, so the form submits', () => {
+      for (const config of [{ validationState: 'invalid' }, { readonly: true, validationState: 'invalid' }]) {
+        const { field, form, host, targets } = mount({ config })
+
+        expect(stateClasses(host)).toEqual(['is-invalid'])
+        expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+        expect(targets.map(describedBy)).toEqual(['feedback', 'feedback'])
+        expect(field.validity.customError).toBe(false)
+        expect(form.checkValidity()).toBe(true)
+      }
+    })
+
+    it('should leave a custom validity the page set on a value field through a given state, a redraw, a change of the user and dispose', () => {
+      const { field, form, state, validation } = mount()
+      const blocks = () => [field.validationMessage, form.checkValidity()]
+
+      field.setCustomValidity('Taken.')
+      state.config.validationState = 'invalid'
+      validation.configure()
+
+      expect(blocks()).toEqual(['Taken.', false])
+
+      validation.update()
+
+      expect(blocks()).toEqual(['Taken.', false])
+
+      validation.runAsUser(() => validation.change())
+
+      expect(state.config.validationState).toBeNull()
+      expect(blocks()).toEqual(['Taken.', false])
+
+      validation.dispose()
+
+      expect(blocks()).toEqual(['Taken.', false])
     })
 
     it('should give the description the page gave the host to the first target, and to every target while invalid', () => {
@@ -168,40 +203,15 @@ describe('FieldValidation', () => {
       expect(targets.some(target => target.hasAttribute('aria-invalid') || target.hasAttribute('aria-describedby'))).toBe(false)
     })
 
-    it('should block only the fields that carry the block, and show the state without a field to carry it', () => {
-      const { field, host } = mount({ blockers: () => [], config: { validationState: 'invalid' } })
-
-      expect(stateClasses(host)).toEqual(['is-invalid'])
-      expect(field.validity.customError).toBe(false)
-    })
-
-    it('should not block while the component is disabled, or while it says it cannot', () => {
-      const disabled = mount({ config: { disabled: true, validationState: 'invalid' } })
-
-      expect(stateClasses(disabled.host)).toEqual(['is-invalid'])
-      expect(disabled.field.validity.customError).toBe(false)
-
-      const { field, host } = mount({ canBlock: () => false, config: { validationState: 'invalid' } })
-
-      expect(stateClasses(host)).toEqual(['is-invalid'])
-      expect(field.validity.customError).toBe(false)
-    })
-
-    it('should block for a component without a say on blocking, whatever other keys its configuration holds', () => {
-      const { field } = mount({ config: { readonly: true, validationState: 'invalid' } })
-
-      expect(field.validity.customError).toBe(true)
-    })
-
-    it('should take the message from the first field that carries the block, and show invalid over valid', async () => {
-      fixtureEl.innerHTML = '<form data-coreui-validate="valid"><div id="host" class="form-control-group"><input id="first"><textarea id="second" required data-coreui-invalid-feedback="named"></textarea><span id="target"></span></div><div id="named" class="invalid-feedback">Named.</div><div class="invalid-feedback">Structural.</div></form>'
+    it('should take the message from the first value field, and show invalid over valid', async () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate="valid"><div id="host" class="form-control-group"><input id="first" data-coreui-invalid-feedback="named"><textarea id="second" required></textarea><span id="target"></span></div><div id="named" class="invalid-feedback">Named.</div><div class="invalid-feedback">Structural.</div></form>'
       const host = fixtureEl.querySelector('#host')
       const first = host.querySelector('#first')
       const second = host.querySelector('#second')
       const target = host.querySelector('#target')
       const state = { config: { validationState: 'invalid' } }
       const validation = new FieldValidation(host, {
-        blockers: () => [second], config: () => state.config, fields: () => [first, second], frames: () => [host], invalidTargets: () => [target]
+        config: () => state.config, fields: () => [first, second], frames: () => [host], invalidTargets: () => [target]
       })
 
       controllers.push(validation)
@@ -239,7 +249,7 @@ describe('FieldValidation', () => {
     })
 
     it('should take the state of its owners after its own, mark the owner\'s error without the class, and tell the owners every drop', () => {
-      const { field, host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"' })
+      const { host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"' })
       const range = mountOwner({ frames: true })
       const picker = mountOwner({ config: { validationState: 'invalid' } })
 
@@ -248,7 +258,7 @@ describe('FieldValidation', () => {
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
       expect(stateClasses(range.host)).toEqual(['is-invalid'])
-      expect(field.validity.customError).toBe(true)
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
 
       state.config.validationState = 'valid'
       validation.update()
@@ -268,7 +278,6 @@ describe('FieldValidation', () => {
       expect([state.config.validationState, picker.state.config.validationState]).toEqual([null, null])
       expect(stateClasses(host)).toEqual([])
       expect(stateClasses(range.host)).toEqual([])
-      expect(field.validity.customError).toBe(false)
     })
 
     it('should drop the state from itself up to the owner whose user action it changes in, and draw the tree from the top', () => {
@@ -471,7 +480,7 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
-    it('should block with the message the stylesheet shows next to the state class it draws', () => {
+    it('should describe the field with the message the stylesheet shows next to the state class it draws', () => {
       fixtureEl.innerHTML = '<form><div id="host"><div><textarea></textarea></div></div><div class="invalid-feedback" id="feedback">Fix it.</div></form>'
       const host = fixtureEl.querySelector('#host')
       const field = host.querySelector('textarea')
@@ -482,25 +491,10 @@ describe('FieldValidation', () => {
       controllers.push(validation)
       validation.refresh()
 
-      expect(field.validationMessage).toBe('Fix it.')
       expect(describedBy(field)).toBe('feedback')
     })
 
-    it('should block with a message the page linked through its description', () => {
-      fixtureEl.innerHTML = '<form><div id="host" aria-describedby="error"><textarea></textarea></div></form><div class="invalid-feedback" id="error">Pick one.</div>'
-      const host = fixtureEl.querySelector('#host')
-      const field = host.querySelector('textarea')
-      const validation = new FieldValidation(host, {
-        config: () => ({ validationState: 'invalid' }), fields: () => [field], frames: () => [host], invalidTargets: () => [field]
-      })
-
-      controllers.push(validation)
-      validation.refresh()
-
-      expect(field.validationMessage).toBe('Pick one.')
-    })
-
-    it('should take the message of the first focus target when no field carries the block', () => {
+    it('should take the message of the first focus target when the component has no value field', () => {
       fixtureEl.innerHTML = '<form><div id="host" class="form-control-group"><input id="target" data-coreui-invalid-feedback="named"></div><div id="named" class="invalid-feedback">Named.</div></form>'
       const host = fixtureEl.querySelector('#host')
       const target = host.querySelector('#target')
@@ -696,18 +690,6 @@ describe('FieldValidation', () => {
       validation.refresh()
 
       expect(stateClasses(host)).toEqual([])
-    })
-
-    it('should lift the block from a field the component no longer lists', () => {
-      const { field, validation } = mount({ config: { validationState: 'invalid' } })
-      const replacement = document.createElement('textarea')
-
-      validation._options.fields = () => [replacement]
-      field.form.append(replacement)
-      validation.refresh()
-
-      expect(field.validity.customError).toBe(false)
-      expect(replacement.validity.customError).toBe(true)
     })
 
     it('should take over the fields it owns from the form utilities and hand them back on dispose', () => {

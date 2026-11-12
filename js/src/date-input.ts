@@ -263,7 +263,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostNodes = [...this._element.childNodes]
     this._validation = new FieldValidation(this._element, {
-      canBlock: () => !this._disabled,
       config: () => this._config as DateInputConfig,
       fields: () => [this._inputElement!],
       frames: () => [this._element],

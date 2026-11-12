@@ -882,24 +882,6 @@ describe('OTPInput', () => {
       expect(field.disabled).toBeFalse()
     })
 
-    it('should block the submit once enable() runs on a field built disabled and invalid, and stop again on disable()', () => {
-      fixtureEl.innerHTML = '<form><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div></form>'
-      const form = fixtureEl.querySelector('form')
-      const otpInput = new OTPInput(form.querySelector('.form-otp'), { disabled: true, validationState: 'invalid' })
-      const field = form.querySelector('.form-otp > input:not(.form-otp-control)')
-
-      expect(form.checkValidity()).toBeTrue()
-
-      otpInput.enable()
-
-      expect(form.checkValidity()).toBeFalse()
-
-      otpInput.disable()
-
-      expect(form.checkValidity()).toBeTrue()
-      expect(field.validity.customError).toBeFalse()
-    })
-
     it('should go back to the start code on a form reset after setValue', async () => {
       fixtureEl.innerHTML = '<form><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div></form>'
       const form = fixtureEl.querySelector('form')
@@ -1869,15 +1851,14 @@ describe('OTPInput', () => {
       expect(group).not.toHaveClass('is-invalid')
     })
 
-    it('should show validationState on the group and the slots, and block the submit with the message while it is invalid', () => {
-      const { form, otpInput, slots, valueField } = mountForm({ validationState: 'invalid' })
+    it('should show validationState on the group and the slots, describe the slots with the message while it is invalid, and let the form submit', () => {
+      const { form, otpInput, slots } = mountForm({ validationState: 'invalid' })
       const group = fixtureEl.querySelector('.form-otp')
       const { id } = fixtureEl.querySelector('.invalid-feedback')
 
       expect(group).toHaveClass('is-invalid')
       expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
-      expect(form.checkValidity()).toBeFalse()
-      expect(valueField.validationMessage).toBe('Enter the code.')
+      expect(form.checkValidity()).toBeTrue()
 
       otpInput.setValidationState('valid')
 
@@ -1898,11 +1879,11 @@ describe('OTPInput', () => {
 
     it('should take validationState from a data attribute', () => {
       fixtureEl.innerHTML = '<form><div class="form-otp" data-coreui-validation-state="invalid"><input class="form-otp-control"></div></form>'
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+      // eslint-disable-next-line no-new
+      new OTPInput(fixtureEl.querySelector('.form-otp'))
 
       expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
-      expect(otpInput._inputElement.validationMessage).toBe('Invalid value.')
+      expect(fixtureEl.querySelector('.form-otp-control').getAttribute('aria-invalid')).toBe('true')
     })
 
     it('should show a given state while disabled without blocking the submit', () => {
@@ -1920,12 +1901,12 @@ describe('OTPInput', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should describe the slots with the message named on the group and block with its text', () => {
+    it('should describe the slots with the message named on the group', () => {
       fixtureEl.innerHTML = '<form><p id="otp-message">Wrong code.</p><div class="form-otp" data-coreui-invalid-feedback="otp-message"><input class="form-otp-control"></div></form>'
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { validationState: 'invalid' })
+      // eslint-disable-next-line no-new
+      new OTPInput(fixtureEl.querySelector('.form-otp'), { validationState: 'invalid' })
 
       expect(fixtureEl.querySelector('.form-otp-control').getAttribute('aria-describedby')).toBe('otp-message')
-      expect(otpInput._inputElement.validationMessage).toBe('Wrong code.')
     })
 
     it.each([
@@ -1944,7 +1925,7 @@ describe('OTPInput', () => {
         expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
         expect(group.className).toBe('form-otp is-invalid')
         expect(slots.some(slot => slot.classList.contains('is-invalid'))).toBeFalse()
-        expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+        expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
 
         if (drop) {
           type(slots[0], '1')
@@ -2066,7 +2047,7 @@ describe('OTPInput', () => {
     })
 
     it('should keep a given state through changes from code and through keystrokes that leave the code as it was', () => {
-      const { form, otpInput, slots } = mountForm({ validationState: 'invalid', value: '1' })
+      const { otpInput, slots } = mountForm({ validationState: 'invalid', value: '1' })
 
       const clipboardData = new DataTransfer()
       clipboardData.setData('text', '1')
@@ -2080,29 +2061,29 @@ describe('OTPInput', () => {
 
       expect(otpInput._inputElement.value).toBe('12')
       expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(slots.every(slot => slot.getAttribute('aria-invalid') === 'true')).toBeTrue()
     })
 
     it.each([
       ['change.coreui.otp-input', ({ group }) => group, 'change.coreui.otp-input'],
       ['input', ({ valueField }) => valueField, 'input'],
       ['change', ({ valueField }) => valueField, 'change']
-    ])('should lift the block before %s and treat what the page does there as code', (_, getTarget, type_) => {
+    ])('should drop the state before %s and treat what the page does there as code', (_, getTarget, type_) => {
       const { form, otpInput, slots, valueField } = mountForm({ validationState: 'invalid', value: '1' })
       const group = fixtureEl.querySelector('.form-otp')
       const seen = []
 
       form.addEventListener('input', event => {
         if (event.target === valueField) {
-          seen.push(valueField.validity.valid)
+          seen.push(group.classList.contains('is-invalid'))
         }
       }, true)
       getTarget({ group, valueField }).addEventListener(type_, () => otpInput.setValidationState('invalid'), { once: true })
       type(slots[1], '2')
 
-      expect(seen).toEqual([true])
+      expect(seen).toEqual([false])
       expect(group).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(slots.every(slot => slot.getAttribute('aria-invalid') === 'true')).toBeTrue()
     })
 
     it('should send input and change from the value field when the code changes', () => {

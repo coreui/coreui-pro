@@ -280,7 +280,7 @@ describe('messages of a form field', () => {
 
       expect(displayOf('.invalid-feedback')).toBe('block')
       expect(slots.map(slot => slot.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
-      expect(form.checkValidity()).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
 
       instance.dispose()
     })

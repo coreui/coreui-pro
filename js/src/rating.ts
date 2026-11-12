@@ -142,12 +142,6 @@ class Rating extends BaseComponent {
     this._items = Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index))
     this._currentValue = this._starValue(this._currentValue)
     this._validation = new FieldValidation(this._element, {
-      blockers: () => {
-        const blocked = this._blockedRadio()
-
-        return blocked ? [blocked] : []
-      },
-      canBlock: () => !this._disabled && !this._config.readonly,
       config: () => this._config,
       describedTargets: () => this._radios(),
       fields: () => this._radios(),
@@ -266,7 +260,7 @@ class Rating extends BaseComponent {
     return SelectorEngine.find<HTMLInputElement>(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)
   }
 
-  _blockedRadio(): HTMLInputElement | undefined {
+  _tabStopRadio(): HTMLInputElement | undefined {
     const radios = this._radios()
 
     return radios.find(radio => radio.checked) ?? radios[0]
@@ -501,7 +495,7 @@ class Rating extends BaseComponent {
       return
     }
 
-    const stop = this._blockedRadio()
+    const stop = this._tabStopRadio()
 
     for (const input of this._radios()) {
       input.tabIndex = input === stop ? 0 : -1
