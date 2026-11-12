@@ -205,18 +205,20 @@ $tab-pane-tokens: defaults(
 
     &:hover,
     &:focus {
-      color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-link-hover-color));
-      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}nav-link-hover-bg));
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}nav-link-hover-color));
+      background-color: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}nav-link-hover-bg));
+    }
+
+    &:focus-visible {
+      --#{$prefix}focus-ring-offset: 1px;
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}nav-link-hover-color));
+      @include focus-ring(true);
     }
 
     &.active,
     &:active {
       color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-link-active-color));
-      background-color: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}nav-link-active-bg));
-    }
-
-    &:focus-visible {
-      @include focus-ring(true);
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}nav-link-active-bg));
     }
 
     // Disabled state lightens text

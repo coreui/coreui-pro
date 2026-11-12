@@ -2827,11 +2827,14 @@ field behind that kept submitting.
   It also takes `--cui-nav-link-hover-bg` and `--cui-nav-link-active-bg`, rounded
   by `--cui-nav-link-border-radius` — the base nav used to change text color
   alone. Set the two backgrounds to `transparent` to keep the old look.
-  Under a theme, hover reads `--cui-theme-fg` and the lighter
-  `--cui-theme-bg-subtle`, and the active item the darker `--cui-theme-bg-muted`,
-  so hovering a link never outweighs the selected one.
+  Under a theme, a hovered or focused link takes `--cui-theme-fg-emphasis` on
+  `--cui-theme-bg-muted`, and the active one keeps `--cui-theme-fg` on
+  `--cui-theme-bg-subtle`. A link other than the active one, focused from the
+  keyboard, takes the same emphasis color. The focus ring of a nav link draws 1px
+  off the link (`--cui-focus-ring-offset: 1px` on `.nav-link:focus-visible`), so a
+  page-wide `--cui-focus-ring-offset` does not reach it.
   `.nav-tabs`, `.nav-underline` and `.nav-underline-border` square the link off,
-  and the two underline variants take neither fill, hover or active: they mark
+  and the two underline variants take no fill on hover or when active: they mark
   their state with a line, and a radius curves that line's ends while a fill says
   the same thing twice.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
