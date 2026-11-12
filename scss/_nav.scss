@@ -38,6 +38,7 @@ $nav-tokens: defaults(
     --#{$prefix}nav-link-active-color: var(--#{$prefix}fg-body),
     --#{$prefix}nav-link-active-bg: var(--#{$prefix}bg-2),
     --#{$prefix}nav-link-disabled-color: var(--#{$prefix}fg-4),
+    --#{$prefix}nav-link-border-width: var(--#{$prefix}border-width),
     --#{$prefix}nav-link-transition-property: #{color, background-color, border-color},
     --#{$prefix}nav-link-transition-duration: .15s,
     --#{$prefix}nav-link-transition-timing: ease-in-out,
@@ -195,7 +196,7 @@ $tab-pane-tokens: defaults(
     color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-link-color));
     text-decoration: none;
     background: none;
-    border: 0;
+    border: var(--#{$prefix}nav-link-border-width) solid transparent;
     @include border-radius(var(--#{$prefix}nav-link-border-radius));
     @include transition-props(
       var(--#{$prefix}nav-link-transition-property),
@@ -227,6 +228,11 @@ $tab-pane-tokens: defaults(
       color: var(--#{$prefix}nav-link-disabled-color);
       pointer-events: none;
       cursor: default;
+
+      @media (forced-colors: active) {
+        color: GrayText;
+        border-color: GrayText;
+      }
     }
   }
 
@@ -302,6 +308,7 @@ $tab-pane-tokens: defaults(
 
     .nav-link {
       padding-inline: 0;
+      border: 0;
       border-block-end: var(--#{$prefix}nav-underline-border-width) solid transparent;
 
       &:hover,
@@ -335,6 +342,7 @@ $tab-pane-tokens: defaults(
     .nav-link {
       padding: var(--#{$prefix}nav-underline-border-link-padding-y) var(--#{$prefix}nav-underline-border-link-padding-x);
       margin-bottom: calc(-1 * var(--#{$prefix}nav-underline-border-border-width));
+      border: 0;
       border-block-end: var(--#{$prefix}nav-underline-border-border-width) solid transparent;
 
       &:hover,
