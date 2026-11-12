@@ -351,7 +351,7 @@ Similar to headers and footers, cards can include top and bottom "image caps"—
 
 Adapt an image into a background and overlay your text. Depending on the image, you may need additional styles or utilities.
 
-<Example code={`<div class="card text-bg-inverse">
+<Example code={`<div class="card bg-inverse fg-contrast-inverse">
     <svg class="docs-placeholder-img docs-placeholder-img-lg card-img" width="100%" height="270" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Card image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Card image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Card image</text></svg>
     <div class="card-img-overlay">
       <h5 class="card-title">Card title</h5>
@@ -392,15 +392,15 @@ Add `.card-row` to lay a card out along the inline axis. The sections sit side b
 
 Cards include various options for customizing their backgrounds, borders, and color.
 
-These are general-purpose utilities applied to the card as a whole: `.text-bg-*` fills the card's own background and leaves the frame, the header and the footer neutral; add the matching `.border-{color}` to frame the card in the fill color. To color the caps instead — or to color one section on its own — reach for [theme variants](#theme-variants).
+These are general-purpose utilities applied to the card as a whole. A [theme variant](#theme-variants) colors the frame and the caps; add `.theme-contrast` to fill the body as well, or use the [border utilities](/utilities/border/) to color the frame alone.
 
 ### Background and color
 
 <AddedIn version="4.2.6" />
 
-Set a `background-color` with contrasting foreground `color` with [our `.text-bg-{color}` helpers](/helpers/color-background/). Previously it was required to manually pair your choice of [`.text-{color}`](/utilities/colors/) and [`.bg-{color}`](/utilities/background/) utilities for styling, which you still may use if you prefer.
+Fill a card with a theme color and the text color that reads on it by pairing `.theme-{color}` with the [`.theme-contrast` utility](/utilities/theme/). The theme also paints the frame, the header and the footer, and links, buttons and form controls inside the card take it too.
 
-<Example code={getData('theme-colors').map((c) => `<div class="card text-bg-${c.name} border-${c.name} mb-4" style="max-width: 18rem;">
+<Example code={getData('theme-colors').map((c) => `<div class="card theme-${c.name} theme-contrast mb-4" style="max-width: 18rem;">
     <div class="card-header">Header</div>
     <div class="card-body">
       <h5 class="card-title">${c.title} card title</h5>

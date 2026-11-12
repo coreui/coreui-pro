@@ -186,9 +186,9 @@ Alternatively, you can also add additional controls and components to toasts.
 
 ### Color schemes
 
-Building on the previous example, you can design various toast color schemes using our [color](/utilities/colors/) and [background](/utilities/background/) utilities. We added `.text-bg-primary` to the `.toast`; the close button takes the color it inherits, so it stays legible on its own. To achieve a clean edge, we remove the default border with `.border-0`.
+Building on the previous example, you can design various toast color schemes using our [color](/utilities/colors/) and [background](/utilities/background/) utilities. We added `.bg-primary` and `.fg-contrast-primary` to the `.toast`; the close button takes the color it inherits, so it stays legible on its own. To achieve a clean edge, we remove the default border with `.border-0`.
 
-<Example class=" bg-3" code={`<div class="toast align-items-center text-bg-primary border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+<Example class=" bg-3" code={`<div class="toast align-items-center bg-primary fg-contrast-primary border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="d-flex">
       <div class="toast-body">
         Hello, world! This is a toast message.
