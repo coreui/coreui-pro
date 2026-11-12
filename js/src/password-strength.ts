@@ -14,6 +14,10 @@ import SelectorEngine from './dom/selector-engine.js'
 import {
   defineJQueryPlugin, jQueryDispatch
 } from './util/index.js'
+import {
+  createStrengthEvaluator, PASSWORD_STRENGTH_THRESHOLDS, PASSWORD_STRENGTH_WEIGHTS,
+  type PasswordStrengthEvaluator, type PasswordStrengthResult
+} from './util/password-strength.js'
 
 /**
  * Constants
@@ -63,18 +67,9 @@ const Default: PasswordStrengthConfig = {
   levels: ['Very weak', 'Weak', 'Fair', 'Good', 'Strong'],
   minLength: 8,
   scorer: null,
-  thresholds: [2, 4, 6],
+  thresholds: [...PASSWORD_STRENGTH_THRESHOLDS],
   userInputs: [],
-  weights: {
-    minLength: 1,
-    extraLength: 1,
-    longPassword: 1,
-    lowercase: 1,
-    uppercase: 1,
-    numbers: 1,
-    special: 1,
-    multipleSpecial: 1
-  }
+  weights: { ...PASSWORD_STRENGTH_WEIGHTS }
 }
 
 const DefaultType = {
@@ -89,9 +84,6 @@ const DefaultType = {
   weights: 'object'
 }
 
-const isThenable = (value: unknown): value is Promise<StrengthResult> =>
-  Boolean(value) && typeof (value as Promise<StrengthResult>).then === 'function'
-
 /**
  * Class definition
  */
@@ -105,21 +97,28 @@ class PasswordStrength extends BaseComponent {
   private _suggestionsElement: HTMLElement | null = null
   private _segments: HTMLElement[] = []
   private _score: number | null = null
-  private _timeout: ReturnType<typeof setTimeout> | null = null
-  // Every evaluation takes the next token. A resolved scorer whose token is no
-  // longer the current one answered a password the field has already replaced.
-  private _token = 0
+  private _evaluator: PasswordStrengthEvaluator
+  private _value = ''
 
   constructor(element: string | Element, config?: Partial<PasswordStrengthConfig>) {
     super(element, config)
 
     this._input = this._getInput()
     this._createMeter()
+    this._evaluator = createStrengthEvaluator({
+      debounce: () => this._config.debounce,
+      levelCount: () => this._config.levels.length,
+      onBusy: busy => this._setBusy(busy),
+      onResult: (result, password) => this._apply(result, password),
+      scorer: () => this._config.scorer,
+      scoring: () => this._config,
+      userInputs: () => (typeof this._config.userInputs === 'function' ? this._config.userInputs() : this._config.userInputs)
+    })
 
     if (this._input) {
       EventHandler.on(this._input, EVENT_INPUT, () => this._schedule())
       EventHandler.on(this._input, EVENT_CHANGE, () => this._schedule())
-      this._evaluate()
+      this.evaluate()
     }
   }
 
@@ -142,13 +141,12 @@ class PasswordStrength extends BaseComponent {
   }
 
   evaluate(): void {
-    this._evaluate()
+    this._value = this._input ? this._input.value : ''
+    this._evaluator.evaluate(this._value)
   }
 
   override dispose(): void {
-    if (this._timeout) {
-      clearTimeout(this._timeout)
-    }
+    this._evaluator.cancel()
 
     if (this._input) {
       EventHandler.off(this._input, EVENT_KEY)
@@ -172,6 +170,15 @@ class PasswordStrength extends BaseComponent {
     const parent = this._element.parentElement
 
     return parent ? SelectorEngine.findOne<HTMLInputElement>(SELECTOR_PASSWORD, parent) : null
+  }
+
+  _schedule(): void {
+    if (this._input!.value === this._value) {
+      return
+    }
+
+    this._value = this._input!.value
+    this._evaluator.schedule(this._value)
   }
 
   _createMeter(): void {
@@ -210,188 +217,6 @@ class PasswordStrength extends BaseComponent {
     this._element.append(meter, feedback)
   }
 
-  _schedule(): void {
-    if (this._timeout) {
-      clearTimeout(this._timeout)
-    }
-
-    if (this._config.debounce > 0) {
-      this._timeout = setTimeout(() => this._evaluate(), this._config.debounce)
-      return
-    }
-
-    this._evaluate()
-  }
-
-  _evaluate(): void {
-    const password = this._input ? this._input.value : ''
-    this._token += 1
-    const token = this._token
-
-    if (!password) {
-      this._setBusy(false)
-      this._apply(null, '')
-      return
-    }
-
-    const userInputs = this._getUserInputs()
-
-    if (typeof this._config.scorer !== 'function') {
-      this._setBusy(false)
-      this._apply(this._normalize(this._builtInScore(password, userInputs)), password)
-      return
-    }
-
-    let result
-
-    try {
-      result = this._config.scorer(password, userInputs)
-    } catch {
-      this._setBusy(false)
-      this._apply(null, password)
-      return
-    }
-
-    if (!isThenable(result)) {
-      this._setBusy(false)
-      this._apply(this._normalize(result), password)
-      return
-    }
-
-    // Only an async scorer gets the pending state; a sync one would flash it.
-    this._setBusy(true)
-
-    result.then(
-      value => {
-        if (token !== this._token) {
-          return
-        }
-
-        this._setBusy(false)
-        this._apply(this._normalize(value), password)
-      },
-      () => {
-        if (token !== this._token) {
-          return
-        }
-
-        this._setBusy(false)
-        this._apply(null, password)
-      }
-    )
-  }
-
-  _getUserInputs(): string[] {
-    const { userInputs } = this._config
-    const values = typeof userInputs === 'function' ? userInputs() : userInputs
-
-    return Array.isArray(values) ? values.filter(Boolean).map(String) : []
-  }
-
-  override _configAfterMerge(config: any): any {
-    if (config.weights && typeof config.weights === 'object' && !Array.isArray(config.weights)) {
-      config.weights = Object.fromEntries(
-        Object.entries(Default.weights).map(([rule, weight]) => [
-          rule,
-          Number.isFinite(config.weights[rule]) ? config.weights[rule] : weight
-        ])
-      )
-    }
-
-    if (Array.isArray(config.thresholds)) {
-      config.thresholds = Default.thresholds.map((threshold: number, index: number) =>
-        Number.isFinite(config.thresholds[index]) ? config.thresholds[index] : threshold
-      )
-    }
-
-    return config
-  }
-
-  _normalize(result: unknown): { score: number, warning?: string, suggestions?: string[] } | null {
-    if (typeof result === 'number' && Number.isFinite(result)) {
-      return { score: this._clamp(result) }
-    }
-
-    if (result && typeof result === 'object') {
-      const { score, warning, suggestions } = result as { score: unknown, warning?: string, suggestions?: string[] }
-
-      if (typeof score === 'number' && Number.isFinite(score)) {
-        return { score: this._clamp(score), warning, suggestions }
-      }
-    }
-
-    return null
-  }
-
-  _clamp(score: number): number {
-    return Math.max(0, Math.min(this._config.levels.length - 1, Math.round(score)))
-  }
-
-  // A rule check, not a strength measurement: it counts character classes and
-  // length, which says nothing about how guessable the password actually is.
-  _builtInScore(password: string, userInputs: string[]): { score: number } {
-    const lowered = password.toLowerCase()
-
-    for (const value of userInputs) {
-      const needle = value.trim().toLowerCase()
-
-      if (needle.length >= 3 && lowered.includes(needle)) {
-        return { score: 0 }
-      }
-    }
-
-    const { minLength, weights } = this._config
-    let points = 0
-
-    if (password.length >= minLength) {
-      points += weights.minLength
-    }
-
-    if (password.length >= minLength + 4) {
-      points += weights.extraLength
-    }
-
-    if (password.length >= 16) {
-      points += weights.longPassword
-    }
-
-    if (/[a-z]/.test(password)) {
-      points += weights.lowercase
-    }
-
-    if (/[A-Z]/.test(password)) {
-      points += weights.uppercase
-    }
-
-    if (/\d/.test(password)) {
-      points += weights.numbers
-    }
-
-    if (/[^\w\s]/.test(password)) {
-      points += weights.special
-    }
-
-    if (/[^\w\s].*[^\w\s]/.test(password)) {
-      points += weights.multipleSpecial
-    }
-
-    const [weak, fair, good] = this._config.thresholds
-
-    if (points <= weak) {
-      return { score: 1 }
-    }
-
-    if (points <= fair) {
-      return { score: 2 }
-    }
-
-    if (points <= good) {
-      return { score: 3 }
-    }
-
-    return { score: 4 }
-  }
-
   _setBusy(busy: boolean): void {
     this._element.classList.toggle(CLASS_NAME_BUSY, busy)
 
@@ -400,7 +225,7 @@ class PasswordStrength extends BaseComponent {
     }
   }
 
-  _apply(result: { score: number, warning?: string, suggestions?: string[] } | null, password: string): void {
+  _apply(result: PasswordStrengthResult | null, password: string): void {
     const score = result ? result.score : null
     const changed = score !== this._score
 
@@ -418,7 +243,7 @@ class PasswordStrength extends BaseComponent {
     })
   }
 
-  _render(result: { score: number, warning?: string, suggestions?: string[] } | null): void {
+  _render(result: PasswordStrengthResult | null): void {
     const score = result ? result.score : null
 
     if (score === null) {

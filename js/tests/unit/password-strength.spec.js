@@ -342,6 +342,77 @@ describe('PasswordStrength', () => {
     })
   })
 
+  describe('stale answers', () => {
+    for (const [title, next] of [['cleared', ''], ['given another password', 'abc']]) {
+      it(`should ignore a scorer answer for a password the field no longer holds when it is ${title}`, async () => {
+        const resolvers = []
+        const changes = []
+        const { element, input, instance } = setup({
+          debounce: 20,
+          scorer: () => new Promise(resolve => {
+            resolvers.push(resolve)
+          })
+        }, 'Correct-horse-1')
+
+        element.addEventListener('change.coreui.password-strength', event => changes.push(event.score))
+        type(input, next)
+        resolvers[0](4)
+        await Promise.resolve()
+
+        expect(instance.getScore()).toBeNull()
+        expect(element.dataset.coreuiStrength).toBeUndefined()
+        expect(changes).not.toContain(4)
+      })
+    }
+  })
+
+  describe('dispose while pending', () => {
+    it('should drop an answer that settles after dispose', async () => {
+      const resolvers = []
+      const changes = []
+      const { element, instance } = setup({
+        scorer: () => new Promise(resolve => {
+          resolvers.push(resolve)
+        })
+      }, 'Correct-horse-1')
+
+      element.addEventListener('change.coreui.password-strength', event => changes.push(event.score))
+      instance.dispose()
+      resolvers[0](4)
+      await Promise.resolve()
+
+      expect(changes).toEqual([])
+      expect(element.dataset.coreuiStrength).toBeUndefined()
+    })
+  })
+
+  describe('unchanged value', () => {
+    it('should keep the pending answer when the field fires change without a new value', async () => {
+      const resolvers = []
+      const { element, input, instance } = setup({
+        debounce: 20,
+        scorer: () => new Promise(resolve => {
+          resolvers.push(resolve)
+        })
+      })
+
+      type(input, 'Correct-horse-1')
+      await new Promise(resolve => {
+        setTimeout(resolve, 30)
+      })
+      input.dispatchEvent(new Event('change'))
+      resolvers[0](4)
+      await Promise.resolve()
+
+      expect(instance.getScore()).toBe(4)
+      expect(element.classList.contains('password-strength-busy')).toBeFalse()
+      await new Promise(resolve => {
+        setTimeout(resolve, 30)
+      })
+      expect(resolvers).toHaveLength(1)
+    })
+  })
+
   describe('dispose', () => {
     it('should remove what it built and stop listening', () => {
       const { element, input, instance } = setup()
