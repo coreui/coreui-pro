@@ -37,6 +37,7 @@ describe('LoadingButton while it blocks itself', () => {
     const shown = new Promise(resolve => {
       button.addEventListener('shown.coreui.tooltip', resolve, { once: true })
     })
+    await userEvent.unhover(button)
     await userEvent.hover(button)
     await shown
 

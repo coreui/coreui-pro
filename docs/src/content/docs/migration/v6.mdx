@@ -656,12 +656,12 @@ announces its toasts through it. See
   breaking change, once they ship `calc-size()`. The component's events and
   methods do not depend on it and stay either way.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **The accordion's events replace Collapse's.** `shown`/`hidden.coreui.accordion`
-  fire on the `.accordion-item` whenever its open state changes, mirroring the
-  native `toggle` event but bubbling, so they can be delegated. There is no
-  `show`/`hide` counterpart: `<details>` has no cancelable event before the
-  state change, so an item is kept shut by cancelling the click on its
-  `<summary>` instead of by preventing an event.
+  **The accordion's events replace Collapse's.** `show`/`hide.coreui.accordion`
+  fire on the `.accordion-item` before it changes and can be prevented;
+  `shown`/`hidden.coreui.accordion` fire once the panel has finished moving,
+  when the promise of the method settles. All four bubble, so they can be
+  delegated. A change the component did not start (find-in-page, the `open`
+  property) fires them too, with `show`/`hide` after the fact.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The plugin replaces Collapse's, and it is instantiated on the `.accordion`
   container, not on a panel.** Where v5 called
