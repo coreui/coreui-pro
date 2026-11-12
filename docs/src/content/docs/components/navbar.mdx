@@ -650,7 +650,7 @@ To create an offcanvas navbar that expands into a normal navbar at a specific br
 </nav>
 ```
 
-When using offcanvas in a dark navbar, be aware that you may need to have a dark background on the offcanvas content to avoid the text becoming illegible. In the example below, we set `data-coreui-theme="dark"` on the `.navbar` and add `.text-bg-inverse` to the `.offcanvas` and `.dropdown-menu-dark` to `.dropdown-menu` for proper styling with a dark offcanvas. The close button takes the color it inherits, so it needs nothing.
+When using offcanvas in a dark navbar, be aware that you may need to have a dark background on the offcanvas content to avoid the text becoming illegible. In the example below, we set `data-coreui-theme="dark"` on the `.navbar` and add `.bg-inverse` and `.fg-contrast-inverse` to the `.offcanvas` and `.dropdown-menu-dark` to `.dropdown-menu` for proper styling with a dark offcanvas. The close button takes the color it inherits, so it needs nothing.
 
 <Example code={`<nav class="navbar bg-3 fixed-top" data-coreui-theme="dark">
     <div class="container-fluid">
@@ -658,7 +658,7 @@ When using offcanvas in a dark navbar, be aware that you may need to have a dark
       <button class="navbar-toggler" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <dialog class="offcanvas offcanvas-end text-bg-inverse" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+      <dialog class="offcanvas offcanvas-end bg-inverse fg-contrast-inverse" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Dark offcanvas</h5>
           <button type="button" class="btn-close" data-coreui-dismiss="offcanvas" aria-label="Close"></button>

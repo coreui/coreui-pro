@@ -176,6 +176,22 @@ describe('theme slots', () => {
     expect(style('#alert').borderTopLeftRadius).toBe(style('#stop').borderTopLeftRadius)
   })
 
+  it('should fill with a background and its contrast text without theming the content', () => {
+    mount('<div class="bg-inverse fg-contrast-inverse p-3" id="fill"><a href="#">a</a></div><a href="#" id="plain">b</a>')
+    const fill = container.querySelector('#fill')
+
+    expect(getComputedStyle(fill).backgroundColor).toBe(resolve('', 'var(--cui-inverse-bg)'))
+    expect(getComputedStyle(fill).color).toBe(resolve('', 'var(--cui-inverse-contrast)'))
+    expect(getComputedStyle(fill.querySelector('a')).color).toBe(getComputedStyle(container.querySelector('#plain')).color)
+  })
+
+  it('should paint the header of a filled themed card with the contrast text on the theme color', () => {
+    mount('<div class="card theme-primary theme-contrast"><div class="card-header">h</div><div class="card-body">b</div></div>')
+
+    expect(style('.card-header').backgroundColor).toBe(slot('theme-primary', 'bg'))
+    expect(style('.card-header').color).toBe(slot('theme-primary', 'contrast'))
+  })
+
   it('should mark the active nav link with the subtle slot and a hovered one with the muted slot', async () => {
     mount('<ul class="nav theme-primary"><li class="nav-item"><a class="nav-link active" href="#">a</a></li><li class="nav-item"><a class="nav-link" href="#">b</a></li></ul>')
     const [active, other] = container.querySelectorAll('.nav-link')

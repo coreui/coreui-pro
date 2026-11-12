@@ -154,11 +154,11 @@ A color modifier is now a variant class plus a `.theme-{color}` class. The v5 cl
 | `.badge.bg-primary` | `.badge.theme-primary` |
 | `.link-primary` | `.theme-primary.underline` on the `<a>` |
 
-`.text-bg-{color}`, `.bg-{color}` and `.table-{color}` keep working.
+`.bg-{color}` and `.table-{color}` keep working. `.text-bg-{color}` is gone: use `.bg-{color}.fg-contrast-{color}` (same background and text color, nothing else; with another `.fg-*` on the element, use `.bg-{color}` and that class), or `.theme-{color}` alone on a badge or a progress bar.
 
 ### `dark` and `light` are `inverse` and `secondary`
 
-The `dark` and `light` theme colors are gone. Rename `-dark` to `-inverse` and `-light` to `-secondary` in `bg`, `text`, `text-bg`, `border`, `btn`, `btn-outline`, `btn-ghost`, `alert`, `callout`, `chip`, `list-group-item`, `table`, `focus-ring`, `shadow` and `underline` classes, and in their `-subtle` and `-emphasis` forms (`.bg-dark-subtle` becomes `.bg-inverse-subtle`, `.text-dark-emphasis` becomes `.text-inverse-emphasis`). `.navbar-dark`, `.dropdown-menu-dark`, `.sidebar-dark` and `.fw-light` keep their names. Where `.bg-light` meant a neutral panel, use `.bg-3` or `.bg-4`. Where `.bg-dark` meant a dark area, set `data-coreui-theme="dark"` on the container.
+The `dark` and `light` theme colors are gone. Rename `-dark` to `-inverse` and `-light` to `-secondary` in `bg`, `text`, `border`, `btn`, `btn-outline`, `btn-ghost`, `alert`, `callout`, `chip`, `list-group-item`, `table`, `focus-ring`, `shadow` and `underline` classes, and in their `-subtle` and `-emphasis` forms (`.bg-dark-subtle` becomes `.bg-inverse-subtle`, `.text-dark-emphasis` becomes `.text-inverse-emphasis`). `.navbar-dark`, `.dropdown-menu-dark`, `.sidebar-dark` and `.fw-light` keep their names. Where `.bg-light` meant a neutral panel, use `.bg-3` or `.bg-4`. Where `.bg-dark` meant a dark area, set `data-coreui-theme="dark"` on the container.
 
 ### Utility renames
 
@@ -440,7 +440,7 @@ A custom ratio moves from `--cui-aspect-ratio: 50%` to `--cui-ratio: 2 / 1` on `
 ### Other components
 
 - **Alert.** An alert is a flex row. Wrap several block children (heading, paragraphs, `<hr>`) in `<div class="vstack">`. Keep the `.btn-close` a direct child of `.alert`. Every alert fades out on close; add `.alert-instant` where v5 omitted `.fade`.
-- **Badge.** A bare `.badge` is neutral. Replace `.badge.bg-{color}` with `.badge.theme-{color}`, or keep `.text-bg-{color}`.
+- **Badge.** A bare `.badge` is neutral. Replace `.badge.bg-{color}` and `.badge.text-bg-{color}` with `.badge.theme-{color}`.
 - **Card.** `.card-body` is a flex column. Add `.w-100` to a block child that must stretch, and replace `text-align` on buttons or links with `.mx-auto` or `.ms-auto`. Replace `.card-link` with a wrapper `<div class="hstack gap-4">`. Delete `.card-header-pills` and keep `.nav.nav-pills`.
 - **Card group, list group.** `.card-group` and `.list-group-horizontal-{breakpoint}` read the width of the nearest query container. Add `.contains-inline` to an ancestor, or the cards stay stacked and the list stays vertical.
 - **Navbar.** Wrap the content of every `.navbar-expand-*` navbar in `.container`, `.container-fluid` or `.container-{breakpoint}`.
@@ -712,7 +712,9 @@ All library CSS is in cascade layers and utilities no longer carry `!important`.
 | `.ratio` wrapper | ratio class on the element (Step 3) |
 | `.link-{color}` | `.theme-{color}.underline` |
 | `.elevation-*` | `.shadow-sm`, `.shadow`, `.shadow-lg` |
-| `.bg-{color}-gradient`, `.text-bg-{color}-gradient` | `.bg-{color}.bg-gradient` |
+| `.bg-{color}-gradient` | `.bg-{color}.bg-gradient` |
+| `.text-bg-{color}-gradient` | `.bg-{color}.fg-contrast-{color}.bg-gradient` |
+| `.text-bg-{color}` | `.bg-{color}.fg-contrast-{color}` |
 | `.dark:bg-*`, `.dark:text-*` | none; color utilities follow the color mode |
 | `.collapsed` | `[aria-expanded="false"]` |
 | `.carousel-dark` | `data-coreui-theme="dark"` on `.carousel` |
@@ -739,6 +741,7 @@ All library CSS is in cascade layers and utilities no longer carry `!important`.
    grep -rnE '\b[a-z-]+-(xxl)\b|\b[a-z-]+-xxl-[a-z0-9-]+' .
    grep -rnE '\b(mw|mh)-100\b|link-(offset|underline|primary|secondary|success|danger|warning|info|light|dark|body-emphasis)|text-(muted|black-50|white-50|high-emphasis|medium-emphasis|disabled)\b|display-[1-6]|\blead\b|elevation-|-gradient\b|spinner-(border|grow)-sm|progress-(group|thin)|card-link|card-header-pills|(header|footer)-sticky|\bfooter\b|carousel-dark|\bcollapsed\b|chip-dismiss|form-select|form-multi-select' .
    grep -rnE '\b(bg|text|border|text-bg|table|focus-ring|shadow)-(light|dark)\b' .
+   grep -rnE '\btext-bg-' .
    grep -rnE '\.update\(\{|changed\.coreui\.(autocomplete|multi-select)|getSelected\(\)|cellHover|selectAdjacement|showAdjacement|optionsStyle|selectAllStyle|optionsGroupsStyle|selectionTypeCounterText|ariaIndicatorLabel|ariaTagDeleteLabel|inputDateFormat|todayButton|cancelButton|confirmButton|previewDateOnHover|clickableLabels|ariaLabels|readOnly|dateObject' --include=*.js --include=*.ts --include=*.html .
    grep -rnE "\b(ride|wrap|touch|toggle|focus|animation|offset|variant|indicator|labels|placeholder|search)\s*:" --include=*.js --include=*.ts .
    grep -rnE 'var\(--cui-[a-z0-9-]+-rgb\)|--cui-(primary|secondary|success|danger|warning|info|light|dark)\)|-text-emphasis\)|-border-subtle\)|--cui-border-radius|--cui-font-monospace|--cui-highlight-|--cui-(text|bg|border|link)-opacity|focus-box-shadow|--cui-accordion-btn-|--cui-avatar-(width|height)|--cui-btn-close-(bg|filter)|--cui-range-slider-|--cui-(autocomplete|date-picker|time-picker|form-multi-select|chip-input)-' .

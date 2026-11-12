@@ -1,5 +1,5 @@
 # The v6 theme colours, overriding the engine's v5-shaped list. Name and label
-# only: the contrast pairing comes from `.text-bg-*` at runtime, so nothing here
+# only: the contrast pairing comes from `.fg-contrast-*` at runtime, so nothing here
 # can drift out of step with the stylesheet. Order matches `$theme-colors` in
 # _theme.scss.
 - name: primary

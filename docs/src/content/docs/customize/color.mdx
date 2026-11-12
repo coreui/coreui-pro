@@ -335,7 +335,7 @@ We use a subset of all colors to create a smaller color palette for generating c
 <div class="row">
   {getData('theme-colors').map((c) => (
     <div class="col-md-4">
-      <div class={`p-4 mb-4 text-bg-${c.name} rounded-3`}>{c.title}</div>
+      <div class={`p-4 mb-4 bg-${c.name} fg-contrast-${c.name} rounded-3`}>{c.title}</div>
     </div>
   ))}
 </div>

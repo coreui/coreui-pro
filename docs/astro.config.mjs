@@ -34,6 +34,8 @@ export default defineConfig({
     '/getting-started/accessibility/': `${base}/accessibility/overview/`,
     // `/components/navs-tabs/` split into a nav page and a tab page in v6.
     '/components/navs-tabs/': `${base}/components/nav/`,
+    // The `.text-bg-*` helpers are gone in v6; the theme utilities replace them.
+    '/helpers/color-background/': `${base}/utilities/theme/`,
     // `/utilities/` went from grouped pages to one page per property in v6. Each old
     // URL points at the property that carried the page's name.
     '/utilities/sizing/': `${base}/utilities/width/`,

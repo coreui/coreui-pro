@@ -323,8 +323,6 @@
       to: /helpers/backdrop/
     - title: Clearfix
       to: /helpers/clearfix/
-    - title: Color & background
-      to: /helpers/color-background/
     - title: Focus ring
       to: /helpers/focus-ring/
     - title: Hover lift

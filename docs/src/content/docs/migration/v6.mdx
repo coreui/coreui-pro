@@ -928,7 +928,7 @@ check, radio, carousel and toggler icons already work:
   **`.btn-close-white` is gone**, deprecated since v5.0.0, and so is the
   dark-mode rule that forced the glyph white. Both restated what the inherited
   color already produces on a surface that paints its own text — a
-  `.text-bg-inverse` toast, a dark navbar's offcanvas, a `.bg-body.text-body`
+  `.bg-inverse.fg-contrast-inverse` toast, a dark navbar's offcanvas, a `.bg-body.text-body`
   section under `data-coreui-theme="dark"`. Delete the class; the button
   renders identically without it. The rule additionally got the mirror case
   wrong: a `data-coreui-theme="light"` section inside a dark page inherited the
@@ -951,15 +951,15 @@ check, radio, carousel and toggler icons already work:
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Color comes from `.theme-*`, and `.badge-*` now names the variant.** A bare
   `.badge` used to be white text with no background of its own, so it was
-  invisible until a `.text-bg-*` utility supplied both. It renders neutral on
+  invisible until a `.text-bg-*` helper supplied both. It renders neutral on
   its own now — `--cui-badge-color` is `inherit` and `--cui-badge-bg` is
   `--cui-bg-2` — and a `.theme-*` class colors it:
   `<span class="badge theme-danger">`. The `.badge-*` namespace carries the
   three variants instead: solid (default), `.badge-subtle` and
   `.badge-outline`, each mapping the same theme roles.
 
-  `.text-bg-*` still works and still sets both properties, so existing markup
-  keeps rendering. Markup that paired `.badge` with a background utility alone
+  `.text-bg-*` is gone in v6 (see [Helpers](#helpers)), so swap
+  `.badge.text-bg-{color}` for `.badge.theme-{color}`. Markup that paired `.badge` with a background utility alone
   (`<span class="badge bg-danger">`) now shows the inherited text color on
   that background instead of white — swap it for `.theme-danger` or add a text
   color utility.
@@ -3667,8 +3667,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   keep `.5rem` of block padding. The border reads `--cui-border-color` instead
   of `--cui-border-color-translucent`, except on `.card-translucent`, and the
   radius is `--cui-radius-7` (see the radius scale below). A card filled with
-  `.text-bg-*` keeps that neutral frame; add the matching `.border-{color}` to
-  frame it in the fill color. To keep the v5 spacing, set
+  `.theme-{color}.theme-contrast` takes the theme in its frame and caps too. To keep the v5 spacing, set
   `--cui-card-spacer-y` and `-x` to `var(--cui-spacer-5)` on `.card`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **`.card-header-pills` is gone.** It only pulled the pill row out to the
@@ -4056,6 +4055,17 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 
 ### Helpers
+
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+  **`.text-bg-{color}` is gone**, as in Bootstrap 6, and so is the Color &
+  background helper page. `class="bg-primary fg-contrast-primary"` sets the same
+  background and text color and nothing else, for every theme color in both color
+  modes. To set another text color as well, use `.bg-{color}` with that `.fg-*`
+  class instead: `.fg-contrast-{color}` is a utility too and would override it.
+  On a badge or a progress bar, `.theme-{color}` alone is enough.
+  `.theme-{color}` with `.theme-contrast` fills too, but the theme also reaches
+  links, buttons, form controls and focus rings inside, so keep it for a
+  component meant to follow the theme, such as a card.
 
 - **`.link-{color}` is gone; a theme class colors a link.** Reboot resolves a
   link's color from `--cui-theme-fg`, which every `.theme-*` class sets, so the
@@ -4667,8 +4677,8 @@ it at the color's slots, so nothing is defined in a file that never renders it.
   `rgba($white, .87)`, a color frozen at build time, so an active state
   recolored to a light background kept near-white text. It reads the
   `contrast` slot now. Against the default primary that lifts the ratio from
-  **4.71** to **5.65**, and it matches `.text-bg-primary`, which already used
-  the slot — the two whites in the library are one white again.
+  **4.71** to **5.65**, and it matches `.theme-primary.theme-contrast`, which
+  already used the slot — the two whites in the library are one white again.
 - **Override the color, not the pair.** Set `$primary` (or
   `--cui-primary-500` at runtime) to move every active state at once, or the
   component's own knob to move one. Per instance, `.theme-*` still wins where a
@@ -4951,7 +4961,8 @@ tintable and lets dark mode deepen every shadow at once.
   their `-dark` twins), and the `--cui-{color}-start` / `--cui-{color}-stop`
   custom properties they read. These were CoreUI-only additions with no Bootstrap counterpart.
   Replace a removed class with the base color plus the generic gradient —
-  `class="bg-primary bg-gradient"` — or write the two-stop gradient yourself if
+  `class="bg-primary bg-gradient"`, and `fg-contrast-primary` for the text of
+  a `.text-bg-*-gradient` — or write the two-stop gradient yourself if
   you need the exact 45° ramp.
 - **`.bg-gradient` itself stays**, as do `$gradient`, `--cui-gradient`,
   `$enable-gradients` and the `gradient-bg()` mixin — that is the gradient
@@ -5146,8 +5157,8 @@ tintable and lets dark mode deepen every shadow at once.
   everywhere else.
 - **`--cui-{color}-contrast` custom properties are new root tokens.** Previously
   only buttons computed their own contrast color; the root tokens now carry it,
-  written in the `contrast` slot. `.text-bg-*` reads the token instead of
-  calling `color-contrast()`.
+  written in the `contrast` slot. `.theme-contrast` and `.fg-contrast-{color}`
+  read the token instead of calling `color-contrast()`.
 
 #### `--cui-mobile-breakpoint` removed
 
@@ -5391,7 +5402,7 @@ meaning something else entirely, and neither followed the reader's scheme — a
 now, and the two neutrals swap ends of the gray scale between schemes.
 
 - **`inverse` replaces `dark`.** It resolves to `gray-900` in light mode and
-  `gray-100` in dark, so `.btn-inverse`, `.text-bg-inverse` and
+  `gray-100` in dark, so `.btn-inverse`, `.theme-inverse` and
   `.table-inverse` stand against the page in both.
 - **`secondary` takes over what `light` did.** It is a light neutral now
   (`gray-100` in light mode, `gray-600` in dark) rather than the mid gray-blue
@@ -5399,8 +5410,8 @@ now, and the two neutrals swap ends of the gray scale between schemes.
 - **Every `-light` and `-dark` class is gone.** Rename `-dark` to `-inverse` and
   `-light` to `-secondary` across `alert`, `bg`, `border` (and its per-side
   variants), `btn`, `btn-ghost`, `btn-outline`, `btn-subtle`, `callout`, `chip`,
-  `focus-ring`, `underline`, `list-group-item`, `shadow`, `table`, `text`,
-  `text-bg` and `theme`, plus the `-subtle` and `-emphasis` families. The
+  `focus-ring`, `underline`, `list-group-item`, `shadow`, `table`, `text`
+  and `theme`, plus the `-subtle` and `-emphasis` families. The
   color-scheme opt-ins keep their names: `.navbar-dark`, `.dropdown-menu-dark`
   and `.sidebar-dark` are unaffected, as is `.fw-light`. (`.carousel-dark` is
   gone; see [Carousel](#carousel-slides-by-scrolling).)
