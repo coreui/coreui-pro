@@ -1391,6 +1391,33 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should keep the focus on the row the keyboard opened the menu from while show fires', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <table class="area" tabindex="-1" data-coreui-toggle="context-menu"><tbody><tr id="row" tabindex="0"><td>Row</td></tr></tbody></table>',
+        '  <div class="menu"><a class="menu-item" href="#">Item 1</a></div>',
+        '</div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const row = fixtureEl.querySelector('#row')
+      let focused = null
+      area.addEventListener('show.coreui.context-menu', () => {
+        focused = document.activeElement
+      }, { once: true })
+
+      row.focus()
+      row.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: 'F10',
+        shiftKey: true
+      }))
+
+      expect(focused).toEqual(row)
+      expect(fixtureEl.querySelector('.menu')).toHaveClass('show')
+    })
+
     it('should return the focus on Escape to the button inside the shadow host the keyboard opened the menu from', async () => {
       fixtureEl.innerHTML = [
         '<div class="area" tabindex="0" data-coreui-toggle="context-menu">',

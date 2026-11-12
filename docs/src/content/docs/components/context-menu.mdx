@@ -11,7 +11,7 @@ import contextMenuTable from './snippets/context-menu-table.js?raw'
 
 <AddedIn version="6.0.0" />
 
-Context menus replace the browser's native menu on an element with a [Menu](/components/menu/). Add `data-coreui-toggle="context-menu"` to any element and place a `.menu` next to it: a right-click (or <kbd>Shift</kbd>+<kbd>F10</kbd> / the <kbd>Menu</kbd> key when the element has focus) opens it at the pointer, and every menu feature - items, icons, dividers, headers, submenus and the keyboard navigation - works unchanged.
+Context menus replace the browser's native menu on an element with a [Menu](/components/menu/). Add `data-coreui-toggle="context-menu"` to any element and place a `.menu` next to it: a right-click (or <kbd>Shift</kbd>+<kbd>F10</kbd> / the <kbd>Menu</kbd> key when the focus is in the element) opens it at the pointer, and every menu feature - items, icons, dividers, headers, submenus and the keyboard navigation - works unchanged.
 
 <Example code={`<div class="border rounded-3 p-6 text-center fg-2" role="region" aria-label="Document" tabindex="0" data-coreui-toggle="context-menu" data-coreui-aria-menu-label="Edit">
     Right-click anywhere in this area
@@ -74,9 +74,9 @@ Submenus work as in [Menu](/components/menu/#submenus): wrap a `.menu-item` trig
 
 ### One menu for many rows
 
-A context menu belongs to the element that carries `data-coreui-toggle="context-menu"`, and it opens for right-clicks anywhere inside that element. Put the attribute on the container - a table, a list, a file grid - rather than on every row, and read `contextmenuEvent.target` in the `show.coreui.context-menu` event to learn which row was clicked. One menu, one instance, no matter how many rows.
+A context menu belongs to the element that carries `data-coreui-toggle="context-menu"`, and it opens for right-clicks anywhere inside that element. Put the attribute on the container - a table, a list, a file grid - rather than on every row, and keep track of the row the menu is for. The example below remembers the last row that took the focus or a right-click and writes its name into the menu header; `contextmenuEvent.target` in the `show.coreui.context-menu` event tells it that a right-click landed outside the rows. The rows carry `tabindex="0"`, so keyboard users move to a row with <kbd>Tab</kbd> and open the menu for it with <kbd>Shift</kbd>+<kbd>F10</kbd> or the <kbd>Menu</kbd> key; with the focus on the table itself, the keys open it for the last row. The table carries `tabindex="-1"`: it is not a <kbd>Tab</kbd> stop of its own, but it can take the focus back when a menu opened with the pointer closes. One menu, one instance, no matter how many rows.
 
-<Example code={`<table class="table table-hover" id="contextMenuTable" tabindex="0" data-coreui-toggle="context-menu">
+<Example code={`<table class="table table-hover" id="contextMenuTable" tabindex="-1" data-coreui-toggle="context-menu">
     <thead>
       <tr>
         <th scope="col">Name</th>
@@ -85,17 +85,17 @@ A context menu belongs to the element that carries `data-coreui-toggle="context-
       </tr>
     </thead>
     <tbody>
-      <tr data-name="Quarterly report.pdf">
+      <tr data-name="Quarterly report.pdf" tabindex="0">
         <td>Quarterly report.pdf</td>
         <td>2 hours ago</td>
         <td>1.2 MB</td>
       </tr>
-      <tr data-name="Logo.svg">
+      <tr data-name="Logo.svg" tabindex="0">
         <td>Logo.svg</td>
         <td>Yesterday</td>
         <td>24 KB</td>
       </tr>
-      <tr data-name="Notes.txt">
+      <tr data-name="Notes.txt" tabindex="0">
         <td>Notes.txt</td>
         <td>3 days ago</td>
         <td>2 KB</td>
@@ -148,9 +148,9 @@ The context menu writes the menu semantics itself every time it opens, so items 
 
 Name the panel with the `ariaMenuLabel` option (`data-coreui-aria-menu-label`); the plugin writes it as `aria-label` when the panel has no `aria-label` yet. Without it the panel has no name unless you give it `aria-label` or `aria-labelledby`, as the [table example](#one-menu-for-many-rows) does with its header. Headers inside the panel are decoration for screen readers, which move from item to item, so anything a user needs goes into the item names or the panel's name.
 
-The plugin writes nothing on the trigger area. Give it a role and a name (`role="region"` and `aria-label` in the examples above), give a non-interactive trigger `tabindex="0"` so keyboard users can reach it, and describe the gesture somewhere nearby - nothing in the markup announces that an element has a context menu.
+The plugin writes nothing on the trigger area. Give it a role and a name (`role="region"` and `aria-label` in the examples above), give a non-interactive trigger `tabindex="0"` so keyboard users can reach it, or `tabindex="-1"` when the elements inside it take the focus, as the rows of the [table example](#one-menu-for-many-rows) do, and describe the gesture somewhere nearby - nothing in the markup announces that an element has a context menu.
 
-Three gestures open the menu: a right-click (or a long-press on touch devices that dispatch `contextmenu`), and, with focus on the trigger, <kbd>Shift</kbd>+<kbd>F10</kbd> or the <kbd>Menu</kbd> key, which anchor the menu to the element instead of the pointer. <kbd>Shift</kbd>+<kbd>F10</kbd> is the Windows convention the [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/) adopt for opening a context menu from the keyboard; the plugin handles the keys itself, so they work on macOS too, where no system shortcut exists and browsers never turn them into a `contextmenu` event. On Apple keyboards the function keys default to their media actions, so the shortcut is <kbd>Fn</kbd>+<kbd>Shift</kbd>+<kbd>F10</kbd> unless the system is set to use them as standard function keys.
+Three gestures open the menu: a right-click (or a long-press on touch devices that dispatch `contextmenu`), and, with the focus in the trigger, <kbd>Shift</kbd>+<kbd>F10</kbd> or the <kbd>Menu</kbd> key, which anchor the menu to the element instead of the pointer. <kbd>Shift</kbd>+<kbd>F10</kbd> is the Windows convention the [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/) adopt for opening a context menu from the keyboard; the plugin handles the keys itself, so they work on macOS too, where no system shortcut exists and browsers never turn them into a `contextmenu` event. On Apple keyboards the function keys default to their media actions, so the shortcut is <kbd>Fn</kbd>+<kbd>Shift</kbd>+<kbd>F10</kbd> unless the system is set to use them as standard function keys.
 
 Opening from the keyboard moves focus to the first item; a right-click moves it to the panel, and the arrow keys go on from there. While focus is in the menu, <kbd>Tab</kbd> and <kbd>Shift</kbd>+<kbd>Tab</kbd> do nothing, as in a native context menu. <kbd>Esc</kbd> closes the menu, also while focus is still on the trigger, and when the menu closes with the focus in it or on no element, the focus goes back to the trigger. A menu opened with <kbd>Shift</kbd>+<kbd>F10</kbd> or the <kbd>Menu</kbd> key gives it back to the element in the trigger that had it at that moment, such as a field or a button in the open shadow root of a web component. When that element can no longer take it, the focus goes to the web component in the trigger that contains it, if that component takes the focus, and otherwise to the trigger.
 
@@ -158,7 +158,7 @@ Opening from the keyboard moves focus to the first item; a right-click moves it 
 
 | Key | Action |
 | --- | --- |
-| <kbd>Shift</kbd>+<kbd>F10</kbd>, <kbd>Menu</kbd> | Open the context menu anchored to the focused trigger, with focus on the first item (<kbd>Fn</kbd>+<kbd>Shift</kbd>+<kbd>F10</kbd> on Apple keyboards) |
+| <kbd>Shift</kbd>+<kbd>F10</kbd>, <kbd>Menu</kbd> | Open the context menu anchored to the trigger the focus is in, with focus on the first item (<kbd>Fn</kbd>+<kbd>Shift</kbd>+<kbd>F10</kbd> on Apple keyboards) |
 | `↓` / `↑` | Navigate to next/previous menu item, stopping at the ends of the list unless `loopFocus` is set |
 | `→` | Enter submenu (or `←` in RTL) |
 | `←` | Exit submenu and return to parent (or `→` in RTL) |
@@ -172,7 +172,7 @@ Opening from the keyboard moves focus to the first item; a right-click moves it 
 The plugin listens on the document: a `contextmenu` event (a right-click, or a long-press on touch devices that dispatch it) or a <kbd>Shift</kbd>+<kbd>F10</kbd> / <kbd>Menu</kbd> keydown inside an element with `data-coreui-toggle="context-menu"` opens its `.menu` and suppresses the browser menu. A right-click inside the open menu keeps it open; one elsewhere in the trigger element closes it and opens it again at the new point (`hide`, `hidden`, `show`, `shown`), and one outside closes it, as do a left-click anywhere outside the menu (the trigger area included) and <kbd>Esc</kbd>. Opening it closes the other open menus, pickers and combobox panels, as [opening a menu](/components/menu/#auto-close-behavior) does. While the menu is open the page does not scroll - wheel, touch and the scroll keys are held, as with the native menu - but a `.menu-scrollable` still scrolls inside.
 
 <Callout>
-iOS Safari does not dispatch `contextmenu` for a long-press. Call `show()` yourself from a `touchstart`/`pointerdown` timer when the gesture matters on iOS, and `hide()` first when the menu is already open, so it opens again at the new point as a right-click does.
+iOS Safari does not dispatch `contextmenu` for a long-press. Call `show()` yourself from a `touchstart`/`pointerdown` timer when the gesture matters on iOS, and `hide()` first when the menu is already open, so it opens again at the new point as a right-click does. A menu opened this way carries no `contextmenuEvent`, so set what it needs from the touched element before you call `show()`.
 </Callout>
 
 ### Via data attributes
@@ -247,7 +247,7 @@ The context menu accepts every [Menu option](/components/menu/#options), adds `a
 
 ### Events
 
-All context menu events are fired at the trigger element and then bubbled up. `show.coreui.context-menu` and `shown.coreui.context-menu` carry a `contextmenuEvent` property when the menu was opened by the data API - the native `contextmenu` event, whose `target` is the element under the pointer. `hide.coreui.context-menu` and `hidden.coreui.context-menu` carry a `clickEvent` property when a click closed the menu.
+All context menu events are fired at the trigger element and then bubbled up. `show.coreui.context-menu` and `shown.coreui.context-menu` carry a `contextmenuEvent` property when a `contextmenu` event opened the menu (a right-click, or a long-press on touch devices that dispatch it) - the native event, whose `target` is the element under the pointer. A menu opened with <kbd>Shift</kbd>+<kbd>F10</kbd>, the <kbd>Menu</kbd> key or the `show` method carries none. `hide.coreui.context-menu` and `hidden.coreui.context-menu` carry a `clickEvent` property when a click closed the menu.
 
 | Event type | Description |
 | --- | --- |
