@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 import LoadingButton from '../../src/loading-button.js'
 import Data from '../../src/dom/data.js'
+import { announce } from '../../src/util/announce.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
 } from '../helpers/fixture.js'
@@ -329,6 +330,14 @@ describe('LoadingButton', () => {
       }
     }
 
+    const readyRegions = () => {
+      announce('Welcome')
+      vi.advanceTimersByTime(110)
+      const observer = new MutationObserver(() => {})
+      observer.observe(document.querySelector('[data-coreui-live-announcer]'), { childList: true, subtree: true })
+      return () => observer.takeRecords().flatMap(record => [...record.addedNodes].map(node => node.textContent))
+    }
+
     beforeEach(() => {
       removeAnnouncers()
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
@@ -428,6 +437,96 @@ describe('LoadingButton', () => {
 
       expect(messages()).toEqual([])
       expect(messages('polite')).toEqual(['Save'])
+    })
+
+    it('should add a message announced before the start together with the start message', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button, { spinner: false })
+
+      readyRegions()
+      button.focus()
+      announce('Draft saved')
+      loadingButton.start()
+      vi.advanceTimersByTime(110)
+
+      expect(messages('polite')).toEqual(['Welcome'])
+      expect(messages()).toEqual(['Save, Loading', 'Draft saved'])
+    })
+
+    it('should add a message announced after the start together with the start message', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button, { spinner: false })
+
+      readyRegions()
+      button.focus()
+      loadingButton.start()
+      announce('Draft saved')
+      vi.advanceTimersByTime(110)
+
+      expect(messages('polite')).toEqual(['Welcome'])
+      expect(messages()).toEqual(['Save, Loading', 'Draft saved'])
+    })
+
+    it('should add a message from a start listener together with the start message', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button, { spinner: false })
+
+      readyRegions()
+      button.addEventListener('start.coreui.loading-button', () => announce('Uploading'))
+      button.focus()
+      loadingButton.start()
+      vi.advanceTimersByTime(110)
+
+      expect(messages('polite')).toEqual(['Welcome'])
+      expect(messages()).toEqual(['Save, Loading', 'Uploading'])
+    })
+
+    it('should stay silent when the focus leaves the button in the task that starts loading', () => {
+      fixtureEl.innerHTML = '<input><button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button, { spinner: false })
+
+      const added = readyRegions()
+      button.focus()
+      loadingButton.start()
+      fixtureEl.querySelector('input').focus()
+      vi.advanceTimersByTime(110)
+
+      expect(added()).toEqual([])
+    })
+
+    it('should stay silent when loading stops in the task it starts', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button)
+
+      const added = readyRegions()
+      button.focus()
+      loadingButton.start()
+      loadingButton.stop()
+      vi.advanceTimersByTime(500)
+
+      expect(added()).toEqual([])
+    })
+
+    it('should drop a start message not read yet when loading stops and the focus moves on', () => {
+      fixtureEl.innerHTML = '<button>Save</button><input>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button)
+
+      const added = readyRegions()
+      button.focus()
+      loadingButton.start()
+      button.querySelector('.btn-loading-spinner').style.transition = 'opacity .15s'
+      vi.advanceTimersByTime(20)
+      loadingButton.stop()
+      fixtureEl.querySelector('input').focus()
+      vi.advanceTimersByTime(500)
+
+      expect(added()).toEqual([])
     })
 
     it('should announce the accessible name', () => {
