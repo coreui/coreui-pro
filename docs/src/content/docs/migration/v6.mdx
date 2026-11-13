@@ -2920,6 +2920,11 @@ field behind that kept submitting.
   and `ArrowRight` walks back freely. Previously the guard was attached to the
   key name, which let the caret jump ahead over empty slots in RTL and refused
   to walk back.
+- **The field is a single tab stop.** <kbd>Tab</kbd> enters it on the first slot
+  and leaves it from any slot; <kbd>Shift</kbd>+<kbd>Tab</kbd> leaves it
+  backwards in one press. Previously every filled slot was a stop of its own,
+  and with `linear: false` every slot was, so getting past a six-digit code took
+  up to six presses. The arrow keys move between the slots, as before.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The code is validated as one value.** It moved from an
   `<input type="hidden">`, which the browser leaves out of validation, to a
