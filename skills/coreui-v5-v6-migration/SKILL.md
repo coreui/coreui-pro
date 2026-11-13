@@ -244,7 +244,7 @@ A plugin that builds a component inside an element is enabled with a bare `data-
 | `data-coreui-read-only` (Rating) | `data-coreui-readonly` |
 | `data-coreui-readonly` (OTP) | remove, use `data-coreui-disabled="true"` |
 | `data-coreui-select-adjacement-days`, `data-coreui-show-adjacement-days` | `data-coreui-select-adjacent-days`, `data-coreui-show-adjacent-days` |
-| `data-coreui-labels`, `data-coreui-clickable-labels`, `data-coreui-aria-labels` (Range Slider) | `data-coreui-ticks`, `data-coreui-clickable-ticks`, `data-coreui-aria-label` |
+| `data-coreui-labels`, `data-coreui-clickable-labels`, `data-coreui-aria-labels` (Range Slider) | `data-coreui-ticks`, `data-coreui-clickable-ticks`, `data-coreui-aria-thumb-label` |
 | `data-coreui-search="global"` (Multi Select) | `data-coreui-search="true"` |
 | `data-coreui-search="external, global"` (Autocomplete) | `data-coreui-search="external"` |
 | `data-coreui-indicator` (pickers, Autocomplete) | `data-coreui-picker-icon` |
@@ -546,7 +546,8 @@ Change events now fire only when the value changes. Code that relied on a change
 | Date Range Picker | `previewDateOnHover`, `separator` | removed; `separatorIcon` and `separatorIconRtl` set the icon |
 | Time Picker | `variant` | removed, no replacement |
 | Range Slider | `labels`, `clickableLabels` | `ticks`, `clickableTicks` |
-| Range Slider | `ariaLabels` | `ariaLabel` (array, comma-separated string, or `(index, total) => string`) |
+| Range Slider | `ariaLabels` | `ariaThumbLabel` (array, comma-separated string, or `(index, total) => string`) |
+| Rating | `ariaLabel` | `ariaItemLabel` |
 | Rating | `readOnly` | `readonly` |
 | OTP Input | `ariaLabel` | `ariaControlLabel`; default `Character N of M` |
 | OTP Input | `readonly` | removed; use `disabled` |

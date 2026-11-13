@@ -195,7 +195,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `activeIcon` | object, string, null | `null` | The default icon to display when the item is selected. |
 | `allowClear` | boolean | `false` | Enables the clearing upon clicking the selected item again. |
 | `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) |  Object which contains allowed attributes and tags. |
-| `ariaLabel` | function | `` (value, itemCount) => `${value} of ${itemCount}` `` | Accessible name of each item, built from its value and the total. |
+| `ariaItemLabel` | function | `` (value, itemCount) => `${value} of ${itemCount}` `` | Accessible name of each item, built from its value and the total. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `highlightOnlySelected` | boolean | `false` | If enabled, only the currently selected icon will be visibly highlighted. |
 | `icon` | object, string, null | `null` | The default icon to display when the item is not selected. |
@@ -241,7 +241,7 @@ myRating.addEventListener('change.coreui.rating', event => {
 ## Accessibility
 
 - The rating element gets `role="radiogroup"`, with `aria-readonly` when `readonly` is on and `aria-required` when the rating is required. Name the group with `aria-label` or `aria-labelledby`.
-- Each star is a native radio button named by the `ariaLabel` option, `1 of 5` by default.
+- Each star is a native radio button named by the `ariaItemLabel` option, `1 of 5` by default.
 
 ### Keyboard support
 
