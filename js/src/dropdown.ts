@@ -10,7 +10,6 @@
  * --------------------------------------------------------------------------
  */
 
-import { type ReferenceElement } from '@floating-ui/dom'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
@@ -36,8 +35,6 @@ const CLASS_NAME_DROPEND = 'dropend'
 const CLASS_NAME_DROPSTART = 'dropstart'
 const CLASS_NAME_DROPUP_CENTER = 'dropup-center'
 const CLASS_NAME_DROPDOWN_CENTER = 'dropdown-center'
-
-const SELECTOR_NAVBAR = '.navbar'
 
 const PLACEMENT_TOP = 'top-start'
 const PLACEMENT_TOPEND = 'top-end'
@@ -66,13 +63,6 @@ const DefaultType: Record<string, string> = {
 
 class Dropdown extends Menu {
   declare ['constructor']: typeof Dropdown
-  protected declare _inNavbar: boolean
-
-  constructor(element?: string | Element | null, config?: Partial<DropdownConfig> | null) {
-    super(element, config)
-
-    this._inNavbar = this._detectNavbar()
-  }
 
   // Getters
   static override get SELECTOR_DATA_TOGGLE(): string {
@@ -89,6 +79,10 @@ class Dropdown extends Menu {
 
   static override get SELECTOR_MENU(): string {
     return '.dropdown-menu'
+  }
+
+  static override get SELECTOR_NAVBAR(): string {
+    return '.navbar'
   }
 
   static override get SELECTOR_VISIBLE_ITEMS(): string {
@@ -108,11 +102,6 @@ class Dropdown extends Menu {
   }
 
   // Overrides
-  override update(): void {
-    this._inNavbar = this._detectNavbar()
-    super.update()
-  }
-
   // Without a `placement` option the v5 dropdown derives its placement from
   // the wrapper classes and the `--cui-position` custom property.
   protected override _getPlacement(): string {
@@ -149,29 +138,12 @@ class Dropdown extends Menu {
     return isEnd ? PLACEMENT_BOTTOMEND : PLACEMENT_BOTTOM
   }
 
-  // In a navbar (or with static display) the menu is positioned by the
-  // dropdown CSS, which keys on this attribute — the engine stays out of it.
   protected override _createFloating(): void {
     if (this._isStatic()) {
       Manipulator.setDataAttribute(this._menu, 'popper', 'static')
-      Manipulator.setDataAttribute(this._menu, 'placement', this._getPlacement())
-      return
     }
 
     super._createFloating()
-  }
-
-  protected override async _updateFloatingPosition(referenceElement: ReferenceElement | null = null): Promise<void> {
-    if (this._isStatic()) {
-      Manipulator.setDataAttribute(this._menu, 'placement', this._getPlacement())
-      return
-    }
-
-    return super._updateFloatingPosition(referenceElement)
-  }
-
-  private _isStatic(): boolean {
-    return this._inNavbar || this._config.display === 'static'
   }
 
   protected override _removeMenuAttributes(): void {
@@ -188,10 +160,6 @@ class Dropdown extends Menu {
 
   protected override _getLevelMenu(): Element {
     return this._menu
-  }
-
-  _detectNavbar(): boolean {
-    return this._element.closest(SELECTOR_NAVBAR) !== null
   }
 
   // Static

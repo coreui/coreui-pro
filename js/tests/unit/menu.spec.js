@@ -1661,7 +1661,38 @@ describe('Menu', () => {
       })
     })
 
-    it('should use Floating UI positioning in navbar', () => {
+    it('should not use Floating UI in navbar', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<nav class="navbar md:navbar-expand">',
+          '  <ul class="navbar-nav">',
+          '    <li class="nav-item">',
+          '      <button class="nav-link" data-coreui-toggle="menu" aria-expanded="false">Menu</button>',
+          '      <div class="menu">',
+          '        <a class="menu-item" href="#">Secondary link</a>',
+          '      </div>',
+          '    </li>',
+          '  </ul>',
+          '</nav>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menuEl = fixtureEl.querySelector('.menu')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          expect(menu._floatingCleanup).toBeNull()
+          expect(menuEl.getAttribute('data-coreui-display')).toEqual('static')
+          expect(menuEl.getAttribute('data-coreui-placement')).toEqual('bottom-start')
+          expect(menuEl.style.position).toEqual('')
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+
+    it('should use Floating UI in a navbar outside its .navbar-nav', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
           '<nav class="navbar md:navbar-expand">',
@@ -1680,11 +1711,74 @@ describe('Menu', () => {
 
         btnMenu.addEventListener('shown.coreui.menu', () => {
           expect(menu._floatingCleanup).not.toBeNull()
-          // Floating UI sets data-coreui-placement attribute asynchronously
-          setTimeout(() => {
-            expect(menuEl.getAttribute('data-coreui-placement')).not.toBeNull()
-            resolve()
-          }, 10)
+          expect(menuEl.getAttribute('data-coreui-display')).toBeNull()
+          menu.dispose()
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+
+    it('should re-resolve a responsive placement on a navbar menu when the breakpoint changes', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<nav class="navbar md:navbar-expand">',
+          '  <ul class="navbar-nav">',
+          '    <li class="nav-item">',
+          '      <button class="nav-link" data-coreui-toggle="menu" data-coreui-placement="bottom-start md:bottom-end" aria-expanded="false">Menu</button>',
+          '      <div class="menu">',
+          '        <a class="menu-item" href="#">Secondary link</a>',
+          '      </div>',
+          '    </li>',
+          '  </ul>',
+          '</nav>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menuEl = fixtureEl.querySelector('.menu')
+        const menu = new Menu(btnMenu)
+        const innerWidth = spyOnProperty(window, 'innerWidth', 'get').and.returnValue(500)
+
+        btnMenu.addEventListener('shown.coreui.menu', async () => {
+          expect(menuEl.getAttribute('data-coreui-placement')).toEqual('bottom-start')
+
+          innerWidth.and.returnValue(1000)
+          await menu._updateFloatingPosition()
+
+          expect(menuEl.getAttribute('data-coreui-placement')).toEqual('bottom-end')
+          expect(menuEl.style.position).toEqual('')
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+
+    it('should use Floating UI in navbar when the menu has a container', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<nav class="navbar md:navbar-expand">',
+          '  <ul class="navbar-nav">',
+          '    <li class="nav-item">',
+          '      <button class="nav-link" data-coreui-toggle="menu" data-coreui-container="body" aria-expanded="false">Menu</button>',
+          '      <div class="menu">',
+          '        <a class="menu-item" href="#">Secondary link</a>',
+          '      </div>',
+          '    </li>',
+          '  </ul>',
+          '</nav>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menuEl = fixtureEl.querySelector('.menu')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          expect(menu._floatingCleanup).not.toBeNull()
+          expect(menuEl.getAttribute('data-coreui-display')).toBeNull()
+          menu.dispose()
+          resolve()
         })
 
         menu.show()
@@ -1749,8 +1843,8 @@ describe('Menu', () => {
         const menuEl = fixtureEl.querySelector('.menu')
 
         btnMenu.addEventListener('shown.coreui.menu', () => {
-          // Floating UI adds this attribute when we use it
-          expect(menuEl.getAttribute('data-coreui-placement')).toBeNull()
+          expect(menuEl.style.position).toEqual('')
+          expect(menuEl.getAttribute('data-coreui-placement')).toEqual('bottom-start')
           resolve()
         })
 

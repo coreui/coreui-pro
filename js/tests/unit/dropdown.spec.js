@@ -1414,7 +1414,7 @@ describe('Dropdown', () => {
   })
 
   describe('update', () => {
-    it('should reposition and detect navbar on update', () => {
+    it('should reposition on update', () => {
       fixtureEl.innerHTML = [
         '<div class="dropdown">',
         '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
@@ -1432,33 +1432,10 @@ describe('Dropdown', () => {
       expect(dropdown._floatingCleanup).not.toBeNull()
 
       const spyUpdate = spyOn(dropdown, '_updateFloatingPosition')
-      const spyDetect = spyOn(dropdown, '_detectNavbar')
 
       dropdown.update()
 
       expect(spyUpdate).toHaveBeenCalled()
-      expect(spyDetect).toHaveBeenCalled()
-    })
-
-    it('should just detect navbar on update', () => {
-      fixtureEl.innerHTML = [
-        '<div class="dropdown">',
-        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
-        '  <div class="dropdown-menu">',
-        '    <a class="dropdown-item" href="#">Secondary link</a>',
-        '  </div>',
-        '</div>'
-      ].join('')
-
-      const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
-      const dropdown = new Dropdown(btnDropdown)
-
-      const spy = spyOn(dropdown, '_detectNavbar')
-
-      dropdown.update()
-
-      expect(dropdown._floatingCleanup).toBeNull()
-      expect(spy).toHaveBeenCalled()
     })
   })
 
@@ -1534,6 +1511,33 @@ describe('Dropdown', () => {
       })
     })
 
+    it('should position the menu with the engine in navbar when it has a container', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<nav class="navbar navbar-expand-md bg-4">',
+          '  <div class="dropdown">',
+          '    <button class="btn dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-container="body" aria-expanded="false">Dropdown</button>',
+          '    <div class="dropdown-menu">',
+          '      <a class="dropdown-item" href="#">Secondary link</a>',
+          '    </div>',
+          '  </div>',
+          '</nav>'
+        ].join('')
+
+        const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+        const dropdownMenu = fixtureEl.querySelector('.dropdown-menu')
+        const dropdown = new Dropdown(btnDropdown)
+
+        btnDropdown.addEventListener('shown.coreui.dropdown', () => {
+          expect(dropdown._floatingCleanup).not.toBeNull()
+          expect(dropdownMenu.getAttribute('data-coreui-popper')).toBeNull()
+          dropdown.dispose()
+          resolve()
+        })
+
+        dropdown.show()
+      })
+    })
     it('should not collapse the dropdown when clicking a select option nested in the dropdown', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

@@ -25,6 +25,7 @@ $menu-tokens: defaults(
     --#{$prefix}menu-overflow-y: visible,
     --#{$prefix}menu-padding-x: .25rem,
     --#{$prefix}menu-padding-y: .25rem,
+    --#{$prefix}menu-spacer: .125rem,
     --#{$prefix}menu-font-size: var(--#{$prefix}font-size-sm),
     --#{$prefix}menu-color: var(--#{$prefix}fg-body),
     --#{$prefix}menu-bg: var(--#{$prefix}bg-body),

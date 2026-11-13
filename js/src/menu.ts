@@ -241,6 +241,10 @@ class Menu extends BaseComponent {
     return '.menu'
   }
 
+  static get SELECTOR_NAVBAR(): string {
+    return SELECTOR_NAVBAR_NAV
+  }
+
   static get SELECTOR_SUBMENU(): string {
     return '.submenu'
   }
@@ -549,8 +553,9 @@ class Menu extends BaseComponent {
   }
 
   protected _createFloating(): void {
-    if (this._config.display === 'static') {
+    if (this._isStatic()) {
       Manipulator.setDataAttribute(this._menu, 'display', 'static')
+      Manipulator.setDataAttribute(this._menu, 'placement', this._getPlacement())
       return
     }
 
@@ -567,6 +572,11 @@ class Menu extends BaseComponent {
 
   protected async _updateFloatingPosition(referenceElement: ReferenceElement | null = null): Promise<void> {
     if (!this._menu) {
+      return
+    }
+
+    if (this._isStatic()) {
+      Manipulator.setDataAttribute(this._menu, 'placement', this._getPlacement())
       return
     }
 
@@ -605,6 +615,10 @@ class Menu extends BaseComponent {
 
   protected _isShown(): boolean {
     return this._menu.classList.contains(CLASS_NAME_SHOW)
+  }
+
+  protected _isStatic(): boolean {
+    return this._config.display === 'static' || (this._config.container === false && this._element.closest(this.constructor.SELECTOR_NAVBAR) !== null)
   }
 
   protected _isToggleTarget(composedPath: EventTarget[]): boolean {
