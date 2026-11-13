@@ -118,18 +118,14 @@ This will render a styled tooltip that interprets the HTML tags instead of treat
 
 ### Tooltips on SVG Elements
 
-Applying Bootstrap Tooltips to SVG elements requires a different approach, since SVGs do not support the `title` attribute in the same way HTML elements do. To show tooltips on SVG icons or shapes, you must initialize them manually using JavaScript.
+An icon has no text, so the link or button that holds it needs a name. Put `aria-label` on that element, not on the `<svg>`, and hide the icon with `aria-hidden="true"`; the tooltip text is then read as the element's description. Without `aria-label`, the plugin names the element with its `title`, and the same text becomes both its name and its description.
 
-It’s recommended to set the container option to `'body'` to avoid positioning issues, especially when SVGs are nested inside complex layouts.
-
-<Example class="tooltip-demo" sandboxJsId="enable-tooltips" code={`<a href="#" class="d-inline-block" data-coreui-toggle="tooltip" title="Default tooltip">
-    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 100 100">
+<Example class="tooltip-demo" sandboxJsId="enable-tooltips" code={`<a href="#" class="d-inline-block" data-coreui-toggle="tooltip" title="Default tooltip" aria-label="Hover or focus to see default tooltip">
+    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 100 100" aria-hidden="true">
       <rect width="100%" height="100%" fill="#563d7c"/>
       <circle cx="50" cy="50" r="30" fill="#007bff"/>
     </svg>
   </a>`} />
-
-Using Bootstrap Tooltips with SVGs is a great way to enhance accessibility and interactivity for icon-based UIs or data visualizations without modifying the structure of your SVGs.
 
 ### Multiple anchors
 
@@ -153,7 +149,7 @@ const tooltip = new coreui.Tooltip(toolbar, {
 
 - On its way from an anchor to the tooltip the pointer may cross another anchor. The tooltip stays while the pointer keeps heading towards it, and moves to the anchor under the pointer once the pointer stops or turns away.
 - An anchor without text shows no tooltip, so the others keep theirs. To leave some elements out, narrow the selector, for example `data-coreui-anchors="[title]"`.
-- A disabled button gets no focus and, with the button classes, no pointer events. Wrap it in an element with `tabindex="0"` and its own `title`, list that wrapper among the anchors and keep the disabled button out of the selector, for example `data-coreui-anchors="button:enabled, [tabindex]"`. Focus lands on the wrapper, so let the text name the control and its state, as in "Italic is not available".
+- A disabled button gets no focus and, with the button classes, no pointer events. Wrap it in an element with `tabindex="0"` and its own `title` (`data-coreui-title` when the button holds only an icon, see [Disabled elements](#disabled-elements)), list that wrapper among the anchors and keep the disabled button out of the selector, for example `data-coreui-anchors="button:enabled, [tabindex]"`. Focus lands on the wrapper, so let the text name the control and its state, as in "Italic is not available".
 - Call the methods on the wrapper's instance; `Tooltip.getOrCreateInstance()` on an anchor would create a second tooltip.
 - `move.coreui.tooltip` fires when the tooltip starts moving to another anchor and `moved.coreui.tooltip` once it stands there; `event.relatedTarget` is the new anchor. Content you set with `setContent()` in a `move` listener applies to the new anchor.
 - The move animates `left` and `top` for 0.2 seconds, only while the tooltip carries `data-coreui-moving`, so outside a move it follows a scrolling anchor at once. A move that starts before the previous one ends continues from where the tooltip is. With `animation: false` or reduced motion it jumps.
@@ -215,6 +211,14 @@ Elements that have the `disabled` attribute are non-interactive, which prevents 
 
 <Example class="tooltip-demo" sandboxJsId="enable-tooltips" code={`<span class="d-inline-block" tabindex="0" data-coreui-toggle="tooltip" title="Disabled tooltip">
     <button class="btn-solid theme-primary" type="button" disabled>Disabled button</button>
+  </span>`} />
+
+When the disabled button holds only an icon, name the button with `aria-label` and put the tooltip text on the wrapper in `data-coreui-title`, not `title`. The wrapper has no role, so `aria-label` is not allowed on it, and the plugin turns `title` into `aria-label` on a trigger without text. The wrapper then takes its name from the button and its description from the tooltip.
+
+<Example class="tooltip-demo" sandboxJsId="enable-tooltips" code={`<span class="d-inline-block" tabindex="0" data-coreui-toggle="tooltip" data-coreui-title="Delete is not available">
+    <button class="btn-solid theme-primary" type="button" disabled aria-label="Delete">
+      <svg class="icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M96 472a23.82 23.82 0 0 0 23.579 24h272.842A23.82 23.82 0 0 0 416 472V152H96Zm32-288h256v280H128Z"/><path d="M168 216h32v200h-32zm72 0h32v200h-32zm72 0h32v200h-32zm16-128V40c0-13.458-9.488-24-21.6-24H205.6C193.488 16 184 26.542 184 40v48H64v32h384V88ZM216 48h80v40h-80Z"/></svg>
+    </button>
   </span>`} />
 
 ### Options
@@ -328,7 +332,7 @@ tooltip.hide()
 
 ## Accessibility
 
-- The tip is rendered with `role="tooltip"`. While it is shown, the plugin adds the tip's `id` to the trigger's `aria-describedby`, so the text is read as the trigger's description. When the trigger has neither text nor an `aria-label`, the title becomes its `aria-label`.
+- The tip is rendered with `role="tooltip"`. While it is shown, the plugin adds the tip's `id` to the trigger's `aria-describedby`, so the text is read as the trigger's description. When the trigger has neither text nor an `aria-label`, the title becomes its `aria-label`. A trigger without a role, such as a `<span>` wrapper, may not carry `aria-label`: give it the text in `data-coreui-title` and name the control inside it.
 - With `anchors`, the description moves with the tooltip: only the anchor it stands at, or the focused element inside that anchor, carries the tip's `id`. A text you change with `setContent()` while the anchor keeps the focus is not announced; use a live region for that.
 - Put tooltips on elements that already take focus, such as links, buttons and form controls, and keep the default `hover focus` trigger so keyboard users get them too. See [Making tooltips work for keyboard and assistive technology users](#making-tooltips-work-for-keyboard-and-assistive-technology-users).
 
