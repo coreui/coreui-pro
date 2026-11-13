@@ -356,11 +356,11 @@ The one-time password input component is designed with accessibility in mind and
 
 ### Customizing accessibility
 
-You can customize the aria-label generation function to provide more specific descriptions:
+Each slot is named `Character N of M` by default, next to the name of the group. Pass `ariaLabel` to translate it or to name the slots differently.
 
 ```javascript
 const otp = new coreui.OTPInput(element, {
-  ariaLabel: (index, total) => `Enter digit ${index + 1} of your ${total}-digit verification code`
+  ariaLabel: (index, total) => `Zeichen ${index + 1} von ${total}`
 })
 ```
 
@@ -415,7 +415,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `ariaLabel` | function | `(index, total) => Digit ${index + 1} of ${total}` | Function to generate aria-label for each input field. Receives current index (0-based) and total number of inputs |
+| `ariaLabel` | function | `(index, total) => Character ${index + 1} of ${total}` | Function to generate aria-label for each input field. Receives current index (0-based) and total number of inputs |
 | `autoSubmit` | boolean | `false` | Automatically submit the form when all OTP fields are filled |
 | `disabled` | boolean | `false` | Disable all OTP input fields |
 | `id` | string, null | `null` | ID attribute for the value input |

@@ -76,12 +76,12 @@ export const a11yComponents = [
       {
         criterion: '3.3.2',
         status: 'built-in',
-        note: 'Each digit input carries its own aria-label (default \'Digit N of M\' via the ariaLabel config).'
+        note: 'Each slot carries its own aria-label (default \'Character N of M\' via the ariaLabel config).'
       },
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The container is a role=group and each field is a native input with its own name ("Digit N of M" by default), recomputed from the number of fields. Name the group with aria-label or aria-labelledby so it reads as one code entry.'
+        note: 'The container is a role=group and each field is a native input with its own name ("Character N of M" by default), recomputed from the number of fields. Name the group with aria-label or aria-labelledby so it reads as one code entry.'
       },
       {
         criterion: '2.2.1',

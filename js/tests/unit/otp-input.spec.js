@@ -173,9 +173,19 @@ describe('OTPInput', () => {
       new OTPInput(otpContainer) // eslint-disable-line no-new
 
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      expect(inputs[0].getAttribute('aria-label')).toBe('Digit 1 of 3')
-      expect(inputs[1].getAttribute('aria-label')).toBe('Digit 2 of 3')
-      expect(inputs[2].getAttribute('aria-label')).toBe('Digit 3 of 3')
+      expect(inputs[0].getAttribute('aria-label')).toBe('Character 1 of 3')
+      expect(inputs[1].getAttribute('aria-label')).toBe('Character 2 of 3')
+      expect(inputs[2].getAttribute('aria-label')).toBe('Character 3 of 3')
+    })
+
+    it('should name the slots from the count of a new instance after dispose', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      new OTPInput(otpContainer).dispose()
+      otpContainer.append(Object.assign(document.createElement('input'), { className: 'form-otp-control' }))
+      new OTPInput(otpContainer) // eslint-disable-line no-new
+
+      expect([...otpContainer.querySelectorAll('.form-otp-control')].map(input => input.getAttribute('aria-label'))).toEqual(['Character 1 of 3', 'Character 2 of 3', 'Character 3 of 3'])
     })
 
     it('should set custom aria-label when provided', () => {

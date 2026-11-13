@@ -63,7 +63,7 @@ type OtpInputConfig = {
 }
 
 const Default: OtpInputConfig = {
-  ariaLabel: (index: number, total: number) => `Digit ${index + 1} of ${total}`,
+  ariaLabel: (index: number, total: number) => `Character ${index + 1} of ${total}`,
   autoSubmit: false,
   disabled: false,
   id: null,
@@ -574,10 +574,7 @@ class OTPInput extends BaseComponent {
         input.id = `${this._config.id}-${index}`
       }
 
-      if (typeof this._config.ariaLabel === 'function') {
-        const ariaLabel = this._config.ariaLabel(index, inputs.length)
-        input.setAttribute('aria-label', ariaLabel as unknown as string)
-      }
+      input.setAttribute('aria-label', this._config.ariaLabel(index, inputs.length))
     }
 
     this._syncFirstInputMaxLength()
