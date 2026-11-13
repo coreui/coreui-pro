@@ -1065,6 +1065,59 @@ describe('Dialog', () => {
   })
 
   describe('dialog swapping', () => {
+    for (const tag of ['button', 'a']) {
+      it(`should keep an open dialog open when a ${tag === 'a' ? 'link' : 'button'} inside it targets the same dialog`, async () => {
+        const href = tag === 'a' ? ' href="#"' : ''
+        fixtureEl.innerHTML = [
+          '<dialog id="self" class="dialog">',
+          `  <${tag}${href} data-coreui-toggle="dialog" data-coreui-target="#self">Again</${tag}>`,
+          '</dialog>'
+        ].join('')
+
+        const dialogEl = fixtureEl.querySelector('#self')
+        const selfTrigger = dialogEl.querySelector(tag)
+        const shown = new Promise(resolve => {
+          dialogEl.addEventListener('shown.coreui.dialog', resolve, { once: true })
+        })
+
+        const hideSpy = jasmine.createSpy('hide')
+        dialogEl.addEventListener('hide.coreui.dialog', hideSpy)
+
+        Dialog.getOrCreateInstance(dialogEl).show()
+        await shown
+
+        const click = new MouseEvent('click', { bubbles: true, cancelable: true })
+        selfTrigger.dispatchEvent(click)
+        await new Promise(resolve => {
+          setTimeout(resolve, 50)
+        })
+
+        expect(dialogEl.open).toBeTrue()
+        expect(hideSpy).not.toHaveBeenCalled()
+        expect(click.defaultPrevented).toBe(tag === 'a')
+      })
+    }
+
+    it('should keep a dialog open from the markup open when a trigger inside it targets it', async () => {
+      fixtureEl.innerHTML = [
+        '<dialog id="self" class="dialog" open>',
+        '  <button data-coreui-toggle="dialog" data-coreui-target="#self">Again</button>',
+        '</dialog>'
+      ].join('')
+
+      const dialogEl = fixtureEl.querySelector('#self')
+      const hideSpy = jasmine.createSpy('hide')
+      dialogEl.addEventListener('hide.coreui.dialog', hideSpy)
+
+      dialogEl.querySelector('button').click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(dialogEl.open).toBeTrue()
+      expect(hideSpy).not.toHaveBeenCalled()
+    })
+
     it('should swap dialogs when trigger is inside an open dialog', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

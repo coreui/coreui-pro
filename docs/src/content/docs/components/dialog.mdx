@@ -168,6 +168,8 @@ Add `.dialog-scrollable` — the header and footer stay fixed while the dialog b
 
 When a trigger sits inside an open dialog, the component swaps to the target dialog seamlessly — the backdrop stays up without flashing. The swap fires `show.coreui.dialog` on the target and `hide.coreui.dialog` on the open dialog before it changes either one; when a handler cancels either event, or one of the two dialogs is still opening or closing, the open dialog stays as it is.
 
+A trigger inside an open dialog that targets that same dialog leaves it open. Close it with `data-coreui-dismiss="dialog"`.
+
 <Example code={`<dialog class="dialog" id="exampleDialogToggle" aria-labelledby="exampleDialogToggleLabel">
     <div class="dialog-header">
       <h5 class="dialog-title" id="exampleDialogToggleLabel">Dialog 1</h5>
@@ -285,7 +287,7 @@ Be sure to add `aria-labelledby="..."`, referencing the dialog title, to the `<d
 
 ### Via data attributes
 
-Set `data-coreui-toggle="dialog"` on a controller element, like a button, along with a `data-coreui-target="#foo"` or `href="#foo"` to target a specific dialog to toggle. Dismiss from within with `data-coreui-dismiss="dialog"`.
+Set `data-coreui-toggle="dialog"` on a controller element, like a button, along with a `data-coreui-target="#foo"` or `href="#foo"` to target a specific dialog to toggle. A trigger inside the open dialog it targets leaves it open; dismiss from within with `data-coreui-dismiss="dialog"`.
 
 ### Via JavaScript
 

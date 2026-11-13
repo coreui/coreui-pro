@@ -136,7 +136,14 @@ class Dialog extends DialogBase<DialogConfig> {
 
     // A trigger inside an open dialog swaps to the target one
     const currentDialog = trigger.closest<HTMLDialogElement>('dialog[open]')
-    const currentInstance = currentDialog && currentDialog !== target ? Dialog.getInstance(currentDialog) : null
+
+    // A trigger inside the open dialog that targets the same dialog has
+    // nothing to swap to. Keep the dialog open instead of toggling it closed.
+    if (currentDialog === target) {
+      return
+    }
+
+    const currentInstance = currentDialog ? Dialog.getInstance(currentDialog) : null
 
     if (!currentDialog || !currentInstance) {
       EventHandler.one(target, EVENT_SHOW, showEvent => {
