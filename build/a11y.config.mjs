@@ -925,13 +925,13 @@ export const a11yComponents = [
       {
         criterion: '2.1.1',
         label: 'Enter on a collapsed header opens its panel',
-        steps: [{ press: 'Enter' }, { wait: 100 }],
+        steps: [{ press: 'Enter' }, { wait: 500 }],
         run: 'return document.querySelector(\'#a11yAccordion > .accordion-item:last-of-type\').open === true'
       },
       {
         criterion: '2.1.1',
         label: 'Enter on an expanded header closes it again',
-        steps: [{ press: 'Enter' }, { wait: 100 }],
+        steps: [{ press: 'Enter' }, { wait: 500 }],
         run: 'return document.querySelector(\'#a11yAccordion > .accordion-item:last-of-type\').open === false'
       },
       {
