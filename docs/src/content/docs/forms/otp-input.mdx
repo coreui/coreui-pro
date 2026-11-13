@@ -356,7 +356,7 @@ The one-time password input component is designed with accessibility in mind and
 
 ### Customizing accessibility
 
-Each slot is named `Character N of M` by default, next to the name of the group. Pass `ariaControlLabel` to translate it or to name the slots differently.
+Each slot is named `Character N of M` by default, next to the name of the group. Pass `ariaControlLabel` to translate it or to name the slots differently. The plugin writes these names on every slot when it starts, over an `aria-label` written on a slot in the markup, so set them through the option.
 
 ```javascript
 const otp = new coreui.OTPInput(element, {
