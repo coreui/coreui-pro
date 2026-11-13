@@ -99,14 +99,14 @@ Seed either end with `data-coreui-start-date` and `data-coreui-end-date`; a stri
 
 ## Min and max dates
 
-`minDate` and `maxDate` constrain both ends. A completed date outside the range gets the `.is-invalid` class on its own field and that end reports `null` until the value is corrected.
+`minDate` and `maxDate` constrain both ends. A completed date outside the range gets the `.is-invalid` class on its own field at once and blocks the submit, whether the range is required or not, with the browser's message for the limit, and that end reports `null` until the value is corrected.
 
 <Example pro code={`<label class="form-label" id="dateRangeInputDatesInJuly2026Label">Dates in July 2026</label>
   <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31" aria-labelledby="dateRangeInputDatesInJuly2026Label"></div>`} />
 
 ## Disabled dates
 
-Beyond a simple range, `disabledDates` excludes specific dates from both ends — single `Date`s, `[start, end]` ranges, or a matcher function. As in the [date input](/forms/date-input/#disabled-dates), a completed date that hits a disabled entry gets `.is-invalid` and that end reports `null`.
+Beyond a simple range, `disabledDates` excludes specific dates from both ends — single `Date`s, `[start, end]` ranges, or a matcher function. As in the [date input](/forms/date-input/#disabled-dates), a completed date that hits a disabled entry gets `.is-invalid` and blocks the submit, and that end reports `null`. The browser shows the message it gives an empty field, so give your own hint next to the range and link it with `aria-describedby`.
 
 In this example July 4–7 and July 16 can't be entered — try typing one of them:
 
@@ -140,17 +140,16 @@ The token parser covers dayjs, moment, date-fns, and luxon format strings, so yo
 
 ## Validation
 
-The frame shows the state of the range and each field shows its own, the way the [form plugin](/forms/validation/) does for a native field. Each end keeps its value in a `<textarea>` laid invisibly over its field, which takes part in native constraint validation: a `required` end that is empty, incomplete or holds a rejected date blocks the submit, and the browser, or the [form plugin](/forms/validation/#usage), puts focus on its first empty section.
+The frame shows the state of the range and each field shows its own, the way the [form plugin](/forms/validation/) does for a native field. Each end keeps its value in a `<textarea>` laid invisibly over its field, which takes part in native constraint validation: a `required` end that is empty or incomplete blocks the submit, and the browser, or the [form plugin](/forms/validation/#usage), puts focus on its first empty section. Each end also has a hidden, unnamed control before its value field, which blocks the submit while the end holds a date the limits reject or lies before the start, see [Blocking the submit](#blocking-the-submit).
 
 The state comes from these places, in this order:
 
-- The order: an end before the start is a state of the range, not of either date, so `.is-invalid` lands on the frame and both fields stay editable. Every section of both fields carries `aria-invalid="true"` until the order is fixed, and neither field is drawn valid meanwhile, whatever else is set. `isRangeValid()` reports it.
-- The limits: a completed date outside `minDate`/`maxDate`/`disabledDates` makes its own field invalid, which the frame picks up, and that field's value field submits no date until it is corrected. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
-- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`, a verdict on the whole range that lands on the frame and on both ends.
-- An `.is-invalid` or `.is-valid` class written on the frame in the markup, for example by a server that has already checked the range. It is read once, when the component starts.
-- A validation that reports a field (a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well), and in a form with `data-coreui-validate` the `:user-invalid` state of each value field, with `data-coreui-validate="valid"` also its `:user-valid` state, as for the [date input](/forms/date-input/#validation).
+- The order: an end before the start is a state of the range, not of either date, so it lands on the frame and both fields stay editable. The frame shows `.is-invalid` at once, in any form, as it always did, and the order now also blocks the submit; after a blocked submit in a form with `data-coreui-validate` the end field takes the class as well, with no visible difference. Every section of both fields carries `aria-invalid="true"` until the order is fixed, and neither field is drawn valid meanwhile, whatever else is set. `isRangeValid()` reports it.
+- The limits: a completed date outside `minDate`/`maxDate`/`disabledDates` makes its own field invalid at once, which the frame picks up, and that field's value field submits no date until it is corrected. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`, a verdict on the whole range that lands on the frame and on both ends. In the markup, for example from a server that has already checked the range, set it with `data-coreui-validation-state`.
+- A validation that reports a field (a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well) where the [date input](/forms/date-input/#validation) shows it, and in a form with `data-coreui-validate` the `:user-invalid` state of each value field, with `data-coreui-validate="valid"` also its `:user-valid` state, as for the [date input](/forms/date-input/#validation).
 
-A state you give, with the option or with the class, is a verdict on the range it was given for, so the next change the user makes to either end drops it from both ends and the frame. A change your own code makes, with `setRange()`, `clear()` or `reset()`, keeps it. To set it again, call `setValidationState()`: it updates the state without rebuilding the fields and replaces a class written on the frame. A class or an `aria-invalid` written on the frame after the component starts is not read. While the given state is `'invalid'`, both ends block the submit with the text of the message after the frame, or `Invalid value.` when there is none, unless the range is disabled or read-only. A native form reset returns both ends to the dates they were created with and drops the state; a `reset` listener that calls `preventDefault()` cancels the whole reset.
+A state you give stays on both ends and the frame until you change it: the user's edits, a native form reset and a change your own code makes, with `setRange()`, `clear()` or `reset()`, keep it. An edit that changes a date fires `startDateChange.coreui.date-range-input` or `endDateChange.coreui.date-range-input`, so to clear the state when the user changes the range, call `setValidationState(null)` in a listener for both. A listener there also clears the state on a native form reset and on `clear()` and `reset()`, which fire these events when they change a date; `setRange()`, `setStartDate()` and `setEndDate()` fire them only with `triggerChange`. To change it, call `setValidationState()`: it updates the state without rebuilding the fields. A `.is-invalid` or `.is-valid` class or an `aria-invalid` written on the frame is not read, at start or later; the class stays yours and paints the frame without giving the sections `aria-invalid` or a linked message, also next to the `.is-invalid` an end before the start draws, see [Form components](/forms/validation/#form-components). A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field of an end, `form.elements[startName]` or `form.elements[endName]`, see [Form components](/forms/validation/#form-components). A native form reset returns both ends to the dates they were created with and keeps the state; a `reset` listener that calls `preventDefault()` cancels the whole reset.
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control. The error shows when the frame is invalid and when a field inside it is, which is where the state of a single date lands; the success message waits until nothing is invalid. While a field is invalid, the error message describes each of its sections.
 
@@ -173,7 +172,7 @@ Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other fo
 
 ### Blocking the submit
 
-A `required` end that is empty, incomplete or rejected by the limits blocks the submit by itself. An end before the start does not, since both ends hold dates the browser accepts, and neither does an optional end that is empty, incomplete or rejected, which submits no date. Check the range in your `submit` listener; `getStartDate()` and `getEndDate()` return `null` for an end that is empty, incomplete or rejected, so one condition covers both:
+A `required` end that is empty or incomplete blocks the submit by itself. An end holding a date the limits reject blocks it whether it is required or not, and so does an end before the start: the browser's message for it names the start date, and the focus goes to its first section. An optional end that is empty or incomplete does not block, and submits no date. In a form with `novalidate` the browser blocks none of these, so to ask for both dates without `required`, or to check the range there, check it in your `submit` listener; `getStartDate()` and `getEndDate()` return `null` for an end that is empty, incomplete or rejected, so one condition covers both:
 
 ```js
 const element = document.querySelector('#stayRange')
@@ -311,7 +310,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `autofocus` | boolean | `false` | Focus the first section of the start date right after initialization |
 | `dayPlaceholder` | string, null | `null` | Replaces the `DD` the day section shows while it is empty. |
 | `disabled` | boolean | `false` | Disable both ends |
-| `disabledDates` | array, date, function, null | `null` | Dates (or a matcher function) neither end can hold |
+| `disabledDates` | array, date, function, null | `null` | Dates (or a matcher function) neither end can hold. An end holding one blocks the submit, see [Disabled dates](#disabled-dates). |
 | `endDate` | date, string, null | `null` | Initial end date |
 | `endFloatingLabel` | string, null | `null` | Floating label of the end field |
 | `endName` | string, null | `null` | Name of the value input carrying the end date. Without it the end date is not submitted with the form. |
@@ -320,9 +319,9 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
 | `inputOptions` | object | `{}` | Extra options passed to both date inputs, except `validationState`: the range gives the state to both. |
 | `locale` | string | browser locale | Locale used to derive the masks and month names |
-| `maxDate` | date, string, null | `null` | Latest date either end can hold |
+| `maxDate` | date, string, null | `null` | Latest date either end can hold. An end after it blocks the submit, see [Validation](#validation). |
 | `meridiemPlaceholder` | string, null | `null` | Replaces the `AM` the meridiem section shows while it is empty. |
-| `minDate` | date, string, null | `null` | Earliest date either end can hold |
+| `minDate` | date, string, null | `null` | Earliest date either end can hold. An end before it blocks the submit, see [Validation](#validation). |
 | `minutePlaceholder` | string, null | `null` | Replaces the `mm` the minute section shows while it is empty. |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`) |
 | `monthPlaceholder` | string, null | `null` | Replaces the `MM` the month section shows while it is empty. |
@@ -340,7 +339,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `startFloatingLabel` | string, null | `null` | Floating label of the start field |
 | `startName` | string, null | `null` | Name of the value input carrying the start date. Without it the start date is not submitted with the form. |
 | `type` | string | `'date'` | Which sections the locale-derived layout carries on both ends: `'date'` or `'datetime'`. A `format` names the sections itself and overrides this. |
-| `validationState` | string, null | `null` | The validation state of the range, shown on the frame and on both ends: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change the user makes to either end clears it, see [Validation](#validation). |
+| `validationState` | string, null | `null` | The validation state of the range, shown on the frame and on both ends: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` does not block the submit. It stays until you change it, see [Validation](#validation). |
 | `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
 | `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |
 
@@ -352,8 +351,8 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `getEndDate` | Return the end date, or `null` when that end is incomplete or invalid |
 | `getStartDate` | Return the start date, or `null` when that end is incomplete or invalid |
 | `isDateSelectable` | Whether a date passes the shared limits |
-| `isRangeValid` | `false` while the end is before the start |
-| `reset` | Restore the dates the component was created with, emitting the change events when a value moves. A native form reset does the same and also drops a given validation state. |
+| `isRangeValid` | `false` while the end is before the start, which blocks the submit |
+| `reset` | Restore the dates the component was created with, emitting the change events when a value moves. A native form reset does the same; a given validation state stays. |
 | `setEndDate(date, triggerChange)` | Sets the end date and keeps the start, without an event by default; pass `true` as `triggerChange` to fire the events a date the user gives through another control would. |
 | `setValidationState(state)` | Gives the component a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
 | `setStartDate(date, triggerChange)` | Sets the start date and keeps the end, without an event by default; pass `true` as `triggerChange` to fire the events a date the user gives through another control would. |

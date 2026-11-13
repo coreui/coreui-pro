@@ -82,7 +82,7 @@ Set the initial time with the `data-coreui-date` attribute — a time string lik
 
 ## Min and max times
 
-Constrain the selectable range with `minDate` and `maxDate` — time strings work here too. A completed time outside the range gets the `.is-invalid` class and the component reports `null`, and submits no time, until the value is corrected.
+Constrain the selectable range with `minDate` and `maxDate` — time strings work here too. A completed time outside the range blocks the submit, whether the field is required or not, with the browser's own message, which names the limit, as for a native `<input type="time">` with `min` and `max`. The field gets the `.is-invalid` class at once, and the component reports `null`, and submits no time, until the value is corrected.
 
 <Example pro code={`<label class="form-label" id="timeInputBusinessHours09001700Label">Business hours (09:00–17:00)</label>
   <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30"
@@ -104,14 +104,14 @@ The built-in token parser covers dayjs, moment, date-fns, and luxon format strin
 
 ## Validation
 
-The field takes its validation state [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` makes it invalid whatever else is set, then the `validationState` option or an `.is-invalid`/`.is-valid` class written on the element in the markup, then a validation that reported the field, and in a form with `data-coreui-validate` the `:user-invalid` state of its value field, with `data-coreui-validate="valid"` also its `:user-valid` state. A given state drops on the next change the user makes to the time and stays through changes your code makes; `setValidationState()` sets it again without re-rendering the field. A given `'invalid'` blocks the submit with the text of the linked message, or `Invalid value.` when there is none. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control, and while the field is invalid the error message describes every section.
+The field takes its validation state [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` makes it invalid whatever else is set and blocks the submit through a hidden, unnamed control before the value field, shown at once in any form, then the `validationState` option, `data-coreui-validation-state` in the markup, then a validation that reported the field where the date input shows it, and in a form with `data-coreui-validate` the `:user-invalid` state of its value field, with `data-coreui-validate="valid"` also its `:user-valid` state. A given state stays until you change it, through the user's edits, a native form reset and changes your code makes. Every edit that changes the time fires `timeChange.coreui.time-input`, so to clear the state then, call `setValidationState(null)` in a `timeChange.coreui.time-input` listener. A listener there also clears the state on a native form reset and on `clear()` and `reset()`, which fire `timeChange.coreui.time-input` when they change the time; `setDate()` fires it only with `triggerChange`. `setValidationState()` changes the state without re-rendering the field. A `.is-invalid` or `.is-valid` class written on the element is not read and stays yours, see [Form components](/forms/validation/#form-components). A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field, `form.elements[name]`, see [Form components](/forms/validation/#form-components). Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control, and while the field is invalid the error message describes every section.
 
 <Example pro code={`<div class="mb-4 form-field">
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30" data-coreui-validation-state="valid"></div>
     <div class="valid-feedback">Looks good!</div>
   </div>
   <div class="form-field">
-    <div class="form-control form-date-time is-invalid" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="12:30"></div>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="12:30" data-coreui-validation-state="invalid"></div>
     <div class="invalid-feedback">The room is taken at this time.</div>
   </div>`} />
 
@@ -199,21 +199,21 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `autofocus` | boolean | `false` | Focus the first section right after initialization |
 | `date` | date, number, string, null | `null` | Initial time — a `Date` or a time string like `'14:30'` |
 | `disabled` | boolean | `false` | Disable the component. |
-| `disabledDates` | array, date, function, null | `null` | Times (or a matcher function) that can't be selected |
+| `disabledDates` | array, date, function, null | `null` | Times (or a matcher function) that can't be selected. A completed time among them blocks the submit, with the message the browser gives an empty field, see [Validation](#validation). |
 | `format` | function, string, null | `null` | Mask layout: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
 | `hourPlaceholder` | string, null | `null` | Replaces the `HH` (`hh` on a 12-hour clock) the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
 | `locale` | string | `'default'` | Locale used to derive the hour cycle and layout |
-| `maxDate` | date, number, string, null | `null` | Latest selectable time |
+| `maxDate` | date, number, string, null | `null` | Latest selectable time. A completed time after it blocks the submit, see [Validation](#validation). |
 | `meridiemPlaceholder` | string, null | `null` | Replaces the `AM` the meridiem section shows while it is empty. |
-| `minDate` | date, number, string, null | `null` | Earliest selectable time |
+| `minDate` | date, number, string, null | `null` | Earliest selectable time. A completed time before it blocks the submit, see [Validation](#validation). |
 | `minutePlaceholder` | string, null | `null` | Replaces the `mm` the minute section shows while it is empty. |
 | `name` | string, null | `null` | Name of the value input the value is submitted under. Without it the field is not submitted with the form. |
 | `readonly` | boolean | `false` | Make the field focusable but non-editable |
 | `required` | boolean | `false` | Required attribute of the value input |
 | `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
 | `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout |
-| `validationState` | string, null | `null` | The validation state the field shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change of the time by the user clears it, see [Validation](#validation). |
+| `validationState` | string, null | `null` | The validation state the field shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` does not block the submit. It stays until you change it, see [Validation](#validation). |
 
 ### Methods
 

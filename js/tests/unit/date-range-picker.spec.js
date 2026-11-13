@@ -3,7 +3,9 @@ import Calendar from '../../src/calendar.js'
 import DateInput from '../../src/date-input.js'
 import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
-import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+import {
+  clearFixture, getFixture, getValueFields, jQueryMock
+} from '../helpers/fixture.js'
 
 describe('DateRangePicker', () => {
   let fixtureEl
@@ -384,7 +386,7 @@ describe('DateRangePicker', () => {
         endDate: new Date(2026, 7, 5)
       })
 
-      const values = [...fixtureEl.querySelectorAll('#picker .form-date-time > textarea')].map(input => input.value)
+      const values = getValueFields(fixtureEl.querySelector('#picker')).map(input => input.value)
       expect(values).toEqual(['Week 29, 2026', 'Week 32, 2026'])
     })
 
@@ -395,7 +397,7 @@ describe('DateRangePicker', () => {
         endDate: new Date(2026, 10, 15)
       })
 
-      const values = [...fixtureEl.querySelectorAll('#picker .form-date-time > textarea')].map(input => input.value)
+      const values = getValueFields(fixtureEl.querySelector('#picker')).map(input => input.value)
       expect(values).toEqual(['Q1 2026', 'Q4 2026'])
     })
   })
@@ -1004,14 +1006,14 @@ describe('DateRangePicker', () => {
     const sectionStates = () => [...fixtureEl.querySelectorAll('.form-date-time-section')]
       .map(section => [section.getAttribute('aria-invalid'), section.getAttribute('aria-describedby')])
 
-    it('should take a state class the markup carries on the picker element as the given state of both ends, with the message after it, and block with it', () => {
-      buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div class="form-field"><div id="picker" class="is-invalid"></div><div class="invalid-feedback">Already booked.</div></div></form>')
+    it('should take a state the markup gives on the picker element with a data attribute as the given state of both ends, with the message after it, and let a valid range submit', () => {
+      buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div class="form-field"><div id="picker" data-coreui-validation-state="invalid"></div><div class="invalid-feedback">Already booked.</div></div></form>')
       const { id } = fixtureEl.querySelector('.invalid-feedback')
 
       expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', id]))
       expect(fixtureEl.querySelector('.form-date-range')).toHaveClass('is-invalid')
       expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
     it('should show a state given by the option or by setValidationState on the picker element, with the message after it', () => {
@@ -1022,7 +1024,6 @@ describe('DateRangePicker', () => {
 
       expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
       expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
-      expect(fixtureEl.querySelector('textarea').validationMessage).toEqual('Already booked.')
 
       picker.setValidationState('valid')
       picker.setValidationState('invalid')
@@ -1100,22 +1101,21 @@ describe('DateRangePicker', () => {
       expect(element).toHaveClass('is-valid')
     })
 
-    it('should treat what the page does in a change listener during a template action as a change made by code', () => {
+    it('should keep a given state through a range the page sets in a change listener during a template action', () => {
       const picker = buildPicker({
         endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'invalid'
       }, '<form><div id="picker"></div></form>')
 
       fixtureEl.querySelector('#picker').addEventListener('endDateChange.coreui.date-range-picker', () => {
-        picker.setValidationState('invalid')
         picker.setRange(new Date(2026, 6, 2), new Date(2026, 6, 8))
       }, { once: true })
       picker.getContext().setRange(new Date(2026, 6, 1), new Date(2026, 6, 7))
 
       expect(picker.getStartDate()).toEqual(new Date(2026, 6, 2))
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
-    it('should drop the given state when a template action picks a range, and keep it when code sets one', () => {
+    it('should keep the given state when a template action picks a range and when code sets one', () => {
       const picker = buildPicker({
         endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'invalid'
       }, '<form><div id="picker"></div></form>')
@@ -1123,13 +1123,13 @@ describe('DateRangePicker', () => {
 
       picker.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21))
 
-      expect(form.checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
 
       picker.getContext().setRange(new Date(2026, 6, 1), new Date(2026, 6, 7))
 
       expect(form.checkValidity()).toBeTrue()
-      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
-      expect(fixtureEl.querySelector('#picker')).not.toHaveClass('is-invalid')
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
+      expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
     })
 
     it('should take no state from a class or an aria-invalid the page writes on the picker element', async () => {
@@ -1141,21 +1141,13 @@ describe('DateRangePicker', () => {
       expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => [null, null]))
     })
 
-    it('should let the valid option win over a class the markup carries', () => {
-      buildPicker({
-        endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), valid: true
-      }, '<div id="picker" class="is-invalid"></div>')
-
-      expect(fixtureEl.querySelector('.form-date-range')).toHaveClass('is-valid')
-      expect(fixtureEl.querySelector('#picker')).not.toHaveClass('is-invalid')
-    })
-
-    it('should keep the fields invalid while the end is before the start after the user drops the given state', () => {
-      buildPicker({ endDate: new Date(2026, 6, 14), locale: 'en-US', startDate: new Date(2026, 6, 20) }, '<div id="picker" class="is-invalid"></div>')
+    it('should keep the fields invalid while the end is before the start once the page clears the given state after a change of the user', () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 14), locale: 'en-US', startDate: new Date(2026, 6, 20) }, '<div id="picker" data-coreui-validation-state="invalid"></div>')
 
       const [day] = fixtureEl.querySelectorAll('[data-coreui-range-end] .form-date-time-section')
       day.focus()
       day.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+      picker.setValidationState(null)
 
       expect(sectionStates()).toHaveSize(6)
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
@@ -1180,24 +1172,24 @@ describe('DateRangePicker', () => {
         month.focus()
         month.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
       }]
-    ])('should drop the given state from both ends and the frame when the user %s', (_, act) => {
-      for (const markup of ['class="is-invalid"', 'data-coreui-invalid="true"']) {
+    ])('should keep the given state on both ends and the frame when the user %s', (_, act) => {
+      for (const markup of ['data-coreui-validation-state="invalid"', 'data-coreui-invalid="true"']) {
         const picker = buildPicker({ endDate: new Date(2026, 6, 24), locale: 'en-US', startDate: new Date(2026, 6, 14) }, `<form><div id="picker" ${markup}></div></form>`)
 
         act(picker)
 
         expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
-        expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
-        expect(fixtureEl.querySelector('.form-date-range')).not.toHaveClass('is-invalid')
+        expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
+        expect(fixtureEl.querySelector('.form-date-range')).toHaveClass('is-invalid')
         picker.dispose()
       }
     })
 
     it.each([
-      ['drop the given state through a native form reset', false],
+      ['keep the given state through a native form reset', false],
       ['keep the given state when a reset listener cancels the reset', true]
     ])('should %s', async (_, cancel) => {
-      buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker" class="is-invalid"></div></form>')
+      buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker" data-coreui-validation-state="invalid"></div></form>')
       const form = fixtureEl.querySelector('form')
 
       form.addEventListener('reset', event => {
@@ -1210,9 +1202,9 @@ describe('DateRangePicker', () => {
         setTimeout(resolve, 20)
       })
 
-      expect(fixtureEl.querySelector('#picker').classList.contains('is-invalid')).toEqual(cancel)
-      expect(fixtureEl.querySelector('.form-date-range').classList.contains('is-invalid')).toEqual(cancel)
-      expect(form.checkValidity()).toEqual(!cancel)
+      expect(fixtureEl.querySelector('#picker').classList.contains('is-invalid')).toBeTrue()
+      expect(fixtureEl.querySelector('.form-date-range').classList.contains('is-invalid')).toBeTrue()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it('should show the restored order to the date change listeners of a native reset', async () => {
@@ -1236,7 +1228,7 @@ describe('DateRangePicker', () => {
     })
 
     it('should keep a state the page gives the picker after a native reset started', async () => {
-      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker" class="is-valid"></div></form>')
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker" data-coreui-validation-state="valid"></div></form>')
 
       fixtureEl.querySelector('form').reset()
       picker.setValidationState('invalid')
@@ -1245,23 +1237,22 @@ describe('DateRangePicker', () => {
       })
 
       expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it('should change the state through setValidationState and keep it through changes made by code', () => {
       const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker"></div></form>')
-      const form = fixtureEl.querySelector('form')
 
       picker.setValidationState('invalid')
       picker.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21))
       picker.clear()
       picker.reset()
 
-      expect(form.checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
 
       picker.setValidationState(null)
 
-      expect(form.checkValidity()).toBeTrue()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
     })
   })
 

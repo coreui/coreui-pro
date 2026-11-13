@@ -1,8 +1,10 @@
 import { userEvent } from 'vitest/browser'
 import { vi } from 'vitest'
 import FieldValidation from '../../../src/util/field-validation.js'
-import { nextStateSerial, updateValidationState } from '../../../src/util/form-validation.js'
+import { updateValidationState } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
+
+const VALIDATING = ' data-coreui-validate'
 
 describe('FieldValidation', () => {
   let fixtureEl
@@ -12,8 +14,10 @@ describe('FieldValidation', () => {
     setTimeout(resolve)
   })
 
-  const mount = ({ attributes = '', classes = '', config = {}, root = null, targetClasses = '', ...options } = {}) => {
-    const markup = `<form><div id="host" class="form-control-group${classes}"${attributes}><textarea name="value"></textarea><span id="target" class="${targetClasses}"></span><span id="second"></span></div><div class="invalid-feedback" id="feedback">Fix it.</div></form>`
+  const mount = ({
+    attributes = '', classes = '', config = {}, form = '', root = null, ...options
+  } = {}) => {
+    const markup = `<form${form}><div id="host" class="form-control-group${classes}"${attributes}><textarea name="value"></textarea><span id="target"></span><span id="second"></span></div><div class="invalid-feedback" id="feedback">Fix it.</div></form>`
     const container = root ?? fixtureEl
 
     container.innerHTML = markup
@@ -72,25 +76,90 @@ describe('FieldValidation', () => {
   })
 
   describe('a given state', () => {
-    it('should take a state class from the markup as the given state, block with it and give it back on dispose', () => {
-      const { field, host, validation } = mount({ classes: ' is-invalid' })
+    it('should not take a state class from the markup as the given state, and leave it through a given state and dispose', () => {
+      const { host, state, targets, validation } = mount({ classes: ' is-invalid' })
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
-      expect(field.validationMessage).toBe('Fix it.')
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual([null, null])
+      expect(targets.map(describedBy)).toEqual([null, null])
+
+      state.config.validationState = 'invalid'
+      validation.update()
+
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+
+      state.config.validationState = null
+      validation.update()
+
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual([null, null])
 
       validation.dispose()
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
-      expect(field.validity.customError).toBe(false)
+    })
+
+    it('should take off the class it drew when the state goes, also after the page wrote the same class', () => {
+      const { host, state, validation } = mount({ config: { validationState: 'invalid' } })
+
+      host.classList.add('is-invalid')
+      state.config.validationState = null
+      validation.update()
+
+      expect(stateClasses(host)).toEqual([])
+    })
+
+    it('should take off on dispose the class it drew, also after the page wrote the same class', () => {
+      const { host, validation } = mount({ config: { validationState: 'invalid' } })
+
+      host.classList.add('is-invalid')
+      validation.dispose()
+
+      expect(stateClasses(host)).toEqual([])
     })
 
     it('should draw the state on the frames, aria-invalid on the targets and the feedback in their description', () => {
-      const { field, host, targets } = mount({ config: { validationState: 'invalid' } })
+      const { host, targets } = mount({ config: { validationState: 'invalid' } })
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
       expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
       expect(targets.map(describedBy)).toEqual(['feedback', 'feedback'])
-      expect(field.form.checkValidity()).toBe(false)
+    })
+
+    it('should draw a given invalid without a custom validity on the value fields, so the form submits', () => {
+      for (const config of [{ validationState: 'invalid' }, { readonly: true, validationState: 'invalid' }]) {
+        const { field, form, host, targets } = mount({ config })
+
+        expect(stateClasses(host)).toEqual(['is-invalid'])
+        expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+        expect(targets.map(describedBy)).toEqual(['feedback', 'feedback'])
+        expect(field.validity.customError).toBe(false)
+        expect(form.checkValidity()).toBe(true)
+      }
+    })
+
+    it('should leave a custom validity the page set on a value field through a given state, a redraw, an input of the user and dispose', () => {
+      const { field, form, state, validation } = mount()
+      const blocks = () => [field.validationMessage, form.checkValidity()]
+
+      field.setCustomValidity('Taken.')
+      state.config.validationState = 'invalid'
+      validation.update()
+
+      expect(blocks()).toEqual(['Taken.', false])
+
+      validation.update()
+
+      expect(blocks()).toEqual(['Taken.', false])
+
+      field.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(state.config.validationState).toBe('invalid')
+      expect(blocks()).toEqual(['Taken.', false])
+
+      validation.dispose()
+
+      expect(blocks()).toEqual(['Taken.', false])
     })
 
     it('should give the description the page gave the host to the first target, and to every target while invalid', () => {
@@ -168,40 +237,15 @@ describe('FieldValidation', () => {
       expect(targets.some(target => target.hasAttribute('aria-invalid') || target.hasAttribute('aria-describedby'))).toBe(false)
     })
 
-    it('should block only the fields that carry the block, and show the state without a field to carry it', () => {
-      const { field, host } = mount({ blockers: () => [], config: { validationState: 'invalid' } })
-
-      expect(stateClasses(host)).toEqual(['is-invalid'])
-      expect(field.validity.customError).toBe(false)
-    })
-
-    it('should not block while the component is disabled, or while it says it cannot', () => {
-      const disabled = mount({ config: { disabled: true, validationState: 'invalid' } })
-
-      expect(stateClasses(disabled.host)).toEqual(['is-invalid'])
-      expect(disabled.field.validity.customError).toBe(false)
-
-      const { field, host } = mount({ canBlock: () => false, config: { validationState: 'invalid' } })
-
-      expect(stateClasses(host)).toEqual(['is-invalid'])
-      expect(field.validity.customError).toBe(false)
-    })
-
-    it('should block for a component without a say on blocking, whatever other keys its configuration holds', () => {
-      const { field } = mount({ config: { readonly: true, validationState: 'invalid' } })
-
-      expect(field.validity.customError).toBe(true)
-    })
-
-    it('should take the message from the first field that carries the block, and show invalid over valid', async () => {
-      fixtureEl.innerHTML = '<form data-coreui-validate="valid"><div id="host" class="form-control-group"><input id="first"><textarea id="second" required data-coreui-invalid-feedback="named"></textarea><span id="target"></span></div><div id="named" class="invalid-feedback">Named.</div><div class="invalid-feedback">Structural.</div></form>'
+    it('should take the message from the first value field, and show invalid over valid', async () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate="valid"><div id="host" class="form-control-group"><input id="first" data-coreui-invalid-feedback="named"><textarea id="second" required></textarea><span id="target"></span></div><div id="named" class="invalid-feedback">Named.</div><div class="invalid-feedback">Structural.</div></form>'
       const host = fixtureEl.querySelector('#host')
       const first = host.querySelector('#first')
       const second = host.querySelector('#second')
       const target = host.querySelector('#target')
       const state = { config: { validationState: 'invalid' } }
       const validation = new FieldValidation(host, {
-        blockers: () => [second], config: () => state.config, fields: () => [first, second], frames: () => [host], invalidTargets: () => [target]
+        config: () => state.config, fields: () => [first, second], frames: () => [host], invalidTargets: () => [target]
       })
 
       controllers.push(validation)
@@ -212,7 +256,7 @@ describe('FieldValidation', () => {
       await userEvent.type(first, 'x')
       await userEvent.tab()
       state.config.validationState = null
-      validation.configure()
+      validation.update()
 
       expect(stateClasses(host)).toEqual(['is-valid'])
 
@@ -223,7 +267,7 @@ describe('FieldValidation', () => {
 
     it('should show an error of its own as invalid over a given state, without blocking', () => {
       let hasError = true
-      const { field, form, host, state, targets, validation } = mount({ config: { validationState: 'valid' }, ownError: () => hasError })
+      const { field, form, host, state, targets, validation } = mount({ config: { validationState: 'valid' }, form: VALIDATING, ownError: () => hasError })
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
       expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
@@ -238,8 +282,8 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
-    it('should take the state of its owners after its own, mark the owner\'s error without the class, and tell the owners every drop', () => {
-      const { field, host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"' })
+    it('should take the state of its owners after its own and mark the owner\'s error without the class', () => {
+      const { host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"' })
       const range = mountOwner({ frames: true })
       const picker = mountOwner({ config: { validationState: 'invalid' } })
 
@@ -248,7 +292,7 @@ describe('FieldValidation', () => {
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
       expect(stateClasses(range.host)).toEqual(['is-invalid'])
-      expect(field.validity.customError).toBe(true)
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
 
       state.config.validationState = 'valid'
       validation.update()
@@ -263,30 +307,32 @@ describe('FieldValidation', () => {
       expect(targets.map(describedBy)).toEqual(['hint feedback', 'hint feedback'])
 
       range.state.error = false
-      validation.dismiss()
+      state.config.validationState = null
+      validation.update()
 
-      expect([state.config.validationState, picker.state.config.validationState]).toEqual([null, null])
-      expect(stateClasses(host)).toEqual([])
-      expect(stateClasses(range.host)).toEqual([])
-      expect(field.validity.customError).toBe(false)
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(stateClasses(range.host)).toEqual(['is-invalid'])
     })
 
-    it('should drop the state from itself up to the owner whose user action it changes in, and draw the tree from the top', () => {
-      const { host, validation } = mount()
+    it('should keep the states given to it and its owners through an input of the user, and draw the tree from the top', () => {
+      const { field, host, state, validation } = mount({ config: { validationState: 'warning' } })
       const range = mountOwner({ config: { validationState: 'invalid' }, frames: true })
       const picker = mountOwner({ config: { validationState: 'invalid' }, frames: true })
 
       picker.validation.adopt(range.validation)
       range.validation.adopt(validation)
-      validation.change()
+      field.dispatchEvent(new Event('input', { bubbles: true }))
+      field.dispatchEvent(new Event('change', { bubbles: true }))
 
-      expect(stateClasses(range.host)).toEqual(['is-invalid'])
+      expect([state.config.validationState, range.state.config.validationState, picker.state.config.validationState]).toEqual(['warning', 'invalid', 'invalid'])
+      expect([host, range.host, picker.host].map(stateClasses)).toEqual([['is-warning'], ['is-invalid'], ['is-invalid']])
 
-      picker.validation.runAsUser(() => validation.change())
+      state.config.validationState = null
+      range.state.config.validationState = null
+      picker.state.config.validationState = 'valid'
+      validation.update()
 
-      expect([range.state.config.validationState, picker.state.config.validationState]).toEqual([null, null])
-      expect([host, range.host, picker.host].map(stateClasses)).toEqual([[], [], []])
-      expect(picker.validation.userAction).toBe(false)
+      expect([host, range.host, picker.host].map(stateClasses)).toEqual([['is-valid'], ['is-valid'], ['is-valid']])
 
       range.state.error = true
       validation.update()
@@ -373,12 +419,8 @@ describe('FieldValidation', () => {
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
 
-      validation.runAsUser(() => validation.change())
-
-      expect(state.config).toEqual({ invalid: false, valid: false, validationState: null })
-
-      state.config.valid = true
-      validation.configure()
+      state.config.invalid = false
+      validation.update()
 
       expect(stateClasses(host)).toEqual(['is-valid'])
     })
@@ -412,17 +454,6 @@ describe('FieldValidation', () => {
   })
 
   describe('what it writes', () => {
-    it('should take the state classes of every server source and give each its own back', () => {
-      const { host, targets, validation } = mount({ classes: ' is-valid', targetClasses: 'is-invalid', serverClassSources: () => [fixtureEl.querySelector('#host'), fixtureEl.querySelector('#target')] })
-
-      expect(stateClasses(targets[0])).toEqual([])
-
-      validation.dispose()
-
-      expect(stateClasses(host)).toEqual(['is-valid'])
-      expect(stateClasses(targets[0])).toEqual(['is-invalid'])
-    })
-
     it('should add its ids after the ones someone else put on a target, and take back only its own', () => {
       const { field, host, state, targets, validation } = mount({ attributes: ' aria-describedby="hint"' })
 
@@ -471,7 +502,7 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
-    it('should block with the message the stylesheet shows next to the state class it draws', () => {
+    it('should describe the field with the message the stylesheet shows next to the state class it draws', () => {
       fixtureEl.innerHTML = '<form><div id="host"><div><textarea></textarea></div></div><div class="invalid-feedback" id="feedback">Fix it.</div></form>'
       const host = fixtureEl.querySelector('#host')
       const field = host.querySelector('textarea')
@@ -482,25 +513,10 @@ describe('FieldValidation', () => {
       controllers.push(validation)
       validation.refresh()
 
-      expect(field.validationMessage).toBe('Fix it.')
       expect(describedBy(field)).toBe('feedback')
     })
 
-    it('should block with a message the page linked through its description', () => {
-      fixtureEl.innerHTML = '<form><div id="host" aria-describedby="error"><textarea></textarea></div></form><div class="invalid-feedback" id="error">Pick one.</div>'
-      const host = fixtureEl.querySelector('#host')
-      const field = host.querySelector('textarea')
-      const validation = new FieldValidation(host, {
-        config: () => ({ validationState: 'invalid' }), fields: () => [field], frames: () => [host], invalidTargets: () => [field]
-      })
-
-      controllers.push(validation)
-      validation.refresh()
-
-      expect(field.validationMessage).toBe('Pick one.')
-    })
-
-    it('should take the message of the first focus target when no field carries the block', () => {
+    it('should take the message of the first focus target when the component has no value field', () => {
       fixtureEl.innerHTML = '<form><div id="host" class="form-control-group"><input id="target" data-coreui-invalid-feedback="named"></div><div id="named" class="invalid-feedback">Named.</div></form>'
       const host = fixtureEl.querySelector('#host')
       const target = host.querySelector('#target')
@@ -516,27 +532,13 @@ describe('FieldValidation', () => {
     })
   })
 
-  describe('configure', () => {
-    it('should draw the stored state in place and forget the state class from the markup', () => {
-      const { host, state, validation } = mount({ classes: ' is-invalid' })
-
-      state.config.validationState = 'valid'
-      validation.configure()
-
-      expect(stateClasses(host)).toEqual(['is-valid'])
-
-      state.config.validationState = null
-      validation.update()
-
-      expect(stateClasses(host)).toEqual([])
-    })
-
+  describe('update', () => {
     it('should draw no state once the given invalid goes, also on a field a validation reported because of it', () => {
       const { field, host, state, targets, validation } = mount({ config: { validationState: 'invalid' } })
 
       field.form.checkValidity()
       state.config.validationState = null
-      validation.configure()
+      validation.update()
 
       expect(field.validity.valid).toBe(true)
       expect(stateClasses(host)).toEqual([])
@@ -545,90 +547,26 @@ describe('FieldValidation', () => {
   })
 
   describe('a change of the value', () => {
-    it('should drop the given state at the first change of a user action and keep a state given after it', () => {
-      const { field, host, state, validation } = mount({ classes: ' is-valid', config: { validationState: 'invalid' } })
+    it('should keep a given state through the input and change events of its value fields, until the page gives another', () => {
+      const { field, host, state, validation } = mount({ config: { validationState: 'invalid' } })
 
-      const changeValue = () => {
-        validation.change()
-        validation.update()
-      }
+      field.value = 'changed'
+      field.dispatchEvent(new Event('input', { bubbles: true }))
+      field.dispatchEvent(new Event('change', { bubbles: true }))
 
-      validation.runAsUser(() => {
-        changeValue()
-        state.config.validationState = 'invalid'
-        changeValue()
-      })
-
+      expect(state.config.validationState).toBe('invalid')
       expect(stateClasses(host)).toEqual(['is-invalid'])
 
-      validation.runAsUser(() => validation.change())
-
-      expect(field.validity.customError).toBe(false)
-      expect(stateClasses(host)).toEqual([])
-    })
-
-    it('should draw the component without the state it dropped, and leave the configuration alone when none was given', () => {
-      const { host, state, validation } = mount({ config: { validationState: 'invalid' } })
-
-      validation.dismiss()
-
-      expect(state.config.validationState).toBeNull()
-      expect(stateClasses(host)).toEqual([])
-
-      state.config.validationState = undefined
-      validation.dismiss()
-
-      expect(state.config.validationState).toBeUndefined()
-    })
-
-    it('should drop a state given before the moment a serial stands for, and keep one given after it', () => {
-      const { host, state, validation } = mount({ config: { validationState: 'invalid' } })
-      const serial = nextStateSerial()
-
-      validation.dismiss(serial)
+      state.config.validationState = null
       validation.update()
 
       expect(stateClasses(host)).toEqual([])
-
-      const later = nextStateSerial()
-
-      state.config.validationState = 'invalid'
-      validation.configure()
-      validation.dismiss(later)
-      validation.update()
-
-      expect(stateClasses(host)).toEqual(['is-invalid'])
-    })
-
-    it('should keep the given state for a change made by code, and end a user action that changed nothing', () => {
-      const { host, validation } = mount({ config: { validationState: 'invalid' } })
-
-      validation.change()
-      validation.runAsUser(() => {})
-      validation.change()
-
-      expect(validation.userAction).toBe(false)
-      expect(stateClasses(host)).toEqual(['is-invalid'])
-    })
-
-    it('should keep a user action open through an inner action that changed nothing, and close it once one changed the value', () => {
-      const { validation } = mount({ config: { validationState: 'invalid' } })
-      const seen = []
-
-      validation.runAsUser(() => {
-        validation.runAsUser(() => {})
-        seen.push(validation.userAction)
-        validation.runAsUser(() => validation.change())
-        seen.push(validation.userAction)
-      })
-
-      expect(seen).toEqual([true, false])
     })
   })
 
   describe('a reported state', () => {
     it('should show it once a validation reports a field', () => {
-      const { field, host } = mount()
+      const { field, host } = mount({ form: VALIDATING })
 
       field.required = true
 
@@ -639,8 +577,24 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
+    it('should draw nothing for a report in a plain form, and draw it once the form shows reported errors', () => {
+      const { field, form, host, targets, validation } = mount()
+
+      field.required = true
+      form.checkValidity()
+
+      expect(stateClasses(host)).toEqual([])
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual([null, null])
+
+      form.setAttribute('data-coreui-validate', '')
+      validation.update()
+
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+    })
+
     it('should carry a report to a field that replaces one at the same position, and stop following one it removed', () => {
-      const { field, host, validation } = mount()
+      const { field, host, validation } = mount({ form: VALIDATING })
       const replacement = document.createElement('textarea')
       let fields = [field]
 
@@ -665,7 +619,7 @@ describe('FieldValidation', () => {
     })
 
     it('should carry a report through partial replacements, and hand a field put in front the follower of a field that is gone', () => {
-      fixtureEl.innerHTML = '<form><div id="host" class="form-control-group"></div></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate><div id="host" class="form-control-group"></div></form>'
       const host = fixtureEl.querySelector('#host')
       const make = (required = true) => {
         const field = document.createElement('textarea')
@@ -698,18 +652,6 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual([])
     })
 
-    it('should lift the block from a field the component no longer lists', () => {
-      const { field, validation } = mount({ config: { validationState: 'invalid' } })
-      const replacement = document.createElement('textarea')
-
-      validation._options.fields = () => [replacement]
-      field.form.append(replacement)
-      validation.refresh()
-
-      expect(field.validity.customError).toBe(false)
-      expect(replacement.validity.customError).toBe(true)
-    })
-
     it('should take over the fields it owns from the form utilities and hand them back on dispose', () => {
       const { field, form, validation } = mount()
 
@@ -726,7 +668,7 @@ describe('FieldValidation', () => {
   })
 
   describe('a native reset', () => {
-    it('should drop a state given before it and restore the value', async () => {
+    it('should keep a given state and restore the value', async () => {
       const restore = vi.fn()
       const { form, host } = mount({ config: { validationState: 'invalid' }, restore })
 
@@ -734,7 +676,29 @@ describe('FieldValidation', () => {
       await tick()
 
       expect(restore).toHaveBeenCalledTimes(1)
-      expect(stateClasses(host)).toEqual([])
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+    })
+
+    it('should lift the block at once and set it again after the restore, or after a cancelled reset', async () => {
+      const calls = []
+      const lift = vi.fn(isLifted => calls.push(['lift', isLifted]))
+      const restore = vi.fn(() => calls.push(['restore']))
+      const { form } = mount({ lift, restore })
+
+      form.reset()
+
+      expect(calls).toEqual([['lift', true]])
+
+      await tick()
+
+      expect(calls).toEqual([['lift', true], ['restore'], ['lift', false]])
+
+      calls.length = 0
+      form.addEventListener('reset', event => event.preventDefault(), { once: true })
+      form.reset()
+      await tick()
+
+      expect(calls).toEqual([['lift', true], ['lift', false]])
     })
 
     it('should answer the reset of its form when another form resets in the same task', async () => {
@@ -748,19 +712,7 @@ describe('FieldValidation', () => {
       await tick()
 
       expect(restore).toHaveBeenCalledTimes(1)
-      expect(stateClasses(host)).toEqual([])
-    })
-
-    it('should draw the dropped state before the value is restored', async () => {
-      const seen = []
-      let onRestore = () => {}
-      const { form, host } = mount({ config: { validationState: 'invalid' }, restore: () => onRestore() })
-
-      onRestore = () => seen.push(stateClasses(host))
-      form.reset()
-      await tick()
-
-      expect(seen).toEqual([[]])
+      expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
     it('should follow a reset while a reset listener that runs before its own builds new fields', async () => {
@@ -770,7 +722,8 @@ describe('FieldValidation', () => {
 
       document.addEventListener('reset', listener, true)
 
-      const { form, host, validation } = mount({ config: { validationState: 'invalid' }, fields })
+      const restore = vi.fn()
+      const { form, host, validation } = mount({ config: { validationState: 'invalid' }, fields, restore })
 
       rebuild = () => {
         const [field] = fields()
@@ -783,7 +736,8 @@ describe('FieldValidation', () => {
       await tick()
       document.removeEventListener('reset', listener, true)
 
-      expect(stateClasses(host)).toEqual([])
+      expect(restore).toHaveBeenCalledTimes(1)
+      expect(stateClasses(host)).toEqual(['is-invalid'])
       expect(form.checkValidity()).toBe(true)
     })
 
@@ -794,7 +748,7 @@ describe('FieldValidation', () => {
 
       document.addEventListener('reset', listener, true)
 
-      const { field, form, host, validation } = mount({ fields })
+      const { field, form, host, validation } = mount({ fields, form: VALIDATING })
 
       field.required = true
       form.checkValidity()
@@ -814,7 +768,7 @@ describe('FieldValidation', () => {
 
     it('should keep a report when a reset listener rebuilds the fields and a later one cancels the reset', async () => {
       const fields = () => [...fixtureEl.querySelectorAll('textarea')]
-      const { field, form, host, validation } = mount({ fields })
+      const { field, form, host, validation } = mount({ fields, form: VALIDATING })
 
       field.required = true
       form.checkValidity()
@@ -844,28 +798,12 @@ describe('FieldValidation', () => {
       expect(errors).toEqual([])
     })
 
-    it('should tell the owner the serial of a reset', async () => {
-      const { form, validation } = mount()
-      const range = mountOwner({ config: { validationState: 'invalid' }, frames: true })
-      const before = nextStateSerial()
-      const dismiss = vi.spyOn(range.validation, 'dismiss')
-
-      range.validation.adopt(validation)
-      form.reset()
-      await tick()
-
-      expect(dismiss).toHaveBeenCalledTimes(1)
-      expect(dismiss.mock.calls[0][0]).toBeGreaterThan(before)
-      expect(Number.isFinite(dismiss.mock.calls[0][0])).toBe(true)
-      expect(stateClasses(range.host)).toEqual([])
-    })
-
     it('should keep a state given in a reset listener of the form', async () => {
       const { form, host, state, validation } = mount()
 
       form.addEventListener('reset', () => {
         state.config.validationState = 'invalid'
-        validation.configure()
+        validation.update()
       })
       form.reset()
       await tick()
@@ -901,12 +839,14 @@ describe('FieldValidation', () => {
       fixtureEl.append(shadowHost)
 
       const root = shadowHost.attachShadow({ mode: 'open' })
-      const { form, host } = mount({ config: { validationState: 'invalid' }, root })
+      const restore = vi.fn()
+      const { form, host } = mount({ config: { validationState: 'invalid' }, restore, root })
 
       form.reset()
       await tick()
 
-      expect(stateClasses(host)).toEqual([])
+      expect(restore).toHaveBeenCalledTimes(1)
+      expect(stateClasses(host)).toEqual(['is-invalid'])
     })
   })
 })

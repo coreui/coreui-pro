@@ -1,5 +1,7 @@
 import { vi } from 'vitest'
+import DateInput from '../../src/date-input.js'
 import Form from '../../src/form.js'
+import MultiSelect from '../../src/multi-select.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('Form', () => {
@@ -86,6 +88,39 @@ describe('Form', () => {
       expect(city).not.toHaveClass('is-invalid')
       expect(city.hasAttribute('aria-invalid')).toBeFalse()
       expect(document.activeElement).toBe(name)
+    })
+
+    it('should stop a submit while a date field rejects its date, focus its first section, and leave its error control unmarked and its input at the control', () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><div class="date-input"></div><div class="invalid-feedback">Pick a day in 2026.</div><button type="submit">Send</button></form>'
+      const form = fixtureEl.querySelector('form')
+      const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), {
+        date: new Date(2027, 4, 5), format: 'dd.MM.yyyy', maxDate: new Date(2026, 11, 31), name: 'when'
+      })
+      const host = fixtureEl.querySelector('.form-date-time')
+      const errorField = form.elements.when.previousElementSibling
+
+      expect(host).toHaveClass('is-invalid')
+      expect(submit(form)).toBeTrue()
+      expect(document.activeElement).toBe(host.querySelector('.form-date-time-section'))
+      expect([errorField.className, errorField.hasAttribute('aria-invalid')]).toEqual(['', false])
+
+      const targets = []
+
+      form.addEventListener('input', event => targets.push(event.target))
+      dateInput.setDate(new Date(2026, 6, 14))
+
+      expect(targets).not.toContain(errorField)
+      expect([errorField.className, errorField.hasAttribute('aria-invalid')]).toEqual(['', false])
+      expect(submit(form)).toBeFalse()
+      expect(host).not.toHaveClass('is-invalid')
+
+      dateInput.setDate(new Date(2027, 4, 6))
+
+      expect(targets).not.toContain(errorField)
+      expect([errorField.className, errorField.hasAttribute('aria-invalid')]).toEqual(['', false])
+      expect(host).toHaveClass('is-invalid')
+
+      dateInput.dispose()
     })
 
     it('should let a valid submit through, and mark the valid controls only when the form opts in', () => {
@@ -300,6 +335,47 @@ describe('Form', () => {
       type(name, '')
 
       expect(name).not.toHaveClass('is-invalid')
+    })
+
+    it('should leave the error a form component drew in a form without data-coreui-validate until its value next changes', () => {
+      fixtureEl.innerHTML = `<form>
+        <input id="name" required><div class="invalid-feedback">Enter your name.</div>
+        <select id="tech" multiple></select><div id="techError" class="invalid-feedback">Pick one.</div>
+      </form>`
+      const name = fixtureEl.querySelector('#name')
+      const select = fixtureEl.querySelector('#tech')
+      const multiSelect = new MultiSelect(select, {
+        options: [{ value: '1', text: 'Angular' }, { value: '2', text: 'React' }],
+        required: true,
+        search: true
+      })
+      const drawn = () => [
+        multiSelect._wrapperElement.classList.contains('is-invalid'),
+        multiSelect._searchElement.getAttribute('aria-invalid'),
+        multiSelect._searchElement.getAttribute('aria-describedby')
+      ]
+      const instance = new Form(fixtureEl.querySelector('form'))
+
+      instance.validate()
+
+      expect(drawn()).toEqual([true, 'true', 'techError'])
+
+      instance.reset()
+
+      expect(name).not.toHaveClass('is-invalid')
+      expect(name.hasAttribute('aria-invalid')).toBeFalse()
+      expect(drawn()).toEqual([true, 'true', 'techError'])
+
+      multiSelect._searchElement.focus()
+      name.focus()
+
+      expect(drawn()).toEqual([true, 'true', 'techError'])
+
+      select.setCustomValidity('Pick another.')
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+
+      expect(select.validity.valid).toBeFalse()
+      expect(drawn()).toEqual([false, null, null])
     })
   })
 

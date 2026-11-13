@@ -1,5 +1,7 @@
 import DateRangeInput from '../../src/date-range-input.js'
-import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+import {
+  clearFixture, getFixture, getValueField, getValueFields, jQueryMock
+} from '../helpers/fixture.js'
 
 describe('DateRangeInput', () => {
   let fixtureEl
@@ -13,7 +15,7 @@ describe('DateRangeInput', () => {
   }
 
   const root = () => fixtureEl.querySelector('#range')
-  const hiddenInputs = () => [...root().querySelectorAll('.form-date-time > textarea')]
+  const hiddenInputs = () => getValueFields(root())
   const fields = () => [...root().querySelectorAll('.form-date-time')]
 
   beforeAll(() => {
@@ -574,8 +576,8 @@ describe('DateRangeInput', () => {
       expect([...end.querySelectorAll('.form-date-time-section')].map(element => element.getAttribute('aria-invalid'))).toEqual(['true', 'true', 'true'])
     })
 
-    it('should announce a claim of invalid written on the frame on both fields', () => {
-      build({ endDate: new Date(2026, 6, 20), startDate: new Date(2026, 6, 14) }, '<div id="range" class="is-invalid"></div>')
+    it('should announce an invalid state the markup gives on both fields', () => {
+      build({ endDate: new Date(2026, 6, 20), startDate: new Date(2026, 6, 14) }, '<div id="range" data-coreui-validation-state="invalid"></div>')
 
       expect(root().classList.contains('is-invalid')).toBeTrue()
       expect(fields().flatMap(field => [...field.querySelectorAll('.form-date-time-section')]).map(element => element.getAttribute('aria-invalid'))).toEqual(Array.from({ length: 6 }, () => 'true'))
@@ -640,38 +642,38 @@ describe('DateRangeInput', () => {
       section.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
     }
 
-    it('should take a state class the markup carries on the frame as the given state of both ends, and block with it', () => {
-      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" class="is-invalid"></div></form>')
+    it('should take a state the markup gives with a data attribute as the given state of both ends, and let a valid range submit', () => {
+      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" data-coreui-validation-state="invalid"></div></form>')
       const form = fixtureEl.querySelector('form')
 
       expect(root().classList.contains('is-invalid')).toBeTrue()
       expect(fields().every(field => field.classList.contains('is-invalid'))).toBeTrue()
       expect(sectionsInvalid()).toEqual(Array.from({ length: 6 }, () => 'true'))
-      expect(form.checkValidity()).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
 
       range.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21))
       range.clear()
       range.reset()
 
       expect(root().classList.contains('is-invalid')).toBeTrue()
-      expect(form.checkValidity()).toBeFalse()
+      expect(sectionsInvalid()).toEqual(Array.from({ length: 6 }, () => 'true'))
     })
 
-    it('should drop the given state from both ends and the frame when the user edits one end', () => {
+    it('should keep the given state on both ends and the frame when the user edits one end', () => {
       for (const config of [{}, { validationState: 'invalid' }]) {
-        build({ ...config, startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, `<form><div id="range"${Object.keys(config).length > 0 ? '' : ' class="is-invalid"'}></div></form>`)
+        build({ ...config, startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, `<form><div id="range"${Object.keys(config).length > 0 ? '' : ' data-coreui-validation-state="invalid"'}></div></form>`)
 
         typeIn(fields()[0])
 
-        expect(root().classList.contains('is-invalid')).toBeFalse()
-        expect(fields().some(field => field.classList.contains('is-invalid'))).toBeFalse()
-        expect(sectionsInvalid()).toEqual(Array.from({ length: 6 }, () => null))
+        expect(root().classList.contains('is-invalid')).toBeTrue()
+        expect(fields().every(field => field.classList.contains('is-invalid'))).toBeTrue()
+        expect(sectionsInvalid()).toEqual(Array.from({ length: 6 }, () => 'true'))
         expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
       }
     })
 
-    it('should keep a valid class the markup carried and drop it when the order breaks', () => {
-      const range = build({}, '<div id="range" class="is-valid"></div>')
+    it('should keep a valid state the markup gave and drop it when the order breaks', () => {
+      const range = build({}, '<div id="range" data-coreui-validation-state="valid"></div>')
 
       expect(root().classList.contains('is-valid')).toBeTrue()
 
@@ -682,19 +684,14 @@ describe('DateRangeInput', () => {
       expect(fields().some(field => field.classList.contains('is-valid'))).toBeFalse()
     })
 
-    it('should let validationState win over a class the markup carries, and take no state from invalid or valid', () => {
-      build({ validationState: 'valid' }, '<div id="range" class="is-invalid"></div>')
-
-      expect(root().classList.contains('is-valid')).toBeTrue()
-      expect(root().classList.contains('is-invalid')).toBeFalse()
-
+    it('should take no state from invalid or valid', () => {
       build({ invalid: true, valid: true })
 
       expect(root().classList.contains('is-valid')).toBeFalse()
       expect(root().classList.contains('is-invalid')).toBeFalse()
     })
 
-    it('should give a state class the markup carried back on dispose, unless the user dropped it, and remove the one it added', () => {
+    it('should leave a state class the markup carried through a change of the user and dispose, and remove the one it added', () => {
       const markup = build({}, '<div id="range" class="is-valid"></div>')
       const marked = root()
 
@@ -704,14 +701,14 @@ describe('DateRangeInput', () => {
 
       expect(marked.classList.contains('is-valid')).toBeTrue()
 
-      const dropped = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<div id="range" class="is-invalid"></div>')
+      const edited = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<div id="range" class="is-invalid"></div>')
       const element = root()
 
       typeIn(fields()[1])
-      dropped.dispose()
+      edited.dispose()
       instances.length = 0
 
-      expect(element.classList.contains('is-invalid')).toBeFalse()
+      expect(element.classList.contains('is-invalid')).toBeTrue()
 
       const configured = build({ validationState: 'valid' })
       const configuredElement = root()
@@ -764,8 +761,8 @@ describe('DateRangeInput', () => {
       expect(() => range.dispose()).not.toThrow()
     })
 
-    it('should change the state through setValidationState without rebuilding, leave the other options as they are, and drop the class the markup carried', () => {
-      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" class="is-invalid"></div></form>')
+    it('should change the state through setValidationState without rebuilding, leave the other options as they are, and drop the state the markup gave', () => {
+      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range" data-coreui-validation-state="invalid"></div></form>')
       const [day] = root().querySelectorAll('.form-date-time-section')
 
       range.setValidationState('valid')
@@ -787,8 +784,8 @@ describe('DateRangeInput', () => {
       expect(typeof range.setConfig).toEqual('undefined')
     })
 
-    it('should drop the given state through a native form reset', async () => {
-      fixtureEl.innerHTML = '<form><div id="range" class="is-invalid"></div></form>'
+    it('should keep the given state through a native form reset', async () => {
+      fixtureEl.innerHTML = '<form><div id="range" data-coreui-validation-state="invalid"></div></form>'
       const range = new DateRangeInput(root(), {
         format: 'dd.MM.yyyy', locale: 'en-US', startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20)
       })
@@ -799,12 +796,12 @@ describe('DateRangeInput', () => {
         setTimeout(resolve, 20)
       })
 
-      expect(root().classList.contains('is-invalid')).toBeFalse()
+      expect(root().classList.contains('is-invalid')).toBeTrue()
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
     it('should keep a state the page gives after a native reset started', async () => {
-      fixtureEl.innerHTML = '<form><div id="range" class="is-valid"></div></form>'
+      fixtureEl.innerHTML = '<form><div id="range" data-coreui-validation-state="valid"></div></form>'
       const range = new DateRangeInput(root(), {
         format: 'dd.MM.yyyy', locale: 'en-US', startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20)
       })
@@ -861,8 +858,8 @@ describe('DateRangeInput', () => {
       expect(fields().every(field => field.classList.contains('is-valid'))).toBeTrue()
     })
 
-    it('should keep the submit verdict off the fields under a frame the markup marks invalid, until the user edits the range', () => {
-      build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form data-coreui-validate="valid" novalidate><div id="range" class="is-invalid"></div></form>')
+    it('should keep the submit verdict off the fields under an invalid state the markup gives, also after the user edits the range, until the page clears it', () => {
+      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form data-coreui-validate="valid" novalidate><div id="range" data-coreui-validation-state="invalid"></div></form>')
       const form = fixtureEl.querySelector('form')
 
       form.addEventListener('submit', event => event.preventDefault())
@@ -871,6 +868,10 @@ describe('DateRangeInput', () => {
       expect(fields().some(field => field.classList.contains('is-valid'))).toBeFalse()
 
       typeIn(fields()[0])
+
+      expect(fields().some(field => field.classList.contains('is-valid'))).toBeFalse()
+
+      range.setValidationState(null)
 
       expect(fields().every(field => field.classList.contains('is-valid'))).toBeTrue()
     })
@@ -916,6 +917,161 @@ describe('DateRangeInput', () => {
 
       expect(sectionsInvalid()).toEqual(Array.from({ length: 6 }, () => 'true'))
       expect(root().classList.contains('is-invalid')).toBeTrue()
+    })
+  })
+
+  describe('the order of the ends', () => {
+    const orderMessage = Object.assign(document.createElement('input'), { min: '2026-06-15', type: 'date', value: '2026-06-10' }).validationMessage
+    const errorFields = () => getValueFields(root()).map(field => field.previousElementSibling)
+    const mountForm = (config = {}, attributes = '') => {
+      const instance = build({ endName: 'to', startName: 'from', ...config }, `<form${attributes}><div id="range"></div><button type="submit">Send</button></form>`)
+      const form = fixtureEl.querySelector('form')
+      const submitted = []
+
+      form.addEventListener('submit', event => {
+        submitted.push([...new FormData(form).keys()])
+        event.preventDefault()
+      })
+
+      return { form, instance, submitted }
+    }
+
+    const reversed = { endDate: new Date(2026, 5, 10), startDate: new Date(2026, 5, 15) }
+
+    it('should block the submit of a reversed range, required or not, with the message of a date before the start on the error control of the end', () => {
+      for (const required of [false, true]) {
+        const { form, instance, submitted } = mountForm({ ...reversed, required })
+        const invalid = []
+
+        form.addEventListener('invalid', event => invalid.push(event.target), true)
+        form.requestSubmit()
+
+        expect(submitted).toEqual([])
+        expect(invalid[0]).toBe(errorFields()[1])
+        expect(errorFields().map(field => field.validationMessage)).toEqual(['', orderMessage])
+        expect(orderMessage).not.toBe('')
+        expect(document.activeElement).toBe(instance.getEndElement().querySelector('.form-date-time-section'))
+
+        instance.dispose()
+        instances.length = 0
+      }
+    })
+
+    it('should draw a reversed range at once in a plain, a validating and a novalidate form', () => {
+      for (const attributes of ['', ' data-coreui-validate', ' novalidate']) {
+        const { instance } = mountForm(reversed, attributes)
+
+        expect(root().classList.contains('is-invalid'), attributes).toBeTrue()
+        expect([...root().querySelectorAll('.form-date-time-section')].map(section => section.getAttribute('aria-invalid'))).toEqual(Array.from({ length: 6 }, () => 'true'))
+
+        instance.dispose()
+        instances.length = 0
+      }
+    })
+
+    it('should set and lift the order block through setRange(), setStartDate(), clear(), reset() and a native reset', async () => {
+      const { form, instance, submitted } = mountForm({ endDate: new Date(2026, 5, 20), startDate: new Date(2026, 5, 15) })
+      const blocked = () => errorFields().map(field => field.validity.customError)
+
+      instance.setRange(new Date(2026, 5, 15), new Date(2026, 5, 10))
+
+      expect(blocked()).toEqual([false, true])
+
+      instance.setStartDate(new Date(2026, 5, 5))
+
+      expect(blocked()).toEqual([false, false])
+
+      instance.setStartDate(new Date(2026, 5, 15))
+
+      expect(blocked()).toEqual([false, true])
+
+      instance.clear()
+
+      expect(blocked()).toEqual([false, false])
+
+      instance.setRange(new Date(2026, 5, 15), new Date(2026, 5, 10))
+      instance.reset()
+
+      expect(blocked()).toEqual([false, false])
+
+      instance.setRange(new Date(2026, 5, 15), new Date(2026, 5, 10))
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(blocked()).toEqual([false, false])
+
+      form.requestSubmit()
+
+      expect(submitted).toEqual([['from', 'to']])
+    })
+
+    it('should lift the order block as a native reset starts, so a submit in the same task goes through', () => {
+      const { form, instance, submitted } = mountForm({ endDate: new Date(2026, 5, 20), startDate: new Date(2026, 5, 15) })
+
+      instance.setRange(new Date(2026, 5, 15), new Date(2026, 5, 10))
+      form.reset()
+
+      expect(form.checkValidity()).toBeTrue()
+
+      form.requestSubmit()
+
+      expect(submitted).toEqual([['from', 'to']])
+    })
+
+    it('should block again once the restore runs after a native reset to a reversed starting range', async () => {
+      const { form, instance } = mountForm(reversed)
+
+      instance.setRange(new Date(2026, 5, 25), new Date(2026, 5, 22))
+      form.reset()
+
+      expect(form.checkValidity()).toBeTrue()
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(errorFields().map(field => field.validity.customError)).toEqual([false, true])
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should take the order from a change of the user on either end', () => {
+      mountForm({ endDate: new Date(2026, 5, 20), startDate: new Date(2026, 5, 15) })
+      const endDay = root().querySelectorAll('.form-date-time-section')[3]
+
+      endDay.focus()
+
+      for (let step = 0; step < 10; step++) {
+        endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowDown' }))
+      }
+
+      expect(errorFields()[1].validity.customError).toBeTrue()
+
+      endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+      endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+      endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+      endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+      endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+
+      expect(errorFields()[1].validity.customError).toBeFalse()
+    })
+
+    it('should keep one error control per end after a dispose and a new instance', () => {
+      const { form, instance } = mountForm(reversed)
+
+      instance.dispose()
+      instances.length = 0
+
+      expect(root().querySelectorAll('textarea')).toHaveLength(0)
+      expect(form.checkValidity()).toBeTrue()
+
+      instances.push(new DateRangeInput(root(), {
+        ...reversed, endName: 'to', format: 'dd.MM.yyyy', locale: 'en-US', startName: 'from'
+      }))
+
+      expect([...root().querySelectorAll('textarea')].map(field => field.name)).toEqual(['', 'from', '', 'to'])
+      expect(form.checkValidity()).toBeFalse()
     })
   })
 
@@ -990,7 +1146,7 @@ describe('DateRangeInput', () => {
     it('should leave a disabled class on an adopted field to the range input, which stays enabled', () => {
       build({}, OWN_MARKUP.replace('<div data-coreui-range-start>', '<div data-coreui-range-start class="disabled">'))
 
-      expect(root().querySelector('[data-coreui-range-start] textarea').disabled).toBeFalse()
+      expect(getValueField(root().querySelector('[data-coreui-range-start]')).disabled).toBeFalse()
     })
 
     it('should adopt the hosts and the separator the author wrote', () => {

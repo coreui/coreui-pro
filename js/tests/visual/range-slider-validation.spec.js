@@ -3,7 +3,7 @@
  * handle blocks the submit, so the others stay valid for the browser. In a
  * form that opts in to success styling they match `:user-valid` after a
  * submit, and only a real browser with the stylesheet can tell which colour
- * wins.
+ * wins. A state class the page writes on the slider element colours no thumb.
  * Copyright 2026 The Bootstrap Authors
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
@@ -16,18 +16,27 @@ import RangeSlider from '../../src/range-slider.js'
 let container
 let rangeSlider
 
-const mount = validationState => {
+const mount = (validationState, { className = '', submit = true } = {}) => {
   container = document.createElement('div')
   container.style.cssText = 'padding: 2rem; width: 420px;'
-  container.innerHTML = '<form data-coreui-validate="valid" novalidate><div></div><div class="invalid-feedback">Pick a budget.</div><button>Save</button></form>'
+  container.innerHTML = `<form data-coreui-validate="valid" novalidate><div class="${className}"></div><div class="invalid-feedback">Pick a budget.</div><button>Save</button></form>`
   document.body.append(container)
 
   const form = container.querySelector('form')
   form.addEventListener('submit', event => event.preventDefault())
   rangeSlider = new RangeSlider(form.firstElementChild, { tooltips: false, validationState, value: [0, 100] })
-  form.querySelector('button').click()
+
+  if (submit) {
+    form.querySelector('button').click()
+  }
 
   return [...form.querySelectorAll('.form-range-input')]
+}
+
+const unmount = () => {
+  rangeSlider?.dispose()
+  rangeSlider = null
+  container?.remove()
 }
 
 const pixelAt = async (element, x, y) => {
@@ -70,11 +79,7 @@ const thumbColours = inputs => {
 }
 
 describe('range slider validation', () => {
-  afterEach(() => {
-    rangeSlider?.dispose()
-    rangeSlider = null
-    container?.remove()
-  })
+  afterEach(unmount)
 
   it('paints every thumb with a given invalid state, also the handles the browser finds valid', async () => {
     const inputs = mount('invalid')
@@ -89,5 +94,19 @@ describe('range slider validation', () => {
     const success = await tokenColour('--cui-success-bg')
 
     expect(await thumbColours(inputs)).toEqual([success, success])
+  })
+
+  it('colours no thumb for a state class the page writes on the slider element, and shows the message', async () => {
+    const given = await thumbColours(mount('invalid', { submit: false }))
+    const danger = await tokenColour('--cui-danger-bg')
+    unmount()
+    const none = await thumbColours(mount(null, { submit: false }))
+    unmount()
+    const pageClass = await thumbColours(mount(null, { className: 'is-invalid', submit: false }))
+
+    expect(given).toEqual([danger, danger])
+    expect(pageClass).toEqual(none)
+    expect(pageClass).not.toEqual(given)
+    expect(getComputedStyle(container.querySelector('.invalid-feedback')).display).toBe('block')
   })
 })

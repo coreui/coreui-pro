@@ -186,8 +186,6 @@ class RangeSlider extends BaseComponent {
     this._ticks = null
     this._tooltips = []
     this._validation = new FieldValidation(this._element, {
-      blockers: () => this._inputs.slice(0, 1),
-      canBlock: () => !this._disabled,
       config: () => this._config,
       fields: () => this._inputs,
       frames: () => [this._element, ...this._inputs],
@@ -206,12 +204,8 @@ class RangeSlider extends BaseComponent {
 
       if (this._inputs.includes(input)) {
         this._constrain(input)
-
-        if (input.value !== this._shownValues[this._inputs.indexOf(input)]) {
-          this._validation.dismiss()
-        }
-
         this._update()
+        this._validation.update()
         EventHandler.trigger(this._element, EVENT_INPUT, { value: this._values() })
       }
     }
@@ -254,7 +248,7 @@ class RangeSlider extends BaseComponent {
 
   setValidationState(validationState: ValidationState | null): void {
     this._config = this._getConfig({ ...this._config, validationState }) as RangeSliderConfig
-    this._validation.configure()
+    this._validation.update()
   }
 
   setValue(value: RangeSliderConfig['value']): void {

@@ -4,7 +4,9 @@ import Calendar from '../../src/calendar.js'
 import DateInput from '../../src/date-input.js'
 import DatePicker from '../../src/date-picker.js'
 import Dialog from '../../src/dialog.js'
-import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+import {
+  clearFixture, getFixture, getValueField, jQueryMock
+} from '../helpers/fixture.js'
 
 describe('DatePicker', () => {
   let fixtureEl
@@ -206,11 +208,11 @@ describe('DatePicker', () => {
         date: new Date(2026, 0, 15)
       })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Sty 2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Sty 2026')
 
       buildPicker({ locale: 'en-US', format: () => [{ type: 'year', length: 4 }], date: new Date(2026, 0, 15) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('2026')
     })
 
     it('should not build the calendar until the popup opens', () => {
@@ -616,7 +618,7 @@ describe('DatePicker', () => {
       buildPicker({}, OWN_MARKUP.replace('<div data-coreui-picker-field>', '<div data-coreui-picker-field class="disabled">'))
       const field = fixtureEl.querySelector('[data-coreui-picker-field]')
 
-      expect(field.querySelector('textarea').disabled).toBeFalse()
+      expect(getValueField(field).disabled).toBeFalse()
       expect(field.querySelector('.form-date-time-section').hasAttribute('aria-disabled')).toBeFalse()
     })
 
@@ -640,7 +642,7 @@ describe('DatePicker', () => {
       expect(el.querySelector('.form-control-action')).toBeNull()
       expect(el.querySelector('.form-control-cleaner')).toBeNull()
       expect(el.querySelector('[data-coreui-picker-field] .form-date-time-section')).not.toBeNull()
-      expect(el.querySelector('.form-date-time > textarea').value).toEqual('07/14/2026')
+      expect(getValueField(el).value).toEqual('07/14/2026')
 
       el.querySelector('[data-coreui-picker-toggle]').click()
       expect(picker._popup.isShown).toBeTrue()
@@ -911,7 +913,7 @@ describe('DatePicker', () => {
       expect(emitted.length).toBe(1)
 
       picker.setDate(new Date(2026, 6, 21))
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('07/21/2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('07/21/2026')
       expect(picker._calendar._startDate).toEqual(new Date(2026, 6, 21))
       expect(emitted.length).toBe(1)
     })
@@ -1074,7 +1076,7 @@ describe('DatePicker', () => {
     it('should show in the calendar a date a native input listener sets during a calendar pick', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' })
 
-      fixtureEl.querySelector('#picker textarea').addEventListener('input', () => {
+      getValueField(fixtureEl.querySelector('#picker')).addEventListener('input', () => {
         DateInput.getInstance(fixtureEl.querySelector('#picker .form-date-time')).setDate(new Date(2026, 6, 3))
       }, { once: true })
       picker.show();
@@ -1204,20 +1206,20 @@ describe('DatePicker', () => {
     it('should mask week selection like the native week input', () => {
       const picker = buildPicker({ locale: 'en-US', selectionType: 'week', date: new Date(2026, 6, 14) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Week 29, 2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Week 29, 2026')
       expect(picker.getDate()).toEqual(new Date(2026, 6, 13))
     })
 
     it('should localize the fixed week label', () => {
       buildPicker({ locale: 'pl-PL', selectionType: 'week', date: new Date(2026, 6, 14) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Tydzień 29, 2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Tydzień 29, 2026')
     })
 
     it('should let an explicit format override the week mask', () => {
       buildPicker({ format: 'yyyy-Www', selectionType: 'week', date: new Date(2026, 6, 14) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('2026-W29')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('2026-W29')
     })
 
     it('should fill the week sections when a calendar week is selected', () => {
@@ -1233,7 +1235,7 @@ describe('DatePicker', () => {
 
       expect(emitted.date).toBeInstanceOf(Date)
       expect(emitted.formattedDate).toMatch(/^\d{4}W\d{2}$/)
-      expect(el.querySelector('.form-date-time > textarea').value).toEqual(`Week ${emitted.formattedDate.slice(5)}, ${emitted.formattedDate.slice(0, 4)}`)
+      expect(getValueField(el).value).toEqual(`Week ${emitted.formattedDate.slice(5)}, ${emitted.formattedDate.slice(0, 4)}`)
     })
 
     it('should pick a week whose Monday is disabled on any first day of the week', () => {
@@ -1264,14 +1266,14 @@ describe('DatePicker', () => {
         fixtureEl.querySelector(`.date-picker-popup td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr').click()
 
         expect(emitted).toEqual(['2026W36'])
-        expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Week 36, 2026')
+        expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Week 36, 2026')
       }
     })
 
     it('should keep the ISO week-numbering year around January 1st', () => {
       const picker = buildPicker({ locale: 'en-US', selectionType: 'week', date: new Date(2027, 0, 1) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Week 53, 2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Week 53, 2026')
       expect(picker.getDate()).toEqual(new Date(2026, 11, 28))
     })
 
@@ -1293,7 +1295,7 @@ describe('DatePicker', () => {
     it('should mask quarter selection with the quarter name', () => {
       const picker = buildPicker({ selectionType: 'quarter', date: new Date(2026, 10, 15) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Q4 2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Q4 2026')
       expect(picker.getDate()).toEqual(new Date(2026, 9, 1))
     })
 
@@ -1304,7 +1306,7 @@ describe('DatePicker', () => {
       picker.show()
       fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-selectable]').click()
 
-      expect(el.querySelector('.form-date-time > textarea').value).toMatch(/^Q[1-4] \d{4}$/)
+      expect(getValueField(el).value).toMatch(/^Q[1-4] \d{4}$/)
     })
   })
 
@@ -1554,15 +1556,15 @@ describe('DatePicker', () => {
       .map(section => [section.getAttribute('aria-invalid'), section.getAttribute('aria-describedby')])
     const footer = '<template data-coreui-template="footer"><button type="button" data-coreui-picker-action="today">Today</button><button type="button" data-coreui-picker-action="clear">Clear</button><button type="button" data-coreui-picker-action="close">OK</button></template>'
 
-    it('should take a state class the markup carries on the picker element as the given state, with the message after it, and block with it', () => {
-      buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div><div class="invalid-feedback">Already booked.</div></form>')
+    it('should take a state the markup gives on the picker element with a data attribute as the given state, with the message after it, and let a valid date submit', () => {
+      buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" data-coreui-validation-state="invalid"></div><div class="invalid-feedback">Already booked.</div></form>')
       const { id } = fixtureEl.querySelector('.invalid-feedback')
       const count = fixtureEl.querySelectorAll('.form-date-time-section').length
 
       expect(count).toBeGreaterThan(0)
       expect(sectionStates()).toEqual(Array.from({ length: count }, () => ['true', id]))
       expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
     it('should draw a given state on the field and leave the picker element without a state class', () => {
@@ -1582,7 +1584,7 @@ describe('DatePicker', () => {
     })
 
     it('should change the state through setValidationState and leave the other options as they are', () => {
-      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div></form>')
+      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" data-coreui-validation-state="invalid"></div></form>')
 
       picker.setValidationState('valid')
 
@@ -1593,7 +1595,7 @@ describe('DatePicker', () => {
       picker.setValidationState('invalid')
 
       expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
 
       picker.setValidationState(null)
 
@@ -1635,25 +1637,25 @@ describe('DatePicker', () => {
         section.focus()
         section.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
       }]
-    ])('should drop the given state and the class the markup carried when the user %s', (_, act) => {
-      for (const [markup, field] of [['class="is-invalid"', ''], ['data-coreui-validation-state="invalid"', ''], ['', '<div data-coreui-picker-field class="is-invalid"></div>']]) {
+    ])('should keep the given state when the user %s, and leave a state class the markup carried', (_, act) => {
+      for (const [markup, field] of [['class="is-invalid" data-coreui-validation-state="invalid"', ''], ['data-coreui-invalid="true"', ''], ['data-coreui-validation-state="invalid"', '<div data-coreui-picker-field class="is-invalid"></div>']]) {
         const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, `<form><div id="picker" ${markup}>${field}${footer}</div></form>`)
         const element = fixtureEl.querySelector('#picker')
 
         act(picker)
 
         expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
-        expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
+        expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
 
         picker.dispose()
 
-        expect(element.classList.contains('is-invalid')).toBeFalse()
-        expect(fixtureEl.querySelector('.is-invalid')).toBeNull()
+        expect(element.classList.contains('is-invalid')).toBe(markup.startsWith('class='))
+        expect(Boolean(fixtureEl.querySelector('.is-invalid'))).toBe(markup.startsWith('class=') || field !== '')
       }
     })
 
-    it('should keep a state the page gives after a native reset started, and drop the one given before', async () => {
-      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" class="is-invalid"></div></form>')
+    it('should keep a state given before a native reset and one the page gives after it started', async () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' }, '<form><div id="picker" data-coreui-validation-state="invalid"></div></form>')
       const form = fixtureEl.querySelector('form')
       const nextTask = () => new Promise(resolve => {
         setTimeout(resolve)
@@ -1663,13 +1665,14 @@ describe('DatePicker', () => {
       await nextTask()
 
       expect(form.checkValidity()).toBeTrue()
-      expect(fixtureEl.querySelector('#picker').classList.contains('is-invalid')).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
 
+      picker.setValidationState(null)
       form.reset()
       picker.setValidationState('invalid')
       await nextTask()
 
-      expect(form.checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it('should keep the given state when the user picks the day it already holds', () => {
@@ -1678,11 +1681,10 @@ describe('DatePicker', () => {
       picker.show()
       fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Tue Jul 14 2026"]').click()
 
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
-    it('should drop the given state before the change events, so a state the page sets in them stays', () => {
+    it('should leave the value field valid at the change events under a given state, and keep a state the page sets in them', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US', validationState: 'invalid' }, '<form><div id="picker"></div></form>')
       const seen = []
 
@@ -1696,13 +1698,12 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
-    it('should treat what the page does in a change listener during a user pick as a change made by code', () => {
+    it('should keep a given state through a date the page sets in a change listener during a user pick', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US', validationState: 'invalid' }, '<form><div id="picker"></div></form>')
       const element = fixtureEl.querySelector('#picker')
 
       element.addEventListener('dateChange.coreui.date-picker', event => {
         if (event.date?.getDate() === 20) {
-          picker.setValidationState('invalid')
           picker.setDate(new Date(2026, 6, 21))
         }
       })
@@ -1710,7 +1711,7 @@ describe('DatePicker', () => {
       fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
 
       expect(picker.getDate()).toEqual(new Date(2026, 6, 21))
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it('should leave the validation options of inputOptions out, so the picker owns the state', () => {
@@ -1725,7 +1726,7 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
-    it('should leave a state class the page put on the picker element after start', () => {
+    it('should leave a state class the page put on the picker element', () => {
       const picker = buildPicker({ locale: 'en-US' })
       const element = fixtureEl.querySelector('#picker')
 
@@ -1736,12 +1737,12 @@ describe('DatePicker', () => {
       expect(element.classList.contains('is-invalid')).toBeTrue()
     })
 
-    it('should give a state class the markup carried back on dispose when an option overrode it', () => {
+    it('should leave a state class the markup carried next to the state of an option, and on dispose', () => {
       const picker = buildPicker({ locale: 'en-US', validationState: 'valid' }, '<div id="picker" class="is-invalid"></div>')
       const element = fixtureEl.querySelector('#picker')
 
       expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-valid')).toBeTrue()
-      expect(element.classList.contains('is-invalid')).toBeFalse()
+      expect(element.classList.contains('is-invalid')).toBeTrue()
 
       picker.dispose()
 
@@ -1758,16 +1759,7 @@ describe('DatePicker', () => {
       picker.clear()
       picker.reset()
 
-      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
-    })
-
-    it('should give a state class the markup carried back on dispose', () => {
-      const picker = buildPicker({ locale: 'en-US' }, '<div id="picker" class="is-invalid"></div>')
-      const element = fixtureEl.querySelector('#picker')
-
-      picker.dispose()
-
-      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
 
     it('should keep the message on the sections while the popup with time selects is open and after it closes', async () => {
@@ -1790,14 +1782,14 @@ describe('DatePicker', () => {
       expect(describedBy()).toEqual(Array.from({ length: count }, () => id))
     })
 
-    it('should drop the given state when the user picks a time', async () => {
+    it('should keep the given state when the user picks a time', async () => {
       const picker = buildPicker({ invalid: true, locale: 'en-US', timepicker: true }, '<div id="picker"></div><div class="invalid-feedback">Already booked.</div>')
 
       picker.show()
       await Promise.resolve()
       pickMinutes(5)
 
-      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
   })
 
@@ -2269,7 +2261,7 @@ describe('DatePicker', () => {
       expect(toggle.disabled).toBeFalse()
       expect(element.classList.contains('form-control-sm')).toBeTrue()
       expect(element.classList.contains('form-control-lg')).toBeFalse()
-      expect(element.querySelector('textarea').disabled).toBeFalse()
+      expect(getValueField(element).disabled).toBeFalse()
     })
 
     it('should replace a size the markup carried', () => {
@@ -2760,7 +2752,7 @@ describe('DatePicker', () => {
     it('should mask the field as a date and a time', () => {
       const picker = buildPicker({ timepicker: true, locale: 'en-US', date: new Date(2026, 5, 15, 14, 30, 0) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('06/15/2026, 02:30:00 PM')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('06/15/2026, 02:30:00 PM')
       expect(picker.getDate()).not.toBeNull()
     })
 
@@ -2781,7 +2773,7 @@ describe('DatePicker', () => {
         const picker = buildPicker({ locale: 'en-US', date: new Date(2026, 6, 14) })
         picker.show()
 
-        expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('07/2026')
+        expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('07/2026')
         expect(picker._calendar._config.selectionType).toEqual('month')
       } finally {
         DatePicker.Default.selectionType = selectionType

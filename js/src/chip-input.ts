@@ -101,7 +101,6 @@ class ChipInput extends ChipSet {
   protected declare _input: HTMLInputElement
   private _text = ''
   protected declare _initialChips: HTMLElement[]
-  protected declare _removingByCode: boolean
   protected declare _validation: FieldValidation
   private _createdInput = false
   private _labelledFor: Element | null = null
@@ -114,7 +113,6 @@ class ChipInput extends ChipSet {
 
     this._uniqueId = this._config.id ?? getUID(NAME)
     this._valueField = null
-    this._removingByCode = false
     this._validation = new FieldValidation(this._element, {
       config: () => this._config,
       fields: () => (this._valueField ? [this._valueField] : []),
@@ -165,17 +163,6 @@ class ChipInput extends ChipSet {
   }
 
   // Public
-  override remove(chipOrValue: HTMLElement | string): boolean {
-    const previous = this._removingByCode
-    this._removingByCode = true
-
-    try {
-      return super.remove(chipOrValue)
-    } finally {
-      this._removingByCode = previous
-    }
-  }
-
   focus(): void {
     this._input?.focus()
   }
@@ -210,7 +197,7 @@ class ChipInput extends ChipSet {
     }
 
     this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._validation.configure()
+    this._validation.update()
   }
 
   override _containerRole(leaving: HTMLElement | null = null): string | null {
@@ -267,20 +254,6 @@ class ChipInput extends ChipSet {
 
   override _getRemovalFallback(): HTMLElement {
     return this._input ?? super._getRemovalFallback()
-  }
-
-  override _handleChipRemoved(event: any): void {
-    if (this._removingByCode) {
-      super._handleChipRemoved(event)
-      return
-    }
-
-    this._validation.runAsUser(() => super._handleChipRemoved(event))
-  }
-
-  override _noteChange(): void {
-    super._noteChange()
-    this._validation.change()
   }
 
   override _triggerChange(): void {
@@ -472,17 +445,15 @@ class ChipInput extends ChipSet {
   _addPieces(pieces: string[], text: string): void {
     const added: string[] = []
 
-    this._validation.runAsUser(() => {
-      for (const piece of pieces) {
-        const count = this._chips.length
+    for (const piece of pieces) {
+      const count = this._chips.length
 
-        this.add(piece)
+      this.add(piece)
 
-        if (this._chips.length > count) {
-          added.push(piece.trim())
-        }
+      if (this._chips.length > count) {
+        added.push(piece.trim())
       }
-    })
+    }
 
     this._writeText(removeChipText(text, added, this._config.separator))
   }

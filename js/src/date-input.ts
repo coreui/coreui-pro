@@ -19,6 +19,7 @@ import {
   formatSectionValue,
   getDateFromSections,
   getDateLimitError,
+  getDateLimitMessage,
   getDateWithin,
   getDaySectionMax,
   getFullYearFromSection,
@@ -224,12 +225,15 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   protected declare _disabled: boolean
   protected declare _minDate: Date | null
   protected declare _notifying: number
+  protected declare _orderMessage: string
   protected declare _maxDate: Date | null
   protected declare _sections: DateSection[]
   protected declare _draft: string
   protected declare _allSelected: boolean
   protected declare _error: string | null
+  protected declare _errorElement: HTMLTextAreaElement | null
   protected declare _errorHolds: number
+  protected declare _errorMessage: string
   protected declare _fieldValue: string
   protected declare _hostAriaLabel: string | null
   protected declare _hostNodes: ChildNode[]
@@ -242,7 +246,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   protected declare _reports: number
   declare _validation: FieldValidation
   protected declare _validationError: string | null
-  protected declare _valueKey: string
 
   constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
@@ -254,7 +257,10 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._reports = 0
     this._allSelected = false
     this._error = null
+    this._errorElement = null
     this._errorHolds = 0
+    this._errorMessage = ''
+    this._orderMessage = ''
     this._fieldValue = ''
     this._inputElement = null
     this._isBuilt = false
@@ -263,11 +269,11 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostNodes = [...this._element.childNodes]
     this._validation = new FieldValidation(this._element, {
-      canBlock: () => !this._disabled,
       config: () => this._config as DateInputConfig,
-      fields: () => [this._inputElement!],
+      fields: () => [this._inputElement!, this._errorElement!],
       frames: () => [this._element],
       invalidTargets: () => this._getSectionElements(),
+      lift: isLifted => this._writeErrorMessage(isLifted),
       ownError: () => this._rejected,
       pageDescribed: isInvalid => [this._element, ...this._getSectionElements().filter((_, index) => index === 0 || isInvalid)],
       restore: () => this.reset()
@@ -278,7 +284,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._applyValidationState()
     this._reportedDate = this._date
     this._announceError()
-    this._valueKey = this._getValueKey(this._sections)
     this._inputElement!.defaultValue = this._getResetValue()
     this._isBuilt = true
     this._addEventListeners()
@@ -345,7 +350,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
   setValidationState(validationState: ValidationState | null): void {
     this._config = this._getConfig({ ...this._config, validationState })
-    this._validation.configure()
+    this._validation.update()
   }
 
   override dispose(): void {
@@ -387,6 +392,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     }
 
     this._inputElement!.disabled = disabled
+    this._errorElement!.disabled = disabled
     this._setTabIndexes(focused)
     this._validation.update()
   }
@@ -410,10 +416,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._maxDate = this._convertDate(maxDate)
     this._sections = setSectionsFromDate(sections, date ? this._convertDate(date) : null)
     this._draft = ''
-  }
-
-  _getValueKey(sections: DateSection[]): string {
-    return JSON.stringify(sections.map(section => section.value))
   }
 
   _addEventListeners(): void {
@@ -552,7 +554,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       event.preventDefault()
       section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY ? 1 : -1, this._getSectionMax(section))
       this._draft = ''
-      this._runAsUser(() => this._commitSections())
+      this._commitSections()
       return
     }
 
@@ -566,7 +568,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
       section.value = null
       this._draft = ''
-      this._runAsUser(() => this._commitSections())
+      this._commitSections()
       return
     }
 
@@ -619,7 +621,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
     this._draft = result.completed ? '' : result.draft
     section.value = result.value
-    this._runAsUser(() => this._commitSections())
+    this._commitSections()
 
     if (result.completed) {
       this._focusSibling(sectionElement, true)
@@ -631,7 +633,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   _clearAndFocus(): HTMLElement {
     this._setAllSelected(false)
     this._draft = ''
-    this._runAsUser(() => this._commitSections(setSectionsFromDate(this._sections, null)))
+    this._commitSections(setSectionsFromDate(this._sections, null))
     const [firstSection] = this._getSectionElements()
     firstSection.focus()
     return firstSection
@@ -647,7 +649,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     const sections = this._config.inputDateParse ? null : getSectionsFromString(text, this._sections)
 
     if (sections) {
-      this._runAsUser(() => this._commitSections(sections))
+      this._commitSections(sections)
       return
     }
 
@@ -656,7 +658,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       getLocalDateFromString(text, this._config.locale)
 
     if (date instanceof Date && !Number.isNaN(date.getTime())) {
-      this._runAsUser(() => this._commitSections(setSectionsFromDate(this._sections, date)))
+      this._commitSections(setSectionsFromDate(this._sections, date))
     }
   }
 
@@ -675,15 +677,10 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   }
 
   _commitSections(sections: DateSection[] = this._sections, notify = true): void {
-    if (this._getValueKey(sections) !== this._valueKey) {
-      this._validation.change()
-    }
-
     this._sections = sections
     this._syncSections()
 
     const value = this._applyValidationState()
-    this._valueKey = this._getValueKey(this._sections)
 
     try {
       if (notify) {
@@ -749,9 +746,31 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
     this._date = isDisabled ? null : date
     this._validationError = error
+    this._writeErrorMessage()
     this._validation.update()
 
     return isChanged && this._isBuilt ? value : null
+  }
+
+  _setOrderMessage(message: string): void {
+    this._orderMessage = message
+    this._writeErrorMessage()
+  }
+
+  _writeErrorMessage(isLifted = false): void {
+    let message = isLifted ? '' : this._orderMessage
+
+    if (!isLifted && this._rejected) {
+      message = getDateLimitMessage(this._sections, getDateFromSections(this._sections), this._minDate, this._maxDate, this._validationError)
+    }
+
+    if (message === this._errorMessage) {
+      return
+    }
+
+    this._errorMessage = message
+    this._errorElement!.setCustomValidity(message)
+    this._errorElement!.dispatchEvent(new Event('input'))
   }
 
   _announceError(): void {
@@ -770,10 +789,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   _holdErrors(hold: boolean): void {
     this._errorHolds += hold ? 1 : -1
     this._announceError()
-  }
-
-  _runAsUser(action: () => void): void {
-    this._validation.runAsUser(action)
   }
 
   _getValidationError(date: Date | null, isFilled: boolean): string | null {
@@ -849,12 +864,14 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       this._element.append(element)
     }
 
+    this._errorElement ??= createValueField('textarea', () => this._getFirstEmptySection(), this._element)
     this._inputElement ??= createValueField('textarea', () => this._getFirstEmptySection(), this._element)
     this._inputElement.defaultValue = this._isBuilt ? this._getResetValue() : ''
+    configureValueField(this._errorElement, { disabled, readOnly: readonly, required: false })
     configureValueField(this._inputElement, {
       disabled, name, readOnly: readonly, required
     })
-    this._element.append(this._inputElement)
+    this._element.append(this._errorElement, this._inputElement)
     this._syncSections()
     this._setTabIndexes()
     this._validation.refresh()

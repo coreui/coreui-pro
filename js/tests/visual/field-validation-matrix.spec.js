@@ -1,9 +1,17 @@
 /*!
  * Every field component in three kinds of form and with three given states:
- * read at load, after submitting the empty required field and after a native
- * reset, then held to the same rules, one observable per rule. The custom
- * components also take their state from a server class and from
- * `setValidationState()`, and have to read as with the option. What a field
+ * read at load, after submitting the empty required field, in a plain form
+ * also after leaving it, and after a native reset, then held to the same rules, one observable per rule. Each field
+ * also holds a valid value with a given invalid state and is submitted, and
+ * each field of the date family a value it rejects. The
+ * custom components also take their state from `setValidationState()`, and
+ * have to read as with the option, and keep a given state through a change of
+ * the user until the page clears it. A state class the page writes on a custom
+ * component gives no state: no `aria-invalid` and no linked message, also after
+ * `setValidationState()`. It shows the messages as the option does, and colours
+ * the frame of a component that has one; the range slider, which shows the
+ * option on its handles, and the rating have their own specs. A state given
+ * by the attribute shows only once the component starts. What a field
  * shows is decided by the stylesheet, `:user-invalid` and the accessibility
  * tree, which only a real browser has. A combination listed in KNOWN_FAILURES
  * has to keep failing its rule, so the list shrinks with every fix.
@@ -51,7 +59,42 @@ const COMPONENTS = {
   rangeslider: '<div id="field" data-coreui-range-slider data-coreui-value="25,75" data-coreui-name="v"></div>'
 }
 
+const FILLED = {
+  input: ['name="v"', 'name="v" value="x"'],
+  textarea: ['></textarea>', '>x</textarea>'],
+  select: ['<option value="1">', '<option value="1" selected>'],
+  checkbox: ['name="v"', 'name="v" checked'],
+  radio: ['name="v"', 'name="v" checked'],
+  switch: ['name="v"', 'name="v" checked'],
+  number: ['name="v"', 'name="v" value="1"'],
+  password: ['name="v"', 'name="v" value="x"'],
+  autocomplete: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-value="Alpha"'],
+  combobox: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-value="a"'],
+  multiselect: ['<option value="a">', '<option value="a" selected>'],
+  chipinput: ['</label>', '</label><span class="chip">Alpha</span>'],
+  chipfilter: ['<span class="chip">Alpha', '<span class="chip" data-coreui-selected="true">Alpha'],
+  dateinput: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-date="2026-07-14"'],
+  timeinput: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-date="10:30:00"'],
+  daterangeinput: ['data-coreui-end-name="w"', 'data-coreui-end-name="w" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"'],
+  datepicker: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-date="2026-07-14"'],
+  daterangepicker: ['data-coreui-end-name="w"', 'data-coreui-end-name="w" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"'],
+  timepicker: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-time="10:30:00"'],
+  otp: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-value="1234"'],
+  rating: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-value="3"'],
+  rangeslider: ['', '']
+}
+
+const REJECTED = {
+  dateinput: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-date="2027-05-05" data-coreui-max-date="2026-12-31"'],
+  timeinput: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-date="08:00:00" data-coreui-min-date="09:30:00"'],
+  daterangeinput: ['data-coreui-end-name="w"', 'data-coreui-end-name="w" data-coreui-start-date="2026-07-20" data-coreui-end-date="2026-07-14"'],
+  datepicker: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-date="2025-05-05" data-coreui-min-date="2026-01-01"'],
+  daterangepicker: ['data-coreui-end-name="w"', 'data-coreui-end-name="w" data-coreui-start-date="2026-07-14" data-coreui-end-date="2027-05-05" data-coreui-max-date="2026-12-31"'],
+  timepicker: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-time="18:00:00" data-coreui-max-date="17:00:00"']
+}
+
 const NATIVE = new Set(['input', 'textarea', 'select', 'checkbox', 'radio', 'switch', 'number', 'password'])
+const CHECKS = new Set(['checkbox', 'radio', 'switch'])
 const CUSTOM = Object.keys(COMPONENTS).filter(component => !NATIVE.has(component))
 
 const SUBMITTED_NAMES = {
@@ -72,11 +115,13 @@ const required = cell => cell.component !== 'rangeslider'
 const plain = cell => !cell.given
 const emptySubmit = cell => required(cell) && plain(cell)
 const reportedMode = cell => emptySubmit(cell) && cell.mode !== 'm0'
+const plainMode = cell => emptySubmit(cell) && cell.mode === 'm0'
 const scriptMode = cell => emptySubmit(cell) && cell.mode === 'm2'
 const givenInvalid = cell => cell.given === 'invalid'
 const givenValid = cell => cell.given === 'valid'
 const givenInvalidComponent = cell => givenInvalid(cell) && !NATIVE.has(cell.component)
 const givenValidSubmit = cell => givenValid(cell) && required(cell)
+const givenValidComponent = cell => givenValid(cell) && !NATIVE.has(cell.component)
 const always = () => true
 
 const RULES = [
@@ -94,6 +139,17 @@ const RULES = [
   ['submit m1/m2: invalid colour in the field', reportedMode, ({ submit }) => red(submit)],
   ['submit m2: the focused element is invalid for assistive technology', scriptMode, ({ submit }) => Boolean(submit.ax?.invalid) && submit.ax.invalid !== 'false'],
   ['submit m2: the focused element is described by BAD', scriptMode, ({ submit }) => Boolean(submit.ax?.description?.includes('BAD'))],
+  ['submit m0: no BAD, as a native control', plainMode, ({ submit }) => !bad(submit)],
+  ['submit m0: no invalid colour, as a native control', plainMode, ({ submit }) => !red(submit)],
+  ['submit m0: no aria-invalid, as a native control', plainMode, ({ submit }) => submit.ariaInvalid.length === 0],
+  ['submit m0: no is-invalid class, as a native control', plainMode, ({ submit }) => submit.isInvalid.length === 0],
+  ['submit m0: no message linked, as a native control', plainMode, ({ submit }) => submit.linked.length === 0],
+  ['submit m0, then leaving the field: the focus is outside the field and the browser marks it :user-invalid', plainMode, ({ left }) => !left.activeInField && left.userInvalid.length > 0],
+  ['submit m0, then leaving the field: no BAD, as a native control', plainMode, ({ left }) => !bad(left)],
+  ['submit m0, then leaving the field: no invalid colour, as a native control', plainMode, ({ left }) => !red(left)],
+  ['submit m0, then leaving the field: no aria-invalid, as a native control', plainMode, ({ left }) => left.ariaInvalid.length === 0],
+  ['submit m0, then leaving the field: no is-invalid class, as a native control', plainMode, ({ left }) => left.isInvalid.length === 0],
+  ['submit m0, then leaving the field: no message linked, as a native control', plainMode, ({ left }) => left.linked.length === 0],
   ['submit, no given state: no OK', emptySubmit, ({ submit }) => !ok(submit)],
   ['submit, no given state: no valid colour', emptySubmit, ({ submit }) => !green(submit)],
   ['submit: aria-invalid only outside aria-hidden', always, ({ submit }) => !submit.ariaInvalid.some(item => item.includes('(hidden)'))],
@@ -105,7 +161,7 @@ const RULES = [
   ['given invalid at load: invalid colour', givenInvalid, ({ load }) => red(load)],
   ['given invalid at load: BAD shown', givenInvalid, ({ load }) => bad(load)],
   ['given invalid at load: aria-invalid on a visible element (components)', givenInvalidComponent, ({ load }) => load.ariaInvalid.some(item => !item.includes('('))],
-  ['given invalid at load: the value field blocks with the feedback text (components)', givenInvalidComponent, ({ load }) => load.constraint.some(item => item.includes('BAD'))],
+  ['given invalid at load: the value field carries no custom validity (components)', givenInvalidComponent, ({ load }) => !load.constraint.some(item => item.includes('BAD'))],
   ['given valid at load: valid colour', givenValid, ({ load }) => green(load)],
   ['given valid at load: OK shown', givenValid, ({ load }) => ok(load)],
   ['given valid at load: no invalid colour', givenValid, ({ load }) => !red(load)],
@@ -113,22 +169,117 @@ const RULES = [
   ['given valid, empty required, after submit: no invalid colour', givenValidSubmit, ({ submit }) => !red(submit)],
   ['given valid, empty required, after submit: no BAD', givenValidSubmit, ({ submit }) => !bad(submit)],
   ['given valid, empty required, after submit: valid colour', givenValidSubmit, ({ submit }) => green(submit)],
-  ['given valid, empty required, after submit: OK shown', givenValidSubmit, ({ submit }) => ok(submit)]
+  ['given valid, empty required, after submit: OK shown', givenValidSubmit, ({ submit }) => ok(submit)],
+  ['given invalid, after reset: BAD shown', givenInvalid, ({ reset }) => bad(reset)],
+  ['given invalid, after reset: aria-invalid on a visible element (components)', givenInvalidComponent, ({ reset }) => reset.ariaInvalid.some(item => !item.includes('('))],
+  ['given valid, after reset: is-valid class (components)', givenValidComponent, ({ reset }) => reset.isValid.length > 0],
+  ['given valid, after reset: no BAD (components)', givenValidComponent, ({ reset }) => !bad(reset)]
 ]
 
-const SOURCES = {
-  'server class': (host, given) => host.classList.add(`is-${given}`),
-  'setValidationState()': (host, given) => instanceOf(host).setValidationState(given)
-}
+const bordered = cell => !CHECKS.has(cell.component)
+const custom = cell => !NATIVE.has(cell.component)
+
+const FILLED_RULES = [
+  ['valid value, given invalid: no console or page errors', always, ({ errors }) => errors.length === 0],
+  ['valid value, given invalid: every submitted name carries a value', always, ({ load }) => load.values.length > 0 && load.values.every(Boolean)],
+  ['valid value, given invalid: no constraint stops the submit', always, ({ load }) => load.constraint.length === 0],
+  ['valid value, given invalid: the submit goes through', always, ({ submit }) => submit.submits === 1],
+  ['valid value, given invalid, after submit: invalid colour (fields with a border)', bordered, ({ submit }) => red(submit)],
+  ['valid value, given invalid, after submit: BAD shown', always, ({ submit }) => bad(submit)],
+  ['valid value, given invalid, after submit: aria-invalid on a visible element (components)', custom, ({ submit }) => submit.ariaInvalid.some(item => !item.includes('('))]
+]
+
+const REJECTED_RULES = [
+  ['rejected value: no console or page errors', always, ({ errors }) => errors.length === 0],
+  ['rejected value: the value is submitted under the documented names', always, ({ load }, { component }) => JSON.stringify(load.names) === JSON.stringify(SUBMITTED_NAMES[component] ?? ['v'])],
+  ['rejected value: a control carries the message of the browser', always, ({ load }) => load.constraint.some(item => item.startsWith('textarea: ') && item.length > 'textarea: '.length)],
+  ['rejected value: the submit is blocked', always, ({ submit }) => submit.submits === 0],
+  ['rejected value, submit: focus lands inside the field', always, ({ submit }) => submit.activeInField],
+  ['rejected value: aria-invalid on a visible element', always, ({ load }) => load.ariaInvalid.some(item => !item.includes('('))],
+  ['rejected value: invalid colour at load and after submit', always, ({ load, submit }) => red(load) && red(submit)],
+  ['rejected value: BAD shown at load and after submit', always, ({ load, submit }) => bad(load) && bad(submit)],
+  ['rejected value: is-invalid class at load and after submit', always, ({ load, submit }) => load.isInvalid.length > 0 && submit.isInvalid.length > 0],
+  ['rejected value: message linked at load and after submit', always, ({ load, submit }) => load.linked.length > 0 && submit.linked.length > 0]
+]
 
 const SOURCE_RULES = [
-  ...Object.keys(SOURCES).flatMap(source => STATE_READINGS.map(reading => `${source}: ${reading} as with the option`)),
+  ...STATE_READINGS.map(reading => `setValidationState(): ${reading} as with the option`),
   ...STATE_READINGS.map(reading => `setValidationState(null): ${reading} as with no state`)
+]
+
+const UNFRAMED = new Set(['chipfilter', 'rangeslider', 'rating'])
+const pageClass = ({ given }, step) => (given === 'invalid' ? step.isInvalid : step.isValid).length > 0
+const sameReadings = (step, option, readings) => readings.every(reading => JSON.stringify(step[reading]) === JSON.stringify(option[reading]))
+const messagesAsOption = (step, option) => sameReadings(step, option, ['invalidFeedback', 'validFeedback'])
+const colouredAsOption = (step, option) => (red(option) || green(option)) && sameReadings(step, option, ['green', 'red'])
+const framed = cell => !UNFRAMED.has(cell.component)
+
+const PAGE_CLASS_RULES = [
+  ['page class: no console or page errors', always, ({ errors }) => errors.length === 0],
+  ['page class: the class stays', always, ({ load }, cell) => pageClass(cell, load)],
+  ['page class: messages as with the option', always, ({ load, option }) => messagesAsOption(load, option)],
+  ['page class: frame colour as with the option (components with a frame)', framed, ({ load, option }) => colouredAsOption(load, option)],
+  ['page class: no aria-invalid', always, ({ load }) => load.ariaInvalid.length === 0],
+  ['page class: no message linked', always, ({ load }) => load.linked.length === 0],
+  ['page class, given invalid by setValidationState(): aria-invalid on a visible element', givenInvalid, ({ set }) => set.ariaInvalid.some(item => !item.includes('('))],
+  ['page class, then setValidationState(null): the class stays', always, ({ cleared }, cell) => pageClass(cell, cleared)],
+  ['page class, then setValidationState(null): messages as with the option', always, ({ cleared, option }) => messagesAsOption(cleared, option)],
+  ['page class, then setValidationState(null): frame colour as with the option (components with a frame)', framed, ({ cleared, option }) => colouredAsOption(cleared, option)],
+  ['page class, then setValidationState(null): no aria-invalid', always, ({ cleared }) => cleared.ariaInvalid.length === 0],
+  ['page class, then setValidationState(null): no message linked', always, ({ cleared }) => cleared.linked.length === 0]
 ]
 
 const sourceCell = cell => CUSTOM.includes(cell.component) && cell.mode === 'm2' && STATES.has(cell.given)
 
-const COVERAGE = new Map([...RULES.map(([title, applies]) => [title, applies]), ...SOURCE_RULES.map(title => [title, sourceCell])])
+const press = key => async element => {
+  element.focus()
+  await userEvent.keyboard(key)
+}
+
+const pick = (open, option) => async host => {
+  await userEvent.click(open(host))
+  await userEvent.click(host.closest('.probe-field').querySelector(option))
+}
+
+const firstSection = host => host.closest('.probe-field').querySelector('.form-date-time-section')
+
+const USER_CHANGES = {
+  autocomplete: host => press('B')(instanceOf(host)._inputElement),
+  combobox: pick(host => host, '.list-box-option[data-coreui-value="b"]'),
+  multiselect: pick(host => instanceOf(host)._wrapperElement, '.list-box-option[data-coreui-value="b"]'),
+  chipinput: host => press('Gamma{Enter}')(instanceOf(host)._input),
+  chipfilter: host => userEvent.click(host.querySelectorAll('.chip')[1]),
+  dateinput: host => press('{ArrowDown}')(firstSection(host)),
+  timeinput: host => press('{ArrowDown}')(firstSection(host)),
+  daterangeinput: host => press('{ArrowDown}')(firstSection(host)),
+  datepicker: host => press('{ArrowDown}')(firstSection(host)),
+  daterangepicker: host => press('{ArrowDown}')(firstSection(host)),
+  timepicker: host => press('{ArrowDown}')(firstSection(host)),
+  otp: host => press('9')(host.querySelector('.form-otp-control')),
+  rating: host => userEvent.click(host.querySelectorAll('.rating-item-label')[4]),
+  rangeslider: host => press('{ArrowRight}')(host.querySelector('.form-range-input'))
+}
+
+const USER_CHANGE_RULES = [
+  ['user change, given state: no console or page errors', always, ({ errors }) => errors.length === 0],
+  ['user change, given state: the submitted value changed', always, ({ changed, load }) => JSON.stringify(changed.values) !== JSON.stringify(load.values)],
+  ['user change, given invalid: is-invalid class stays', givenInvalid, ({ changed }) => changed.isInvalid.length > 0],
+  ['user change, given invalid: BAD shown', givenInvalid, ({ changed }) => bad(changed)],
+  ['user change, given invalid: aria-invalid on a visible element', givenInvalid, ({ changed }) => changed.ariaInvalid.some(item => !item.includes('('))],
+  ['user change, given valid: is-valid class stays', givenValid, ({ changed }) => changed.isValid.length > 0],
+  ['user change, given valid: no BAD', givenValid, ({ changed }) => !bad(changed)],
+  ['user change, then setValidationState(null): no state class', always, ({ cleared }) => cleared.isInvalid.length === 0 && cleared.isValid.length === 0],
+  ['user change, then setValidationState(null): no aria-invalid', always, ({ cleared }) => cleared.ariaInvalid.length === 0]
+]
+
+const COVERAGE = new Map([
+  ...RULES.map(([title, applies]) => [title, applies]),
+  ...SOURCE_RULES.map(title => [title, sourceCell]),
+  ...PAGE_CLASS_RULES.map(([title, applies]) => [title, cell => sourceCell(cell) && applies(cell)]),
+  ...FILLED_RULES.map(([title, applies]) => [title, cell => givenInvalid(cell) && applies(cell)]),
+  ...REJECTED_RULES.map(([title, applies]) => [title, cell => Object.hasOwn(REJECTED, cell.component) && !cell.given && applies(cell)]),
+  ...USER_CHANGE_RULES.map(([title, applies]) => [title, cell => CUSTOM.includes(cell.component) && STATES.has(cell.given) && applies(cell)])
+])
 
 const KNOWN_FAILURES = [
   ['submit m1/m2: invalid colour in the field', ['chipfilter', 'rating'], ['m1', 'm2'], ['']],
@@ -137,6 +288,7 @@ const KNOWN_FAILURES = [
   ['reset after submit, no given state: no invalid colour', ['checkbox', 'radio', 'switch'], ['m1'], ['']],
   ['reset after submit, no given state: no BAD', ['checkbox', 'radio', 'switch'], ['m1'], ['']],
   ['given invalid at load: invalid colour', ['chipfilter', 'rangeslider', 'rating'], ALL_MODES, ['invalid']],
+  ['valid value, given invalid, after submit: invalid colour (fields with a border)', ['chipfilter', 'rangeslider', 'rating'], ALL_MODES, ['invalid']],
   ['given valid at load: valid colour', ['chipfilter', 'rangeslider', 'rating'], ALL_MODES, ['valid']],
   ['given valid, empty required, after submit: no invalid colour', ['autocomplete', 'checkbox', 'input', 'multiselect', 'number', 'otp', 'password', 'radio', 'select', 'switch', 'textarea'], ['m1', 'm2'], ['valid']],
   ['given valid, empty required, after submit: no BAD', ['autocomplete', 'checkbox', 'chipinput', 'combobox', 'input', 'multiselect', 'number', 'otp', 'password', 'radio', 'select', 'switch', 'textarea'], ['m1', 'm2'], ['valid']],
@@ -190,9 +342,11 @@ const read = form => {
     invalidFeedback: feedback('.invalid-feedback, .invalid-tooltip'),
     isInvalid: [...form.querySelectorAll('.is-invalid')].map(describeElement),
     isValid: [...form.querySelectorAll('.is-valid')].map(describeElement),
+    linked: [...form.querySelectorAll('.invalid-feedback, .valid-feedback')].filter(element => element.id && form.querySelector(`[aria-describedby~="${element.id}"]`)).map(element => element.textContent.trim()),
     names: [...form.elements].filter(element => element.name).map(element => element.name),
     red: coloured(borderColour('ref-invalid')),
     submits,
+    userInvalid: [...form.querySelectorAll(':user-invalid')].map(describeElement),
     validFeedback: feedback('.valid-feedback, .valid-tooltip')
   }
 }
@@ -265,11 +419,19 @@ const unmount = () => {
   container = null
 }
 
-const mount = ({ component, given, mode }, source = 'option') => {
+const start = () => {
+  document.dispatchEvent(new Event('DOMContentLoaded'))
+  window.dispatchEvent(new Event('load'))
+}
+
+const mount = ({
+  component, filled, given, mode, rejected
+}, source = 'option', started = true) => {
   unmount()
   container = document.createElement('div')
   container.style.padding = '40px'
-  container.innerHTML = `<input id="ref-invalid" class="form-control is-invalid" aria-label="ref"><input id="ref-valid" class="form-control is-valid" aria-label="ref"><button id="before" type="button">Before</button><form${MODES[mode]}><div class="form-field probe-field"><label class="form-label" for="field" id="lbl">Field</label>${COMPONENTS[component]}<div class="invalid-feedback">BAD</div><div class="valid-feedback">OK</div></div><button id="send">Send</button><button id="rst" type="reset">Reset</button></form>`
+  const markup = filled || rejected ? COMPONENTS[component].replace(...(rejected ? REJECTED : FILLED)[component]) : COMPONENTS[component]
+  container.innerHTML = `<input id="ref-invalid" class="form-control is-invalid" aria-label="ref"><input id="ref-valid" class="form-control is-valid" aria-label="ref"><button id="before" type="button">Before</button><form${MODES[mode]}><div class="form-field probe-field"><label class="form-label" for="field" id="lbl">Field</label>${markup}<div class="invalid-feedback">BAD</div><div class="valid-feedback">OK</div></div><button id="send">Send</button><button id="rst" type="reset">Reset</button></form>`
   document.body.append(container)
 
   const host = container.querySelector('#lbl').nextElementSibling
@@ -282,15 +444,16 @@ const mount = ({ component, given, mode }, source = 'option') => {
     }
   }
 
-  if (given && source === 'server class') {
-    SOURCES[source](host, given)
+  if (given && source === 'page class') {
+    host.classList.add(`is-${given}`)
   }
 
-  document.dispatchEvent(new Event('DOMContentLoaded'))
-  window.dispatchEvent(new Event('load'))
+  if (started) {
+    start()
+  }
 
   if (given && source === 'setValidationState()') {
-    SOURCES[source](host, given)
+    instanceOf(host).setValidationState(given)
   }
 
   return { form: container.querySelector('form'), host }
@@ -305,15 +468,76 @@ const runCell = async cell => {
   const submit = await settled(form)
   submit.ax = await focusedNode()
 
+  let left
+
+  if (plainMode(cell)) {
+    await userEvent.click(container.querySelector('#before'))
+    left = await settled(form)
+  }
+
   await userEvent.click(container.querySelector('#rst'))
   const reset = await settled(form)
 
   return {
-    errors: [...errors], load, reset, submit
+    errors: [...errors], left, load, reset, submit
+  }
+}
+
+const runFilledCell = async cell => {
+  const { form } = mount(cell)
+  const load = { ...await settled(form), values: [...new FormData(form).values()].map(String) }
+
+  container.querySelector('#before').focus()
+  await userEvent.click(container.querySelector('#send'))
+  const submit = await settled(form)
+
+  return { errors: [...errors], load, submit }
+}
+
+const runRejectedCell = async cell => {
+  const { form } = mount(cell)
+  const load = await settled(form)
+
+  container.querySelector('#before').focus()
+  await userEvent.click(container.querySelector('#send'))
+  const submit = await settled(form)
+
+  return { errors: [...errors], load, submit }
+}
+
+const runUserChangeCell = async cell => {
+  const { form, host } = mount(cell)
+  const values = () => [...new FormData(form).values()].map(String)
+  const load = { ...await settled(form), values: values() }
+
+  await USER_CHANGES[cell.component](host)
+  const changed = { ...await settled(form), values: values() }
+
+  instanceOf(host).setValidationState(null)
+  const cleared = await settled(form)
+
+  return {
+    changed, cleared, errors: [...errors], load
   }
 }
 
 const loadReading = async (cell, source) => settled(mount(cell, source).form)
+
+const runPageClassCell = async cell => {
+  const option = await loadReading(cell)
+  const { form, host } = mount(cell, 'page class')
+  const load = await settled(form)
+
+  instanceOf(host).setValidationState(cell.given)
+  const set = await settled(form)
+
+  instanceOf(host).setValidationState(null)
+  const cleared = await settled(form)
+
+  return {
+    cleared, errors: [...errors], load, option, set
+  }
+}
 
 const expectRule = (title, cell, passed, details) => {
   const known = isKnownFailure(title, cell)
@@ -381,16 +605,73 @@ describe('field validation matrix', () => {
     }
   }
 
+  for (const component of Object.keys(COMPONENTS)) {
+    for (const mode of ALL_MODES) {
+      const cell = {
+        component, filled: true, given: 'invalid', mode
+      }
+
+      it(`${component} in ${mode} holding a valid value with a given invalid state`, async () => {
+        const run = await runFilledCell(cell)
+
+        for (const [title, applies, passes] of FILLED_RULES) {
+          if (applies(cell)) {
+            expectRule(title, cell, passes(run, cell), run)
+          }
+        }
+      })
+    }
+  }
+
+  for (const component of Object.keys(REJECTED)) {
+    for (const mode of ALL_MODES) {
+      const cell = {
+        component, given: '', mode, rejected: true
+      }
+
+      it(`${component} in ${mode} holding a value it rejects`, async () => {
+        const run = await runRejectedCell(cell)
+
+        for (const [title, applies, passes] of REJECTED_RULES) {
+          if (applies(cell)) {
+            expectRule(title, cell, passes(run, cell), run)
+          }
+        }
+      })
+    }
+  }
+
+  for (const component of CUSTOM) {
+    for (const mode of ALL_MODES) {
+      for (const given of STATES) {
+        const cell = {
+          component, filled: true, given, mode
+        }
+
+        it(`${component} in ${mode} keeps a given ${given} state through a change of the user`, async () => {
+          const run = await runUserChangeCell(cell)
+
+          for (const [title, applies, passes] of USER_CHANGE_RULES) {
+            if (applies(cell)) {
+              expectRule(title, cell, passes(run, cell), run)
+            }
+          }
+        })
+      }
+    }
+  }
+
   for (const component of CUSTOM) {
     for (const given of STATES) {
       const cell = { component, given, mode: 'm2' }
 
-      it(`${component} given ${given} by a server class reads as with the option`, async () => {
-        const expected = await loadReading(cell)
-        const actual = await loadReading(cell, 'server class')
+      it(`${component} with a ${given} state class the page wrote takes no state from it`, async () => {
+        const run = await runPageClassCell(cell)
 
-        for (const reading of STATE_READINGS) {
-          expectRule(`server class: ${reading} as with the option`, cell, JSON.stringify(actual[reading]) === JSON.stringify(expected[reading]), { actual, expected })
+        for (const [title, applies, passes] of PAGE_CLASS_RULES) {
+          if (applies(cell)) {
+            expectRule(title, cell, passes(run, cell), run)
+          }
         }
       })
 
@@ -412,5 +693,18 @@ describe('field validation matrix', () => {
         }
       })
     }
+  }
+
+  for (const component of ['dateinput', 'multiselect']) {
+    it(`${component} shows a state given by the attribute only once the component starts`, async () => {
+      const { form } = mount({ component, given: 'invalid', mode: 'm0' }, 'option', false)
+      const before = await settled(form)
+
+      start()
+      const after = await settled(form)
+
+      expect({ bad: bad(before), red: red(before) }).toEqual({ bad: false, red: false })
+      expect({ bad: bad(after), red: red(after) }).toEqual({ bad: true, red: true })
+    })
   }
 })

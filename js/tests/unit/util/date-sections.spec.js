@@ -1,3 +1,5 @@
+import { onTestFinished } from 'vitest'
+import { cdp } from 'vitest/browser'
 import {
   applyDigitToSection,
   applyLetterToSection,
@@ -9,6 +11,7 @@ import {
   getDateFromSections,
   getDateOfISOWeek,
   getDateLimitError,
+  getDateLimitMessage,
   getDateTimeSectionsFromLocale,
   getDaysInMonth,
   getDateWithin,
@@ -1002,6 +1005,69 @@ describe('Date Sections Utilities', () => {
       expect(constrainDateTime(new Date(2026, 9, 20, 18), null, new Date(2026, 9, 20, 17, 45))).toEqual(new Date(2026, 9, 20, 17, 45))
       expect(constrainDateTime(new Date(2026, 9, 20, 18), null, new Date(2026, 9, 20))).toEqual(new Date(2026, 9, 20, 18))
       expect(constrainDateTime(new Date(2026, 9, 21, 1), null, new Date(2026, 9, 20))).toEqual(new Date(2026, 9, 20, 23, 59, 59, 999))
+    })
+  })
+
+  describe('getDateLimitMessage', () => {
+    const native = (type, attributes) => Object.assign(Object.assign(document.createElement('input'), { type }), attributes).validationMessage
+    const required = Object.assign(document.createElement('input'), { required: true }).validationMessage
+
+    it('should read the message of a detached date input with only the crossed limit', () => {
+      const date = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
+      const max = native('date', { max: '2026-12-31', value: '2027-05-05' })
+
+      expect(max).not.toBe('')
+      expect(getDateLimitMessage(date, new Date(2027, 4, 5), new Date(2026, 0, 1), new Date(2026, 11, 31), 'maxDate')).toBe(max)
+      expect(getDateLimitMessage(date, new Date(2025, 4, 5), new Date(2026, 0, 1), new Date(2026, 11, 31), 'minDate')).toBe(native('date', { min: '2026-01-01', value: '2025-05-05' }))
+    })
+
+    it('should give a field that picks a period the limit of the option as a date', () => {
+      const quarters = getSectionsFromFormat('QQQ yyyy', 'en-US')
+
+      expect(getDateLimitMessage(quarters, new Date(2025, 9, 1), new Date(2026, 1, 15), null, 'minDate')).toBe(native('date', { min: '2026-02-15', value: '2025-10-01' }))
+    })
+
+    it('should read a time of day from a time input and cover the whole day with a latest time at midnight', () => {
+      const time = getTimeSectionsFromLocale('en-GB')
+
+      expect(getDateLimitMessage(time, new Date(2026, 9, 15, 8), new Date(2026, 9, 15, 9, 30), null, 'minDate')).toBe(native('time', { min: '09:30', value: '08:00' }))
+      expect(getDateLimitMessage(getDateTimeSectionsFromLocale('en-US'), new Date(2027, 0, 1, 10), null, new Date(2026, 11, 31), 'maxDate'))
+        .toBe(native('datetime-local', { max: '2026-12-31T23:59', value: '2027-01-01T10:00' }))
+    })
+
+    it('should read the latest time of day and the earliest date and time, at the precision of the field', () => {
+      const time = getTimeSectionsFromLocale('en-GB')
+      const dateTime = getDateTimeSectionsFromLocale('en-US', true)
+
+      expect(getDateLimitMessage(time, new Date(2026, 9, 15, 18), null, new Date(2026, 9, 15, 17), 'maxDate')).toBe(native('time', { max: '17:00', value: '18:00' }))
+      expect(getDateLimitMessage(dateTime, new Date(2025, 11, 31, 23, 59, 30), new Date(2026, 0, 1, 8, 15, 45), null, 'minDate'))
+        .toBe(native('datetime-local', { min: '2026-01-01T08:15:45', value: '2025-12-31T23:59:30' }))
+    })
+
+    it('should give a week field the limit of the option as a date', () => {
+      const weeks = getWeekSectionsFromLocale('en-US')
+
+      expect(getDateLimitMessage(weeks, new Date(2027, 0, 4), null, new Date(2026, 11, 31), 'maxDate')).toBe(native('date', { max: '2026-12-31', value: '2027-01-04' }))
+    })
+
+    it('should write the limit and the date in local parts in a time zone away from UTC', async () => {
+      await cdp().send('Emulation.setTimezoneOverride', { timezoneId: 'Asia/Tokyo' })
+      onTestFinished(() => cdp().send('Emulation.setTimezoneOverride', { timezoneId: '' }))
+
+      const date = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
+      const dateTime = getDateTimeSectionsFromLocale('en-US')
+
+      expect(getDateLimitMessage(date, new Date(2027, 0, 1), null, new Date(2026, 11, 31), 'maxDate')).toBe(native('date', { max: '2026-12-31', value: '2027-01-01' }))
+      expect(getDateLimitMessage(dateTime, new Date(2026, 0, 1, 0, 30), new Date(2026, 0, 1, 1), null, 'minDate'))
+        .toBe(native('datetime-local', { min: '2026-01-01T01:00', value: '2026-01-01T00:30' }))
+    })
+
+    it('should give the message of an empty required input without a limit or a date the browser can hold', () => {
+      const date = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
+
+      expect(required).not.toBe('')
+      expect(getDateLimitMessage(date, new Date(2026, 10, 20), null, null, 'disabledDate')).toBe(required)
+      expect(getDateLimitMessage(date, null, new Date(2026, 0, 1), null, 'minDate')).toBe(required)
     })
   })
 

@@ -62,4 +62,14 @@ describe('rating validation', () => {
     expect(document.activeElement).toBe(label.closest('.rating-item').querySelector('.rating-item-input'))
     expect(getComputedStyle(label.closest('.rating-item')).outlineColor).toEqual(colourOf('var(--cui-danger-focus-ring)'))
   })
+
+  it('draws the focus ring in the colour of a state class the page writes on the rating, as a given state does', async () => {
+    const label = mount(null, 'is-invalid')
+
+    await userEvent.keyboard('{Tab}')
+
+    expect(document.activeElement).toBe(label.closest('.rating-item').querySelector('.rating-item-input'))
+    expect(getComputedStyle(label.closest('.rating-item')).outlineColor).toEqual(colourOf('var(--cui-danger-focus-ring)'))
+    expect(label.closest('.rating').getAttribute('aria-invalid')).toBeNull()
+  })
 })

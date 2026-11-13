@@ -64,16 +64,16 @@ Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out 
 A rating can be required, and it takes a validation state from the page.
 
 - `required` (`data-coreui-required="true"`) makes every radio required, so the browser stops the submit while no star is picked, and gives the rating `aria-required="true"`. A read-only rating is never required.
-- Give a state with the `validationState` option (`data-coreui-validation-state`), or with `.is-invalid` or `.is-valid` on the rating element in the HTML the server renders. The class is read once, when the rating starts; after that, use `setValidationState()`, which changes the state without rendering the stars again.
+- Give a state with the `validationState` option, `data-coreui-validation-state` in the HTML the server renders, and change it with `setValidationState()`, which does not render the stars again. A `.is-invalid` or `.is-valid` class written on the rating element is not read and stays yours: it colours the focus ring and shows the message after the rating as a given state does, but the rating gets no `aria-invalid` and the stars no linked message from it, see [Form components](/forms/validation/#form-components).
 - The state shows on the rating element: it colors the focus ring, the stars keep their colors, and `'invalid'` sets `aria-invalid` on the group and adds the invalid feedback that follows the rating, or the one named in its `data-coreui-invalid-feedback`, to the `aria-describedby` of every star.
-- `'invalid'` blocks the submit through the checked star, or the first one when none is picked, with the text of the feedback as the message the browser shows, or `Invalid value.` without one, and the browser moves the focus to that star. `'valid'` and a custom state do not block, and neither does a disabled or read-only rating.
-- Picking or clearing a star, or a native form reset, removes the state before `change.coreui.rating` fires. A change from code, such as `setValue()` or `reset()`, keeps it.
-- A required rating without a value shows `'invalid'` once a validation reports it, and a given state shows over it.
+- A given state does not block the submit. To stop it on your own verdict, call `setCustomValidity()` on the radio that takes the focus: the checked radio of the rating, or its first radio while none is checked, `form.querySelector('input[name="score"]:checked') ?? form.querySelector('input[name="score"]')` for a rating named `score` (`form.elements[name]` is a single radio, not a list, for a rating of one star at the default `precision`). On a refused submit the browser moves the focus to that radio. When the user picks another star while your verdict still holds, move the validity to the newly checked radio and clear it on the previous one; with `allowClear`, taking the star off fires only `change.coreui.rating`, so listen to it as well. See [Form components](/forms/validation/#form-components).
+- The state stays until you change it: picking or clearing a star, a native form reset and a change from code, such as `setValue()` or `reset()`, keep it. Picking a star and clearing it with `allowClear` both fire `change.coreui.rating`, so to clear the state then, call `setValidationState(null)` in a `change.coreui.rating` listener. A listener there also clears the state on a native form reset and on `reset()`, which fire `change.coreui.rating` when they change the value; `setValue()` fires nothing.
+- A required rating without a value shows `'invalid'` once a validation reports it in a form with `data-coreui-validate`, in a form the form plugin validated, in a form with `novalidate` the stepper validated, and outside a form, and a given state shows over it. In any other form the rating shows what native radios show after a blocked submit, the browser's message and the focus.
 
 <Example pro code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-12 form-field">
       <span class="form-label" id="deliveryRatingLabel">Delivery</span>
-      <div class="is-invalid" aria-labelledby="deliveryRatingLabel" data-coreui-rating data-coreui-name="deliveryRating" data-coreui-required="true"></div>
+      <div aria-labelledby="deliveryRatingLabel" data-coreui-rating data-coreui-validation-state="invalid" data-coreui-name="deliveryRating" data-coreui-required="true"></div>
       <div class="invalid-feedback">Rate the delivery before you send the review.</div>
     </div>
     <div class="col-12">
@@ -208,14 +208,14 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `sanitizeFn` | null, function | `null` |  Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 | `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |
 | `tooltips` | array, boolean, object, string | `false` | Enable tooltips with default values or set specific labels for each icon, as an array or a comma-separated string. A read-only rating shows none. |
-| `validationState` | string, null | `null` | The validation state, rendered as the `is-{state}` class on the rating; `'invalid'` also sets `aria-invalid` and blocks the submit. Any custom state declared in the `$form-validation-states` Sass map is accepted. See [Validation](#validation). |
+| `validationState` | string, null | `null` | The validation state, rendered as the `is-{state}` class on the rating; `'invalid'` also sets `aria-invalid`, and does not block the submit. Any custom state declared in the `$form-validation-states` Sass map is accepted. See [Validation](#validation). |
 | `value` | number, null | `null` | The default `value` of component: `null` or `0` for no rating, or the value of a star, such as `0.3` at a `precision` of `0.1`. Any other value throws a `TypeError` and leaves the element as it was; on the data API it also stops the ratings after it from initializing. |
 
 ### Methods
 
 | Method | Description |
 | --- | --- |
-| `dispose` | Destroys a rating instance and removes the items with their radios, so the form no longer submits the value, and the `aria-invalid` it wrote. The classes, `role`, `aria-readonly` and `aria-required` stay until a new instance writes them from its options. A state class the server wrote and the user did not dismiss stays. (Removes stored data on the DOM element) |
+| `dispose` | Destroys a rating instance and removes the items with their radios, so the form no longer submits the value, and the `aria-invalid` it wrote. The classes, `role`, `aria-readonly` and `aria-required` stay until a new instance writes them from its options. The state class it drew comes off; a state class you wrote on the rating element stays, unless you wrote it while the rating already showed the same class: then it comes off with the rating's. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the rating instance associated to a DOM element, you can use it like this: `coreui.Rating.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a rating instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Rating.getOrCreateInstance(element)` |
 | `reset` | Reset the value to `null` or to provided value, firing `change.coreui.rating` when that changes the value. Takes `null`, `0` or the value of a star; any other value throws a `TypeError`. |

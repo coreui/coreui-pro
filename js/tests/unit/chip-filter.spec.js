@@ -591,7 +591,7 @@ describe('ChipFilter', () => {
     })
 
     it('should put the state and its message on the listbox', () => {
-      fixtureEl.innerHTML = '<form><div class="chip-filter is-invalid"><span class="chip">First</span></div><div class="invalid-feedback" id="tags-error">Pick one.</div></form>'
+      fixtureEl.innerHTML = '<form><div class="chip-filter" data-coreui-validation-state="invalid"><span class="chip">First</span></div><div class="invalid-feedback" id="tags-error">Pick one.</div></form>'
       const el = fixtureEl.querySelector('.chip-filter')
       const chipFilter = new ChipFilter(el, { name: 'tags' })
 
@@ -603,8 +603,8 @@ describe('ChipFilter', () => {
       expect(el.hasAttribute('aria-invalid')).toBeFalse()
     })
 
-    it('should drop a given state on a change the user makes, and keep it on one from code', () => {
-      fixtureEl.innerHTML = '<form><div class="chip-filter is-invalid"><span class="chip">First</span><span class="chip">Second</span></div></form>'
+    it('should keep a given state on a change the user makes and on one from code', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-filter" data-coreui-validation-state="invalid"><span class="chip">First</span><span class="chip">Second</span></div></form>'
       const el = fixtureEl.querySelector('.chip-filter')
       const chipFilter = new ChipFilter(el, { name: 'tags' })
       const form = fixtureEl.querySelector('form')
@@ -612,12 +612,12 @@ describe('ChipFilter', () => {
       chipFilter.selectChip(el.querySelectorAll('.chip')[1])
 
       expect(el.classList.contains('is-invalid')).toBeTrue()
-      expect(form.checkValidity()).toBeFalse()
+      expect(el.getAttribute('aria-invalid')).toBe('true')
 
       el.querySelector('.chip').click()
 
-      expect(el.classList.contains('is-invalid')).toBeFalse()
-      expect(el.hasAttribute('aria-invalid')).toBeFalse()
+      expect(el.classList.contains('is-invalid')).toBeTrue()
+      expect(el.getAttribute('aria-invalid')).toBe('true')
       expect(form.checkValidity()).toBeTrue()
     })
 

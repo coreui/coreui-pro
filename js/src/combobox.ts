@@ -312,7 +312,7 @@ class Combobox extends ComboboxBase {
     }
 
     this._config = this._getConfig({ ...this._config, validationState: config.validationState })
-    this._validation.configure()
+    this._validation.update()
   }
 
   override _getConfig(config?: any): any {
@@ -602,14 +602,6 @@ class Combobox extends ComboboxBase {
       this._searchElement.value = ''
       this._listBox?.update()
     }
-  }
-
-  override _onOptionSelected(): void {
-    this._validation.dismiss()
-  }
-
-  override _onOptionDeselected(): void {
-    this._validation.dismiss()
   }
 
   override _onSelectionChange(): void {

@@ -366,7 +366,7 @@ describe('Autocomplete', () => {
       expect(autocompleteEl.classList.contains('is-valid')).toBe(true)
     })
 
-    it('should keep a validation class written in the markup and mark the field invalid', () => {
+    it('should keep a validation class written in the markup without taking it as a state', () => {
       fixtureEl.innerHTML = '<div class="autocomplete is-invalid"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -374,7 +374,7 @@ describe('Autocomplete', () => {
       })
 
       expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
-      expect(autocomplete._inputElement.getAttribute('aria-invalid')).toBe('true')
+      expect(autocomplete._inputElement.hasAttribute('aria-invalid')).toBeFalse()
     })
 
     it('should set optionsMaxHeight on the options container', () => {
@@ -594,7 +594,7 @@ describe('Autocomplete', () => {
       input.dispatchEvent(new Event('input', { bubbles: true }))
     }
 
-    it('should show a state dropped by a native reset as gone while the reset empties the search', async () => {
+    it('should keep a given state while a native reset empties the search', async () => {
       const { autocomplete, element, form, input } = mountInForm()
       const seen = []
 
@@ -604,18 +604,17 @@ describe('Autocomplete', () => {
       form.reset()
       await settle()
 
-      expect(seen).toEqual([[false, null]])
+      expect(seen).toEqual([[true, 'true']])
     })
 
-    it('should show validationState on the frame and the field, and block the submit with the message while it is invalid', () => {
+    it('should show validationState on the frame and the field, describe the field with the message while it is invalid, and let the form submit', () => {
       const { autocomplete, element, form, input } = mountInForm({ validationState: 'invalid' })
       const { id } = fixtureEl.querySelector('.invalid-feedback')
 
       expect(element).toHaveClass('is-invalid')
       expect(input.getAttribute('aria-invalid')).toBe('true')
       expect(input.getAttribute('aria-describedby')).toBe(id)
-      expect(form.checkValidity()).toBeFalse()
-      expect(input.validationMessage).toBe('Pick a country.')
+      expect(form.checkValidity()).toBeTrue()
 
       autocomplete.setValidationState('warning')
 
@@ -643,7 +642,7 @@ describe('Autocomplete', () => {
     })
 
     it('should change only the state on setValidationState', () => {
-      const { autocomplete, element, input } = mountInForm({}, { classes: 'is-valid' })
+      const { autocomplete, element, input } = mountInForm({ validationState: 'valid' })
       const items = autocomplete._options
       input.value = 'Opt'
 
@@ -666,23 +665,23 @@ describe('Autocomplete', () => {
       ['the cleaner', ({ autocomplete }) => autocomplete._cleanerElement.click()],
       ['Backspace on the selected option', ({ input }) => input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))],
       ['Delete on the selected option', ({ input }) => input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))]
-    ])('should drop a given state and a state class from the markup through %s', (_, act) => {
-      for (const given of [{ config: { validationState: 'invalid' } }, { classes: 'is-invalid' }]) {
-        const mounted = mountInForm({ cleaner: true, value: '1', ...given.config }, { classes: given.classes ?? '' })
+    ])('should keep a given state through %s, and leave a state class the markup carried', (_, act) => {
+      for (const pageClass of ['', 'is-invalid']) {
+        const mounted = mountInForm({ cleaner: true, value: '1', validationState: 'invalid' }, { classes: pageClass })
 
         act(mounted)
 
-        expect(mounted.element).not.toHaveClass('is-invalid')
-        expect(mounted.input.hasAttribute('aria-invalid')).toBeFalse()
+        expect(mounted.element).toHaveClass('is-invalid')
+        expect(mounted.input.getAttribute('aria-invalid')).toBe('true')
         expect(mounted.form.checkValidity()).toBeTrue()
 
         mounted.autocomplete.dispose()
 
-        expect(mounted.element).not.toHaveClass('is-invalid')
+        expect(mounted.element.classList.contains('is-invalid')).toBe(Boolean(pageClass))
       }
     })
 
-    it.each([['Escape', 'escape'], ['a click outside', 'click'], ['leaving the field', 'blur']])('should drop a given state when %s empties a field that takes only defined options', async (_, how) => {
+    it.each([['Escape', 'escape'], ['a click outside', 'click'], ['leaving the field', 'blur']])('should keep a given state when %s empties a field that takes only defined options', async (_, how) => {
       const { element, input } = mountInForm({ allowOnlyDefinedOptions: true, validationState: 'invalid' })
       input.focus()
       await userEvent.keyboard('Op')
@@ -697,7 +696,7 @@ describe('Autocomplete', () => {
       }
 
       expect(input.value).toBe('')
-      expect(element).not.toHaveClass('is-invalid')
+      expect(element).toHaveClass('is-invalid')
     })
 
     it('should keep a given state when Escape leaves an empty field empty', async () => {
@@ -710,7 +709,7 @@ describe('Autocomplete', () => {
     })
 
     it('should keep a given state through changes from code and through user actions that change nothing', () => {
-      const { autocomplete, element, form } = mountInForm({ value: '1', validationState: 'invalid' }, { classes: 'is-invalid' })
+      const { autocomplete, element, input } = mountInForm({ value: '1', validationState: 'invalid' }, { classes: 'is-invalid' })
 
       autocomplete._onOptionSelected('1')
       autocomplete.setOptions([...OPTIONS, { label: 'Option 3', value: '3' }])
@@ -719,26 +718,294 @@ describe('Autocomplete', () => {
       autocomplete.deselectAll()
 
       expect(element).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(input.getAttribute('aria-invalid')).toBe('true')
 
       autocomplete.dispose()
 
       expect(element).toHaveClass('is-invalid')
     })
 
-    it('should lift the block before change.coreui.autocomplete and treat what the page does there as code', () => {
-      const { autocomplete, element, form, input } = mountInForm({ validationState: 'invalid' })
+    it('should keep the state at change.coreui.autocomplete and drop it at once when the page clears it there', () => {
+      const { autocomplete, element, input } = mountInForm({ validationState: 'invalid' })
       const seen = []
 
       element.addEventListener('change.coreui.autocomplete', () => {
-        seen.push(input.validity.valid)
-        autocomplete.setValidationState('invalid')
+        seen.push(element.classList.contains('is-invalid'))
+        autocomplete.setValidationState(null)
+        seen.push(element.classList.contains('is-invalid'))
       }, { once: true })
       autocomplete._onOptionSelected('2')
 
-      expect(seen).toEqual([true])
-      expect(element).toHaveClass('is-invalid')
-      expect(form.checkValidity()).toBeFalse()
+      expect(seen).toEqual([true, false])
+      expect(element).not.toHaveClass('is-invalid')
+      expect(input.hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    const clickOption = (autocomplete, value) => {
+      autocomplete.show()
+      autocomplete._optionsElement.querySelector(`.list-box-option[data-coreui-value="${value}"]`).click()
+    }
+
+    const giveStateForRejectedText = ({ autocomplete, element, input }, { symmetric = false } = {}) => {
+      const rejected = input.value
+      const seen = []
+      const followText = event => {
+        seen.push([event.type.split('.')[0], input.value])
+
+        if (symmetric) {
+          autocomplete.setValidationState(input.value === rejected ? 'invalid' : null)
+        } else if (input.value !== rejected) {
+          autocomplete.setValidationState(null)
+        }
+      }
+
+      autocomplete.setValidationState('invalid')
+      element.addEventListener('change.coreui.autocomplete', followText)
+      element.addEventListener('input.coreui.autocomplete', followText)
+
+      return seen
+    }
+
+    const typeText = async (input, text) => {
+      input.focus()
+      await userEvent.keyboard(text)
+    }
+
+    it.each([
+      ['an open and an outside close', {}, async ({ autocomplete }) => {
+        autocomplete.show()
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+      }, [['input', 'Option 1']]],
+      ['Tab out of the open panel', { text: 'Opt' }, async ({ autocomplete }) => {
+        expect(autocomplete._isShown()).toBeTrue()
+        await userEvent.keyboard('{Tab}')
+      }, [['input', 'Opt']]],
+      ['Enter on unchanged text', { text: 'Opt' }, async () => {
+        await userEvent.keyboard('{Enter}')
+      }, [['input', 'Opt']]],
+      ['a pick of the already selected option', {}, async ({ autocomplete }) => clickOption(autocomplete, '1'), []],
+      ['a native reset to the same value', {}, async ({ form }) => {
+        form.reset()
+        await settle()
+      }, []]
+    ])('keeps a given state through %s when the page clears it only for a changed text', async (_, { text }, act, events) => {
+      const check = async symmetric => {
+        const mounted = mountInForm(text ? { cleaner: true } : { cleaner: true, value: '1' })
+
+        if (text) {
+          await typeText(mounted.input, text)
+        }
+
+        const seen = giveStateForRejectedText(mounted, { symmetric })
+
+        await act(mounted)
+
+        expect(seen).toEqual(events)
+        expect(mounted.element).toHaveClass('is-invalid')
+        expect(mounted.input.getAttribute('aria-invalid')).toBe('true')
+        mounted.autocomplete.dispose()
+      }
+
+      await check(false)
+      await check(true)
+    })
+
+    it.each([
+      ['typing', async ({ input }) => {
+        input.focus()
+        input.setSelectionRange(input.value.length, input.value.length)
+        await userEvent.keyboard('x')
+      }, [['change', 'Option 1x'], ['input', 'Option 1x']]],
+      ['a pick of another option', async ({ autocomplete }) => clickOption(autocomplete, '2'), [['change', 'Option 2'], ['input', 'Option 2']]],
+      ['the cleaner', async ({ autocomplete }) => autocomplete._cleanerElement.click(), [['input', ''], ['change', '']]],
+      ['Backspace that removes the selection', async ({ input }) => {
+        input.focus()
+        input.setSelectionRange(input.value.length, input.value.length)
+        await userEvent.keyboard('{Backspace}')
+      }, [['change', 'Option 1'], ['input', 'Option ']]],
+      ['Delete that removes the selection', async ({ input }) => {
+        input.focus()
+        input.setSelectionRange(0, 0)
+        await userEvent.keyboard('{Delete}')
+      }, [['change', 'Option 1'], ['input', 'ption 1']]]
+    ])('clears a given state on %s when the page clears it only for a changed text', async (_, act, events) => {
+      const check = async symmetric => {
+        const mounted = mountInForm({ cleaner: true, value: '1' })
+        const seen = giveStateForRejectedText(mounted, { symmetric })
+
+        await act(mounted)
+
+        expect(seen).toEqual(events)
+        expect(mounted.element).not.toHaveClass('is-invalid')
+        expect(mounted.input.hasAttribute('aria-invalid')).toBeFalse()
+        mounted.autocomplete.dispose()
+      }
+
+      await check(false)
+      await check(true)
+    })
+
+    it.each([
+      ['the user types a character and deletes it', async ({ input }) => {
+        input.focus()
+        input.setSelectionRange(input.value.length, input.value.length)
+        await userEvent.keyboard('x{Backspace}')
+        await userEvent.keyboard('{Tab}')
+        await settle()
+      }, [['change', 'Option 1x'], ['input', 'Option 1x'], ['input', 'Option 1'], ['change', 'Option 1'], ['input', 'Option 1']]],
+      ['a native reset restores the rejected value', async ({ autocomplete, form }) => {
+        clickOption(autocomplete, '2')
+        form.reset()
+        await settle()
+      }, [['change', 'Option 2'], ['input', 'Option 2'], ['change', 'Option 1']]]
+    ])('shows a given state again when %s brings the rejected text back', async (_, act, events) => {
+      const mounted = mountInForm({ cleaner: true, value: '1' })
+      const seen = giveStateForRejectedText(mounted, { symmetric: true })
+
+      await act(mounted)
+
+      expect(seen).toEqual(events)
+      expect(mounted.input.value).toBe('Option 1')
+      expect(mounted.element).toHaveClass('is-invalid')
+      expect(mounted.input.getAttribute('aria-invalid')).toBe('true')
+    })
+
+    describe('with allowOnlyDefinedOptions', () => {
+      const mountRejected = () => mountInForm({ allowOnlyDefinedOptions: true, cleaner: true, value: '1' })
+
+      const leave = async () => {
+        await userEvent.keyboard('{Tab}')
+        await settle()
+      }
+
+      const clickOutside = async input => {
+        input.blur()
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+        await settle()
+      }
+
+      const replaceText = async (input, text) => {
+        input.focus()
+        input.select()
+        await userEvent.keyboard(text)
+      }
+
+      it.each([
+        ['an open and an outside close', async ({ autocomplete }) => {
+          autocomplete.show()
+          document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+          await settle()
+        }, [['input', 'Option 1']]],
+        ['an open and Escape, then leaving the field', async ({ input }) => {
+          input.focus()
+          await userEvent.keyboard('{ArrowDown}')
+          await userEvent.keyboard('{Escape}')
+          await leave()
+        }, []],
+        ['Delete that removes no text, then leaving the field', async ({ input }) => {
+          input.focus()
+          input.setSelectionRange(input.value.length, input.value.length)
+          await userEvent.keyboard('{Delete}')
+          await leave()
+        }, [['change', 'Option 1'], ['change', 'Option 1'], ['input', 'Option 1']]],
+        ['Backspace that removes no text, then leaving the field', async ({ input }) => {
+          input.focus()
+          input.setSelectionRange(0, 0)
+          await userEvent.keyboard('{Backspace}')
+          await leave()
+        }, [['change', 'Option 1'], ['change', 'Option 1'], ['input', 'Option 1']]],
+        ['a native reset to the same value', async ({ form }) => {
+          form.reset()
+          await settle()
+        }, []]
+      ])('keeps a given state through %s when the page clears it only for a changed text', async (_, act, events) => {
+        const check = async symmetric => {
+          const mounted = mountRejected()
+          const seen = giveStateForRejectedText(mounted, { symmetric })
+
+          await act(mounted)
+
+          expect(seen).toEqual(events)
+          expect(mounted.input.value).toBe('Option 1')
+          expect(mounted.element).toHaveClass('is-invalid')
+          expect(mounted.input.getAttribute('aria-invalid')).toBe('true')
+          mounted.autocomplete.dispose()
+        }
+
+        await check(false)
+        await check(true)
+      })
+
+      it.each([
+        ['one more character, then leaving the field that empties it', async ({ input }) => {
+          input.focus()
+          input.setSelectionRange(input.value.length, input.value.length)
+          await userEvent.keyboard('x')
+          await leave()
+        }, [['change', 'Option 1x'], ['input', 'Option 1x'], ['input', ''], ['change', '']], ''],
+        ['text that names no option, then Escape that empties it', async ({ input }) => {
+          await replaceText(input, 'Zed')
+          await userEvent.keyboard('{Escape}')
+          await settle()
+        }, [['change', 'Z'], ['input', 'Z'], ['input', 'Ze'], ['input', 'Zed'], ['input', '']], ''],
+        ['text that names no option, then a click outside that empties it', async ({ input }) => {
+          await replaceText(input, 'Zed')
+          await clickOutside(input)
+        }, [['change', 'Z'], ['input', 'Z'], ['input', 'Ze'], ['input', 'Zed'], ['input', ''], ['change', '']], ''],
+        ['a pick of another option', async ({ autocomplete }) => clickOption(autocomplete, '2'), [['change', 'Option 2'], ['input', 'Option 2']], 'Option 2'],
+        ['the cleaner', async ({ autocomplete }) => autocomplete._cleanerElement.click(), [['input', ''], ['change', '']], '']
+      ])('clears a given state on %s when the page clears it only for a changed text', async (_, act, events, text) => {
+        const check = async symmetric => {
+          const mounted = mountRejected()
+          const seen = giveStateForRejectedText(mounted, { symmetric })
+
+          await act(mounted)
+
+          expect(seen).toEqual(events)
+          expect(mounted.input.value).toBe(text)
+          expect(mounted.element).not.toHaveClass('is-invalid')
+          expect(mounted.input.hasAttribute('aria-invalid')).toBeFalse()
+          mounted.autocomplete.dispose()
+        }
+
+        await check(false)
+        await check(true)
+      })
+
+      const mountEmpty = () => mountInForm({ allowOnlyDefinedOptions: true, cleaner: true })
+
+      it.each([
+        ['leaving the field empties a text that names no option', mountEmpty, async ({ input }) => {
+          await typeText(input, 'Zed')
+          await leave()
+        }, [['input', 'Z'], ['input', 'Ze'], ['input', 'Zed'], ['input', ''], ['change', '']], ''],
+        ['Escape empties a text that names no option', mountEmpty, async ({ input }) => {
+          await typeText(input, 'Zed')
+          await userEvent.keyboard('{Escape}')
+          await settle()
+        }, [['input', 'Z'], ['input', 'Ze'], ['input', 'Zed'], ['input', '']], ''],
+        ['the user types a character and deletes it', mountRejected, async ({ input }) => {
+          input.focus()
+          input.setSelectionRange(input.value.length, input.value.length)
+          await userEvent.keyboard('x{Backspace}')
+          await leave()
+        }, [['change', 'Option 1x'], ['input', 'Option 1x'], ['input', 'Option 1'], ['change', 'Option 1'], ['input', 'Option 1']], 'Option 1'],
+        ['a native reset restores the rejected value', mountRejected, async ({ autocomplete, form }) => {
+          clickOption(autocomplete, '2')
+          form.reset()
+          await settle()
+        }, [['change', 'Option 2'], ['input', 'Option 2'], ['change', 'Option 1']], 'Option 1']
+      ])('shows a given state again when %s brings the rejected text back', async (_, mount, act, events, text) => {
+        const mounted = mount()
+        const seen = giveStateForRejectedText(mounted, { symmetric: true })
+
+        await act(mounted)
+
+        expect(seen).toEqual(events)
+        expect(mounted.input.value).toBe(text)
+        expect(mounted.element).toHaveClass('is-invalid')
+        expect(mounted.input.getAttribute('aria-invalid')).toBe('true')
+      })
     })
 
     it('should keep a state the page gives on the change Backspace reports through the input of the same key', async () => {
@@ -771,7 +1038,7 @@ describe('Autocomplete', () => {
       expect(input.hasAttribute('aria-invalid')).toBeFalse()
     })
 
-    it('should not read aria-invalid on the element, nor a state class the page writes after start', () => {
+    it('should not read aria-invalid on the element, nor a state class the page writes', () => {
       fixtureEl.innerHTML = '<form><div class="autocomplete" aria-invalid="true"></div></form>'
       const element = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(element, { options: OPTIONS })
@@ -782,10 +1049,6 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputElement.hasAttribute('aria-invalid')).toBeFalse()
       expect(element.getAttribute('aria-invalid')).toBe('true')
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
-    })
-
-    it('should block the submit for a state class from the markup', () => {
-      expect(mountInForm({}, { classes: 'is-invalid' }).form.checkValidity()).toBeFalse()
     })
 
     it('should keep the description the page gives its input and add the message only while it is invalid', () => {
@@ -807,6 +1070,10 @@ describe('Autocomplete', () => {
 
       typeInto(input, 'x')
 
+      expect(input.getAttribute('aria-describedby')).toBe(`help ${id}`)
+
+      autocomplete.setValidationState(null)
+
       expect(input.getAttribute('aria-describedby')).toBe('help')
     })
 
@@ -815,7 +1082,6 @@ describe('Autocomplete', () => {
       const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), { options: OPTIONS, validationState: 'invalid' })
 
       expect(autocomplete._inputElement.getAttribute('aria-describedby')).toBe('ac-message')
-      expect(autocomplete._inputElement.validationMessage).toBe('Pick a country.')
     })
 
     it.each([['leaving the field', 'blur'], ['Enter', 'enter']])('should keep a given state when %s picks the option the text already names', (_, how) => {
@@ -891,42 +1157,14 @@ describe('Autocomplete', () => {
       expect(element).toHaveClass('is-invalid')
     })
 
-    it('should not let a key that changed nothing hold back the next change', () => {
-      const { autocomplete, element, input } = mountInForm()
-
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', bubbles: true }))
-      input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Shift', bubbles: true }))
-      autocomplete.setValidationState('invalid')
-      typeInto(input, 'x')
-
-      expect(element).not.toHaveClass('is-invalid')
-    })
-
-    it('should treat two inputs without a key between them as two actions', () => {
-      const { autocomplete, element, input } = mountInForm()
-
-      element.addEventListener('input.coreui.autocomplete', event => {
-        if (event.value === 'a') {
-          autocomplete.setValidationState('invalid')
-        }
-      })
-      typeInto(input, 'a')
-
-      expect(element).toHaveClass('is-invalid')
-
-      typeInto(input, 'ab')
-
-      expect(element).not.toHaveClass('is-invalid')
-    })
-
-    it('should lift the block before input.coreui.autocomplete when the cleaner empties the field', () => {
+    it('should keep a given state at input.coreui.autocomplete when the cleaner empties the field', () => {
       const { autocomplete, element, input } = mountInForm({ cleaner: true, value: '1', validationState: 'invalid' })
       const seen = []
 
-      element.addEventListener('input.coreui.autocomplete', () => seen.push([input.validity.valid, element.classList.contains('is-invalid'), input.getAttribute('aria-invalid')]))
+      element.addEventListener('input.coreui.autocomplete', () => seen.push([element.classList.contains('is-invalid'), input.getAttribute('aria-invalid')]))
       autocomplete._cleanerElement.click()
 
-      expect(seen[0]).toEqual([true, false, null])
+      expect(seen[0]).toEqual([true, 'true'])
     })
 
     it('should keep a state the page gives on input.coreui.autocomplete when Escape empties a field that takes only defined options', async () => {
@@ -945,14 +1183,15 @@ describe('Autocomplete', () => {
       expect(element).toHaveClass('is-invalid')
     })
 
-    it('should keep the state class from the markup when setValidationState rejects the state', () => {
-      const { autocomplete, element, input } = mountInForm({}, { classes: 'is-invalid' })
+    it('should keep a given state when setValidationState rejects the state', () => {
+      const { autocomplete, element, input } = mountInForm({ validationState: 'invalid' })
 
       expect(() => autocomplete.setValidationState(1)).toThrowError(TypeError)
 
       input.dispatchEvent(new Event('focusout'))
 
       expect(element).toHaveClass('is-invalid')
+      expect(input.getAttribute('aria-invalid')).toBe('true')
     })
 
     it('should not report the free text a native reset clears, also when the page gives a state right after it', async () => {
@@ -970,11 +1209,11 @@ describe('Autocomplete', () => {
 
       typeInto(input, 'foo')
 
-      expect(element).not.toHaveClass('is-invalid')
+      expect(element).toHaveClass('is-invalid')
     })
 
     it('should settle its state before it reports a value that arrives with late options after a reset', async () => {
-      const { autocomplete, element, form } = mountInForm({ options: [], required: true, value: '3' })
+      const { autocomplete, element, form } = mountInForm({ options: [], required: true, value: '3' }, { attributes: 'data-coreui-validate' })
       const seen = []
 
       form.reset()
@@ -989,7 +1228,7 @@ describe('Autocomplete', () => {
       expect(seen).toEqual([false])
     })
 
-    it.each([['before the reset', 'before', false], ['in a reset listener', 'listener', true], ['right after form.reset()', 'after', true]])('should put back the value it started with on a native reset and treat a state given %s as the reset says', async (_, when, kept) => {
+    it.each([['before the reset', 'before'], ['in a reset listener', 'listener'], ['right after form.reset()', 'after']])('should put back the value it started with on a native reset and keep a state given %s', async (_, when) => {
       const { autocomplete, element, form, input } = mountInForm({ value: '1' })
       const giveState = () => autocomplete.setValidationState('invalid')
 
@@ -1010,16 +1249,16 @@ describe('Autocomplete', () => {
       await settle()
 
       expect(input.value).toBe('Option 1')
-      expect(element.classList.contains('is-invalid')).toBe(kept)
+      expect(element).toHaveClass('is-invalid')
     })
 
-    it('should drop a state class from the markup on a native reset', async () => {
-      const { element, form } = mountInForm({ value: '1' }, { classes: 'is-valid' })
+    it('should keep a given state through a native reset', async () => {
+      const { element, form } = mountInForm({ validationState: 'valid', value: '1' })
 
       form.reset()
       await settle()
 
-      expect(element).not.toHaveClass('is-valid')
+      expect(element).toHaveClass('is-valid')
     })
   })
 
@@ -1981,21 +2220,6 @@ describe('Autocomplete', () => {
       autocomplete._togglerElement.click()
 
       expect(autocomplete._isShown()).toBeTrue()
-    })
-
-    it('should block the submit once enable() runs on a field built disabled and invalid, and stop again on disable()', () => {
-      const { autocomplete, form } = mount({ disabled: true, validationState: 'invalid' })
-
-      expect(form.checkValidity()).toBeTrue()
-
-      autocomplete.enable()
-
-      expect(form.checkValidity()).toBeFalse()
-
-      autocomplete.disable()
-
-      expect(form.checkValidity()).toBeTrue()
-      expect(autocomplete._inputElement.validity.customError).toBeFalse()
     })
 
     it('should not take a gesture in an open list once disable() runs', () => {
@@ -3935,7 +4159,7 @@ describe('Autocomplete', () => {
   })
 
   describe('dispose', () => {
-    it('should give back validation classes from the markup and remove its own', () => {
+    it('should leave validation classes from the markup and remove its own', () => {
       fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -3943,7 +4167,8 @@ describe('Autocomplete', () => {
         options: []
       })
 
-      expect(autocompleteEl.classList.contains('is-valid')).toBeFalse()
+      expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
+      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
 
       autocomplete.dispose()
 
@@ -6005,39 +6230,6 @@ describe('Autocomplete', () => {
       autocomplete.show()
 
       expect(autocomplete._menu.querySelector('[role="listbox"]').getAttribute('aria-labelledby')).toBe(input.id)
-    })
-
-    it('should treat dragging text inside the field as one change', () => {
-      const { autocomplete, element, input } = start({ validationState: 'invalid' })
-
-      element.addEventListener('change.coreui.autocomplete', () => {}, { once: true })
-      type(input, 'ab', 'deleteByDrag')
-      autocomplete.setValidationState('valid')
-      type(input, 'ba', 'insertFromDrop')
-
-      expect(element.classList.contains('is-valid')).toBeTrue()
-    })
-
-    it('should end a drag that left the field when the field loses the focus', () => {
-      const { autocomplete, element, input } = start({ validationState: 'valid' })
-
-      type(input, 'ab', 'deleteByDrag')
-      input.dispatchEvent(createEvent('blur'))
-      autocomplete.setValidationState('invalid')
-      type(input, 'abc', 'insertFromPaste')
-
-      expect(element.classList.contains('is-invalid')).toBeFalse()
-    })
-
-    it('should end the drag with its drop, so the next change drops a state again', () => {
-      const { autocomplete, element, input } = start({ validationState: 'invalid' })
-
-      type(input, 'ab', 'deleteByDrag')
-      type(input, 'ba', 'insertFromDrop')
-      autocomplete.setValidationState('valid')
-      type(input, 'bax')
-
-      expect(element.classList.contains('is-valid')).toBeFalse()
     })
   })
 

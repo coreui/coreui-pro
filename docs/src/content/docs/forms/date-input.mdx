@@ -149,14 +149,14 @@ A field holds what its format shows. A date given with a time of day to a field 
 
 ## Min and max dates
 
-Constrain the selectable range with `minDate` and `maxDate`. A completed date outside the range gets the `.is-invalid` class and the component reports `null` until the value is corrected. A date field compares the limits by the day. A field with a time compares them to the smallest unit it shows, and there a `maxDate` without a time of day covers its whole day.
+Constrain the selectable range with `minDate` and `maxDate`. A completed date outside the range blocks the submit, whether the field is required or not, with the browser's own message, which names the limit the date crosses, as for a native `<input type="date">` with `min` and `max`. The field gets the `.is-invalid` class at once, and the component reports `null` and submits no date until the value is corrected. A date field compares the limits by the day. A field with a time compares them to the smallest unit it shows, and there a `maxDate` without a time of day covers its whole day.
 
 <Example pro code={`<label class="form-label" id="dateInputDateInJuly2026Label">Date in July 2026</label>
   <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31" aria-labelledby="dateInputDateInJuly2026Label"></div>`} />
 
 ## Disabled dates
 
-Beyond a simple range, the `disabledDates` option excludes specific dates — single `Date`s, `[start, end]` ranges, or a matcher function. Unlike in the [date picker](/forms/date-picker/#disabled-dates), there is no calendar to gray out: a completed date that hits a disabled entry gets the `.is-invalid` class and the component reports `null` until the value is corrected.
+Beyond a simple range, the `disabledDates` option excludes specific dates — single `Date`s, `[start, end]` ranges, or a matcher function. Unlike in the [date picker](/forms/date-picker/#disabled-dates), there is no calendar to gray out: a completed date that hits a disabled entry gets the `.is-invalid` class and blocks the submit, and the component reports `null` until the value is corrected. A native date input has nothing like `disabledDates`, so the browser has no message of its own for such a date and shows the one it gives an empty field. Give your own hint next to the field, such as the days you deliver on, and link it with `aria-describedby`.
 
 In this example July 4–7 and July 16 can't be entered — try typing one of them:
 
@@ -205,17 +205,16 @@ Localized formats work the same way — the section names come from the componen
 
 ## Validation
 
-The field shows its validation state on the element and on its sections, and links the message that follows it, the way the [form plugin](/forms/validation/) does for a native field. It keeps its value in a `<textarea>` laid invisibly over the field, which takes part in native constraint validation: a `required` field that is empty, incomplete or holds a rejected date blocks the submit, and the browser, or the [form plugin](/forms/validation/#usage), puts focus on its first empty section, the browser with its own message over the field. A field that is not required does not block, and submits no date while it rejects one.
+The field shows its validation state on the element and on its sections, and links the message that follows it, the way the [form plugin](/forms/validation/) does for a native field. It keeps its value in a `<textarea>` laid invisibly over the field, which takes part in native constraint validation: a `required` field that is empty or incomplete blocks the submit, and the browser, or the [form plugin](/forms/validation/#usage), puts focus on its first empty section, the browser with its own message over the field. A field that is not required and empty or incomplete does not block. A rejected date blocks the submit whether the field is required or not, through a second hidden `<textarea>` the component places before the value field. That control has no name, so it is never submitted, it carries the browser's message for the limit the date crosses, and it is disabled and read-only with the field, so a disabled or read-only field never blocks. Reach the value field through `form.elements[name]`, not as the first `<textarea>` of the field. A submit your code makes with `form.submit()` skips validation, as it does for native fields, so call `form.checkValidity()` before it.
 
-The state comes from five places, in this order:
+The state comes from four places, in this order:
 
-- The limits: a completed date outside `minDate`/`maxDate`/`disabledDates` makes the field invalid until it is corrected, whatever else is set, and until then the value field submits no date, as `getDate()` returns none; a read-only field holding such a date submits none either. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
-- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`.
-- An `.is-invalid` or `.is-valid` class written on the element in the markup, for example by a server that has already checked the date. It is read once, when the component starts.
-- A validation that reports the field invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the field shows it invalid whenever its date is invalid, until a native reset of the form.
+- The limits: a completed date outside `minDate`/`maxDate`/`disabledDates` makes the field invalid until it is corrected, whatever else is set, and until then the value field submits no date, as `getDate()` returns none; a read-only field holding such a date submits none either. The field shows the error at once, in any form and outside one, as it always did, and now also blocks the submit; a disabled or read-only field shows it as well and does not block. A date before year 1 counts as before `minDate` even without that option, with the browser's message for an empty field; when the field loses the focus, its year becomes 1.
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. In the markup, for example from a server that has already checked the date, set it with `data-coreui-validation-state`.
+- A validation that reports the field invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the field shows it invalid whenever its date is invalid, until a native reset of the form. This holds in a form with `data-coreui-validate`, in a form the form plugin validated, in a form with `novalidate` the stepper validated, and outside a form; in any other form the field shows what a native field shows after a blocked submit, the browser's message and the focus, see [Form components](/forms/validation/#form-components).
 - In a form with `data-coreui-validate`, the `:user-invalid` and `:user-valid` states of the value field, the same states the stylesheet reads on a native field. A field becomes `.is-valid` after a submit only when the form opts into success styling with `data-coreui-validate="valid"`.
 
-A state you give, with the option or with the class, is a verdict on the date it was given for, so the next change of the date the user makes drops it: a typed digit or letter, an arrow, <kbd>Backspace</kbd> or <kbd>Delete</kbd>, a paste or a cut that changes what the field holds. A key that leaves the field as it is keeps the state. A change your own code makes, with `setDate()`, `clear()` or `reset()`, keeps it. To set it again, from a `dateChange.coreui.date-input` or `change` listener or after a server response, call `setValidationState()`. It updates the state without rebuilding the field and replaces a class written on the element, so `setValidationState(null)` withdraws that class. A class or an `aria-invalid` written on the element after the component starts is not read. While the given state is `'invalid'`, the field blocks the submit like any invalid field, with the text of the linked message, or `Invalid value.` when there is none; a custom validity you set on the value field yourself stays as it is, and a disabled or read-only field does not block. A native form reset returns the field to the date it was created with and drops the state; a `reset` listener that calls `preventDefault()` cancels the whole reset.
+A state you give stays until you change it: the user's edits, a native form reset and a change your own code makes, with `setDate()`, `clear()` or `reset()`, keep it. Every edit that changes the date fires `dateChange.coreui.date-input`, so to clear the state when the user changes the date, call `setValidationState(null)` in a `dateChange.coreui.date-input` listener. A listener there also clears the state on a native form reset and on `clear()` and `reset()`, which fire `dateChange.coreui.date-input` when they change the date; `setDate()` fires it only with `triggerChange`. To change it, there or after a server response, call `setValidationState()`. It updates the state without rebuilding the field. A `.is-invalid` or `.is-valid` class or an `aria-invalid` written on the element is not read, at start or later; the class stays yours and paints the field without giving the sections `aria-invalid` or a linked message, see [Form components](/forms/validation/#form-components). A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field, `form.elements[name]`, which the component leaves as it is, see [Form components](/forms/validation/#form-components). A native form reset returns the field to the date it was created with and keeps the state; a `reset` listener that calls `preventDefault()` cancels the whole reset.
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control. While the field is invalid, its error message, an `.invalid-feedback` or `.invalid-tooltip` after the field, after the frame around it or in its `.form-field`, describes every section, so a screen reader reads the error with the field. A message placed anywhere else can be named in `data-coreui-invalid-feedback` on the field, and one with the `hidden` attribute is left out, so an `errorChange` listener can show the message that matches `event.error` and hide the rest. A message the page adds later, while the field stays invalid, is picked up the next time the field changes, or right away when it is added in an `errorChange` listener.
 
@@ -224,7 +223,7 @@ Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other fo
     <div class="valid-feedback">Looks good!</div>
   </div>
   <div class="form-field">
-    <div class="form-control form-date-time is-invalid" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-20"></div>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-20" data-coreui-validation-state="invalid"></div>
     <div class="invalid-feedback">We have no delivery slots left on this date.</div>
   </div>`} />
 
@@ -249,7 +248,7 @@ Add `.form-floating-always` to the wrapper, or to any ancestor, to keep the labe
 
 ## Sizing
 
-The field renders as a `.form-control`, so the standard sizing classes work — add `.form-control-sm` or `.form-control-lg` to the container. Validation states (`.is-invalid` set automatically for out-of-range dates, or your own `.is-valid`) and input groups work the same way.
+The field renders as a `.form-control`, so the standard sizing classes work — add `.form-control-sm` or `.form-control-lg` to the container. Validation states (`.is-invalid` set automatically for out-of-range dates, or a state you give with `data-coreui-validation-state` or `setValidationState()`) and input groups work the same way.
 
 <Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateInputLargeLabel">Large</label>
@@ -285,7 +284,7 @@ The date input implements the [spinbutton pattern](https://www.w3.org/WAI/ARIA/a
 - **Roving tabindex**: the whole field is a single tab stop; arrow keys move between sections.
 - **Labels**: point `aria-labelledby` at the visible label, as the examples on this page do, because a `<label for>` does not name a group. An `aria-label` written on the element stays as it is, and the `ariaLabel` option fills it in only when the element has none. Sections receive `aria-label`s (`Day`, `Month`, `Year`), each replaceable on its own — `ariaDayLabel`, `ariaMonthLabel`, `ariaYearLabel` — for localization.
 - **Label click**: clicking a label that names the field, through `aria-labelledby` or a `<label for>` pointing at the element, moves focus to the first empty section, as clicking the label of an input focuses it.
-- **Validity**: while the field is invalid (a date outside `minDate` / `maxDate` or in `disabledDates`, a date before year 1, a given `'invalid'` state, or a validation that reported the field), every section carries `aria-invalid="true"`. The group does not, since ARIA defines no invalid state for a group, and an `aria-invalid` you write on the element is left as it is and does not change the state; set it with `validationState`. A disabled or read-only field is never reported as missing. With `required`, every section carries `aria-required="true"`.
+- **Validity**: while the field is invalid (a date outside `minDate` / `maxDate` or in `disabledDates`, a date before year 1, a given `'invalid'` state, or a validation that reported the field where the field shows it, see [Validation](#validation)), every section carries `aria-invalid="true"`. The group does not, since ARIA defines no invalid state for a group, and an `aria-invalid` you write on the element is left as it is and does not change the state; set it with `validationState`. A disabled or read-only field is never reported as missing. With `required`, every section carries `aria-required="true"`.
 - **Description**: the `aria-describedby` the field has when it starts, pointing at its help text or feedback message, reaches the first section, and every section while the field is invalid, together with the error message shown for the field, so the reason for an error is read wherever the focus sits without the help text repeating on each section. A description the page sets on the field later stays on the field.
 - **Mobile input**: sections use `inputmode="numeric"`, so touch devices show the numeric keyboard.
 
@@ -345,14 +344,14 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `date` | date, number, string, null | `null` | Initial date |
 | `dayPlaceholder` | string, null | `null` | Replaces the `DD` the day section shows while it is empty. |
 | `disabled` | boolean | `false` | Disable the component. |
-| `disabledDates` | array, date, function, null | `null` | Dates (or a matcher function) that can't be selected |
+| `disabledDates` | array, date, function, null | `null` | Dates (or a matcher function) that can't be selected. A completed date among them blocks the submit, see [Disabled dates](#disabled-dates). |
 | `format` | function, string, null | `null` | Mask layout: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
 | `hourPlaceholder` | string, null | `null` | Replaces the `HH` (`hh` on a 12-hour clock) the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
 | `locale` | string | `'default'` | Locale used to derive the mask layout and month names |
-| `maxDate` | date, number, string, null | `null` | Latest selectable date |
+| `maxDate` | date, number, string, null | `null` | Latest selectable date. A completed date after it blocks the submit, see [Validation](#validation). |
 | `meridiemPlaceholder` | string, null | `null` | Replaces the `AM` the meridiem section shows while it is empty. |
-| `minDate` | date, number, string, null | `null` | Earliest selectable date |
+| `minDate` | date, number, string, null | `null` | Earliest selectable date. A completed date before it blocks the submit, see [Validation](#validation). |
 | `minutePlaceholder` | string, null | `null` | Replaces the `mm` the minute section shows while it is empty. |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`), overriding the locale-derived, date-context grammatical form |
 | `monthPlaceholder` | string, null | `null` | Replaces the `MM` the month section shows while it is empty. |
@@ -363,7 +362,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
 | `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout of `type="datetime"` and `type="time"` |
 | `type` | string | `'date'` | Which sections the locale-derived layout carries: `'date'`, `'datetime'` or `'time'`. A `format` names the sections itself and overrides this. |
-| `validationState` | string, null | `null` | The validation state the field shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change of the date by the user clears it, see [Validation](#validation). |
+| `validationState` | string, null | `null` | The validation state the field shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` does not block the submit. It stays until you change it, see [Validation](#validation). |
 | `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
 | `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |
 

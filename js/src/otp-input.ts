@@ -115,14 +115,12 @@ class OTPInput extends BaseComponent {
     this._resetCode = null
     this._value = ''
     this._validation = new FieldValidation(this._element, {
-      canBlock: () => !this._disabled,
       config: () => this._config,
       fields: () => (this._inputElement ? [this._inputElement] : []),
       frames: () => [this._element],
       invalidTargets: () => this._getInputs(),
       owned: () => [this._inputElement!, ...this._getInputs()],
-      restore: () => this._restoreValue(),
-      serverClassSources: () => [this._element, ...this._getInputs()]
+      restore: () => this._restoreValue()
     })
 
     this._element.setAttribute('role', 'group')
@@ -190,7 +188,7 @@ class OTPInput extends BaseComponent {
 
   setValidationState(validationState: ValidationState | null): void {
     this._config = this._getConfig({ ...this._config, validationState })
-    this._validation.configure()
+    this._validation.update()
   }
 
   setValue(value: OtpInputConfig['value']): void {
@@ -282,7 +280,7 @@ class OTPInput extends BaseComponent {
       const value = inputs.map((input: HTMLInputElement) => input.value).join('')
 
       if (value !== (this._inputElement ? this._inputElement.value : '')) {
-        this._setValue(value, true)
+        this._setValue(value)
       }
 
       if (target!.value.length === 1) {
@@ -367,7 +365,7 @@ class OTPInput extends BaseComponent {
     inputs[nextEmptyIndex < inputs.length ? nextEmptyIndex : inputs.length - 1].focus()
 
     // Read the value back from the slots so already-filled ones are preserved.
-    this._setValue(inputs.map((input: HTMLInputElement) => input.value).join(''), true)
+    this._setValue(inputs.map((input: HTMLInputElement) => input.value).join(''))
     this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
     this._checkAutoSubmit(inputs)
@@ -474,7 +472,7 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _setValue(value: string | null, byUser = false): void {
+  _setValue(value: string | null): void {
     if (!this._inputElement) {
       return
     }
@@ -484,11 +482,6 @@ class OTPInput extends BaseComponent {
 
     this._value = code
     writeValueField(this._inputElement, code)
-
-    if (isChanged && byUser) {
-      this._validation.dismiss()
-    }
-
     this._validation.update()
 
     if (!isChanged) {

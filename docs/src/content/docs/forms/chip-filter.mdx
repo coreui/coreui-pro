@@ -78,7 +78,7 @@ Give the filter a `name` and its selection is submitted with the form, in a hidd
     </div>
   </form>`} />
 
-The state comes from `validationState`, from `.is-invalid` or `.is-valid` written in the markup, or from a validation that reports the field invalid, as on the [other form fields](/forms/chip-input/#validation). A native reset of the form puts back the selection the filter started with, limited to the options it still lists.
+The state comes from `validationState` (`data-coreui-validation-state` in the markup) or from a validation that reports the field invalid, in the forms where the [other form fields](/forms/chip-input/#validation) show it. A `.is-invalid` or `.is-valid` class written on the filter is not read and stays yours, see [Form components](/forms/validation/#form-components). A given state stays until you change it: every change of the selection fires `change.coreui.chip-filter`, so to clear the state when the user changes the selection, call `setValidationState(null)` in a `change.coreui.chip-filter` listener. A listener there also clears the state on a native form reset and on `selectChip()`, `selectAll()`, `deselectAll()` and `clear()`, which fire `change.coreui.chip-filter` when they change the selection. A native reset of the form puts back the selection the filter started with, limited to the options it still lists, and keeps the state.
 
 ## Usage
 
@@ -119,7 +119,7 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | `selectionMode` | string | `'multiple'` | Selection behavior: `'multiple'` allows several selected chips, `'single'` keeps at most one. |
 | `typeahead` | boolean | `true` | Moves focus to the chip whose value starts with the typed characters. |
 | `unique` | boolean | `false` | Prevents adding a chip whose value already exists. |
-| `validationState` | string \| null | `null` | The state the filter shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. |
+| `validationState` | string \| null | `null` | The state the filter shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` does not block the submit. |
 
 ### Methods
 

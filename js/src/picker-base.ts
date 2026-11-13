@@ -127,7 +127,7 @@ abstract class PickerBase extends BaseComponent {
     }
 
     this._config = this._getConfig({ ...this._config, ...config })
-    this._validation.configure()
+    this._validation.update()
   }
 
   _createPopup(): void {
@@ -167,7 +167,7 @@ abstract class PickerBase extends BaseComponent {
           return
         }
 
-        this._runAsUser(() => this._clearValue(true))
+        this._clearValue(true)
 
         if (this._element && [this._cleanerElement, document.body].includes(document.activeElement as HTMLElement)) {
           SelectorEngine.findOne(SELECTOR_SECTION, this._popupAnchor())?.focus()
@@ -193,10 +193,6 @@ abstract class PickerBase extends BaseComponent {
 
   _isEditable(): boolean {
     return !this._config.disabled && !this._config.readonly
-  }
-
-  _runAsUser(action: () => void): void {
-    this._validation.runAsUser(action)
   }
 
   _createControlGroup(className: string): void {
@@ -311,10 +307,10 @@ abstract class PickerBase extends BaseComponent {
 
   _baseContext(): Record<string, any> {
     return {
-      clear: () => this._runAsUser(() => this.clear()),
+      clear: () => this.clear(),
       close: () => this.hide(),
       disabled: this._config.disabled,
-      reset: () => this._runAsUser(() => this.reset())
+      reset: () => this.reset()
     }
   }
 

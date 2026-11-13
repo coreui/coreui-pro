@@ -11,7 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import FieldValidation from './util/field-validation.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
-import { nextStateSerial, type ValidationState } from './util/form-validation.js'
+import type { ValidationState } from './util/form-validation.js'
 import {
   DefaultAllowlist, type SanitizerAllowList
 } from './util/sanitizer.js'
@@ -49,7 +49,6 @@ const EVENT_CLEAR = `clear${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
@@ -188,7 +187,6 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputElement: any
   protected declare _inputHintElement: any
   protected declare _hostAria: Array<[string, string]>
-  protected declare _keySerial: number | null
   protected declare _disabled: boolean
   protected declare _givenValue: any
   protected declare _known: Map<string, any>
@@ -210,11 +208,9 @@ class Autocomplete extends ComboboxBase {
     this._inputHintElement = null
     this._togglerElement = null
     this._openingKey = null
-    this._keySerial = null
     this._shownText = ''
     this._validation = new FieldValidation(this._element, {
       aliases: true,
-      canBlock: () => !this._disabled,
       config: () => this._config,
       fields: () => [this._inputElement],
       frames: () => [this._element],
@@ -276,7 +272,7 @@ class Autocomplete extends ComboboxBase {
 
   override _afterOutsideHide(): void {
     if (this._config.allowOnlyDefinedOptions && this._store.size() === 0) {
-      this._emptyByUser()
+      this._emptyText()
     }
 
     this.search('')
@@ -387,7 +383,7 @@ class Autocomplete extends ComboboxBase {
   setValidationState(validationState: ValidationState | null): void {
     const state = { invalid: false, valid: false, validationState }
     this._config = this._getConfig({ ...this._config, ...state })
-    this._validation.configure()
+    this._validation.update()
   }
 
   setValue(value: AutocompleteConfig['value']): void {
@@ -465,8 +461,6 @@ class Autocomplete extends ComboboxBase {
     })
 
     EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
-      this._keySerial = nextStateSerial()
-
       if (event.key === ESCAPE_KEY) {
         const handled = event.defaultPrevented
 
@@ -474,7 +468,7 @@ class Autocomplete extends ComboboxBase {
         this._handleFieldEscape(event)
 
         if (!handled && !event.repeat && !isComposingKey(event) && this._config.allowOnlyDefinedOptions && this._store.size() === 0) {
-          this._emptyByUser()
+          this._emptyText()
           this.search('')
         }
 
@@ -484,15 +478,10 @@ class Autocomplete extends ComboboxBase {
       this._routeTyping(event)
 
       if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._store.size() > 0) {
-        this._validation.dismiss(this._keySerial)
         this._clearSelection()
         this._validation.update()
         this._triggerChangeEvent(null)
       }
-    })
-
-    EventHandler.on(this._element, EVENT_KEYUP, () => {
-      this._keySerial = null
     })
 
     EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => this._routeTyping(event))
@@ -512,7 +501,6 @@ class Autocomplete extends ComboboxBase {
       const inputValue = this._inputElement.value
 
       this._awaitingOptions = false
-      this._keySerial = null
 
       if (this._disabled || inputValue.length === 0) {
         return
@@ -531,7 +519,6 @@ class Autocomplete extends ComboboxBase {
       }
 
       if (this._config.allowOnlyDefinedOptions) {
-        this._dismissForClear()
         this._emptyField()
       }
     })
@@ -565,19 +552,10 @@ class Autocomplete extends ComboboxBase {
       }
     })
 
-    EventHandler.on(this._inputElement, EVENT_INPUT, (event: any) => {
+    EventHandler.on(this._inputElement, EVENT_INPUT, () => {
       const { value } = this._inputElement
 
-      if (event.inputType === 'deleteByDrag') {
-        this._keySerial = nextStateSerial()
-      }
-
       this._listBox?._requestEntry(null)
-
-      if (value !== this._shownText) {
-        this._validation.dismiss(this._keySerial ?? Number.POSITIVE_INFINITY)
-      }
-
       this._shownText = value
       this._valueApplied = true
       this._validation.update()
@@ -597,10 +575,6 @@ class Autocomplete extends ComboboxBase {
       if (value && !this._isShown()) {
         this._showForText()
       }
-
-      if (event.inputType === 'insertFromDrop') {
-        this._keySerial = null
-      }
     })
 
     EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN, (event: any) => {
@@ -614,7 +588,7 @@ class Autocomplete extends ComboboxBase {
         event.preventDefault()
         settleClick(event)
         event.stopPropagation()
-        this._clearByUser()
+        this.clear()
         this._inputElement.focus()
       }
     })
@@ -811,11 +785,6 @@ class Autocomplete extends ComboboxBase {
     }
 
     this._valueApplied = true
-
-    if (this._inputElement.value !== option.label) {
-      this._validation.dismiss()
-    }
-
     this._applySelection(option)
     this._validation.update()
     this._triggerChangeEvent(option)
@@ -883,22 +852,7 @@ class Autocomplete extends ComboboxBase {
     return isChanged
   }
 
-  _clearByUser(): void {
-    this._dismissForClear()
-    this.clear()
-  }
-
-  _dismissForClear(): void {
-    if (this._store.size() > 0 || this._inputElement.value !== '') {
-      this._validation.dismiss()
-    }
-  }
-
-  _emptyByUser(): void {
-    if (this._inputElement.value !== '') {
-      this._validation.dismiss()
-    }
-
+  _emptyText(): void {
     this._setText('')
     this._validation.update()
   }

@@ -30,7 +30,6 @@ const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
 const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`
 const EVENT_HOVER = `hover${EVENT_KEY}`
-const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`
@@ -142,12 +141,6 @@ class Rating extends BaseComponent {
     this._items = Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index))
     this._currentValue = this._starValue(this._currentValue)
     this._validation = new FieldValidation(this._element, {
-      blockers: () => {
-        const blocked = this._blockedRadio()
-
-        return blocked ? [blocked] : []
-      },
-      canBlock: () => !this._disabled && !this._config.readonly,
       config: () => this._config,
       describedTargets: () => this._radios(),
       fields: () => this._radios(),
@@ -188,7 +181,7 @@ class Rating extends BaseComponent {
 
   setValidationState(validationState: ValidationState | null): void {
     this._config = this._getConfig({ ...this._config, validationState })
-    this._validation.configure()
+    this._validation.update()
   }
 
   setValue(value: RatingConfig['value']): void {
@@ -266,7 +259,7 @@ class Rating extends BaseComponent {
     return SelectorEngine.find<HTMLInputElement>(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)
   }
 
-  _blockedRadio(): HTMLInputElement | undefined {
+  _tabStopRadio(): HTMLInputElement | undefined {
     const radios = this._radios()
 
     return radios.find(radio => radio.checked) ?? radios[0]
@@ -300,18 +293,11 @@ class Rating extends BaseComponent {
         this._currentValue = null
         target.checked = false
         this._resetLabels()
-        this._validation.dismiss()
         this._validation.update()
 
         EventHandler.trigger(this._element, EVENT_CHANGE, {
           value: null
         })
-      }
-    })
-
-    EventHandler.on(this._element, EVENT_INPUT, SELECTOR_RATING_ITEM_INPUT, () => {
-      if (!this._disabled && !this._config.readonly) {
-        this._validation.dismiss()
       }
     })
 
@@ -501,7 +487,7 @@ class Rating extends BaseComponent {
       return
     }
 
-    const stop = this._blockedRadio()
+    const stop = this._tabStopRadio()
 
     for (const input of this._radios()) {
       input.tabIndex = input === stop ? 0 : -1

@@ -92,7 +92,6 @@ const DefaultType: Record<string, string> = {
 class ChipFilter extends ChipSet {
   protected declare _anchor: HTMLElement | null
   protected declare _batching: boolean
-  protected declare _byCode: boolean
   protected declare _initialSelection: string[]
   protected declare _reported: string
   protected declare _unlistenLabel: () => void
@@ -104,7 +103,6 @@ class ChipFilter extends ChipSet {
 
     this._anchor = null
     this._batching = false
-    this._byCode = false
     this._moveTabStop(this._getFocusableChips().find(chip => chip.classList.contains(CLASS_NAME_ACTIVE)) ?? null)
     this._element.classList.add(CLASS_NAME_CHIP_FILTER, CLASS_NAME_CHIP_SET)
     this._initialSelection = this.getSelectedValues()
@@ -144,20 +142,20 @@ class ChipFilter extends ChipSet {
   // Public
   selectChip(chip: HTMLElement): void {
     if (this._getChipElements().includes(chip)) {
-      this._asCode(() => Chip.getInstance(chip)?.select())
+      Chip.getInstance(chip)?.select()
     }
   }
 
   selectAll(): void {
-    this._asCode(() => this._selectEvery())
+    this._selectEvery()
   }
 
   deselectAll(): void {
-    this._asCode(() => this._batchSelection(() => {
+    this._batchSelection(() => {
       for (const chip of this._getSelectedChipElements()) {
         Chip.getInstance(chip)?.deselect()
       }
-    }))
+    })
   }
 
   getSelectedValues(): string[] {
@@ -166,7 +164,7 @@ class ChipFilter extends ChipSet {
 
   setValidationState(validationState: ValidationState | null): void {
     this._config = this._getConfig({ ...this._config, validationState })
-    this._validation.configure()
+    this._validation.update()
   }
 
   override dispose(): void {
@@ -246,15 +244,7 @@ class ChipFilter extends ChipSet {
   }
 
   override _triggerChange(): void {
-    this._asCode(() => this._reportSelection())
-  }
-
-  _asCode(run: () => void): void {
-    const previous = this._byCode
-
-    this._byCode = true
-    run()
-    this._byCode = previous
+    this._reportSelection()
   }
 
   _selectEvery(): void {
@@ -290,10 +280,6 @@ class ChipFilter extends ChipSet {
     this._reported = key
 
     const isChanged = writeValueField(this._valueField, value)
-
-    if (!this._byCode) {
-      this._validation.runAsUser(() => this._validation.change())
-    }
 
     this._validation.update()
     EventHandler.trigger(this._element, EVENT_CHANGE, { value })
@@ -361,7 +347,7 @@ class ChipFilter extends ChipSet {
   _restoreSelection(): void {
     const start = new Set(this._initialSelection)
 
-    this._asCode(() => this._batchSelection(() => {
+    this._batchSelection(() => {
       for (const chip of this._getChipElements()) {
         const instance = Chip.getInstance(chip)
 
@@ -371,7 +357,7 @@ class ChipFilter extends ChipSet {
           instance?.deselect()
         }
       }
-    }))
+    })
 
     writeValueField(this._valueField, this.getSelectedValues())
   }

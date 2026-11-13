@@ -185,18 +185,35 @@ The text input carries the value, so `required` blocks the submit of an empty fi
     </div>
   </form>`} />
 
-The state comes from four places, in this order:
+The state comes from three places, in this order:
 
-- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. The `invalid` and `valid` options still work as aliases; `invalid` wins when both are set, and both are ignored once `validationState` is set.
-- An `.is-invalid` or `.is-valid` class written on the autocomplete in the markup, for example by a server that has already checked the value. It is read once, when the component starts.
-- A validation that reports the input invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the autocomplete shows it invalid whenever its value is invalid, until a native reset of the form.
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. In the markup, for example from a server that has already checked the value, set it with `data-coreui-validation-state`. The `invalid` and `valid` options still work as aliases; `invalid` wins when both are set, and both are ignored once `validationState` is set.
+- A validation that reports the input invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the autocomplete shows it invalid whenever its value is invalid, until a native reset of the form. This holds in a form with `data-coreui-validate`, in a form the form plugin validated, in a form with `novalidate` the stepper validated, and outside a form; in any other form the autocomplete shows what a native field shows after a blocked submit, the browser's message and the focus, see [Form components](/forms/validation/#form-components).
 - In a form with `data-coreui-validate`, the `:user-invalid` state of the input, and with `data-coreui-validate="valid"` also its `:user-valid` state.
 
 <Example pro code={`<label class="form-label" for="autocompleteServerCountry">Country</label>
-  <div class="is-invalid" data-coreui-autocomplete data-coreui-id="autocompleteServerCountry" data-coreui-name="country" data-coreui-options="Germany, Poland, Spain" data-coreui-value="Spain"></div>
+  <div data-coreui-autocomplete data-coreui-validation-state="invalid" data-coreui-id="autocompleteServerCountry" data-coreui-name="country" data-coreui-options="Germany, Poland, Spain" data-coreui-value="Spain"></div>
   <div class="invalid-feedback">We do not ship to Spain yet.</div>`} />
 
-A state you give, with the option or with the class, is a verdict on the value it was given for, so the next change of the value the user makes drops it: typing, a pick of a different option, the cleaner, <kbd>Backspace</kbd> or <kbd>Delete</kbd> on the selected option, and with `allowOnlyDefinedOptions` an <kbd>Escape</kbd>, a click outside or leaving the field that empties it. A pick of the option already selected keeps it. One action drops the state once, at its first change, so a state you give from a `change.coreui.autocomplete` listener while the action runs stays. A change your own code makes, with `clear()`, `deselectAll()`, `setValue()` or options that arrive later, keeps it. To set it again, call `setValidationState()`: it updates the state without rebuilding the field and replaces a class written on the autocomplete or a state given with `invalid` or `valid`, so `setValidationState(null)` withdraws them. The component never reads `aria-invalid` on the autocomplete, and a state class written after it started only paints the frame: the input gets no `aria-invalid` and the submit is not blocked, so change the state after start with `setValidationState()`. A message placed where the stylesheet does not show it for the autocomplete can be named in `data-coreui-invalid-feedback` on the autocomplete. While the given state is `'invalid'`, the input blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled autocomplete does not block. A native reset of the form puts back the selection the autocomplete started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays.
+A state you give stays until you change it: the user's changes of the value, a native form reset and your own code keep it. Every change the user makes fires `change.coreui.autocomplete`, `input.coreui.autocomplete` or both: typing, a pick, the cleaner, <kbd>Backspace</kbd> or <kbd>Delete</kbd> on the selected option, and with `allowOnlyDefinedOptions` an <kbd>Escape</kbd>, a click outside or leaving the field that empties it. `input.coreui.autocomplete` also fires when the text stays as it was: when a click outside or <kbd>Tab</kbd> closes the panel, and on <kbd>Enter</kbd> over text that names no option. A given state is a verdict on the text of the input, so remember that text and, in a listener for both events, give the state while the input holds that text and drop it while it holds another:
+
+```js
+const element = document.getElementById('country')
+const autocomplete = coreui.Autocomplete.getOrCreateInstance(element)
+const input = element.closest('form').elements.country
+const rejectedText = input.value
+
+autocomplete.setValidationState('invalid')
+
+const followText = () => {
+  autocomplete.setValidationState(input.value === rejectedText ? 'invalid' : null)
+}
+
+element.addEventListener('change.coreui.autocomplete', followText)
+element.addEventListener('input.coreui.autocomplete', followText)
+```
+
+The state then follows the text in both directions, with `allowOnlyDefinedOptions` too: it goes when the input holds another text and comes back when the rejected text returns, as when the user types a character and deletes it, a native form reset restores the rejected option, or the autocomplete empties text that names no option in a field you judged empty. The same listener follows the text `clear()`, a native form reset or `setOptions()` with `resetSelectionOnOptionsChange` puts in the input, since they fire these events as well; `setValue()` and `deselectAll()` fire neither. To change the state, call `setValidationState()`: it updates the state without rebuilding the field and replaces a state given with `invalid` or `valid`, so `setValidationState(null)` withdraws them. The component never reads `aria-invalid` or a `.is-invalid` or `.is-valid` class on the autocomplete. A state class you write there stays yours, at start or later: it paints the frame, but the input gets no `aria-invalid` and no linked message, see [Form components](/forms/validation/#form-components). A message placed where the stylesheet does not show it for the autocomplete can be named in `data-coreui-invalid-feedback` on the autocomplete. A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the input, `form.elements[name]`, as [Form components](/forms/validation/#form-components) shows. A pick, the cleaner and emptying the field change the input without an `input` event, so set your validity in `change.coreui.autocomplete` and `input.coreui.autocomplete` as well, in the same listener as the state; after them the autocomplete can keep showing the error until the user changes the value again or the focus leaves the input. A native reset of the form puts back the selection the autocomplete started with and keeps the state.
 
 ## Disabled
 
@@ -346,7 +363,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `searchNoResultsLabel` | boolean, string | `false` | Text displayed when no search results are found; `true` shows "No results found". |
 | `showHints` | boolean | `false` | Shows completion hints as users type. |
 | `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
-| `validationState` | string, null | `null` | The state the autocomplete shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's next change of the value drops it. See [Validation](#validation). |
+| `validationState` | string, null | `null` | The state the autocomplete shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` does not block the submit. It stays until you change it. See [Validation](#validation). |
 | `value` | number, string, null | `null` | Sets the initial value of the component: the option whose value, compared as text, equals it, so `1` and `'1'` select the same option. It is applied once, as soon as the options contain it, unless the user picks, types or clears the field first; pass it to `setValue()` to select another option, or `null` to clear the field. |
 
 ### Methods
