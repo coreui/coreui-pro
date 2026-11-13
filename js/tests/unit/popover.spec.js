@@ -259,6 +259,41 @@ describe('Popover', () => {
       })
     })
 
+    it('should show title and content attributes as written', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<a href="#" data-coreui-title="1.50" data-coreui-content=\'{"a":1}\'>Nice link</a>'
+
+        const popoverEl = fixtureEl.querySelector('a')
+        const popover = new Popover(popoverEl)
+
+        popoverEl.addEventListener('shown.coreui.popover', () => {
+          const popoverDisplayed = document.querySelector('.popover')
+
+          expect(popoverDisplayed.querySelector('.popover-header').textContent).toEqual('1.50')
+          expect(popoverDisplayed.querySelector('.popover-body').textContent).toEqual('{"a":1}')
+          resolve()
+        })
+
+        popover.show()
+      })
+    })
+
+    it('should show the text of a content attribute that reads null', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<a href="#" title="Title" data-coreui-content="null">Nice link</a>'
+
+        const popoverEl = fixtureEl.querySelector('a')
+        const popover = new Popover(popoverEl)
+
+        popoverEl.addEventListener('shown.coreui.popover', () => {
+          expect(document.querySelector('.popover .popover-body').textContent).toEqual('null')
+          resolve()
+        })
+
+        popover.show()
+      })
+    })
+
     it('should NOT show a popover without `title` and `content`', () => {
       fixtureEl.innerHTML = '<a href="#" data-coreui-content="" title="">Nice link</a>'
 

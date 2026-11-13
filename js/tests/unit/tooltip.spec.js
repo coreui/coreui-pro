@@ -93,14 +93,43 @@ describe('Tooltip', () => {
       expect(tooltip._config.content).toEqual('7')
     })
 
-    it('should convert title and content to string if booleans (e.g. data-coreui-content="true")', () => {
-      fixtureEl.innerHTML = '<a href="#" rel="tooltip" data-coreui-title="true" data-coreui-content="false"></a>'
+    it('should convert title and content to string if booleans', () => {
+      fixtureEl.innerHTML = '<a href="#" rel="tooltip"></a>'
 
       const tooltipEl = fixtureEl.querySelector('a')
-      const tooltip = new Tooltip(tooltipEl)
+      const tooltip = new Tooltip(tooltipEl, { title: true, content: false })
 
       expect(tooltip._config.title).toEqual('true')
       expect(tooltip._config.content).toEqual('false')
+    })
+
+    it('should keep title and content attributes as written', () => {
+      const cases = ['1.50', '1e3', '007', '%31', '{"a":1}', '[1,2]', 'null', '']
+
+      for (const value of cases) {
+        fixtureEl.innerHTML = '<a href="#" rel="tooltip"></a>'
+
+        const tooltipEl = fixtureEl.querySelector('a')
+        tooltipEl.setAttribute('data-coreui-title', value)
+        tooltipEl.setAttribute('data-coreui-content', value)
+
+        const tooltip = new Tooltip(tooltipEl)
+
+        expect(tooltip._config.title).toEqual(value)
+        expect(tooltip._config.content).toEqual(value)
+
+        tooltip.dispose()
+      }
+    })
+
+    it('should let a title or content passed in JavaScript win over the attribute', () => {
+      fixtureEl.innerHTML = '<a href="#" rel="tooltip" data-coreui-title="1.50" data-coreui-content="[1,2]"></a>'
+
+      const tooltipEl = fixtureEl.querySelector('a')
+      const tooltip = new Tooltip(tooltipEl, { title: 'From config', content: 'Body' })
+
+      expect(tooltip._config.title).toEqual('From config')
+      expect(tooltip._config.content).toEqual('Body')
     })
 
     it('should enable selector delegation', () => {

@@ -1315,6 +1315,20 @@ class Tooltip extends BaseComponent {
     return Object.values(this._activeTrigger).includes(true)
   }
 
+  override _mergeConfigObj(config?: ComponentConfig | null, element?: Element): ComponentConfig {
+    const merged = super._mergeConfigObj(config, element)
+
+    for (const key of ['title', 'content']) {
+      const attribute = element?.getAttribute(`data-coreui-${key}`)
+
+      if (attribute !== null && attribute !== undefined && !(config && key in config)) {
+        merged[key] = attribute
+      }
+    }
+
+    return merged
+  }
+
   override _configAfterMerge(config: ComponentConfig): ComponentConfig {
     if (config.anchors && (config.selector || config.trigger.includes(TRIGGER_MANUAL))) {
       throw new TypeError(`${this.constructor.NAME.toUpperCase()}: "anchors" cannot be used with "selector" or a manual trigger.`)
