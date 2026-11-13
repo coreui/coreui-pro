@@ -34,6 +34,7 @@ const EVENT_BEFORE_INPUT = `beforeinput${EVENT_KEY}`
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_COMPLETE = `complete${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
+const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_PASTE = `paste${EVENT_KEY}`
@@ -47,7 +48,7 @@ const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
  */
 
 type OtpInputConfig = {
-  ariaLabel: (index: number, total: number) => string
+  ariaControlLabel: (index: number, total: number) => string
   autoSubmit: boolean
   disabled: boolean
   id: string | null
@@ -62,7 +63,7 @@ type OtpInputConfig = {
 }
 
 const Default: OtpInputConfig = {
-  ariaLabel: (index: number, total: number) => `Digit ${index + 1} of ${total}`,
+  ariaControlLabel: (index: number, total: number) => `Character ${index + 1} of ${total}`,
   autoSubmit: false,
   disabled: false,
   id: null,
@@ -77,7 +78,7 @@ const Default: OtpInputConfig = {
 }
 
 const DefaultType = {
-  ariaLabel: 'function',
+  ariaControlLabel: 'function',
   autoSubmit: 'boolean',
   disabled: 'boolean',
   id: '(string|null)',
@@ -124,7 +125,7 @@ class OTPInput extends BaseComponent {
       serverClassSources: () => [this._element, ...this._getInputs()]
     })
 
-    this._setRoleAttribute()
+    this._element.setAttribute('role', 'group')
     this._setInputsAttributes()
     this._seedSlots(this._config.value)
     this._createValueField()
@@ -229,6 +230,8 @@ class OTPInput extends BaseComponent {
     EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_FORM_OTP_CONTROL, event => {
       const { target } = event as unknown as { target: HTMLInputElement }
 
+      this._setInputsTabIndexes()
+
       if (target!.value) {
         setTimeout(() => {
           target!.select()
@@ -244,6 +247,10 @@ class OTPInput extends BaseComponent {
           firstEmptyInput.focus()
         }
       }
+    })
+
+    EventHandler.on(this._element, EVENT_FOCUSOUT, SELECTOR_FORM_OTP_CONTROL, () => {
+      this._setInputsTabIndexes()
     })
 
     EventHandler.on(this._element, EVENT_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
@@ -567,10 +574,7 @@ class OTPInput extends BaseComponent {
         input.id = `${this._config.id}-${index}`
       }
 
-      if (typeof this._config.ariaLabel === 'function') {
-        const ariaLabel = this._config.ariaLabel(index, inputs.length)
-        input.setAttribute('aria-label', ariaLabel as unknown as string)
-      }
+      input.setAttribute('aria-label', this._config.ariaControlLabel(index, inputs.length))
     }
 
     this._syncFirstInputMaxLength()
@@ -590,34 +594,12 @@ class OTPInput extends BaseComponent {
 
   _setInputsTabIndexes(): void {
     const inputs = this._getInputs()
-
-    if (!this._config.linear) {
-      for (const input of inputs) {
-        input.removeAttribute('tabindex')
-      }
-
-      return
-    }
-
-    let foundEmpty = false
+    const { activeElement } = this._element.getRootNode() as Document | ShadowRoot
+    const tabStop = inputs.find(input => input === activeElement) ?? inputs[0]
 
     for (const input of inputs) {
-      const hasValue = input.value !== ''
-
-      if (hasValue) {
-        input.removeAttribute('tabindex')
-      } else if (foundEmpty) {
-        input.tabIndex = -1
-      } else {
-        // First empty input - should be tabbable
-        input.removeAttribute('tabindex')
-        foundEmpty = true
-      }
+      input.tabIndex = input === tabStop ? 0 : -1
     }
-  }
-
-  _setRoleAttribute(): any {
-    this._element.setAttribute('role', 'group')
   }
 
   // Static

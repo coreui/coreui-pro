@@ -160,7 +160,7 @@ The colon stays inside attribute values: `data-coreui-placement="bottom-start lg
 | `.avatar-status.status-offline` | `.avatar-status` with no theme class |
 | `.carousel-icon-prev`, `.carousel-icon-next` inside a `.btn-icon` | `<button class="carousel-control-prev">` with `.carousel-control-prev-icon` (and `-next`) |
 | `.carousel-overlay`, `.carousel-overlay-controls` | No equivalent. See `/components/carousel/`. |
-| `.otp`, `.otp-input`, `.otp-slot` | `.form-otp`, `.form-otp-control` (one input per character) |
+| `.otp`, `.otp-input`, `.otp-slot` | `.form-otp`, `.form-otp-control` (one input per character; name the `.form-otp` group with `aria-labelledby` or `aria-label`, a `<label for>` does not name the slots) |
 | `.strength`, `.strength-segment` | An empty `<div data-coreui-password-strength>` (the plugin renders the meter) |
 | `.stepper` with `.stepper-item` | A different component: `.stepper[data-coreui-stepper]` with `.stepper-steps` and `.stepper-step`. See `/forms/stepper/`. |
 

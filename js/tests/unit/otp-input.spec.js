@@ -173,9 +173,19 @@ describe('OTPInput', () => {
       new OTPInput(otpContainer) // eslint-disable-line no-new
 
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      expect(inputs[0].getAttribute('aria-label')).toBe('Digit 1 of 3')
-      expect(inputs[1].getAttribute('aria-label')).toBe('Digit 2 of 3')
-      expect(inputs[2].getAttribute('aria-label')).toBe('Digit 3 of 3')
+      expect(inputs[0].getAttribute('aria-label')).toBe('Character 1 of 3')
+      expect(inputs[1].getAttribute('aria-label')).toBe('Character 2 of 3')
+      expect(inputs[2].getAttribute('aria-label')).toBe('Character 3 of 3')
+    })
+
+    it('should name the slots from the count of a new instance after dispose', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      new OTPInput(otpContainer).dispose()
+      otpContainer.append(Object.assign(document.createElement('input'), { className: 'form-otp-control' }))
+      new OTPInput(otpContainer) // eslint-disable-line no-new
+
+      expect([...otpContainer.querySelectorAll('.form-otp-control')].map(input => input.getAttribute('aria-label'))).toEqual(['Character 1 of 3', 'Character 2 of 3', 'Character 3 of 3'])
     })
 
     it('should set custom aria-label when provided', () => {
@@ -188,7 +198,7 @@ describe('OTPInput', () => {
 
       const otpContainer = fixtureEl.querySelector('.form-otp')
       new OTPInput(otpContainer, { // eslint-disable-line no-new
-        ariaLabel: (index, total) => `Code ${index + 1} of ${total}`
+        ariaControlLabel: (index, total) => `Code ${index + 1} of ${total}`
       })
 
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
@@ -658,7 +668,7 @@ describe('OTPInput', () => {
       expect(typeof otpInput.setConfig).toEqual('undefined')
     })
 
-    it('should leave every slot in the tab order when linear is off', () => {
+    it('should keep a single tab stop whether linear is on or off', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control">
@@ -669,17 +679,61 @@ describe('OTPInput', () => {
 
       const otpContainer = fixtureEl.querySelector('.form-otp')
       const otpInput = new OTPInput(otpContainer)
-      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      const inputs = [...otpContainer.querySelectorAll('.form-otp-control')]
 
-      expect(inputs[2].getAttribute('tabindex')).toBe('-1')
+      expect(inputs.map(input => input.getAttribute('tabindex'))).toEqual(['0', '-1', '-1'])
 
       otpInput.dispose()
       // eslint-disable-next-line no-new
       new OTPInput(otpContainer, { linear: false })
 
-      for (const input of inputs) {
-        expect(input.hasAttribute('tabindex')).toBe(false)
-      }
+      expect(inputs.map(input => input.getAttribute('tabindex'))).toEqual(['0', '-1', '-1'])
+    })
+
+    it('should move the tab stop to the slot that takes the focus', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      // eslint-disable-next-line no-new
+      new OTPInput(fixtureEl.querySelector('.form-otp'), { linear: false, value: '1234' })
+      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+
+      slots[1].focus()
+
+      expect(slots.map(slot => slot.getAttribute('tabindex'))).toEqual(['-1', '0', '-1', '-1'])
+    })
+
+    it('should give the tab stop back to the first slot when the focus leaves the field', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div><button type="button">After</button>'
+      // eslint-disable-next-line no-new
+      new OTPInput(fixtureEl.querySelector('.form-otp'), { linear: false, value: '1' })
+      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+
+      slots[2].focus()
+      fixtureEl.querySelector('button').focus()
+
+      expect(slots.map(slot => slot.getAttribute('tabindex'))).toEqual(['0', '-1', '-1'])
+    })
+
+    it('should move the tab stop to the focused slot inside a shadow root', () => {
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const shadow = host.attachShadow({ mode: 'open' })
+      shadow.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      // eslint-disable-next-line no-new
+      new OTPInput(shadow.querySelector('.form-otp'), { linear: false, value: '123' })
+      const slots = [...shadow.querySelectorAll('.form-otp-control')]
+
+      slots[2].focus()
+
+      expect(slots.map(slot => slot.getAttribute('tabindex'))).toEqual(['-1', '-1', '0'])
+    })
+
+    it('should keep the tab stop on the first slot of a full code', () => {
+      fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      // eslint-disable-next-line no-new
+      new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '123' })
+      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+
+      expect(slots.map(slot => slot.getAttribute('tabindex'))).toEqual(['0', '-1', '-1'])
     })
 
     it('should disable every slot and the value field', () => {
@@ -742,7 +796,7 @@ describe('OTPInput', () => {
           <input type="text" class="form-otp-control">
         </div>
       `
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { ariaLabel: index => `Digit ${index + 1}` })
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { ariaControlLabel: index => `Digit ${index + 1}` })
       const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
 
       expect(first.disabled).toBeFalse()
@@ -763,7 +817,7 @@ describe('OTPInput', () => {
 
     it('should write only the code on setValue, keeping the focused slot and firing no change', () => {
       fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div>'
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { ariaLabel: index => `Digit ${index + 1}`, linear: false })
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { ariaControlLabel: index => `Digit ${index + 1}`, linear: false })
       const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
       const events = []
       for (const type of ['input', 'change', 'change.coreui.otp-input', 'complete.coreui.otp-input']) {
@@ -787,14 +841,14 @@ describe('OTPInput', () => {
       expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('')
     })
 
-    it('should move the tab stop to the first empty slot after setValue', () => {
+    it('should keep the tab stop on the first slot after setValue', () => {
       fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div>'
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
       const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
 
       otpInput.setValue('12')
 
-      expect(slots.map(slot => slot.getAttribute('tabindex'))).toEqual([null, null, null, '-1'])
+      expect(slots.map(slot => slot.getAttribute('tabindex'))).toEqual(['0', '-1', '-1', '-1'])
     })
 
     it('should drop a reported invalid state once setValue fills the code', () => {
@@ -1981,13 +2035,14 @@ describe('OTPInput', () => {
     })
 
     it('should not repaint the slots when setValidationState changes the state', () => {
-      const ariaLabel = jasmine.createSpy('ariaLabel').and.returnValue('Digit')
-      const { otpInput } = mountForm({ ariaLabel })
-      ariaLabel.calls.reset()
+      const ariaControlLabel = jasmine.createSpy('ariaControlLabel').and.returnValue('Digit')
+      const { otpInput } = mountForm({ ariaControlLabel })
+      expect(ariaControlLabel).toHaveBeenCalled()
+      ariaControlLabel.calls.reset()
 
       otpInput.setValidationState('invalid')
 
-      expect(ariaLabel).not.toHaveBeenCalled()
+      expect(ariaControlLabel).not.toHaveBeenCalled()
       expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
     })
 
@@ -2115,7 +2170,7 @@ describe('OTPInput', () => {
 
       expect(slots.map(slot => slot.value)).toEqual(['4', '', ''])
       expect(valueField.value).toBe('4')
-      expect(slots.map(slot => slot.tabIndex)).toEqual([0, 0, -1])
+      expect(slots.map(slot => slot.tabIndex)).toEqual([-1, -1, 0])
       expect(fixtureEl.querySelector('.form-otp').classList.contains('is-invalid')).toBe(kept)
     })
 
