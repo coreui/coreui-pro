@@ -2254,6 +2254,7 @@ describe('Rating', () => {
 
     it('should keep a report when a reset listener disables and enables the rating and a later one cancels the reset', async () => {
       const { element, form, rating } = mountInForm({ required: true })
+      form.setAttribute('data-coreui-validate', '')
 
       form.checkValidity()
       form.addEventListener('reset', () => {
@@ -2301,8 +2302,9 @@ describe('Rating', () => {
       expect(readonlyForm.checkValidity()).toBeTrue()
     })
 
-    it('should show the state a validation reports for a required rating without a value, and drop it once a star is picked', () => {
+    it('should show the state a validation reports for a required rating without a value in a form with data-coreui-validate, and drop it once a star is picked', () => {
       const { element, form } = mountInForm({ required: true })
+      form.setAttribute('data-coreui-validate', '')
       const feedback = form.querySelector('.invalid-feedback')
 
       form.checkValidity()
@@ -2319,6 +2321,7 @@ describe('Rating', () => {
 
     it('should keep the state a validation reported through disable() and enable()', () => {
       const { element, form, rating } = mountInForm({ required: true })
+      form.setAttribute('data-coreui-validate', '')
 
       form.checkValidity()
       rating.disable()

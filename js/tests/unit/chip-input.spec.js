@@ -433,8 +433,8 @@ describe('ChipInput', () => {
       expect(events).toEqual([['input', 'one'], ['change', 'one']])
     })
 
-    it('should show what a validation reports until the value is valid', () => {
-      fixtureEl.innerHTML = '<form><div class="chip-input"></div><div class="invalid-feedback">Add a tag.</div></form>'
+    it('should show what a validation reports in a form with data-coreui-validate until the value is valid', () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate><div class="chip-input"></div><div class="invalid-feedback">Add a tag.</div></form>'
       const element = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(element, { required: true })
 

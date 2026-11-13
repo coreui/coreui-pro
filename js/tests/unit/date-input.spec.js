@@ -134,7 +134,7 @@ describe('DateInput', () => {
     })
 
     it('should mark itself invalid when a validation reports its value field, outside a submit as well', () => {
-      const { form } = mountForm({ required: true }, 'novalidate')
+      const { form } = mountForm({ required: true }, 'data-coreui-validate novalidate')
       const host = fixtureEl.querySelector('.form-date-time')
 
       expect(form.checkValidity()).toBeFalse()
@@ -304,8 +304,8 @@ describe('DateInput', () => {
       expect(getFieldHandler(element)).toBeUndefined()
     })
 
-    it('should describe the sections with the message under the field once the browser or the form plugin finds it empty', () => {
-      for (const attributes of ['', 'data-coreui-validate novalidate']) {
+    it('should describe the sections with the message under the field once the browser or the form plugin finds it empty in a form with data-coreui-validate', () => {
+      for (const attributes of ['data-coreui-validate', 'data-coreui-validate novalidate']) {
         fixtureEl.innerHTML = `<form ${attributes}><div class="date-input"></div><div class="invalid-feedback">Pick a date.</div><button type="submit">Send</button></form>`
         const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy', name: 'when', required: true })
         const form = fixtureEl.querySelector('form')

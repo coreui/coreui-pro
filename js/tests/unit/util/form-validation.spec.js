@@ -613,6 +613,76 @@ describe('Form validation utilities', () => {
 
       expect(getUserValidity(control)).toBeUndefined()
     })
+
+    it('should read a reported control invalid while its value is invalid, only where reported errors are shown', () => {
+      fixtureEl.innerHTML = `<form><input id="plain" required></form>
+        <form data-coreui-validate><input id="validating" required></form>
+        <div data-coreui-validate><form><input id="inside" required></form></div>
+        <form id="owner" data-coreui-validate></form><input id="named" form="owner" required>
+        <form class="was-validated"><input id="classed" required></form>
+        <input id="formless" required>`
+      const read = (id, reported) => getUserValidity(fixtureEl.querySelector(`#${id}`), reported)
+
+      expect(['plain', 'validating', 'inside', 'named', 'classed', 'formless'].map(id => read(id, true)))
+        .toEqual([undefined, 'invalid', 'invalid', 'invalid', undefined, 'invalid'])
+      expect(read('validating', false)).toBeUndefined()
+
+      fixtureEl.querySelector('#validating').value = 'filled'
+
+      expect(read('validating', true)).toBeUndefined()
+    })
+
+    it('should read the form when called, so an attribute the page adds or removes counts from the next call', () => {
+      fixtureEl.innerHTML = '<form><input id="value" required></form>'
+      const form = fixtureEl.querySelector('form')
+      const control = fixtureEl.querySelector('#value')
+
+      expect(getUserValidity(control, true)).toBeUndefined()
+
+      form.setAttribute('data-coreui-validate', '')
+
+      expect(getUserValidity(control, true)).toBe('invalid')
+
+      form.removeAttribute('data-coreui-validate')
+
+      expect(getUserValidity(control, true)).toBeUndefined()
+    })
+
+    it('should read a reported control invalid in a form whose state validateForm or updateValidationState shows, until each owner clears it', () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
+      const form = fixtureEl.querySelector('form')
+      const control = fixtureEl.querySelector('#value')
+      const first = new WeakMap()
+      const second = new WeakMap()
+      const atInvalid = []
+
+      control.addEventListener('invalid', () => atInvalid.push(getUserValidity(control, true)))
+
+      expect(getUserValidity(control, true)).toBeUndefined()
+
+      validateForm(form, first)
+
+      expect(atInvalid).toEqual(['invalid'])
+
+      updateValidationState(form, second)
+      clearValidationState(form, first)
+
+      expect(getUserValidity(control, true)).toBe('invalid')
+
+      clearValidationState(form, second)
+
+      expect(getUserValidity(control, true)).toBeUndefined()
+    })
+
+    it('should not count a form whose result the hook of validateForm took over', () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
+      const form = fixtureEl.querySelector('form')
+      const control = fixtureEl.querySelector('#value')
+
+      validateForm(form, new WeakMap(), () => true)
+
+      expect(getUserValidity(control, true)).toBeUndefined()
+    })
   })
 
   describe('splitIds', () => {
@@ -629,7 +699,7 @@ describe('Form validation utilities', () => {
     }
 
     it('should keep the follower of a control that stays', () => {
-      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><input id="a" required><input id="b" required></form>'
       const a = fixtureEl.querySelector('#a')
       const b = fixtureEl.querySelector('#b')
       const followers = followUserValidities([a], new Map(), () => {})
@@ -642,7 +712,7 @@ describe('Form validation utilities', () => {
     })
 
     it('should go on with the report of a control that is gone', () => {
-      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><input id="a" required><input id="b" required></form>'
       const a = fixtureEl.querySelector('#a')
       const b = fixtureEl.querySelector('#b')
       const followers = followUserValidities([a], new Map(), () => {})
@@ -659,7 +729,7 @@ describe('Form validation utilities', () => {
     })
 
     it('should hand the report of a control that is gone to a new control at another position', () => {
-      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required><input id="c" required></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><input id="a" required><input id="b" required><input id="c" required></form>'
       const a = fixtureEl.querySelector('#a')
       const b = fixtureEl.querySelector('#b')
       const c = fixtureEl.querySelector('#c')
@@ -678,7 +748,7 @@ describe('Form validation utilities', () => {
     })
 
     it('should start without a report for a control that replaces nothing', () => {
-      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><input id="a" required><input id="b" required></form>'
       const a = fixtureEl.querySelector('#a')
       const b = fixtureEl.querySelector('#b')
       const followers = followUserValidities([a], new Map(), () => {})
@@ -708,7 +778,7 @@ describe('Form validation utilities', () => {
     })
 
     it('should forget a report once a reset in progress ends on the replacing control', async () => {
-      fixtureEl.innerHTML = '<form novalidate><input id="a" required><input id="b" required></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><input id="a" required><input id="b" required></form>'
       const form = fixtureEl.querySelector('form')
       const a = fixtureEl.querySelector('#a')
       const b = fixtureEl.querySelector('#b')
@@ -732,7 +802,7 @@ describe('Form validation utilities', () => {
 
   describe('followUserValidity', () => {
     it('should report a control invalid once a validation reports it, until its value is valid', () => {
-      fixtureEl.innerHTML = '<form novalidate><select id="value" required><option value="">None</option><option value="1">One</option></select><input id="other" required></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><select id="value" required><option value="">None</option><option value="1">One</option></select><input id="other" required></form>'
       const control = fixtureEl.querySelector('#value')
       const updates = []
       const validity = followUserValidity(control, state => updates.push(state))
@@ -757,7 +827,7 @@ describe('Form validation utilities', () => {
     })
 
     it('should go on with the control it follows next, with its report', () => {
-      fixtureEl.innerHTML = '<form novalidate><select id="value" required><option value="">None</option><option value="1">One</option></select><select id="next" required><option value="">None</option></select></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><select id="value" required><option value="">None</option><option value="1">One</option></select><select id="next" required><option value="">None</option></select></form>'
       const control = fixtureEl.querySelector('#value')
       const next = fixtureEl.querySelector('#next')
       const updates = []
@@ -781,7 +851,7 @@ describe('Form validation utilities', () => {
     })
 
     it('should forget the report after a native reset, unless the reset was cancelled', async () => {
-      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><input id="value" required></form>'
       const control = fixtureEl.querySelector('#value')
       const validity = followUserValidity(control, () => {})
       const nextTask = () => new Promise(resolve => {
@@ -806,7 +876,7 @@ describe('Form validation utilities', () => {
     })
 
     it('should keep a report made after a native reset, before its task runs', async () => {
-      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><input id="value" required></form>'
       const control = fixtureEl.querySelector('#value')
       const validity = followUserValidity(control, () => {})
 
@@ -869,7 +939,7 @@ describe('Form validation utilities', () => {
     })
 
     it('should follow a control that names its form from outside it, and leave the other fields of the form alone', async () => {
-      fixtureEl.innerHTML = '<form id="owner" novalidate><input id="other"></form><input id="value" form="owner" required>'
+      fixtureEl.innerHTML = '<form id="owner" data-coreui-validate novalidate><input id="other"></form><input id="value" form="owner" required>'
       const control = fixtureEl.querySelector('#value')
       const updates = []
       const validity = followUserValidity(control, state => updates.push(state))

@@ -1213,7 +1213,7 @@ describe('Autocomplete', () => {
     })
 
     it('should settle its state before it reports a value that arrives with late options after a reset', async () => {
-      const { autocomplete, element, form } = mountInForm({ options: [], required: true, value: '3' })
+      const { autocomplete, element, form } = mountInForm({ options: [], required: true, value: '3' }, { attributes: 'data-coreui-validate' })
       const seen = []
 
       form.reset()

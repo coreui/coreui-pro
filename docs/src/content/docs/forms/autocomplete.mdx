@@ -188,7 +188,7 @@ The text input carries the value, so `required` blocks the submit of an empty fi
 The state comes from three places, in this order:
 
 - The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. In the markup, for example from a server that has already checked the value, set it with `data-coreui-validation-state`. The `invalid` and `valid` options still work as aliases; `invalid` wins when both are set, and both are ignored once `validationState` is set.
-- A validation that reports the input invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the autocomplete shows it invalid whenever its value is invalid, until a native reset of the form.
+- A validation that reports the input invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the autocomplete shows it invalid whenever its value is invalid, until a native reset of the form. This holds in a form with `data-coreui-validate`, in a form the form plugin validated, in a form with `novalidate` the stepper validated, and outside a form; in any other form the autocomplete shows what a native field shows after a blocked submit, the browser's message and the focus, see [Form components](/forms/validation/#form-components).
 - In a form with `data-coreui-validate`, the `:user-invalid` state of the input, and with `data-coreui-validate="valid"` also its `:user-valid` state.
 
 <Example pro code={`<label class="form-label" for="autocompleteServerCountry">Country</label>

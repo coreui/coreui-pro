@@ -441,7 +441,7 @@ describe('MultiSelect', () => {
       ['empties', [{ value: '1', text: 'Option 1', selected: true }], ['is-invalid', 'true']],
       ['fills', [{ value: '1', text: 'Option 1' }], [null, null]]
     ])('should show the state of the new selection at the change event when the user %s a reported required field', (_, options, expected) => {
-      fixtureEl.innerHTML = '<form><select multiple></select><div class="invalid-feedback">Pick one.</div></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate><select multiple></select><div class="invalid-feedback">Pick one.</div></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options, required: true })
       const seen = []
@@ -736,7 +736,7 @@ describe('MultiSelect', () => {
     })
 
     it('should show a select a validation reported invalid until its selection is valid', () => {
-      fixtureEl.innerHTML = '<form novalidate><select></select><div class="invalid-feedback">Pick one.</div></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><select></select><div class="invalid-feedback">Pick one.</div></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
 
@@ -756,7 +756,7 @@ describe('MultiSelect', () => {
     })
 
     it('should keep a reported state through disable() and enable()', () => {
-      fixtureEl.innerHTML = '<form novalidate><select></select></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><select></select></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
 
@@ -769,7 +769,7 @@ describe('MultiSelect', () => {
     })
 
     it('should let a given state win over a reported one', () => {
-      fixtureEl.innerHTML = '<form novalidate><select></select></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><select></select></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
 
@@ -782,7 +782,7 @@ describe('MultiSelect', () => {
     })
 
     it('should follow a select that names its form from outside it', async () => {
-      fixtureEl.innerHTML = '<form id="outsideForm" novalidate></form><select form="outsideForm"></select>'
+      fixtureEl.innerHTML = '<form id="outsideForm" data-coreui-validate novalidate></form><select form="outsideForm"></select>'
       const form = fixtureEl.querySelector('form')
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }], required: true })
 
@@ -920,7 +920,7 @@ describe('MultiSelect', () => {
     })
 
     it('should forget a reported state on a native reset', async () => {
-      fixtureEl.innerHTML = '<form novalidate><select></select></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><select></select></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
 

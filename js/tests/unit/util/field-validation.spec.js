@@ -4,6 +4,8 @@ import FieldValidation from '../../../src/util/field-validation.js'
 import { updateValidationState } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
+const VALIDATING = ' data-coreui-validate'
+
 describe('FieldValidation', () => {
   let fixtureEl
   const controllers = []
@@ -12,8 +14,10 @@ describe('FieldValidation', () => {
     setTimeout(resolve)
   })
 
-  const mount = ({ attributes = '', classes = '', config = {}, root = null, ...options } = {}) => {
-    const markup = `<form><div id="host" class="form-control-group${classes}"${attributes}><textarea name="value"></textarea><span id="target"></span><span id="second"></span></div><div class="invalid-feedback" id="feedback">Fix it.</div></form>`
+  const mount = ({
+    attributes = '', classes = '', config = {}, form = '', root = null, ...options
+  } = {}) => {
+    const markup = `<form${form}><div id="host" class="form-control-group${classes}"${attributes}><textarea name="value"></textarea><span id="target"></span><span id="second"></span></div><div class="invalid-feedback" id="feedback">Fix it.</div></form>`
     const container = root ?? fixtureEl
 
     container.innerHTML = markup
@@ -263,7 +267,7 @@ describe('FieldValidation', () => {
 
     it('should show an error of its own as invalid over a given state, without blocking', () => {
       let hasError = true
-      const { field, form, host, state, targets, validation } = mount({ config: { validationState: 'valid' }, ownError: () => hasError })
+      const { field, form, host, state, targets, validation } = mount({ config: { validationState: 'valid' }, form: VALIDATING, ownError: () => hasError })
 
       expect(stateClasses(host)).toEqual(['is-invalid'])
       expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
@@ -562,7 +566,7 @@ describe('FieldValidation', () => {
 
   describe('a reported state', () => {
     it('should show it once a validation reports a field', () => {
-      const { field, host } = mount()
+      const { field, host } = mount({ form: VALIDATING })
 
       field.required = true
 
@@ -573,8 +577,24 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
+    it('should draw nothing for a report in a plain form, and draw it once the form shows reported errors', () => {
+      const { field, form, host, targets, validation } = mount()
+
+      field.required = true
+      form.checkValidity()
+
+      expect(stateClasses(host)).toEqual([])
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual([null, null])
+
+      form.setAttribute('data-coreui-validate', '')
+      validation.update()
+
+      expect(stateClasses(host)).toEqual(['is-invalid'])
+      expect(targets.map(target => target.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+    })
+
     it('should carry a report to a field that replaces one at the same position, and stop following one it removed', () => {
-      const { field, host, validation } = mount()
+      const { field, host, validation } = mount({ form: VALIDATING })
       const replacement = document.createElement('textarea')
       let fields = [field]
 
@@ -599,7 +619,7 @@ describe('FieldValidation', () => {
     })
 
     it('should carry a report through partial replacements, and hand a field put in front the follower of a field that is gone', () => {
-      fixtureEl.innerHTML = '<form><div id="host" class="form-control-group"></div></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate><div id="host" class="form-control-group"></div></form>'
       const host = fixtureEl.querySelector('#host')
       const make = (required = true) => {
         const field = document.createElement('textarea')
@@ -706,7 +726,7 @@ describe('FieldValidation', () => {
 
       document.addEventListener('reset', listener, true)
 
-      const { field, form, host, validation } = mount({ fields })
+      const { field, form, host, validation } = mount({ fields, form: VALIDATING })
 
       field.required = true
       form.checkValidity()
@@ -726,7 +746,7 @@ describe('FieldValidation', () => {
 
     it('should keep a report when a reset listener rebuilds the fields and a later one cancels the reset', async () => {
       const fields = () => [...fixtureEl.querySelectorAll('textarea')]
-      const { field, form, host, validation } = mount({ fields })
+      const { field, form, host, validation } = mount({ fields, form: VALIDATING })
 
       field.required = true
       form.checkValidity()

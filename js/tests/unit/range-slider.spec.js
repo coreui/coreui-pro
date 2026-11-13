@@ -1110,8 +1110,9 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetError', 'budgetError'])
     })
 
-    it('should show the state a validation reports for a handle the page sets a validity on', () => {
+    it('should show the state a validation reports for a handle the page sets a validity on, in a form with data-coreui-validate', () => {
       const { element, form } = mountInForm({ value: [20, 80] })
+      form.setAttribute('data-coreui-validate', '')
       const [, second] = inputsOf(element)
 
       second.setCustomValidity('Too wide.')
@@ -1123,6 +1124,7 @@ describe('RangeSlider', () => {
 
     it('should keep the report a validation made on a handle for the handle that replaces it', () => {
       const { element, form, rangeSlider } = mountInForm({ value: [20, 80] })
+      form.setAttribute('data-coreui-validate', '')
 
       const replaced = inputsOf(element)[1]
       replaced.setCustomValidity('Too wide.')

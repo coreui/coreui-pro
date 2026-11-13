@@ -6,6 +6,7 @@ import DateInput from '../../src/date-input.js'
 import DatePicker from '../../src/date-picker.js'
 import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
+import Form from '../../src/form.js'
 import MultiSelect from '../../src/multi-select.js'
 import OTPInput from '../../src/otp-input.js'
 import RangeSlider from '../../src/range-slider.js'
@@ -16,6 +17,7 @@ import { clearFixture, getFixture } from '../helpers/fixture.js'
 
 const FEEDBACK = '<div class="invalid-feedback" id="feedback">Fix this field.</div>'
 const GIVEN_STATES = ['invalid', 'valid', 'warning']
+const VALIDATING = ' data-coreui-validate'
 const VALIDATION_ONLY = 'its only setter of an option is setValidationState'
 
 const sectionsOf = t => [...t.root.querySelectorAll('.form-date-time-section')]
@@ -423,14 +425,16 @@ describe('validation conformance', () => {
     setTimeout(resolve)
   })
 
-  const mount = (adapter, { config = {}, data = '', pageClass = '' } = {}) => {
+  const mount = (adapter, {
+    config = {}, data = '', form: formAttributes = '', pageClass = ''
+  } = {}) => {
     const attributes = (base = '') => {
       const classes = [base, pageClass].filter(Boolean).join(' ')
 
       return `${classes ? ` class="${classes}"` : ''}${data} aria-describedby="hint"`
     }
 
-    fixtureEl.innerHTML = `<div id="hint">Pick carefully.</div><form>${adapter.markup(attributes)}<button type="submit">Send</button></form>`
+    fixtureEl.innerHTML = `<div id="hint">Pick carefully.</div><form${formAttributes}>${adapter.markup(attributes)}<button type="submit">Send</button></form>`
     const form = fixtureEl.querySelector('form')
     form.addEventListener('submit', event => event.preventDefault())
     const instance = adapter.create(fixtureEl, config)
@@ -631,8 +635,8 @@ describe('validation conformance', () => {
       }
     })
 
-    conform('userChangeReported', 'should show the state of the new value at the change events of a reported field', adapter => {
-      const t = mount(adapter, { config: { ...adapter.filled, ...adapter.required } })
+    conform('userChangeReported', 'should show the state of the new value at the change events of a reported field in a form with data-coreui-validate', adapter => {
+      const t = mount(adapter, { config: { ...adapter.filled, ...adapter.required }, form: VALIDATING })
       const fieldStates = () => {
         const frames = adapter.frames(t)
         const fields = adapter.valueFields(t)
@@ -785,12 +789,81 @@ describe('validation conformance', () => {
   })
 
   describe('a reported state', () => {
-    const mountInvalid = adapter => {
-      const t = mount(adapter, { config: adapter.required ?? {} })
+    const mountInvalid = (adapter, form = VALIDATING) => {
+      const t = mount(adapter, { config: adapter.required ?? {}, form })
       adapter.makeInvalid?.(t)
 
       return t
     }
+
+    const leaveField = (adapter, t) => {
+      adapter.valueFields(t)[0].dispatchEvent(new FocusEvent('focusout'))
+    }
+
+    const expectDrawn = (adapter, t) => {
+      expectFrames(adapter, t, ['is-invalid'])
+      expect(ariaInvalid(t)).toEqual(adapter.invalidTargets(t))
+      expect(describesFeedback(adapter, t)).toBe(true)
+    }
+
+    const expectNothingDrawn = (adapter, t) => {
+      expect(shownStates(t)).toEqual([])
+      expect(ariaInvalid(t)).toEqual([])
+      expect(describesFeedback(adapter, t)).toBe(false)
+    }
+
+    conform('reportedPlain', 'draws nothing for an error the browser reported in a plain form, also after the user leaves the field', adapter => {
+      const t = mountInvalid(adapter, '')
+
+      expect(t.form.checkValidity()).toBe(false)
+      expectNothingDrawn(adapter, t)
+
+      leaveField(adapter, t)
+
+      expectNothingDrawn(adapter, t)
+    })
+
+    conform('reportedValidating', 'draws an error the browser reported in a form with data-coreui-validate', adapter => {
+      const t = mountInvalid(adapter)
+
+      expect(t.form.checkValidity()).toBe(false)
+      expectDrawn(adapter, t)
+
+      leaveField(adapter, t)
+
+      expectDrawn(adapter, t)
+    })
+
+    conform('reportedFormPlugin', 'draws an error reported in a form the Form plugin validates without data-coreui-validate', adapter => {
+      const t = mountInvalid(adapter, ' novalidate')
+      const form = Form.getOrCreateInstance(t.form)
+
+      expect(form.validate()).toBe(false)
+      expectDrawn(adapter, t)
+
+      form.dispose()
+    })
+
+    conform('reportedWasValidated', 'draws nothing for an error the browser reported in a form with .was-validated, which the stylesheet does not paint', adapter => {
+      const t = mountInvalid(adapter, ' class="was-validated"')
+
+      expect(t.form.checkValidity()).toBe(false)
+      expectNothingDrawn(adapter, t)
+    })
+
+    conform('reportedLive', 'starts drawing once the page adds data-coreui-validate before the draw, and stops at the next draw once the page removes it', adapter => {
+      const t = mountInvalid(adapter, '')
+
+      t.form.addEventListener('invalid', () => t.form.setAttribute('data-coreui-validate', ''), { capture: true, once: true })
+
+      expect(t.form.checkValidity()).toBe(false)
+      expectDrawn(adapter, t)
+
+      t.form.removeAttribute('data-coreui-validate')
+      leaveField(adapter, t)
+
+      expectNothingDrawn(adapter, t)
+    })
 
     conform('reported', 'should show it on the frame once a validation reports the field', adapter => {
       const t = mountInvalid(adapter)
@@ -890,9 +963,9 @@ describe('validation conformance', () => {
   })
 
   describe('a verdict of the page', () => {
-    conform('pageVerdict', 'should stop the submit with a custom validity and let it through once the page clears it on the documented event', adapter => {
+    conform('pageVerdict', 'should stop the submit with a custom validity and let it through once the page clears it on the documented event, in a form with data-coreui-validate', adapter => {
       for (const [, config, act, shown] of adapter.verdictChanges ?? [['', {}, adapter.changeAsUser, 'now']]) {
-        const t = mount(adapter, { config: { ...adapter.filled, ...config } })
+        const t = mount(adapter, { config: { ...adapter.filled, ...config }, form: VALIDATING })
         const field = adapter.verdictField(t)
         const drawn = () => adapter.frames(t).some(frame => frame.classList.contains('is-invalid')) || ariaInvalid(t).length > 0
         let cleared = 0

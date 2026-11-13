@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 import Form from '../../src/form.js'
+import MultiSelect from '../../src/multi-select.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('Form', () => {
@@ -300,6 +301,47 @@ describe('Form', () => {
       type(name, '')
 
       expect(name).not.toHaveClass('is-invalid')
+    })
+
+    it('should leave the error a form component drew in a form without data-coreui-validate until its value next changes', () => {
+      fixtureEl.innerHTML = `<form>
+        <input id="name" required><div class="invalid-feedback">Enter your name.</div>
+        <select id="tech" multiple></select><div id="techError" class="invalid-feedback">Pick one.</div>
+      </form>`
+      const name = fixtureEl.querySelector('#name')
+      const select = fixtureEl.querySelector('#tech')
+      const multiSelect = new MultiSelect(select, {
+        options: [{ value: '1', text: 'Angular' }, { value: '2', text: 'React' }],
+        required: true,
+        search: true
+      })
+      const drawn = () => [
+        multiSelect._wrapperElement.classList.contains('is-invalid'),
+        multiSelect._searchElement.getAttribute('aria-invalid'),
+        multiSelect._searchElement.getAttribute('aria-describedby')
+      ]
+      const instance = new Form(fixtureEl.querySelector('form'))
+
+      instance.validate()
+
+      expect(drawn()).toEqual([true, 'true', 'techError'])
+
+      instance.reset()
+
+      expect(name).not.toHaveClass('is-invalid')
+      expect(name.hasAttribute('aria-invalid')).toBeFalse()
+      expect(drawn()).toEqual([true, 'true', 'techError'])
+
+      multiSelect._searchElement.focus()
+      name.focus()
+
+      expect(drawn()).toEqual([true, 'true', 'techError'])
+
+      select.setCustomValidity('Pick another.')
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+
+      expect(select.validity.valid).toBeFalse()
+      expect(drawn()).toEqual([false, null, null])
     })
   })
 

@@ -1252,9 +1252,10 @@ check, radio, carousel and toggler icons already work:
   native form reset. An `.is-invalid` or `.is-valid` class on the autocomplete
   is not read: it stays as you wrote it and gives the input no `aria-invalid`
   and no linked message. A validation that reports the input, from a
-  submit or the page's own `checkValidity()`, now shows on the frame, and the
-  autocomplete is the only one that writes `aria-invalid` and the message link on
-  its input: the form plugin and the stepper leave the input to it. See
+  submit or the page's own `checkValidity()`, now shows on the frame in a form
+  with `data-coreui-validate`, one the form plugin validated or one with
+  `novalidate` the stepper validated, and the autocomplete is the only one that writes `aria-invalid` and the
+  message link on its input: the form plugin and the stepper leave the input to it. See
   [Validation](/forms/autocomplete/#validation).
 
 #### Menu (new) and Dropdown
@@ -1893,9 +1894,10 @@ validation and the arrow between them. Two consequences:
   submitting a form that has no submit button. A `required` field that is
   empty, incomplete or holds a rejected date now stops the submit, and the
   browser puts focus on its first empty section with its own message over the
-  field. The field marks itself invalid whenever a validation reports it, also
-  outside a submit, and its value field fires `input` and `change` when the
-  date changes. This applies to the date and time pickers and to both ends of a
+  field. In a form with `data-coreui-validate`, one the form plugin validated
+  or one with `novalidate` the stepper validated, the field marks itself invalid whenever a validation
+  reports it, also outside a submit. Its value field fires `input` and
+  `change` when the date changes. This applies to the date and time pickers and to both ends of a
   date range as well. Code that selects `input[type="hidden"]` inside the field
   needs `.form-date-time > textarea`.
 
@@ -2243,6 +2245,14 @@ state the same way, described under
   [Form components](/forms/validation/#form-components) shows.
 - **The form plugin and the stepper leave the field that carries a component's
   value to the component**, which shows the state they report on its frame.
+- **An error the browser reports shows only where a native field shows it.**
+  In a form with `data-coreui-validate`, in a form the form plugin validated,
+  in a form with `novalidate` the stepper validated, and outside a form, a
+  reported error gets the state class, `aria-invalid` and the linked message.
+  In any other form, a step form without `novalidate` included, a blocked
+  submit or step gives the component what it gives a native field next to it: the
+  browser's message and the focus. Add `data-coreui-validate` to a form whose
+  components should show it.
 - **After taking the result over** with `preventDefault()` on
   `validate.coreui.form`, keep `event.isValid` rather than calling
   `checkValidity()`: the call reports every invalid field again, and the
@@ -2964,8 +2974,9 @@ field behind that kept submitting.
   `required` that the slots used to carry. A `required` code that is empty or
   incomplete stops the submit, so does an incomplete code that is not
   required, and the browser puts focus on the first empty slot with its own
-  message over the group. Once a validation reports the code, the group gets
-  `.is-invalid` and every slot carries `aria-invalid="true"` and is described
+  message over the group. Once a validation reports the code in a form with
+  `data-coreui-validate`, one the form plugin validated or one with
+  `novalidate` the stepper validated, the group gets `.is-invalid` and every slot carries `aria-invalid="true"` and is described
   by the message after the group while the code stays invalid. The stylesheet
   colors every slot and shows that message, which it never did for a slot
   marked invalid. Code that selects `input[type="hidden"]` inside the field

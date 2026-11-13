@@ -2132,6 +2132,26 @@ describe('Stepper', () => {
       }
     })
 
+    it('should let a component show the error of a failed step as the controls next to it: in a form with novalidate, and not in a form the browser validates', () => {
+      for (const [formAttributes, shown] of [['novalidate', true], ['', false]]) {
+        fixtureEl.innerHTML = validationFixture(formAttributes)
+        const form = fixtureEl.querySelector('#step1 form')
+        form.insertAdjacentHTML('beforeend', '<select name="tech"></select>')
+        const multiSelect = new MultiSelect(form.querySelector('select'), { options: [{ value: '1', text: 'One' }], required: true })
+        const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+        stepper.next()
+
+        expect(fixtureEl.querySelector('#step1')).toHaveClass('active')
+        expect(fixtureEl.querySelector('#empty').classList.contains('is-invalid')).toBe(shown)
+        expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBe(shown)
+        expect(multiSelect._getFocusTarget().getAttribute('aria-invalid')).toBe(shown ? 'true' : null)
+
+        multiSelect.dispose()
+        stepper.dispose()
+      }
+    })
+
     it('should fire stepValidationComplete once when next() or finish() passes a step', () => {
       fixtureEl.innerHTML = validationFixture('novalidate')
       fixtureEl.querySelector('#empty').value = 'filled'

@@ -177,7 +177,7 @@ A range never fails the browser's own validation: a handle always holds a value 
 - The state shows on the slider element and on its handles: `'invalid'` colors the thumbs, sets `aria-invalid` on every handle and adds the invalid feedback that follows the slider element, or the one named in `data-coreui-invalid-feedback` on it, to their `aria-describedby`.
 - A given state does not block the submit. To stop it on your own verdict, call `setCustomValidity()` on a handle; the first one of a slider named `budget` is `form.elements['budget-0']`. See [Form components](/forms/validation/#form-components).
 - The state stays until you change it: the user's moves of a handle, a native form reset and a change from code, such as `setValue()`, keep it. Every move the user makes fires `change.coreui.range-slider`, so to clear the state then, call `setValidationState(null)` in a `change.coreui.range-slider` listener. A listener there also clears the state on a native form reset that moves a handle, which fires `change.coreui.range-slider` as well; `setValue()` fires nothing.
-- A validity you set on a handle with `setCustomValidity()` shows on the slider once a validation reports it, and a given `'valid'` shows over it.
+- A validity you set on a handle with `setCustomValidity()` shows on the slider once a validation reports it in a form with `data-coreui-validate`, in a form the form plugin validated, in a form with `novalidate` the stepper validated, and outside a form, and a given `'valid'` shows over it. In any other form the slider shows what a native field shows after a blocked submit, the browser's message and the focus.
 
 <Example pro code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-12 form-field">

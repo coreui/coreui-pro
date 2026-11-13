@@ -852,7 +852,7 @@ describe('OTPInput', () => {
     })
 
     it('should drop a reported invalid state once setValue fills the code', () => {
-      fixtureEl.innerHTML = '<form novalidate><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div></form>'
       const form = fixtureEl.querySelector('form')
       const otpInput = new OTPInput(form.querySelector('.form-otp'), { required: true })
 
@@ -1737,8 +1737,8 @@ describe('OTPInput', () => {
       expect(getFieldHandler(fixtureEl.querySelector('.form-otp'))).toBeUndefined()
     })
 
-    it('should mark every slot and describe it with the message after the group once the browser or the form plugin reports the code', () => {
-      for (const attributes of ['', 'data-coreui-validate novalidate']) {
+    it('should mark every slot and describe it with the message after the group once the browser or the form plugin reports the code in a form with data-coreui-validate', () => {
+      for (const attributes of ['data-coreui-validate', 'data-coreui-validate novalidate']) {
         const { form, slots } = mountForm({ required: true }, attributes)
 
         form.requestSubmit()
@@ -1750,7 +1750,7 @@ describe('OTPInput', () => {
     })
 
     it('should give the slots back their own description and state once the code is complete', () => {
-      const { form, slots } = mountForm({ required: true }, '', '<input class="form-otp-control" aria-describedby="hint"><input class="form-otp-control">')
+      const { form, slots } = mountForm({ required: true }, 'data-coreui-validate', '<input class="form-otp-control" aria-describedby="hint"><input class="form-otp-control">')
       form.requestSubmit()
       const { id } = fixtureEl.querySelector('.invalid-feedback')
 
@@ -1771,7 +1771,7 @@ describe('OTPInput', () => {
     })
 
     it('should drop the state on a native form reset, and restore the value the slots show', async () => {
-      const { form, slots, valueField } = mountForm({ required: true }, '', '<input class="form-otp-control" value="4"><input class="form-otp-control">')
+      const { form, slots, valueField } = mountForm({ required: true }, 'data-coreui-validate', '<input class="form-otp-control" value="4"><input class="form-otp-control">')
       form.requestSubmit()
       type(slots[1], '2')
       type(slots[1], '')
@@ -1800,7 +1800,7 @@ describe('OTPInput', () => {
     })
 
     it('should drop the state on a reset of the form it was moved into', async () => {
-      fixtureEl.innerHTML = '<form><button type="submit">Send</button></form><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      fixtureEl.innerHTML = '<form data-coreui-validate><button type="submit">Send</button></form><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
       const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { required: true })
       const form = fixtureEl.querySelector('form')
       form.prepend(fixtureEl.querySelector('.form-otp'))
@@ -1820,7 +1820,7 @@ describe('OTPInput', () => {
     })
 
     it('should keep the reset of another code in the same form after dispose', async () => {
-      fixtureEl.innerHTML = '<form><div class="form-otp" id="first"><input class="form-otp-control"></div><div class="form-otp" id="second"><input class="form-otp-control"></div><button type="submit">Send</button></form>'
+      fixtureEl.innerHTML = '<form data-coreui-validate><div class="form-otp" id="first"><input class="form-otp-control"></div><div class="form-otp" id="second"><input class="form-otp-control"></div><button type="submit">Send</button></form>'
       const first = new OTPInput(fixtureEl.querySelector('#first'), { required: true })
       const second = new OTPInput(fixtureEl.querySelector('#second'), { required: true })
       const form = fixtureEl.querySelector('form')
@@ -1837,8 +1837,8 @@ describe('OTPInput', () => {
       second.dispose()
     })
 
-    it('should put .is-invalid on the group once the code is reported, and take it off once it is complete', () => {
-      const { form, slots } = mountForm({ required: true })
+    it('should put .is-invalid on the group once the code is reported in a form with data-coreui-validate, and take it off once it is complete', () => {
+      const { form, slots } = mountForm({ required: true }, 'data-coreui-validate')
       const group = fixtureEl.querySelector('.form-otp')
 
       form.requestSubmit()

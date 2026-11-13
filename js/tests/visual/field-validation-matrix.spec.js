@@ -1,7 +1,7 @@
 /*!
  * Every field component in three kinds of form and with three given states:
- * read at load, after submitting the empty required field and after a native
- * reset, then held to the same rules, one observable per rule. Each field
+ * read at load, after submitting the empty required field, in a plain form
+ * also after leaving it, and after a native reset, then held to the same rules, one observable per rule. Each field
  * also holds a valid value with a given invalid state and is submitted. The
  * custom components also take their state from `setValidationState()`, and
  * have to read as with the option, and keep a given state through a change of
@@ -105,6 +105,7 @@ const required = cell => cell.component !== 'rangeslider'
 const plain = cell => !cell.given
 const emptySubmit = cell => required(cell) && plain(cell)
 const reportedMode = cell => emptySubmit(cell) && cell.mode !== 'm0'
+const plainMode = cell => emptySubmit(cell) && cell.mode === 'm0'
 const scriptMode = cell => emptySubmit(cell) && cell.mode === 'm2'
 const givenInvalid = cell => cell.given === 'invalid'
 const givenValid = cell => cell.given === 'valid'
@@ -128,6 +129,17 @@ const RULES = [
   ['submit m1/m2: invalid colour in the field', reportedMode, ({ submit }) => red(submit)],
   ['submit m2: the focused element is invalid for assistive technology', scriptMode, ({ submit }) => Boolean(submit.ax?.invalid) && submit.ax.invalid !== 'false'],
   ['submit m2: the focused element is described by BAD', scriptMode, ({ submit }) => Boolean(submit.ax?.description?.includes('BAD'))],
+  ['submit m0: no BAD, as a native control', plainMode, ({ submit }) => !bad(submit)],
+  ['submit m0: no invalid colour, as a native control', plainMode, ({ submit }) => !red(submit)],
+  ['submit m0: no aria-invalid, as a native control', plainMode, ({ submit }) => submit.ariaInvalid.length === 0],
+  ['submit m0: no is-invalid class, as a native control', plainMode, ({ submit }) => submit.isInvalid.length === 0],
+  ['submit m0: no message linked, as a native control', plainMode, ({ submit }) => submit.linked.length === 0],
+  ['submit m0, then leaving the field: the focus is outside the field and the browser marks it :user-invalid', plainMode, ({ left }) => !left.activeInField && left.userInvalid.length > 0],
+  ['submit m0, then leaving the field: no BAD, as a native control', plainMode, ({ left }) => !bad(left)],
+  ['submit m0, then leaving the field: no invalid colour, as a native control', plainMode, ({ left }) => !red(left)],
+  ['submit m0, then leaving the field: no aria-invalid, as a native control', plainMode, ({ left }) => left.ariaInvalid.length === 0],
+  ['submit m0, then leaving the field: no is-invalid class, as a native control', plainMode, ({ left }) => left.isInvalid.length === 0],
+  ['submit m0, then leaving the field: no message linked, as a native control', plainMode, ({ left }) => left.linked.length === 0],
   ['submit, no given state: no OK', emptySubmit, ({ submit }) => !ok(submit)],
   ['submit, no given state: no valid colour', emptySubmit, ({ submit }) => !green(submit)],
   ['submit: aria-invalid only outside aria-hidden', always, ({ submit }) => !submit.ariaInvalid.some(item => item.includes('(hidden)'))],
@@ -310,6 +322,7 @@ const read = form => {
     names: [...form.elements].filter(element => element.name).map(element => element.name),
     red: coloured(borderColour('ref-invalid')),
     submits,
+    userInvalid: [...form.querySelectorAll(':user-invalid')].map(describeElement),
     validFeedback: feedback('.valid-feedback, .valid-tooltip')
   }
 }
@@ -429,11 +442,18 @@ const runCell = async cell => {
   const submit = await settled(form)
   submit.ax = await focusedNode()
 
+  let left
+
+  if (plainMode(cell)) {
+    await userEvent.click(container.querySelector('#before'))
+    left = await settled(form)
+  }
+
   await userEvent.click(container.querySelector('#rst'))
   const reset = await settled(form)
 
   return {
-    errors: [...errors], load, reset, submit
+    errors: [...errors], left, load, reset, submit
   }
 }
 

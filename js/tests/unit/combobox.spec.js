@@ -939,8 +939,9 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toBe('us')
     })
 
-    it('should show what a validation reports until the value is valid, and link the message', () => {
+    it('should show what a validation reports in a form with data-coreui-validate until the value is valid, and link the message', () => {
       const toggle = setMarkupInForm('', null, '<div class="invalid-feedback">Pick a country.</div>')
+      toggle.form.setAttribute('data-coreui-validate', '')
       const combobox = new Combobox(toggle, { required: true })
       const feedback = fixtureEl.querySelector('.invalid-feedback')
 
