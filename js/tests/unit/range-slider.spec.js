@@ -687,20 +687,20 @@ describe('RangeSlider', () => {
   })
 
   describe('accessible names', () => {
-    it('should take an ariaLabel array in order', () => {
-      const { element } = mount({ ariaLabel: ['Lowest price', 'Highest price'], value: [20, 80] })
+    it('should take an ariaThumbLabel array in order', () => {
+      const { element } = mount({ ariaThumbLabel: ['Lowest price', 'Highest price'], value: [20, 80] })
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Lowest price', 'Highest price'])
     })
 
-    it('should take an ariaLabel function of the index and the total', () => {
-      const { element } = mount({ ariaLabel: (index, total) => `Handle ${index + 1} of ${total}`, value: [8, 12, 18] })
+    it('should take an ariaThumbLabel function of the index and the total', () => {
+      const { element } = mount({ ariaThumbLabel: (index, total) => `Handle ${index + 1} of ${total}`, value: [8, 12, 18] })
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Handle 1 of 3', 'Handle 2 of 3', 'Handle 3 of 3'])
     })
 
-    it('should read an ariaLabel array from a data attribute', () => {
-      const { element } = mount({}, 'data-coreui-value="25, 75" data-coreui-aria-label=\'["Min", "Max"]\'')
+    it('should read an ariaThumbLabel array from a data attribute', () => {
+      const { element } = mount({}, 'data-coreui-value="25, 75" data-coreui-aria-thumb-label=\'["Min", "Max"]\'')
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Min', 'Max'])
     })
@@ -713,27 +713,27 @@ describe('RangeSlider', () => {
       expect(inputsOf(three).map(input => input.getAttribute('aria-label'))).toEqual(['Value 1', 'Value 2', 'Value 3'])
     })
 
-    it('should read a string ariaLabel, comma separated for several handles', () => {
-      const { element } = mount({}, 'data-coreui-value="50" data-coreui-aria-label="Volume"')
+    it('should read a string ariaThumbLabel, comma separated for several handles', () => {
+      const { element } = mount({}, 'data-coreui-value="50" data-coreui-aria-thumb-label="Volume"')
       expect(inputsOf(element)[0].getAttribute('aria-label')).toEqual('Volume')
 
-      const { element: two } = mount({ ariaLabel: 'Min, Max', value: [20, 80] })
+      const { element: two } = mount({ ariaThumbLabel: 'Min, Max', value: [20, 80] })
       expect(inputsOf(two).map(input => input.getAttribute('aria-label'))).toEqual(['Min', 'Max'])
     })
 
     it('should keep the generated name of a handle the array does not cover', () => {
-      const { element } = mount({ ariaLabel: ['Low'], value: [20, 80] })
+      const { element } = mount({ ariaThumbLabel: ['Low'], value: [20, 80] })
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Low', 'Maximum value'])
     })
 
-    it('should name a single handle with ariaLabel', () => {
-      const { element } = mount({ ariaLabel: ['Volume'], value: 40 })
+    it('should name a single handle with ariaThumbLabel', () => {
+      const { element } = mount({ ariaThumbLabel: ['Volume'], value: 40 })
 
       expect(inputsOf(element)[0].getAttribute('aria-label')).toEqual('Volume')
     })
 
-    it('should leave a single handle unnamed without ariaLabel', () => {
+    it('should leave a single handle unnamed without ariaThumbLabel', () => {
       const { element } = mount({ value: 40 })
 
       expect(inputsOf(element)[0].hasAttribute('aria-label')).toBeFalse()
@@ -750,7 +750,7 @@ describe('RangeSlider', () => {
     })
 
     it('should leave the aria-label of the element to the group and name every handle by its own name', () => {
-      const { element } = mount({ ariaLabel: ['Minimum', 'Maximum'], value: [20, 80] }, 'aria-label="Budget"')
+      const { element } = mount({ ariaThumbLabel: ['Minimum', 'Maximum'], value: [20, 80] }, 'aria-label="Budget"')
 
       expect(element.getAttribute('aria-label')).toEqual('Budget')
       expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Minimum', 'Maximum'])
@@ -766,13 +766,13 @@ describe('RangeSlider', () => {
     })
 
     it('should put the label of the element in front of the name of a single handle', () => {
-      const { element } = mount({ ariaLabel: ['Master'], value: 40 }, 'aria-labelledby="volumeLabel"')
+      const { element } = mount({ ariaThumbLabel: ['Master'], value: 40 }, 'aria-labelledby="volumeLabel"')
       const [input] = inputsOf(element)
 
       expect(input.getAttribute('aria-labelledby')).toEqual(`volumeLabel ${input.id}`)
       expect(input.getAttribute('aria-label')).toEqual('Master')
 
-      const { element: named } = mount({ ariaLabel: ['Master'], value: 40 }, 'aria-label="Volume"')
+      const { element: named } = mount({ ariaThumbLabel: ['Master'], value: 40 }, 'aria-label="Volume"')
       expect(inputsOf(named)[0].getAttribute('aria-label')).toEqual('Volume Master')
     })
 

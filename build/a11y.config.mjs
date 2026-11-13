@@ -461,7 +461,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'Each thumb is a native range input, which exposes its value, minimum and maximum, with aria-orientation when vertical; multi-thumb sliders get a per-thumb aria-label (ariaLabel), and aria-valuetext carries the tooltipsFormat text or the label of the tick a thumb sits on.'
+        note: 'Each thumb is a native range input, which exposes its value, minimum and maximum, with aria-orientation when vertical; multi-thumb sliders get a per-thumb aria-label (ariaThumbLabel), and aria-valuetext carries the tooltipsFormat text or the label of the tick a thumb sits on.'
       },
       {
         criterion: '2.1.1',
@@ -481,7 +481,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'Each item is a native radio input named via the ariaLabel config (default \'N of M\'), so the group exposes name, role, and checked state.'
+        note: 'Each item is a native radio input named via the ariaItemLabel option (default \'N of M\'), so the group exposes name, role, and checked state.'
       },
       {
         criterion: '2.1.1',

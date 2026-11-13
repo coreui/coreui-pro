@@ -71,7 +71,7 @@ const SELECTOR_TICK = '.form-range-tick'
 
 type RangeSliderConfig = {
   allowList: SanitizerAllowList
-  ariaLabel: string[] | string | ((index: number, total: number) => string) | null
+  ariaThumbLabel: string[] | string | ((index: number, total: number) => string) | null
   clickableTicks: boolean
   disabled: boolean
   distance: number
@@ -102,7 +102,7 @@ type RangeSliderPress = {
 
 const Default: RangeSliderConfig = {
   allowList: DefaultAllowlist,
-  ariaLabel: null,
+  ariaThumbLabel: null,
   clickableTicks: true,
   disabled: false,
   distance: 0,
@@ -125,7 +125,7 @@ const Default: RangeSliderConfig = {
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
-  ariaLabel: '(array|function|string|null)',
+  ariaThumbLabel: '(array|function|string|null)',
   clickableTicks: 'boolean',
   disabled: 'boolean',
   distance: 'number',
@@ -424,7 +424,7 @@ class RangeSlider extends BaseComponent {
   }
 
   _nameInput(input: HTMLInputElement, index: number): void {
-    const handleLabel = this._ariaLabel(index)
+    const handleLabel = this._ariaThumbLabel(index)
     const label = this._hostAttributes.get('aria-label')
     const labelledBy = this._hostAttributes.get('aria-labelledby')
 
@@ -454,10 +454,10 @@ class RangeSlider extends BaseComponent {
     }
   }
 
-  _ariaLabel(index: number): string | null {
+  _ariaThumbLabel(index: number): string | null {
     const total = this._inputs.length
-    const { ariaLabel } = this._config
-    const given = typeof ariaLabel === 'function' ? ariaLabel(index, total) : (ariaLabel as string[] | null)?.[index]
+    const { ariaThumbLabel } = this._config
+    const given = typeof ariaThumbLabel === 'function' ? ariaThumbLabel(index, total) : (ariaThumbLabel as string[] | null)?.[index]
 
     if (given) {
       return given
@@ -657,8 +657,8 @@ class RangeSlider extends BaseComponent {
       config.ticks = config.ticks.split(/,\s*/)
     }
 
-    if (typeof config.ariaLabel === 'string') {
-      config.ariaLabel = config.ariaLabel.split(/,\s*/)
+    if (typeof config.ariaThumbLabel === 'string') {
+      config.ariaThumbLabel = config.ariaThumbLabel.split(/,\s*/)
     }
 
     if (typeof config.name === 'string' && config.name.includes(',')) {

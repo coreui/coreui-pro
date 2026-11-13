@@ -58,7 +58,7 @@ type RatingConfig = {
   activeIcon: string | Record<number, string> | null
   allowClear: boolean
   allowList: SanitizerAllowList
-  ariaLabel: (value: number, itemCount: number) => string
+  ariaItemLabel: (value: number, itemCount: number) => string
   disabled: boolean
   highlightOnlySelected: boolean
   icon: string | Record<number, string> | null
@@ -79,7 +79,7 @@ const Default: RatingConfig = {
   activeIcon: null,
   allowClear: false,
   allowList: SVGAllowlist,
-  ariaLabel: (value: number, itemCount: number) => `${value} of ${itemCount}`,
+  ariaItemLabel: (value: number, itemCount: number) => `${value} of ${itemCount}`,
   disabled: false,
   highlightOnlySelected: false,
   icon: null,
@@ -100,7 +100,7 @@ const DefaultType = {
   activeIcon: '(object|string|null)',
   allowClear: 'boolean',
   allowList: 'object',
-  ariaLabel: 'function',
+  ariaItemLabel: 'function',
   disabled: 'boolean',
   highlightOnlySelected: 'boolean',
   icon: '(object|string|null)',
@@ -595,8 +595,8 @@ class Rating extends BaseComponent {
         ratingItemInputElement.name = this._config.name
       }
 
-      if (typeof this._config.ariaLabel === 'function') {
-        ratingItemInputElement.setAttribute('aria-label', this._config.ariaLabel(value, this._config.itemCount))
+      if (typeof this._config.ariaItemLabel === 'function') {
+        ratingItemInputElement.setAttribute('aria-label', this._config.ariaItemLabel(value, this._config.itemCount))
       }
 
       if (this._disabled) {

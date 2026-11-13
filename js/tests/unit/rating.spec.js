@@ -128,12 +128,12 @@ describe('Rating', () => {
       expect(inputs[4].getAttribute('aria-label')).toEqual('5 of 5')
     })
 
-    it('should use a custom ariaLabel function', () => {
+    it('should use a custom ariaItemLabel function', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       new Rating(div, { // eslint-disable-line no-new
         itemCount: 5,
-        ariaLabel: (value, itemCount) => `${value} star of ${itemCount}`
+        ariaItemLabel: (value, itemCount) => `${value} star of ${itemCount}`
       })
 
       const inputs = div.querySelectorAll('.rating-item-input')
