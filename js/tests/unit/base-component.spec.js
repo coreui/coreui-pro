@@ -15,6 +15,12 @@ class DummyClass extends BaseComponent {
   }
 }
 
+class OtherDummyClass extends BaseComponent {
+  static get NAME() {
+    return 'other-dummy'
+  }
+}
+
 describe('Base Component', () => {
   let fixtureEl
   const name = 'dummy'
@@ -117,6 +123,19 @@ describe('Base Component', () => {
 
         expect(DummyClass.getInstance(element)).toBeNull()
         expect(instance._element).toBeNull()
+      })
+
+      it('should leave another component on the same element registered', () => {
+        createInstance()
+        const other = new OtherDummyClass(element)
+
+        expect(DummyClass.getInstance(element)).toBe(instance)
+        expect(OtherDummyClass.getInstance(element)).toBe(other)
+
+        instance.dispose()
+
+        expect(DummyClass.getInstance(element)).toBeNull()
+        expect(OtherDummyClass.getInstance(element)).toBe(other)
       })
 
       it('should de-register element event listeners', () => {

@@ -121,7 +121,7 @@ Our dropdowns, popovers and tooltips also depend on [Floating UI](https://floati
 
 ## Data attributes
 
-Nearly all CoreUI for Bootstrap plugins can be enabled and configured through HTML alone with data attributes (our preferred way of using JavaScript functionality). Be sure to **only use one set of data attributes on a single element** (e.g., you cannot trigger a tooltip and modal from the same button.)
+Nearly all CoreUI for Bootstrap plugins can be enabled and configured through HTML alone with data attributes (our preferred way of using JavaScript functionality). An element takes **one `data-coreui-toggle`**, so a second plugin on the same element (e.g., a tooltip on a button that opens a modal) is created in JavaScript, see [getting an instance](#programmatic-api).
 
 ## Selectors
 
@@ -184,6 +184,8 @@ coreui.Popover.getInstance(myPopoverEl)
 ```
 
 This method will return `null` if an instance is not initiated over the requested element.
+
+Each plugin keeps its own instance, so different plugins can share one element, such as a `Tooltip` and a `Menu` on the same toggle: `coreui.Menu.getInstance(button)` returns the menu, and disposing one leaves the other in place. Both read the element's `data-coreui-*` attributes, so an option they both have, such as `placement`, applies to both; pass it in JavaScript to give each its own value.
 
 Alternatively, `getOrCreateInstance` can be used to get the instance associated with a DOM element, or create a new one in case it wasn't initialized.
 
