@@ -884,6 +884,20 @@ describe('Calendar', () => {
       expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2026, 9, 1).toDateString())
     })
 
+    it('should focus the start of the month when the month button opens the months view inside a shadow root', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const root = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      root.innerHTML = '<div></div>'
+
+      const div = root.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 8, 15), locale: 'en-US', startDate: new Date(2026, 2, 10) }) // eslint-disable-line no-new
+
+      div.querySelector('.btn-month').focus()
+      div.querySelector('.btn-month').click()
+
+      expect(root.activeElement.dataset.coreuiDate).toEqual(new Date(2026, 8, 1).toDateString())
+    })
+
     it('should leave the year button disabled where the years view is the one that picks', () => {
       fixtureEl.innerHTML = '<div></div><div></div>'
 
@@ -1850,6 +1864,20 @@ describe('Calendar', () => {
       calendar.refresh()
 
       expect(document.activeElement.getAttribute('data-coreui-date')).toBe('Tue Sep 15 2026')
+    })
+
+    it('should keep focus on the same date when refresh() renders the grid again inside a shadow root', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const root = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      root.innerHTML = '<div></div>'
+
+      const div = root.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+
+      div.querySelector('[data-coreui-date="Tue Sep 15 2026"]').focus()
+      calendar.refresh()
+
+      expect(root.activeElement.getAttribute('data-coreui-date')).toBe('Tue Sep 15 2026')
     })
 
     it('should keep focus on the navigation button when refresh() follows a page turn', () => {

@@ -857,6 +857,25 @@ describe('Carousel', () => {
       expect(document.activeElement).toEqual(prev)
     })
 
+    it('should move focus to the prev control when the focused next control becomes disabled inside a shadow root', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const root = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      root.innerHTML = controlsMarkup()
+
+      const carousel = new Carousel(root.querySelector('#myCarousel'), { ends: 'stop' })
+      const prev = root.querySelector('#prev')
+      const next = root.querySelector('#next')
+
+      carousel._activeIndex = 1
+      carousel._refreshActiveState()
+      next.focus()
+      carousel._activeIndex = 2
+      carousel._refreshActiveState()
+
+      expect(next.disabled).toBeTrue()
+      expect(root.activeElement).toEqual(prev)
+    })
+
     it('should not leave focus on the disabled control when the viewport is not focusable', () => {
       fixtureEl.innerHTML = [
         '<div id="myCarousel" class="carousel slide">',

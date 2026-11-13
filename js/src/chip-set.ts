@@ -14,7 +14,7 @@ import { announce } from './util/announce.js'
 import {
   type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement, resolveChipClassName
 } from './util/chip-values.js'
-import { containsFocus, focusWithTemporaryTabindex } from './util/focus.js'
+import { containsFocus, focusWithTemporaryTabindex, rootActiveElement } from './util/focus.js'
 import { REMOVE_ICON } from './util/icons.js'
 import {
   createTypeaheadBuffer, getRemovalNeighbor, isTypingKey, type TypeaheadBuffer
@@ -557,7 +557,7 @@ class ChipSet extends BaseComponent {
     }
 
     const chips = this._getFocusableChips()
-    const current = chips.indexOf(document.activeElement as HTMLElement)
+    const current = chips.indexOf(rootActiveElement(this._element) as HTMLElement)
 
     this._typeaheadBuffer.search(key, chips, current, chip => this._getChipValue(chip))?.focus()
   }

@@ -1,3 +1,4 @@
+import { rootActiveElement } from './focus.js'
 import { normalizeSearchText } from './option-tree.js'
 
 export { getNextActiveElement } from './index.js'
@@ -381,7 +382,7 @@ export const endsEntryWait = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 
  * @returns `true` when the focus stays where it is
  */
 export const keepsFocus = (list: Element): boolean => {
-  const focused = (list.getRootNode() as Document | ShadowRoot).activeElement
+  const focused = rootActiveElement(list)
 
   return focused !== document.body && !focused?.contains(list)
 }

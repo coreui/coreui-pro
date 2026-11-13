@@ -10,6 +10,7 @@
 
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
+import { rootActiveElement } from './focus.js'
 import { isDisabled, isVisible } from './index.js'
 
 /**
@@ -165,7 +166,7 @@ class FocusTrap extends Config {
 
   _focus(element: HTMLElement): boolean {
     element.focus()
-    return (element.getRootNode() as Document | ShadowRoot).activeElement === element
+    return rootActiveElement(element) === element
   }
 }
 
