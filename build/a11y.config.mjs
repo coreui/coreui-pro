@@ -76,7 +76,7 @@ export const a11yComponents = [
       {
         criterion: '3.3.2',
         status: 'built-in',
-        note: 'Each slot carries its own aria-label (default \'Character N of M\' via the ariaLabel config).'
+        note: 'Each slot carries its own aria-label (default \'Character N of M\' via the ariaControlLabel option).'
       },
       {
         criterion: '4.1.2',

@@ -48,7 +48,7 @@ const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
  */
 
 type OtpInputConfig = {
-  ariaLabel: (index: number, total: number) => string
+  ariaControlLabel: (index: number, total: number) => string
   autoSubmit: boolean
   disabled: boolean
   id: string | null
@@ -63,7 +63,7 @@ type OtpInputConfig = {
 }
 
 const Default: OtpInputConfig = {
-  ariaLabel: (index: number, total: number) => `Character ${index + 1} of ${total}`,
+  ariaControlLabel: (index: number, total: number) => `Character ${index + 1} of ${total}`,
   autoSubmit: false,
   disabled: false,
   id: null,
@@ -78,7 +78,7 @@ const Default: OtpInputConfig = {
 }
 
 const DefaultType = {
-  ariaLabel: 'function',
+  ariaControlLabel: 'function',
   autoSubmit: 'boolean',
   disabled: 'boolean',
   id: '(string|null)',
@@ -574,7 +574,7 @@ class OTPInput extends BaseComponent {
         input.id = `${this._config.id}-${index}`
       }
 
-      input.setAttribute('aria-label', this._config.ariaLabel(index, inputs.length))
+      input.setAttribute('aria-label', this._config.ariaControlLabel(index, inputs.length))
     }
 
     this._syncFirstInputMaxLength()

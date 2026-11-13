@@ -540,7 +540,8 @@ and a language that puts the number last cannot be served at all.
 markup-only pages keep a translatable counter.
 
 The argument order matches the two function options the library already ships —
-`Rating.ariaLabel(value, itemCount)` and `OTPInput.ariaLabel(index, total)`.
+`Rating.ariaLabel(value, itemCount)` and `OTPInput.ariaControlLabel(index, total)`
+(`ariaLabel` in v5).
 `total` is passed everywhere, including the two components whose default text
 ignores it, so one function can serve all four.
 
@@ -2928,8 +2929,12 @@ field behind that kept submitting.
 - **Slots are named `Character N of M` by default**, not `Digit N of M`, since a
   code with `data-coreui-type="text"` holds letters as well. Tests that find a
   slot by its name, such as `getByLabelText('Digit 1 of 6')`, need the new name,
-  or pass `` ariaLabel: (index, total) => `Digit ${index + 1} of ${total}` `` to
+  or pass `` ariaControlLabel: (index, total) => `Digit ${index + 1} of ${total}` `` to
   keep the old one.
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+  **`ariaLabel` is renamed `ariaControlLabel`.** The option names each slot, the
+  `.form-otp-control`, not the field, and on the `.form-otp` element
+  `aria-label` is the name of the group.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The code is validated as one value.** It moved from an
   `<input type="hidden">`, which the browser leaves out of validation, to a

@@ -548,6 +548,7 @@ Change events now fire only when the value changes. Code that relied on a change
 | Range Slider | `labels`, `clickableLabels` | `ticks`, `clickableTicks` |
 | Range Slider | `ariaLabels` | `ariaLabel` (array, comma-separated string, or `(index, total) => string`) |
 | Rating | `readOnly` | `readonly` |
+| OTP Input | `ariaLabel` | `ariaControlLabel`; default `Character N of M` |
 | OTP Input | `readonly` | removed; use `disabled` |
 | Autocomplete, Multi Select, pickers | `invalid`, `valid` | `validationState: 'invalid'` or `'valid'` (old options are deprecated aliases) |
 

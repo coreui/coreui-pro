@@ -198,7 +198,7 @@ describe('OTPInput', () => {
 
       const otpContainer = fixtureEl.querySelector('.form-otp')
       new OTPInput(otpContainer, { // eslint-disable-line no-new
-        ariaLabel: (index, total) => `Code ${index + 1} of ${total}`
+        ariaControlLabel: (index, total) => `Code ${index + 1} of ${total}`
       })
 
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
@@ -796,7 +796,7 @@ describe('OTPInput', () => {
           <input type="text" class="form-otp-control">
         </div>
       `
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { ariaLabel: index => `Digit ${index + 1}` })
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { ariaControlLabel: index => `Digit ${index + 1}` })
       const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
 
       expect(first.disabled).toBeFalse()
@@ -817,7 +817,7 @@ describe('OTPInput', () => {
 
     it('should write only the code on setValue, keeping the focused slot and firing no change', () => {
       fixtureEl.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div>'
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { ariaLabel: index => `Digit ${index + 1}`, linear: false })
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { ariaControlLabel: index => `Digit ${index + 1}`, linear: false })
       const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
       const events = []
       for (const type of ['input', 'change', 'change.coreui.otp-input', 'complete.coreui.otp-input']) {
@@ -2035,13 +2035,14 @@ describe('OTPInput', () => {
     })
 
     it('should not repaint the slots when setValidationState changes the state', () => {
-      const ariaLabel = jasmine.createSpy('ariaLabel').and.returnValue('Digit')
-      const { otpInput } = mountForm({ ariaLabel })
-      ariaLabel.calls.reset()
+      const ariaControlLabel = jasmine.createSpy('ariaControlLabel').and.returnValue('Digit')
+      const { otpInput } = mountForm({ ariaControlLabel })
+      expect(ariaControlLabel).toHaveBeenCalled()
+      ariaControlLabel.calls.reset()
 
       otpInput.setValidationState('invalid')
 
-      expect(ariaLabel).not.toHaveBeenCalled()
+      expect(ariaControlLabel).not.toHaveBeenCalled()
       expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
     })
 
