@@ -129,8 +129,8 @@ Chrome and Edge 124: they turn the native input with `writing-mode`, which a
 range input honours from 124 on, one version above what `light-dark()` needs;
 `<details name>` sets Firefox 130: exclusive accordions group their panels
 through `details.name`, which reads back undefined below it.
-`@starting-style` and `transition-behavior: allow-discrete` need Firefox 129 (the
-Menu's entry animation) and `@property` needs 128 — its `inherits: false`
+`@starting-style` (the entry animations of the Menu, Dialog and Modal) and
+`transition-behavior: allow-discrete` (the Menu's) need Firefox 129 and `@property` needs 128 — its `inherits: false`
 registrations are what stop the color and opacity utilities leaking into
 descendants, so an older Firefox does not lose an animation, it gets a bug.
 `:has()` sets a lower bound of Firefox 121, since validation and focus states on Multi Select,

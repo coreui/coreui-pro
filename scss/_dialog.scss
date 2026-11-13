@@ -73,9 +73,7 @@ $dialog-tokens: defaults(
   .dialog {
     @include tokens($dialog-tokens);
 
-    // Override the UA display: none so visibility controls the hidden state,
-    // enabling reliable cross-browser exit animations after close().
-    display: flex;
+    display: none;
     flex-direction: column;
     width: var(--#{$prefix}dialog-width);
     max-width: calc(100% - var(--#{$prefix}dialog-margin) * 2);
@@ -91,6 +89,13 @@ $dialog-tokens: defaults(
     outline: 0;
     @include border-radius(var(--#{$prefix}dialog-border-radius));
     @include box-shadow(var(--#{$prefix}dialog-box-shadow));
+
+    // stylelint-disable selector-no-qualifying-type
+    &[open],
+    &:has(dialog[open]) {
+      display: flex;
+    }
+    // stylelint-enable selector-no-qualifying-type
 
     &:not(.dialog-instant) {
       opacity: 0;
@@ -169,6 +174,20 @@ $dialog-tokens: defaults(
   }
 
   @starting-style {
+    .dialog:not(.dialog-instant) {
+      &[open]:not(.hiding) {
+        opacity: 0;
+      }
+
+      &.dialog-slide-down[open]:not(.hiding) {
+        transform: translateY(calc(var(--#{$prefix}dialog-slide-distance) * -1));
+      }
+
+      &.dialog-slide-up[open]:not(.hiding) {
+        transform: translateY(var(--#{$prefix}dialog-slide-distance));
+      }
+    }
+
     .dialog:not(.dialog-instant)::backdrop {
       background-color: transparent;
       backdrop-filter: blur(0);

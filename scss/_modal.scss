@@ -76,7 +76,7 @@ $modal-tokens: defaults(
   .modal {
     @include tokens($modal-tokens);
 
-    display: flex;
+    display: none;
     flex-direction: column;
     width: var(--#{$prefix}modal-width);
     max-width: calc(100% - var(--#{$prefix}modal-margin) * 2);
@@ -92,6 +92,13 @@ $modal-tokens: defaults(
     outline: 0;
     @include border-radius(var(--#{$prefix}modal-border-radius));
     @include box-shadow(var(--#{$prefix}modal-box-shadow));
+
+    // stylelint-disable selector-no-qualifying-type
+    &[open],
+    &:has(dialog[open]) {
+      display: flex;
+    }
+    // stylelint-enable selector-no-qualifying-type
 
     &:not(.modal-instant) {
       opacity: 0;
@@ -156,6 +163,11 @@ $modal-tokens: defaults(
   }
 
   @starting-style {
+    .modal:not(.modal-instant)[open]:not(.hiding) {
+      opacity: 0;
+      transform: var(--#{$prefix}modal-fade-transform);
+    }
+
     .modal:not(.modal-instant)::backdrop {
       background-color: transparent;
     }
