@@ -174,6 +174,10 @@ class ContextMenu extends Menu {
     return true
   }
 
+  protected override _isStatic(): boolean {
+    return this._config.display === 'static'
+  }
+
   protected override _announceMenu(): void {}
 
   protected override _setRoles(): void {

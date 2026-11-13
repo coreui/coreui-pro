@@ -21,7 +21,7 @@ Toggle menus with buttons whenever possible. Here’s an example using a CoreUI 
 
 Menus are toggleable, contextual overlays for displaying lists of links and more. They’re made interactive with the included CoreUI menu JavaScript plugin. They’re toggled by clicking, not by hovering; this is [an intentional design decision](https://markdotto.com/blog/bootstrap-explained-dropdowns/).
 
-Menus are built on a third party library, [Floating UI](https://floating-ui.com/), which provides dynamic positioning and viewport detection. Use `coreui.bundle.min.js` / `coreui.bundle.js` which includes Floating UI, or include Floating UI separately via an [import map](/getting-started/javascript/#using-coreui-for-bootstrap-as-a-module). Floating UI isn’t used to position menus in navbars though as dynamic positioning isn’t required.
+Menus are built on a third party library, [Floating UI](https://floating-ui.com/), which provides dynamic positioning and viewport detection. Use `coreui.bundle.min.js` / `coreui.bundle.js` which includes Floating UI, or include Floating UI separately via an [import map](/getting-started/javascript/#using-coreui-for-bootstrap-as-a-module). Floating UI isn’t used to position menus in a `.navbar-nav`: the navbar stylesheet opens the menu in the flow of a collapsed navbar, pushing the items below it down, and under its toggle in an expanded one, aligned to its end for an `-end` placement and above it for `top-*`. The gap is `--cui-menu-spacer`, and `offset` and the other Floating UI options don’t apply there. A menu with a `container`, or one elsewhere in the navbar, is still positioned by Floating UI.
 
 ## Examples
 
@@ -462,7 +462,7 @@ Submenus can be nested to multiple levels. Each level opens to the side and flip
 
 ## Menu options
 
-Use `data-coreui-offset` or `data-coreui-reference` to change the location of the menu. Offset is the distance from the trigger element in pixels. Reference is the element to reference the menu from.
+Use `data-coreui-offset` or `data-coreui-reference` to change the location of the menu. Offset is the distance from the trigger element in pixels. Reference is the element to reference the menu from. Neither applies to a menu the navbar stylesheet places.
 
 <Example code={`<div class="d-flex">
     <div class="me-1">
@@ -649,7 +649,7 @@ menu.toggle()
 | `autoClose` | boolean, string | `true` | Configure the auto close behavior of the menu: <ul class="my-3"><li>`true` - the menu will be closed by clicking outside or inside the menu.</li><li>`false` - the menu will be closed by clicking the toggle button and manually calling `hide` or `toggle` method. <kbd>Esc</kbd> still closes it.</li><li>`'inside'` - the menu will be closed (only) by clicking inside the menu.</li> <li>`'outside'` - the menu will be closed (only) by clicking outside the menu.</li></ul> Note: the menu can always be closed with the <kbd>Esc</kbd> key, and a menu with `role="menu"` with <kbd>Tab</kbd>. |
 | `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the menu (applies only to the shift middleware). By default it’s `clippingParents` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI’s [shift docs](https://floating-ui.com/docs/shift). |
 | `container` | string, element, boolean | `false` | Appends the menu to a specific element when shown. Use `'body'` or `true` to append to the document body, which helps escape containers with `overflow: hidden`. The menu is moved back to its original position when hidden. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
-| `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. |
+| `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. In a `.navbar-nav` the menu is static unless it has a `container`. |
 | `floatingConfig` | null, object, function | `null` | To change Bootstrap’s default Floating UI config, see [Floating UI’s configuration](https://floating-ui.com/docs/computePosition). When a function is used to create the Floating UI configuration, it’s called with an object that contains the Bootstrap’s default Floating UI configuration. It helps you use and merge the default with your own configuration. The function must return a configuration object for Floating UI. |
 | `loopFocus` | boolean | `false` | Move the focus from the last item to the first on <kbd>↓</kbd>, and from the first to the last on <kbd>↑</kbd>. By default the arrow keys stop at the ends of the list. |
 | `menu` | null, element | `null` | The `.menu` to open (JavaScript only). By default the plugin takes the `.menu` next to the toggle, or the one inside the toggle's wrapper. |

@@ -237,6 +237,39 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should open at the pointer inside a navbar', () => {
+      fixtureEl.innerHTML = `<nav class="navbar">${markup()}</nav>`
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const contextMenu = new ContextMenu(area)
+
+      const done = whenShown(area, () => {
+        expect(contextMenu._floatingCleanup).not.toBeNull()
+        expect(menu.getAttribute('data-coreui-display')).toBeNull()
+        expect(menu.style.position).toEqual('fixed')
+      })
+
+      contextMenu.show({ x: 1, y: 1 })
+      return done
+    })
+
+    it('should leave a menu with static display to the page', () => {
+      fixtureEl.innerHTML = markup('data-coreui-display="static"')
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const contextMenu = new ContextMenu(area)
+
+      const done = whenShown(area, () => {
+        expect(contextMenu._floatingCleanup).toBeNull()
+        expect(menu.style.position).toEqual('')
+      })
+
+      contextMenu.show({ x: 1, y: 1 })
+      return done
+    })
+
     it('should keep the point when shown again while open', () => {
       fixtureEl.innerHTML = markup()
 

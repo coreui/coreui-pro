@@ -14,7 +14,7 @@ otherFrameworks:
 
 Dropdowns are toggleable, contextual overlays for displaying lists of links and more. They're made interactive with the included CoreUI dropdown JavaScript plugin. They're toggled by clicking, not by hovering.
 
-Dropdowns are built on a third party library, [Floating UI](https://floating-ui.com/), which provides dynamic positioning and viewport detection. Be sure to include [floating-ui.core.umd.min.js](https://cdn.jsdelivr.net/npm/@floating-ui/core@1.8.0/dist/floating-ui.core.umd.min.js) and [floating-ui.dom.umd.min.js](https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.8.0/dist/floating-ui.dom.umd.min.js) (in this order) before CoreUI's JavaScript or use `coreui.bundle.min.js` / `coreui.bundle.js` which contains Floating UI. Floating UI isn't used to position dropdowns in navbars though as dynamic positioning isn't required.
+Dropdowns are built on a third party library, [Floating UI](https://floating-ui.com/), which provides dynamic positioning and viewport detection. Be sure to include [floating-ui.core.umd.min.js](https://cdn.jsdelivr.net/npm/@floating-ui/core@1.8.0/dist/floating-ui.core.umd.min.js) and [floating-ui.dom.umd.min.js](https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.8.0/dist/floating-ui.dom.umd.min.js) (in this order) before CoreUI's JavaScript or use `coreui.bundle.min.js` / `coreui.bundle.js` which contains Floating UI. Floating UI isn't used to position dropdowns in navbars though as dynamic positioning isn't required, unless the dropdown has a `container`.
 
 ## Accessibility
 
@@ -384,7 +384,7 @@ The direction classes above pick one of six fixed positions. `data-coreui-placem
     </ul>
   </div>`} />
 
-Inside a `.navbar`, or with `display: 'static'`, the plugin writes the resolved placement onto the menu and the stylesheet positions it from that, so the option works there too — every placement except the centered ones.
+Inside a `.navbar` without a `container`, or with `display: 'static'`, the plugin writes the resolved placement onto the menu and the stylesheet positions it from that, so the option works there too — every placement except the centered ones.
 
 ## Menu items
 
@@ -778,7 +778,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `autoClose` | boolean, string | `true` | Configure the auto close behavior of the dropdown: <ul class="my-3"><li>`true` - the dropdown will be closed by clicking outside or inside the dropdown menu.</li><li>`false` - the dropdown will be closed by clicking the toggle button and manually calling `hide` or `toggle` method. <kbd>Esc</kbd> still closes it.</li><li>`'inside'` - the dropdown will be closed (only) by clicking inside the dropdown menu.</li>  <li>`'outside'` - the dropdown will be closed (only) by clicking outside the dropdown menu.</li></ul> Note: the dropdown can always be closed with the <kbd>ESC</kbd> key, and one with `role="menu"` with <kbd>Tab</kbd>. |
 | `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the dropdown menu. By default it's `clippingParents` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI's [detectOverflow docs](https://floating-ui.com/docs/detectOverflow/#boundary). |
 | `container` | string, element, boolean | `false` | Appends the dropdown menu to a specific element when shown. Use `'body'` or `true` to append to the document body, which helps escape containers with `overflow: hidden`. The menu is moved back to its original position when hidden. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
-| `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. |
+| `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. In a navbar the dropdown is static unless it has a `container`. |
 | `floatingConfig` | null, object, function | `null` | To change CoreUI's default Floating UI config, see Floating UI's [computePosition docs](https://floating-ui.com/docs/computePosition/#options). When a function is used to create the configuration, it's called with an object that contains the default configuration. It helps you use and merge the default with your own configuration. The function must return a configuration object for Floating UI. |
 | `loopFocus` | boolean | `false` | Move the focus from the last item to the first on <kbd>↓</kbd>, and from the first to the last on <kbd>↑</kbd>. By default the arrow keys stop at the ends of the list. |
 | `menu` | null, element | `null` | The `.dropdown-menu` to open (JavaScript only). By default the plugin takes the `.dropdown-menu` next to the toggle, or the one inside the toggle's wrapper. |

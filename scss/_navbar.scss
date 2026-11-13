@@ -202,11 +202,30 @@ $navbar-dark-tokens: defaults(
     }
 
     .nav-item {
+      position: relative;
       flex-direction: column;
     }
 
     .dropdown-menu {
       position: static;
+    }
+
+    :not(.submenu) > .menu {
+      position: static;
+      inset-inline-start: 0;
+      top: 100%;
+      margin-top: var(--#{$prefix}menu-spacer);
+      @include transition(none);
+
+      &[data-coreui-placement$="-end"] {
+        inset-inline: auto 0;
+      }
+
+      &[data-coreui-placement^="top"] {
+        top: auto;
+        bottom: 100%;
+        margin-block: 0 var(--#{$prefix}menu-spacer);
+      }
     }
   }
 
@@ -299,7 +318,8 @@ $navbar-dark-tokens: defaults(
           .navbar-nav {
             flex-direction: row;
 
-            .dropdown-menu {
+            .dropdown-menu,
+            .menu {
               position: absolute;
             }
 
