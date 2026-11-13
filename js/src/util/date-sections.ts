@@ -979,6 +979,44 @@ export const constrainDateTime = (date: Date, minDate: Date | null, maxDate: Dat
   constrainDate(date, minDate, getInclusiveMax(maxDate))
 
 /**
+ * Reads the message the browser gives for a date outside one limit of a field, from a native
+ * input that is never added to the document: `date` for a field without a time, whatever period it
+ * picks, `time` for a time of day and `datetime-local` for both, with only the limit the date
+ * crossed and the date, as local parts at the field's precision. A latest date at midnight in a
+ * field with a time covers its whole day. Where the browser gives no message, for a date it cannot
+ * hold or without a limit, the message of an empty required input stands in.
+ *
+ * @param layout - The sections and literals of the field
+ * @param date - The date the field holds, or `null` when it holds none
+ * @param minDate - The earliest date allowed, or `null` without one
+ * @param maxDate - The latest date allowed, or `null` without one
+ * @param error - The limit the date breaks, `'minDate'` or `'maxDate'`; any other value gives the
+ * message of an empty required input
+ * @returns The message, in the language of the browser
+ */
+export const getDateLimitMessage = (layout: DateSection[], date: Date | null, minDate: Date | null, maxDate: Date | null, error: string | null): string => {
+  const pad = (value: number, length = 2) => String(value).padStart(length, '0')
+  const types = new Set(layout.map(section => section.type))
+  const hasTime = types.has('hour')
+  const hasDate = !hasTime || types.has('day')
+  const format = (value: Date) => [
+    hasDate && `${pad(value.getFullYear(), 4)}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`,
+    hasTime && `${pad(value.getHours())}:${pad(value.getMinutes())}${types.has('second') ? `:${pad(value.getSeconds())}` : ''}`
+  ].filter(Boolean).join('T')
+  const limit = error === 'minDate' ? minDate : (error === 'maxDate' && hasTime ? getInclusiveMax(maxDate) : maxDate)
+  const input = document.createElement('input')
+
+  input.type = hasTime ? (hasDate ? 'datetime-local' : 'time') : 'date'
+
+  if (date && limit && (error === 'minDate' || error === 'maxDate')) {
+    input[error === 'minDate' ? 'min' : 'max'] = format(limit)
+    input.value = format(date)
+  }
+
+  return input.validationMessage || Object.assign(document.createElement('input'), { required: true }).validationMessage
+}
+
+/**
  * Names the limit a date a field holds breaks. The bounds are compared at the
  * field's precision: to the smallest unit the field shows when it has a time,
  * where a latest date without a time of day covers its whole day, by the day

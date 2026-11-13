@@ -21,6 +21,10 @@ export type FieldValidationConfig = {
  * - `fields`: the value fields, in order; the first one gives the invalid feedback.
  * - `frames`: the elements that get the state class.
  * - `invalidTargets`: the elements that get `aria-invalid`.
+ * - `lift`: with `true`, as a native reset of the form starts, lifts the block the component's own
+ *   error puts on the submit, so a submit in the same task meets the value the reset puts back; with
+ *   `false`, once the reset task ran, after `restore` or when a listener cancelled the reset, sets
+ *   it again from the value the component holds.
  * - `owned`: the elements the form utilities leave to the component; `fields` by default.
  * - `ownError`: whether the component has an error of its own, such as a value outside its limits
  *   or a range in the wrong order, which it shows as `'invalid'` over the given and the reported
@@ -38,6 +42,7 @@ export type FieldValidationOptions = {
   fields: () => ValueField[]
   frames: () => Element[]
   invalidTargets: () => Element[]
+  lift?: (isLifted: boolean) => void
   owned?: () => Element[]
   ownError?: () => boolean
   pageDescribed?: (isInvalid: boolean) => Element[]
@@ -348,8 +353,9 @@ class FieldValidation {
   }
 
   /**
-   * Answers a native reset of the form of a value field: in the next task, unless a listener
-   * cancelled it, restores the value; of several resets of the form in one task, the last decides.
+   * Answers a native reset of the form of a value field: lifts the component's own block at once
+   * and, in the next task, unless a listener cancelled the reset, restores the value, then sets the
+   * block again from the value; of several resets of the form in one task, the last decides.
    * The given state stays. The followers of the fields draw the state of the restored value right
    * after, in their own tasks for the same reset.
    *
@@ -360,11 +366,14 @@ class FieldValidation {
       return
     }
 
+    this._options.lift?.(true)
     clearTimeout(this._resetTimeout)
     this._resetTimeout = setTimeout(() => {
       if (!event.defaultPrevented) {
         this._options.restore?.()
       }
+
+      this._options.lift?.(false)
     })
   }
 }

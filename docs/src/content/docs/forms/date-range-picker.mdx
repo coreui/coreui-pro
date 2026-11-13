@@ -156,6 +156,8 @@ calendar are turned off.
 
 ## Disabled dates
 
+The `disabledDates` option excludes dates from both ends. The calendar grays them out, and a date typed into either field that hits one blocks the submit, with the message the browser gives an empty field, as in the [date input](/forms/date-input/#disabled-dates). Give your own hint next to the picker and link it with `aria-describedby`.
+
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
       <div id="myDateRangePickerDisabledDates"></div>
@@ -178,7 +180,7 @@ Set `allowDisabledDatesInRange` to let a range run across disabled dates, for ex
 
 ## Validation
 
-The picker takes its validation state the way the [date range input](/forms/date-range-input/#validation) does: an end before the start makes the frame invalid while it stands and keeps both fields from being drawn valid, and a state you give lands on the frame and on both ends. You give it with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases), which the HTML the server renders sets with `data-coreui-validation-state` on the picker element. While the given state is `'invalid'`, every section of both fields carries `aria-invalid="true"` and is described by the message after the picker. A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field of an end, `form.elements[startName]` or `form.elements[endName]`, see [Form components](/forms/validation/#form-components).
+The picker takes its validation state the way the [date range input](/forms/date-range-input/#validation) does: an end before the start makes the frame invalid while it stands, blocks the submit and keeps both fields from being drawn valid, and a state you give lands on the frame and on both ends. An end before the start and a date the limits reject show at once, in any form, as they always did, and now also block the submit. You give it with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases), which the HTML the server renders sets with `data-coreui-validation-state` on the picker element. While the given state is `'invalid'`, every section of both fields carries `aria-invalid="true"` and is described by the message after the picker. A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field of an end, `form.elements[startName]` or `form.elements[endName]`, see [Form components](/forms/validation/#form-components).
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7 form-field">
@@ -191,7 +193,7 @@ A given state stays on both ends and the picker element until you change it: the
 
 ### Blocking the submit
 
-A `required` end that is empty, incomplete or rejected by the limits blocks the submit by itself. An end before the start does not, since both ends hold dates the browser accepts, and neither does an optional end that is empty, incomplete or rejected, which submits no date. Check the range in your `submit` listener; `getStartDate()` and `getEndDate()` return `null` for an end that is empty, incomplete or rejected, so one condition covers both:
+A `required` end that is empty or incomplete blocks the submit by itself. An end holding a date the limits reject blocks it whether it is required or not, and so does an end before the start, with the browser's message naming the start date. An optional end that is empty or incomplete does not block, and submits no date. In a form with `novalidate` the browser blocks none of these, so to ask for both dates without `required`, or to check the range there, check it in your `submit` listener; `getStartDate()` and `getEndDate()` return `null` for an end that is empty, incomplete or rejected, so one condition covers both:
 
 ```js
 const element = document.querySelector('#stayRange')
@@ -361,8 +363,8 @@ and `selectEndDate` are set by the picker itself.
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options, except `readonly` and `validationState`, which the picker owns. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
-| `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
-| `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
+| `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. An end typed after it blocks the submit, see [Validation](#validation). |
+| `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. An end typed before it blocks the submit, see [Validation](#validation). |
 | `pickerIcon` | string, boolean | `true` | The button that opens the calendar: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Without it the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |
 | `readonly` | boolean | `false` | Makes both fields read-only and keeps the calendar closed: the range can be read, not changed. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |

@@ -19,6 +19,7 @@ import {
   formatSectionValue,
   getDateFromSections,
   getDateLimitError,
+  getDateLimitMessage,
   getDateWithin,
   getDaySectionMax,
   getFullYearFromSection,
@@ -224,12 +225,15 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   protected declare _disabled: boolean
   protected declare _minDate: Date | null
   protected declare _notifying: number
+  protected declare _orderMessage: string
   protected declare _maxDate: Date | null
   protected declare _sections: DateSection[]
   protected declare _draft: string
   protected declare _allSelected: boolean
   protected declare _error: string | null
+  protected declare _errorElement: HTMLTextAreaElement | null
   protected declare _errorHolds: number
+  protected declare _errorMessage: string
   protected declare _fieldValue: string
   protected declare _hostAriaLabel: string | null
   protected declare _hostNodes: ChildNode[]
@@ -253,7 +257,10 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._reports = 0
     this._allSelected = false
     this._error = null
+    this._errorElement = null
     this._errorHolds = 0
+    this._errorMessage = ''
+    this._orderMessage = ''
     this._fieldValue = ''
     this._inputElement = null
     this._isBuilt = false
@@ -263,9 +270,10 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._hostNodes = [...this._element.childNodes]
     this._validation = new FieldValidation(this._element, {
       config: () => this._config as DateInputConfig,
-      fields: () => [this._inputElement!],
+      fields: () => [this._inputElement!, this._errorElement!],
       frames: () => [this._element],
       invalidTargets: () => this._getSectionElements(),
+      lift: isLifted => this._writeErrorMessage(isLifted),
       ownError: () => this._rejected,
       pageDescribed: isInvalid => [this._element, ...this._getSectionElements().filter((_, index) => index === 0 || isInvalid)],
       restore: () => this.reset()
@@ -384,6 +392,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     }
 
     this._inputElement!.disabled = disabled
+    this._errorElement!.disabled = disabled
     this._setTabIndexes(focused)
     this._validation.update()
   }
@@ -737,9 +746,31 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
     this._date = isDisabled ? null : date
     this._validationError = error
+    this._writeErrorMessage()
     this._validation.update()
 
     return isChanged && this._isBuilt ? value : null
+  }
+
+  _setOrderMessage(message: string): void {
+    this._orderMessage = message
+    this._writeErrorMessage()
+  }
+
+  _writeErrorMessage(isLifted = false): void {
+    let message = isLifted ? '' : this._orderMessage
+
+    if (!isLifted && this._rejected) {
+      message = getDateLimitMessage(this._sections, getDateFromSections(this._sections), this._minDate, this._maxDate, this._validationError)
+    }
+
+    if (message === this._errorMessage) {
+      return
+    }
+
+    this._errorMessage = message
+    this._errorElement!.setCustomValidity(message)
+    this._errorElement!.dispatchEvent(new Event('input'))
   }
 
   _announceError(): void {
@@ -833,12 +864,14 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       this._element.append(element)
     }
 
+    this._errorElement ??= createValueField('textarea', () => this._getFirstEmptySection(), this._element)
     this._inputElement ??= createValueField('textarea', () => this._getFirstEmptySection(), this._element)
     this._inputElement.defaultValue = this._isBuilt ? this._getResetValue() : ''
+    configureValueField(this._errorElement, { disabled, readOnly: readonly, required: false })
     configureValueField(this._inputElement, {
       disabled, name, readOnly: readonly, required
     })
-    this._element.append(this._inputElement)
+    this._element.append(this._errorElement, this._inputElement)
     this._syncSections()
     this._setTabIndexes()
     this._validation.refresh()

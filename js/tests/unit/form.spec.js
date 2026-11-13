@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+import DateInput from '../../src/date-input.js'
 import Form from '../../src/form.js'
 import MultiSelect from '../../src/multi-select.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -87,6 +88,39 @@ describe('Form', () => {
       expect(city).not.toHaveClass('is-invalid')
       expect(city.hasAttribute('aria-invalid')).toBeFalse()
       expect(document.activeElement).toBe(name)
+    })
+
+    it('should stop a submit while a date field rejects its date, focus its first section, and leave its error control unmarked and its input at the control', () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><div class="date-input"></div><div class="invalid-feedback">Pick a day in 2026.</div><button type="submit">Send</button></form>'
+      const form = fixtureEl.querySelector('form')
+      const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), {
+        date: new Date(2027, 4, 5), format: 'dd.MM.yyyy', maxDate: new Date(2026, 11, 31), name: 'when'
+      })
+      const host = fixtureEl.querySelector('.form-date-time')
+      const errorField = form.elements.when.previousElementSibling
+
+      expect(host).toHaveClass('is-invalid')
+      expect(submit(form)).toBeTrue()
+      expect(document.activeElement).toBe(host.querySelector('.form-date-time-section'))
+      expect([errorField.className, errorField.hasAttribute('aria-invalid')]).toEqual(['', false])
+
+      const targets = []
+
+      form.addEventListener('input', event => targets.push(event.target))
+      dateInput.setDate(new Date(2026, 6, 14))
+
+      expect(targets).not.toContain(errorField)
+      expect([errorField.className, errorField.hasAttribute('aria-invalid')]).toEqual(['', false])
+      expect(submit(form)).toBeFalse()
+      expect(host).not.toHaveClass('is-invalid')
+
+      dateInput.setDate(new Date(2027, 4, 6))
+
+      expect(targets).not.toContain(errorField)
+      expect([errorField.className, errorField.hasAttribute('aria-invalid')]).toEqual(['', false])
+      expect(host).toHaveClass('is-invalid')
+
+      dateInput.dispose()
     })
 
     it('should let a valid submit through, and mark the valid controls only when the form opts in', () => {

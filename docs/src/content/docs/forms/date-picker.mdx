@@ -58,7 +58,7 @@ field's mask, passes the `minDate`/`maxDate`/`disabledDates` validation (a day
 mask checks the calendar day, so `new Date()` passes with a `maxDate` of
 today, and a month, quarter or year mask checks the whole period) — and every
 programmatic date still runs through the field's
-validation: out of range, the field turns `is-invalid`, `errorChange` reports
+validation: out of range, the field turns `is-invalid` and blocks the submit, `errorChange` reports
 the reason, and `getDate()` reports `null`, the same outcome as typing that
 date. `setDate()` fires no `dateChange`; an action such as `today` fires it
 with `null`.
@@ -267,7 +267,10 @@ calendar are turned off.
 The `disabledDates` option excludes specific dates — single `Date`s,
 `[start, end]` ranges, or a matcher function. The calendar grays them out and
 the field refuses them: a completed date that hits a disabled entry gets the
-`.is-invalid` class and the picker reports `null`, and submits no date, until it is corrected.
+`.is-invalid` class and blocks the submit, and the picker reports `null`, and submits no date, until it is corrected.
+The browser has no message of its own for such a date and shows the one it gives
+an empty field, so give your own hint next to the picker and link it with
+`aria-describedby`.
 In week, month, quarter and year selection the calendar and the field judge the
 whole period: it is refused only when it lies wholly before `minDate` or after
 `maxDate`, or `disabledDates` covers every day of it that the limits leave. In week selection the limits count as whole weeks, so for a week that is all seven days.
@@ -294,7 +297,7 @@ Pass a function to disable every date that matches a rule.
 
 ## Validation
 
-The picker shows its validation state on the frame and on the sections of its field, which the message after the picker describes, the way the [form plugin](/forms/validation/) does for a native field. The field keeps its value in a `<textarea>` laid invisibly over it, so a `required` picker that is empty, incomplete or holds a rejected date blocks the submit, as the [date input](/forms/date-input/#validation) does.
+The picker shows its validation state on the frame and on the sections of its field, which the message after the picker describes, the way the [form plugin](/forms/validation/) does for a native field. The field keeps its value in a `<textarea>` laid invisibly over it, so a `required` picker that is empty or incomplete blocks the submit, and a picker holding a date its limits reject blocks it whether it is required or not, with the browser's message for the limit, as the [date input](/forms/date-input/#validation) does. The picker shows that error at once, in any form, as it always did, and now also blocks the submit.
 
 You give a state with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases), which the HTML the server renders sets with `data-coreui-validation-state` on the picker element. A given state stays until you change it: the user's changes of the date, a native form reset and a change your own code makes, with `setDate()`, `clear()`, `reset()` or `today()`, keep it. Every change of the date the user makes fires `dateChange.coreui.date-picker`: a day picked in the calendar, a time picked with `timepicker`, the cleaner, a footer button that changes the date through the context, or typing in the field. To clear the state then, call `setValidationState(null)` in a `dateChange.coreui.date-picker` listener. A listener there also clears the state on a native form reset and on `clear()`, `reset()` and `today()`, which fire `dateChange.coreui.date-picker` when they change the date; `setDate()` fires nothing. `setValidationState()` changes the state without rebuilding the picker. A `.is-invalid` or `.is-valid` class or an `aria-invalid` written on the picker element or on a `data-coreui-picker-field` is not read, at start or later; the class stays yours and gives the sections no `aria-invalid` and no linked message, see [Form components](/forms/validation/#form-components). A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the value field, `form.elements[name]`, see [Form components](/forms/validation/#form-components). A native form reset puts back the date the picker started with and keeps the state.
 
@@ -480,8 +483,8 @@ by the picker itself.
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options, except `readonly` and `validationState`, which the picker owns. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
-| `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. With `timepicker`, a time of day bounds the time on that day, and a date without one covers its whole day. |
-| `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. With `timepicker`, a time of day bounds the time on that day. |
+| `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. With `timepicker`, a time of day bounds the time on that day, and a date without one covers its whole day. A date typed after it blocks the submit, see [Validation](#validation). |
+| `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. With `timepicker`, a time of day bounds the time on that day. A date typed before it blocks the submit, see [Validation](#validation). |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`). |
 | `name` | string, null | `null` | Name of the generated value input. Without it the field is not submitted with the form. |
 | `pickerIcon` | string, boolean | `true` | The button that opens the calendar: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Not used for a `data-coreui-picker-toggle` you wrote. Without either the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |

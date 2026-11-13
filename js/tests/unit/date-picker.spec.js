@@ -4,7 +4,9 @@ import Calendar from '../../src/calendar.js'
 import DateInput from '../../src/date-input.js'
 import DatePicker from '../../src/date-picker.js'
 import Dialog from '../../src/dialog.js'
-import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+import {
+  clearFixture, getFixture, getValueField, jQueryMock
+} from '../helpers/fixture.js'
 
 describe('DatePicker', () => {
   let fixtureEl
@@ -206,11 +208,11 @@ describe('DatePicker', () => {
         date: new Date(2026, 0, 15)
       })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Sty 2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Sty 2026')
 
       buildPicker({ locale: 'en-US', format: () => [{ type: 'year', length: 4 }], date: new Date(2026, 0, 15) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('2026')
     })
 
     it('should not build the calendar until the popup opens', () => {
@@ -616,7 +618,7 @@ describe('DatePicker', () => {
       buildPicker({}, OWN_MARKUP.replace('<div data-coreui-picker-field>', '<div data-coreui-picker-field class="disabled">'))
       const field = fixtureEl.querySelector('[data-coreui-picker-field]')
 
-      expect(field.querySelector('textarea').disabled).toBeFalse()
+      expect(getValueField(field).disabled).toBeFalse()
       expect(field.querySelector('.form-date-time-section').hasAttribute('aria-disabled')).toBeFalse()
     })
 
@@ -640,7 +642,7 @@ describe('DatePicker', () => {
       expect(el.querySelector('.form-control-action')).toBeNull()
       expect(el.querySelector('.form-control-cleaner')).toBeNull()
       expect(el.querySelector('[data-coreui-picker-field] .form-date-time-section')).not.toBeNull()
-      expect(el.querySelector('.form-date-time > textarea').value).toEqual('07/14/2026')
+      expect(getValueField(el).value).toEqual('07/14/2026')
 
       el.querySelector('[data-coreui-picker-toggle]').click()
       expect(picker._popup.isShown).toBeTrue()
@@ -911,7 +913,7 @@ describe('DatePicker', () => {
       expect(emitted.length).toBe(1)
 
       picker.setDate(new Date(2026, 6, 21))
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('07/21/2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('07/21/2026')
       expect(picker._calendar._startDate).toEqual(new Date(2026, 6, 21))
       expect(emitted.length).toBe(1)
     })
@@ -1074,7 +1076,7 @@ describe('DatePicker', () => {
     it('should show in the calendar a date a native input listener sets during a calendar pick', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US' })
 
-      fixtureEl.querySelector('#picker textarea').addEventListener('input', () => {
+      getValueField(fixtureEl.querySelector('#picker')).addEventListener('input', () => {
         DateInput.getInstance(fixtureEl.querySelector('#picker .form-date-time')).setDate(new Date(2026, 6, 3))
       }, { once: true })
       picker.show();
@@ -1204,20 +1206,20 @@ describe('DatePicker', () => {
     it('should mask week selection like the native week input', () => {
       const picker = buildPicker({ locale: 'en-US', selectionType: 'week', date: new Date(2026, 6, 14) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Week 29, 2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Week 29, 2026')
       expect(picker.getDate()).toEqual(new Date(2026, 6, 13))
     })
 
     it('should localize the fixed week label', () => {
       buildPicker({ locale: 'pl-PL', selectionType: 'week', date: new Date(2026, 6, 14) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Tydzień 29, 2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Tydzień 29, 2026')
     })
 
     it('should let an explicit format override the week mask', () => {
       buildPicker({ format: 'yyyy-Www', selectionType: 'week', date: new Date(2026, 6, 14) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('2026-W29')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('2026-W29')
     })
 
     it('should fill the week sections when a calendar week is selected', () => {
@@ -1233,7 +1235,7 @@ describe('DatePicker', () => {
 
       expect(emitted.date).toBeInstanceOf(Date)
       expect(emitted.formattedDate).toMatch(/^\d{4}W\d{2}$/)
-      expect(el.querySelector('.form-date-time > textarea').value).toEqual(`Week ${emitted.formattedDate.slice(5)}, ${emitted.formattedDate.slice(0, 4)}`)
+      expect(getValueField(el).value).toEqual(`Week ${emitted.formattedDate.slice(5)}, ${emitted.formattedDate.slice(0, 4)}`)
     })
 
     it('should pick a week whose Monday is disabled on any first day of the week', () => {
@@ -1264,14 +1266,14 @@ describe('DatePicker', () => {
         fixtureEl.querySelector(`.date-picker-popup td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr').click()
 
         expect(emitted).toEqual(['2026W36'])
-        expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Week 36, 2026')
+        expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Week 36, 2026')
       }
     })
 
     it('should keep the ISO week-numbering year around January 1st', () => {
       const picker = buildPicker({ locale: 'en-US', selectionType: 'week', date: new Date(2027, 0, 1) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Week 53, 2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Week 53, 2026')
       expect(picker.getDate()).toEqual(new Date(2026, 11, 28))
     })
 
@@ -1293,7 +1295,7 @@ describe('DatePicker', () => {
     it('should mask quarter selection with the quarter name', () => {
       const picker = buildPicker({ selectionType: 'quarter', date: new Date(2026, 10, 15) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('Q4 2026')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('Q4 2026')
       expect(picker.getDate()).toEqual(new Date(2026, 9, 1))
     })
 
@@ -1304,7 +1306,7 @@ describe('DatePicker', () => {
       picker.show()
       fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-selectable]').click()
 
-      expect(el.querySelector('.form-date-time > textarea').value).toMatch(/^Q[1-4] \d{4}$/)
+      expect(getValueField(el).value).toMatch(/^Q[1-4] \d{4}$/)
     })
   })
 
@@ -2259,7 +2261,7 @@ describe('DatePicker', () => {
       expect(toggle.disabled).toBeFalse()
       expect(element.classList.contains('form-control-sm')).toBeTrue()
       expect(element.classList.contains('form-control-lg')).toBeFalse()
-      expect(element.querySelector('textarea').disabled).toBeFalse()
+      expect(getValueField(element).disabled).toBeFalse()
     })
 
     it('should replace a size the markup carried', () => {
@@ -2750,7 +2752,7 @@ describe('DatePicker', () => {
     it('should mask the field as a date and a time', () => {
       const picker = buildPicker({ timepicker: true, locale: 'en-US', date: new Date(2026, 5, 15, 14, 30, 0) })
 
-      expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('06/15/2026, 02:30:00 PM')
+      expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('06/15/2026, 02:30:00 PM')
       expect(picker.getDate()).not.toBeNull()
     })
 
@@ -2771,7 +2773,7 @@ describe('DatePicker', () => {
         const picker = buildPicker({ locale: 'en-US', date: new Date(2026, 6, 14) })
         picker.show()
 
-        expect(fixtureEl.querySelector('#picker .form-date-time > textarea').value).toEqual('07/2026')
+        expect(getValueField(fixtureEl.querySelector('#picker')).value).toEqual('07/2026')
         expect(picker._calendar._config.selectionType).toEqual('month')
       } finally {
         DatePicker.Default.selectionType = selectionType

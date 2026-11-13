@@ -35,6 +35,10 @@ const nativeChange = field => [[field, 'input'], [field, 'change']]
 
 const noop = () => {}
 
+const nativeMessage = attributes => Object.assign(document.createElement('input'), attributes).validationMessage
+const LATEST_DAY = { config: { maxDate: new Date(2026, 11, 31) }, message: nativeMessage({ max: '2026-12-31', type: 'date', value: '2027-05-05' }) }
+const EARLIEST_TIME = { config: { minDate: '09:30:00' }, message: nativeMessage({ min: '09:30', type: 'time', value: '08:00' }) }
+
 const disableAndEnable = t => {
   t.instance.disable()
   t.instance.enable()
@@ -211,6 +215,7 @@ const ADAPTERS = [
     clearFromCode: clearAndReset,
     value: t => t.instance.getDate(),
     reconfigure: disableAndEnable,
+    rejected: { ...LATEST_DAY, config: { ...LATEST_DAY.config, date: new Date(2027, 4, 5) } },
     required: { required: true }
   },
   {
@@ -236,6 +241,7 @@ const ADAPTERS = [
     clearFromCode: clearAndReset,
     value: t => t.instance.getDate(),
     reconfigure: disableAndEnable,
+    rejected: { ...EARLIEST_TIME, config: { ...EARLIEST_TIME.config, date: '08:00:00' } },
     required: { required: true }
   },
   {
@@ -263,6 +269,7 @@ const ADAPTERS = [
     changeFromCode: t => t.instance.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21)),
     clearFromCode: clearAndReset,
     value: t => [t.instance.getStartDate(), t.instance.getEndDate()],
+    rejected: { ...LATEST_DAY, config: { ...LATEST_DAY.config, endDate: new Date(2027, 4, 5), startDate: new Date(2026, 5, 15) } },
     required: { required: true }
   },
   {
@@ -286,6 +293,7 @@ const ADAPTERS = [
     changeFromCode: t => t.instance.setDate(new Date(2026, 6, 15)),
     clearFromCode: clearAndReset,
     value: t => t.instance.getDate(),
+    rejected: { ...LATEST_DAY, config: { ...LATEST_DAY.config, date: new Date(2027, 4, 5) } },
     required: { required: true }
   },
   {
@@ -309,6 +317,7 @@ const ADAPTERS = [
     changeFromCode: t => t.instance.setTime('11:45:00'),
     clearFromCode: clearAndReset,
     value: t => t.instance.getTime(),
+    rejected: { ...EARLIEST_TIME, config: { ...EARLIEST_TIME.config, time: '08:00:00' } },
     required: { required: true }
   },
   {
@@ -336,6 +345,7 @@ const ADAPTERS = [
     changeFromCode: t => t.instance.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21)),
     clearFromCode: clearAndReset,
     value: t => [t.instance.getStartDate(), t.instance.getEndDate()],
+    rejected: { ...LATEST_DAY, config: { ...LATEST_DAY.config, endDate: new Date(2027, 4, 5), startDate: new Date(2026, 5, 15) } },
     required: { required: true }
   },
   {
@@ -467,7 +477,8 @@ describe('validation conformance', () => {
   const reasonFor = (adapter, rule) => adapter.notApplicable?.[rule] ??
     (rule.endsWith('Reconfigure') && !adapter.reconfigure ? VALIDATION_ONLY : null) ??
     (rule === 'pageValueField' && !adapter.pageOwnsValueField ? 'its value field is built by the component' : null) ??
-    (rule === 'pageClearsOnMethods' && !adapter.changeMethods ? 'none of its methods fires the change event' : null)
+    (rule === 'pageClearsOnMethods' && !adapter.changeMethods ? 'none of its methods fires the change event' : null) ??
+    (rule === 'rejected' && !adapter.rejected ? 'it rejects no value of its own' : null)
 
   const conform = (rule, title, test) => {
     for (const adapter of ADAPTERS) {
@@ -922,6 +933,66 @@ describe('validation conformance', () => {
       dispose(t)
 
       expect(field.validationMessage).toBe('The page says no.')
+    })
+  })
+
+  describe('a value it rejects', () => {
+    const errorFields = (adapter, t) => adapter.valueFields(t).map(field => field.previousElementSibling)
+    const drawn = (adapter, t) => adapter.frames(t).some(frame => frame.classList.contains('is-invalid'))
+
+    conform('rejected', 'should block the submit, required or not, with the message of the browser on an unnamed control right before its value field', adapter => {
+      for (const required of [false, true]) {
+        const t = mount(adapter, { config: { ...adapter.rejected.config, required } })
+        const invalid = []
+        let submitted = false
+
+        t.form.addEventListener('invalid', event => invalid.push(event.target), true)
+        t.form.addEventListener('submit', () => {
+          submitted = true
+        })
+        t.form.requestSubmit()
+
+        expect(submitted).toBe(false)
+        expect(errorFields(adapter, t)).toContain(invalid[0])
+        expect([invalid[0].name, invalid[0].required, invalid[0].validationMessage]).toEqual(['', false, adapter.rejected.message])
+        expect(t.root.contains(document.activeElement)).toBe(true)
+        dispose(t)
+      }
+    })
+
+    conform('rejected', 'should draw the value at once in a plain, a validating and a novalidate form', adapter => {
+      for (const form of ['', VALIDATING, ' novalidate']) {
+        const t = mount(adapter, { config: adapter.rejected.config, form })
+
+        expect([drawn(adapter, t), describesFeedback(adapter, t)], form).toEqual([true, true])
+        expect(ariaInvalid(t).length).toBeGreaterThan(0)
+        dispose(t)
+      }
+    })
+
+    conform('rejected', 'should lift the block with clear()', adapter => {
+      const t = mount(adapter, { config: adapter.rejected.config })
+
+      expect(t.form.checkValidity()).toBe(false)
+
+      t.instance.clear()
+
+      expect(t.form.checkValidity()).toBe(true)
+    })
+
+    conform('rejected', 'should leave one error control per value field after a dispose and a new instance', adapter => {
+      const t = mount(adapter, { config: adapter.rejected.config })
+      const count = () => [...t.form.elements].filter(element => element.tagName === 'TEXTAREA' && !element.name).length
+
+      dispose(t)
+
+      expect([count(), t.form.checkValidity()]).toEqual([0, true])
+
+      const instance = adapter.create(fixtureEl, adapter.rejected.config)
+
+      live.add(instance)
+
+      expect([count(), t.form.checkValidity()]).toEqual([adapter.valueFields({ ...t, instance }).length, false])
     })
   })
 

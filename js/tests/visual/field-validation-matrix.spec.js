@@ -2,7 +2,8 @@
  * Every field component in three kinds of form and with three given states:
  * read at load, after submitting the empty required field, in a plain form
  * also after leaving it, and after a native reset, then held to the same rules, one observable per rule. Each field
- * also holds a valid value with a given invalid state and is submitted. The
+ * also holds a valid value with a given invalid state and is submitted, and
+ * each field of the date family a value it rejects. The
  * custom components also take their state from `setValidationState()`, and
  * have to read as with the option, and keep a given state through a change of
  * the user until the page clears it. A state class the page writes on a custom
@@ -81,6 +82,15 @@ const FILLED = {
   otp: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-value="1234"'],
   rating: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-value="3"'],
   rangeslider: ['', '']
+}
+
+const REJECTED = {
+  dateinput: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-date="2027-05-05" data-coreui-max-date="2026-12-31"'],
+  timeinput: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-date="08:00:00" data-coreui-min-date="09:30:00"'],
+  daterangeinput: ['data-coreui-end-name="w"', 'data-coreui-end-name="w" data-coreui-start-date="2026-07-20" data-coreui-end-date="2026-07-14"'],
+  datepicker: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-date="2025-05-05" data-coreui-min-date="2026-01-01"'],
+  daterangepicker: ['data-coreui-end-name="w"', 'data-coreui-end-name="w" data-coreui-start-date="2026-07-14" data-coreui-end-date="2027-05-05" data-coreui-max-date="2026-12-31"'],
+  timepicker: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-time="18:00:00" data-coreui-max-date="17:00:00"']
 }
 
 const NATIVE = new Set(['input', 'textarea', 'select', 'checkbox', 'radio', 'switch', 'number', 'password'])
@@ -179,6 +189,19 @@ const FILLED_RULES = [
   ['valid value, given invalid, after submit: aria-invalid on a visible element (components)', custom, ({ submit }) => submit.ariaInvalid.some(item => !item.includes('('))]
 ]
 
+const REJECTED_RULES = [
+  ['rejected value: no console or page errors', always, ({ errors }) => errors.length === 0],
+  ['rejected value: the value is submitted under the documented names', always, ({ load }, { component }) => JSON.stringify(load.names) === JSON.stringify(SUBMITTED_NAMES[component] ?? ['v'])],
+  ['rejected value: a control carries the message of the browser', always, ({ load }) => load.constraint.some(item => item.startsWith('textarea: ') && item.length > 'textarea: '.length)],
+  ['rejected value: the submit is blocked', always, ({ submit }) => submit.submits === 0],
+  ['rejected value, submit: focus lands inside the field', always, ({ submit }) => submit.activeInField],
+  ['rejected value: aria-invalid on a visible element', always, ({ load }) => load.ariaInvalid.some(item => !item.includes('('))],
+  ['rejected value: invalid colour at load and after submit', always, ({ load, submit }) => red(load) && red(submit)],
+  ['rejected value: BAD shown at load and after submit', always, ({ load, submit }) => bad(load) && bad(submit)],
+  ['rejected value: is-invalid class at load and after submit', always, ({ load, submit }) => load.isInvalid.length > 0 && submit.isInvalid.length > 0],
+  ['rejected value: message linked at load and after submit', always, ({ load, submit }) => load.linked.length > 0 && submit.linked.length > 0]
+]
+
 const SOURCE_RULES = [
   ...STATE_READINGS.map(reading => `setValidationState(): ${reading} as with the option`),
   ...STATE_READINGS.map(reading => `setValidationState(null): ${reading} as with no state`)
@@ -254,6 +277,7 @@ const COVERAGE = new Map([
   ...SOURCE_RULES.map(title => [title, sourceCell]),
   ...PAGE_CLASS_RULES.map(([title, applies]) => [title, cell => sourceCell(cell) && applies(cell)]),
   ...FILLED_RULES.map(([title, applies]) => [title, cell => givenInvalid(cell) && applies(cell)]),
+  ...REJECTED_RULES.map(([title, applies]) => [title, cell => Object.hasOwn(REJECTED, cell.component) && !cell.given && applies(cell)]),
   ...USER_CHANGE_RULES.map(([title, applies]) => [title, cell => CUSTOM.includes(cell.component) && STATES.has(cell.given) && applies(cell)])
 ])
 
@@ -400,11 +424,13 @@ const start = () => {
   window.dispatchEvent(new Event('load'))
 }
 
-const mount = ({ component, filled, given, mode }, source = 'option', started = true) => {
+const mount = ({
+  component, filled, given, mode, rejected
+}, source = 'option', started = true) => {
   unmount()
   container = document.createElement('div')
   container.style.padding = '40px'
-  const markup = filled ? COMPONENTS[component].replace(...FILLED[component]) : COMPONENTS[component]
+  const markup = filled || rejected ? COMPONENTS[component].replace(...(rejected ? REJECTED : FILLED)[component]) : COMPONENTS[component]
   container.innerHTML = `<input id="ref-invalid" class="form-control is-invalid" aria-label="ref"><input id="ref-valid" class="form-control is-valid" aria-label="ref"><button id="before" type="button">Before</button><form${MODES[mode]}><div class="form-field probe-field"><label class="form-label" for="field" id="lbl">Field</label>${markup}<div class="invalid-feedback">BAD</div><div class="valid-feedback">OK</div></div><button id="send">Send</button><button id="rst" type="reset">Reset</button></form>`
   document.body.append(container)
 
@@ -460,6 +486,17 @@ const runCell = async cell => {
 const runFilledCell = async cell => {
   const { form } = mount(cell)
   const load = { ...await settled(form), values: [...new FormData(form).values()].map(String) }
+
+  container.querySelector('#before').focus()
+  await userEvent.click(container.querySelector('#send'))
+  const submit = await settled(form)
+
+  return { errors: [...errors], load, submit }
+}
+
+const runRejectedCell = async cell => {
+  const { form } = mount(cell)
+  const load = await settled(form)
 
   container.querySelector('#before').focus()
   await userEvent.click(container.querySelector('#send'))
@@ -578,6 +615,24 @@ describe('field validation matrix', () => {
         const run = await runFilledCell(cell)
 
         for (const [title, applies, passes] of FILLED_RULES) {
+          if (applies(cell)) {
+            expectRule(title, cell, passes(run, cell), run)
+          }
+        }
+      })
+    }
+  }
+
+  for (const component of Object.keys(REJECTED)) {
+    for (const mode of ALL_MODES) {
+      const cell = {
+        component, given: '', mode, rejected: true
+      }
+
+      it(`${component} in ${mode} holding a value it rejects`, async () => {
+        const run = await runRejectedCell(cell)
+
+        for (const [title, applies, passes] of REJECTED_RULES) {
           if (applies(cell)) {
             expectRule(title, cell, passes(run, cell), run)
           }

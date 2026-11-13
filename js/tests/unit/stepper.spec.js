@@ -1,5 +1,6 @@
 // stepper.spec.js
 import { vi } from 'vitest'
+import DateInput from '../../src/date-input.js'
 import MultiSelect from '../../src/multi-select.js'
 import Stepper from '../../src/stepper.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -1577,6 +1578,53 @@ describe('Stepper', () => {
         removeAnnouncers()
       }
     }
+
+    it('should draw a date a field rejects when the focus lands, in a novalidate step and in a step it validates', () => {
+      for (const attributes of ['novalidate', '']) {
+        fixtureEl.innerHTML = validationFixture(attributes).replace('<input id="empty" type="text" required value="">', '<div class="date-input"></div><div class="invalid-feedback">Pick a day in 2026.</div>')
+        const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), {
+          date: new Date(2027, 4, 5), format: 'dd.MM.yyyy', maxDate: new Date(2026, 11, 31), name: 'when'
+        })
+        const host = fixtureEl.querySelector('.form-date-time')
+        const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+        const landing = []
+
+        host.addEventListener('focusin', () => landing.push([host.classList.contains('is-invalid'), host.querySelector('.form-date-time-section').getAttribute('aria-invalid')]))
+        stepper.next()
+
+        expect(fixtureEl.querySelectorAll('.stepper-step-button')[0]).toHaveClass('active')
+        expect(document.activeElement).toBe(host.querySelector('.form-date-time-section'))
+        expect(landing[0], attributes).toEqual([true, 'true'])
+
+        stepper.dispose()
+        dateInput.dispose()
+      }
+    })
+
+    it('should keep the input of the error control of a date field from a step form the stepper validated, leave the control unmarked and go on once the date is accepted', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate').replace('<input id="empty" type="text" required value="">', '<div class="date-input"></div>')
+      const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), {
+        date: new Date(2027, 4, 5), format: 'dd.MM.yyyy', maxDate: new Date(2026, 11, 31), name: 'when'
+      })
+      const form = fixtureEl.querySelector('form')
+      const errorField = form.elements.when.previousElementSibling
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const targets = []
+
+      stepper.next()
+      form.addEventListener('input', event => targets.push(event.target))
+      dateInput.setDate(new Date(2026, 6, 14))
+
+      expect(targets).not.toContain(errorField)
+      expect([errorField.className, errorField.hasAttribute('aria-invalid')]).toEqual(['', false])
+
+      stepper.next()
+
+      expect(fixtureEl.querySelectorAll('.stepper-step-button')[1]).toHaveClass('active')
+
+      stepper.dispose()
+      dateInput.dispose()
+    })
 
     it('should mark invalid controls on noValidate forms on failure', () => {
       fixtureEl.innerHTML = validationFixture('novalidate')

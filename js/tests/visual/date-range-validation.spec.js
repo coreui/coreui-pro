@@ -308,6 +308,34 @@ describe('validation feedback next to a frame', () => {
     expect(displayOf('.valid-feedback')).toBe('none')
   })
 
+  it('draws a reversed range after a blocked submit the same with or without the state class its end takes', () => {
+    mount('<style>*, *::before, *::after { transition: none !important; }</style><form data-coreui-validate><div class="form-field"><div id="host"></div><div class="invalid-feedback">Pick both dates.</div></div><button>Send</button></form>', {
+      endDate: new Date(2026, 6, 14),
+      endFloatingLabel: 'Check-out',
+      startDate: new Date(2026, 6, 20),
+      startFloatingLabel: 'Check-in'
+    })
+    const form = container.querySelector('form')
+    const end = fields()[1]
+    const painted = () => [...container.querySelectorAll('*')].map(element => {
+      const style = getComputedStyle(element)
+
+      return [...style].filter(property => !property.startsWith('--')).map(property => `${property}: ${style.getPropertyValue(property)}`).join(';')
+    })
+
+    form.addEventListener('submit', event => event.preventDefault())
+    form.requestSubmit()
+    document.activeElement.blur()
+
+    expect(end.classList.contains('is-invalid')).toBeTrue()
+
+    const withClass = painted()
+
+    end.classList.remove('is-invalid')
+
+    expect(painted()).toEqual(withClass)
+  })
+
   it('lays the value field of each end over its field, invisible and out of the pointer\'s way', async () => {
     mount('<form data-coreui-validate novalidate><div class="form-field"><div id="host"></div><div class="invalid-feedback">Pick both dates.</div></div></form>', { required: true })
     const form = container.querySelector('form')
@@ -316,7 +344,7 @@ describe('validation feedback next to a frame', () => {
     form.requestSubmit()
 
     for (const field of fields()) {
-      const input = field.querySelector(':scope > textarea')
+      const input = field.querySelector(':scope > textarea + textarea')
       const styles = getComputedStyle(input)
       const fieldRect = field.getBoundingClientRect()
       const inputRect = input.getBoundingClientRect()

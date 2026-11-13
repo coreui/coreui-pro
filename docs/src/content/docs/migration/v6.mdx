@@ -1899,7 +1899,38 @@ validation and the arrow between them. Two consequences:
   reports it, also outside a submit. Its value field fires `input` and
   `change` when the date changes. This applies to the date and time pickers and to both ends of a
   date range as well. Code that selects `input[type="hidden"]` inside the field
-  needs `.form-date-time > textarea`.
+  needs `form.elements[name]`.
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+  **A rejected date blocks the submit.** In v5 a date typed into a date or
+  date range picker outside `minDate`/`maxDate` or on a disabled date was not
+  taken as the value, but the named text input kept the typed text and the
+  form submitted it, with no error drawn unless the page set `invalid`, and a
+  range typed with its end before its start was submitted as typed. Now a
+  completed date outside `minDate`/`maxDate`, in `disabledDates` or before
+  year 1, a time outside the limits of a time field, and in a range an end
+  before the start stop the submit whether the field is required or not, with
+  the browser's own message: for a limit it words it as for a native
+  `<input type="date">` with `min` and `max`, and for an end before the start
+  it names the start date. For a disabled date the browser has no message of
+  its own and shows the one it gives an empty field, so give your own hint
+  next to the field and link it with `aria-describedby`. Nothing is submitted
+  for a rejected entry: the value field holds no date until the entry is
+  corrected. The field draws the error at once, in any form, with the class,
+  the message and `aria-invalid` on its sections, and now also blocks the
+  submit. A disabled or read-only field draws it and never blocks. A block can
+  come or go without an `input` event reaching the form; follow it with the
+  `errorChange` event of the field. A submit your code makes with
+  `form.submit()` skips validation, as it does for native fields, so call
+  `form.checkValidity()` before it. The block comes from a hidden `<textarea>`
+  without a name and without a label, which each field places before its
+  value field, one for each end of a range. It is part of `form.elements` and
+  the first target of the form's `invalid` event for a rejected entry, so a
+  page that builds its own list of errors from `invalid` events or from
+  `form.elements` should skip controls without a name, or listen to the
+  `errorChange` event of the field and read `isRangeValid()` of a range. Reach
+  the value field through `form.elements[name]`: `.form-date-time > textarea`
+  now finds the hidden control first. This applies to the date and time
+  pickers and to both ends of a date range as well.
 
 #### Time Picker
 

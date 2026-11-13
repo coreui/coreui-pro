@@ -100,7 +100,7 @@ selection are turned off.
 
 ## Min and max times
 
-Constrain the times the user can pick with `minDate` and `maxDate`, given as time strings like `09:30` or as dates, of which only the time of day counts. The panel disables the hours that hold no allowed time and, once an hour is chosen, the minutes and seconds outside the range, and a time picked in the panel that crosses a limit moves to it. A time typed in the field outside the range gets the `.is-invalid` class, the picker reports `null` and submits no time until the value is corrected. A `maxDate` at midnight covers the whole day; any other `maxDate` before the `minDate` leaves no time to pick. The limits also apply when you give them through `inputOptions`.
+Constrain the times the user can pick with `minDate` and `maxDate`, given as time strings like `09:30` or as dates, of which only the time of day counts. The panel disables the hours that hold no allowed time and, once an hour is chosen, the minutes and seconds outside the range, and a time picked in the panel that crosses a limit moves to it. A time typed in the field outside the range blocks the submit, whether the picker is required or not, with the browser's message for the limit, and the picker reports `null` and submits no time until the value is corrected. The picker shows the error at once, as it always did, as the [date picker](/forms/date-picker/#validation) does. A `maxDate` at midnight covers the whole day; any other `maxDate` before the `minDate` leaves no time to pick. The limits also apply when you give them through `inputOptions`.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4">
@@ -267,8 +267,8 @@ by the picker itself.
 | `inputOptions` | object | `{}` | Programmatic escape hatch for time input options, except `readonly` and `validationState`, which the picker owns. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives the mask and the 12/24-hour split. |
-| `maxDate` | date, string, null | `null` | The latest time the user can pick, a time string or a date of which only the time of day counts. |
-| `minDate` | date, string, null | `null` | The earliest time the user can pick, a time string or a date of which only the time of day counts. |
+| `maxDate` | date, string, null | `null` | The latest time the user can pick, a time string or a date of which only the time of day counts. A time typed after it blocks the submit, see [Min and max times](#min-and-max-times). |
+| `minDate` | date, string, null | `null` | The earliest time the user can pick, a time string or a date of which only the time of day counts. A time typed before it blocks the submit, see [Min and max times](#min-and-max-times). |
 | `minutes` | array, boolean, function | `true` | Allowed minutes, or `false` to drop the column. |
 | `name` | string, null | `null` | Name of the generated value input. Without it the field is not submitted with the form. |
 | `pickerIcon` | string, boolean | `true` | The button that opens the time selection: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Without it the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |

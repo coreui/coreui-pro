@@ -11,7 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { type DisabledDate, isSameInstantAs } from './util/calendar.js'
 import { getForwardedOptions } from './util/composite.js'
-import { hasShortcutModifier, type SectionFormat } from './util/date-sections.js'
+import { getDateLimitMessage, hasShortcutModifier, type SectionFormat } from './util/date-sections.js'
 import FieldValidation from './util/field-validation.js'
 import { type ValidationState } from './util/form-validation.js'
 import {
@@ -244,6 +244,7 @@ class DateRangeInput extends BaseComponent {
 
     this._createDateRangeInput()
     this._reported = { end: this.getEndDate(), start: this.getStartDate() }
+    this._applyOrder()
     this._validation.update()
     this._addEventListeners()
   }
@@ -524,7 +525,15 @@ class DateRangeInput extends BaseComponent {
       if (this._element && !batching && (triggerChange || endDate !== undefined)) {
         this._reported.end = this.getEndDate()
       }
+
+      if (this._element && !batching) {
+        this._applyOrder()
+      }
     }
+  }
+
+  _applyOrder(): void {
+    this._endInput._setOrderMessage(this.isRangeValid() ? '' : getDateLimitMessage(this._endInput._sections, this.getEndDate(), this.getStartDate(), null, 'minDate'))
   }
 
   _onFieldChange(end: 'end' | 'start'): void {
@@ -532,6 +541,7 @@ class DateRangeInput extends BaseComponent {
       return
     }
 
+    this._applyOrder()
     this._reportDate(end)
   }
 

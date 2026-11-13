@@ -1,7 +1,9 @@
 import { onTestFinished, vi } from 'vitest'
 import TimeInput from '../../src/time-input.js'
 import TimePicker from '../../src/time-picker.js'
-import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+import {
+  clearFixture, getFixture, getValueField, jQueryMock
+} from '../helpers/fixture.js'
 
 describe('TimePicker', () => {
   let fixtureEl
@@ -1537,7 +1539,7 @@ describe('TimePicker', () => {
       expect(element.classList.contains('form-control-sm')).toBeTrue()
       expect(element.classList.contains('form-control-lg')).toBeFalse()
       expect(element.classList.contains('show')).toBeFalse()
-      expect(element.querySelector('textarea').disabled).toBeTrue()
+      expect(getValueField(element).disabled).toBeTrue()
       expect(element.querySelector('.form-control-action').disabled).toBeTrue()
     })
 

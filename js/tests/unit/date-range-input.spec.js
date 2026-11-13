@@ -1,5 +1,7 @@
 import DateRangeInput from '../../src/date-range-input.js'
-import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+import {
+  clearFixture, getFixture, getValueField, getValueFields, jQueryMock
+} from '../helpers/fixture.js'
 
 describe('DateRangeInput', () => {
   let fixtureEl
@@ -13,7 +15,7 @@ describe('DateRangeInput', () => {
   }
 
   const root = () => fixtureEl.querySelector('#range')
-  const hiddenInputs = () => [...root().querySelectorAll('.form-date-time > textarea')]
+  const hiddenInputs = () => getValueFields(root())
   const fields = () => [...root().querySelectorAll('.form-date-time')]
 
   beforeAll(() => {
@@ -918,6 +920,161 @@ describe('DateRangeInput', () => {
     })
   })
 
+  describe('the order of the ends', () => {
+    const orderMessage = Object.assign(document.createElement('input'), { min: '2026-06-15', type: 'date', value: '2026-06-10' }).validationMessage
+    const errorFields = () => getValueFields(root()).map(field => field.previousElementSibling)
+    const mountForm = (config = {}, attributes = '') => {
+      const instance = build({ endName: 'to', startName: 'from', ...config }, `<form${attributes}><div id="range"></div><button type="submit">Send</button></form>`)
+      const form = fixtureEl.querySelector('form')
+      const submitted = []
+
+      form.addEventListener('submit', event => {
+        submitted.push([...new FormData(form).keys()])
+        event.preventDefault()
+      })
+
+      return { form, instance, submitted }
+    }
+
+    const reversed = { endDate: new Date(2026, 5, 10), startDate: new Date(2026, 5, 15) }
+
+    it('should block the submit of a reversed range, required or not, with the message of a date before the start on the error control of the end', () => {
+      for (const required of [false, true]) {
+        const { form, instance, submitted } = mountForm({ ...reversed, required })
+        const invalid = []
+
+        form.addEventListener('invalid', event => invalid.push(event.target), true)
+        form.requestSubmit()
+
+        expect(submitted).toEqual([])
+        expect(invalid[0]).toBe(errorFields()[1])
+        expect(errorFields().map(field => field.validationMessage)).toEqual(['', orderMessage])
+        expect(orderMessage).not.toBe('')
+        expect(document.activeElement).toBe(instance.getEndElement().querySelector('.form-date-time-section'))
+
+        instance.dispose()
+        instances.length = 0
+      }
+    })
+
+    it('should draw a reversed range at once in a plain, a validating and a novalidate form', () => {
+      for (const attributes of ['', ' data-coreui-validate', ' novalidate']) {
+        const { instance } = mountForm(reversed, attributes)
+
+        expect(root().classList.contains('is-invalid'), attributes).toBeTrue()
+        expect([...root().querySelectorAll('.form-date-time-section')].map(section => section.getAttribute('aria-invalid'))).toEqual(Array.from({ length: 6 }, () => 'true'))
+
+        instance.dispose()
+        instances.length = 0
+      }
+    })
+
+    it('should set and lift the order block through setRange(), setStartDate(), clear(), reset() and a native reset', async () => {
+      const { form, instance, submitted } = mountForm({ endDate: new Date(2026, 5, 20), startDate: new Date(2026, 5, 15) })
+      const blocked = () => errorFields().map(field => field.validity.customError)
+
+      instance.setRange(new Date(2026, 5, 15), new Date(2026, 5, 10))
+
+      expect(blocked()).toEqual([false, true])
+
+      instance.setStartDate(new Date(2026, 5, 5))
+
+      expect(blocked()).toEqual([false, false])
+
+      instance.setStartDate(new Date(2026, 5, 15))
+
+      expect(blocked()).toEqual([false, true])
+
+      instance.clear()
+
+      expect(blocked()).toEqual([false, false])
+
+      instance.setRange(new Date(2026, 5, 15), new Date(2026, 5, 10))
+      instance.reset()
+
+      expect(blocked()).toEqual([false, false])
+
+      instance.setRange(new Date(2026, 5, 15), new Date(2026, 5, 10))
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(blocked()).toEqual([false, false])
+
+      form.requestSubmit()
+
+      expect(submitted).toEqual([['from', 'to']])
+    })
+
+    it('should lift the order block as a native reset starts, so a submit in the same task goes through', () => {
+      const { form, instance, submitted } = mountForm({ endDate: new Date(2026, 5, 20), startDate: new Date(2026, 5, 15) })
+
+      instance.setRange(new Date(2026, 5, 15), new Date(2026, 5, 10))
+      form.reset()
+
+      expect(form.checkValidity()).toBeTrue()
+
+      form.requestSubmit()
+
+      expect(submitted).toEqual([['from', 'to']])
+    })
+
+    it('should block again once the restore runs after a native reset to a reversed starting range', async () => {
+      const { form, instance } = mountForm(reversed)
+
+      instance.setRange(new Date(2026, 5, 25), new Date(2026, 5, 22))
+      form.reset()
+
+      expect(form.checkValidity()).toBeTrue()
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(errorFields().map(field => field.validity.customError)).toEqual([false, true])
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should take the order from a change of the user on either end', () => {
+      mountForm({ endDate: new Date(2026, 5, 20), startDate: new Date(2026, 5, 15) })
+      const endDay = root().querySelectorAll('.form-date-time-section')[3]
+
+      endDay.focus()
+
+      for (let step = 0; step < 10; step++) {
+        endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowDown' }))
+      }
+
+      expect(errorFields()[1].validity.customError).toBeTrue()
+
+      endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+      endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+      endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+      endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+      endDay.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowUp' }))
+
+      expect(errorFields()[1].validity.customError).toBeFalse()
+    })
+
+    it('should keep one error control per end after a dispose and a new instance', () => {
+      const { form, instance } = mountForm(reversed)
+
+      instance.dispose()
+      instances.length = 0
+
+      expect(root().querySelectorAll('textarea')).toHaveLength(0)
+      expect(form.checkValidity()).toBeTrue()
+
+      instances.push(new DateRangeInput(root(), {
+        ...reversed, endName: 'to', format: 'dd.MM.yyyy', locale: 'en-US', startName: 'from'
+      }))
+
+      expect([...root().querySelectorAll('textarea')].map(field => field.name)).toEqual(['', 'from', '', 'to'])
+      expect(form.checkValidity()).toBeFalse()
+    })
+  })
+
   describe('keyboard', () => {
     const sections = element => [...element.querySelectorAll('.form-date-time-section')]
     const press = (target, key) => target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
@@ -989,7 +1146,7 @@ describe('DateRangeInput', () => {
     it('should leave a disabled class on an adopted field to the range input, which stays enabled', () => {
       build({}, OWN_MARKUP.replace('<div data-coreui-range-start>', '<div data-coreui-range-start class="disabled">'))
 
-      expect(root().querySelector('[data-coreui-range-start] textarea').disabled).toBeFalse()
+      expect(getValueField(root().querySelector('[data-coreui-range-start]')).disabled).toBeFalse()
     })
 
     it('should adopt the hosts and the separator the author wrote', () => {

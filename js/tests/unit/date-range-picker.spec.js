@@ -3,7 +3,9 @@ import Calendar from '../../src/calendar.js'
 import DateInput from '../../src/date-input.js'
 import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
-import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+import {
+  clearFixture, getFixture, getValueFields, jQueryMock
+} from '../helpers/fixture.js'
 
 describe('DateRangePicker', () => {
   let fixtureEl
@@ -384,7 +386,7 @@ describe('DateRangePicker', () => {
         endDate: new Date(2026, 7, 5)
       })
 
-      const values = [...fixtureEl.querySelectorAll('#picker .form-date-time > textarea')].map(input => input.value)
+      const values = getValueFields(fixtureEl.querySelector('#picker')).map(input => input.value)
       expect(values).toEqual(['Week 29, 2026', 'Week 32, 2026'])
     })
 
@@ -395,7 +397,7 @@ describe('DateRangePicker', () => {
         endDate: new Date(2026, 10, 15)
       })
 
-      const values = [...fixtureEl.querySelectorAll('#picker .form-date-time > textarea')].map(input => input.value)
+      const values = getValueFields(fixtureEl.querySelector('#picker')).map(input => input.value)
       expect(values).toEqual(['Q1 2026', 'Q4 2026'])
     })
   })

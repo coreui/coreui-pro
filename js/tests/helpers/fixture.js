@@ -34,6 +34,10 @@ export const waitUntil = async (check, timeout = 1000) => {
   }
 }
 
+export const getValueField = element => element.querySelector('.form-date-time > textarea + textarea')
+
+export const getValueFields = element => [...element.querySelectorAll('.form-date-time > textarea + textarea')]
+
 export const createEvent = (eventName, parameters = {}) => {
   return new Event(eventName, parameters)
 }

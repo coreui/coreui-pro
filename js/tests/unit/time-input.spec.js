@@ -1,6 +1,8 @@
 import { vi } from 'vitest'
 import TimeInput from '../../src/time-input.js'
-import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+import {
+  clearFixture, getFixture, getValueField, jQueryMock
+} from '../helpers/fixture.js'
 
 describe('TimeInput', () => {
   let fixtureEl
@@ -188,14 +190,14 @@ describe('TimeInput', () => {
 
       expect(hour.textContent).toEqual('14')
       expect(minute.textContent).toEqual('30')
-      expect(timeInput._element.querySelector('.form-date-time > textarea').value).toEqual('14:30')
+      expect(getValueField(timeInput._element).value).toEqual('14:30')
     })
 
     it('should accept a time string as the initial value', () => {
       const timeInput = createTimeInput({ date: '09:30' })
 
       expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 9, 30))
-      expect(timeInput._element.querySelector('.form-date-time > textarea').value).toEqual('09:30')
+      expect(getValueField(timeInput._element).value).toEqual('09:30')
     })
 
     it('should accept 12-hour time strings with a day period', () => {
@@ -371,12 +373,12 @@ describe('TimeInput', () => {
       timeInput.disable()
 
       expect(timeInput._element.classList.contains('disabled')).toBeTrue()
-      expect(timeInput._element.querySelector('textarea').disabled).toBeTrue()
+      expect(getValueField(timeInput._element).disabled).toBeTrue()
 
       timeInput.enable()
 
       expect(timeInput._element.classList.contains('disabled')).toBeFalse()
-      expect(timeInput._element.querySelector('textarea').disabled).toBeFalse()
+      expect(getValueField(timeInput._element).disabled).toBeFalse()
       expect([...getSections(timeInput._element)].map(section => section.textContent)).toEqual(['14', '30'])
     })
 
@@ -408,7 +410,7 @@ describe('TimeInput', () => {
       // eslint-disable-next-line no-new
       new TimeInput(element)
 
-      expect(element.querySelector('textarea').disabled).toBeFalse()
+      expect(getValueField(element).disabled).toBeFalse()
       expect(element.classList.contains('disabled')).toBeFalse()
     })
   })

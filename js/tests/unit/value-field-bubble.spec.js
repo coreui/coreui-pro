@@ -4,7 +4,7 @@ import Combobox from '../../src/combobox.js'
 import DateInput from '../../src/date-input.js'
 import MultiSelect from '../../src/multi-select.js'
 import OTPInput from '../../src/otp-input.js'
-import { clearFixture, getFixture } from '../helpers/fixture.js'
+import { clearFixture, getFixture, getValueField } from '../helpers/fixture.js'
 
 const OPTIONS = '<div class="popup combobox-popup"><div class="list-box"><div class="list-box-options" role="listbox" aria-label="Item"><div class="list-box-option" data-coreui-value="1">One</div></div></div></div>'
 
@@ -35,7 +35,7 @@ const components = {
     const host = form.firstElementChild
     const instance = new DateInput(host, { required: true })
 
-    return { field: host.querySelector('textarea'), host, instance }
+    return { field: getValueField(host), host, instance }
   },
   MultiSelect(form, options) {
     form.innerHTML = '<select multiple required><option value="1">One</option></select>'

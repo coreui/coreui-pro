@@ -679,6 +679,28 @@ describe('FieldValidation', () => {
       expect(stateClasses(host)).toEqual(['is-invalid'])
     })
 
+    it('should lift the block at once and set it again after the restore, or after a cancelled reset', async () => {
+      const calls = []
+      const lift = vi.fn(isLifted => calls.push(['lift', isLifted]))
+      const restore = vi.fn(() => calls.push(['restore']))
+      const { form } = mount({ lift, restore })
+
+      form.reset()
+
+      expect(calls).toEqual([['lift', true]])
+
+      await tick()
+
+      expect(calls).toEqual([['lift', true], ['restore'], ['lift', false]])
+
+      calls.length = 0
+      form.addEventListener('reset', event => event.preventDefault(), { once: true })
+      form.reset()
+      await tick()
+
+      expect(calls).toEqual([['lift', true], ['lift', false]])
+    })
+
     it('should answer the reset of its form when another form resets in the same task', async () => {
       const restore = vi.fn()
       const { form, host } = mount({ config: { validationState: 'invalid' }, restore })
