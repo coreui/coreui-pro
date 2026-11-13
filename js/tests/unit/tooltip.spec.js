@@ -1,6 +1,6 @@
 import EventHandler from '../../src/dom/event-handler.js'
 import Tooltip from '../../src/tooltip.js'
-import { getParentLayer, registerLayer, unregisterLayer } from '../../src/util/layers.js'
+import { registerLayer, unregisterLayer } from '../../src/util/layers.js'
 import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
@@ -8,6 +8,8 @@ import {
 
 describe('Tooltip', () => {
   let fixtureEl
+
+  const getParentLayer = entry => globalThis[Symbol.for('coreui.layers')].stack.find(record => record.entry === entry)?.parent?.entry ?? null
 
   beforeAll(() => {
     fixtureEl = getFixture()

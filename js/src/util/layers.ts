@@ -632,12 +632,3 @@ export const getLayerFocusTargetFor = (element: Element): Element | null => {
   const entry = throughTips(getState().stack.findLast(record => inParts(record, element)))?.entry
   return (entry?.focusTarget?.() ?? entry?.anchor()) || null
 }
-
-/**
- * Returns the parent of a registered layer.
- *
- * @param entry - The layer
- * @returns The parent's entry, or `null` for a root layer or one that is not registered
- */
-export const getParentLayer = (entry: LayerEntry): LayerEntry | null =>
-  recordOf(entry)?.parent?.entry ?? null

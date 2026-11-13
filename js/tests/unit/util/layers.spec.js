@@ -1,5 +1,5 @@
 import {
-  closeLayersIn, getLayerAnchorFor, getLayerFocusTargetFor, getParentLayer, handleEscape, isComposingKey, isInDescendantParts, reanchorLayer,
+  closeLayersIn, getLayerAnchorFor, getLayerFocusTargetFor, handleEscape, isComposingKey, isInDescendantParts, reanchorLayer,
   registerLayer, settleClick, unregisterLayer
 } from '../../../src/util/layers.js'
 import { trackPress } from '../../../src/util/press.js'
@@ -10,6 +10,8 @@ describe('layers', () => {
   let calls
 
   const state = () => globalThis[Symbol.for('coreui.layers')]
+
+  const getParentLayer = entry => state().stack.find(record => record.entry === entry)?.parent?.entry ?? null
 
   const layer = (name, { anchor, kind = 'popup', parts, refuses = [], tip = false } = {}) => {
     const entry = {
