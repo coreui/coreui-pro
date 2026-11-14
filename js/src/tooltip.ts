@@ -1315,6 +1315,23 @@ class Tooltip extends BaseComponent {
     return Object.values(this._activeTrigger).includes(true)
   }
 
+  override _getConfig(config?: ComponentConfig | null): ComponentConfig {
+    const dataAttributes: ComponentConfig = {}
+
+    if (this._element.getAttribute('data-coreui-title') !== null) {
+      dataAttributes.title = this._element.getAttribute('data-coreui-title')
+    }
+
+    if (this._element.getAttribute('data-coreui-content') !== null) {
+      dataAttributes.content = this._element.getAttribute('data-coreui-content')
+    }
+
+    return super._getConfig({
+      ...dataAttributes,
+      ...(typeof config === 'object' && config ? config : {})
+    })
+  }
+
   override _configAfterMerge(config: ComponentConfig): ComponentConfig {
     if (config.anchors && (config.selector || config.trigger.includes(TRIGGER_MANUAL))) {
       throw new TypeError(`${this.constructor.NAME.toUpperCase()}: "anchors" cannot be used with "selector" or a manual trigger.`)
@@ -1337,11 +1354,15 @@ class Tooltip extends BaseComponent {
     // Coerce number/boolean title and content to strings. `data-coreui-title="true"`
     // / `data-coreui-content="false"` are auto-converted to booleans by the data-API,
     // which would otherwise fail the (null|string|element|function) type check.
-    if (typeof config.title === 'number' || typeof config.title === 'boolean') {
+    if (config.title === null) {
+      config.title = ''
+    } else if (typeof config.title === 'number' || typeof config.title === 'boolean') {
       config.title = config.title.toString()
     }
 
-    if (typeof config.content === 'number' || typeof config.content === 'boolean') {
+    if (config.content === null) {
+      config.content = ''
+    } else if (typeof config.content === 'number' || typeof config.content === 'boolean') {
       config.content = config.content.toString()
     }
 
