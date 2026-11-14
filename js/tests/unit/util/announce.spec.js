@@ -549,6 +549,66 @@ describe('announce', () => {
     expect(messages(dialog)).toEqual(['Saved'])
   })
 
+  it('should hold a message while focus is in a dialog that is closing', () => {
+    fixtureEl.innerHTML = '<dialog class="hiding"><button type="button">Close</button></dialog>'
+    const dialog = fixtureEl.querySelector('dialog')
+    dialog.show()
+    dialog.querySelector('button').focus()
+
+    announce('Saved')
+    vi.advanceTimersByTime(100)
+
+    expect(messages(document.body)).toEqual([])
+
+    dialog.classList.remove('hiding')
+    vi.advanceTimersByTime(500)
+
+    expect(messages(document.body)).toEqual(['Saved'])
+  })
+
+  it('should hold a message while focus is in a shadow root inside a dialog that is closing', () => {
+    fixtureEl.innerHTML = '<dialog class="hiding"><div></div></dialog>'
+    const dialog = fixtureEl.querySelector('dialog')
+    const root = dialog.querySelector('div').attachShadow({ mode: 'open' })
+    root.innerHTML = '<button type="button">Inner</button>'
+    dialog.show()
+    root.querySelector('button').focus()
+
+    announce('Saved')
+    vi.advanceTimersByTime(100)
+
+    expect(messages(document.body)).toEqual([])
+  })
+
+  it('should hold a message while focus is on an element slotted into a closing dialog inside a shadow root', () => {
+    fixtureEl.innerHTML = '<div><button type="button">Slotted</button></div>'
+    const host = fixtureEl.querySelector('div')
+    const root = host.attachShadow({ mode: 'open' })
+    root.innerHTML = '<dialog class="hiding"><slot></slot></dialog>'
+    root.querySelector('dialog').show()
+    host.querySelector('button').focus()
+
+    announce('Saved')
+    vi.advanceTimersByTime(100)
+
+    expect(messages(document.body)).toEqual([])
+  })
+
+  it('should hold a message while focus is in a closing dialog inside a shadow root', () => {
+    const host = document.createElement('div')
+    fixtureEl.append(host)
+    const root = host.attachShadow({ mode: 'open' })
+    root.innerHTML = '<dialog class="hiding"><button type="button">Close</button></dialog>'
+    const dialog = root.querySelector('dialog')
+    dialog.show()
+    root.querySelector('button').focus()
+
+    announce('Saved')
+    vi.advanceTimersByTime(100)
+
+    expect(messages(document.body)).toEqual([])
+  })
+
   it('should announce inside a shown element with aria-modal, which hides the page', () => {
     fixtureEl.innerHTML = '<div role="dialog" aria-modal="true"><button type="button">Next month</button></div>'
     const panel = fixtureEl.querySelector('[aria-modal]')

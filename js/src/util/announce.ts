@@ -57,17 +57,18 @@ const isModal = (element: Element): boolean => {
 }
 
 /**
- * Finds the open modal dialog around an element, through the slots it is assigned to and the
- * shadow roots it sits in.
+ * Finds the closest element that passes a test, starting at an element and going up through the
+ * slots it is assigned to and the shadow roots it sits in.
  *
  * @param element - The element to start from
- * @returns The closest open modal dialog, or `null` when there is none
+ * @param test - Tells whether an element is the one wanted
+ * @returns The closest element that passes, or `null` when there is none
  */
-const getDialogAround = (element: Element | null): HTMLElement | null => {
+const closestAcross = (element: Element | null, test: (node: Element) => boolean): HTMLElement | null => {
   let node = element
 
   while (node) {
-    if (isModal(node)) {
+    if (test(node)) {
       return node as HTMLElement
     }
 
@@ -88,7 +89,7 @@ const getModal = (context: Element | null): HTMLElement | null => {
   const focused = deepActiveElement(document)
   const modals = [...document.querySelectorAll<HTMLElement>('dialog[open], [aria-modal="true"]')].filter(isModal)
 
-  return getDialogAround(focused) ?? getDialogAround(context) ?? modals.at(-1) ?? null
+  return closestAcross(focused, isModal) ?? closestAcross(context, isModal) ?? modals.at(-1) ?? null
 }
 
 /**
@@ -211,7 +212,7 @@ const flush = (): void => {
 
     const modal = getModal(context)
 
-    if (modal?.classList.contains(CLASS_NAME_HIDING) || document.activeElement?.closest(`dialog.${CLASS_NAME_HIDING}`)) {
+    if (modal?.classList.contains(CLASS_NAME_HIDING) || closestAcross(deepActiveElement(document), node => node.matches(`dialog.${CLASS_NAME_HIDING}`))) {
       setTimeout(flush, CLOSE_DELAY)
       break
     }

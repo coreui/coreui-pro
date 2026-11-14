@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { rootActiveElement } from './util/focus.js'
 import {
   createControlGroupAction, ensureControlGroup, releaseControlGroup, type ControlGroup
 } from './util/form-control-group.js'
@@ -284,7 +285,7 @@ class NumberInput extends BaseComponent {
 
     event.preventDefault()
 
-    if (document.activeElement !== this._element) {
+    if (rootActiveElement(this._element) !== this._element) {
       this._element.focus({ preventScroll: true })
     }
   }

@@ -11,7 +11,7 @@ import {
 import EventHandler from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
-import { containsFocus, focusIfUsable } from './focus.js'
+import { containsFocus, focusIfUsable, rootActiveElement } from './focus.js'
 import FocusTrap from './focustrap.js'
 import {
   handleEscape, registerLayer, unregisterLayer, type LayerEntry, type LayerReason
@@ -222,7 +222,7 @@ class Popup extends Config {
     this._isShown = true
     this._hiding = false
     const transition = ++this._transition
-    this._previouslyFocused = document.activeElement as HTMLElement | null
+    this._previouslyFocused = rootActiveElement(this._anchor ?? document) as HTMLElement | null
 
     this._mount()
 
@@ -484,7 +484,7 @@ class Popup extends Config {
     }
 
     this._revealPending = false
-    const active = document.activeElement
+    const active = this._content && rootActiveElement(this._content)
 
     if (active instanceof HTMLElement && this._content?.contains(active)) {
       active.scrollIntoView({ block: 'nearest', inline: 'nearest' })

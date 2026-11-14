@@ -10,6 +10,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onLabelClick } from './util/field-label.js'
 import FieldValidation from './util/field-validation.js'
+import { rootActiveElement } from './util/focus.js'
 import {
   configureValueField, createValueField, dispatchValueChange, writeValueField, type ValidationState
 } from './util/form-validation.js'
@@ -587,8 +588,8 @@ class OTPInput extends BaseComponent {
 
   _setInputsTabIndexes(): void {
     const inputs = this._getInputs()
-    const { activeElement } = this._element.getRootNode() as Document | ShadowRoot
-    const tabStop = inputs.find(input => input === activeElement) ?? inputs[0]
+    const active = rootActiveElement(this._element)
+    const tabStop = inputs.find(input => input === active) ?? inputs[0]
 
     for (const input of inputs) {
       input.tabIndex = input === tabStop ? 0 : -1

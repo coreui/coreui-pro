@@ -2211,6 +2211,21 @@ describe('Tooltip', () => {
       expect(a.getAttribute('title')).toBe('Bold')
     })
 
+    it('should describe the focused control inside an anchor in a shadow root', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const root = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      root.innerHTML = '<ul id="bar"><li title="Bold"><button type="button" id="b">B</button></li></ul><div id="tips"></div>'
+      const bar = root.querySelector('#bar')
+      const button = root.querySelector('#b')
+      const tooltip = new Tooltip(bar, { anchors: 'li', container: root.querySelector('#tips') })
+      const shown = wait(bar, 'shown')
+      button.focus()
+      await shown
+
+      expect(button.getAttribute('aria-describedby')).toBe(root.querySelector('.tooltip').id)
+      tooltip.dispose()
+    })
+
     it('should show the tip of a wrapper around a disabled button listed among the anchors', async () => {
       fixtureEl.innerHTML = '<div id="bar"><button type="button" id="a" title="Bold">B</button><span id="s" tabindex="0" title="Italic is not available"><button type="button" id="off" disabled>I</button></span></div>'
       const bar = fixtureEl.querySelector('#bar')

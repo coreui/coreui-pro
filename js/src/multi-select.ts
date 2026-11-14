@@ -15,7 +15,7 @@ import { announce } from './util/announce.js'
 import { hasShortcutModifier } from './util/calendar.js'
 import { type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement } from './util/chip-values.js'
 import FieldValidation from './util/field-validation.js'
-import { containsFocus } from './util/focus.js'
+import { containsFocus, rootActiveElement } from './util/focus.js'
 import FocusTrap from './util/focustrap.js'
 import { armValueFieldBubble, closeValueFieldBubble, type ValidationState } from './util/form-validation.js'
 import { isComposingKey, settleClick } from './util/layers.js'
@@ -498,7 +498,7 @@ class MultiSelect extends ComboboxBase {
       return
     }
 
-    const focused = (this._menu.getRootNode() as Document | ShadowRoot).activeElement
+    const focused = rootActiveElement(this._menu)
 
     if (!hadFocus || (focused !== this._menu && containsFocus(this._menu) && isVisible(focused))) {
       return

@@ -11,6 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
 import FieldValidation from './util/field-validation.js'
+import { holdsFocusOrNone } from './util/focus.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -169,7 +170,7 @@ abstract class PickerBase extends BaseComponent {
 
         this._clearValue(true)
 
-        if (this._element && [this._cleanerElement, document.body].includes(document.activeElement as HTMLElement)) {
+        if (this._element && holdsFocusOrNone(this._cleanerElement)) {
           SelectorEngine.findOne(SELECTOR_SECTION, this._popupAnchor())?.focus()
         }
       })
