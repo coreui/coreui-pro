@@ -10,6 +10,7 @@ import ListBox, { type ListBoxEntry, type ListBoxGroup, type ListBoxOption } fro
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
+import { rootActiveElement } from './util/focus.js'
 import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
 } from './util/icons.js'
@@ -636,7 +637,7 @@ class Transfer extends BaseComponent {
     }
 
     const moved = options.map(option => this._optionValue(option))
-    const trigger = document.activeElement as HTMLElement | null
+    const trigger = rootActiveElement(this._element) as HTMLElement | null
 
     if (EventHandler.trigger(this._element, this.constructor.eventName(EVENT_MOVE), { direction: side, values: moved }).defaultPrevented) {
       return

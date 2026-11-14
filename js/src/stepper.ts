@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { rootActiveElement } from './util/focus.js'
 import {
   clearValidationState, isFormValid, updateValidationState, validateForm
 } from './util/form-validation.js'
@@ -333,7 +334,7 @@ class Stepper extends BaseComponent {
   }
 
   _getFocusedElement(): Element | null {
-    return (this._element.getRootNode() as Document | ShadowRoot).activeElement
+    return rootActiveElement(this._element)
   }
 
   _holdsFocus(): boolean {

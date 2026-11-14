@@ -1,5 +1,6 @@
 import {
-  containsFocus, deepActiveElement, focusFirstUsable, focusIfUsable, focusWithTemporaryTabindex, holdsFocusOrNone
+  containsFocus, deepActiveElement, focusFirstUsable, focusIfUsable, focusWithTemporaryTabindex, holdsFocusOrNone,
+  rootActiveElement
 } from '../../../src/util/focus.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -12,6 +13,45 @@ describe('Focus utilities', () => {
 
   afterEach(() => {
     clearFixture()
+  })
+
+  describe('rootActiveElement', () => {
+    it('should return the focused element of the document for an element in the document', () => {
+      fixtureEl.innerHTML = '<button id="one"></button><button id="two"></button>'
+      fixtureEl.querySelector('#two').focus()
+
+      expect(rootActiveElement(fixtureEl.querySelector('#one'))).toEqual(fixtureEl.querySelector('#two'))
+    })
+
+    it('should return the focused element of the shadow root the node sits in, not its host', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const host = fixtureEl.querySelector('div')
+      const root = host.attachShadow({ mode: 'open' })
+      root.innerHTML = '<span></span><button></button>'
+      root.querySelector('button').focus()
+
+      expect(document.activeElement).toEqual(host)
+      expect(rootActiveElement(root.querySelector('span'))).toEqual(root.querySelector('button'))
+    })
+
+    it('should read a closed shadow root from a node inside it', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const root = fixtureEl.querySelector('div').attachShadow({ mode: 'closed' })
+      root.innerHTML = '<span></span><button></button>'
+      root.querySelector('button').focus()
+
+      expect(rootActiveElement(root.querySelector('span'))).toEqual(root.querySelector('button'))
+    })
+
+    it('should return null for a detached node and for a shadow root without focus', () => {
+      fixtureEl.innerHTML = '<div></div><button></button>'
+      const root = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      root.innerHTML = '<span></span>'
+      fixtureEl.querySelector('button').focus()
+
+      expect(rootActiveElement(document.createElement('span'))).toBeNull()
+      expect(rootActiveElement(root.querySelector('span'))).toBeNull()
+    })
   })
 
   describe('containsFocus', () => {

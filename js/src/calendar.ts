@@ -10,6 +10,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
+import { containsFocus, rootActiveElement } from './util/focus.js'
 import {
   escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
@@ -673,7 +674,7 @@ class Calendar extends BaseComponent {
   _showPeriodView(view: ViewTypes, index: number): boolean {
     const shown = getCalendarDate(this._calendarDate, index, this._view === 'years' ? view : this._view)
     const start = getStartOfView(createDate(shown.getFullYear(), shown.getMonth(), 1), view).toDateString()
-    const focus = view !== this._view && this._element.contains(document.activeElement)
+    const focus = view !== this._view && containsFocus(this._element)
 
     this._setCalendarView(view, 'navigation')
     this._updateCalendar(() => {
@@ -889,7 +890,7 @@ class Calendar extends BaseComponent {
     }
 
     const panels = this._panels()
-    const active = (this._element.getRootNode() as Document | ShadowRoot).activeElement
+    const active = rootActiveElement(this._element)
     const date = active && this._element.contains(active) ?
       active.closest(`${SELECTOR_CALENDAR_CELL}[aria-label], ${SELECTOR_CALENDAR_ROW}[aria-label]`) :
       null
@@ -1119,7 +1120,8 @@ class Calendar extends BaseComponent {
   }
 
   _keepingFocus(render: () => void): void {
-    const focused = this._element.contains(document.activeElement) ? document.activeElement as HTMLElement : null
+    const active = rootActiveElement(this._element)
+    const focused = active && this._element.contains(active) ? active as HTMLElement : null
     const restoreFocus = focused && this._focusRestorer(focused)
 
     render()

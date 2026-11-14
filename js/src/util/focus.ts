@@ -1,13 +1,23 @@
 import { isDisabled, isVisible } from './index.js'
 
 /**
+ * Returns the element holding the focus of the document or shadow root a node sits in. Inside a
+ * shadow root that is the focused element there, where `document.activeElement` gives the host.
+ *
+ * @param node - The node whose document or shadow root to ask
+ * @returns The focused element, or `null` when nothing there has focus or the node is detached
+ */
+export const rootActiveElement = (node: Node): Element | null =>
+  (node.getRootNode() as Document | ShadowRoot).activeElement ?? null
+
+/**
  * Tells whether an element, or a node inside it, holds the focus of its document or shadow root.
  *
  * @param element - The element
  * @returns `true` when the focus is on the element or inside it
  */
 export const containsFocus = (element: Element | null | undefined): boolean =>
-  Boolean(element?.contains((element.getRootNode() as Document | ShadowRoot).activeElement))
+  Boolean(element?.contains(rootActiveElement(element)))
 
 /**
  * Returns the element holding the focus of a document or shadow root, followed into the open shadow
@@ -38,7 +48,7 @@ export const holdsFocusOrNone = (element: Element | null | undefined): boolean =
     return false
   }
 
-  const active = (element.getRootNode() as Document | ShadowRoot).activeElement ?? document.activeElement
+  const active = rootActiveElement(element) ?? document.activeElement
   return !active || active === document.body || element.contains(active)
 }
 
@@ -55,12 +65,11 @@ export const focusIfUsable = (element: HTMLElement | null | undefined, options?:
     return false
   }
 
-  const root = element.getRootNode() as Document | ShadowRoot
-  const before = root.activeElement
+  const before = rootActiveElement(element)
   element.focus(options)
-  const { activeElement } = root
+  const active = rootActiveElement(element)
 
-  return activeElement === element || (activeElement !== before && element.contains(activeElement))
+  return active === element || (active !== before && element.contains(active))
 }
 
 /**
@@ -88,7 +97,7 @@ export const focusWithTemporaryTabindex = (element: HTMLElement): void => {
   }
 
   const release = () => {
-    if ((element.getRootNode() as Document | ShadowRoot).activeElement !== element) {
+    if (rootActiveElement(element) !== element) {
       element.removeEventListener('blur', release)
       element.removeAttribute('tabindex')
     }

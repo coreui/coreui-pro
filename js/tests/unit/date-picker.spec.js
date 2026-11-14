@@ -1470,6 +1470,19 @@ describe('DatePicker', () => {
       expect(document.activeElement).toBe(fixtureEl.querySelector('.form-date-time-section'))
     })
 
+    it('should move focus to the field once the cleaner has cleared the value inside a shadow root', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const root = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      root.innerHTML = '<div id="picker"></div>'
+      pickers.push(new DatePicker(root.querySelector('#picker'), { date: new Date(2026, 6, 14) }))
+      const cleaner = root.querySelector('.form-control-cleaner')
+
+      cleaner.focus()
+      cleaner.click()
+
+      expect(root.activeElement).toBe(root.querySelector('.form-date-time-section'))
+    })
+
     it('should leave focus where a dateChange listener moved it when the cleaner clears the value', () => {
       buildPicker({ date: new Date(2026, 6, 14) })
       const other = document.createElement('input')

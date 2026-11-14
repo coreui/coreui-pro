@@ -273,6 +273,25 @@ describe('Popup', () => {
       expect(document.activeElement).toEqual(inside)
     })
 
+    it('should restore focus to the element of the anchor that had it before opening inside a shadow root', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const root = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      root.innerHTML = [
+        '<div id="anchor"><button id="first">first</button><button id="inside">toggle</button></div>',
+        '<div id="content"><button id="option">option</button></div>'
+      ].join('')
+      const popup = new Popup({ anchor: root.querySelector('#anchor'), content: root.querySelector('#content'), focusTrap: false })
+      popups.push(popup)
+      const inside = root.querySelector('#inside')
+
+      inside.focus()
+      popup.show()
+      root.querySelector('#option').focus()
+      popup.hide()
+
+      expect(root.activeElement).toEqual(inside)
+    })
+
     it('should hand the focus to the anchor, not to an element outside it that had the focus before opening', () => {
       const popup = buildPopup()
 
@@ -1090,6 +1109,26 @@ describe('Popup', () => {
 
       expect(popup.isMobile).toBeTrue()
       expect(fixtureEl.querySelector('#content').style.position).toEqual('')
+    })
+
+    it('should scroll the entry it focused into view in mobile mode inside a shadow root', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const root = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      root.innerHTML = '<div id="anchor"><button id="inside">toggle</button></div><div id="content"><button id="option">option</button></div>'
+      const popup = new Popup({
+        anchor: root.querySelector('#anchor'),
+        content: root.querySelector('#content'),
+        focusTrap: false,
+        mobileBreakpoint: 100000
+      })
+      popups.push(popup)
+      const option = root.querySelector('#option')
+      const spy = spyOn(option, 'scrollIntoView')
+
+      popup.show()
+
+      expect(root.activeElement).toEqual(option)
+      expect(spy).toHaveBeenCalled()
     })
 
     it('should drop a position left from a desktop open when it opens in mobile mode', async () => {

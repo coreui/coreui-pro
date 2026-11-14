@@ -254,6 +254,22 @@ describe('ChipSet', () => {
       expect(document.activeElement).toEqual(chips[2])
     })
 
+    it('should move focus to the chip matching the typed characters inside a shadow root', () => {
+      const el = setMarkup(['Apple', 'Banana', 'Apricot'])
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const root = host.attachShadow({ mode: 'open' })
+      root.append(el)
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].focus()
+      keydown(chips[0], 'a')
+
+      expect(root.activeElement).toEqual(chips[2])
+    })
+
     it('should not move focus when typeahead is off', () => {
       const el = setMarkup(['Alpha', 'Beta', 'Gamma'])
       // eslint-disable-next-line no-new

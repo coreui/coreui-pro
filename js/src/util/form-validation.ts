@@ -1,4 +1,5 @@
 import { announce } from './announce.js'
+import { rootActiveElement } from './focus.js'
 import { getUID, splitIds, writeAttribute } from './index.js'
 
 export { splitIds } from './index.js'
@@ -437,7 +438,7 @@ export const clearValidationState = (form: HTMLFormElement, marks: ValidationMar
  * @returns The focused element, or `null`
  */
 const getFocusedElement = (form: HTMLFormElement): HTMLElement | null =>
-  ((form.getRootNode() as Document | ShadowRoot).activeElement ?? form.ownerDocument.activeElement) as HTMLElement | null
+  (rootActiveElement(form) ?? form.ownerDocument.activeElement) as HTMLElement | null
 
 /**
  * Focuses a control and tells whether focus moved while doing so, to the control or to an element

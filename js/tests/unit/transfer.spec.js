@@ -503,6 +503,21 @@ describe('Transfer', () => {
       expect(document.activeElement).toEqual(option(el, 'target', 'one'))
     })
 
+    it('should move the focus to the moved option when the button it came from turns off inside a shadow root', () => {
+      const el = setMarkup()
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const root = host.attachShadow({ mode: 'open' })
+      root.append(el)
+      const transfer = new Transfer(el)
+
+      transfer._sides.source.listBox.select('one')
+      moveButton(el, 'target').focus()
+      click(moveButton(el, 'target'))
+
+      expect(root.activeElement).toEqual(option(el, 'target', 'one'))
+    })
+
     it('should leave the focus alone when the move came from somewhere else', () => {
       const el = setMarkup()
       const transfer = new Transfer(el)

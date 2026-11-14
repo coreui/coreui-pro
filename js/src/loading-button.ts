@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import { announce, holdAnnouncements, type AnnouncePriority } from './util/announce.js'
+import { rootActiveElement } from './util/focus.js'
 import {
   defineJQueryPlugin, jQueryDispatch
 } from './util/index.js'
@@ -178,7 +179,7 @@ class LoadingButton extends BaseComponent {
   // Private
 
   _announce(message: string, priority: AnnouncePriority): (() => void) | null {
-    if (!message || (this._element.getRootNode() as Document | ShadowRoot).activeElement !== this._element) {
+    if (!message || rootActiveElement(this._element) !== this._element) {
       return null
     }
 

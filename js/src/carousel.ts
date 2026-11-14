@@ -12,6 +12,7 @@ import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { rootActiveElement } from './util/focus.js'
 import {
   defineJQueryPlugin, isRTL, isVisible, jQueryDispatch
 } from './util/index.js'
@@ -724,7 +725,7 @@ class Carousel extends BaseComponent {
     for (const control of controls) {
       // a11y: if we're about to disable the focused control, move focus to the
       // opposite (still-enabled) control so focus isn't lost.
-      if (disabled && control === document.activeElement) {
+      if (disabled && rootActiveElement(control) === control) {
         const opposite = controls === this._prevControls ? this._nextControls : this._prevControls
         const fallback = opposite[0] ?? this._viewport
         // `preventScroll` so moving focus doesn't yank the page/viewport to the
@@ -733,7 +734,7 @@ class Carousel extends BaseComponent {
 
         // The viewport isn't focusable without a `tabindex`: don't leave focus
         // on a control we're disabling, browsers differ on when they drop it.
-        if (document.activeElement === control) {
+        if (rootActiveElement(control) === control) {
           control.blur()
         }
       }

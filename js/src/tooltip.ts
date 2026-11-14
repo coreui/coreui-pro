@@ -24,7 +24,7 @@ import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
-import { containsFocus, focusIfUsable } from './util/focus.js'
+import { containsFocus, focusIfUsable, rootActiveElement } from './util/focus.js'
 import {
   closeLayersIn, handleEscape, reanchorLayer, registerLayer, unregisterLayer, type LayerEntry
 } from './util/layers.js'
@@ -573,7 +573,7 @@ class Tooltip extends BaseComponent {
       write(this._described, false)
     }
 
-    const active = this._anchor.ownerDocument.activeElement
+    const active = rootActiveElement(this._anchor)
     this._described = described ? (this._config.anchors && active !== this._anchor && this._anchor.contains(active) ? active! : this._anchor) : null
 
     if (this._described) {
