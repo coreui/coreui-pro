@@ -25,7 +25,6 @@ declare global {
 }
 
 const MAX_UID = 1_000_000
-const MILLISECONDS_MULTIPLIER = 1000
 const TRANSITION_END = 'transitionend'
 
 /**
@@ -65,29 +64,6 @@ const getUID = (prefix: string): string => {
   } while (document.getElementById(prefix))
 
   return prefix
-}
-
-const getTransitionDurationFromElement = (element: Element | null): number => {
-  if (!element) {
-    return 0
-  }
-
-  // Get transition-duration of the element
-  let { transitionDuration, transitionDelay } = window.getComputedStyle(element)
-
-  const floatTransitionDuration = Number.parseFloat(transitionDuration)
-  const floatTransitionDelay = Number.parseFloat(transitionDelay)
-
-  // Return 0 if element or transition duration is not found
-  if (!floatTransitionDuration && !floatTransitionDelay) {
-    return 0
-  }
-
-  // If multiple durations are defined, take the first
-  transitionDuration = transitionDuration.split(',')[0]
-  transitionDelay = transitionDelay.split(',')[0]
-
-  return (Number.parseFloat(transitionDuration) + Number.parseFloat(transitionDelay)) * MILLISECONDS_MULTIPLIER
 }
 
 const triggerTransitionEnd = (element: Element): void => {
@@ -319,99 +295,6 @@ const execute = <T = any>(possibleCallback: T | ((...functionArgs: any[]) => T),
 }
 
 /**
- * Return the unfinished CSS transitions of an element that a wait of the given length covers.
- *
- * @param element The element whose transitions are read.
- * @param duration Without a property, only the transitions whose delay and duration add up to no more than this many milliseconds count.
- * @param transitionProperty When given, only the transitions of this property count, whatever their length.
- * @returns The transitions, or an empty list where Web Animations are not available.
- */
-const getCoveredTransitions = (element: Element, duration: number, transitionProperty?: string): CSSTransition[] => {
-  if (typeof element.getAnimations !== 'function' || typeof CSSTransition === 'undefined') {
-    return []
-  }
-
-  return element.getAnimations().filter((animation): animation is CSSTransition =>
-    animation instanceof CSSTransition &&
-    animation.playState !== 'finished' &&
-    (transitionProperty ?
-      animation.transitionProperty === transitionProperty :
-      Number(animation.effect?.getComputedTiming().endTime) <= duration)
-  )
-}
-
-/**
- * Run a callback once the transition of an element has finished.
- *
- * The callback runs on the element's own `transitionend`, or when a timer as long as the
- * transition expires. A timer that fires more than a frame late means a busy main thread, which
- * delayed the start of the transition too; a covered transition still running at that moment is
- * then waited for until it finishes or is cancelled, at most as long again and one more second.
- * In a hidden document the timer always settles. `transitionProperty` narrows the wait to that
- * property, since the events of a run that just finished can land after the next run has started
- * waiting; such a wait ignores the event another wait's timer sends, and its own timer finishes it.
- *
- * @param callback The function to run.
- * @param transitionElement The element whose transition is waited for.
- * @param waitForTransition When false, the callback runs at once.
- * @param transitionProperty When given, only this property's transition is waited for.
- */
-const executeAfterTransition = (callback: () => void, transitionElement: Element, waitForTransition = true, transitionProperty?: string): void => {
-  if (!waitForTransition) {
-    execute(callback)
-    return
-  }
-
-  const durationPadding = 5
-  const emulatedDuration = getTransitionDurationFromElement(transitionElement) + durationPadding
-  const start = Date.now()
-  const transitions = getCoveredTransitions(transitionElement, emulatedDuration, transitionProperty)
-
-  let called = false
-
-  const finish = (): void => {
-    if (called) {
-      return
-    }
-
-    called = true
-    transitionElement.removeEventListener(TRANSITION_END, handler)
-    execute(callback)
-  }
-
-  const handler = (event: Event): void => {
-    if (event.target !== transitionElement) {
-      return
-    }
-
-    if (transitionProperty && (event as TransitionEvent).propertyName !== transitionProperty) {
-      return
-    }
-
-    finish()
-  }
-
-  transitionElement.addEventListener(TRANSITION_END, handler)
-  setTimeout(() => {
-    const late = Date.now() - start > emulatedDuration + 16
-    const running = called || document.hidden || !late ? [] : transitions.filter(transition => transition.playState === 'running')
-
-    if (running.length === 0) {
-      if (transitionProperty) {
-        finish()
-      } else if (!called) {
-        triggerTransitionEnd(transitionElement)
-      }
-
-      return
-    }
-
-    Promise.race(running.map(transition => transition.finished)).then(finish, finish)
-    setTimeout(finish, emulatedDuration + 1000)
-  }, emulatedDuration)
-}
-
-/**
  * Return the previous/next element of a list.
  *
  * @param list - The list of elements to traverse
@@ -444,13 +327,10 @@ const getNextActiveElement = <T>(list: T[], activeElement: T, shouldGetNext: boo
 export {
   defineJQueryPlugin,
   execute,
-  executeAfterTransition,
   findShadowRoot,
-  getCoveredTransitions,
   getElement,
   getjQuery,
   getNextActiveElement,
-  getTransitionDurationFromElement,
   getUID,
   isDisabled,
   isElement,
@@ -467,3 +347,5 @@ export {
   toType,
   writeAttribute
 }
+
+export { executeAfterTransition, getCoveredTransitions, getTransitionDurationFromElement } from './transition.js'

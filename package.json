@@ -337,6 +337,16 @@
         "default": "./js/dist/util/transfer.js"
       }
     },
+    "./utils/transition": {
+      "import": {
+        "types": "./js/dist/util/transition.d.mts",
+        "default": "./js/dist/util/transition.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/transition.d.ts",
+        "default": "./js/dist/util/transition.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
