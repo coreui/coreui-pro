@@ -89,16 +89,19 @@ describe('Data', () => {
     expect(Data.get(div, TEST_KEY)).toBeNull()
   })
 
-  it('should console.error a message if called with multiple keys', () => {
-    console.error = jasmine.createSpy('console.error')
-
+  it('should keep instances stored under different keys on one element', () => {
     const data = { ...TEST_DATA }
     const copy = { ...data }
 
     Data.set(div, TEST_KEY, data)
     Data.set(div, UNKNOWN_KEY, copy)
 
-    expect(console.error).toHaveBeenCalled()
-    expect(Data.get(div, UNKNOWN_KEY)).toBeNull()
+    expect(Data.get(div, TEST_KEY)).toBe(data)
+    expect(Data.get(div, UNKNOWN_KEY)).toBe(copy)
+
+    Data.remove(div, TEST_KEY)
+
+    expect(Data.get(div, TEST_KEY)).toBeNull()
+    expect(Data.get(div, UNKNOWN_KEY)).toBe(copy)
   })
 })

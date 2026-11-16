@@ -22,14 +22,6 @@ export default {
 
     const instanceMap = elementMap.get(element)!
 
-    // make it clear we only want one instance per element
-    // can be removed later when multiple key/instances are fine to be used
-    if (!instanceMap.has(key) && instanceMap.size !== 0) {
-      // eslint-disable-next-line no-console
-      console.error(`CoreUI doesn't allow more than one instance per element. Bound instance: ${Array.from(instanceMap.keys())[0]}.`)
-      return
-    }
-
     instanceMap.set(key, instance)
   },
 
