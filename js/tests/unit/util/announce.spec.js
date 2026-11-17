@@ -349,6 +349,25 @@ describe('announce', () => {
     expect(messages(outer)).toEqual(['Before', 'After'])
   })
 
+  it('should hold a modal dialog opened after another one closed', () => {
+    fixtureEl.innerHTML = '<dialog id="details"><button type="button">Next</button></dialog><dialog id="review"><button type="button">Finish</button></dialog>'
+    const details = fixtureEl.querySelector('#details')
+    const review = fixtureEl.querySelector('#review')
+    details.showModal()
+    vi.advanceTimersByTime(100)
+
+    announce('Saved')
+    details.close()
+    holdAnnouncements()
+    vi.advanceTimersByTime(3)
+    review.showModal()
+    vi.advanceTimersByTime(496)
+    expect(messages(review)).toEqual([])
+
+    vi.advanceTimersByTime(1)
+    expect(messages(review)).toEqual(['Saved'])
+  })
+
   it('should keep the hold after a close on a clock with fractions of a millisecond', async () => {
     vi.useRealTimers()
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })

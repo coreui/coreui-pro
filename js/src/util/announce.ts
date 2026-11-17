@@ -36,9 +36,9 @@ const VISUALLY_HIDDEN: Partial<CSSStyleDeclaration> = {
   width: '1px'
 }
 
-const holds = new WeakMap<Element, Moment>()
 const readyAt = new WeakMap<Element, Moment>()
 const pending: Message[] = []
+let heldUntil: Moment | undefined
 
 /**
  * Tells whether an element is an open modal dialog: a native dialog opened with `showModal()`, or
@@ -96,12 +96,11 @@ const getModal = (context: Element | null): HTMLElement | null => {
  * Reads a stored time when it was taken on the clock in use now. A time from another clock, such
  * as a test's fake timers, counts as long past.
  *
- * @param times - The ready times of regions or the holds of hosts
- * @param element - The element the time belongs to
+ * @param moment - The ready time of a region or the end of the hold
  * @returns The time on the `performance.now()` clock, `0` when there is none
  */
-const readTime = (times: WeakMap<Element, Moment>, element: Element): number => {
-  const [time, clock] = times.get(element) ?? [0, null]
+const readTime = (moment: Moment | undefined): number => {
+  const [time, clock] = moment ?? [0, null]
 
   return clock === performance.now ? time : 0
 }
@@ -164,11 +163,11 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
 }
 
 /**
- * Holds the messages for the page or the open modal dialog. The dialog components of every edition
- * call it right after they close their dialog, before their `hidden` event: the host that takes
- * over comes back to screen readers then, and they drop a message added at that moment. LoadingButton
- * holds for 100 ms when it starts loading, so the messages of that click go out with its own. A hold
- * never shortens one already running.
+ * Holds every waiting message, for the page and for any modal dialog. The dialog components of every
+ * edition call it right after they close their dialog, before their `hidden` event: focus moves to
+ * the host that takes over, or to a dialog opened in place of the closed one, and screen readers
+ * drop a message added while they read it. LoadingButton holds for 100 ms when it starts loading,
+ * so the messages of that click go out with its own. A hold never shortens one already running.
  *
  * @param delay - How long (ms) to hold, 500 by default
  */
@@ -177,8 +176,7 @@ export const holdAnnouncements = (delay: number = CLOSE_DELAY): void => {
     return
   }
 
-  const host = getModal(null) ?? document.body
-  holds.set(host, [Math.max(readTime(holds, host), performance.now() + delay), performance.now])
+  heldUntil = [Math.max(readTime(heldUntil), performance.now() + delay), performance.now]
 
   if (pending.length > 0) {
     setTimeout(flush, delay)
@@ -219,7 +217,7 @@ const flush = (): void => {
 
     const host = modal ?? document.body
     const announcer = getAnnouncer(host)
-    const wait = Math.max(readTime(holds, host), readTime(readyAt, announcer)) - performance.now()
+    const wait = Math.max(readTime(heldUntil), readTime(readyAt.get(announcer))) - performance.now()
 
     if (wait > 0) {
       setTimeout(flush, wait)
@@ -271,7 +269,7 @@ export const announce = (message: string, { context = null, priority = 'normal',
   pending.push({
     context, node, page: host === document.body ? announcer : null, priority, timeout
   })
-  setTimeout(flush, Math.max(0, readTime(readyAt, announcer) - performance.now()))
+  setTimeout(flush, Math.max(0, readTime(readyAt.get(announcer)) - performance.now()))
 
   return () => {
     const index = pending.findIndex(message => message.node === node)
