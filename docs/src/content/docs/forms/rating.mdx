@@ -105,6 +105,8 @@ For custom messages, provide a comma-separated list of tooltips corresponding to
 
 <Example pro code={`<div data-coreui-rating data-coreui-tooltips="Very bad, Bad, Meh, Good, Very good" data-coreui-value="3"></div>`} />
 
+Rating creates the tooltip on its own element and disposes it with itself, so `coreui.Tooltip.getInstance(ratingEl)` returns it. Leave that tooltip to Rating: do not create, replace or dispose another Tooltip on the rating element.
+
 ## Sizing
 
 Larger or smaller rating component? Add `data-coreui-size="lg"` or `data-coreui-size="sm"` for additional sizes.
@@ -215,7 +217,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 
 | Method | Description |
 | --- | --- |
-| `dispose` | Destroys a rating instance and removes the items with their radios, so the form no longer submits the value, and the `aria-invalid` it wrote. The classes, `role`, `aria-readonly` and `aria-required` stay until a new instance writes them from its options. The state class it drew comes off; a state class you wrote on the rating element stays, unless you wrote it while the rating already showed the same class: then it comes off with the rating's. (Removes stored data on the DOM element) |
+| `dispose` | Destroys a rating instance and its tooltip, and removes the items with their radios, so the form no longer submits the value, and the `aria-invalid` it wrote. The classes, `role`, `aria-readonly` and `aria-required` stay until a new instance writes them from its options. The state class it drew comes off; a state class you wrote on the rating element stays, unless you wrote it while the rating already showed the same class: then it comes off with the rating's. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the rating instance associated to a DOM element, you can use it like this: `coreui.Rating.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a rating instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Rating.getOrCreateInstance(element)` |
 | `reset` | Reset the value to `null` or to provided value, firing `change.coreui.rating` when that changes the value. Takes `null`, `0` or the value of a star; any other value throws a `TypeError`. |

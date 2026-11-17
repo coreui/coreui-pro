@@ -1498,6 +1498,24 @@ describe('Rating', () => {
       expect(rating._tooltip).not.toBeNull()
     })
 
+    it('should register its tooltip on the rating element next to itself', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const consoleError = spyOn(console, 'error')
+      const rating = new Rating(div, { itemCount: 3, tooltips: true })
+
+      div.querySelectorAll('.rating-item-label')[1].dispatchEvent(createEvent('mouseover'))
+
+      expect(Rating.getInstance(div)).toBe(rating)
+      expect(Tooltip.getInstance(div)).toBe(rating._tooltip)
+      expect(consoleError).not.toHaveBeenCalled()
+
+      rating.dispose()
+
+      expect(Rating.getInstance(div)).toBeNull()
+      expect(Tooltip.getInstance(div)).toBeNull()
+    })
+
     it('should create tooltip on focusin when tooltips is true', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

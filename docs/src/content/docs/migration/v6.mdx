@@ -260,6 +260,19 @@ plugins used to let a private name through (`$(el).tooltip('_getConfig')`
 called it) or skipped the check altogether (`button`, `number-input`,
 `password-input`); they now reject those names like the rest.
 
+#### Different plugins can share an element
+
+v5 kept one plugin instance per element: a second plugin on the same element
+logged an error and was not stored, so its `getInstance()` returned `null`.
+Each plugin now keeps its own instance, so a `Tooltip` and a `Menu` can sit on
+one toggle and each `getInstance()` returns its own. A second instance of the
+same plugin still disposes the first.
+
+A component that creates a plugin on its own element owns it. Rating with
+`tooltips` registers its Tooltip on the rating element, so
+`coreui.Tooltip.getInstance(ratingEl)` now returns that tooltip; leave it to
+Rating. See [getting an instance](/getting-started/javascript/#programmatic-api).
+
 #### The attribute that enables a plugin
 
 `data-coreui-toggle="…"` now means one thing only: **this element is a control

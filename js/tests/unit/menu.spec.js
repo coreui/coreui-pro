@@ -3,6 +3,7 @@ import ContextMenu from '../../src/context-menu.js'
 import Dropdown from '../../src/dropdown.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Menu from '../../src/menu.js'
+import Tooltip from '../../src/tooltip.js'
 import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
@@ -1659,6 +1660,30 @@ describe('Menu', () => {
 
         btnMenu.click()
       })
+    })
+
+    it('should keep one menu on a toggle that also has a tooltip', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu" title="More actions">Menu</button>',
+        '  <div class="menu">',
+        '    <a class="menu-item" href="#">Secondary link</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const spy = spyOn(console, 'error')
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const tooltip = new Tooltip(btnMenu)
+
+      btnMenu.click()
+      const menu = Menu.getInstance(btnMenu)
+      btnMenu.click()
+
+      expect(menu).toBeInstanceOf(Menu)
+      expect(Menu.getInstance(btnMenu)).toBe(menu)
+      expect(Tooltip.getInstance(btnMenu)).toBe(tooltip)
+      expect(spy).not.toHaveBeenCalled()
     })
 
     it('should use Floating UI positioning in navbar', () => {
