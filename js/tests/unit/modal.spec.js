@@ -944,6 +944,30 @@ describe('Modal', () => {
       })
     })
 
+    it('should hold page announcements from the moment it is disposed while open', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal modal-instant"><div class="modal-dialog"><div class="modal-content"></div></div></dialog>'
+      const dialog = new Modal(fixtureEl.querySelector('.modal'))
+      const messages = () => [...document.body.querySelector(':scope > [data-coreui-live-announcer] > [aria-live="polite"]').children].map(message => message.textContent)
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      try {
+        announce('Before')
+        vi.advanceTimersByTime(100)
+        await dialog.show()
+
+        dialog.dispose()
+        announce('After')
+        vi.advanceTimersByTime(499)
+        expect(messages()).toEqual(['Before'])
+
+        vi.advanceTimersByTime(1)
+        expect(messages()).toEqual(['Before', 'After'])
+      } finally {
+        vi.useRealTimers()
+        document.body.querySelector(':scope > [data-coreui-live-announcer]')?.remove()
+      }
+    })
+
     it('should remove the native cancel listener on dispose', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<dialog class="modal" id="exampleDialog"></dialog>'
