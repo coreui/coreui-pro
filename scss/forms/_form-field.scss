@@ -27,7 +27,8 @@
       background-color: var(--#{$prefix}form-field-card-hover-bg);
     }
 
-    &:has(:checked) {
+    &:has(:checked),
+    &:has([type="checkbox"]:indeterminate) {
       background-color: var(--#{$prefix}form-field-card-checked-bg);
       border-color: var(--#{$prefix}form-field-card-checked-border-color);
     }

@@ -272,8 +272,8 @@ $list-box-tokens: defaults(
   }
 
   .indeterminate > .list-box-option-indicator {
-    background-color: var(--#{$prefix}check-indeterminate-bg);
-    border-color: var(--#{$prefix}check-indeterminate-border-color);
+    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}check-indeterminate-bg));
+    border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}check-indeterminate-border-color));
 
     &::before {
       opacity: 1;

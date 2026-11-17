@@ -4960,10 +4960,10 @@ named after `.form-check` — the v5 wrapper they no longer use. The names said
 | `$form-check-label-disabled-opacity` | `--cui-control-label-disabled-opacity` |
 | `$form-check-input-checked-bg-color` | `--cui-control-checked-bg` |
 | `$form-check-input-checked-border-color` | `--cui-control-checked-border-color` |
-| `$form-check-input-indeterminate-bg-color` | `--cui-control-indeterminate-bg` |
-| `$form-check-input-indeterminate-border-color` | `--cui-control-indeterminate-border-color` |
+| `$form-check-input-indeterminate-bg-color` | `--cui-check-indeterminate-bg` |
+| `$form-check-input-indeterminate-border-color` | `--cui-check-indeterminate-border-color` |
 
-All nine are tokens in `$root-tokens` (`_root.scss`), emitted on `:root`.
+The first seven are tokens in `$root-tokens` (`_root.scss`), emitted on `:root`.
 Set them through `$root-tokens` in Sass, or retune the three controls together
 without recompiling:
 
@@ -4981,6 +4981,31 @@ move into `forms/_form-check.scss`, so they leave the build with it.
 
 The class names are unchanged. `.form-check`, `.form-check-input` and
 `.form-check-label` still work exactly as before.
+
+#### An indeterminate checkbox takes the colors of a checked one
+
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+
+`--cui-control-indeterminate-bg` and `--cui-control-indeterminate-border-color`,
+which v6 alpha emitted on `:root`, are removed. The indeterminate colors are
+`--cui-check-indeterminate-bg` and `--cui-check-indeterminate-border-color`,
+declared on `.check` in `$check-tokens`, and they follow
+`--cui-check-checked-bg` and `-border-color` unless you set them on the
+checkbox. An indeterminate checkbox therefore takes the theme of the field or
+of a container, the validation state and a highlighted `.form-field-card`, as
+a checked one does; it used to stay in the primary color. A theme or a
+validation state wins over the indeterminate tokens.
+
+The mark of a checked or indeterminate checkbox and of a checked radio is now
+drawn in the theme's contrast color (`--cui-theme-contrast`) under
+`.theme-{color}`, a table variant or a validation state, so it stays readable
+on light theme colors such as `warning` or `secondary`. `--cui-check-mark-color`
+and `--cui-radio-mark-color` still set it where no theme applies.
+
+```diff
+- :root { --cui-control-indeterminate-bg: orange; }
++ .check { --cui-check-indeterminate-bg: orange; }
+```
 
 #### The `$input-*` variables are gone; configure the frame once
 
@@ -5819,11 +5844,11 @@ Nothing existing changes; these are additions. See
   (`--cui-btn-input-padding-y/-x`, `-font-family/-size`, `-line-height`,
   `-border-width`, `-transition`, `-color`, `-bg`, `-disabled-opacity`, plus
   `-sm-*`/`-lg-*` size sets) and the selection state
-  (`--cui-control-checked-bg/-border-color`,
-  `--cui-control-indeterminate-bg/-border-color`). Restyle these once and
-  every control follows: inputs, selects, checks, switches, OTP, chip input,
-  autocomplete, multi select, and the pickers — including the checkbox-style
-  option indicators inside autocomplete and multi select.
+  (`--cui-control-checked-bg/-border-color`, which the indeterminate checkbox
+  follows too). Restyle these once and every control follows: inputs, selects,
+  checks, switches, OTP, chip input, autocomplete, multi select, and the
+  pickers — including the checkbox-style option indicators inside autocomplete
+  and multi select.
 - **Every text control consumes per-element `--cui-control-*` tokens**
   (padding, font, colors, border, radius, shadows, focus and disabled sets)
   that default to those knobs. Override a single control on its element;
