@@ -100,8 +100,8 @@ class ContextMenu extends Menu {
     return this._isShown() ? this.hide() : this.show(point)
   }
 
-  override async show(point?: Point): Promise<void> {
-    this._showAt(point, { relatedTarget: this._element })
+  override show(point?: Point): Promise<void> {
+    return this._showAt(point, { relatedTarget: this._element })
   }
 
   override dispose(): void {
@@ -110,7 +110,7 @@ class ContextMenu extends Menu {
   }
 
   // Private
-  protected _showAt(point: Point | undefined, relatedTarget: Record<string, unknown>, fromKeyboard = false): void {
+  protected _showAt(point: Point | undefined, relatedTarget: Record<string, unknown>, fromKeyboard = false): Promise<void> {
     if (!this._isShown()) {
       const root = this._element.getRootNode() as Document | ShadowRoot
       const active = root.activeElement
@@ -120,9 +120,10 @@ class ContextMenu extends Menu {
 
     this._openedBy = fromKeyboard ? 'key' : 'pointer'
     ContextMenu._opening = this
-    this._show(relatedTarget)
+    const shown = this._show(relatedTarget)
     ContextMenu._opening = null
     this._openedBy = null
+    return shown
   }
 
   protected override _isShown(): boolean {

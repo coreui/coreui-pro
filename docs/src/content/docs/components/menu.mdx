@@ -688,6 +688,8 @@ const menu = new coreui.Menu(element, {
 
 All menu events are fired at the toggling element and then bubbled up. So you can also add event listeners on the `.menu`'s parent element. `hide.coreui.menu` and `hidden.coreui.menu` events have a `clickEvent` property (only when the original Event type is `click`) that contains an Event Object for the click event.
 
+`shown.coreui.menu` and `hidden.coreui.menu` wait for the menu's fade, and the promise `show()` and `hide()` return resolves with them. A transition that the opposite call interrupts fires neither: a menu opened again while it fades out gets `hide`, `show` and `shown`, with no `hidden`. A menu moved by `container` stays there until the fade has ended.
+
 | Event type | Description |
 | --- | --- |
 | `hidden.coreui.menu` | Fired when the menu has finished being hidden from the user and CSS transitions have completed. |

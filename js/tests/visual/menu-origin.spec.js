@@ -128,7 +128,7 @@ describe('menu transform origin', () => {
     })
   })
 
-  describe.each(SHAPES.filter(([, shape]) => !shape.container))('in %s', (_, shape) => {
+  describe.each(SHAPES)('in %s', (_, shape) => {
     it.each(PLACEMENTS)('shrinks a %s menu toward the point it shares with its toggle', async placement => {
       const [x, y] = await open(shape, placement)
       menuElement.style.transition = 'opacity 1s, transform 1s, display 1s allow-discrete'
