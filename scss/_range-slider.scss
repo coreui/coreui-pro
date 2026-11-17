@@ -112,7 +112,7 @@ $form-range-vertical-tokens: defaults(
 
   .form-range-tooltip:is(.bs-tooltip-start, .bs-tooltip-end) {
     inset-inline-end: 100%;
-    bottom: calc((var(--#{$prefix}range-thumb-width) * .5) + var(--#{$prefix}range-fill, 0) * (100% - var(--#{$prefix}range-thumb-width)));
+    bottom: calc((var(--#{$prefix}range-thumb-width) * .5) + var(--cui-range-fill, 0) * (100% - var(--#{$prefix}range-thumb-width)));
     margin-inline-end: var(--#{$prefix}tooltip-arrow-height);
     transform: translateY(50%);
 

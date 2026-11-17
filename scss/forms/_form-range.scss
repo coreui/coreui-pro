@@ -72,8 +72,8 @@ $form-range-tokens: defaults(
 
 @mixin form-range-track() {
   // The plugins keep `--cui-range-fill` (0–1) in sync, and RangeSlider `--cui-range-fill-start`; unset, the band is empty.
-  --#{$prefix}range-fill-start-edge: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--#{$prefix}range-fill-start) * (100% - var(--#{$prefix}range-thumb-width)));
-  --#{$prefix}range-fill-edge: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--#{$prefix}range-fill) * (100% - var(--#{$prefix}range-thumb-width)));
+  --#{$prefix}range-fill-start-edge: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--cui-range-fill-start) * (100% - var(--#{$prefix}range-thumb-width)));
+  --#{$prefix}range-fill-edge: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--cui-range-fill) * (100% - var(--#{$prefix}range-thumb-width)));
 
   inline-size: var(--#{$prefix}range-track-width);
   block-size: var(--#{$prefix}range-track-height);
@@ -192,7 +192,7 @@ $form-range-tokens: defaults(
   }
 
   .form-range-tooltip.bs-tooltip-top {
-    inset-inline-start: calc((var(--#{$prefix}range-thumb-width) * .5) + var(--#{$prefix}range-fill, 0) * (100% - var(--#{$prefix}range-thumb-width)));
+    inset-inline-start: calc((var(--#{$prefix}range-thumb-width) * .5) + var(--cui-range-fill, 0) * (100% - var(--#{$prefix}range-thumb-width)));
     bottom: 100%;
     margin-bottom: var(--#{$prefix}tooltip-arrow-height);
     @include ltr-rtl("transform", translateX(-50%), null, translateX(50%));
