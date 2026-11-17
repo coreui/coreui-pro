@@ -40,7 +40,7 @@ Add `role="switch"` to convey the nature of the control to assistive technologie
 
 `.switch-sm`, `.switch-lg` and `.switch-xl` size the whole row — the track, its thumb, and the label beside it — the way [`.check-sm`](/forms/checkbox/#sizing) and [`.radio-lg`](/forms/radio/#sizing) do.
 
-Each sets **one** custom property. The track's width follows its height through the aspect ratio, the thumb follows the height minus the padding, and the alignment margin is computed from the line — so nothing needs re-tuning per size.
+Each sets **one** custom property and the font size of the label beside it. The switch takes that font size too when a label follows it, so the alignment margin, computed from the line, centers the track on the label's first line; a sized switch with no label stays centered on the line it sits in. The track's width follows its height through the aspect ratio and the thumb follows the height minus the padding.
 
 <Example code={`<div class="form-field">
     <input class="switch switch-sm" type="checkbox" role="switch" id="flexSwitchCheckSizeSm" checked>

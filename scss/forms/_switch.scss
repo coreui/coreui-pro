@@ -11,8 +11,11 @@
     .switch-#{$size} {
       --#{$prefix}switch-height: #{map.get($map, "height")};
 
-      + label {
-        font-size: #{map.get($map, "font-size")};
+      @if map.has-key($map, "font-size") {
+        &:has(+ label),
+        + label {
+          font-size: #{map.get($map, "font-size")};
+        }
       }
     }
   }
