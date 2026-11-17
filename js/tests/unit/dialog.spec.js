@@ -1099,6 +1099,61 @@ describe('Dialog', () => {
       })
     })
 
+    it('should keep the dialog open when a trigger inside it targets the same dialog', async () => {
+      fixtureEl.innerHTML = [
+        '<button data-coreui-toggle="dialog" data-coreui-target="#dialog1">Open first</button>',
+        '<dialog id="dialog1" class="dialog">',
+        '  <button data-coreui-toggle="dialog" data-coreui-target="#dialog1">Same dialog</button>',
+        '</dialog>'
+      ].join('')
+
+      const dialogEl = fixtureEl.querySelector('#dialog1')
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.dialog', resolve, { once: true })
+      })
+      let hideFired = false
+      dialogEl.addEventListener('hide.coreui.dialog', () => {
+        hideFired = true
+      })
+
+      fixtureEl.querySelector('button').click()
+      await shown
+      dialogEl.querySelector('button').click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 10)
+      })
+
+      expect(hideFired).toBeFalse()
+      expect(dialogEl.open).toBeTrue()
+    })
+
+    it('should prevent default on a link trigger that targets its own open dialog', async () => {
+      fixtureEl.innerHTML = [
+        '<button data-coreui-toggle="dialog" data-coreui-target="#dialog1">Open first</button>',
+        '<dialog id="dialog1" class="dialog">',
+        '  <a href="#dialog1" data-coreui-toggle="dialog">Same dialog</a>',
+        '</dialog>'
+      ].join('')
+
+      const dialogEl = fixtureEl.querySelector('#dialog1')
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.dialog', resolve, { once: true })
+      })
+      let hideFired = false
+      dialogEl.addEventListener('hide.coreui.dialog', () => {
+        hideFired = true
+      })
+
+      fixtureEl.querySelector('button').click()
+      await shown
+      const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true })
+      dialogEl.querySelector('a').dispatchEvent(clickEvent)
+
+      expect(clickEvent.defaultPrevented).toBeTrue()
+      expect(hideFired).toBeFalse()
+      expect(dialogEl.open).toBeTrue()
+    })
+
     describe('mid-swap and rejected swaps', () => {
       const once = (element, type) => new Promise(resolve => {
         element.addEventListener(type, resolve, { once: true })
