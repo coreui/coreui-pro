@@ -1768,7 +1768,7 @@ describe('Autocomplete', () => {
       autocomplete.show()
       await autocomplete._updateFloatingPosition()
       expect(autocomplete._menu.classList.contains('show')).toBe(true)
-      expect(autocomplete._menu.style.minWidth).not.toBe('')
+      expect(autocomplete._menu.style.getPropertyValue('--cui-anchor-width')).not.toBe('')
     })
   })
 

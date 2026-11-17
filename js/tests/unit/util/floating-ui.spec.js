@@ -232,7 +232,7 @@ describe('FloatingUI Util', () => {
 
     const mount = width => {
       host = document.createElement('div')
-      host.innerHTML = `<div style="width: ${width}"></div><div style="width: 80px">Panel</div>`
+      host.innerHTML = `<div style="width: ${width}"></div><div style="width: 80px; min-width: var(--cui-anchor-width)">Panel</div>`
       document.body.append(host)
       return [host.firstElementChild, host.lastElementChild]
     }
@@ -242,13 +242,13 @@ describe('FloatingUI Util', () => {
       host = null
     })
 
-    it('should place the panel under the field and give it the field width as its min-width', async () => {
+    it('should place the panel under the field and give it the field width as --cui-anchor-width', async () => {
       const [field, panel] = mount('300.5px')
       const anchored = createAnchoredPosition(field, panel)
 
       await anchored.update()
 
-      expect(panel.style.minWidth).toBe(`${field.getBoundingClientRect().width}px`)
+      expect(panel.style.getPropertyValue('--cui-anchor-width')).toBe(`${field.getBoundingClientRect().width}px`)
       expect(Number.parseFloat(panel.style.top)).toBeGreaterThan(field.getBoundingClientRect().top)
       anchored.destroy()
     })
@@ -261,21 +261,21 @@ describe('FloatingUI Util', () => {
       field.style.width = '200px'
       await nextFrames()
 
-      expect(panel.style.minWidth).toBe('200px')
+      expect(panel.style.getPropertyValue('--cui-anchor-width')).toBe('200px')
       anchored.destroy()
     })
 
-    it('should clear the min-width once the field loses its width', async () => {
+    it('should remove --cui-anchor-width once the field loses its width', async () => {
       const [field, panel] = mount('300px')
       const anchored = createAnchoredPosition(field, panel)
 
       await anchored.ready
-      expect(panel.style.minWidth).toBe('300px')
+      expect(panel.style.getPropertyValue('--cui-anchor-width')).toBe('300px')
 
       field.style.width = '0px'
       await nextFrames()
 
-      expect(panel.style.minWidth).toBe('')
+      expect(panel.style.getPropertyValue('--cui-anchor-width')).toBe('')
       anchored.destroy()
     })
 
@@ -283,7 +283,7 @@ describe('FloatingUI Util', () => {
       host = document.createElement('div')
       host.innerHTML = [
         `<div style="position: fixed; left: 0; top: ${window.innerHeight - 70}px; width: 400px; height: 20px"></div>`,
-        '<div style="width: min-content; font: 16px/20px sans-serif">lorem ipsum dolor sitamet consectetur adipiscing</div>'
+        '<div style="width: min-content; min-width: var(--cui-anchor-width); font: 16px/20px sans-serif">lorem ipsum dolor sitamet consectetur adipiscing</div>'
       ].join('')
       document.body.append(host)
       const [field, panel] = host.children
@@ -325,16 +325,16 @@ describe('FloatingUI Util', () => {
       host = null
     })
 
-    it('should give the floating element the reference width as its min-width', async () => {
+    it('should give the floating element the reference width as --cui-anchor-width', async () => {
       const [reference, floating] = await measure('300.5px')
 
-      expect(floating.style.minWidth).toBe(`${reference.getBoundingClientRect().width}px`)
+      expect(floating.style.getPropertyValue('--cui-anchor-width')).toBe(`${reference.getBoundingClientRect().width}px`)
     })
 
-    it('should leave min-width unset for a reference without width', async () => {
+    it('should leave --cui-anchor-width unset for a reference without width', async () => {
       const [, floating] = await measure('0px')
 
-      expect(floating.style.minWidth).toBe('')
+      expect(floating.style.getPropertyValue('--cui-anchor-width')).toBe('')
     })
   })
 })

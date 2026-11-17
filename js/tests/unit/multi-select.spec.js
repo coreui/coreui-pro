@@ -1621,14 +1621,14 @@ describe('MultiSelect', () => {
       multiSelect.show()
       await multiSelect._updateFloatingPosition()
 
-      expect(multiSelect._menu.style.minWidth).toEqual(`${multiSelect._wrapperElement.getBoundingClientRect().width}px`)
+      expect(multiSelect._menu.style.getPropertyValue('--cui-anchor-width')).toEqual(`${multiSelect._wrapperElement.getBoundingClientRect().width}px`)
 
       wrap.style.width = '400px'
       await new Promise(resolve => {
         requestAnimationFrame(() => requestAnimationFrame(resolve))
       })
 
-      expect(multiSelect._menu.style.minWidth).toEqual(`${multiSelect._wrapperElement.getBoundingClientRect().width}px`)
+      expect(multiSelect._menu.style.getPropertyValue('--cui-anchor-width')).toEqual(`${multiSelect._wrapperElement.getBoundingClientRect().width}px`)
       expect(multiSelect._wrapperElement.offsetWidth).toBeLessThan(660)
 
       multiSelect.hide()

@@ -23,6 +23,8 @@ interface BreakpointListener {
   handler: (event: MediaQueryListEvent) => void
 }
 
+const PROPERTY_ANCHOR_WIDTH = '--cui-anchor-width'
+
 /**
  * Breakpoints for responsive placement (matches SCSS $breakpoints)
  */
@@ -155,14 +157,15 @@ export const toFloatingOffset = (value: FloatingOffsetInput): FloatingOffsetValu
 }
 
 /**
- * Floating UI middleware that gives the floating element a `min-width` equal to
- * the width of its reference, so a panel is never narrower than its field. A
- * reference without width (not laid out yet) clears `min-width`. A changed
- * width resets the measured rects; put it before `flip` and `shift`, so they
- * place the panel at its final size. Under `autoUpdate` the value follows the
- * reference while it resizes.
+ * Floating UI middleware that writes the width of the reference as the
+ * `--cui-anchor-width` custom property of the floating element, so its
+ * stylesheet can size the panel by its field (the combobox panel takes it as
+ * its `min-width`). A reference without width (not laid out yet) removes the
+ * property. A changed width resets the measured rects; put it before `flip` and
+ * `shift`, so they place the panel at its final size. Under `autoUpdate` the
+ * value follows the reference while it resizes.
  *
- * @returns The middleware that writes the floating element's `min-width`.
+ * @returns The middleware that writes `--cui-anchor-width` on the floating element.
  */
 export const matchAnchorWidth = (): Middleware => {
   let written: string | undefined
@@ -170,14 +173,20 @@ export const matchAnchorWidth = (): Middleware => {
   return {
     name: 'matchAnchorWidth',
     fn({ elements, rects }) {
-      const minWidth = rects.reference.width > 0 ? `${rects.reference.width}px` : ''
+      const width = rects.reference.width > 0 ? `${rects.reference.width}px` : ''
 
-      if (minWidth === written) {
+      if (width === written) {
         return {}
       }
 
-      written = minWidth
-      elements.floating.style.minWidth = minWidth
+      written = width
+
+      if (width) {
+        elements.floating.style.setProperty(PROPERTY_ANCHOR_WIDTH, width)
+      } else {
+        elements.floating.style.removeProperty(PROPERTY_ANCHOR_WIDTH)
+      }
+
       return { reset: { rects: true } }
     }
   }
@@ -186,8 +195,8 @@ export const matchAnchorWidth = (): Middleware => {
 /**
  * Positions a combobox-family panel under its field: bottom-start placement
  * (mirrored in RTL), a 2px main-axis offset, flip and shift within the clipping
- * ancestors, and the field's width as the panel's `min-width`
- * (`matchAnchorWidth`), which `autoUpdate` keeps current while the field resizes.
+ * ancestors, and the field's width as `--cui-anchor-width` (`matchAnchorWidth`),
+ * which `autoUpdate` keeps current while the field resizes.
  *
  * @param anchor - The field the panel belongs to.
  * @param content - The panel.

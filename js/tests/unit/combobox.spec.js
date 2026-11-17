@@ -1710,6 +1710,17 @@ describe('Combobox', () => {
       expect(reveal).not.toHaveBeenCalled()
     })
 
+    it('should write the toggle width on the panel as --cui-anchor-width', async () => {
+      const toggle = setMarkup(' style="width: 260px"')
+      const combobox = new Combobox(toggle)
+
+      combobox.show()
+      await combobox._anchoredPosition.ready
+
+      expect(combobox._menu.style.getPropertyValue('--cui-anchor-width')).toBe('260px')
+      combobox.dispose()
+    })
+
     it('should close without a change when Enter or a click picks the selected option again', () => {
       const toggle = setMarkup(' data-coreui-value="uk"')
       const combobox = new Combobox(toggle)
