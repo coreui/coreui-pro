@@ -1756,7 +1756,7 @@ describe('Autocomplete', () => {
       expect(autocomplete._menu.querySelector('.list-box-empty').textContent).toBe('No results found')
     })
 
-    it('should show with container mode', () => {
+    it('should show with container mode', async () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div><div id="container"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const containerEl = fixtureEl.querySelector('#container')
@@ -1766,6 +1766,7 @@ describe('Autocomplete', () => {
       })
 
       autocomplete.show()
+      await autocomplete._updateFloatingPosition()
       expect(autocomplete._menu.classList.contains('show')).toBe(true)
       expect(autocomplete._menu.style.minWidth).not.toBe('')
     })

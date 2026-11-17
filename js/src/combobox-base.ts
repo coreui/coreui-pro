@@ -72,7 +72,6 @@ class ComboboxBase extends BaseComponent {
   protected declare _options: any[]
   protected declare _search: any
   protected declare _floatingCleanup: (() => void) | null
-  protected declare _widthObserver: ResizeObserver | null
   protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
   protected declare _layerEntry: LayerEntry | undefined
   protected declare _tabOutListener: ((event: any) => void) | undefined
@@ -113,8 +112,11 @@ class ComboboxBase extends BaseComponent {
 
     EventHandler.trigger(this._element, this.constructor.eventName('shown'))
 
-    this._createFloating()
-    this._listBox?._revealActive()
+    this._createFloating().then(() => {
+      if (this._anchoredPosition) {
+        this._listBox?._revealActive()
+      }
+    })
     this._afterShow()
   }
 
@@ -253,9 +255,7 @@ class ComboboxBase extends BaseComponent {
   // Mounted for the duration of the interaction, into a container decided
   // fresh on each open (in place, the open dialog's subtree, or body when an
   // ancestor would clip the panel). In place means next to the frame, not
-  // inside it — the frame is a flex control chrome. The frame cannot size the
-  // panel through CSS once the panel can leave it, so the width rides along
-  // inline.
+  // inside it — the frame is a flex control chrome.
   _mountMenu(): void {
     this._activateForKey(this._openingKey)
 
@@ -269,13 +269,6 @@ class ComboboxBase extends BaseComponent {
     }
 
     this._menu.inert = false
-
-    // The frame used to size the panel through CSS (min-width: 100%), which
-    // tracked resizes for free; an inline snapshot must follow the frame
-    // itself for as long as the panel is open.
-    this._syncMenuWidth()
-    this._widthObserver = new ResizeObserver(() => this._syncMenuWidth())
-    this._widthObserver.observe(showTarget)
   }
 
   _syncPanelReferences(): void {
@@ -299,12 +292,6 @@ class ComboboxBase extends BaseComponent {
 
   _getPanelController(): HTMLElement | null {
     return null
-  }
-
-  _syncMenuWidth(): void {
-    if (this._menu) {
-      this._menu.style.minWidth = `${this._getShowTarget().offsetWidth}px`
-    }
   }
 
   _getFocusTarget(): HTMLElement {
@@ -570,9 +557,10 @@ class ComboboxBase extends BaseComponent {
 
   // Anchored positioning (shared wiring around util/floating-ui)
 
-  _createFloating(): void {
+  _createFloating(): Promise<void> {
     this._anchoredPosition = createAnchoredPosition(this._togglerElement, this._menu)
     this._floatingCleanup = this._anchoredPosition.destroy
+    return this._anchoredPosition.ready
   }
 
   async _updateFloatingPosition(): Promise<void> {
@@ -580,11 +568,6 @@ class ComboboxBase extends BaseComponent {
   }
 
   _disposeFloating(): void {
-    // The width observer shares the floating lifecycle exactly: both live
-    // while the panel is interactive, and every hide/dispose path ends here.
-    this._widthObserver?.disconnect()
-    this._widthObserver = null
-
     if (this._floatingCleanup) {
       this._floatingCleanup()
       this._floatingCleanup = null

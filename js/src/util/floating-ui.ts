@@ -9,7 +9,7 @@
  */
 
 import {
-  autoUpdate, computePosition, flip, offset, shift
+  autoUpdate, computePosition, flip, offset, shift, type Middleware
 } from '@floating-ui/dom'
 
 /**
@@ -155,16 +155,47 @@ export const toFloatingOffset = (value: FloatingOffsetInput): FloatingOffsetValu
 }
 
 /**
- * The dropdown-shaped anchored panel: bottom-start placement (mirrored in
- * RTL), a 2px main-axis offset, flip and shift within the clipping ancestors.
- * Autocomplete, multi-select and the v1 pickers all position exactly this way,
- * so the wiring — initial position, autoUpdate resubscription and the
- * disconnect guards on both sides of the await — lives here once.
+ * Floating UI middleware that gives the floating element a `min-width` equal to
+ * the width of its reference, so a panel is never narrower than its field. A
+ * reference without width (not laid out yet) clears `min-width`. A changed
+ * width resets the measured rects; put it before `flip` and `shift`, so they
+ * place the panel at its final size. Under `autoUpdate` the value follows the
+ * reference while it resizes.
  *
- * `destroy()` also acts as the in-flight guard: a computePosition resolving
- * after teardown must not touch the content's styles.
+ * @returns The middleware that writes the floating element's `min-width`.
  */
-export const createAnchoredPosition = (anchor: Element, content: HTMLElement): { update: () => Promise<void>, destroy: () => void } => {
+export const matchAnchorWidth = (): Middleware => {
+  let written: string | undefined
+
+  return {
+    name: 'matchAnchorWidth',
+    fn({ elements, rects }) {
+      const minWidth = rects.reference.width > 0 ? `${rects.reference.width}px` : ''
+
+      if (minWidth === written) {
+        return {}
+      }
+
+      written = minWidth
+      elements.floating.style.minWidth = minWidth
+      return { reset: { rects: true } }
+    }
+  }
+}
+
+/**
+ * Positions a combobox-family panel under its field: bottom-start placement
+ * (mirrored in RTL), a 2px main-axis offset, flip and shift within the clipping
+ * ancestors, and the field's width as the panel's `min-width`
+ * (`matchAnchorWidth`), which `autoUpdate` keeps current while the field resizes.
+ *
+ * @param anchor - The field the panel belongs to.
+ * @param content - The panel.
+ * @returns `ready`, which settles once the panel has its first position and
+ * width, `update()` to reposition now and `destroy()` to stop following the
+ * field. `top` and `left` that resolve after `destroy()` are not applied.
+ */
+export const createAnchoredPosition = (anchor: Element, content: HTMLElement): { destroy: () => void, ready: Promise<void>, update: () => Promise<void> } => {
   let disposed = false
 
   const update = async (): Promise<void> => {
@@ -174,6 +205,7 @@ export const createAnchoredPosition = (anchor: Element, content: HTMLElement): {
 
     const { x, y } = await computePosition(anchor, content, {
       middleware: [
+        matchAnchorWidth(),
         offset({ mainAxis: 2 }),
         flip(),
         shift({ boundary: 'clippingAncestors' })
@@ -192,15 +224,16 @@ export const createAnchoredPosition = (anchor: Element, content: HTMLElement): {
     })
   }
 
-  update()
+  const ready = update()
   const cleanup = autoUpdate(anchor, content, update)
 
   return {
-    update,
     destroy(): void {
       disposed = true
       cleanup()
-    }
+    },
+    ready,
+    update
   }
 }
 

@@ -1619,17 +1619,16 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
+      await multiSelect._updateFloatingPosition()
 
-      expect(multiSelect._menu.style.minWidth).toEqual(`${multiSelect._wrapperElement.offsetWidth}px`)
+      expect(multiSelect._menu.style.minWidth).toEqual(`${multiSelect._wrapperElement.getBoundingClientRect().width}px`)
 
-      // The frame resizes while the panel is open — an inline snapshot that
-      // does not follow it leaves the panel at the stale width.
       wrap.style.width = '400px'
       await new Promise(resolve => {
         requestAnimationFrame(() => requestAnimationFrame(resolve))
       })
 
-      expect(multiSelect._menu.style.minWidth).toEqual(`${multiSelect._wrapperElement.offsetWidth}px`)
+      expect(multiSelect._menu.style.minWidth).toEqual(`${multiSelect._wrapperElement.getBoundingClientRect().width}px`)
       expect(multiSelect._wrapperElement.offsetWidth).toBeLessThan(660)
 
       multiSelect.hide()
