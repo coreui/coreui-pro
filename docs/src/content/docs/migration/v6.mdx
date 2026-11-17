@@ -230,6 +230,12 @@ The `util` modules are internal, but the package exports every file under `js/di
 
 Loaded with a plain `<script>`, `js/dist/util/calendar.js` registers as `CalendarUtil`, and the new `js/dist/util/range.js` as `RangeUtil`. The calendar util used the `Calendar` global of the component, so the two files overwrote each other and `js/dist/calendar.js` read its helpers from itself. Load the util file before the component, as with the other `js/dist/util` files.
 
+#### No synthetic `transitionend` when a transition does not end
+
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+
+A component that waits for its own transition (Modal, Collapse, Toast, Tooltip, Sidebar and the others) finishes the wait on a timer when the browser sends no `transitionend`: with no transition at all, `transition: none`, reduced motion, or a transition cut short. CoreUI v5 and Bootstrap dispatched a synthetic `transitionend` on the element at that point, and that event also ended every other wait on the same element, so an opening interrupted by a closing finished both too early. Each wait now ends on its own event or timer, and no event is dispatched. A page that listened for `transitionend` on a component's element to learn that it had opened or closed should listen for the component's `shown` and `hidden` events. Navigation fires no events for its groups; a page that waits for a group to finish opening reads the browser's own `transitionend` on `.nav-group-items`, which does not come when the group has no transition. In the per-file UMD builds, `js/dist/util/transition.js` registers as `Transition` and holds the transition helpers that `js/dist/util/index.js` used to define; load it before `index.js`.
+
 #### `coreui.Offcanvas` in the UMD bundle
 
 The UMD bundle exposed the offcanvas plugin as `coreui.OffCanvas`, while the
