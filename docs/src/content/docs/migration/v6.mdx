@@ -337,8 +337,8 @@ that event fires, so you can `await` the method instead:
 + // the area is expanded
 ```
 
-Collapse, Menu, Modal, Offcanvas, Popover, Sidebar and Tooltip return one from
-`show`/`hide`/`toggle`, Toast from `show`/`hide`, Tab from `show`, and Alert
+Collapse, Context Menu, Dropdown, Menu, Modal, Offcanvas, Popover, Sidebar and
+Tooltip return one from `show`/`hide`/`toggle`, Toast from `show`/`hide`, Tab from `show`, and Alert
 from `close`. The event path is unchanged and still the right tool when you must
 react to changes your own code did not start.
 
@@ -1279,6 +1279,13 @@ check, radio, carousel and toggler icons already work:
 
 #### Menu (new) and Dropdown
 
+- **Menu and Context Menu fire `shown` and `hidden` after the fade.** Both events used to fire
+  with the class change, before the menu had faded in or out. They now wait for the transition,
+  and a transition that the opposite call interrupts fires neither, so a context menu opened again
+  at a new point fires `hide`, `show` and `shown`. The closing menu keeps following its toggle,
+  and a menu moved by `container` fades out there before it returns to its place; it used to
+  return at once and disappear without the transition. Dropdown has no transition and keeps firing
+  both events at once.
 - **The first click on a submenu trigger after a hover opened its submenu keeps it open.** With the
   default `submenuTrigger: 'both'` the hover opened the submenu and the click closed it again, and a
   tap could do the same where the browser sends the tap's click after its emulated hover. The next

@@ -31,7 +31,7 @@ import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import {
-  defineJQueryPlugin, execute, getElement, getUID, isDisabled, isElement, isRTL, isVisible, jQueryDispatch, noop
+  defineJQueryPlugin, execute, getElement, getTransitionDurationFromElement, getUID, isDisabled, isElement, isRTL, isVisible, jQueryDispatch, noop
 } from './util/index.js'
 import {
   parseResponsivePlacement,
@@ -145,6 +145,7 @@ class Menu extends BaseComponent {
   declare ['constructor']: typeof Menu
   static _openInstances: Set<Menu> = new Set<Menu>()
   static _engineMenus: WeakSet<Element> = new WeakSet<Element>()
+  static _exiting: WeakMap<Element, Menu> = new WeakMap<Element, Menu>()
   protected declare _config: MenuConfig
   protected declare _disabledItems: WeakSet<Element>
   protected declare _floatingCleanup: (() => void) | null
@@ -167,6 +168,8 @@ class Menu extends BaseComponent {
   protected declare _openedBy: 'key' | 'pointer' | null
   protected declare _layer: LayerEntry
   protected declare _escapeListener: EventCallable
+  protected declare _transition: number
+  protected declare _pendingHidden: Record<string, unknown> | null
 
   constructor(element?: string | Element | null, config?: Partial<MenuConfig> | null) {
     if (typeof computePosition === 'undefined') {
@@ -188,6 +191,8 @@ class Menu extends BaseComponent {
     this._pendingTrigger = null
     this._disabledItems = new WeakSet()
     this._openedBy = null
+    this._transition = 0
+    this._pendingHidden = null
 
     this._menu = (this._config.menu || this._findMenu()) as HTMLElement
 
@@ -270,11 +275,11 @@ class Menu extends BaseComponent {
     return this._isShown() ? this.hide() : this.show()
   }
 
-  async show(): Promise<void> {
-    this._show({ relatedTarget: this._element })
+  show(): Promise<void> {
+    return this._show({ relatedTarget: this._element })
   }
 
-  protected _show(relatedTarget: Record<string, unknown>): void {
+  protected async _show(relatedTarget: Record<string, unknown>): Promise<void> {
     if (isDisabled(this._element) || this._isShown()) {
       return
     }
@@ -287,6 +292,8 @@ class Menu extends BaseComponent {
 
     registerLayer(this._layer)
     this._toggleEscapeListeners(true)
+    this._takeOverMenu()
+    const transition = ++this._transition
     this._moveMenuToContainer()
     this._createFloating()
 
@@ -300,7 +307,12 @@ class Menu extends BaseComponent {
     this._setShown(true)
 
     Menu._openInstances.add(this)
-    EventHandler.trigger(this._element, this.constructor.eventName('shown'), relatedTarget)
+
+    await this._queueCallback(() => {
+      if (transition === this._transition) {
+        EventHandler.trigger(this._element, this.constructor.eventName('shown'), relatedTarget)
+      }
+    }, this._menu, this._isAnimated(), 'opacity')
   }
 
   async hide(): Promise<void> {
@@ -312,7 +324,7 @@ class Menu extends BaseComponent {
       relatedTarget: this._element
     }
 
-    this._completeHide(relatedTarget)
+    await this._completeHide(relatedTarget)
   }
 
   override dispose(): void {
@@ -321,6 +333,7 @@ class Menu extends BaseComponent {
       this._toggleEscapeListeners(false)
     }
 
+    this._finishHide()
     this._disposeFloating()
     this._restoreMenuToOriginalParent()
     this._disposeMediaQueryListeners()
@@ -340,7 +353,11 @@ class Menu extends BaseComponent {
   }
 
   update(): void {
-    if (this._isMenu && this._isShown()) {
+    if (!this._isShown()) {
+      return
+    }
+
+    if (this._isMenu) {
       this._setRoles()
     }
 
@@ -368,7 +385,7 @@ class Menu extends BaseComponent {
     return (wrapper instanceof Element ? wrapper : this._element.parentNode) as HTMLElement
   }
 
-  protected _completeHide(relatedTarget: Record<string, unknown>, reason?: LayerReason, returnFocus = true): void {
+  protected async _completeHide(relatedTarget: Record<string, unknown>, reason?: LayerReason, returnFocus = true): Promise<void> {
     const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName('hide'), relatedTarget)
     if (hideEvent.defaultPrevented) {
       return
@@ -385,19 +402,48 @@ class Menu extends BaseComponent {
       }
     }
 
-    this._disposeFloating()
-    this._restoreMenuToOriginalParent()
-
     this._menu.classList.remove(CLASS_NAME_SHOW)
     this._setShown(false)
-    this._removeMenuAttributes()
     Menu._openInstances.delete(this)
 
     if (refocus) {
       this._returnFocus()
     }
 
+    this._pendingHidden = relatedTarget
+    Menu._exiting.set(this._menu, this)
+    const transition = ++this._transition
+
+    await this._queueCallback(() => {
+      if (transition === this._transition) {
+        this._finishHide()
+      }
+    }, this._menu, this._isAnimated(), 'opacity')
+  }
+
+  protected _finishHide(): void {
+    const relatedTarget = this._pendingHidden
+    if (!relatedTarget) {
+      return
+    }
+
+    this._pendingHidden = null
+    Menu._exiting.delete(this._menu)
+    this._disposeFloating()
+    this._restoreMenuToOriginalParent()
+    this._removeMenuAttributes()
     EventHandler.trigger(this._element, this.constructor.eventName('hidden'), relatedTarget)
+  }
+
+  protected _takeOverMenu(): void {
+    const exiting = Menu._exiting.get(this._menu)
+
+    if (exiting === this) {
+      this._pendingHidden = null
+      Menu._exiting.delete(this._menu)
+    } else {
+      exiting?._finishHide()
+    }
   }
 
   protected _createLayer(): LayerEntry {
@@ -529,9 +575,8 @@ class Menu extends BaseComponent {
     return level === this._menu
   }
 
-  // Everything the engine stamped on the menu but the placement, which the
-  // closing transition still scales toward; Dropdown extends this with its own
-  // data-coreui-popper hook.
+  // Everything the engine stamped on the menu but the placement; Dropdown
+  // extends this with its own data-coreui-popper hook.
   protected _removeMenuAttributes(): void {
     Manipulator.removeDataAttribute(this._menu, 'display')
   }
@@ -549,6 +594,8 @@ class Menu extends BaseComponent {
   }
 
   protected _createFloating(): void {
+    this._disposeFloating()
+
     if (this._config.display === 'static') {
       Manipulator.setDataAttribute(this._menu, 'display', 'static')
       return
@@ -605,6 +652,10 @@ class Menu extends BaseComponent {
 
   protected _isShown(): boolean {
     return this._menu.classList.contains(CLASS_NAME_SHOW)
+  }
+
+  protected _isAnimated(): boolean {
+    return getTransitionDurationFromElement(this._menu) > 0
   }
 
   protected _isToggleTarget(composedPath: EventTarget[]): boolean {
