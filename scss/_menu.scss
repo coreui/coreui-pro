@@ -90,20 +90,50 @@ $menu-tokens: defaults(
     transform: scale(.95);
     transform-origin: top left;
 
-    &[data-coreui-placement^="top"] {
-      transform-origin: bottom left;
+    &[data-coreui-placement="bottom-start"] {
+      @include rtl() {
+        transform-origin: top right;
+      }
+    }
+
+    &[data-coreui-placement="top-start"] {
+      @include ltr-rtl-value-only("transform-origin", bottom left);
+    }
+
+    &[data-coreui-placement="bottom"] {
+      transform-origin: top center;
+    }
+
+    &[data-coreui-placement="top"] {
+      transform-origin: bottom center;
     }
 
     &[data-coreui-placement="bottom-end"] {
-      transform-origin: top right;
+      @include ltr-rtl-value-only("transform-origin", top right);
     }
 
     &[data-coreui-placement="top-end"] {
-      transform-origin: bottom right;
+      @include ltr-rtl-value-only("transform-origin", bottom right);
     }
 
-    &[data-coreui-placement^="left"] {
+    &[data-coreui-placement="right"] {
+      transform-origin: left center;
+    }
+
+    &[data-coreui-placement="right-end"] {
+      transform-origin: bottom left;
+    }
+
+    &[data-coreui-placement="left-start"] {
       transform-origin: top right;
+    }
+
+    &[data-coreui-placement="left"] {
+      transform-origin: right center;
+    }
+
+    &[data-coreui-placement="left-end"] {
+      transform-origin: bottom right;
     }
 
     @include transition-props(

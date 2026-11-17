@@ -350,7 +350,7 @@ describe('ContextMenu', () => {
           expect(hideEventTriggered).toBeTrue()
           expect(event.relatedTarget).toEqual(area)
           expect(menu).not.toHaveClass('show')
-          expect(menu.hasAttribute('data-coreui-placement')).toBeFalse()
+          expect(menu.hasAttribute('data-coreui-placement')).toBeTrue()
           expect(document.activeElement).toEqual(area)
           expect(contextMenu._point).toBeNull()
           resolve()
