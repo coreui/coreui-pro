@@ -41,16 +41,16 @@ $progress-segmented-tokens: () !default;
 // scss-docs-start progress-segmented-tokens
 $progress-segmented-tokens: defaults(
   (
-    --#{$prefix}progress-segment-gap: .25rem,
-    --#{$prefix}progress-segment-min-width: .25rem,
-    --#{$prefix}progress-segment-border-radius: var(--#{$prefix}radius-2),
+    --cui-progress-segment-gap: .25rem,
+    --cui-progress-segment-min-width: .25rem,
+    --cui-progress-segment-border-radius: var(--#{$prefix}radius-2),
   ),
   $progress-segmented-tokens
 );
 
 // Unset by default: the plugin then packs as many segments as fit above the minimum width
 @if $progress-segments != null {
-  $progress-segmented-tokens: map.set($progress-segmented-tokens, --#{$prefix}progress-segments, $progress-segments);
+  $progress-segmented-tokens: map.set($progress-segmented-tokens, --cui-progress-segments, $progress-segments);
 }
 // scss-docs-end progress-segmented-tokens
 
@@ -120,17 +120,17 @@ $progress-segmented-tokens: defaults(
   .progress-segmented {
     @include tokens($progress-segmented-tokens);
 
-    $gap: var(--#{$prefix}progress-segment-gap);
+    $gap: var(--cui-progress-segment-gap);
     // Capped at half the segment so the corner circles never cross; the plugin writes the exact cap,
     // the stylesheet's fallback knows only the minimum width
-    $radius: var(--#{$prefix}progress-segment-radius-fit, min(var(--#{$prefix}progress-segment-border-radius), calc(var(--#{$prefix}progress-segment-min-width) * .5)));
+    $radius: var(--cui-progress-segment-radius-fit, min(var(--cui-progress-segment-border-radius), calc(var(--cui-progress-segment-min-width) * .5)));
     // Without a count (neither the token nor the plugin's fit) the pitch is invalid and the
     // tiles fall back to the minimum width, so a page without JavaScript still gets segments
-    $pitch: var(--#{$prefix}progress-segment-pitch, calc(var(--#{$prefix}progress-segment-min-width) + #{$gap}));
+    $pitch: var(--#{$prefix}progress-segment-pitch, calc(var(--cui-progress-segment-min-width) + #{$gap}));
 
     --#{$prefix}progress-border-radius: 0;
     --#{$prefix}progress-box-shadow: none;
-    --#{$prefix}progress-segment-pitch: calc((100% + #{$gap}) / var(--#{$prefix}progress-segments-fit, var(--#{$prefix}progress-segments)));
+    --#{$prefix}progress-segment-pitch: calc((100% + #{$gap}) / var(--cui-progress-segments-fit, var(--cui-progress-segments)));
 
     // One tile per segment: a rounded rectangle from two crossed bars plus a circle in each corner,
     // intersected with the segment's box so a corner wider than the segment is cut off at the gap
@@ -148,7 +148,7 @@ $progress-segmented-tokens: defaults(
     // Whole segments: the Progress plugin (or the page) sets the count to fill, and the bar
     // ends on that segment's far edge instead of wherever the value lands.
     > .progress-bar {
-      width: calc(var(--#{$prefix}progress-segments-filled) * #{$pitch} - #{$gap});
+      width: calc(var(--cui-progress-segments-filled) * #{$pitch} - #{$gap});
     }
   }
 

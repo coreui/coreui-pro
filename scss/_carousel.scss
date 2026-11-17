@@ -15,9 +15,9 @@ $carousel-tokens: () !default;
 // scss-docs-start carousel-tokens
 $carousel-tokens: defaults(
   (
-    --#{$prefix}carousel-items: 1,
+    --cui-carousel-items: 1,
     --#{$prefix}carousel-items-gap: 0px,
-    --#{$prefix}carousel-items-peek: 0px,
+    --cui-carousel-items-peek: 0px,
     --#{$prefix}carousel-fade-duration: .6s,
     --#{$prefix}carousel-fade-timing: ease,
     --#{$prefix}carousel-control-color: light-dark(var(--#{$prefix}white), var(--#{$prefix}black)),
@@ -65,11 +65,11 @@ $carousel-tokens: defaults(
     display: flex;
     gap: var(--#{$prefix}carousel-items-gap);
     width: 100%;
-    padding-inline: var(--#{$prefix}carousel-items-peek);
+    padding-inline: var(--cui-carousel-items-peek);
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--#{$prefix}carousel-items-peek);
+    scroll-padding-inline: var(--cui-carousel-items-peek);
     scrollbar-width: none; // Hide the scrollbar without losing scrollability
 
     &::-webkit-scrollbar {
@@ -88,7 +88,7 @@ $carousel-tokens: defaults(
     // Anchors the slide's absolute caption.
     position: relative;
     // 100% is the content box, already inset by the peek — subtract only the gaps.
-    flex: 0 0 calc((100% - (var(--#{$prefix}carousel-items) - 1) * var(--#{$prefix}carousel-items-gap)) / var(--#{$prefix}carousel-items));
+    flex: 0 0 calc((100% - (var(--cui-carousel-items) - 1) * var(--#{$prefix}carousel-items-gap)) / var(--cui-carousel-items));
     min-width: 0;
     scroll-snap-align: start;
     scroll-snap-stop: always;
@@ -320,7 +320,7 @@ $carousel-tokens: defaults(
           inline-size: 0;
           content: "";
           background-color: var(--#{$prefix}carousel-indicator-progress-bg);
-          animation: carousel-indicator-progress var(--#{$prefix}carousel-interval, 5000ms) linear forwards;
+          animation: carousel-indicator-progress var(--cui-carousel-interval, 5000ms) linear forwards;
         }
       }
     }
