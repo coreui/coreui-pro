@@ -760,19 +760,47 @@ describe('Sidebar', () => {
       expect(spyGetOrCreate).toHaveBeenCalledWith(sidebarEl)
     })
 
-    it('should drop the backdrop and restore body scroll when disposed while shown on mobile', () => {
+    it('should restore page scroll when hidden after the viewport stopped being mobile', async () => {
+      fixtureEl.innerHTML = '<div class="sidebar" style="--cui-is-mobile: true; position: fixed; top: 0; left: 0; width: 10px; height: 10px"></div>'
+      const sidebarEl = fixtureEl.querySelector('.sidebar')
+      const sidebar = new Sidebar(sidebarEl)
+
+      sidebar.show()
+
+      expect(document.documentElement.style.overflow).toBe('hidden')
+
+      sidebarEl.style.removeProperty('--cui-is-mobile')
+      await sidebar.hide()
+
+      expect(document.documentElement.style.overflow).toBe('')
+      sidebar.dispose()
+    })
+
+    it('should restore page scroll when disposed after the viewport stopped being mobile', () => {
+      fixtureEl.innerHTML = '<div class="sidebar" style="--cui-is-mobile: true; position: fixed; top: 0; left: 0; width: 10px; height: 10px"></div>'
+      const sidebarEl = fixtureEl.querySelector('.sidebar')
+      const sidebar = new Sidebar(sidebarEl)
+
+      sidebar.show()
+      sidebarEl.style.removeProperty('--cui-is-mobile')
+      sidebar.dispose()
+
+      expect(document.documentElement.style.overflow).toBe('')
+    })
+
+    it('should drop the backdrop and restore page scroll when disposed while shown on mobile', () => {
       fixtureEl.innerHTML = '<div class="sidebar" style="--cui-is-mobile: true; position: fixed; top: 0; left: 0; width: 10px; height: 10px"></div>'
       const sidebar = new Sidebar(fixtureEl.querySelector('.sidebar'))
 
       sidebar.show()
 
       expect(document.querySelector('.sidebar-backdrop')).not.toBeNull()
-      expect(document.body.style.overflow).toBe('hidden')
+      expect(document.documentElement.style.overflow).toBe('hidden')
 
       sidebar.dispose()
 
       expect(document.querySelector('.sidebar-backdrop')).toBeNull()
-      expect(document.body.style.overflow).toBe('')
+      expect(document.documentElement.style.overflow).toBe('')
     })
   })
 })

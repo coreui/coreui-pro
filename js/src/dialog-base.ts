@@ -18,12 +18,12 @@ import {
   isComposingKey, registerLayer, unregisterLayer, type LayerEntry
 } from './util/layers.js'
 import { unwrapLegacyShell } from './util/legacy-markup.js'
+import { lockScroll, unlockScroll } from './util/scroll-lock.js'
 
 /**
  * Constants
  */
 
-const CLASS_NAME_OPEN = 'dialog-open'
 const CLASS_NAME_HIDING = 'hiding'
 
 const SELECTOR_NAVBAR_EXPAND = '.navbar[class*="navbar-expand"]'
@@ -173,13 +173,17 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
       cancelAnimationFrame(this._resizeFrame)
     }
 
+    unregisterLayer(this._layer, 'parent')
+
     // Disposed while still open (e.g. an SPA tearing the component down
     // mid-navigation): close the native <dialog> and restore body scroll, or
     // `dialog-open` (overflow: hidden) stays stuck on the root element.
     if (this._element.open) {
-      unregisterLayer(this._layer, 'parent')
       this._closeAndCleanup()
     }
+
+    // Native close queues its event; dispose must also release an already-closed dialog.
+    unlockScroll(this._element)
 
     // `_queueCallback` skips its completion callback once the instance is
     // disposed, so nothing else would clear the exit state. A stranded
@@ -235,10 +239,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     }
 
     if (preventBodyScroll) {
-      // The lock lands on the root element, where `scrollbar-gutter: stable`
-      // keeps the gutter reserved while the scrollbar is hidden, so the page
-      // doesn't shift and the ::backdrop covers the gutter.
-      document.documentElement.classList.add(CLASS_NAME_OPEN)
+      lockScroll(this._element)
     }
   }
 
@@ -264,9 +265,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     holdAnnouncements()
     this._openedAsModal = false
 
-    if (!document.querySelector('dialog[open]:modal')) {
-      document.documentElement.classList.remove(CLASS_NAME_OPEN)
-    }
+    unlockScroll(this._element)
   }
 
   protected _finishHide(): void {
