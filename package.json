@@ -307,6 +307,16 @@
         "default": "./js/dist/util/safe-triangle.js"
       }
     },
+    "./utils/scroll-lock": {
+      "import": {
+        "types": "./js/dist/util/scroll-lock.d.mts",
+        "default": "./js/dist/util/scroll-lock.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/scroll-lock.d.ts",
+        "default": "./js/dist/util/scroll-lock.js"
+      }
+    },
     "./utils/selection-state": {
       "import": {
         "types": "./js/dist/util/selection-state.d.mts",

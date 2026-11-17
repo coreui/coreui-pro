@@ -11,7 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import Backdrop from './util/backdrop.js'
-import ScrollBarHelper from './util/scrollbar.js'
+import { lockScroll, unlockScroll } from './util/scroll-lock.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -115,7 +115,7 @@ class Sidebar extends BaseComponent {
     if (this._isMobile()) {
       this._element.classList.add(CLASS_NAME_SHOW)
       this._backdrop.show()
-      new ScrollBarHelper().hide()
+      lockScroll(this._element)
     }
 
     const complete = () => {
@@ -141,8 +141,9 @@ class Sidebar extends BaseComponent {
 
     if (this._isMobile()) {
       this._backdrop.hide()
-      new ScrollBarHelper().reset()
     }
+
+    unlockScroll(this._element)
 
     if (!this._isMobile() && !this._overlaid) {
       this._element.classList.add(CLASS_NAME_HIDE)
@@ -213,10 +214,7 @@ class Sidebar extends BaseComponent {
   }
 
   override dispose(): void {
-    if (this._isMobile() && this._isVisible()) {
-      new ScrollBarHelper().reset()
-    }
-
+    unlockScroll(this._element)
     this._backdrop.dispose()
     this._removeClickOutListener()
     EventHandler.off(window, EVENT_RESIZE, this._resizeHandler)

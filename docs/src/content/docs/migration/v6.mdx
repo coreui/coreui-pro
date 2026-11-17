@@ -226,6 +226,16 @@ or, if you are already resolving the package by name, `import { Tooltip } from
 
 The `util` modules are internal, but the package exports every file under `js/dist`, so a deep import could reach them. These helpers are no longer exported: `js/dist/util/date-range-picker.js` as a whole, `getFirstAvailableDateInRange`, `getSelectableDates`, `createDateFromMonth`, `createDateFromWeek` and `createDateFromYear` from `util/calendar.js`, `getDateSections` from `util/date-sections.js` (now `getSectionLayout`), and `convertTimeToDate`, `formatTimePartials`, `getAmPm`, `isValidTime` and `shouldUseTwoDigitHour` from `util/time.js`. Most had no reader in the library and are gone; `createDateFromYear`, `formatTimePartials` and `shouldUseTwoDigitHour` stay as module internals. Pass dates to the components in the formats their options take (`startDate: '2026W03'` with `selectionType: 'week'`), or keep a copy of the helper in your code. The nine per-unit comparisons of `util/calendar.js`, `isMonthDisabled`, `isMonthInRange`, `isMonthSelected` and their `isQuarter…` and `isYear…` counterparts, are three functions that take the calendar view as the second argument: `isPeriodDisabled(date, 'months', min, max, disabledDates)`, `isPeriodInRange(date, 'quarters', start, end)` and `isPeriodSelected(date, 'years', start, end)`.
 
+#### One scroll lock for dialogs and the mobile Sidebar
+
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+
+Modal, Dialog, Offcanvas, Drawer and the Sidebar on mobile lock the page through one helper, `js/dist/util/scroll-lock.js`. It sets `overflow: hidden` on the root element, adds the `dialog-open` class to it, and gives the width of the scrollbar that disappears to padding on the root and to a margin on full-width `.fixed-top`, `.fixed-bottom` and `.is-fixed` elements. Add `.is-fixed` to a full-width fixed element of your own to have it compensated too. The stylesheet no longer has a `:root.dialog-open` rule or `scrollbar-gutter: stable`, so the lock does not depend on which stylesheets the page loads.
+
+`js/dist/util/scrollbar.js`, which locked `<body>` for the mobile Sidebar, is removed, and a deep import of it no longer resolves. In the per-file UMD builds, `js/dist/util/scroll-lock.js` registers as `ScrollLock`; load it after `js/dist/dom/selector-engine.js` and before `js/dist/dialog-base.js` and `js/dist/sidebar.js`.
+
+The root carries `dialog-open` while a modal dialog or the mobile Sidebar is open, so a page rule on `:root.dialog-open` now also applies while the Sidebar is open. Adding the class yourself no longer locks the page.
+
 #### `CalendarUtil` and `RangeUtil` in the per-file UMD builds
 
 Loaded with a plain `<script>`, `js/dist/util/calendar.js` registers as `CalendarUtil`, and the new `js/dist/util/range.js` as `RangeUtil`. The calendar util used the `Calendar` global of the component, so the two files overwrote each other and `js/dist/calendar.js` read its helpers from itself. Load the util file before the component, as with the other `js/dist/util` files.
@@ -1430,9 +1440,8 @@ check, radio, carousel and toggler icons already work:
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The Modal `focus` option is removed** — the native dialog always traps
   focus. `handleUpdate()` remains as a no-op for API compatibility; the
-  scrollbar-compensation logic it triggered no longer exists (scroll lock is
-  `overflow: hidden` + `scrollbar-gutter: stable` on the root element, with
-  the `dialog-open` class).
+  scrollbar compensation now runs when a dialog locks the page (see
+  [One scroll lock for dialogs and the mobile Sidebar](#one-scroll-lock-for-dialogs-and-the-mobile-sidebar)).
 - **New capabilities:** a `modal: false` option opens the dialog non-modally
   (page stays interactive); a `cancel.coreui.modal` event fires when a modal
   is dismissed with Escape; toggling from a trigger inside an open modal swaps

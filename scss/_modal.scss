@@ -68,11 +68,6 @@ $modal-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default
 
 @layer components {
-  :root.dialog-open {
-    overflow: hidden;
-    scrollbar-gutter: stable;
-  }
-
   .modal {
     @include tokens($modal-tokens);
 
