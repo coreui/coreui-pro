@@ -68,7 +68,7 @@ $radio-tokens: defaults(
     inset: 0;
     pointer-events: none;
     content: "";
-    background-color: var(--#{$prefix}radio-mark-color);
+    background-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}radio-mark-color));
     opacity: 0;
     transform: scale(0);
     @include mask-icon(var(--#{$prefix}radio-mark));

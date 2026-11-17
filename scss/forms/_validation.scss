@@ -129,9 +129,14 @@
       --#{$prefix}check-checked-bg: var(--#{$prefix}#{$theme}-bg);
       --#{$prefix}check-checked-border-color: var(--#{$prefix}#{$theme}-bg);
 
-      &:checked:not(:indeterminate) {
+      &:checked,
+      &:indeterminate {
         background-color: var(--#{$prefix}check-checked-bg);
         border-color: var(--#{$prefix}check-checked-border-color);
+
+        &::before {
+          background-color: var(--#{$prefix}#{$theme}-contrast);
+        }
       }
 
       &:focus-visible {
@@ -174,6 +179,10 @@
       &:checked {
         background-color: var(--#{$prefix}radio-checked-bg);
         border-color: var(--#{$prefix}radio-checked-border-color);
+
+        &::before {
+          background-color: var(--#{$prefix}#{$theme}-contrast);
+        }
       }
 
       &:focus-visible {

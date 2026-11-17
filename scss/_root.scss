@@ -93,8 +93,6 @@ $root-token-defaults: (
   --#{$prefix}control-size: 1em,
   --#{$prefix}control-checked-bg: var(--#{$prefix}primary-base),
   --#{$prefix}control-checked-border-color: var(--#{$prefix}primary-base),
-  --#{$prefix}control-indeterminate-bg: var(--#{$prefix}primary-base),
-  --#{$prefix}control-indeterminate-border-color: var(--#{$prefix}primary-base),
   --#{$prefix}control-active-filter: brightness(90%),
   --#{$prefix}control-focus-border-color: var(--#{$prefix}btn-input-focus-border-color),
   --#{$prefix}control-disabled-bg: var(--#{$prefix}bg-3),

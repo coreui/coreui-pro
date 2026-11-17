@@ -31,6 +31,8 @@ The check and indeterminate marks are drawn with a CSS mask on the input's own `
 
 Checkboxes can use the `:indeterminate` pseudo-class when it is set from JavaScript — there is no HTML attribute for it.
 
+An indeterminate checkbox takes the colors of a checked one, its theme, its validation state and the `--cui-check-checked-bg` and `--cui-check-checked-border-color` tokens included. Set `--cui-check-indeterminate-bg` and `--cui-check-indeterminate-border-color` on the checkbox to give it colors of its own where no theme or validation state applies.
+
 <Example class="docs-example-indeterminate" code={`<div class="form-field">
     <input class="check" type="checkbox" value="" id="checkIndeterminate">
     <label for="checkIndeterminate">Indeterminate checkbox</label>
@@ -198,7 +200,7 @@ See the [v6 migration guide](/migration/v6/) for the full picture.
 
 ## Theme variants
 
-Modify the appearance of checked checkboxes by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.check` input, or to any element above it. This sets the checked background and border color to the theme color.
+Modify the appearance of checked and indeterminate checkboxes by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.check` input, or to any element above it. This sets their background and border color to the theme color and draws the mark in the theme's contrast color.
 
 <Example class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="form-field theme-${c.name}">
     <input class="check" type="checkbox" id="check-${c.name}" checked>

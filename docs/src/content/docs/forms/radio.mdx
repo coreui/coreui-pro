@@ -188,7 +188,7 @@ See the [v6 migration guide](/migration/v6/) for the full picture.
 
 ## Theme variants
 
-Modify the appearance of checked radios by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.radio` input, or to any element above it. This sets the checked background and border color to the theme color.
+Modify the appearance of checked radios by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.radio` input, or to any element above it. This sets the checked background and border color to the theme color and draws the mark in the theme's contrast color.
 
 <Example class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="form-field theme-${c.name}">
     <input class="radio" type="radio" name="radio-theme-${c.name}" id="radio-${c.name}" checked>
