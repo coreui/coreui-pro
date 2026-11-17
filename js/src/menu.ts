@@ -529,10 +529,10 @@ class Menu extends BaseComponent {
     return level === this._menu
   }
 
-  // Everything the engine stamped on the menu; Dropdown extends this with its
-  // own data-coreui-popper hook.
+  // Everything the engine stamped on the menu but the placement, which the
+  // closing transition still scales toward; Dropdown extends this with its own
+  // data-coreui-popper hook.
   protected _removeMenuAttributes(): void {
-    Manipulator.removeDataAttribute(this._menu, 'placement')
     Manipulator.removeDataAttribute(this._menu, 'display')
   }
 
