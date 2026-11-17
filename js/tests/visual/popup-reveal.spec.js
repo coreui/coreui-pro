@@ -12,6 +12,7 @@ import { page } from 'vitest/browser'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
 import DatePicker from '../../src/date-picker.js'
+import MultiSelect from '../../src/multi-select.js'
 import TimePicker from '../../src/time-picker.js'
 import Popup from '../../src/util/popup.js'
 
@@ -101,5 +102,28 @@ describe('popup reveal', () => {
     expect(document.activeElement.id).toEqual('entry')
     expect(inViewport(document.activeElement)).toBeTrue()
     popup.dispose()
+  })
+
+  it('should keep the selected option visible when the panel narrows to its field after opening', async () => {
+    const label = index => `Option ${index} with a label long enough to wrap in a narrow panel`
+    const host = mount([
+      '<div style="margin-inline-start: 200px">',
+      '<select id="host" multiple>',
+      ...Array.from({ length: 30 }, (_, index) => `<option value="${index}"${index === 27 ? ' selected' : ''}>${label(index)}</option>`),
+      '</select>',
+      '</div>'
+    ].join(''))
+    const multiSelect = new MultiSelect(host, { optionsMaxHeight: 120 })
+
+    multiSelect.show()
+    await settle()
+
+    const list = multiSelect._menu.querySelector('.list-box-options')
+    const selected = [...list.querySelectorAll('.list-box-option')].find(option => option.textContent.includes(label(27)))
+    const box = list.getBoundingClientRect()
+    const rect = selected.getBoundingClientRect()
+    expect(rect.top).toBeGreaterThanOrEqual(box.top)
+    expect(rect.bottom).toBeLessThanOrEqual(box.bottom)
+    multiSelect.dispose()
   })
 })

@@ -1090,7 +1090,10 @@ check, radio, carousel and toggler icons already work:
   `--cui-combobox-option-*` and `--cui-combobox-optgroup-*` are replaced by
   `--cui-list-box-header-*`, `--cui-list-box-padding-*` / `-gap`,
   `--cui-list-box-option-*` and `--cui-list-box-section-label-*`. Only
-  `--cui-combobox-popup-min-width` is left on `.combobox-popup`. Option
+  `--cui-combobox-popup-min-width` is left on `.combobox-popup`, and it
+  defaults to the width of the field (`--cui-anchor-width`). A value you set
+  replaces that floor, so write `max(var(--cui-anchor-width, 100%), …)` to keep
+  the panel no narrower than the field. Option
   padding follows the List box (`.5rem .75rem`, indicator in its own grid
   column) rather than the wider `1.25rem` the combobox surface used.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>

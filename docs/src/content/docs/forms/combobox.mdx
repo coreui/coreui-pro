@@ -633,6 +633,14 @@ The panel is the shared combobox surface, which only sizes itself:
 
 <ScssDocs file="scss/_combobox.scss" capture="combobox-tokens" />
 
+While the panel is open, the plugin writes the width of the field on it as `--cui-anchor-width`, so the panel is never narrower than its field. That property is not a token and keeps its `--cui-` name under a custom `$prefix`; a panel without it, such as one you render statically, takes `100%` of its containing block. A value you set on the token replaces the field width as the floor, so keep `--cui-anchor-width` in it. For example, to make the panel at least `20rem` wide on a screen that has room for it, and never narrower than the field:
+
+```css
+.combobox-popup {
+  --cui-combobox-popup-min-width: max(var(--cui-anchor-width, 100%), min(20rem, 100vw - 2rem));
+}
+```
+
 Its surface, border, shadow, stacking and fade come from the `.popup` tokens it shares with the pickers. `.popup` declares them itself, so set them on `.combobox-popup` or on `.popup`; a value set on an ancestor or on `:root` does not reach it.
 
 <ScssDocs file="scss/_popup.scss" capture="popup-tokens" />

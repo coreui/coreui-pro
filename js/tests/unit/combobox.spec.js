@@ -1670,7 +1670,7 @@ describe('Combobox', () => {
       expect(combobox._isShown()).toBeTrue()
     })
 
-    it('should scroll the list to the selected option when the panel opens', () => {
+    it('should scroll the list to the selected option when the panel opens', async () => {
       fixtureEl.innerHTML = [
         '<button class="form-control combobox-toggle" type="button" data-coreui-value="o15"><span class="combobox-value"></span></button>',
         '<div class="popup combobox-popup"><div class="list-box">',
@@ -1682,6 +1682,7 @@ describe('Combobox', () => {
       const combobox = new Combobox(toggle)
 
       combobox.show()
+      await combobox._anchoredPosition.ready
 
       const list = combobox._menu.querySelector('.list-box-options')
       const box = list.getBoundingClientRect()
@@ -1689,6 +1690,35 @@ describe('Combobox', () => {
       expect(list.scrollTop).toBeGreaterThan(0)
       expect(rect.top).toBeGreaterThanOrEqual(box.top)
       expect(rect.bottom).toBeLessThanOrEqual(box.bottom)
+    })
+
+    it('should not scroll the list of a panel closed or disposed before it was positioned', async () => {
+      const toggle = setMarkup(' data-coreui-value="uk"')
+      const combobox = new Combobox(toggle)
+      const reveal = spyOn(combobox._listBox, '_revealActive')
+
+      combobox.show()
+      const { ready } = combobox._anchoredPosition
+      combobox.hide()
+      await ready
+
+      combobox.show()
+      const second = combobox._anchoredPosition.ready
+      combobox.dispose()
+      await second
+
+      expect(reveal).not.toHaveBeenCalled()
+    })
+
+    it('should write the toggle width on the panel as --cui-anchor-width', async () => {
+      const toggle = setMarkup(' style="width: 260px"')
+      const combobox = new Combobox(toggle)
+
+      combobox.show()
+      await combobox._anchoredPosition.ready
+
+      expect(combobox._menu.style.getPropertyValue('--cui-anchor-width')).toBe('260px')
+      combobox.dispose()
     })
 
     it('should close without a change when Enter or a click picks the selected option again', () => {

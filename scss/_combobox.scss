@@ -16,7 +16,7 @@ $combobox-toggle-tokens: () !default;
 // scss-docs-start combobox-tokens
 $combobox-tokens: defaults(
   (
-    --#{$prefix}combobox-popup-min-width: 100%,
+    --#{$prefix}combobox-popup-min-width: var(--cui-anchor-width, 100%),
   ),
   $combobox-tokens
 );

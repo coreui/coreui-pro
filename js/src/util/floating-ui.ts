@@ -9,7 +9,7 @@
  */
 
 import {
-  autoUpdate, computePosition, flip, offset, shift
+  autoUpdate, computePosition, flip, offset, shift, type Middleware
 } from '@floating-ui/dom'
 
 /**
@@ -22,6 +22,8 @@ interface BreakpointListener {
   mql: MediaQueryList
   handler: (event: MediaQueryListEvent) => void
 }
+
+const PROPERTY_ANCHOR_WIDTH = '--cui-anchor-width'
 
 /**
  * Breakpoints for responsive placement (matches SCSS $breakpoints)
@@ -155,16 +157,54 @@ export const toFloatingOffset = (value: FloatingOffsetInput): FloatingOffsetValu
 }
 
 /**
- * The dropdown-shaped anchored panel: bottom-start placement (mirrored in
- * RTL), a 2px main-axis offset, flip and shift within the clipping ancestors.
- * Autocomplete, multi-select and the v1 pickers all position exactly this way,
- * so the wiring — initial position, autoUpdate resubscription and the
- * disconnect guards on both sides of the await — lives here once.
+ * Floating UI middleware that writes the width of the reference as the
+ * `--cui-anchor-width` custom property of the floating element, so its
+ * stylesheet can size the panel by its field (the combobox panel takes it as
+ * its `min-width`). A reference without width (not laid out yet) removes the
+ * property. A changed width resets the measured rects; put it before `flip` and
+ * `shift`, so they place the panel at its final size. Under `autoUpdate` the
+ * value follows the reference while it resizes.
  *
- * `destroy()` also acts as the in-flight guard: a computePosition resolving
- * after teardown must not touch the content's styles.
+ * @returns The middleware that writes `--cui-anchor-width` on the floating element.
  */
-export const createAnchoredPosition = (anchor: Element, content: HTMLElement): { update: () => Promise<void>, destroy: () => void } => {
+export const matchAnchorWidth = (): Middleware => {
+  let written: string | undefined
+
+  return {
+    name: 'matchAnchorWidth',
+    fn({ elements, rects }) {
+      const width = rects.reference.width > 0 ? `${rects.reference.width}px` : ''
+
+      if (width === written) {
+        return {}
+      }
+
+      written = width
+
+      if (width) {
+        elements.floating.style.setProperty(PROPERTY_ANCHOR_WIDTH, width)
+      } else {
+        elements.floating.style.removeProperty(PROPERTY_ANCHOR_WIDTH)
+      }
+
+      return { reset: { rects: true } }
+    }
+  }
+}
+
+/**
+ * Positions a combobox-family panel under its field: bottom-start placement
+ * (mirrored in RTL), a 2px main-axis offset, flip and shift within the clipping
+ * ancestors, and the field's width as `--cui-anchor-width` (`matchAnchorWidth`),
+ * which `autoUpdate` keeps current while the field resizes.
+ *
+ * @param anchor - The field the panel belongs to.
+ * @param content - The panel.
+ * @returns `ready`, which settles once the panel has its first position and
+ * width, `update()` to reposition now and `destroy()` to stop following the
+ * field. `top` and `left` that resolve after `destroy()` are not applied.
+ */
+export const createAnchoredPosition = (anchor: Element, content: HTMLElement): { destroy: () => void, ready: Promise<void>, update: () => Promise<void> } => {
   let disposed = false
 
   const update = async (): Promise<void> => {
@@ -174,6 +214,7 @@ export const createAnchoredPosition = (anchor: Element, content: HTMLElement): {
 
     const { x, y } = await computePosition(anchor, content, {
       middleware: [
+        matchAnchorWidth(),
         offset({ mainAxis: 2 }),
         flip(),
         shift({ boundary: 'clippingAncestors' })
@@ -192,15 +233,16 @@ export const createAnchoredPosition = (anchor: Element, content: HTMLElement): {
     })
   }
 
-  update()
+  const ready = update()
   const cleanup = autoUpdate(anchor, content, update)
 
   return {
-    update,
     destroy(): void {
       disposed = true
       cleanup()
-    }
+    },
+    ready,
+    update
   }
 }
 
