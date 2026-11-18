@@ -241,6 +241,23 @@ describe('Dialog', () => {
   })
 
   describe('hide', () => {
+    it('should close while it opens and report no shown', async () => {
+      fixtureEl.innerHTML = '<dialog class="dialog"><button type="button">Close</button></dialog>'
+      const element = fixtureEl.querySelector('dialog')
+      const instance = new Dialog(element)
+      const events = []
+      for (const name of ['shown', 'hide', 'hidden']) {
+        element.addEventListener(`${name}.coreui.dialog`, () => events.push(name))
+      }
+
+      const shown = instance.show()
+      await instance.hide()
+      await shown
+
+      expect(element.open).toBeFalse()
+      expect(events).toEqual(['hide', 'hidden'])
+    })
+
     it('should hide a dialog', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'
@@ -1231,6 +1248,18 @@ describe('Dialog', () => {
 
         expect([first.open, second.open]).toEqual([true, false])
         await firstShown
+      })
+
+      it('should drop the swap-in class of a dialog closed while it swaps in', async () => {
+        const [open, , second, toSecond] = mount()
+        open.click()
+        await once(fixtureEl.querySelector('#first'), 'shown.coreui.dialog')
+        toSecond.click()
+        const hidden = once(second, 'hidden.coreui.dialog')
+        await Dialog.getInstance(second).hide()
+        await hidden
+
+        expect(second.classList.contains('dialog-swap-in')).toBeFalse()
       })
 
       it('should not swap into a dialog that is already open', async () => {

@@ -638,6 +638,40 @@ describe('Drawer', () => {
   })
 
   describe('hide', () => {
+    it('should close on toggle() while it opens', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer" data-coreui-scroll="true" data-coreui-backdrop="false"><button type="button">Close</button></dialog>'
+      const element = fixtureEl.querySelector('dialog')
+      const instance = new Drawer(element)
+      const events = []
+      for (const name of ['shown', 'hide', 'hidden']) {
+        element.addEventListener(`${name}.coreui.drawer`, () => events.push(name))
+      }
+
+      const shown = instance.show()
+      await instance.toggle()
+      await shown
+
+      expect(element.open).toBeFalse()
+      expect(events).toEqual(['hide', 'hidden'])
+    })
+
+    it('should close while it opens and report no shown', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer"><button type="button">Close</button></dialog>'
+      const element = fixtureEl.querySelector('dialog')
+      const instance = new Drawer(element)
+      const events = []
+      for (const name of ['shown', 'hide', 'hidden']) {
+        element.addEventListener(`${name}.coreui.drawer`, () => events.push(name))
+      }
+
+      const shown = instance.show()
+      await instance.hide()
+      await shown
+
+      expect(element.open).toBeFalse()
+      expect(events).toEqual(['hide', 'hidden'])
+    })
+
     it('should close the dialog element', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<dialog class="drawer"></dialog>'

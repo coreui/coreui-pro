@@ -18,6 +18,7 @@ import { containsFocus, deepActiveElement } from './util/focus.js'
 import {
   isComposingKey, registerLayer, rememberFocusOrigin, returnFocus, unregisterLayer, type LayerEntry
 } from './util/layers.js'
+import { executeAfterTransition } from './util/index.js'
 import { unwrapLegacyShell } from './util/legacy-markup.js'
 import { trackPress } from './util/press.js'
 import { lockScroll, unlockScroll } from './util/scroll-lock.js'
@@ -51,6 +52,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   protected declare _resizeObserver: ResizeObserver | null
   protected declare _resizeFrame: number | null
   protected declare _layer: LayerEntry
+  protected declare _pendingShown: { cancel: () => void, settle: () => void } | null
 
   constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
@@ -59,6 +61,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._openedAsModal = false
     this._closedByComponent = false
     this._hiddenByComponent = !this._element?.open
+    this._pendingShown = null
     this._resizeObserver = null
     this._resizeFrame = null
     this._layer = {
@@ -135,14 +138,27 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     registerLayer(this._layer)
     this._showElement({ modal, preventBodyScroll })
 
-    await this._queueCallback(() => {
-      this._isTransitioning = false
-      EventHandler.trigger(this._element, this.constructor.eventName('shown'), { relatedTarget })
-    }, this._element, this._isAnimated())
+    await new Promise<void>(resolve => {
+      const pending = { cancel() {}, settle: resolve }
+      this._pendingShown = pending
+      pending.cancel = executeAfterTransition(() => {
+        this._pendingShown = null
+        this._isTransitioning = false
+        EventHandler.trigger(this._element, this.constructor.eventName('shown'), { relatedTarget })
+        resolve()
+      }, this._element, this._isAnimated())
+    })
+  }
+
+  protected _stopPendingShown(): (() => void) | undefined {
+    const pending = this._pendingShown
+    this._pendingShown = null
+    pending?.cancel()
+    return pending?.settle
   }
 
   protected _canHide(): boolean {
-    if (!this._element.open || this._isTransitioning) {
+    if (!this._element.open || (this._isTransitioning && !this._pendingShown)) {
       return false
     }
 
@@ -152,6 +168,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   }
 
   protected async _hide(): Promise<void> {
+    const settleShow = this._stopPendingShown()
     this._isTransitioning = true
     this._hiddenByComponent = true
     this._hideElement()
@@ -168,9 +185,12 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
       this._finishHide()
     }, this._element, this._isAnimated())
+
+    settleShow?.()
   }
 
   override dispose(): void {
+    this._stopPendingShown()?.()
     this._resizeObserver?.disconnect()
 
     if (this._resizeFrame !== null) {
@@ -315,7 +335,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     }
 
     const hideWhenInline = (): void => {
-      if (this._isTransitioning) {
+      if (this._isTransitioning && !this._pendingShown) {
         this._resizeFrame = requestAnimationFrame(hideWhenInline)
         return
       }
@@ -375,10 +395,12 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
         return
       }
 
+      const settleShow = this._stopPendingShown()
       unregisterLayer(this._layer, 'parent')
       this._hideChildComponents()
       this._closeAndCleanup()
       this._finishHide()
+      settleShow?.()
     }
 
     EventHandler.on(this._element, 'close', this._closeHandler)

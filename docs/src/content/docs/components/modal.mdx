@@ -589,7 +589,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 <Callout color="info">
 #### Promises and transitions
 
-**Methods that show or hide a component return a promise.** The promise resolves when the transition ends, so `await` continues at the same moment a `shown.coreui.*` or `hidden.coreui.*` listener runs. The methods still return immediately and never block the caller. A call on a component that is already transitioning does nothing and resolves right away.
+**Methods that show or hide a component return a promise.** The promise resolves when the transition ends, so `await` continues at the same moment a `shown.coreui.*` or `hidden.coreui.*` listener runs. The methods still return immediately and never block the caller. Closing the modal while it opens, with `hide()`, `toggle()`, its trigger, <kbd>Escape</kbd>, a click on the backdrop or a dismiss button, closes it from where its opening animation got to: `hide.coreui.modal` and `hidden.coreui.modal` fire, `shown.coreui.modal` does not, and the promises of both `show()` and `hide()` resolve at `hidden`. Any other call while the component is transitioning does nothing and resolves right away.
 
 [Refer to our JavaScript documentation for further details](/getting-started/javascript/#promises-and-transitions).
 </Callout>
