@@ -275,8 +275,8 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `backdrop` | boolean or the string `static` | `true` | Shows the native `::backdrop` while the drawer is open. Alternatively, specify `static` for a backdrop that doesn't close the drawer when clicked, or `false` to visually suppress it. |
-| `keyboard` | boolean | `true` | Closes the drawer when the escape key is pressed. |
-| `scroll` | boolean | `false` | Allows body scrolling while the drawer is open — the drawer then opens non-modally, keeping the rest of the page interactive.
+| `keyboard` | boolean | `true` | Closes the drawer when the escape key is pressed. With `false`, the browser limits how many times the page can refuse Escape without a click or key press in between, so a repeated Escape still closes a drawer opened as a modal. |
+| `scroll` | boolean | `false` | Allows body scrolling while the drawer is open; with `backdrop: false` the drawer then opens non-modally, keeping the rest of the page interactive.
 
 ### Methods
 

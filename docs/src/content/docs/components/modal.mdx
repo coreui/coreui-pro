@@ -105,13 +105,13 @@ Toggle a working modal demo by clicking the button below. It will slide down and
 
 When backdrop is set to static, the modal will not close when clicking outside of it. Click the button below to try it.
 
-<dialog class="modal" id="staticBackdropLive" data-coreui-backdrop="static" data-coreui-keyboard="false" aria-labelledby="staticBackdropLiveLabel">
+<dialog class="modal" id="staticBackdropLive" data-coreui-backdrop="static" aria-labelledby="staticBackdropLiveLabel">
   <div class="modal-header">
     <h5 class="modal-title" id="staticBackdropLiveLabel">Modal title</h5>
     <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
   </div>
   <div class="modal-body">
-    <p>I will not close if you click outside of me. Don't even try to press escape key.</p>
+    <p>I will not close if you click outside of me. Use the close button or press Escape.</p>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn-solid theme-secondary" data-coreui-dismiss="modal">Close</button>
@@ -128,7 +128,7 @@ When backdrop is set to static, the modal will not close when clicking outside o
 </button>
 
 <!-- Modal -->
-<dialog class="modal" id="staticBackdrop" data-coreui-backdrop="static" data-coreui-keyboard="false" aria-labelledby="staticBackdropLabel">
+<dialog class="modal" id="staticBackdrop" data-coreui-backdrop="static" aria-labelledby="staticBackdropLabel">
   <div class="modal-header">
     <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
     <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
@@ -581,7 +581,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `backdrop` | boolean, `'static'` | `true` | Shows the native `::backdrop` behind the modal. Alternatively, specify `static` for a backdrop which doesn't close the modal when clicked, or `false` to visually suppress it. |
-| `keyboard` | boolean | `true` | Closes the modal when escape key is pressed. |
+| `keyboard` | boolean | `true` | Closes the modal when escape key is pressed. With `false`, the browser limits how many times the page can refuse Escape without a click or key press in between, so a repeated Escape still closes a modal opened with `modal: true`. |
 | `modal` | boolean | `true` | Opens the dialog in the browser's top layer with a backdrop and focus trapping. Set to `false` for a non-modal dialog that leaves the rest of the page interactive. |
 
 ### Methods
