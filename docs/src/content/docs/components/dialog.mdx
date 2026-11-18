@@ -304,7 +304,7 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `backdrop` | boolean, `'static'` | `true` | Shows the native `::backdrop` behind the dialog. Alternatively, specify `static` for a backdrop which doesn't close the dialog when clicked, or `false` to visually suppress it. |
+| `backdrop` | boolean, `'static'` | `true` | Shows the native `::backdrop` behind the dialog. Alternatively, specify `static` for a backdrop which doesn't close the dialog when clicked, or `false` to visually suppress it. A click counts only when the press started and ended on the backdrop, so selecting text in the dialog and releasing the button over the backdrop does nothing. A click without a pointer press, such as one from assistive technology, still counts. |
 | `keyboard` | boolean | `true` | Closes the dialog when escape key is pressed. With `false`, the browser limits how many times the page can refuse Escape without a click or key press in between, so a repeated Escape still closes a dialog opened as a modal. |
 | `modal` | boolean | `true` | Opens the dialog in the browser's top layer with a backdrop and focus trapping. Set to `false` for a non-modal dialog that leaves the rest of the page interactive. |
 
