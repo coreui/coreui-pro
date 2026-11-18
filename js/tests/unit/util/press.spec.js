@@ -1,5 +1,5 @@
 import {
-  forgetPress, lastPressedElement, pressPathOf, trackPress
+  forgetPress, isPressOn, lastPressedElement, pressPathOf, trackPress
 } from '../../../src/util/press.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -168,6 +168,61 @@ describe('Press utilities', () => {
       expect(listeners).toBeGreaterThan(0)
       expect(spy.calls.count()).toEqual(listeners)
       expect(pressPathOf(event)).toContain(doc.querySelector('#panel'))
+    })
+  })
+
+  describe('isPressOn', () => {
+    const release = element => {
+      element.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, composed: true, button: 0 }))
+    }
+
+    it('should tell a press that started and ended on the element from a drag across it', () => {
+      fixtureEl.innerHTML = '<div id="outer"><input aria-label="Field"></div>'
+      const outer = fixtureEl.querySelector('#outer')
+      const field = fixtureEl.querySelector('input')
+
+      press(outer)
+      release(outer)
+      expect(isPressOn(click(outer), outer)).toBeTrue()
+
+      press(field)
+      release(outer)
+      expect(isPressOn(click(outer), outer)).toBeFalse()
+
+      press(outer)
+      release(field)
+      expect(isPressOn(click(outer), outer)).toBeFalse()
+    })
+
+    it('should not reuse the release of an earlier press', () => {
+      fixtureEl.innerHTML = '<div id="outer"><input aria-label="Field"></div>'
+      const outer = fixtureEl.querySelector('#outer')
+
+      press(outer)
+      release(outer)
+      click(outer)
+      press(outer)
+
+      expect(isPressOn(click(outer), outer)).toBeFalse()
+    })
+
+    it('should count a press it cannot follow into a closed shadow root', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const root = fixtureEl.querySelector('#host').attachShadow({ mode: 'closed' })
+      root.innerHTML = '<div id="inner"><input aria-label="Field"></div>'
+      const inner = root.querySelector('#inner')
+
+      press(inner)
+      release(inner)
+
+      expect(isPressOn(click(inner), inner)).toBeTrue()
+    })
+
+    it('should count a click with no press of its own', () => {
+      fixtureEl.innerHTML = '<div id="outer"></div>'
+      const outer = fixtureEl.querySelector('#outer')
+
+      expect(isPressOn(click(outer), outer)).toBeTrue()
     })
   })
 

@@ -460,6 +460,73 @@ describe('Modal', () => {
       })
     })
 
+    it('should close on the backdrop only when the press started and ended on it', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal modal-instant"><input aria-label="Field"></dialog><dialog class="modal modal-instant" id="static" data-coreui-backdrop="static"><input aria-label="Field"></dialog>'
+      const [modalEl, staticEl] = fixtureEl.querySelectorAll('dialog')
+      const drag = (from, to, target) => {
+        from.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+        to.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, composed: true, button: 0 }))
+        target.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      }
+
+      const modal = new Modal(modalEl)
+      await modal.show()
+      drag(modalEl.querySelector('input'), modalEl, modalEl)
+      drag(modalEl, modalEl.querySelector('input'), modalEl)
+
+      expect(modalEl.open).toBeTrue()
+
+      drag(modalEl, modalEl, modalEl)
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(modalEl.open).toBeFalse()
+
+      const staticModal = new Modal(staticEl)
+      const prevented = []
+      staticEl.addEventListener('hidePrevented.coreui.modal', () => prevented.push('prevented'))
+      await staticModal.show()
+      drag(staticEl.querySelector('input'), staticEl, staticEl)
+
+      expect(prevented).toEqual([])
+
+      drag(staticEl, staticEl, staticEl)
+
+      expect(prevented).toEqual(['prevented'])
+    })
+
+    for (const mode of ['open', 'closed']) {
+      it(`should close on the backdrop of a modal inside a ${mode} shadow root`, async () => {
+        const drag = (from, to, target) => {
+          from.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+          to.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, composed: true, button: 0 }))
+          target.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+        }
+
+        fixtureEl.innerHTML = '<div id="host"></div>'
+        const root = fixtureEl.querySelector('#host').attachShadow({ mode })
+        root.innerHTML = '<dialog class="modal modal-instant"><input aria-label="Field"></dialog>'
+        const modalEl = root.querySelector('dialog')
+        const modal = new Modal(modalEl)
+        await modal.show()
+
+        if (mode === 'open') {
+          drag(modalEl.querySelector('input'), modalEl, modalEl)
+
+          expect(modalEl.open).toBeTrue()
+        }
+
+        drag(modalEl, modalEl, modalEl)
+        await new Promise(resolve => {
+          setTimeout(resolve)
+        })
+
+        expect(modalEl.open).toBeFalse()
+        modal.dispose()
+      })
+    }
+
     it('should close dialog when backdrop is clicked', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
