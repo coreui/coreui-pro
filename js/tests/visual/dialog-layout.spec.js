@@ -3,7 +3,7 @@
  * page with the stylesheet lays the dialog out and runs its transitions.
  */
 
-import { page } from 'vitest/browser'
+import { page, userEvent } from 'vitest/browser'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
 import Dialog from '../../src/dialog.js'
@@ -251,5 +251,27 @@ describe('dialog layout', () => {
     } finally {
       await page.viewport(innerWidth, innerHeight)
     }
+  })
+
+  it('should refuse the first Escape on a modal with keyboard false and let a repeated one close it', async () => {
+    const element = mount('<dialog class="modal modal-instant" data-coreui-backdrop="static" data-coreui-keyboard="false"><div class="modal-body"><button type="button">Inside</button></div></dialog>')
+    const trigger = document.createElement('button')
+    trigger.type = 'button'
+    trigger.textContent = 'Open'
+    container.prepend(trigger)
+    instance = new Modal(element)
+    trigger.addEventListener('click', () => instance.show(trigger))
+
+    await userEvent.click(trigger)
+    await userEvent.keyboard('{Escape}')
+    await nextFrames()
+
+    expect(element.open).toBeTrue()
+
+    await userEvent.keyboard('{Escape}')
+    await userEvent.keyboard('{Escape}')
+    await nextFrames()
+
+    expect(element.open).toBeFalse()
   })
 })

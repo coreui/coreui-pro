@@ -17,7 +17,7 @@ Key features of the native dialog:
 - **Modal or non-modal** via `showModal()` / `show()` — `modal: true` (default) promotes the dialog to the browser's top layer with a backdrop and focus trapping; `modal: false` renders it non-modally, leaving the page interactive.
 - **Built-in backdrop** using the `::backdrop` pseudo-element, with a blur effect; set `backdrop: "static"` to lock clicks outside, or `backdrop: false` to visually suppress it.
 - **Page scroll lock** — a modal dialog stops the page from scrolling. The root element gets `overflow: hidden` and the `dialog-open` class, and the space of the scrollbar that disappears goes to padding on the root and to a margin on full-width `.fixed-top`, `.fixed-bottom` and `.is-fixed` elements, so the page does not shift. The lock comes from the script, not the stylesheet, so it works with the per-component stylesheets too.
-- **Escape key handling** closes the dialog by default; set `keyboard: false` to disable. A dialog that leaves the page interactive does not close on an <kbd>Escape</kbd> that ends an input method composition, repeats while the key is held, or that the page already handled.
+- **Escape key handling** closes the dialog by default; set `keyboard: false` to ignore it, although the browser limits how many times the page can refuse Escape without a click or key press in between, so a repeated Escape still closes a dialog opened as a modal. A dialog that leaves the page interactive does not close on an <kbd>Escape</kbd> that ends an input method composition, repeats while the key is held, or that the page already handled.
 - **Panels inside it** — Menus, pickers and combobox panels open in the dialog close when it hides, and opening the dialog as a modal closes the ones open on the page. A click in such a panel or <kbd>Esc</kbd> pressed in it never closes the dialog.
 - **Accessibility** — focus is trapped inside modal dialogs and returned to the trigger on close, also when one dialog was opened in place of another, with native `<dialog>` ARIA semantics: no `role`, `aria-modal`, `aria-hidden`, or `tabindex` attributes in the markup.
 - **Animated open and close** — the exit transition (including the `::backdrop` fade) plays in every browser, because the plugin keeps the dialog in the top layer until the transition ends.
@@ -99,13 +99,13 @@ To disable animation entirely, add `.dialog-instant`.
 
 When backdrop is set to `static`, the dialog will not close when clicking outside of it — it plays a scale "bounce" instead.
 
-<dialog class="dialog" id="exampleDialogStatic" data-coreui-backdrop="static" data-coreui-keyboard="false" aria-labelledby="exampleDialogStaticLabel">
+<dialog class="dialog" id="exampleDialogStatic" data-coreui-backdrop="static" aria-labelledby="exampleDialogStaticLabel">
   <div class="dialog-header">
     <h5 class="dialog-title" id="exampleDialogStaticLabel">Dialog title</h5>
     <button type="button" class="btn-close" data-coreui-dismiss="dialog" aria-label="Close"></button>
   </div>
   <div class="dialog-body">
-    <p>I will not close if you click outside of me. Don't even try to press escape key.</p>
+    <p>I will not close if you click outside of me. Use the close button or press Escape.</p>
   </div>
   <div class="dialog-footer">
     <button type="button" class="btn-solid theme-secondary" data-coreui-dismiss="dialog">Close</button>
@@ -305,7 +305,7 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `backdrop` | boolean, `'static'` | `true` | Shows the native `::backdrop` behind the dialog. Alternatively, specify `static` for a backdrop which doesn't close the dialog when clicked, or `false` to visually suppress it. |
-| `keyboard` | boolean | `true` | Closes the dialog when escape key is pressed. |
+| `keyboard` | boolean | `true` | Closes the dialog when escape key is pressed. With `false`, the browser limits how many times the page can refuse Escape without a click or key press in between, so a repeated Escape still closes a dialog opened as a modal. |
 | `modal` | boolean | `true` | Opens the dialog in the browser's top layer with a backdrop and focus trapping. Set to `false` for a non-modal dialog that leaves the rest of the page interactive. |
 
 ### Methods

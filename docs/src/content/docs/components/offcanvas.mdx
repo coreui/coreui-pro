@@ -286,8 +286,8 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `backdrop` | boolean or the string `static` | `true` | Shows the native `::backdrop` while the Bootstrap offcanvas is open. Alternatively, specify `static` for a backdrop that doesn't close the offcanvas component when clicked, or `false` to visually suppress it. |
-| `keyboard` | boolean | `true` | Closes the offcanvas when the escape key is pressed. |
-| `scroll` | boolean | `false` | Allows body scrolling while the offcanvas is open — the offcanvas then opens non-modally, keeping the rest of the page interactive.
+| `keyboard` | boolean | `true` | Closes the offcanvas when the escape key is pressed. With `false`, the browser limits how many times the page can refuse Escape without a click or key press in between, so a repeated Escape still closes a offcanvas opened as a modal. |
+| `scroll` | boolean | `false` | Allows body scrolling while the offcanvas is open; with `backdrop: false` the offcanvas then opens non-modally, keeping the rest of the page interactive.
 
 ### Methods
 
