@@ -421,7 +421,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `linear` | boolean | `true` | Enforce sequential input (users must fill fields in order) |
 | `masked` | boolean | `false` | Show input as password (masked characters) |
 | `name` | string, null | `null` | Name of the value input the code is submitted under. Without it the code is not submitted with the form. |
-| `placeholder` | string, null | `null` | Placeholder text for input fields. Single character applies to all fields, longer strings apply character-by-character |
+| `placeholder` | number, string, null | `null` | Placeholder text for input fields. Single character applies to all fields, longer strings apply character-by-character |
 | `required` | boolean | `false` | Makes the code required: an empty or incomplete code blocks the submit. |
 | `type` | string | `'number'` | Input validation type: 'number' for digits only, or any other string for free text |
 | `validationState` | string, null | `null` | The state the code shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` does not block the submit. It stays until you change it. See [Validation](#validation). |
