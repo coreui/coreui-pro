@@ -1,3 +1,4 @@
+@use "sass:list";
 @use "sass:map";
 @use "functions/defaults" as *;
 @use "layout/breakpoints" as *;
@@ -50,7 +51,40 @@ $drawer-tokens: defaults(
 // scss-docs-end drawer-tokens
 
 // stylelint-enable scss/dollar-variable-default
+
+@mixin drawer-offscreen {
+  &:where(.drawer-start) {
+    @include ltr-rtl-value-only(
+      "transform",
+      translateX(calc(-100% - var(--#{$prefix}drawer-inset))),
+      translateX(calc(100% + var(--#{$prefix}drawer-inset)))
+    );
+  }
+
+  &:where(.drawer-end) {
+    @include ltr-rtl-value-only(
+      "transform",
+      translateX(calc(100% + var(--#{$prefix}drawer-inset))),
+      translateX(calc(-100% - var(--#{$prefix}drawer-inset)))
+    );
+  }
+
+  &:where(.drawer-top) {
+    transform: translateY(calc(-100% - var(--#{$prefix}drawer-inset)));
+  }
+
+  &:where(.drawer-bottom, .drawer-fullscreen) {
+    transform: translateY(calc(100% + var(--#{$prefix}drawer-inset)));
+  }
+}
+
 @layer components {
+  $drawers: ();
+
+  @each $breakpoint in map.keys($breakpoints) {
+    $drawers: list.append($drawers, ".drawer#{breakpoint-infix($breakpoint, $breakpoints)}", comma);
+  }
+
   %drawer-css-vars {
     @include tokens($drawer-tokens);
   }
@@ -73,7 +107,7 @@ $drawer-tokens: defaults(
         position: fixed;
         inset: auto;
         z-index: var(--#{$prefix}drawer-zindex);
-        display: flex;
+        display: none;
         flex-direction: column;
         width: auto;
         max-width: calc(100% - var(--#{$prefix}drawer-inset) * 2);
@@ -83,7 +117,6 @@ $drawer-tokens: defaults(
         margin: 0;
         overflow: hidden;
         color: var(--#{$prefix}drawer-color);
-        visibility: hidden;
         background-color: var(--#{$prefix}drawer-bg);
         background-clip: padding-box;
         border: var(--#{$prefix}drawer-border-width) solid var(--#{$prefix}drawer-border-color);
@@ -122,44 +155,15 @@ $drawer-tokens: defaults(
         }
 
         &:not(.drawer-instant) {
-          // One transition covers both directions — see the note in _dialog.scss
-          // on `visibility` in the property list.
           @include transition-props(
             var(--#{$prefix}drawer-transition-property),
             var(--#{$prefix}drawer-transition-duration),
             var(--#{$prefix}drawer-transition-timing)
           );
 
-          &:where(.drawer-start) {
-            @include ltr-rtl-value-only(
-              "transform",
-              translateX(calc(-100% - var(--#{$prefix}drawer-inset))),
-              translateX(calc(100% + var(--#{$prefix}drawer-inset)))
-            );
-          }
-
-          &:where(.drawer-end) {
-            @include ltr-rtl-value-only(
-              "transform",
-              translateX(calc(100% + var(--#{$prefix}drawer-inset))),
-              translateX(calc(-100% - var(--#{$prefix}drawer-inset)))
-            );
-          }
-
-          &:where(.drawer-top) {
-            transform: translateY(calc(-100% - var(--#{$prefix}drawer-inset)));
-          }
-
-          &:where(.drawer-bottom) {
-            transform: translateY(calc(100% + var(--#{$prefix}drawer-inset)));
-          }
-
-          &:where(.drawer-fullscreen) {
-            transform: translateY(calc(100% + var(--#{$prefix}drawer-inset)));
-          }
+          @include drawer-offscreen();
 
           &[open]:not(.hiding) {
-            visibility: visible;
             transform: none;
           }
 
@@ -186,7 +190,6 @@ $drawer-tokens: defaults(
 
         // Open state base (always applies, regardless of animation mode)
         &[open]:not(.hiding) {
-          visibility: visible;
           transform: none;
         }
 
@@ -211,7 +214,6 @@ $drawer-tokens: defaults(
           max-height: none;
           padding: 0;
           margin: 0;
-          visibility: visible !important;
           background-color: transparent !important;
           border: 0 !important;
           transform: none !important;
@@ -238,12 +240,17 @@ $drawer-tokens: defaults(
     }
   }
 
-  @starting-style {
-    @each $breakpoint in map.keys($breakpoints) {
-      $next: breakpoint-next($breakpoint, $breakpoints);
-      $infix: breakpoint-infix($next, $breakpoints);
+  :is(#{$drawers})[open] {
+    display: flex;
+  }
 
-      .drawer#{$infix}:not(.drawer-instant)::backdrop {
+  @starting-style {
+    :is(#{$drawers}) {
+      &:not(.drawer-instant)[open]:not(.hiding) {
+        @include drawer-offscreen();
+      }
+
+      &:not(.drawer-instant)::backdrop {
         background-color: transparent;
         backdrop-filter: blur(0);
       }

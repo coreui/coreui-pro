@@ -61,7 +61,7 @@ describe('a component reads the direction of its context', () => {
 describe('mirrored values follow the direction of the element they style', () => {
   it.each(shapes)('hides a closed panel beyond the edge it is pinned to in %s', (_name, shape) => {
     for (const className of ['offcanvas offcanvas-start', 'offcanvas offcanvas-end', 'drawer drawer-start', 'drawer drawer-end']) {
-      const panel = mount(`<div class="${className}" data-probe></div>`, shape)
+      const panel = mount(`<div class="${className}" data-probe${className.startsWith('drawer') ? ' style="display: flex"' : ''}></div>`, shape)
       const { left, right } = panel.getBoundingClientRect()
       const startIsLeft = getComputedStyle(panel).direction === 'ltr'
       const hidesLeft = className.endsWith('start') === startIsLeft
