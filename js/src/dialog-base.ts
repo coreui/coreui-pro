@@ -238,6 +238,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
     if (modal) {
       this._element.showModal()
+      holdAnnouncements()
     } else {
       this._element.show()
     }

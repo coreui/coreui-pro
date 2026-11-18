@@ -163,11 +163,12 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
 }
 
 /**
- * Holds every waiting message, for the page and for any modal dialog. The dialog components of every
- * edition call it right after they close their dialog, before their `hidden` event: focus moves to
- * the host that takes over, or to a dialog opened in place of the closed one, and screen readers
- * drop a message added while they read it. LoadingButton holds for 100 ms when it starts loading,
- * so the messages of that click go out with its own. A hold never shortens one already running.
+ * Holds every message for `delay` ms, those waiting and those sent meanwhile, for the page and for any
+ * modal dialog. The dialog components of every edition call it right after they open a modal
+ * dialog and right after they close their dialog, before their `hidden` event: screen readers read
+ * the new dialog, or the page coming back, at that moment and drop a message added then.
+ * LoadingButton holds for 100 ms when it starts loading, so the messages of that click go out with
+ * its own. A hold never shortens one already running.
  *
  * @param delay - How long (ms) to hold, 500 by default
  */
@@ -176,7 +177,7 @@ export const holdAnnouncements = (delay: number = CLOSE_DELAY): void => {
     return
   }
 
-  heldUntil = [Math.max(readTime(heldUntil), performance.now() + delay), performance.now]
+  heldUntil = getMoment(Math.max(delay, readTime(heldUntil) - performance.now()))
 
   if (pending.length > 0) {
     setTimeout(flush, delay)
@@ -188,9 +189,10 @@ export const holdAnnouncements = (delay: number = CLOSE_DELAY): void => {
  * those with priority `'high'` first and the rest in the order they came in. When one of them is
  * `'high'`, all the messages for that page or dialog go to its assertive region, since VoiceOver in
  * Safari read only one of two regions changed together. The queue holds while that dialog, or the
- * dialog holding focus, plays its closing transition, for 500 ms after a dialog component closes its dialog, for 100 ms after a
- * LoadingButton starts loading, and while a region is younger than 100 ms. A message that waited for page regions removed since is dropped with them, and the
- * whole queue once there is no document, as when a test environment tears down.
+ * dialog holding focus, plays its closing transition, for 500 ms after a dialog component opens
+ * a modal dialog or closes its dialog, for 100 ms after a LoadingButton starts loading, and while
+ * a region is younger than 100 ms. A message that waited for page regions removed since is dropped
+ * with them, and the whole queue once there is no document, as when a test environment tears down.
  */
 const flush = (): void => {
   if (typeof document === 'undefined') {
@@ -244,7 +246,8 @@ const flush = (): void => {
  * the start of the page or, while a modal dialog leaves the rest of the page inert, to one inside
  * that dialog, native or marked with `aria-modal="true"`. The region is picked when the message is
  * added: one task after the call, once a new region is 100 ms old, 500 ms after a dialog
- * component has closed its dialog, and 100 ms after a LoadingButton has started loading. Messages are added in the order of the calls, those with
+ * component has opened a modal dialog or closed its dialog, and 100 ms after a LoadingButton has
+ * started loading. Messages are added in the order of the calls, those with
  * priority `'high'` first among the ones the queue adds together, which then all go to the
  * assertive region, and each call adds a new one, so the same text is read again.
  *
