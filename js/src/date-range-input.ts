@@ -10,6 +10,7 @@ import DateInput, { type DateInputConfig } from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { type DisabledDate, isSameInstantAs } from './util/calendar.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { getForwardedOptions } from './util/composite.js'
 import { getDateLimitMessage, hasShortcutModifier, type SectionFormat } from './util/date-sections.js'
 import FieldValidation from './util/field-validation.js'
@@ -592,7 +593,7 @@ class DateRangeInput extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_DATE_RANGE_INPUT)) {
     DateRangeInput.getOrCreateInstance(element)
   }

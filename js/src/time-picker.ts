@@ -11,6 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import TimeInput, { type TimeInputConfig } from './time-input.js'
 import type { TimeSelectionConfig } from './time-selection/base.js'
 import TimeRoll from './time-selection/roll.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { createDate, isSameInstantAs } from './util/calendar.js'
 import {
@@ -284,7 +285,7 @@ class TimePicker extends PickerBase {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_TIME_PICKER)) {
     TimePicker.getOrCreateInstance(element)
   }

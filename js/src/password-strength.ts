@@ -11,6 +11,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onDocumentReady } from './util/component-functions.js'
 import {
   defineJQueryPlugin, jQueryDispatch
 } from './util/index.js'
@@ -291,7 +292,7 @@ class PasswordStrength extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
+onDocumentReady(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   PasswordStrength._initializeDataApi()
 })
 

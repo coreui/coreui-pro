@@ -6,8 +6,8 @@
  */
 
 import DateInput, { type DateInputConfig } from './date-input.js'
-import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
@@ -68,7 +68,7 @@ class TimeInput extends DateInput<TimeInputConfig> {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   for (const timeInput of SelectorEngine.find(SELECTOR_DATA_TIME_INPUT)) {
     TimeInput.getOrCreateInstance(timeInput)
   }

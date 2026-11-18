@@ -11,6 +11,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { defineJQueryPlugin, jQueryDispatch, setAriaAttribute } from './util/index.js'
 
 /**
@@ -56,7 +57,7 @@ class Button extends BaseComponent {
 // A toggle button must always expose `aria-pressed`. Without it, assistive technology
 // reads the control as a plain button and never announces the pressed state.
 // See https://www.w3.org/WAI/ARIA/apg/patterns/button/
-EventHandler.on(document, EVENT_DOM_CONTENT_LOADED, () => {
+onDocumentReady(document, EVENT_DOM_CONTENT_LOADED, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
     if (!element.hasAttribute('aria-pressed')) {
       setAriaAttribute(element, 'aria-pressed', element.classList.contains(CLASS_NAME_ACTIVE))

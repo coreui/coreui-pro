@@ -14,6 +14,7 @@ import { announce } from './util/announce.js'
 import {
   type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement, resolveChipClassName
 } from './util/chip-values.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { containsFocus, focusWithTemporaryTabindex, rootActiveElement } from './util/focus.js'
 import { REMOVE_ICON } from './util/icons.js'
 import {
@@ -666,7 +667,7 @@ class ChipSet extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
+onDocumentReady(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP_SET)) {
     ChipSet.getOrCreateInstance(element)
   }

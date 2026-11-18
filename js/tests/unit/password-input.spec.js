@@ -253,6 +253,20 @@ describe('PasswordInput', () => {
   })
 
   describe('data-api', () => {
+    it('should wait for DOMContentLoaded in a module script, so the page can set the defaults first', async () => {
+      fixtureEl.innerHTML = '<input type="password" class="form-control" data-coreui-password-input>'
+      spyOnProperty(document, 'readyState').and.returnValue('interactive')
+      spyOn(performance, 'getEntriesByType').and.returnValue([{ domContentLoadedEventStart: 0 }])
+
+      await import('../../src/password-input.js?deferred')
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(PasswordInput.getInstance(fixtureEl.querySelector('.form-control'))).toBeNull()
+      expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
+    })
+
     const initialized = markup => {
       fixtureEl.innerHTML = markup
       PasswordInput._initializeDataApi()

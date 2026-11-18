@@ -123,6 +123,8 @@ Our dropdowns, popovers and tooltips also depend on [Floating UI](https://floati
 
 Nearly all CoreUI for Bootstrap plugins can be enabled and configured through HTML alone with data attributes (our preferred way of using JavaScript functionality). An element takes **one `data-coreui-toggle`**, so a second plugin on the same element (e.g., a tooltip on a button that opens a modal) is created in JavaScript, see [getting an instance](#programmatic-api).
 
+Plugins that start elements from their data attributes when the page is ready do so on `DOMContentLoaded` or on the window's `load` event. A module or deferred script runs before `DOMContentLoaded`, so code right after the import can still change `Default` or create instances with its own options. When CoreUI for Bootstrap loads after that event, through an `import()` once the page is shown or in a playground that runs its script last, the plugins start those elements on the next task, after the code that imported them.
+
 ## Selectors
 
 Currently to query DOM elements we use the native methods `querySelector` and `querySelectorAll` for performance reasons, so you have to use [valid selectors](https://www.w3.org/TR/CSS21/syndata.html#value-def-identifier).

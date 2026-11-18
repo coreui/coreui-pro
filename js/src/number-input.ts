@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { rootActiveElement } from './util/focus.js'
 import {
   createControlGroupAction, ensureControlGroup, releaseControlGroup, type ControlGroup
@@ -358,7 +359,7 @@ class NumberInput extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
+onDocumentReady(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   NumberInput._initializeDataApi()
 })
 

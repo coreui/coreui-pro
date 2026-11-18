@@ -14,6 +14,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
 import { hasShortcutModifier } from './util/calendar.js'
 import { type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement } from './util/chip-values.js'
+import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus, rootActiveElement } from './util/focus.js'
 import FocusTrap from './util/focustrap.js'
@@ -1788,7 +1789,7 @@ class MultiSelect extends ComboboxBase {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   for (const multiSelect of SelectorEngine.find(SELECTOR_DATA_MULTI_SELECT)) {
     MultiSelect.getOrCreateInstance(multiSelect)
   }

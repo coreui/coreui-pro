@@ -378,14 +378,20 @@ The package must come from npm and go through a bundler (Vite, Webpack, Parcel, 
    export default Peek
    ```
 
-2. For a plugin that must exist before any click, initialize on load the way the CoreUI form plugins do:
+2. For a plugin that must exist before any click, initialize on load the way the CoreUI form plugins do. The window's `load` has already fired when the plugin loads later (an `import()` once the page is shown), so start on the next task then, after the code that imported it:
 
    ```js
-   EventHandler.on(window, `load${EVENT_KEY}${DATA_API_KEY}`, () => {
+   const start = () => {
      for (const element of SelectorEngine.find('[data-coreui-peek]')) {
        Peek.getOrCreateInstance(element)
      }
-   })
+   }
+
+   EventHandler.on(window, `load${EVENT_KEY}${DATA_API_KEY}`, start)
+
+   if (document.readyState === 'complete') {
+     setTimeout(start)
+   }
    ```
 
 3. Write the markup. Options go in `data-coreui-*` attributes on the element the plugin binds to:

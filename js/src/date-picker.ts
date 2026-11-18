@@ -20,6 +20,7 @@ import {
   isSameInstantAs,
   type SelectionTypes
 } from './util/calendar.js'
+import { onDocumentReady } from './util/component-functions.js'
 import {
   constrainDateTime, convertValue, getHourCycle, getPickerFormat
 } from './util/date-sections.js'
@@ -431,7 +432,7 @@ class DatePicker extends PickerBase {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_DATE_PICKER)) {
     DatePicker.getOrCreateInstance(element)
   }

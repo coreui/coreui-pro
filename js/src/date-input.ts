@@ -11,6 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import {
   type DisabledDate, getLocalDateFromString, isSameInstantAs
 } from './util/calendar.js'
+import { onDocumentReady } from './util/component-functions.js'
 import {
   applyDigitToSection,
   applyLetterToSection,
@@ -978,7 +979,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   for (const dateInput of SelectorEngine.find(SELECTOR_DATA_DATE_INPUT)) {
     DateInput.getOrCreateInstance(dateInput)
   }

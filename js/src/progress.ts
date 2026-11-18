@@ -6,8 +6,8 @@
  */
 
 import BaseComponent from './base-component.js'
-import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onDocumentReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
@@ -175,7 +175,7 @@ class Progress extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, EVENT_DOM_CONTENT_LOADED, () => {
+onDocumentReady(document, EVENT_DOM_CONTENT_LOADED, () => {
   for (const element of SelectorEngine.find(SELECTOR_PROGRESS)) {
     Progress.getOrCreateInstance(element)
   }

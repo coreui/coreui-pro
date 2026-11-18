@@ -6,6 +6,7 @@
  */
 
 import BaseComponent from './base-component.js'
+import { onDocumentReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
@@ -317,7 +318,7 @@ class Sidebar extends BaseComponent {
  * ------------------------------------------------------------------------
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   for (const element of Array.from(document.querySelectorAll(SELECTOR_SIDEBAR))) {
     Sidebar.getOrCreateInstance(element)
   }

@@ -10,6 +10,7 @@ import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { getNewChipPieces, removeChipText, splitChipText } from './util/chip-values.js'
+import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
@@ -567,7 +568,7 @@ class ChipInput extends ChipSet {
  * Data API implementation
  */
 
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
+onDocumentReady(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP_INPUT)) {
     ChipInput.getOrCreateInstance(element)
   }

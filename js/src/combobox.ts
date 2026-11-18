@@ -10,6 +10,7 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import ListBox, { type ListBoxEntry } from './list-box.js'
+import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
 import {
   alignValueField, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
@@ -689,7 +690,7 @@ class Combobox extends ComboboxBase {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   for (const toggle of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
     Combobox.getOrCreateInstance(toggle)
   }

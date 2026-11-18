@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { rootActiveElement } from './util/focus.js'
 import {
   clearValidationState, isFormValid, updateValidationState, validateForm
@@ -731,7 +732,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_STEPPER_ACTION, functio
   }
 })
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_STEPPER)) {
     Stepper.getOrCreateInstance(element)
   }
