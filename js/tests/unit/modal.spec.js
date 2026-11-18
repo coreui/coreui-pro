@@ -374,6 +374,33 @@ describe('Modal', () => {
       })
     })
 
+    it('should hold messages for half a second after it opens its dialog, and not when it is not modal', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal modal-instant" id="modal"><button type="button">Close</button></dialog><dialog class="modal modal-instant" id="panel"><button type="button">Close</button></dialog>'
+      const [modalEl, panelEl] = ['#modal', '#panel'].map(selector => fixtureEl.querySelector(selector))
+      const messagesIn = host => [...(host.querySelector(':scope > [data-coreui-live-announcer] > [aria-live="polite"]')?.children ?? [])].map(message => message.textContent)
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      try {
+        announce('Opened')
+        await new Modal(modalEl).show()
+        vi.advanceTimersByTime(499)
+        expect(messagesIn(modalEl)).toEqual([])
+
+        vi.advanceTimersByTime(1)
+        expect(messagesIn(modalEl)).toEqual(['Opened'])
+
+        await Modal.getInstance(modalEl).hide()
+        vi.advanceTimersByTime(500)
+        announce('Panel')
+        await new Modal(panelEl, { modal: false }).show()
+        vi.advanceTimersByTime(0)
+        expect(messagesIn(document.body)).toContain('Panel')
+      } finally {
+        vi.useRealTimers()
+        document.body.querySelector(':scope > [data-coreui-live-announcer]')?.remove()
+      }
+    })
+
     it('should hold page announcements from the moment it closes its dialog', async () => {
       fixtureEl.innerHTML = '<dialog class="modal modal-instant"><div class="modal-dialog"><div class="modal-content"></div></div></dialog>'
       const dialog = new Modal(fixtureEl.querySelector('.modal'))
@@ -384,6 +411,7 @@ describe('Modal', () => {
         announce('Before')
         vi.advanceTimersByTime(100)
         await dialog.show()
+        vi.advanceTimersByTime(300)
 
         dialog.hide()
         announce('After')
@@ -534,6 +562,45 @@ describe('Modal', () => {
   })
 
   describe('non-modal dialogs', () => {
+    it('should leave the focus in the page when a non-modal dialog closes without it', async () => {
+      fixtureEl.innerHTML = '<input id="field"><button type="button" id="open">Open</button><dialog class="modal modal-instant"><button type="button">Close</button></dialog>'
+      const [field, open] = ['#field', '#open'].map(selector => fixtureEl.querySelector(selector))
+      const modal = new Modal(fixtureEl.querySelector('dialog'), { modal: false })
+
+      await modal.show(open)
+      field.focus()
+      await modal.hide()
+
+      expect(document.activeElement).toBe(field)
+    })
+
+    it('should give the focus back when the press that closes a non-modal dialog did not focus its button', async () => {
+      fixtureEl.innerHTML = '<button type="button" id="open">Open</button><dialog class="modal modal-instant"><button type="button">Close</button></dialog>'
+      const open = fixtureEl.querySelector('#open')
+      const modalEl = fixtureEl.querySelector('dialog')
+      const modal = new Modal(modalEl, { modal: false })
+
+      await modal.show(open)
+      modalEl.querySelector('button').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      document.activeElement.blur()
+      await modal.hide()
+
+      expect(document.activeElement).toBe(open)
+    })
+
+    it('should leave the focus on the page when a non-modal dialog closes with the focus nowhere', async () => {
+      fixtureEl.innerHTML = '<button type="button" id="open">Open</button><dialog class="modal modal-instant"><button type="button">Close</button></dialog>'
+      const open = fixtureEl.querySelector('#open')
+      const modal = new Modal(fixtureEl.querySelector('dialog'), { modal: false })
+
+      await modal.show(open)
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
+      document.activeElement.blur()
+      await modal.hide()
+
+      expect(document.activeElement).toBe(document.body)
+    })
+
     it('should open a non-modal dialog with show() when modal = false', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
@@ -944,6 +1011,51 @@ describe('Modal', () => {
       })
     })
 
+    it('should hold page announcements from the moment it is disposed while open', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal modal-instant"><div class="modal-dialog"><div class="modal-content"></div></div></dialog>'
+      const dialog = new Modal(fixtureEl.querySelector('.modal'))
+      const messages = () => [...document.body.querySelector(':scope > [data-coreui-live-announcer] > [aria-live="polite"]').children].map(message => message.textContent)
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      try {
+        announce('Before')
+        vi.advanceTimersByTime(100)
+        await dialog.show()
+        vi.advanceTimersByTime(300)
+
+        dialog.dispose()
+        announce('After')
+        vi.advanceTimersByTime(499)
+        expect(messages()).toEqual(['Before'])
+
+        vi.advanceTimersByTime(1)
+        expect(messages()).toEqual(['Before', 'After'])
+      } finally {
+        vi.useRealTimers()
+        document.body.querySelector(':scope > [data-coreui-live-announcer]')?.remove()
+      }
+    })
+
+    it('should not hold page announcements when it is disposed closed', () => {
+      fixtureEl.innerHTML = '<dialog class="modal modal-instant"><div class="modal-dialog"><div class="modal-content"></div></div></dialog>'
+      const dialog = new Modal(fixtureEl.querySelector('.modal'))
+      const messages = () => [...document.body.querySelector(':scope > [data-coreui-live-announcer] > [aria-live="polite"]').children].map(message => message.textContent)
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      try {
+        announce('Before')
+        vi.advanceTimersByTime(100)
+
+        dialog.dispose()
+        announce('After')
+        vi.advanceTimersByTime(1)
+        expect(messages()).toEqual(['Before', 'After'])
+      } finally {
+        vi.useRealTimers()
+        document.body.querySelector(':scope > [data-coreui-live-announcer]')?.remove()
+      }
+    })
+
     it('should remove the native cancel listener on dispose', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<dialog class="modal" id="exampleDialog"></dialog>'
@@ -986,6 +1098,53 @@ describe('Modal', () => {
   })
 
   describe('data-api', () => {
+    it('should leave the focus the page moves in hidden where the page put it', async () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="open" data-coreui-toggle="modal" data-coreui-target="#m">Open</button>',
+        '<button type="button" id="other">Other</button>',
+        '<dialog id="m" class="modal modal-instant"><button type="button">Close</button></dialog>'
+      ].join('')
+      const [open, other, modalEl] = ['#open', '#other', '#m'].map(selector => fixtureEl.querySelector(selector))
+      modalEl.addEventListener('hidden.coreui.modal', () => other.focus())
+
+      open.focus()
+      open.click()
+      await Modal.getInstance(modalEl).hide()
+
+      expect(document.activeElement).toBe(other)
+    })
+
+    it('should give the focus back before hidden', async () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="open" data-coreui-toggle="modal" data-coreui-target="#m">Open</button>',
+        '<dialog id="m" class="modal modal-instant"><button type="button">Close</button></dialog>'
+      ].join('')
+      const [open, modalEl] = ['#open', '#m'].map(selector => fixtureEl.querySelector(selector))
+      let focusedOnHidden
+      modalEl.addEventListener('hidden.coreui.modal', () => {
+        focusedOnHidden = document.activeElement
+      })
+
+      open.focus()
+      open.click()
+      modalEl.querySelector('button').focus()
+      await Modal.getInstance(modalEl).hide()
+
+      expect(focusedOnHidden).toBe(open)
+    })
+
+    it('should give the focus back to the button the user pressed when the press did not focus it', async () => {
+      fixtureEl.innerHTML = '<button type="button" id="open">Open</button><dialog class="modal modal-instant"><button type="button">Close</button></dialog>'
+      const open = fixtureEl.querySelector('#open')
+      const modal = new Modal(fixtureEl.querySelector('dialog'))
+
+      open.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      await modal.show()
+      await modal.hide()
+
+      expect(document.activeElement).toBe(open)
+    })
+
     it('should toggle dialog', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
@@ -1161,6 +1320,37 @@ describe('Modal', () => {
 
         firstTrigger.click()
       })
+    })
+
+    const mountSwap = () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="open" data-coreui-toggle="modal" data-coreui-target="#dialog1">Open first</button>',
+        '<dialog id="dialog1" class="modal modal-instant"><button type="button" id="next" data-coreui-toggle="modal" data-coreui-target="#dialog2">Go to second</button></dialog>',
+        '<dialog id="dialog2" class="modal modal-instant"><button type="button">Close</button></dialog>'
+      ].join('')
+      return ['#open', '#dialog1', '#next', '#dialog2'].map(selector => fixtureEl.querySelector(selector))
+    }
+
+    it('should give the focus back to the page trigger when the modal swapped in closes', async () => {
+      const [open, , next, dialog2] = mountSwap()
+
+      open.focus()
+      open.click()
+      next.focus()
+      next.click()
+      await Modal.getInstance(dialog2).hide()
+
+      expect(document.activeElement).toBe(open)
+    })
+
+    it('should keep a modal-instant class the page gave the outgoing modal', () => {
+      const [open, dialog1, next] = mountSwap()
+
+      open.click()
+      next.click()
+
+      expect(dialog1.open).toBeFalse()
+      expect(dialog1.classList.contains('modal-instant')).toBeTrue()
     })
 
     describe('mid-swap and rejected swaps', () => {

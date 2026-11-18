@@ -13,7 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { enableDismissTrigger, onDocumentReady } from './util/component-functions.js'
 import {
-  defineJQueryPlugin, isDisabled, isVisible, jQueryDispatch
+  defineJQueryPlugin, isDisabled, jQueryDispatch
 } from './util/index.js'
 import { resolveDialogElement } from './util/legacy-markup.js'
 
@@ -27,7 +27,6 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
-const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_RESIZE = `resize${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
@@ -117,14 +116,6 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
   if (isDisabled(this)) {
     return
   }
-
-  EventHandler.one(target, EVENT_HIDDEN, () => {
-    // focus on trigger when it is closed; returning focus must not scroll the
-    // page back to the trigger
-    if (isVisible(this)) {
-      this.focus({ preventScroll: true })
-    }
-  })
 
   // avoid conflict when clicking a toggler of an offcanvas, while another is open
   const alreadyOpen = SelectorEngine.findOne(OPEN_SELECTOR)
