@@ -274,4 +274,22 @@ describe('dialog layout', () => {
 
     expect(element.open).toBeFalse()
   })
+
+  it('should close a .modal from where its opening got to', async () => {
+    const element = mount('<dialog class="modal" style="--cui-modal-transition-duration: 1s"><div class="modal-body">Body</div></dialog>')
+    instance = new Modal(element)
+    await nextFrames()
+
+    instance.show()
+    await wait(300)
+    const opening = Number(getComputedStyle(element).opacity)
+    instance.hide()
+    await nextFrames()
+    const closing = Number(getComputedStyle(element).opacity)
+
+    expect(opening).toBeGreaterThan(0.05)
+    expect(opening).toBeLessThan(0.95)
+    expect(closing).toBeLessThanOrEqual(opening + 0.05)
+    expect(closing).toBeGreaterThan(0.02)
+  })
 })

@@ -240,6 +240,146 @@ describe('Modal', () => {
   })
 
   describe('hide', () => {
+    describe('while it opens', () => {
+      const record = modalEl => {
+        const events = []
+        for (const name of ['show', 'shown', 'hide', 'hidden']) {
+          modalEl.addEventListener(`${name}.coreui.modal`, () => events.push(name))
+        }
+
+        return events
+      }
+
+      it('should close and settle both promises at hidden without shown', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal"><button type="button">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        const modal = new Modal(modalEl)
+        const events = record(modalEl)
+
+        const shown = modal.show().then(() => events.push('show() settled'))
+        const hidden = modal.hide().then(() => events.push('hide() settled'))
+        await Promise.all([shown, hidden])
+
+        expect(modalEl.open).toBeFalse()
+        expect(events).toEqual(['show', 'hide', 'hidden', 'hide() settled', 'show() settled'])
+      })
+
+      it('should close on Escape', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal"><button type="button">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        const modal = new Modal(modalEl)
+        const events = record(modalEl)
+
+        const shown = modal.show()
+        modalEl.dispatchEvent(new Event('cancel', { cancelable: true }))
+        await shown
+
+        expect(modalEl.open).toBeFalse()
+        expect(events).toEqual(['show', 'hide', 'hidden'])
+      })
+
+      it('should close on Escape when it is not modal', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal"><button type="button">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        const modal = new Modal(modalEl, { modal: false })
+        const events = record(modalEl)
+
+        const shown = modal.show()
+        modalEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+        await shown
+
+        expect(modalEl.open).toBeFalse()
+        expect(events).toEqual(['show', 'hide', 'hidden'])
+      })
+
+      it('should close on a click on the backdrop and on a dismiss button', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal"><button type="button" data-coreui-dismiss="modal">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        const modal = new Modal(modalEl)
+        const events = record(modalEl)
+
+        let shown = modal.show()
+        modalEl.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+        await shown
+
+        shown = modal.show()
+        modalEl.querySelector('button').click()
+        await shown
+
+        expect(modalEl.open).toBeFalse()
+        expect(events).toEqual(['show', 'hide', 'hidden', 'show', 'hide', 'hidden'])
+      })
+
+      it('should refuse a second hide while it closes', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal" style="transition: opacity .1s"><button type="button">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        const modal = new Modal(modalEl)
+        const events = record(modalEl)
+
+        await modal.show()
+        const first = modal.hide()
+        await modal.hide()
+        await first
+
+        expect(events).toEqual(['show', 'shown', 'hide', 'hidden'])
+      })
+
+      it('should keep opening when hide is prevented', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal"><button type="button">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        const modal = new Modal(modalEl)
+        const events = record(modalEl)
+        modalEl.addEventListener('hide.coreui.modal', event => event.preventDefault())
+
+        const shown = modal.show()
+        await modal.hide()
+        await shown
+
+        expect(modalEl.open).toBeTrue()
+        expect(events).toEqual(['show', 'hide', 'shown'])
+      })
+
+      it('should not report shown after a native close', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal" style="transition: opacity .2s"><button type="button">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        const modal = new Modal(modalEl)
+        const events = record(modalEl)
+
+        const shown = modal.show()
+        modalEl.close()
+        await shown
+        await new Promise(resolve => {
+          setTimeout(resolve, 300)
+        })
+
+        expect(events).toEqual(['show', 'hidden'])
+      })
+
+      it('should settle show() at once and without shown when it is disposed', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal" style="transition: opacity .2s"><button type="button">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        const modal = new Modal(modalEl)
+        const events = record(modalEl)
+        let settled = false
+
+        modal.show().then(() => {
+          settled = true
+        })
+        modal.dispose()
+        await new Promise(resolve => {
+          setTimeout(resolve)
+        })
+
+        expect(settled).toBeTrue()
+
+        await new Promise(resolve => {
+          setTimeout(resolve, 300)
+        })
+
+        expect(events).toEqual(['show'])
+      })
+    })
+
     it('should hide a dialog', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
@@ -1415,6 +1555,18 @@ describe('Modal', () => {
 
         expect([first.open, second.open]).toEqual([true, false])
         await firstShown
+      })
+
+      it('should drop the swap-in class of a modal closed while it swaps in', async () => {
+        const [open, , second, toSecond] = mount()
+        open.click()
+        await once(fixtureEl.querySelector('#first'), 'shown.coreui.modal')
+        toSecond.click()
+        const hidden = once(second, 'hidden.coreui.modal')
+        await Modal.getInstance(second).hide()
+        await hidden
+
+        expect(second.classList.contains('modal-swap-in')).toBeFalse()
       })
 
       it('should not swap into a modal that is already open', async () => {

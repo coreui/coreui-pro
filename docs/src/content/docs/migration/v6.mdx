@@ -331,6 +331,15 @@ attributes for one job; the v4-era spelling was kept for compatibility and is
 now dropped. Use `data-coreui-navigation`, which v5 already documented as the
 one to write.
 
+#### Dialogs close while they open
+
+Modal, Offcanvas, Dialog and Drawer ignored <kbd>Escape</kbd>, a click on the backdrop, a dismiss
+button, `hide()`, `toggle()` and a second click on the trigger until their opening animation
+ended. They now close from wherever the animation got to: `hide.coreui.*` and `hidden.coreui.*`
+fire, `shown.coreui.*` does not, and the promise of the interrupted `show()` resolves at
+`hidden`. Code that waited for `shown.coreui.*` after every `show()` should also listen for
+`hidden.coreui.*`.
+
 #### Lifecycle methods return a promise
 
 `show()`, `hide()`, `toggle()` and `close()` returned before the transition

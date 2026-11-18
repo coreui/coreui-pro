@@ -75,6 +75,8 @@ describe('drawer in a navbar', () => {
 
     it(`should close the ${name} when its navbar expands during the opening transition`, async () => {
       const element = mount(Component, name)
+      const shown = []
+      element.addEventListener(`shown.coreui.${name}`, () => shown.push(name))
 
       const hidden = settle(element, `hidden.coreui.${name}`)
       instance.show()
@@ -82,6 +84,7 @@ describe('drawer in a navbar', () => {
       await hidden
 
       expect(element.open).toBeFalse()
+      expect(shown).toEqual([])
     })
   }
 })

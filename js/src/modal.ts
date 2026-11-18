@@ -154,7 +154,7 @@ class Modal extends DialogBase<ModalConfig> {
 
     // Check both cancelable events before changing either modal. This keeps
     // the current modal open when either side rejects the swap.
-    if (!newModal._canShow(trigger) || !currentInstance._canHide()) {
+    if (!newModal._canShow(trigger) || currentInstance._isTransitioning || !currentInstance._canHide()) {
       return
     }
 
@@ -167,9 +167,14 @@ class Modal extends DialogBase<ModalConfig> {
     //      frame the incoming one appears — the user sees one continuous
     //      backdrop instead of a double-darkened or half-faded flash.
     target.classList.add(CLASS_NAME_SWAP_IN)
-    EventHandler.one(target, EVENT_SHOWN, () => {
+    const settleSwapIn = (): void => {
       target.classList.remove(CLASS_NAME_SWAP_IN)
-    })
+      EventHandler.off(target, EVENT_SHOWN, settleSwapIn)
+      EventHandler.off(target, EVENT_HIDDEN, settleSwapIn)
+    }
+
+    EventHandler.on(target, EVENT_SHOWN, settleSwapIn)
+    EventHandler.on(target, EVENT_HIDDEN, settleSwapIn)
     newModal._show(trigger)
 
     if (!currentDialog.classList.contains(CLASS_NAME_INSTANT)) {
