@@ -10,6 +10,7 @@ import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { onLabelClick } from './util/field-label.js'
 import FieldValidation from './util/field-validation.js'
 import { focusWithTemporaryTabindex } from './util/focus.js'
@@ -418,7 +419,7 @@ class ChipFilter extends ChipSet {
  * Data API implementation
  */
 
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
+onDocumentReady(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP_FILTER)) {
     ChipFilter.getOrCreateInstance(element)
   }

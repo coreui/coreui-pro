@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
 import { type ValidationState } from './util/form-validation.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
@@ -622,7 +623,7 @@ class Rating extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   const ratings = SelectorEngine.find(SELECTOR_DATA_RATING)
   for (const rating of ratings) {
     Rating.getOrCreateInstance(rating)

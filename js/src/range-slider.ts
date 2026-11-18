@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import { type ValidationState } from './util/form-validation.js'
@@ -686,7 +687,7 @@ class RangeSlider extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_RANGE_SLIDER)) {
     RangeSlider.getOrCreateInstance(element)
   }

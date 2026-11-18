@@ -259,6 +259,17 @@ describe('Progress', () => {
   })
 
   describe('data-api', () => {
+    it('should initialize a segmented progress when CoreUI loads after the page', async () => {
+      fixtureEl.innerHTML = getProgressHtml()
+
+      await import('../../src/progress.js?late')
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(Progress.getInstance(fixtureEl.querySelector('.progress-segmented'))).not.toBeNull()
+    })
+
     it('should initialize every segmented progress on DOMContentLoaded', () => {
       fixtureEl.innerHTML = [
         getProgressHtml(),

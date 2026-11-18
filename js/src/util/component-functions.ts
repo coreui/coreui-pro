@@ -34,6 +34,33 @@ const enableDismissTrigger = (component: typeof BaseComponent, method = 'hide', 
   })
 }
 
+/**
+ * Start a data API on `eventName`, or on the next task when that event has already fired because
+ * the script loaded after it, as an `import()` once the page is shown does. Waiting a task lets the
+ * page's own code right after the import set `Default` or create its instances with options first.
+ * `DOMContentLoaded` counts as fired once the navigation timing says it started, so a module or
+ * deferred script, which runs before it, still waits for it like a classic script does. The listener
+ * keeps its data API namespace, so a page that turns the data API off before it fires stops it.
+ *
+ * @param target - `document` for a `DOMContentLoaded` event, `window` for a `load` event.
+ * @param eventName - The namespaced event the data API listens to.
+ * @param callback - The data API start.
+ * @returns Nothing.
+ */
+const onDocumentReady = (target: Document | Window, eventName: string, callback: () => void): void => {
+  EventHandler.on(target, eventName, callback)
+
+  const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
+  const fired = target === window ?
+    document.readyState === 'complete' :
+    (navigation ? navigation.domContentLoadedEventStart > 0 : document.readyState !== 'loading')
+
+  if (fired) {
+    setTimeout(callback)
+  }
+}
+
 export {
-  enableDismissTrigger
+  enableDismissTrigger,
+  onDocumentReady
 }

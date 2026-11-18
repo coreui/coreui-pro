@@ -10,6 +10,7 @@ import ListBox, { type ListBoxEntry, type ListBoxGroup, type ListBoxOption } fro
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { rootActiveElement } from './util/focus.js'
 import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
@@ -722,7 +723,7 @@ class Transfer extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
+onDocumentReady(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_TRANSFER)) {
     Transfer.getOrCreateInstance(element)
   }

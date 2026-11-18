@@ -1675,6 +1675,30 @@ describe('Rating', () => {
   })
 
   describe('data-api', () => {
+    it('should create rating elements when CoreUI loads after the page', async () => {
+      fixtureEl.innerHTML = '<div id="myRating" data-coreui-rating data-coreui-value="2" data-coreui-item-count="4"></div>'
+
+      await import('../../src/rating.js?late')
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(Rating.getInstance(fixtureEl.querySelector('#myRating'))).not.toBeNull()
+    })
+
+    it('should keep the options a page gives right after loading CoreUI late', async () => {
+      fixtureEl.innerHTML = '<div id="myRating" data-coreui-rating></div>'
+
+      const { default: LateRating } = await import('../../src/rating.js?options')
+      const rating = LateRating.getOrCreateInstance(fixtureEl.querySelector('#myRating'), { itemCount: 3 })
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(rating._config.itemCount).toEqual(3)
+      expect(LateRating.getInstance(fixtureEl.querySelector('#myRating'))).toBe(rating)
+    })
+
     it('should create rating elements on window load event', () => {
       fixtureEl.innerHTML = `
         <div id="myRating" data-coreui-rating data-coreui-value="2" data-coreui-item-count="4"></div>

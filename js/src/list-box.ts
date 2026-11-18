@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { isComposingKey } from './util/layers.js'
 import {
   createTypeaheadBuffer, endsEntryWait, type EntryRequest, findOpeningItem, isEntryWaiting, isShortcutPress, isTypingKey, keepsFocus, rangeBetween,
@@ -1552,7 +1553,7 @@ class ListBox extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
+onDocumentReady(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_LIST_BOX)) {
     ListBox.getOrCreateInstance(element)
   }

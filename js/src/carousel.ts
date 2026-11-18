@@ -12,6 +12,7 @@ import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onDocumentReady } from './util/component-functions.js'
 import { rootActiveElement } from './util/focus.js'
 import {
   defineJQueryPlugin, isRTL, isVisible, jQueryDispatch
@@ -954,7 +955,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_PLAY_PAUSE, function (e
   Carousel.getOrCreateInstance(target)._togglePlayPause()
 })
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
   const carousels = SelectorEngine.find(SELECTOR_DATA_AUTOPLAY)
 
   for (const carousel of carousels) {

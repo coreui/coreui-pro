@@ -1,5 +1,6 @@
 import BaseComponent from '../../../src/base-component.js'
-import { enableDismissTrigger } from '../../../src/util/component-functions.js'
+import EventHandler from '../../../src/dom/event-handler.js'
+import { enableDismissTrigger, onDocumentReady } from '../../../src/util/component-functions.js'
 import { clearFixture, createEvent, getFixture } from '../../helpers/fixture.js'
 
 class DummyClass2 extends BaseComponent {
@@ -101,6 +102,95 @@ describe('Plugin functions', () => {
       btnClose.dispatchEvent(event)
 
       expect(spy).toHaveBeenCalled()
+    })
+  })
+
+  describe('onDocumentReady', () => {
+    const nextTask = () => new Promise(resolve => {
+      setTimeout(resolve)
+    })
+
+    const sources = import.meta.glob('../../../src/*.ts', { query: '?raw', import: 'default', eager: true })
+
+    afterEach(() => {
+      EventHandler.off(document, '.ready-test')
+      EventHandler.off(window, '.ready-test')
+    })
+
+    it('should start a DOMContentLoaded data API on the next task once that event has fired', async () => {
+      const spy = jasmine.createSpy('spy')
+      spyOn(performance, 'getEntriesByType').and.returnValue([{ domContentLoadedEventStart: 120 }])
+
+      onDocumentReady(document, 'DOMContentLoaded.ready-test', spy)
+
+      expect(spy).not.toHaveBeenCalled()
+
+      await nextTask()
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should wait for DOMContentLoaded while a module or deferred script runs before it', async () => {
+      const spy = jasmine.createSpy('spy')
+      spyOnProperty(document, 'readyState').and.returnValue('interactive')
+      spyOn(performance, 'getEntriesByType').and.returnValue([{ domContentLoadedEventStart: 0 }])
+
+      onDocumentReady(document, 'DOMContentLoaded.ready-test', spy)
+      await nextTask()
+
+      expect(spy).not.toHaveBeenCalled()
+
+      document.dispatchEvent(createEvent('DOMContentLoaded'))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should start a load data API on the next task once the page has loaded', async () => {
+      const spy = jasmine.createSpy('spy')
+      spyOnProperty(document, 'readyState').and.returnValue('complete')
+
+      onDocumentReady(window, 'load.ready-test', spy)
+
+      expect(spy).not.toHaveBeenCalled()
+
+      await nextTask()
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should wait for load while the page is still loading its resources', async () => {
+      const spy = jasmine.createSpy('spy')
+      spyOnProperty(document, 'readyState').and.returnValue('interactive')
+
+      onDocumentReady(window, 'load.ready-test', spy)
+      await nextTask()
+
+      expect(spy).not.toHaveBeenCalled()
+
+      window.dispatchEvent(createEvent('load'))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should keep the listener under its namespace, so the data API can still be turned off', () => {
+      const spy = jasmine.createSpy('spy')
+      spyOnProperty(document, 'readyState').and.returnValue('loading')
+      spyOn(performance, 'getEntriesByType').and.returnValue([{ domContentLoadedEventStart: 0 }])
+
+      onDocumentReady(document, 'DOMContentLoaded.ready-test', spy)
+      EventHandler.off(document, '.ready-test')
+      document.dispatchEvent(createEvent('DOMContentLoaded'))
+
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should start every data API through it', () => {
+      const direct = Object.entries(sources)
+        .filter(([, source]) => /EventHandler\.on\((?:window|document), (?:EVENT_LOAD_DATA_API|EVENT_DOM_CONTENT_LOADED|`DOMContentLoaded)/.test(source))
+        .map(([path]) => path)
+
+      expect(direct).toEqual([])
+      expect(Object.values(sources).filter(source => /^onDocumentReady\(/m.test(source))).toHaveSize(35)
     })
   })
 })

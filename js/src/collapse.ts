@@ -9,6 +9,7 @@
  */
 
 import BaseComponent from './base-component.js'
+import { onDocumentReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
@@ -360,7 +361,7 @@ class Collapse extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, EVENT_LOAD_DATA_API, () => {
+onDocumentReady(document, EVENT_LOAD_DATA_API, () => {
   Collapse._initializeDataApi()
 })
 
