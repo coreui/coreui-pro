@@ -1,4 +1,6 @@
-import { forgetPress, pressPathOf, trackPress } from '../../../src/util/press.js'
+import {
+  forgetPress, lastPressedElement, pressPathOf, trackPress
+} from '../../../src/util/press.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('Press utilities', () => {
@@ -166,6 +168,46 @@ describe('Press utilities', () => {
       expect(listeners).toBeGreaterThan(0)
       expect(spy.calls.count()).toEqual(listeners)
       expect(pressPathOf(event)).toContain(doc.querySelector('#panel'))
+    })
+  })
+
+  describe('lastPressedElement', () => {
+    it('should return the control the last left-button press started in until a key is pressed', () => {
+      fixtureEl.innerHTML = '<button type="button"><span>Open</span></button>'
+      const button = fixtureEl.querySelector('button')
+
+      press(button.querySelector('span'))
+
+      expect(lastPressedElement()).toBe(button)
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
+
+      expect(lastPressedElement()).toBeNull()
+    })
+
+    it('should find the control across a shadow root and return null for a press on no control', () => {
+      fixtureEl.innerHTML = '<div id="host"></div><p>Text</p>'
+      const host = fixtureEl.querySelector('#host')
+      host.attachShadow({ mode: 'open' }).innerHTML = '<a href="#x"><b>Link</b></a>'
+      const link = host.shadowRoot.querySelector('a')
+
+      press(link.querySelector('b'))
+
+      expect(lastPressedElement()).toBe(link)
+
+      press(fixtureEl.querySelector('p'))
+
+      expect(lastPressedElement()).toBeNull()
+    })
+
+    it('should return null after a press with another button than the left one', () => {
+      fixtureEl.innerHTML = '<button type="button">Open</button>'
+      const button = fixtureEl.querySelector('button')
+
+      press(button)
+      press(button, { button: 2 })
+
+      expect(lastPressedElement()).toBeNull()
     })
   })
 })

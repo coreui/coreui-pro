@@ -21,7 +21,7 @@ Where a component differs, its own keyboard table says so.
 
 ## Focus in dialogs
 
-A modal dialog, such as the [modal](/components/modal/) or the [offcanvas](/components/offcanvas/), moves focus inside when it opens and keeps <kbd>Tab</kbd> inside while it is open. When it closes, focus returns to the element that opened it. An offcanvas opened with `backdrop: false` and `scroll: true` is not modal: <kbd>Tab</kbd> moves on to the page.
+A modal dialog, such as the [modal](/components/modal/) or the [offcanvas](/components/offcanvas/), moves focus inside when it opens and keeps <kbd>Tab</kbd> inside while it is open. When it closes, focus returns to the element that opened it; when that element sits in a dialog that has closed since, focus goes back to the element that opened the first dialog of the chain. A non-modal dialog hands the focus back only when it held it, or when the press that closed it started inside it (Safari does not focus a clicked button). When the element that opened the dialog is gone, move the focus in the dialog's `hidden` event. An offcanvas opened with `backdrop: false` and `scroll: true` is not modal: <kbd>Tab</kbd> moves on to the page.
 
 ## Focus after a popup closes
 

@@ -12,8 +12,7 @@ import DialogBase from './dialog-base.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { enableDismissTrigger } from './util/component-functions.js'
-import { defineJQueryPlugin, isVisible, jQueryDispatch } from './util/index.js'
-import { getLayerFocusTargetFor } from './util/layers.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -24,7 +23,6 @@ const DATA_KEY = 'coreui.dialog'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_CANCEL = `cancel${EVENT_KEY}`
@@ -146,12 +144,6 @@ class Dialog extends DialogBase<DialogConfig> {
     const currentInstance = currentDialog ? Dialog.getInstance(currentDialog) : null
 
     if (!currentDialog || !currentInstance) {
-      EventHandler.one(target, EVENT_SHOW, showEvent => {
-        if (!showEvent.defaultPrevented) {
-          Dialog._registerFocusRestoration(target, trigger)
-        }
-      })
-
       Dialog.getOrCreateInstance(target).toggle(trigger)
       return
     }
@@ -176,31 +168,20 @@ class Dialog extends DialogBase<DialogConfig> {
     //      non-deferred close path), so its ::backdrop is removed in the same
     //      frame the incoming one appears — the user sees one continuous
     //      backdrop instead of a double-darkened or half-faded flash.
-    Dialog._registerFocusRestoration(target, trigger)
     target.classList.add(CLASS_NAME_SWAP_IN)
     EventHandler.one(target, EVENT_SHOWN, () => {
       target.classList.remove(CLASS_NAME_SWAP_IN)
     })
     newDialog._show(trigger)
 
-    currentDialog.classList.add(CLASS_NAME_INSTANT)
-    EventHandler.one(currentDialog, EVENT_HIDDEN, () => {
-      currentDialog.classList.remove(CLASS_NAME_INSTANT)
-    })
+    if (!currentDialog.classList.contains(CLASS_NAME_INSTANT)) {
+      currentDialog.classList.add(CLASS_NAME_INSTANT)
+      EventHandler.one(currentDialog, EVENT_HIDDEN, () => {
+        currentDialog.classList.remove(CLASS_NAME_INSTANT)
+      })
+    }
+
     currentInstance._hide()
-  }
-
-  protected static _registerFocusRestoration(target: Element, trigger: HTMLElement): void {
-    const layerTarget = getLayerFocusTargetFor(trigger)
-
-    EventHandler.one(target, EVENT_HIDDEN, () => {
-      const returnTo = isVisible(trigger) ? trigger : layerTarget
-
-      if (returnTo instanceof HTMLElement && isVisible(returnTo)) {
-        // Returning focus must not scroll the page back to the trigger.
-        returnTo.focus({ preventScroll: true })
-      }
-    })
   }
 }
 

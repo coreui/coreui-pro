@@ -759,6 +759,30 @@ describe('Offcanvas', () => {
   })
 
   describe('data-api', () => {
+    it('should leave the focus in a non-modal offcanvas opened while another one closes', async () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="toggle-a" data-coreui-toggle="offcanvas" data-coreui-target="#a">A</button>',
+        '<button type="button" id="toggle-b" data-coreui-toggle="offcanvas" data-coreui-target="#b">B</button>',
+        '<dialog id="a" class="offcanvas" data-coreui-scroll="true" data-coreui-backdrop="false"><button type="button">In A</button></dialog>',
+        '<dialog id="b" class="offcanvas" data-coreui-scroll="true" data-coreui-backdrop="false"><button type="button">In B</button></dialog>'
+      ].join('')
+      const [toggleA, toggleB, a, b] = ['#toggle-a', '#toggle-b', '#a', '#b'].map(selector => fixtureEl.querySelector(selector))
+      const shownA = new Promise(resolve => {
+        a.addEventListener('shown.coreui.offcanvas', resolve, { once: true })
+      })
+      const hiddenA = new Promise(resolve => {
+        a.addEventListener('hidden.coreui.offcanvas', resolve, { once: true })
+      })
+
+      toggleA.click()
+      await shownA
+      toggleB.focus()
+      toggleB.click()
+      await hiddenA
+
+      expect(b.contains(document.activeElement)).toBeTrue()
+    })
+
     it('should not prevent event for input', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

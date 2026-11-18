@@ -817,6 +817,27 @@ describe('Drawer', () => {
       })
     })
 
+    it('should leave the focus in the page when a non-modal drawer closes without it', async () => {
+      fixtureEl.innerHTML = [
+        '<input id="field">',
+        '<button type="button" id="btn" data-coreui-toggle="drawer" data-coreui-target="#drawer">Open</button>',
+        '<dialog id="drawer" class="drawer drawer-instant" data-coreui-scroll="true" data-coreui-backdrop="false"><button type="button">Close</button></dialog>'
+      ].join('')
+      const [field, trigger, drawerEl] = ['#field', '#btn', '#drawer'].map(selector => fixtureEl.querySelector(selector))
+      const hidden = new Promise(resolve => {
+        drawerEl.addEventListener('hidden.coreui.drawer', resolve, { once: true })
+      })
+
+      trigger.focus()
+      trigger.click()
+      field.focus()
+      Drawer.getInstance(drawerEl).hide()
+      await hidden
+      await frames(1)
+
+      expect(document.activeElement).toBe(field)
+    })
+
     it('should focus on trigger element after closing drawer', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

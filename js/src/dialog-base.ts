@@ -14,10 +14,12 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { holdAnnouncements } from './util/announce.js'
+import { containsFocus, deepActiveElement } from './util/focus.js'
 import {
-  isComposingKey, registerLayer, unregisterLayer, type LayerEntry
+  isComposingKey, registerLayer, rememberFocusOrigin, returnFocus, unregisterLayer, type LayerEntry
 } from './util/layers.js'
 import { unwrapLegacyShell } from './util/legacy-markup.js'
+import { trackPress } from './util/press.js'
 import { lockScroll, unlockScroll } from './util/scroll-lock.js'
 
 /**
@@ -76,6 +78,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     }
 
     this._addDialogListeners()
+    trackPress()
   }
 
   // Getters
@@ -128,6 +131,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._onBeforeShow()
 
     const { modal, preventBodyScroll } = this._getShowOptions()
+    rememberFocusOrigin(this._element, relatedTarget ?? deepActiveElement(document))
     registerLayer(this._layer)
     this._showElement({ modal, preventBodyScroll })
 
@@ -257,11 +261,14 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
   // Safe to call multiple times — close() is a no-op on a closed dialog.
   protected _closeAndCleanup(): void {
+    const focusWasInside = this._openedAsModal || containsFocus(this._element)
+
     if (this._element.open) {
       this._closedByComponent = true
       this._element.close()
     }
 
+    returnFocus(this._element, focusWasInside)
     holdAnnouncements()
     this._openedAsModal = false
 

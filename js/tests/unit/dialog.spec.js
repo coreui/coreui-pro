@@ -1065,6 +1065,21 @@ describe('Dialog', () => {
   })
 
   describe('dialog swapping', () => {
+    it('should keep a dialog-instant class the page gave the outgoing dialog', () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="open" data-coreui-toggle="dialog" data-coreui-target="#dialog1">Open first</button>',
+        '<dialog id="dialog1" class="dialog dialog-instant"><button type="button" id="next" data-coreui-toggle="dialog" data-coreui-target="#dialog2">Go to second</button></dialog>',
+        '<dialog id="dialog2" class="dialog dialog-instant"><button type="button">Close</button></dialog>'
+      ].join('')
+      const [open, dialog1, next] = ['#open', '#dialog1', '#next'].map(selector => fixtureEl.querySelector(selector))
+
+      open.click()
+      next.click()
+
+      expect(dialog1.open).toBeFalse()
+      expect(dialog1.classList.contains('dialog-instant')).toBeTrue()
+    })
+
     it('should swap dialogs when trigger is inside an open dialog', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

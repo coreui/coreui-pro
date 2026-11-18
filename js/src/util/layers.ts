@@ -1,5 +1,5 @@
-import { deepActiveElement } from './focus.js'
-import { pressPathOf, trackPress } from './press.js'
+import { deepActiveElement, focusFirstUsable, holdsFocusOrNone } from './focus.js'
+import { lastPressedElement, pressPathOf, trackPress } from './press.js'
 
 export type LayerReason = 'escape' | 'outside' | 'parent' | 'sibling'
 
@@ -631,4 +631,45 @@ export const getLayerAnchorFor = (element: Element): Element | null =>
 export const getLayerFocusTargetFor = (element: Element): Element | null => {
   const entry = throughTips(getState().stack.findLast(record => inParts(record, element)))?.entry
   return (entry?.focusTarget?.() ?? entry?.anchor()) || null
+}
+
+const focusReturnTargets = new WeakMap<Element, HTMLElement[]>()
+
+/**
+ * Records where the focus goes back when a dialog closes: the element it opens from, then the focus
+ * target of the layer that element sits in (a menu item's toggle), then the targets of the dialog
+ * that element sits in. A dialog opened from inside another dialog that stays open gives the focus
+ * back inside it, and one opened in place of a dialog that closed or was removed gives it back to
+ * where the chain of dialogs started.
+ *
+ * @param dialog - The dialog being opened
+ * @param origin - The element it opens from: its trigger, or the element holding the focus; when
+ * that is the body, the element the last press started on
+ */
+export const rememberFocusOrigin = (dialog: Element, origin?: Element | null): void => {
+  const start = origin && origin !== origin.ownerDocument.body ? origin : lastPressedElement()
+  const host = start?.closest('dialog')
+  const inherited = host && host !== dialog ? focusReturnTargets.get(host) ?? [] : []
+  const targets = start ? [start, getLayerFocusTargetFor(start), ...inherited] : []
+
+  focusReturnTargets.set(dialog, targets.filter((target): target is HTMLElement => target instanceof HTMLElement))
+}
+
+/**
+ * Sends the focus back after a dialog closed, to the first recorded target that can take it, but
+ * only while the focus is still inside the dialog or on no element, and only when the dialog held
+ * the focus: it was modal, the focus was inside it when it started to close, or the last press
+ * started inside it (a click that did not focus its button, as in Safari). Focus the user or the
+ * page moved elsewhere stays there.
+ *
+ * @param dialog - The dialog that closed, attached or already removed
+ * @param focusWasInside - Whether the dialog was modal or held the focus when it started to close
+ * @returns The element that took the focus, or `undefined` when none did
+ */
+export const returnFocus = (dialog: Element, focusWasInside: boolean): HTMLElement | undefined => {
+  if (!(focusWasInside || containsAcross(dialog, lastPressedElement())) || !holdsFocusOrNone(dialog)) {
+    return undefined
+  }
+
+  return focusFirstUsable(focusReturnTargets.get(dialog) ?? [], { preventScroll: true })
 }

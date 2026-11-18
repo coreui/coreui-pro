@@ -1,6 +1,6 @@
 import {
   closeLayersIn, getLayerAnchorFor, getLayerFocusTargetFor, handleEscape, isComposingKey, isInDescendantParts, reanchorLayer,
-  registerLayer, settleClick, unregisterLayer
+  registerLayer, rememberFocusOrigin, returnFocus, settleClick, unregisterLayer
 } from '../../../src/util/layers.js'
 import { trackPress } from '../../../src/util/press.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
@@ -953,6 +953,103 @@ describe('layers', () => {
       expect(getParentLayer(t)).toBe(d)
       expect(getLayerFocusTargetFor(el('#inside'))).toBe(el('#toggle'))
       expect(getLayerAnchorFor(el('#inside'))).toBe(el('#toggle'))
+    })
+  })
+
+  describe('rememberFocusOrigin and returnFocus', () => {
+    const mount = () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="open">Open</button>',
+        '<input id="field">',
+        '<dialog id="first"><button type="button" id="next">Next</button></dialog>',
+        '<dialog id="second"><button type="button" id="done">Done</button></dialog>'
+      ].join('')
+      return ['#open', '#field', '#first', '#next', '#second'].map(selector => fixtureEl.querySelector(selector))
+    }
+
+    it('should give the focus back to where a chain of dialogs started', () => {
+      const [open, , first, next, second] = mount()
+
+      rememberFocusOrigin(first, open)
+      first.show()
+      rememberFocusOrigin(second, next)
+      first.close()
+      second.show()
+      second.close()
+
+      expect(returnFocus(second, true)).toBe(open)
+      expect(document.activeElement).toBe(open)
+    })
+
+    it('should give the focus back inside a dialog that stays open under the one that closed', () => {
+      const [open, , first, next, second] = mount()
+
+      rememberFocusOrigin(first, open)
+      first.showModal()
+      rememberFocusOrigin(second, next)
+      second.showModal()
+      document.body.focus()
+      second.close()
+      document.activeElement.blur()
+
+      expect(returnFocus(second, true)).toBe(next)
+      first.close()
+    })
+
+    it('should leave the focus that moved out of the dialog where it is', () => {
+      const [open, field, first] = mount()
+
+      rememberFocusOrigin(first, open)
+      first.show()
+      field.focus()
+      first.close()
+
+      expect(returnFocus(first, true)).toBeUndefined()
+      expect(document.activeElement).toBe(field)
+    })
+
+    it('should not give the focus back for a dialog the focus was not in when it started to close', () => {
+      const [open, , first] = mount()
+
+      rememberFocusOrigin(first, open)
+      first.show()
+      document.activeElement.blur()
+      first.close()
+
+      expect(returnFocus(first, false)).toBeUndefined()
+      expect(document.activeElement).toBe(document.body)
+    })
+
+    it('should give the focus back for a non-modal dialog the last press started in', () => {
+      const [open, , first] = mount()
+      trackPress()
+
+      rememberFocusOrigin(first, open)
+      first.show()
+      first.querySelector('button').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      document.activeElement.blur()
+      first.close()
+
+      expect(returnFocus(first, false)).toBe(open)
+
+      open.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      first.show()
+      document.activeElement.blur()
+      first.close()
+
+      expect(returnFocus(first, false)).toBeUndefined()
+    })
+
+    it('should take the element last pressed when the origin is the body', () => {
+      const [open, , first] = mount()
+      trackPress()
+
+      open.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      rememberFocusOrigin(first, document.body)
+      first.show()
+      first.close()
+
+      expect(returnFocus(first, true)).toBe(open)
     })
   })
 

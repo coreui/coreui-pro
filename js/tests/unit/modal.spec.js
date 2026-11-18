@@ -534,6 +534,18 @@ describe('Modal', () => {
   })
 
   describe('non-modal dialogs', () => {
+    it('should leave the focus in the page when a non-modal dialog closes without it', async () => {
+      fixtureEl.innerHTML = '<input id="field"><button type="button" id="open">Open</button><dialog class="modal modal-instant"><button type="button">Close</button></dialog>'
+      const [field, open] = ['#field', '#open'].map(selector => fixtureEl.querySelector(selector))
+      const modal = new Modal(fixtureEl.querySelector('dialog'), { modal: false })
+
+      await modal.show(open)
+      field.focus()
+      await modal.hide()
+
+      expect(document.activeElement).toBe(field)
+    })
+
     it('should open a non-modal dialog with show() when modal = false', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
@@ -1030,6 +1042,34 @@ describe('Modal', () => {
   })
 
   describe('data-api', () => {
+    it('should leave the focus the page moves in hidden where the page put it', async () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="open" data-coreui-toggle="modal" data-coreui-target="#m">Open</button>',
+        '<button type="button" id="other">Other</button>',
+        '<dialog id="m" class="modal modal-instant"><button type="button">Close</button></dialog>'
+      ].join('')
+      const [open, other, modalEl] = ['#open', '#other', '#m'].map(selector => fixtureEl.querySelector(selector))
+      modalEl.addEventListener('hidden.coreui.modal', () => other.focus())
+
+      open.focus()
+      open.click()
+      await Modal.getInstance(modalEl).hide()
+
+      expect(document.activeElement).toBe(other)
+    })
+
+    it('should give the focus back to the button the user pressed when the press did not focus it', async () => {
+      fixtureEl.innerHTML = '<button type="button" id="open">Open</button><dialog class="modal modal-instant"><button type="button">Close</button></dialog>'
+      const open = fixtureEl.querySelector('#open')
+      const modal = new Modal(fixtureEl.querySelector('dialog'))
+
+      open.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true, button: 0 }))
+      await modal.show()
+      await modal.hide()
+
+      expect(document.activeElement).toBe(open)
+    })
+
     it('should toggle dialog', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
@@ -1205,6 +1245,37 @@ describe('Modal', () => {
 
         firstTrigger.click()
       })
+    })
+
+    const mountSwap = () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="open" data-coreui-toggle="modal" data-coreui-target="#dialog1">Open first</button>',
+        '<dialog id="dialog1" class="modal modal-instant"><button type="button" id="next" data-coreui-toggle="modal" data-coreui-target="#dialog2">Go to second</button></dialog>',
+        '<dialog id="dialog2" class="modal modal-instant"><button type="button">Close</button></dialog>'
+      ].join('')
+      return ['#open', '#dialog1', '#next', '#dialog2'].map(selector => fixtureEl.querySelector(selector))
+    }
+
+    it('should give the focus back to the page trigger when the modal swapped in closes', async () => {
+      const [open, , next, dialog2] = mountSwap()
+
+      open.focus()
+      open.click()
+      next.focus()
+      next.click()
+      await Modal.getInstance(dialog2).hide()
+
+      expect(document.activeElement).toBe(open)
+    })
+
+    it('should keep a modal-instant class the page gave the outgoing modal', () => {
+      const [open, dialog1, next] = mountSwap()
+
+      open.click()
+      next.click()
+
+      expect(dialog1.open).toBeFalse()
+      expect(dialog1.classList.contains('modal-instant')).toBeTrue()
     })
 
     describe('mid-swap and rejected swaps', () => {

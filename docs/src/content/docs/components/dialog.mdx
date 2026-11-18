@@ -19,7 +19,7 @@ Key features of the native dialog:
 - **Page scroll lock** — a modal dialog stops the page from scrolling. The root element gets `overflow: hidden` and the `dialog-open` class, and the space of the scrollbar that disappears goes to padding on the root and to a margin on full-width `.fixed-top`, `.fixed-bottom` and `.is-fixed` elements, so the page does not shift. The lock comes from the script, not the stylesheet, so it works with the per-component stylesheets too.
 - **Escape key handling** closes the dialog by default; set `keyboard: false` to disable. A dialog that leaves the page interactive does not close on an <kbd>Escape</kbd> that ends an input method composition, repeats while the key is held, or that the page already handled.
 - **Panels inside it** — Menus, pickers and combobox panels open in the dialog close when it hides, and opening the dialog as a modal closes the ones open on the page. A click in such a panel or <kbd>Esc</kbd> pressed in it never closes the dialog.
-- **Accessibility** — focus is trapped inside modal dialogs and returned to the trigger on close, with native `<dialog>` ARIA semantics: no `role`, `aria-modal`, `aria-hidden`, or `tabindex` attributes in the markup.
+- **Accessibility** — focus is trapped inside modal dialogs and returned to the trigger on close, also when one dialog was opened in place of another, with native `<dialog>` ARIA semantics: no `role`, `aria-modal`, `aria-hidden`, or `tabindex` attributes in the markup.
 - **Animated open and close** — the exit transition (including the `::backdrop` fade) plays in every browser, because the plugin keeps the dialog in the top layer until the transition ends.
 
 ## Example

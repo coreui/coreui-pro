@@ -1,5 +1,8 @@
+const SELECTOR_CONTROL = 'a[href], button, input, select, textarea, summary, [tabindex], [contenteditable="true"]'
+
 const listening = new WeakSet<Document>()
 let pressPath: EventTarget[] | null = null
+let lastPressed: Element | null = null
 const clickPresses = new WeakMap<Event, EventTarget[]>()
 
 /**
@@ -24,6 +27,7 @@ export const trackPress = (doc: Document = document): void => {
   listening.add(doc)
   doc.addEventListener('pointerdown', event => {
     pressPath = event.button === 0 ? event.composedPath() : null
+    lastPressed = (pressPath?.find(target => target instanceof Element && target.matches(SELECTOR_CONTROL)) as Element | undefined) ?? null
   }, true)
   doc.addEventListener('click', event => {
     if (pressPath?.includes(event.composedPath()[0])) {
@@ -33,6 +37,8 @@ export const trackPress = (doc: Document = document): void => {
     pressPath = null
   }, true)
   doc.addEventListener('keydown', event => {
+    lastPressed = null
+
     if (event.key === 'Enter' || event.key === ' ') {
       forgetPress()
     }
@@ -52,3 +58,14 @@ export const trackPress = (doc: Document = document): void => {
  */
 export const pressPathOf = (event: Event): EventTarget[] | null =>
   clickPresses.get(event) ?? null
+
+/**
+ * Returns the control the last left-button press started in (the element itself or its closest
+ * link, button, form field or element with `tabindex`, across shadow roots), until a key is
+ * pressed. It tells which control a click activated where the browser does not focus it
+ * (Safari, buttons).
+ *
+ * @returns The pressed control, or `null` when a key came after the last press, the press was on
+ * no control or nothing was pressed
+ */
+export const lastPressedElement = (): Element | null => lastPressed
