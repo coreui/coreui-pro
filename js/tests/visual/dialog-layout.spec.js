@@ -3,6 +3,7 @@
  * page with the stylesheet lays the dialog out and runs its transitions.
  */
 
+import { page } from 'vitest/browser'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
 import Dialog from '../../src/dialog.js'
@@ -126,4 +127,43 @@ describe('dialog layout', () => {
       expect(getComputedStyle(element).display).toBe('none')
     })
   }
+
+  for (const [size, width] of [
+    ['sm', 280],
+    ['lg', 800],
+    ['xl', 1140],
+    ['2xl', 1440]
+  ]) {
+    it(`should open a .dialog-${size} ${width}px wide on a wide viewport`, async () => {
+      const { innerWidth, innerHeight } = window
+      await page.viewport(1600, 900)
+
+      try {
+        const element = mount(`<dialog class="dialog dialog-${size}"><div class="dialog-body">Body</div></dialog>`)
+        instance = new Dialog(element)
+        instance.show()
+        await nextFrames()
+
+        expect(element.offsetWidth).toBe(width)
+      } finally {
+        await page.viewport(innerWidth, innerHeight)
+      }
+    })
+  }
+
+  it('should narrow a .dialog-2xl to the viewport minus its margins', async () => {
+    const { innerWidth, innerHeight } = window
+    await page.viewport(1366, 768)
+
+    try {
+      const element = mount('<dialog class="dialog dialog-2xl"><div class="dialog-body">Body</div></dialog>')
+      instance = new Dialog(element)
+      instance.show()
+      await nextFrames()
+
+      expect(element.offsetWidth).toBe(document.documentElement.clientWidth - 56)
+    } finally {
+      await page.viewport(innerWidth, innerHeight)
+    }
+  })
 })
