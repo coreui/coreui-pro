@@ -7,7 +7,9 @@ import { page } from 'vitest/browser'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
 import Dialog from '../../src/dialog.js'
+import Drawer from '../../src/drawer.js'
 import Modal from '../../src/modal.js'
+import Offcanvas from '../../src/offcanvas.js'
 
 let container
 let instance
@@ -84,11 +86,95 @@ describe('dialog layout', () => {
     })
   }
 
-  for (const [className, Component, name, moves] of [
-    ['dialog', Dialog, 'dialog', false],
-    ['dialog dialog-slide-down', Dialog, 'dialog', true],
-    ['dialog dialog-slide-up', Dialog, 'dialog', true],
-    ['modal', Modal, 'modal', true]
+  for (const [className, Component, name, options] of [
+    ['dialog', Dialog, 'dialog', {}],
+    ['dialog', Dialog, 'dialog', { modal: false }],
+    ['modal', Modal, 'modal', {}],
+    ['modal', Modal, 'modal', { modal: false }],
+    ['offcanvas offcanvas-end', Offcanvas, 'offcanvas', {}],
+    ['offcanvas offcanvas-end', Offcanvas, 'offcanvas', { backdrop: false, scroll: true }],
+    ['drawer drawer-end', Drawer, 'drawer', {}],
+    ['drawer drawer-end', Drawer, 'drawer', { backdrop: false, scroll: true }]
+  ]) {
+    it(`should put the focus in an animated .${className.replaceAll(' ', '.')} as it opens${Object.keys(options).length > 0 ? ' without a modal' : ''}`, async () => {
+      const element = mount(`<dialog class="${className}"><div class="${name}-body"><button type="button">Inside</button></div></dialog>`)
+      instance = new Component(element, options)
+      await nextFrames()
+
+      instance.show()
+
+      expect(element.contains(document.activeElement)).toBeTrue()
+    })
+  }
+
+  it('should slide a .drawer-end in from its starting style without a modal', async () => {
+    const element = mount('<dialog class="drawer drawer-end" style="--cui-drawer-transition-duration: 100s"><div class="drawer-body">Body</div></dialog>')
+    instance = new Drawer(element, { backdrop: false, scroll: true })
+    await nextFrames()
+
+    instance.show()
+    await nextFrames()
+
+    expect(new DOMMatrixReadOnly(getComputedStyle(element).transform).m41).toBeGreaterThan(0)
+  })
+
+  it('should slide a .drawer-end with open in its markup in as the page shows it', async () => {
+    const element = mount('<dialog class="drawer drawer-end" open style="--cui-drawer-transition-duration: 100s"><div class="drawer-body">Body</div></dialog>')
+    await nextFrames()
+
+    expect(new DOMMatrixReadOnly(getComputedStyle(element).transform).m41).toBeGreaterThan(0)
+  })
+
+  it('should take a .drawer closed natively out of the layout at once', async () => {
+    const element = mount('<dialog class="drawer drawer-end"><div class="drawer-body">Body</div></dialog>')
+    instance = new Drawer(element)
+    const shown = new Promise(resolve => {
+      element.addEventListener('shown.coreui.drawer', resolve, { once: true })
+    })
+    instance.show()
+    await shown
+
+    element.close()
+    await nextFrames()
+
+    expect(getComputedStyle(element).display).toBe('none')
+  })
+
+  it('should take a closed .drawer out of the layout', async () => {
+    const element = mount('<dialog class="drawer drawer-end"><div class="drawer-body">Body</div></dialog>')
+    await nextFrames()
+
+    expect(getComputedStyle(element).display).toBe('none')
+  })
+
+  for (const [placement, axis, sign, dir] of [
+    ['start', 'm41', -1, 'ltr'],
+    ['end', 'm41', 1, 'ltr'],
+    ['start', 'm41', 1, 'rtl'],
+    ['end', 'm41', -1, 'rtl'],
+    ['top', 'm42', -1, 'ltr'],
+    ['bottom', 'm42', 1, 'ltr'],
+    ['fullscreen', 'm42', 1, 'ltr']
+  ]) {
+    it(`should slide a .drawer-${placement} in from its starting style in a ${dir} document`, async () => {
+      const element = mount(`<dialog class="drawer drawer-${placement}" dir="${dir}" style="--cui-drawer-transition-duration: 100s"><div class="drawer-body">Body</div></dialog>`)
+      instance = new Drawer(element)
+      await nextFrames()
+
+      instance.show()
+      await nextFrames()
+
+      expect(getComputedStyle(element).display).toBe('flex')
+      expect(Math.sign(new DOMMatrixReadOnly(getComputedStyle(element).transform)[axis])).toBe(sign)
+    })
+  }
+
+  for (const [className, Component, name, moves, fades] of [
+    ['dialog', Dialog, 'dialog', false, true],
+    ['dialog dialog-slide-down', Dialog, 'dialog', true, true],
+    ['dialog dialog-slide-up', Dialog, 'dialog', true, true],
+    ['modal', Modal, 'modal', true, true],
+    ['drawer drawer-end', Drawer, 'drawer', true, false]
   ]) {
     it(`should finish the entry of a .${className.replaceAll(' ', '.')}, then keep it rendered while it animates out`, async () => {
       const element = mount(`<dialog class="${className}"><div class="${name}-body">Body</div></dialog>`)
@@ -119,7 +205,7 @@ describe('dialog layout', () => {
 
       expect(getComputedStyle(element).display).toBe('flex')
       expect(opacity).toBeGreaterThan(0)
-      expect(opacity).toBeLessThan(1)
+      expect(opacity < 1).toBe(fades)
       expect(getComputedStyle(element).transform !== 'none').toBe(moves)
 
       await hidden

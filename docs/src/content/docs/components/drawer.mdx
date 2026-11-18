@@ -259,7 +259,7 @@ Since the drawer is conceptually a modal dialog, be sure to add `aria-labelledby
 
 ### Via data attributes
 
-Include `data-coreui-toggle="drawer"` along with a `data-coreui-target` or `href` in the element to automatically control a drawer. Dismiss from within with `data-coreui-dismiss="drawer"`. To have a drawer open by default, add the `open` attribute.
+Include `data-coreui-toggle="drawer"` along with a `data-coreui-target` or `href` in the element to automatically control a drawer. Dismiss from within with `data-coreui-dismiss="drawer"`. To have a drawer open by default, add the `open` attribute; the drawer slides in as the page shows it. A drawer closed by the browser itself, for example by a form with `method="dialog"`, disappears without sliding out; close it with `hide()` or `data-coreui-dismiss="drawer"` to keep the animation.
 
 ### Via JavaScript
 

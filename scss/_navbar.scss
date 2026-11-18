@@ -326,6 +326,7 @@ $navbar-dark-tokens: defaults(
             // stylelint-disable declaration-no-important
             position: static;
             z-index: auto;
+            display: flex;
             flex-grow: 1;
             width: auto !important;
             height: auto !important;

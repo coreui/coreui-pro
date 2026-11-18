@@ -9,6 +9,7 @@
 
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
+import { page } from 'vitest/browser'
 import Drawer from '../../src/drawer.js'
 import Offcanvas from '../../src/offcanvas.js'
 
@@ -59,6 +60,19 @@ describe('drawer in a navbar', () => {
       expect(getComputedStyle(element).position).toBe('static')
     })
 
+    it(`should show the closed ${name} inline in an expanded navbar`, async () => {
+      const element = mount(Component, name)
+      container.style.width = '1200px'
+      await new Promise(resolve => {
+        requestAnimationFrame(resolve)
+      })
+
+      expect(element.open).toBeFalse()
+      expect(getComputedStyle(element).display).toBe('flex')
+      expect(getComputedStyle(element).position).toBe('static')
+      expect(element.getBoundingClientRect().width).toBeGreaterThan(0)
+    })
+
     it(`should close the ${name} when its navbar expands during the opening transition`, async () => {
       const element = mount(Component, name)
 
@@ -71,3 +85,55 @@ describe('drawer in a navbar', () => {
     })
   }
 })
+
+describe('responsive drawer', () => {
+  it('should open every responsive drawer below its breakpoint with the focus inside', async () => {
+    const { innerWidth, innerHeight } = window
+
+    try {
+      await page.viewport(500, 600)
+
+      for (const className of ['drawer', 'drawer-sm', 'drawer-md', 'drawer-lg', 'drawer-xl', 'drawer-2xl']) {
+        for (const variant of ['', ' drawer-instant']) {
+          container = document.createElement('div')
+          container.innerHTML = `<dialog class="${className} drawer-end${variant}"><div class="drawer-body"><button type="button">Inside</button></div></dialog>`
+          document.body.append(container)
+          const element = container.querySelector('dialog')
+          instance = new Drawer(element)
+
+          instance.show()
+
+          expect(getComputedStyle(element).display).toBe('flex')
+          expect(element.contains(document.activeElement)).toBeTrue()
+
+          instance.dispose()
+          instance = null
+          container.remove()
+          container = null
+        }
+      }
+    } finally {
+      await page.viewport(innerWidth, innerHeight)
+    }
+  })
+
+  it('should hide a closed .drawer-lg below its breakpoint and show it inline above', async () => {
+    container = document.createElement('div')
+    container.innerHTML = '<dialog class="drawer-lg drawer-end" id="drawer"><div class="drawer-body">Menu</div></dialog>'
+    document.body.append(container)
+    const element = container.querySelector('#drawer')
+    const { innerWidth, innerHeight } = window
+
+    try {
+      await page.viewport(800, 600)
+      expect(getComputedStyle(element).display).toBe('none')
+
+      await page.viewport(1200, 600)
+      expect(getComputedStyle(element).display).toBe('flex')
+      expect(getComputedStyle(element).position).toBe('static')
+    } finally {
+      await page.viewport(innerWidth, innerHeight)
+    }
+  })
+})
+
