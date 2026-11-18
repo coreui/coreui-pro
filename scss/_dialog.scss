@@ -20,6 +20,7 @@ $dialog-sizes: defaults(
     sm: 280px,
     lg: 800px,
     xl: 1140px,
+    "2xl": 1440px,
   ),
   $dialog-sizes
 );
@@ -220,11 +221,6 @@ $dialog-tokens: defaults(
         max-width: none;
         height: 100%;
         max-height: none;
-
-        .dialog-header,
-        .dialog-footer {
-          @include border-radius(0);
-        }
 
         .dialog-body {
           overflow-y: auto;
