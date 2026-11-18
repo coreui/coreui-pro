@@ -2637,6 +2637,16 @@ buttons, and neither the button nor `toggle()` changes what a disabled field
 shows: a password revealed before the field is disabled stays visible, and
 can be hidden once the field is enabled again.
 
+#### Password Strength: the level text keeps text contrast
+
+The level text (`.password-strength-text`) took the segment color, the
+`*-base` color of its level, which falls under 4.5:1 for small text: warning at
+1.65:1 on a light page, danger, info and success near 4.4:1 on a dark one. It
+now takes the level's `*-fg-emphasis` color from the new
+`$password-strength-text-levels` map; the segments keep `*-base` from
+`$password-strength-levels`. `--cui-password-strength-color` therefore colors
+the segments only; restyle the text through the new map.
+
 #### Icons rendered by JavaScript
 
 - New components render their icons as **inline SVG on `currentColor`** (the
