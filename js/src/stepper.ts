@@ -83,8 +83,8 @@ const DefaultType = {
 
 class Stepper extends BaseComponent {
   protected declare _stepButtons: HTMLButtonElement[]
-  protected declare _activeStepButton: HTMLButtonElement
-  protected declare _initialStepButton: HTMLButtonElement
+  protected declare _activeStepButton: HTMLButtonElement | null
+  protected declare _initialStepButton: HTMLButtonElement | null
   protected declare _isFinished: boolean
   protected declare _validationMarks: ValidationMarks
   protected declare _validatedForms: Set<HTMLFormElement>
@@ -95,7 +95,7 @@ class Stepper extends BaseComponent {
 
     this._stepButtons = this._getStepButtons()
     this._tabPattern = !SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, this._element)
-    this._activeStepButton = this._getActiveElem()
+    this._activeStepButton = this._stepButtons.find(button => button.classList.contains(CLASS_NAME_ACTIVE)) ?? null
     this._initialStepButton = this._activeStepButton
     this._isFinished = false
     this._validationMarks = new WeakMap()
@@ -104,7 +104,7 @@ class Stepper extends BaseComponent {
     this._addStepperConnector()
     this._resetPanes(this._getTargetPane(this._activeStepButton))
     this._wrapIndicatorText()
-    this._updateCompleteStates(this._stepButtons.indexOf(this._activeStepButton))
+    this._updateCompleteStates(this._getActiveIndex(this._stepButtons))
     this._updateStepButtonsDisabledState()
     this._setupAccessibilityAttributes()
 
@@ -136,13 +136,13 @@ class Stepper extends BaseComponent {
       return
     }
 
-    const active = this._getActiveElem()
+    const active = this._activeStepButton
 
-    if (this._elemIsActive(button)) {
+    if (button === active) {
       return
     }
 
-    const isForward = this._stepButtons.indexOf(button) > this._stepButtons.indexOf(active)
+    const isForward = this._stepButtons.indexOf(button) > this._getActiveIndex(this._stepButtons)
 
     if (active && isForward && !this._isCurrentStepValid(active)) {
       return
@@ -151,7 +151,7 @@ class Stepper extends BaseComponent {
     if (this._config.linear) {
       const steps = this._getEnabledStepButtons()
       const targetIndex = steps.indexOf(button)
-      const activeIndex = steps.indexOf(active)
+      const activeIndex = this._getActiveIndex(steps)
 
       if (targetIndex > activeIndex + 1) {
         return
@@ -179,9 +179,7 @@ class Stepper extends BaseComponent {
     }
 
     const steps = this._getEnabledStepButtons()
-    const active = this._getActiveElem()
-    const index = steps.indexOf(active)
-    const next = steps[index + 1]
+    const next = steps[this._getActiveIndex(steps) + 1]
 
     if (next) {
       this.showStep(next)
@@ -197,9 +195,7 @@ class Stepper extends BaseComponent {
     }
 
     const steps = this._getEnabledStepButtons()
-    const active = this._getActiveElem()
-    const index = steps.indexOf(active)
-    const prev = steps[index - 1]
+    const prev = steps[this._getActiveIndex(steps) - 1]
 
     if (prev) {
       this.showStep(prev)
@@ -212,10 +208,9 @@ class Stepper extends BaseComponent {
     }
 
     const steps = this._getEnabledStepButtons()
-    const active = this._getActiveElem()
-    const index = steps.indexOf(active)
+    const active = this._activeStepButton
 
-    if (index !== steps.length - 1) {
+    if (!active || this._getActiveIndex(steps) !== steps.length - 1) {
       return
     }
 
@@ -224,6 +219,7 @@ class Stepper extends BaseComponent {
     }
 
     this._isFinished = true
+    this._activeStepButton = null
     this._disableStepButtons()
 
     const finishHandler = () => {
@@ -322,16 +318,17 @@ class Stepper extends BaseComponent {
     return this._getStepButtons().filter(el => !isDisabled(el))
   }
 
-  _getActiveElem(): HTMLButtonElement {
-    return (this._stepButtons.find(child => this._elemIsActive(child)) || null) as HTMLButtonElement
+  _getActiveIndex(steps: HTMLButtonElement[]): number {
+    return this._activeStepButton ? steps.indexOf(this._activeStepButton) : -1
   }
 
   _getTargetPane(element: any): HTMLElement | null {
     return SelectorEngine.getElementFromSelector(element)
   }
 
-  _elemIsActive(elem: HTMLElement): boolean {
-    return elem.classList.contains(CLASS_NAME_ACTIVE)
+  _isActionOfInactiveStep(action: Element): boolean {
+    const content = action.closest(SELECTOR_STEPPER_STEP_CONTENT)
+    return Boolean(content) && content!.parentNode!.querySelector(SELECTOR_STEPPER_STEP_BUTTON) !== this._activeStepButton
   }
 
   _holdsFocus(): boolean {
@@ -464,7 +461,7 @@ class Stepper extends BaseComponent {
   }
 
   _updateStepButtonsDisabledState(): void {
-    const activeIndex = this._stepButtons.indexOf(this._activeStepButton)
+    const activeIndex = this._getActiveIndex(this._stepButtons)
 
     for (const [index, button] of this._stepButtons.entries()) {
       button.disabled = this._config.linear && index > activeIndex + 1
@@ -591,7 +588,7 @@ class Stepper extends BaseComponent {
         pane.setAttribute('aria-labelledby', stepButton.id)
       }
 
-      this._setSelected(stepButton, this._elemIsActive(stepButton))
+      this._setSelected(stepButton, stepButton === this._activeStepButton)
     }
   }
 
@@ -677,6 +674,10 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_STEPPER_ACTION, functio
   }
 
   const stepper = Stepper.getOrCreateInstance(stepperElement)
+  if (stepper._isActionOfInactiveStep(this)) {
+    return
+  }
+
   if (typeof (stepper as any)[action as string] === 'function') {
     (stepper as any)[action as string]()
   }
