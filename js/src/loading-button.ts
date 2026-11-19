@@ -7,6 +7,7 @@
 
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
+import { getAccessibleName } from './util/accessible-name.js'
 import { announce, holdAnnouncements, type AnnouncePriority } from './util/announce.js'
 import { rootActiveElement } from './util/focus.js'
 import {
@@ -31,8 +32,6 @@ const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_IS_LOADING = 'is-loading'
 const CLASS_NAME_LOADING_BUTTON = 'btn-loading'
 const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner'
-
-const SELECTOR_HIDDEN_CONTENT = `[aria-hidden="true"], [hidden], .${CLASS_NAME_LOADING_BUTTON_SPINNER}`
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="loading-button"]'
 
@@ -122,7 +121,7 @@ class LoadingButton extends BaseComponent {
       }
 
       this._announcement = this._announce(
-        [this._getName(), this._config.ariaLoadingLabel].filter(Boolean).join(', '),
+        [getAccessibleName(this._element), this._config.ariaLoadingLabel].filter(Boolean).join(', '),
         'high'
       )
       EventHandler.trigger(this._element, EVENT_START)
@@ -151,7 +150,7 @@ class LoadingButton extends BaseComponent {
       this._unblock()
 
       if (announced) {
-        this._announce(this._getName(), 'normal')
+        this._announce(getAccessibleName(this._element), 'normal')
       }
 
       EventHandler.trigger(this._element, EVENT_STOP)
@@ -235,37 +234,6 @@ class LoadingButton extends BaseComponent {
       this._element.insertBefore(spinner, this._element.firstChild)
       this._spinner = spinner
     }
-  }
-
-  _getName(): string {
-    const root = this._element.getRootNode()
-    const ids = this._element.getAttribute('aria-labelledby')
-
-    if (ids && (root instanceof Document || root instanceof ShadowRoot)) {
-      const labelledBy = ids
-        .split(/\s+/)
-        .map(id => root.getElementById(id)?.textContent?.trim())
-        .filter(Boolean)
-        .join(' ')
-
-      if (labelledBy) {
-        return labelledBy
-      }
-    }
-
-    const label = this._element.getAttribute('aria-label')?.trim()
-
-    if (label) {
-      return label
-    }
-
-    const content = this._element.cloneNode(true) as HTMLElement
-
-    for (const hidden of content.querySelectorAll(SELECTOR_HIDDEN_CONTENT)) {
-      hidden.remove()
-    }
-
-    return content.textContent?.trim() || this._element.getAttribute('title')?.trim() || ''
   }
 
   _unblock(): void {

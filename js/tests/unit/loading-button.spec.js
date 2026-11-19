@@ -530,7 +530,7 @@ describe('LoadingButton', () => {
     })
 
     it('should announce the accessible name', () => {
-      fixtureEl.innerHTML = '<button aria-labelledby="name"><span aria-hidden="true">save</span></button><span id="name">Save draft</span><button id="text"><span aria-hidden="true">save</span>Save</button>'
+      fixtureEl.innerHTML = '<button aria-labelledby="name"><span aria-hidden="true">save</span></button><span id="name">Save <span aria-hidden="true">(ctrl+s)</span>\n  draft</span><button id="text"><span aria-hidden="true">save</span>Save</button>'
       const named = fixtureEl.querySelector('button')
       const text = fixtureEl.querySelector('#text')
       const first = new LoadingButton(named, { spinner: false })
@@ -539,11 +539,19 @@ describe('LoadingButton', () => {
       named.focus()
       first.start()
       vi.advanceTimersByTime(110)
+
+      expect(messages()).toEqual(['Save draft, Loading'])
+
+      first.stop()
+      vi.advanceTimersByTime(110)
+
+      expect(messages('polite')).toEqual(['Save draft'])
+
       text.focus()
       second.start()
       vi.advanceTimersByTime(110)
 
-      expect(messages()).toEqual(['Save draft, Loading', 'Save, Loading'])
+      expect(messages()).toEqual(['Save, Loading'])
     })
 
     it('should take custom ariaLoadingLabel wording', () => {

@@ -240,6 +240,10 @@ The root carries `dialog-open` while a modal dialog or the mobile Sidebar is ope
 
 Loaded with a plain `<script>`, `js/dist/util/calendar.js` registers as `CalendarUtil`, and the new `js/dist/util/range.js` as `RangeUtil`. The calendar util used the `Calendar` global of the component, so the two files overwrote each other and `js/dist/calendar.js` read its helpers from itself. Load the util file before the component, as with the other `js/dist/util` files.
 
+#### `AccessibleName` in the per-file UMD builds
+
+Loaded with a plain `<script>`, the new `js/dist/util/accessible-name.js` registers as `AccessibleName`. `js/dist/loading-button.js` reads the name it announces from it, and `js/dist/util/form-validation.js` the text of invalid feedback. Load it after `js/dist/util/index.js` and before those two files.
+
 #### No synthetic `transitionend` when a transition does not end
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>

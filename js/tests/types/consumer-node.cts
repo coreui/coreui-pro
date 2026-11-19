@@ -12,6 +12,7 @@ import Alert from '@coreui/coreui-pro/js/dist/alert'
 import ContextMenu from '@coreui/coreui-pro/js/dist/context-menu.js'
 import Dropdown from '@coreui/coreui-pro/js/dist/dropdown.js'
 import Tooltip from '@coreui/coreui-pro/js/src/tooltip.js'
+import { getAccessibleName } from '@coreui/coreui-pro/utils/accessible-name'
 import { announce } from '@coreui/coreui-pro/utils/announce'
 import { createDate } from '@coreui/coreui-pro/utils/calendar'
 import { appendChipValues } from '@coreui/coreui-pro/utils/chip-values'
@@ -32,6 +33,7 @@ Dropdown.getOrCreateInstance(element).toggle()
 Tooltip.getOrCreateInstance(element).show()
 const rootTooltip: RootTooltip = Tooltip.getOrCreateInstance(element)
 announce('Saved', { priority: 'high' })()
+announce(getAccessibleName(element), { priority: 'normal' })()
 announce('Saved', { priority: 'normal' })()
 rootAnnounce('Saved', { context: element, timeout: 1000 })()
 // @ts-expect-error — 'assertive' is not a priority
