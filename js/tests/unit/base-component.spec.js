@@ -197,4 +197,85 @@ describe('Base Component', () => {
       })
     })
   })
+
+  describe('Private Methods', () => {
+    describe('_queueCallback', () => {
+      const createAnimatedInstance = () => {
+        fixtureEl.innerHTML = '<div id="foo" style="transition: opacity .05s"></div>'
+        element = fixtureEl.querySelector('#foo')
+        instance = new DummyClass(element)
+      }
+
+      it('should drop the callback of a wait that a later wait on the same element replaces', async () => {
+        createAnimatedInstance()
+        const first = jasmine.createSpy('first')
+        const second = jasmine.createSpy('second')
+
+        await Promise.all([
+          instance._queueCallback(first, element),
+          instance._queueCallback(second, element)
+        ])
+
+        expect(first).not.toHaveBeenCalled()
+        expect(second).toHaveBeenCalledTimes(1)
+      })
+
+      it('should settle a replaced wait only together with the wait that replaced it', async () => {
+        createAnimatedInstance()
+        const order = []
+
+        const first = instance._queueCallback(noop, element).then(() => order.push('first settled'))
+        const second = instance._queueCallback(() => order.push('second callback'), element)
+        await Promise.all([first, second])
+
+        expect(order).toEqual(['second callback', 'first settled'])
+      })
+
+      it('should replace a pending wait with a wait that has no transition', async () => {
+        createAnimatedInstance()
+        const first = jasmine.createSpy('first')
+        const second = jasmine.createSpy('second')
+
+        instance._queueCallback(first, element)
+        instance._queueCallback(second, element, false)
+
+        expect(second).toHaveBeenCalledTimes(1)
+        await new Promise(resolve => {
+          setTimeout(resolve, 100)
+        })
+        expect(first).not.toHaveBeenCalled()
+      })
+
+      it('should keep the wait of another component on the same element', async () => {
+        createAnimatedInstance()
+        const other = new OtherDummyClass(element)
+        const first = jasmine.createSpy('first')
+        const second = jasmine.createSpy('second')
+
+        await Promise.all([
+          instance._queueCallback(first, element),
+          other._queueCallback(second, element)
+        ])
+
+        expect(first).toHaveBeenCalledTimes(1)
+        expect(second).toHaveBeenCalledTimes(1)
+      })
+
+      it('should settle replaced waits without callbacks when disposed', async () => {
+        createAnimatedInstance()
+        const first = jasmine.createSpy('first')
+        const second = jasmine.createSpy('second')
+
+        const waits = Promise.all([
+          instance._queueCallback(first, element),
+          instance._queueCallback(second, element)
+        ])
+        instance.dispose()
+        await waits
+
+        expect(first).not.toHaveBeenCalled()
+        expect(second).not.toHaveBeenCalled()
+      })
+    })
+  })
 })

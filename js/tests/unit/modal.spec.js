@@ -804,6 +804,40 @@ describe('Modal', () => {
       })
     })
 
+    it('should drop the bounce class when hidden while the static backdrop bounces', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
+      const dialogEl = fixtureEl.querySelector('.modal')
+      const dialog = new Modal(dialogEl, { backdrop: 'static' })
+      await dialog.show()
+
+      dialogEl.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      expect(dialogEl).toHaveClass('modal-static')
+      await dialog.hide()
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(dialogEl.open).toBeFalse()
+      expect(dialogEl).not.toHaveClass('modal-static')
+    })
+
+    it('should finish closing when the static backdrop is clicked while it hides', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
+      const dialogEl = fixtureEl.querySelector('.modal')
+      const dialog = new Modal(dialogEl, { backdrop: 'static' })
+      await dialog.show()
+
+      const hiding = dialog.hide()
+      dialogEl.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      await hiding
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(dialogEl.open).toBeFalse()
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+    })
+
     it('should fire hidePrevented.coreui.modal event when static backdrop is clicked', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<dialog class="modal"></dialog>'

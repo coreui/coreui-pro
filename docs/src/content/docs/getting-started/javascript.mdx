@@ -261,7 +261,7 @@ await toast.show()
 
 The promise also resolves when the call does nothing — for example when the component is already open, when a listener calls `preventDefault()` on the `show.coreui.*` event, or when you dispose the component mid-transition. `await` therefore never hangs, but it also does not tell you whether the state changed. Check the state yourself when that matters.
 
-In addition a method call on a **transitioning component will be ignored**. For the promise-returning methods above, such a call resolves immediately. It does not wait for the running transition to end. Modal, Offcanvas, Dialog and Drawer are the exception while they open: `hide()` and `toggle()` close them from where the opening got to, as their pages describe.
+In addition a method call on a **transitioning component will be ignored**. For the promise-returning methods above, such a call resolves immediately. It does not wait for the running transition to end. Modal, Offcanvas, Dialog and Drawer are the exception while they open: `hide()` and `toggle()` close them from where the opening got to, as their pages describe. Menu, Sidebar and Toast take the call while they animate: `hide()` during the show, or `show()` during the hide, starts the new transition at once, the interrupted one fires no `shown.coreui.*` or `hidden.coreui.*` event, and the promise of the interrupted call resolves together with the new one. Tooltip and Popover do the same for `hide()` once the tip has started to fade in.
 
 ```js
 const myCarouselEl = document.getElementById('myCarousel')

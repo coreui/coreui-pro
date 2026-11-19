@@ -312,8 +312,8 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
     const staticClass = `${this.constructor.NAME}-static`
     this._element.classList.add(staticClass)
-    this._queueCallback(() => {
-      this._element.classList.remove(staticClass)
+    executeAfterTransition(() => {
+      this._element?.classList.remove(staticClass)
     }, this._element)
   }
 

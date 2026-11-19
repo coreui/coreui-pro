@@ -397,6 +397,107 @@ describe('Stepper', () => {
   })
 
   describe('showStep', () => {
+    const settle = () => new Promise(resolve => {
+      setTimeout(resolve, 50)
+    })
+    const activeButtons = () => [...fixtureEl.querySelectorAll('.stepper-step-button')].map(button => button.classList.contains('active'))
+
+    it('should go back to a step whose content is still collapsing', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.showStep(2)
+      stepper.showStep(1)
+      await settle()
+
+      expect(activeButtons()).toEqual([true, false, false])
+    })
+
+    it('should move on from the step it is moving to while the previous content collapses', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.showStep(2)
+      stepper.showStep(3)
+      await settle()
+
+      expect(activeButtons()).toEqual([false, false, true])
+    })
+
+    it('should count next() from the step it is moving to', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.next()
+      stepper.next()
+      await settle()
+
+      expect(activeButtons()).toEqual([false, false, true])
+    })
+
+    it('should open a collapsing content again from the height it reached', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const [first] = fixtureEl.querySelectorAll('.stepper-step-content')
+      first.style.transition = 'height .2s linear'
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.showStep(2)
+      await settle()
+      const reached = first.getBoundingClientRect().height
+      stepper.showStep(1)
+
+      expect(reached).toBeGreaterThan(0)
+      expect(Math.abs(first.getBoundingClientRect().height - reached)).toBeLessThan(2)
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 300)
+      })
+
+      expect(first.style.height).toBe('auto')
+      expect(first.getAttribute('aria-hidden')).toBe('false')
+    })
+
+    it('should count prev() from the step it is moving to', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.next()
+      stepper.prev()
+      await settle()
+
+      expect(activeButtons()).toEqual([true, false, false])
+    })
+
+    it('should finish from the last step while the previous content collapses', async () => {
+      fixtureEl.innerHTML = getStepContentFixture({ activeStep: 2 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const finished = jasmine.createSpy('finish')
+      stepperElement.addEventListener('finish.coreui.stepper', finished)
+
+      stepper.next()
+      stepper.finish()
+      await settle()
+
+      expect(finished).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not validate the step it is moving to when going back while the previous content collapses', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      fixtureEl.querySelectorAll('.stepper-step-content')[2].innerHTML = '<form><input required></form>'
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement, { linear: false })
+      const validated = jasmine.createSpy('stepValidationComplete')
+      stepperElement.addEventListener('stepValidationComplete.coreui.stepper', validated)
+
+      stepper.showStep(3)
+      stepper.showStep(2)
+      await settle()
+
+      expect(validated).not.toHaveBeenCalled()
+      expect(activeButtons()).toEqual([false, true, false])
+    })
+
     it('should show step by number', () => {
       fixtureEl.innerHTML = getThreeStepFixture()
       const stepperElement = fixtureEl.querySelector('.stepper')
@@ -869,6 +970,8 @@ describe('Stepper', () => {
       const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
 
       stepper.finish()
+
+      expect(stepper._activeStepButton).toBeNull()
 
       for (const button of fixtureEl.querySelectorAll('.stepper-step-button')) {
         expect(button.getAttribute('aria-selected')).toBe('false')
@@ -1400,6 +1503,41 @@ describe('Stepper', () => {
 
         stepper.reset()
       })
+    })
+
+    it('should drop a finish whose step content is still collapsing', async () => {
+      fixtureEl.innerHTML = getStepContentFixture({ activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const lastButton = fixtureEl.querySelectorAll('.stepper-step-button')[2]
+      let finished = 0
+      stepperElement.addEventListener('finish.coreui.stepper', () => {
+        finished++
+      })
+
+      stepper.finish()
+      stepper.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(finished).toBe(0)
+      expect(lastButton).not.toHaveClass('complete')
+    })
+
+    it('should open the first step content at its own height after reset', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const [first] = fixtureEl.querySelectorAll('.stepper-step-content')
+
+      stepper.next()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+      stepper.reset()
+
+      expect(first.style.height).toBe('')
+      expect(first.style.overflow).toBe('')
     })
   })
 
@@ -2795,6 +2933,22 @@ describe('Stepper', () => {
       button.click()
 
       expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should take one step on a double click of an action in the step content', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      fixtureEl.querySelectorAll('.stepper-step-content')[0].insertAdjacentHTML('beforeend', '<button type="button" data-coreui-stepper-action="next">Next</button>')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const next = fixtureEl.querySelector('[data-coreui-stepper-action="next"]')
+
+      next.click()
+      next.click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect([...fixtureEl.querySelectorAll('.stepper-step-button')].map(button => button.classList.contains('active'))).toEqual([false, true, false])
+      expect(stepper._isFinished).toBeFalse()
     })
 
     it('should call next action via data-coreui-stepper-action', () => {

@@ -436,6 +436,31 @@ describe('Toast', () => {
       })
     })
 
+    it('should not trigger shown when hidden while it is still showing', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="toast" data-coreui-autohide="false">',
+        '  <div class="toast-body">',
+        '    a simple toast',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const toastEl = fixtureEl.querySelector('.toast')
+      const toast = new Toast(toastEl)
+      const shownSpy = jasmine.createSpy('shown')
+      const hiddenSpy = jasmine.createSpy('hidden')
+      toastEl.addEventListener('shown.coreui.toast', shownSpy)
+      toastEl.addEventListener('hidden.coreui.toast', hiddenSpy)
+
+      const showing = toast.show()
+      await toast.hide()
+      await showing
+
+      expect(shownSpy).not.toHaveBeenCalled()
+      expect(hiddenSpy).toHaveBeenCalledTimes(1)
+      expect(toastEl).not.toHaveClass('show')
+    })
+
     it('should trigger hidden synchronously when the toast is instant', () => {
       fixtureEl.innerHTML = [
         '<div class="toast toast-instant show" data-coreui-autohide="false">',

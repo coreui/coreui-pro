@@ -105,7 +105,7 @@ class LoadingButton extends BaseComponent {
   // Public
 
   start(): void {
-    if (this._state === 'loading') {
+    if (this._state !== 'idle') {
       return
     }
 
@@ -139,6 +139,7 @@ class LoadingButton extends BaseComponent {
       return
     }
 
+    this._state = 'stopping'
     this._clearTimeouts()
     this._element.classList.remove(CLASS_NAME_IS_LOADING)
     const announced = Boolean(this._announcement)

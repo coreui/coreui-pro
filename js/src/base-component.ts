@@ -11,7 +11,7 @@
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import Config, { type ComponentConfig } from './util/config.js'
-import { executeAfterTransition, getElement } from './util/index.js'
+import { executeAfterTransition, getElement, noop } from './util/index.js'
 
 /**
  * Constants
@@ -27,6 +27,7 @@ class BaseComponent extends Config {
   declare ['constructor']: typeof BaseComponent
   protected declare _element: HTMLElement
   protected declare _config: ComponentConfig
+  protected declare _waits: WeakMap<Element, { settle: () => void, stop: () => void }> | undefined
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super()
@@ -61,19 +62,30 @@ class BaseComponent extends Config {
 
   // Private
 
-  // Runs `callback` once the transition on `element` ends, and resolves afterwards.
-  // Lifecycle methods return this promise, so `await instance.show()` continues at the
-  // same moment a `shown.coreui.*` listener would run.
   _queueCallback(callback: () => void, element: Element, isAnimated = true, transitionProperty?: string): Promise<void> {
+    const superseded = this._waits?.get(element)
+    superseded?.stop()
+
     return new Promise(resolve => {
-      executeAfterTransition(() => {
+      const wait = {
+        settle() {
+          superseded?.settle()
+          resolve()
+        },
+        stop: noop
+      }
+
+      this._waits ??= new WeakMap()
+      this._waits.set(element, wait)
+      wait.stop = executeAfterTransition(() => {
+        this._waits?.delete(element)
         // Don't run the completion callback if the instance was disposed mid-transition.
         // Still settle the promise, so an awaiting caller resumes instead of hanging.
         if (this._element) {
           callback()
         }
 
-        resolve()
+        wait.settle()
       }, element, isAnimated, transitionProperty)
     })
   }

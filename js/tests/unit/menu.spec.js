@@ -1219,6 +1219,47 @@ describe('Menu', () => {
   })
 
   describe('hide', () => {
+    const animatedMenu = () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <div class="menu" style="transition: opacity .05s">',
+        '    <a class="menu-item" href="#">Secondary link</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const events = []
+      for (const name of ['shown', 'hidden']) {
+        btnMenu.addEventListener(`${name}.coreui.menu`, () => events.push(name))
+      }
+
+      return { events, menu: new Menu(btnMenu) }
+    }
+
+    it('should fire no shown when hidden while it opens', async () => {
+      const { events, menu } = animatedMenu()
+
+      const showing = menu.show()
+      await menu.hide()
+      await showing
+
+      expect(events).toEqual(['hidden'])
+    })
+
+    it('should fire no hidden when shown again while it closes', async () => {
+      const { events, menu } = animatedMenu()
+      await menu.show()
+
+      const hiding = menu.hide()
+      await menu.show()
+      await hiding
+
+      expect(events).toEqual(['shown', 'shown'])
+      menu.dispose()
+    })
+
     it('should hide a menu', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
