@@ -19,7 +19,7 @@ import {
   createControlGroupAction
 } from './util/form-control-group.js'
 import { type ValidationState } from './util/form-validation.js'
-import { getUID } from './util/index.js'
+import { getUID, joinIds } from './util/index.js'
 import { settleClick } from './util/layers.js'
 import Popup from './util/popup.js'
 import { sanitizeByConfig } from './util/sanitizer.js'
@@ -374,7 +374,7 @@ abstract class PickerBase extends BaseComponent {
         continue
       }
 
-      this._writeAdoptedAttribute(element, name, own ? `${own} ${value}` : value)
+      this._writeAdoptedAttribute(element, name, name === 'aria-describedby' ? joinIds(own, value) : value)
       this._writeAdoptedAttribute(this._element, name, null)
     }
   }
