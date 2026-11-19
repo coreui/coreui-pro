@@ -1,5 +1,5 @@
 import {
-  forgetPress, isPressOn, lastPressedElement, pressPathOf, trackPress
+  forgetPress, isBackdropClick, isPressOn, lastPressedElement, pressPathOf, trackPress
 } from '../../../src/util/press.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -223,6 +223,98 @@ describe('Press utilities', () => {
       const outer = fixtureEl.querySelector('#outer')
 
       expect(isPressOn(click(outer), outer)).toBeTrue()
+    })
+  })
+
+  describe('isBackdropClick', () => {
+    const box = () => {
+      fixtureEl.innerHTML = '<div id="box" style="position: fixed; left: 100px; top: 100px; width: 400px; height: 200px"><input aria-label="Field"></div>'
+      return fixtureEl.querySelector('#box')
+    }
+
+    const gesture = (element, [downX, downY], [upX, upY]) => {
+      press(element, { clientX: downX, clientY: downY })
+      element.dispatchEvent(new PointerEvent('pointerup', {
+        bubbles: true, composed: true, button: 0, clientX: upX, clientY: upY
+      }))
+      const event = new MouseEvent('click', {
+        bubbles: true, composed: true, clientX: upX, clientY: upY
+      })
+      element.dispatchEvent(event)
+      return event
+    }
+
+    it('should count a press and a release outside the element\'s box', () => {
+      const element = box()
+
+      expect(isBackdropClick(gesture(element, [99.5, 200], [500, 300]), element)).toBeTrue()
+      expect(isBackdropClick(gesture(element, [50, 50], [600, 350]), element)).toBeTrue()
+      expect(isBackdropClick(gesture(element, [500, 200], [500, 200]), element)).toBeTrue()
+      expect(isBackdropClick(gesture(element, [300, 300], [300, 300]), element)).toBeTrue()
+    })
+
+    it('should judge a press by its own points, not by where the click lands', () => {
+      const element = box()
+      press(element, { clientX: 50, clientY: 50 })
+      element.dispatchEvent(new PointerEvent('pointerup', {
+        bubbles: true, composed: true, button: 0, clientX: 600, clientY: 350
+      }))
+      const event = new MouseEvent('click', {
+        bubbles: true, composed: true, clientX: 300, clientY: 200
+      })
+      element.dispatchEvent(event)
+
+      expect(isBackdropClick(event, element)).toBeTrue()
+    })
+
+    it('should take the last release, not every release since the press', () => {
+      const element = box()
+      press(element, { clientX: 50, clientY: 50 })
+      element.dispatchEvent(new PointerEvent('pointerup', {
+        bubbles: true, composed: true, button: 0, clientX: 300, clientY: 200
+      }))
+      element.dispatchEvent(new PointerEvent('pointerup', {
+        bubbles: true, composed: true, button: 0, clientX: 600, clientY: 350
+      }))
+      const event = new MouseEvent('click', {
+        bubbles: true, composed: true, clientX: 600, clientY: 350
+      })
+      element.dispatchEvent(event)
+
+      expect(isBackdropClick(event, element)).toBeTrue()
+    })
+
+    it('should not count a press or a release inside the box', () => {
+      const element = box()
+
+      expect(isBackdropClick(gesture(element, [300, 200], [300, 200]), element)).toBeFalse()
+      expect(isBackdropClick(gesture(element, [100, 200], [100, 200]), element)).toBeFalse()
+      expect(isBackdropClick(gesture(element, [100.5, 200], [50, 50]), element)).toBeFalse()
+      expect(isBackdropClick(gesture(element, [50, 50], [499.5, 299.5]), element)).toBeFalse()
+    })
+
+    it('should not count a press that started inside the element', () => {
+      const element = box()
+      press(element.querySelector('input'), { clientX: 50, clientY: 50 })
+      element.dispatchEvent(new PointerEvent('pointerup', {
+        bubbles: true, composed: true, button: 0, clientX: 50, clientY: 50
+      }))
+
+      expect(isBackdropClick(click(element), element)).toBeFalse()
+    })
+
+    it('should judge a click with no press by its own point', () => {
+      const element = box()
+      const at = (clientX, clientY) => {
+        const event = new MouseEvent('click', {
+          bubbles: true, composed: true, clientX, clientY
+        })
+        element.dispatchEvent(event)
+        return event
+      }
+
+      expect(isBackdropClick(at(300, 200), element)).toBeFalse()
+      expect(isBackdropClick(at(50, 50), element)).toBeTrue()
     })
   })
 

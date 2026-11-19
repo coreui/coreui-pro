@@ -210,7 +210,7 @@ describe('Offcanvas', () => {
 
         drawerEl.addEventListener('shown.coreui.offcanvas', () => {
           // Click on dialog element itself (backdrop area)
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: drawerEl })
           drawerEl.dispatchEvent(clickEvent)
 
@@ -467,7 +467,7 @@ describe('Offcanvas', () => {
 
         drawerEl.addEventListener('shown.coreui.offcanvas', () => {
           // Click on dialog element itself (backdrop area)
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: drawerEl })
           drawerEl.dispatchEvent(clickEvent)
         })
@@ -495,7 +495,7 @@ describe('Offcanvas', () => {
 
         drawerEl.addEventListener('shown.coreui.offcanvas', () => {
           // Click on dialog element itself
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: drawerEl })
           drawerEl.dispatchEvent(clickEvent)
 
@@ -1325,7 +1325,7 @@ describe('Offcanvas', () => {
         })
 
         drawerEl.addEventListener('shown.coreui.offcanvas', () => {
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: drawerEl })
           drawerEl.dispatchEvent(clickEvent)
 
