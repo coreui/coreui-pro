@@ -29,7 +29,7 @@ import {
   closeLayersIn, handleEscape, reanchorLayer, registerLayer, unregisterLayer, type LayerEntry
 } from './util/layers.js'
 import {
-  defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop, writeAttribute, writeOwnIds
+  defineJQueryPlugin, execute, executeAfterTransition, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop, writeAttribute, writeOwnIds
 } from './util/index.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import { followPointerIntent, type Point } from './util/safe-triangle.js'
@@ -1044,12 +1044,16 @@ class Tooltip extends BaseComponent {
     this._triggerEvent(EVENT_MOVE)
     await positioned
 
-    await this._queueCallback(() => {
-      if (this._anchor === anchor && this._isShown()) {
-        tip.removeAttribute(ATTRIBUTE_MOVING)
-        this._triggerEvent(EVENT_MOVED)
-      }
-    }, tip, animated, 'left')
+    await new Promise<void>(resolve => {
+      executeAfterTransition(() => {
+        if (this._anchor === anchor && this._isShown()) {
+          tip.removeAttribute(ATTRIBUTE_MOVING)
+          this._triggerEvent(EVENT_MOVED)
+        }
+
+        resolve()
+      }, tip, animated, 'left')
+    })
   }
 
   protected _renderTip(tip: HTMLElement): Promise<void> {

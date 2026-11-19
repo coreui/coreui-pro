@@ -1198,6 +1198,28 @@ describe('Tooltip', () => {
   })
 
   describe('hide', () => {
+    it('should not trigger shown when hidden while the tip fades in', async () => {
+      fixtureEl.innerHTML = '<style>.tooltip { position: absolute; transition: opacity .2s linear; } .tooltip:not(.show) { opacity: 0; }</style><button type="button" title="Tip">B</button>'
+      const button = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(button)
+      const shownSpy = jasmine.createSpy('shown')
+      button.addEventListener('shown.coreui.tooltip', shownSpy)
+      const hidden = new Promise(resolve => {
+        button.addEventListener('hidden.coreui.tooltip', resolve, { once: true })
+      })
+
+      const showing = tooltip.show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 30)
+      })
+      tooltip.hide()
+      await hidden
+      await showing
+
+      expect(shownSpy).not.toHaveBeenCalled()
+      tooltip.dispose()
+    })
+
     it('should hide a tooltip', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<a href="#" rel="tooltip" title="Another tooltip"></a>'
@@ -1858,6 +1880,23 @@ describe('Tooltip', () => {
       hover(a)
 
       expect(a.getAttribute('aria-describedby')).toBe(`${id} late`)
+      tooltip.dispose()
+    })
+
+    it('should still trigger shown when it moves to another anchor while the tip fades in', async () => {
+      const { a, b, bar, tooltip } = setup()
+      fixtureEl.insertAdjacentHTML('afterbegin', '<style>.tooltip { transition: opacity .2s linear; } .tooltip:not(.show) { opacity: 0; }</style>')
+      const shown = wait(bar, 'shown')
+      const moved = wait(bar, 'moved')
+      hover(a)
+      await sleep(30)
+
+      leave(a, b)
+      hover(b, a)
+      await moved
+      const event = await Promise.race([shown, sleep(600).then(() => null)])
+
+      expect(event).not.toBeNull()
       tooltip.dispose()
     })
 

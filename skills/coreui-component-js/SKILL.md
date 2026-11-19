@@ -182,7 +182,7 @@ The package must come from npm and go through a bundler (Vite, Webpack, Parcel, 
 
 1. Fire an infinitive event before the action and a past participle after it. Stop when a listener called `preventDefault()` on the first one.
 2. `EventHandler.trigger(element, name, payload)` dispatches a bubbling, cancelable native event and copies the payload keys onto it. Listeners can use `addEventListener('show.coreui.peek', …)`.
-3. Run the "after" event through `this._queueCallback(callback, element)`. It waits for the CSS transition on `element`, skips the callback when the instance was disposed meanwhile, and returns a promise. Return that promise from `show()` and `hide()`, so callers can `await` them.
+3. Run the "after" event through `this._queueCallback(callback, element)`. It waits for the CSS transition on `element`, skips the callback when the instance was disposed meanwhile, and returns a promise. A later `_queueCallback` of the same instance on the same element replaces the pending one: its callback is dropped and its promise resolves with the later one. Wait for a side effect that must not be dropped this way, such as a bounce class, with `executeAfterTransition(callback, element)` from `util/index.js`. Return that promise from `show()` and `hide()`, so callers can `await` them.
 
    ```js
    class Peek extends BaseComponent {

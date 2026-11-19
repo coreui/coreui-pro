@@ -168,7 +168,6 @@ class Menu extends BaseComponent {
   protected declare _openedBy: 'key' | 'pointer' | null
   protected declare _layer: LayerEntry
   protected declare _escapeListener: EventCallable
-  protected declare _transition: number
   protected declare _pendingHidden: Record<string, unknown> | null
 
   constructor(element?: string | Element | null, config?: Partial<MenuConfig> | null) {
@@ -191,7 +190,6 @@ class Menu extends BaseComponent {
     this._pendingTrigger = null
     this._disabledItems = new WeakSet()
     this._openedBy = null
-    this._transition = 0
     this._pendingHidden = null
 
     this._menu = (this._config.menu || this._findMenu()) as HTMLElement
@@ -293,7 +291,6 @@ class Menu extends BaseComponent {
     registerLayer(this._layer)
     this._toggleEscapeListeners(true)
     this._takeOverMenu()
-    const transition = ++this._transition
     this._moveMenuToContainer()
     this._createFloating()
 
@@ -309,9 +306,7 @@ class Menu extends BaseComponent {
     Menu._openInstances.add(this)
 
     await this._queueCallback(() => {
-      if (transition === this._transition) {
-        EventHandler.trigger(this._element, this.constructor.eventName('shown'), relatedTarget)
-      }
+      EventHandler.trigger(this._element, this.constructor.eventName('shown'), relatedTarget)
     }, this._menu, this._isAnimated(), 'opacity')
   }
 
@@ -412,12 +407,9 @@ class Menu extends BaseComponent {
 
     this._pendingHidden = relatedTarget
     Menu._exiting.set(this._menu, this)
-    const transition = ++this._transition
 
     await this._queueCallback(() => {
-      if (transition === this._transition) {
-        this._finishHide()
-      }
+      this._finishHide()
     }, this._menu, this._isAnimated(), 'opacity')
   }
 

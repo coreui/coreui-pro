@@ -205,6 +205,37 @@ describe('Navigation', () => {
     })
   })
 
+  describe('nav group transition', () => {
+    it('should keep the second toggle animating until its own transition ends', async () => {
+      fixtureEl.innerHTML = `
+        <nav data-coreui-navigation>
+          <div class="nav-group">
+            <a class="nav-group-toggle">Toggle</a>
+            <div class="nav-group-items" style="transition: height .1s">Items</div>
+          </div>
+        </nav>
+      `
+      const navEl = fixtureEl.querySelector('nav')
+      const navigation = new Navigation(navEl) // eslint-disable-line no-unused-vars
+      const toggle = navEl.querySelector('.nav-group-toggle')
+      const items = navEl.querySelector('.nav-group-items')
+      const sleep = ms => new Promise(resolve => {
+        setTimeout(resolve, ms)
+      })
+
+      toggle.click()
+      await sleep(50)
+      toggle.click()
+      await sleep(70)
+
+      expect(items).toHaveClass('collapsing')
+
+      await sleep(150)
+
+      expect(items).not.toHaveClass('collapsing')
+    })
+  })
+
   describe('Constants and getters', () => {
     it('should have correct NAME', () => {
       expect(Navigation.NAME).toBe('navigation')

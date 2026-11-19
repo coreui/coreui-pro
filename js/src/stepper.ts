@@ -257,6 +257,10 @@ class Stepper extends BaseComponent {
     this._resetPanes()
 
     for (const content of SelectorEngine.find(SELECTOR_STEPPER_STEP_CONTENT, this._element as ParentNode)) {
+      this._queueCallback(() => {
+        content.style.height = ''
+        content.style.overflow = ''
+      }, content, false)
       content.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
       content.setAttribute('aria-hidden', 'true')
     }
@@ -490,21 +494,19 @@ class Stepper extends BaseComponent {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     element.offsetHeight
 
-    requestAnimationFrame(() => {
-      element.style.height = `${endHeight}px`
-      this._queueCallback(() => {
-        element.style.overflow = 'initial'
-        if (expand) {
-          element.style.height = 'auto'
-        }
+    element.style.height = `${endHeight}px`
+    this._queueCallback(() => {
+      element.style.overflow = 'initial'
+      if (expand) {
+        element.style.height = 'auto'
+      }
 
-        if (hidesFocus) {
-          element.setAttribute('aria-hidden', 'true')
-        }
+      if (hidesFocus) {
+        element.setAttribute('aria-hidden', 'true')
+      }
 
-        callback?.()
-      }, element, true)
-    })
+      callback?.()
+    }, element, true)
   }
 
   _resetPanes(activePane: HTMLElement | null = null): void {

@@ -1401,6 +1401,41 @@ describe('Stepper', () => {
         stepper.reset()
       })
     })
+
+    it('should drop a finish whose step content is still collapsing', async () => {
+      fixtureEl.innerHTML = getStepContentFixture({ activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const lastButton = fixtureEl.querySelectorAll('.stepper-step-button')[2]
+      let finished = 0
+      stepperElement.addEventListener('finish.coreui.stepper', () => {
+        finished++
+      })
+
+      stepper.finish()
+      stepper.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(finished).toBe(0)
+      expect(lastButton).not.toHaveClass('complete')
+    })
+
+    it('should open the first step content at its own height after reset', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const [first] = fixtureEl.querySelectorAll('.stepper-step-content')
+
+      stepper.next()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+      stepper.reset()
+
+      expect(first.style.height).toBe('')
+      expect(first.style.overflow).toBe('')
+    })
   })
 
   describe('linear mode', () => {

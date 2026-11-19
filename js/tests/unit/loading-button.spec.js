@@ -424,6 +424,24 @@ describe('LoadingButton', () => {
       expect(messages('polite')).toEqual(['Save'])
     })
 
+    it('should announce the end once when stopped again while the spinner fades out', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button)
+      const stopped = jasmine.createSpy('stop')
+      button.addEventListener('stop.coreui.loading-button', stopped)
+
+      button.focus()
+      loadingButton.start()
+      vi.advanceTimersByTime(110)
+      loadingButton.stop()
+      loadingButton.stop()
+      vi.advanceTimersByTime(300)
+
+      expect(messages('polite')).toEqual(['Save'])
+      expect(stopped).toHaveBeenCalledTimes(1)
+    })
+
     it('should cancel a start message that was not read yet', () => {
       fixtureEl.innerHTML = '<button>Save</button>'
       const button = fixtureEl.querySelector('button')
