@@ -4,8 +4,10 @@ const listening = new WeakSet<Document>()
 let pressPath: EventTarget[] | null = null
 let lastPressed: Element | null = null
 let releaseTarget: EventTarget | null = null
+let pressPoints: PointerEvent[] = []
 const clickPresses = new WeakMap<Event, EventTarget[]>()
 const clickReleases = new WeakMap<Event, EventTarget>()
+const clickPoints = new WeakMap<Event, PointerEvent[]>()
 
 /**
  * Forgets a press that no click has taken yet, so that only presses made from now on count.
@@ -30,14 +32,17 @@ export const trackPress = (doc: Document = document): void => {
   doc.addEventListener('pointerdown', event => {
     pressPath = event.button === 0 ? event.composedPath() : null
     releaseTarget = null
+    pressPoints = [event]
     lastPressed = (pressPath?.find(target => target instanceof Element && target.matches(SELECTOR_CONTROL)) as Element | undefined) ?? null
   }, true)
   doc.addEventListener('pointerup', event => {
     releaseTarget = event.button === 0 ? event.composedPath()[0] : null
+    pressPoints[1] = event
   }, true)
   doc.addEventListener('click', event => {
     if (pressPath?.includes(event.composedPath()[0])) {
       clickPresses.set(event, pressPath)
+      clickPoints.set(event, pressPoints)
 
       if (releaseTarget) {
         clickReleases.set(event, releaseTarget)
@@ -85,6 +90,25 @@ export const isPressOn = (event: Event, element: Element): boolean => {
   const press = pressPathOf(event)
 
   return !press || !press.includes(element) || (press[0] === element && clickReleases.get(event) === element)
+}
+
+/**
+ * Tells whether a `click` on a modal dialog belongs to its `::backdrop`: the press started and was
+ * released on the dialog itself (see `isPressOn`), and both points lie outside the dialog's border
+ * box. A click with no press of its own is judged by its own point. A press inside the box, on the
+ * dialog's border or on a gap between its parts, and the click a screen reader sends to the middle
+ * of the dialog, do not count.
+ *
+ * @param event - The `click` event, whose target is the dialog
+ * @param dialog - The dialog element
+ * @returns `true` when the click belongs to the backdrop
+ */
+export const isBackdropClick = (event: MouseEvent, dialog: Element): boolean => {
+  const { bottom, left, right, top } = dialog.getBoundingClientRect()
+
+  return isPressOn(event, dialog) && (clickPoints.get(event) ?? [event]).every(({ clientX: x, clientY: y }) =>
+    x < left || x >= right || y < top || y >= bottom
+  )
 }
 
 /**

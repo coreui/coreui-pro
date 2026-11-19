@@ -20,7 +20,7 @@ import {
 } from './util/layers.js'
 import { executeAfterTransition } from './util/index.js'
 import { unwrapLegacyShell } from './util/legacy-markup.js'
-import { isPressOn, trackPress } from './util/press.js'
+import { isBackdropClick, trackPress } from './util/press.js'
 import { lockScroll, unlockScroll } from './util/scroll-lock.js'
 
 /**
@@ -423,7 +423,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
     // Backdrop clicks — clicks on ::backdrop target the dialog element itself
     EventHandler.on(this._element, `click${eventKey}`, event => {
-      if (event.target !== this._element || !this._openedAsModal || !isPressOn(event, this._element)) {
+      if (event.target !== this._element || !this._openedAsModal || !isBackdropClick(event as MouseEvent, this._element)) {
         return
       }
 

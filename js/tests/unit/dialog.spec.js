@@ -349,7 +349,7 @@ describe('Dialog', () => {
 
         dialogEl.addEventListener('shown.coreui.dialog', () => {
           // Click directly on the dialog element (backdrop area)
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
         })
@@ -379,7 +379,7 @@ describe('Dialog', () => {
 
         dialogEl.addEventListener('shown.coreui.dialog', () => {
           // Click on inner content - should not close
-          const clickEvent = createEvent('click', { bubbles: true })
+          const clickEvent = new MouseEvent('click', { bubbles: true })
           dialogBody.dispatchEvent(clickEvent)
 
           setTimeout(() => {
@@ -507,7 +507,7 @@ describe('Dialog', () => {
         const spy = spyOn(dialog, 'hide')
 
         dialogEl.addEventListener('shown.coreui.dialog', () => {
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
 
@@ -532,7 +532,7 @@ describe('Dialog', () => {
         })
 
         dialogEl.addEventListener('shown.coreui.dialog', () => {
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
 
@@ -558,7 +558,7 @@ describe('Dialog', () => {
         })
 
         dialogEl.addEventListener('shown.coreui.dialog', () => {
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
         })
@@ -629,7 +629,7 @@ describe('Dialog', () => {
         const spy = spyOn(dialog, 'hide')
 
         dialogEl.addEventListener('shown.coreui.dialog', () => {
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
 
@@ -1770,7 +1770,7 @@ describe('Dialog', () => {
             }, 10)
           })
 
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
         })

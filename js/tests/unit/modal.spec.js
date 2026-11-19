@@ -496,6 +496,66 @@ describe('Modal', () => {
       expect(prevented).toEqual(['prevented'])
     })
 
+    it('should close on the backdrop only when the press is outside the dialog box', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal modal-instant"><input aria-label="Field"></dialog>'
+      const modalEl = fixtureEl.querySelector('dialog')
+      const press = ([downX, downY], [upX, upY]) => {
+        modalEl.dispatchEvent(new PointerEvent('pointerdown', {
+          bubbles: true, composed: true, button: 0, clientX: downX, clientY: downY
+        }))
+        modalEl.dispatchEvent(new PointerEvent('pointerup', {
+          bubbles: true, composed: true, button: 0, clientX: upX, clientY: upY
+        }))
+        modalEl.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: upX, clientY: upY }))
+      }
+
+      const modal = new Modal(modalEl)
+      await modal.show()
+      const { left, top, right, bottom } = modalEl.getBoundingClientRect()
+      const centre = [(left + right) / 2, (top + bottom) / 2]
+      press(centre, centre)
+      press([left, top], [left, top])
+      press([left + 0.5, centre[1]], [left - 10, centre[1]])
+      modalEl.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: centre[0], clientY: centre[1] }))
+
+      expect(modalEl.open).toBeTrue()
+
+      press([left - 10, top - 10], [right, bottom])
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(modalEl.open).toBeFalse()
+    })
+
+    it('should not bounce a static backdrop on a press inside the dialog box', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal modal-instant" data-coreui-backdrop="static"><input aria-label="Field"></dialog>'
+      const modalEl = fixtureEl.querySelector('dialog')
+      const prevented = []
+      modalEl.addEventListener('hidePrevented.coreui.modal', () => prevented.push('prevented'))
+      const press = ([x, y]) => {
+        modalEl.dispatchEvent(new PointerEvent('pointerdown', {
+          bubbles: true, composed: true, button: 0, clientX: x, clientY: y
+        }))
+        modalEl.dispatchEvent(new PointerEvent('pointerup', {
+          bubbles: true, composed: true, button: 0, clientX: x, clientY: y
+        }))
+        modalEl.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x, clientY: y }))
+      }
+
+      const modal = new Modal(modalEl)
+      await modal.show()
+      const { left, top, right, bottom } = modalEl.getBoundingClientRect()
+      press([(left + right) / 2, (top + bottom) / 2])
+
+      expect(prevented).toEqual([])
+      expect(modalEl).not.toHaveClass('modal-static')
+
+      press([left - 10, top - 10])
+
+      expect(prevented).toEqual(['prevented'])
+    })
+
     for (const mode of ['open', 'closed']) {
       it(`should close on the backdrop of a modal inside a ${mode} shadow root`, async () => {
         const drag = (from, to, target) => {
@@ -538,7 +598,7 @@ describe('Modal', () => {
 
         dialogEl.addEventListener('shown.coreui.modal', () => {
           // Click directly on the dialog element (backdrop area)
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
         })
@@ -568,7 +628,7 @@ describe('Modal', () => {
 
         dialogEl.addEventListener('shown.coreui.modal', () => {
           // Click on inner content - should not close
-          const clickEvent = createEvent('click', { bubbles: true })
+          const clickEvent = new MouseEvent('click', { bubbles: true })
           dialogBody.dispatchEvent(clickEvent)
 
           setTimeout(() => {
@@ -703,7 +763,7 @@ describe('Modal', () => {
         const spy = spyOn(dialog, 'hide')
 
         dialogEl.addEventListener('shown.coreui.modal', () => {
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
 
@@ -728,7 +788,7 @@ describe('Modal', () => {
         })
 
         dialogEl.addEventListener('shown.coreui.modal', () => {
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
 
@@ -754,7 +814,7 @@ describe('Modal', () => {
         })
 
         dialogEl.addEventListener('shown.coreui.modal', () => {
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
         })
@@ -864,7 +924,7 @@ describe('Modal', () => {
         const spy = spyOn(dialog, 'hide')
 
         dialogEl.addEventListener('shown.coreui.modal', () => {
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
 
@@ -2096,7 +2156,7 @@ describe('Modal', () => {
             }, 10)
           })
 
-          const clickEvent = createEvent('click')
+          const clickEvent = new MouseEvent('click')
           Object.defineProperty(clickEvent, 'target', { value: dialogEl })
           dialogEl.dispatchEvent(clickEvent)
         })
