@@ -224,21 +224,21 @@ class Stepper extends BaseComponent {
     }
 
     this._isFinished = true
+    this._disableStepButtons()
 
     const finishHandler = () => {
       active.classList.remove(CLASS_NAME_ACTIVE)
+      this._setSelected(active, false)
       active.classList.add(CLASS_NAME_COMPLETE)
       this._appendIndicatorIcon(active)
       EventHandler.trigger(this._element, EVENT_FINISH)
-      this._isFinished = true
-      this._disableStepButtons()
     }
 
     const pane = this._getTargetPane(active)
     const stepContent = active.parentNode!.querySelector(SELECTOR_STEPPER_STEP_CONTENT)
 
     if (pane) {
-      pane.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
+      this._resetPanes()
       finishHandler()
     } else if (stepContent) {
       this._animateHeight(stepContent, false, finishHandler)
@@ -477,6 +477,12 @@ class Stepper extends BaseComponent {
     const startHeight = expand ? 0 : element.scrollHeight
     const endHeight = expand ? element.scrollHeight : 0
 
+    const hidesFocus = !expand && element.contains(rootActiveElement(element))
+
+    if (!hidesFocus) {
+      element.setAttribute('aria-hidden', String(!expand))
+    }
+
     element.style.height = `${startHeight}px`
     element.style.overflow = 'hidden'
 
@@ -490,6 +496,10 @@ class Stepper extends BaseComponent {
         element.style.overflow = 'initial'
         if (expand) {
           element.style.height = 'auto'
+        }
+
+        if (hidesFocus) {
+          element.setAttribute('aria-hidden', 'true')
         }
 
         callback?.()

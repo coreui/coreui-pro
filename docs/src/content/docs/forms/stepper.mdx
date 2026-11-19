@@ -632,7 +632,7 @@ const stepperList = stepperElementList.map(stepperEl => {
 
 | Method | Description |
 | --- | --- |
-| `finish()` | On the last enabled step, complete the form wizard and mark all steps as finished. Called from an earlier step, it does nothing. |
+| `finish()` | On the last enabled step, complete the form wizard: every step is marked finished and disabled, and no step stays open or selected. Called from an earlier step, it does nothing. |
 | `getInstance(element)` | Retrieve the Stepper instance from a DOM element. |
 | `getOrCreateInstance(element)` | Get or create the Stepper instance associated with a DOM element. |
 | `next()` | Go to the next step. On the last enabled step, finish the wizard as `finish()` does. |
