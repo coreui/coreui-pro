@@ -154,6 +154,8 @@ class Menu extends BaseComponent {
   protected declare _parent: HTMLElement
   protected declare _openSubmenus: Map<HTMLElement, () => void>
   protected declare _hoverOpenedSubmenus: Set<HTMLElement>
+  protected declare _hoverTrigger: HTMLElement | null
+  protected declare _pointerType: string
   protected declare _submenuCloseTimeouts: Map<HTMLElement, number>
   protected declare _submenuListeners: Array<[string, string | null, EventCallable]>
   protected declare _intent: (() => void) | null
@@ -183,6 +185,8 @@ class Menu extends BaseComponent {
     this._parent = this._element.parentNode as HTMLElement // menu wrapper
     this._openSubmenus = new Map()
     this._hoverOpenedSubmenus = new Set()
+    this._hoverTrigger = null
+    this._pointerType = 'mouse'
     this._submenuCloseTimeouts = new Map()
     this._submenuListeners = []
     this._intent = null
@@ -848,7 +852,11 @@ class Menu extends BaseComponent {
 
   protected _setupSubmenuListeners(): void {
     if (this._config.submenuTrigger === 'hover' || this._config.submenuTrigger === 'both') {
-      this._listenOnMenu('mouseenter', this.constructor.SELECTOR_SUBMENU_TOGGLE, event => {
+      this._listenOnMenu('pointerover', null, event => {
+        this._pointerType = (event as unknown as PointerEvent).pointerType
+      })
+
+      this._listenOnMenu('mousemove', null, event => {
         this._onSubmenuTriggerEnter(event)
       })
 
@@ -882,9 +890,12 @@ class Menu extends BaseComponent {
 
   protected _onSubmenuTriggerEnter(event: CoreUIEvent): void {
     const trigger = (event.target as Element).closest<HTMLElement>(this.constructor.SELECTOR_SUBMENU_TOGGLE)
-    if (!trigger) {
+    const { movementX, movementY } = event as unknown as MouseEvent
+    if (!trigger || trigger === this._hoverTrigger || (this._pointerType === 'mouse' && !movementX && !movementY)) {
       return
     }
+
+    this._hoverTrigger = trigger
 
     if (this._intent && !trigger.closest(this.constructor.SELECTOR_SUBMENU)!.contains(this._intentSubmenu)) {
       this._pendingTrigger = trigger
@@ -915,6 +926,10 @@ class Menu extends BaseComponent {
   protected _onSubmenuLeave(event: CoreUIEvent): void {
     const submenuWrapper = (event.target as Element).closest(this.constructor.SELECTOR_SUBMENU)!
     const submenu = SelectorEngine.findOne(this.constructor.SELECTOR_MENU, submenuWrapper)
+
+    if (this._hoverTrigger && submenuWrapper.contains(this._hoverTrigger)) {
+      this._hoverTrigger = null
+    }
 
     if (this._pendingTrigger && submenuWrapper.contains(this._pendingTrigger)) {
       this._pendingTrigger = null
@@ -1098,6 +1113,8 @@ class Menu extends BaseComponent {
   }
 
   protected _closeAllSubmenus(): void {
+    this._hoverTrigger = null
+
     for (const [submenu] of this._openSubmenus) {
       const submenuWrapper = submenu.closest(this.constructor.SELECTOR_SUBMENU)!
       this._closeSubmenu(submenu, submenuWrapper)

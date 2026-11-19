@@ -1541,6 +1541,7 @@ describe('Menu', () => {
       new Menu(btnMenu, { submenuTrigger: 'both' }).dispose()
 
       submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
       submenuTrigger.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
       submenuTrigger.click()
 
@@ -3687,6 +3688,7 @@ describe('Menu', () => {
 
       new Menu(btnMenu).show()
       submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
       expect(submenu).toHaveClass('show')
 
       submenuTrigger.click()
@@ -3695,6 +3697,127 @@ describe('Menu', () => {
 
       submenuTrigger.click()
       expect(submenu).not.toHaveClass('show')
+    })
+
+    it('should not open a submenu when its trigger moves under a pointer that stays still', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '      <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+
+      new Menu(btnMenu).show()
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+      expect(submenu).not.toHaveClass('show')
+
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementY: -1 }))
+      expect(submenu).toHaveClass('show')
+    })
+
+    it('should not reopen a submenu closed by click while the pointer moves on its trigger', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '      <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuWrapper = fixtureEl.querySelector('.submenu')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+
+      new Menu(btnMenu).show()
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
+      submenuTrigger.click()
+      submenuTrigger.click()
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
+      expect(submenu).not.toHaveClass('show')
+
+      submenuWrapper.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: btnMenu }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: btnMenu }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
+      expect(submenu).toHaveClass('show')
+    })
+
+    it('should open a submenu on hover after the menu closed and opened again with no pointer leave', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '      <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+
+      const menu = new Menu(btnMenu, { container: 'body' })
+      menu.show()
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
+      submenuTrigger.click()
+      submenuTrigger.click()
+      menu.hide()
+      menu.show()
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
+
+      expect(submenu).toHaveClass('show')
+    })
+
+    it('should open a submenu in hover mode on a tap, whose emulated mousemove has no movement', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '      <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+
+      new Menu(btnMenu, { submenuTrigger: 'hover' }).show()
+      submenuTrigger.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'touch' }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+
+      expect(submenu).toHaveClass('show')
     })
 
     it('should open on click a submenu that a hover opened and the menu closed since', () => {
@@ -3719,6 +3842,7 @@ describe('Menu', () => {
       const menu = new Menu(btnMenu)
       menu.show()
       submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
       menu.hide()
       menu.show()
       submenuTrigger.click()
@@ -3747,6 +3871,7 @@ describe('Menu', () => {
 
       new Menu(btnMenu).show()
       submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
       submenuTrigger.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' }))
       submenuTrigger.click()
 
@@ -3774,6 +3899,7 @@ describe('Menu', () => {
 
       new Menu(btnMenu).show()
       submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
       fixtureEl.querySelector('.submenu').dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: btnMenu }))
       await new Promise(resolve => {
         setTimeout(resolve, 150)
@@ -3806,6 +3932,7 @@ describe('Menu', () => {
       new Menu(btnMenu).show()
       submenuTrigger.click()
       submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
       submenuTrigger.click()
 
       expect(submenu).not.toHaveClass('show')
@@ -4701,7 +4828,7 @@ describe('Menu', () => {
 
         btnMenu.addEventListener('shown.coreui.menu', () => {
           // Use internal handler directly with mock event
-          const mockEvent = { target: submenuTrigger }
+          const mockEvent = { movementX: 1, target: submenuTrigger }
           menu._onSubmenuTriggerEnter(mockEvent)
 
           // Submenu should open
@@ -4935,7 +5062,7 @@ describe('Menu', () => {
           expect(menu._submenuCloseTimeouts.has(submenu)).toBeTrue()
 
           // Re-enter submenu trigger should cancel timeout
-          const mockEvent = { target: submenuTrigger }
+          const mockEvent = { movementX: 1, target: submenuTrigger }
           menu._onSubmenuTriggerEnter(mockEvent)
 
           // Timeout should be cancelled
@@ -6867,9 +6994,15 @@ describe('Menu', () => {
     })
 
     const pointer = (x, y, target = document) => target.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: x, clientY: y }))
-    const over = (element, relatedTarget, x = 0, y = 0) => element.dispatchEvent(new MouseEvent('mouseover', {
-      bubbles: true, clientX: x, clientY: y, relatedTarget
-    }))
+    const over = (element, relatedTarget, x = 0, y = 0) => {
+      element.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true, clientX: x, clientY: y, relatedTarget
+      }))
+      element.dispatchEvent(new MouseEvent('mousemove', {
+        bubbles: true, clientX: x, clientY: y, movementX: 1
+      }))
+    }
+
     const out = (element, relatedTarget, x = 0, y = 0) => element.dispatchEvent(new MouseEvent('mouseout', {
       bubbles: true, clientX: x, clientY: y, relatedTarget
     }))
@@ -7010,6 +7143,8 @@ describe('Menu', () => {
 
       over(nTrigger, panelA)
       await sleep(20)
+      expect(nPanel).toHaveClass('show')
+
       const nRect = nTrigger.getBoundingClientRect()
       out(nTrigger, document.body, nRect.right - 2, nRect.bottom - 1)
       out(triggerA, document.body, rect.right - 2, rect.bottom - 1)
