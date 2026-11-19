@@ -171,7 +171,7 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | `dispose` | Destroys the instance, removes the tooltip and tick marks it created, and hands back the attributes and styles it set on the input and the wrapper. |
 | `getInstance` | Static method which allows you to get the Range instance associated to a DOM element, you can use it like this: `coreui.Range.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a Range instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Range.getOrCreateInstance(element)` |
-| `update` | Recomputes the fill and the tooltip from the input's current value. Useful after setting a value programmatically. |
+| `update` | Recomputes the fill, the tooltip and the ticks from the input's current value, `min`, `max` and the options of its `<datalist>`. Call it after code changes any of them. |
 
 ### Events
 
@@ -190,7 +190,7 @@ input.addEventListener('changed.coreui.range', event => {
 ## Accessibility
 
 - The control is a native `<input type="range">`: label it with a `<label>`, and the browser exposes it as a slider with its value, minimum and maximum.
-- When the value has a tick label, or `tooltipsFormat` formats it, the input gets `aria-valuetext` with that text; otherwise an `aria-valuetext` the page set stays.
+- When the value has a tick label, or `tooltipsFormat` formats it, the input gets `aria-valuetext` with that text; otherwise it carries the `aria-valuetext` the page set last, also one the page changed while a label was shown.
 
 ### Keyboard support
 
