@@ -237,6 +237,16 @@
         "default": "./js/dist/util/form-validation.js"
       }
     },
+    "./utils/hash-target": {
+      "import": {
+        "types": "./js/dist/util/hash-target.d.mts",
+        "default": "./js/dist/util/hash-target.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/hash-target.d.ts",
+        "default": "./js/dist/util/hash-target.js"
+      }
+    },
     "./utils/layers": {
       "import": {
         "types": "./js/dist/util/layers.d.mts",
