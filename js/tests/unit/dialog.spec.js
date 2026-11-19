@@ -1271,6 +1271,16 @@ describe('Dialog', () => {
         expect([first.open, second.open, second.classList.contains('dialog-swap-in')]).toEqual([true, true, false])
       })
 
+      it('should not swap into a dialog that is still closing', async () => {
+        const [, first, second, toSecond] = mount('class="dialog" data-coreui-modal="false"', 'class="dialog" data-coreui-modal="false"')
+        await Dialog.getOrCreateInstance(second).show()
+        await Dialog.getOrCreateInstance(first).show()
+        Dialog.getInstance(second).hide()
+        toSecond.click()
+
+        expect([first.open, second.classList.contains('hiding'), second.classList.contains('dialog-swap-in')]).toEqual([true, true, false])
+      })
+
       it('should keep the current dialog open when the incoming one cancels its show', async () => {
         const [open, first, second, toSecond] = mount()
         open.click()
@@ -1492,6 +1502,30 @@ describe('Dialog', () => {
 
         dialog.show()
       })
+    })
+
+    it('should close a dropdown opened inside it when it closes after opening again during its exit', async () => {
+      fixtureEl.innerHTML = [
+        '<dialog class="dialog">',
+        '  <div class="dropdown">',
+        '    <button class="btn" data-coreui-toggle="dropdown">Menu</button>',
+        '    <ul class="dropdown-menu"><li><a class="dropdown-item" href="#">Item</a></li></ul>',
+        '  </div>',
+        '</dialog>'
+      ].join('')
+
+      const dialog = new Dialog(fixtureEl.querySelector('.dialog'), { modal: false })
+      const dropdown = new Dropdown(fixtureEl.querySelector('[data-coreui-toggle="dropdown"]'))
+      await dialog.show()
+      dialog.hide()
+      await dialog.show()
+
+      dropdown.show()
+      await dialog.hide()
+      const open = dropdown._isShown()
+      dropdown.dispose()
+
+      expect(open).toBeFalse()
     })
   })
 

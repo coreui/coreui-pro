@@ -1,5 +1,5 @@
 import {
-  containsFocus, deepActiveElement, focusFirstUsable, focusIfUsable, focusWithTemporaryTabindex, holdsFocusOrNone,
+  containsFocus, deepActiveElement, focusDialog, focusFirstUsable, focusIfUsable, focusWithTemporaryTabindex, holdsFocusOrNone,
   rootActiveElement
 } from '../../../src/util/focus.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
@@ -110,6 +110,50 @@ describe('Focus utilities', () => {
       shadow.querySelector('button').focus()
 
       expect(deepActiveElement(document)).toEqual(host)
+    })
+  })
+
+  describe('focusDialog', () => {
+    const openDialog = content => {
+      fixtureEl.innerHTML = `<button id="trigger"></button><dialog>${content}</dialog>`
+      const dialog = fixtureEl.querySelector('dialog')
+      dialog.show()
+      fixtureEl.querySelector('#trigger').focus()
+      return dialog
+    }
+
+    it('should focus the element with autofocus first', () => {
+      const dialog = openDialog('<button id="close"></button><input id="field" autofocus>')
+
+      focusDialog(dialog)
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#field'))
+    })
+
+    it('should focus the first element that takes the focus without autofocus', () => {
+      const dialog = openDialog('<button id="disabled" disabled></button><button id="close"></button><input>')
+
+      focusDialog(dialog)
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#close'))
+    })
+
+    it('should focus the dialog itself when nothing inside takes the focus', () => {
+      const dialog = openDialog('<p>Text</p>')
+
+      focusDialog(dialog)
+
+      expect(document.activeElement).toEqual(dialog)
+    })
+
+    it('should leave the focus where it is when it is already inside', () => {
+      const dialog = openDialog('<button id="close"></button><input id="field" autofocus><button id="current"></button>')
+      const current = fixtureEl.querySelector('#current')
+      current.focus()
+
+      focusDialog(dialog)
+
+      expect(document.activeElement).toEqual(current)
     })
   })
 

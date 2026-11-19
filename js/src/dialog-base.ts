@@ -14,7 +14,7 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { holdAnnouncements } from './util/announce.js'
-import { containsFocus, deepActiveElement } from './util/focus.js'
+import { containsFocus, deepActiveElement, focusDialog } from './util/focus.js'
 import {
   isComposingKey, registerLayer, rememberFocusOrigin, returnFocus, unregisterLayer, type LayerEntry
 } from './util/layers.js'
@@ -95,7 +95,8 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
   // Public
   toggle(relatedTarget?: HTMLElement | null): Promise<void> {
-    return this._element.open ? this.hide() : this.show(relatedTarget)
+    const reopens = this._isClosing() && !this._element.contains(relatedTarget ?? null)
+    return this._element.open && !reopens ? this.hide() : this.show(relatedTarget)
   }
 
   async show(relatedTarget?: HTMLElement | null): Promise<void> {
@@ -117,7 +118,11 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   // Protected — lifecycle stages
 
   protected _canShow(relatedTarget?: HTMLElement | null): boolean {
-    if (this._element.open || this._isTransitioning) {
+    if (this._isClosing()) {
+      if (!this._element.open) {
+        return false
+      }
+    } else if (this._element.open || this._isTransitioning) {
       return false
     }
 
@@ -127,14 +132,20 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   }
 
   protected async _show(relatedTarget?: HTMLElement | null): Promise<void> {
+    const reopening = this._element.open
     this._isTransitioning = true
     this._hiddenByComponent = false
     this._onBeforeShow()
 
-    const { modal, preventBodyScroll } = this._getShowOptions()
-    rememberFocusOrigin(this._element, relatedTarget ?? deepActiveElement(document))
-    registerLayer(this._layer)
-    this._showElement({ modal, preventBodyScroll })
+    if (reopening) {
+      registerLayer(this._layer)
+      this._element.classList.remove(CLASS_NAME_HIDING)
+      focusDialog(this._element)
+    } else {
+      rememberFocusOrigin(this._element, relatedTarget ?? deepActiveElement(document))
+      registerLayer(this._layer)
+      this._showElement(this._getShowOptions())
+    }
 
     await this._queueCallback(() => {
       this._isTransitioning = false
@@ -143,7 +154,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   }
 
   protected _canHide(): boolean {
-    if (!this._element.open || (this._isTransitioning && this._hiddenByComponent)) {
+    if (!this._element.open || this._isClosing()) {
       return false
     }
 
@@ -229,6 +240,10 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   }
 
   // Protected — shared mechanics
+
+  protected _isClosing(): boolean {
+    return this._isTransitioning && this._hiddenByComponent
+  }
 
   protected _showElement({ modal = true, preventBodyScroll = true }: { modal?: boolean, preventBodyScroll?: boolean } = {}): void {
     this._openedAsModal = modal
@@ -316,7 +331,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     }
 
     const hideWhenInline = (): void => {
-      if (this._isTransitioning && this._hiddenByComponent) {
+      if (this._isClosing()) {
         this._resizeFrame = requestAnimationFrame(hideWhenInline)
         return
       }

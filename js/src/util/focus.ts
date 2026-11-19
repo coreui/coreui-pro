@@ -1,3 +1,4 @@
+import SelectorEngine from '../dom/selector-engine.js'
 import { isDisabled, isVisible } from './index.js'
 
 /**
@@ -83,6 +84,19 @@ export const focusIfUsable = (element: HTMLElement | null | undefined, options?:
  */
 export const focusFirstUsable = (elements: (HTMLElement | null | undefined)[], options?: FocusOptions): HTMLElement | undefined =>
   elements.find((element): element is HTMLElement => focusIfUsable(element, options))
+
+/**
+ * Moves the focus into an open dialog: to the element with `autofocus` inside it, else to the first
+ * element `SelectorEngine.focusableChildren` finds in it, else to the dialog itself. Focus already
+ * inside the dialog stays where it is.
+ *
+ * @param dialog - The open dialog
+ */
+export const focusDialog = (dialog: HTMLElement): void => {
+  if (!containsFocus(dialog)) {
+    focusFirstUsable([dialog.querySelector<HTMLElement>('[autofocus]'), ...SelectorEngine.focusableChildren(dialog), dialog])
+  }
+}
 
 /**
  * Focuses an element that need not be focusable. One without a `tabindex` gets `tabindex="-1"`
