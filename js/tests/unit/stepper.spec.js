@@ -243,6 +243,8 @@ describe('Stepper', () => {
       // Panes
       const panes = fixtureEl.querySelectorAll('.stepper-pane')
       expect(panes[0].getAttribute('role')).toBe('tabpanel')
+      expect(panes[0].getAttribute('aria-hidden')).toBe('false')
+      expect(panes[1].getAttribute('aria-hidden')).toBe('true')
       expect(panes[0].getAttribute('aria-labelledby')).toBe(buttons[0].id)
       expect(panes[0].hasAttribute('aria-live')).toBeFalse()
     })
@@ -530,6 +532,8 @@ describe('Stepper', () => {
       expect(panes[0]).not.toHaveClass('show')
       expect(panes[1]).toHaveClass('active')
       expect(panes[1]).toHaveClass('show')
+      expect(panes[0].getAttribute('aria-hidden')).toBe('true')
+      expect(panes[1].getAttribute('aria-hidden')).toBe('false')
     })
 
     it('should mark previous steps as complete', () => {
@@ -858,6 +862,18 @@ describe('Stepper', () => {
 
         stepper.finish()
       })
+    })
+
+    it('should mark every step complete on finish', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 3 })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.finish()
+
+      for (const button of fixtureEl.querySelectorAll('.stepper-step-button')) {
+        expect(button).toHaveClass('complete')
+        expect(button.querySelector('.stepper-step-indicator-icon')).not.toBeNull()
+      }
     })
 
     it('should do nothing before the last step', () => {
@@ -3001,6 +3017,17 @@ describe('Stepper', () => {
       expect(buttons[1]).not.toHaveClass('complete')
       expect(buttons[2]).not.toHaveClass('complete')
     })
+
+    it('should leave the complete marks alone for a step it does not own', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 3 })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper._updateCompleteStates(-1)
+
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+      expect(buttons[0]).toHaveClass('complete')
+      expect(buttons[1]).toHaveClass('complete')
+    })
   })
 
   describe('_disableStepButtons', () => {
@@ -3409,36 +3436,7 @@ describe('Stepper', () => {
     })
   })
 
-  describe('_complete', () => {
-    it('should do nothing if button parent is not in steps container', () => {
-      fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-stepper>
-          <ol class="stepper-steps">
-            <li class="stepper-step">
-              <button type="button" class="stepper-step-button active">
-                <span class="stepper-step-indicator">1</span>
-              </button>
-            </li>
-          </ol>
-        </div>
-      `
-
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement)
-
-      // Create a button inside stepper-steps but not inside a stepper-step
-      const stepsContainer = fixtureEl.querySelector('.stepper-steps')
-      const outsideBtn = document.createElement('button')
-      outsideBtn.classList.add('stepper-step-button')
-      stepsContainer.append(outsideBtn)
-
-      // _complete should return early because activeStepIdx will be -1
-      // (outsideBtn.parentNode is stepper-steps, not a stepper-step)
-      stepper._complete(outsideBtn)
-    })
-  })
-
-  describe('_setInitialComplete', () => {
+  describe('complete marks at start', () => {
     it('should set complete on steps before active', () => {
       fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 2 })
 

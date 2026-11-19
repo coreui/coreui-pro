@@ -104,7 +104,7 @@ class Stepper extends BaseComponent {
     this._addStepperConnector()
     this._resetPanes(this._getTargetPane(this._activeStepButton))
     this._wrapIndicatorText()
-    this._setInitialComplete()
+    this._updateCompleteStates(this._stepButtons.indexOf(this._activeStepButton))
     this._updateStepButtonsDisabledState()
     this._setupAccessibilityAttributes()
 
@@ -166,7 +166,7 @@ class Stepper extends BaseComponent {
     this._deactivate(active)
     this._activate(button)
     this._updateStepButtonsDisabledState()
-    this._complete(button)
+    this._updateCompleteStates(this._stepButtons.indexOf(button))
 
     if (holdsFocus) {
       button.focus()
@@ -227,7 +227,8 @@ class Stepper extends BaseComponent {
 
     const finishHandler = () => {
       active.classList.remove(CLASS_NAME_ACTIVE)
-      this._markAsComplete(active)
+      active.classList.add(CLASS_NAME_COMPLETE)
+      this._appendIndicatorIcon(active)
       EventHandler.trigger(this._element, EVENT_FINISH)
       this._isFinished = true
       this._disableStepButtons()
@@ -253,10 +254,7 @@ class Stepper extends BaseComponent {
 
     const holdsFocus = this._holdsFocus()
 
-    for (const pane of SelectorEngine.find(SELECTOR_STEPPER_PANE, this._element as ParentNode)) {
-      pane.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
-      pane.setAttribute('aria-hidden', 'true')
-    }
+    this._resetPanes()
 
     for (const content of SelectorEngine.find(SELECTOR_STEPPER_STEP_CONTENT, this._element as ParentNode)) {
       content.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
@@ -264,8 +262,7 @@ class Stepper extends BaseComponent {
     }
 
     for (const btn of this._stepButtons) {
-      btn.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_COMPLETE)
-      this._removeIndicatorIcon(btn)
+      btn.classList.remove(CLASS_NAME_ACTIVE)
     }
 
     for (const form of this._element.querySelectorAll(`${SELECTOR_STEPPER_PANE} form, ${SELECTOR_STEPPER_STEP_CONTENT} form`)) {
@@ -281,8 +278,7 @@ class Stepper extends BaseComponent {
 
     const pane = this._getTargetPane(firstStep)
     if (pane) {
-      pane.classList.add(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
-      pane.setAttribute('aria-hidden', 'false')
+      this._resetPanes(pane)
     } else {
       const stepContent = firstStep.parentNode!.querySelector(SELECTOR_STEPPER_STEP_CONTENT)
       if (stepContent) {
@@ -334,12 +330,8 @@ class Stepper extends BaseComponent {
     return elem.classList.contains(CLASS_NAME_ACTIVE)
   }
 
-  _getFocusedElement(): Element | null {
-    return rootActiveElement(this._element)
-  }
-
   _holdsFocus(): boolean {
-    return this._element.contains(this._getFocusedElement())
+    return this._element.contains(rootActiveElement(this._element))
   }
 
   _isCurrentStepValid(element: any): boolean {
@@ -404,15 +396,9 @@ class Stepper extends BaseComponent {
     }
 
     element.classList.add(CLASS_NAME_ACTIVE)
-    element.setAttribute(this._tabPattern ? 'aria-selected' : 'aria-expanded', 'true')
-    element.setAttribute('tabIndex', '0')
+    this._setSelected(element, true)
 
-    const pane = this._getTargetPane(element)
-
-    if (pane) {
-      pane.classList.add(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
-      pane.setAttribute('aria-hidden', 'false')
-    }
+    this._resetPanes(this._getTargetPane(element))
 
     const stepContentElement = SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, element.parentNode)
     if (stepContentElement) {
@@ -421,14 +407,11 @@ class Stepper extends BaseComponent {
   }
 
   _deactivate(element: any): void {
-    this._resetPanes()
-
     if (!element) {
       return
     }
 
-    element.setAttribute(this._tabPattern ? 'aria-selected' : 'aria-expanded', 'false')
-    element.setAttribute('tabIndex', '-1')
+    this._setSelected(element, false)
 
     const stepContentElement = SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, element.parentNode)
     if (stepContentElement) {
@@ -438,30 +421,11 @@ class Stepper extends BaseComponent {
     }
   }
 
-  _complete(activeBtn: HTMLElement): void {
-    const stepsContainer = activeBtn.closest(SELECTOR_STEPPER_STEPS) || document
-    const steps = SelectorEngine.find(SELECTOR_STEPPER_STEP, stepsContainer)
-    const activeStepIdx = steps.indexOf(activeBtn.parentNode as HTMLElement)
-
-    if (activeStepIdx === -1) {
+  _updateCompleteStates(activeIndex: number): void {
+    if (activeIndex < 0) {
       return
     }
 
-    this._updateCompleteStates(activeStepIdx)
-  }
-
-  _markAsComplete(button: HTMLElement): void {
-    const activeStep = button.closest(SELECTOR_STEPPER_STEP)
-    if (activeStep) {
-      const stepButton = SelectorEngine.findOne(SELECTOR_STEPPER_STEP_BUTTON, activeStep)
-      if (stepButton) {
-        stepButton.classList.add(CLASS_NAME_COMPLETE)
-        this._appendIndicatorIcon(stepButton)
-      }
-    }
-  }
-
-  _updateCompleteStates(activeIndex: number): void {
     for (const [idx, stepButton] of this._stepButtons.entries()) {
       const isComplete = idx < activeIndex
       stepButton.classList.toggle(CLASS_NAME_COMPLETE, isComplete)
@@ -472,21 +436,6 @@ class Stepper extends BaseComponent {
         this._removeIndicatorIcon(stepButton)
       }
     }
-  }
-
-  _setInitialComplete(): void {
-    const steps = SelectorEngine.find(SELECTOR_STEPPER_STEP, this._element as ParentNode)
-    const activeBtn = this._getActiveElem()
-    if (!activeBtn) {
-      return
-    }
-
-    const activeIdx = steps.indexOf(activeBtn.closest(SELECTOR_STEPPER_STEP) as HTMLElement)
-    if (activeIdx === -1) {
-      return
-    }
-
-    this._updateCompleteStates(activeIdx)
   }
 
   _appendIndicatorIcon(button: HTMLElement): void {
@@ -578,18 +527,9 @@ class Stepper extends BaseComponent {
         continue
       }
 
-      const childNodes = Array.from(indicator.childNodes)
-      const visibleNodes = childNodes.filter(node => {
-        if (node.nodeType === Node.TEXT_NODE) {
-          return node.textContent!.trim() !== ''
-        }
-
-        if (node.nodeType === Node.ELEMENT_NODE) {
-          return true
-        }
-
-        return false
-      })
+      const visibleNodes = [...indicator.childNodes].filter(node =>
+        node.nodeType === Node.ELEMENT_NODE || (node.nodeType === Node.TEXT_NODE && node.textContent!.trim())
+      )
 
       if (visibleNodes.length !== 1 || visibleNodes[0].nodeType !== Node.TEXT_NODE) {
         continue
@@ -627,7 +567,7 @@ class Stepper extends BaseComponent {
         stepButton.id = `${uId}${index + 1}`
       }
 
-      const pane = SelectorEngine.getElementFromSelector(stepButton)
+      const pane = this._getTargetPane(stepButton)
 
       if (pane) {
         stepButton.setAttribute('aria-controls', pane.id)
@@ -637,17 +577,15 @@ class Stepper extends BaseComponent {
         }
 
         pane.setAttribute('aria-labelledby', stepButton.id)
-        pane.setAttribute('aria-hidden', !this._elemIsActive(stepButton) as any)
       }
 
-      if (this._elemIsActive(stepButton)) {
-        stepButton.setAttribute(this._tabPattern ? 'aria-selected' : 'aria-expanded', 'true')
-        stepButton.setAttribute('tabIndex', '0')
-      } else {
-        stepButton.setAttribute(this._tabPattern ? 'aria-selected' : 'aria-expanded', 'false')
-        stepButton.setAttribute('tabIndex', '-1')
-      }
+      this._setSelected(stepButton, this._elemIsActive(stepButton))
     }
+  }
+
+  _setSelected(button: HTMLElement, selected: boolean): void {
+    button.setAttribute(this._tabPattern ? 'aria-selected' : 'aria-expanded', String(selected))
+    button.setAttribute('tabIndex', selected ? '0' : '-1')
   }
 
   _keydown(event: any): void {
@@ -727,7 +665,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_STEPPER_ACTION, functio
   }
 
   const stepper = Stepper.getOrCreateInstance(stepperElement)
-  if (stepper && typeof (stepper as any)[action as string] === 'function') {
+  if (typeof (stepper as any)[action as string] === 'function') {
     (stepper as any)[action as string]()
   }
 })
