@@ -296,6 +296,28 @@ describe('Offcanvas', () => {
       expect(await hidden).toBeTrue()
     })
 
+    it('should hide an offcanvas whose expanding navbar widens while it opens, without shown', async () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar navbar-expand-md" style="width: 100px">',
+        '  <dialog class="offcanvas offcanvas-end" style="position: fixed; transition: opacity .3s"></dialog>',
+        '</nav>'
+      ].join('')
+
+      const navbarEl = fixtureEl.querySelector('.navbar')
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const shownSpy = jasmine.createSpy('shown')
+      drawerEl.addEventListener('shown.coreui.offcanvas', shownSpy)
+      new Offcanvas(drawerEl).show()
+      await frames(2)
+
+      drawerEl.style.position = 'static'
+      const hidden = eventWithin(drawerEl, 'hidden.coreui.offcanvas', 1000)
+      navbarEl.style.width = '200px'
+
+      expect(await hidden).toBeTrue()
+      expect(shownSpy).not.toHaveBeenCalled()
+    })
+
     it('should keep an offcanvas open when its navbar widens and the offcanvas stays fixed', async () => {
       fixtureEl.innerHTML = [
         '<nav class="navbar navbar-expand-md" style="width: 100px">',

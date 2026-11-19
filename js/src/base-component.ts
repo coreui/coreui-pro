@@ -27,7 +27,7 @@ class BaseComponent extends Config {
   declare ['constructor']: typeof BaseComponent
   protected declare _element: HTMLElement
   protected declare _config: ComponentConfig
-  protected declare _waits: WeakMap<Element, { settle: () => void, stop: () => void }> | undefined
+  protected declare _waits: Map<Element, { settle: () => void, stop: () => void }> | undefined
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super()
@@ -55,6 +55,11 @@ class BaseComponent extends Config {
     Data.remove(this._element, this.constructor.DATA_KEY)
     EventHandler.off(this._element, this.constructor.EVENT_KEY)
 
+    for (const wait of this._waits?.values() ?? []) {
+      wait.stop()
+      wait.settle()
+    }
+
     for (const propertyName of Object.getOwnPropertyNames(this)) {
       (this as Record<string, any>)[propertyName] = null
     }
@@ -69,13 +74,13 @@ class BaseComponent extends Config {
     return new Promise(resolve => {
       const wait = {
         settle() {
-          superseded?.settle()
           resolve()
+          superseded?.settle()
         },
         stop: noop
       }
 
-      this._waits ??= new WeakMap()
+      this._waits ??= new Map()
       this._waits.set(element, wait)
       wait.stop = executeAfterTransition(() => {
         this._waits?.delete(element)
