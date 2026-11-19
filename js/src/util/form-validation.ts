@@ -1,9 +1,9 @@
 import { getText, SELECTOR_HIDDEN } from './accessible-name.js'
 import { announce } from './announce.js'
 import { rootActiveElement } from './focus.js'
-import { getUID, splitIds, writeAttribute } from './index.js'
+import { getUID, splitIds, writeOwnIds } from './index.js'
 
-export { joinIds, splitIds } from './index.js'
+export { joinIds, splitIds, writeOwnIds } from './index.js'
 
 export type ValidationMark = {
   ariaInvalid: boolean
@@ -91,17 +91,6 @@ const createMark = (): ValidationMark => ({ ariaInvalid: false, classes: [], des
  */
 const isValidatable = (control: Element | null): control is FormControl =>
   (control as FormControl | null)?.willValidate === true && !['button', 'image', 'reset', 'submit'].includes((control as FormControl).type)
-
-/**
- * Writes the ids of `aria-describedby`, removing the attribute when no id is left and leaving it
- * untouched when nothing changes.
- *
- * @param control - The control to describe
- * @param ids - The ids the attribute should hold, in order
- */
-const setDescribedBy = (control: Element, ids: string[]): void => {
-  writeAttribute(control, 'aria-describedby', ids.join(' ') || null)
-}
 
 /**
  * Tells whether an element is, or holds, a form control other than the given one or the radios and
@@ -288,13 +277,7 @@ const markControl = (control: FormControl, marks: ValidationMarks): void => {
     mark.ariaInvalid = true
   }
 
-  const feedbackIds = getFeedbackIds(control)
-  const describedBy = splitIds(control.getAttribute('aria-describedby'))
-    .filter(id => feedbackIds.includes(id) || !mark.describedBy.includes(id))
-  const addedIds = feedbackIds.filter(id => !describedBy.includes(id))
-
-  mark.describedBy = [...mark.describedBy.filter(id => feedbackIds.includes(id) && describedBy.includes(id)), ...addedIds]
-  setDescribedBy(control, [...describedBy, ...addedIds])
+  mark.describedBy = writeOwnIds(control, 'aria-describedby', getFeedbackIds(control), mark.describedBy)
   marks.set(control, mark)
 }
 
@@ -316,9 +299,8 @@ const unmarkControl = (control: Element, marks: ValidationMarks): void => {
     control.removeAttribute('aria-invalid')
   }
 
-  setDescribedBy(control, splitIds(control.getAttribute('aria-describedby')).filter(id => !mark.describedBy.includes(id)))
+  mark.describedBy = writeOwnIds(control, 'aria-describedby', [], mark.describedBy)
   mark.ariaInvalid = false
-  mark.describedBy = []
 }
 
 /**
