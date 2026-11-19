@@ -1847,6 +1847,20 @@ describe('Tooltip', () => {
       tooltip.dispose()
     })
 
+    it('should keep its id in place when the pointer enters the shown anchor again', async () => {
+      const { a, bar, tooltip } = setup()
+      const shown = wait(bar, 'shown')
+      hover(a)
+      await shown
+      const { id } = document.querySelector('.tooltip')
+      a.setAttribute('aria-describedby', `${id} late`)
+
+      hover(a)
+
+      expect(a.getAttribute('aria-describedby')).toBe(`${id} late`)
+      tooltip.dispose()
+    })
+
     it('should move one tip to the next anchor without hiding it', async () => {
       const { a, b, bar, tooltip } = setup()
       const shown = wait(bar, 'shown')

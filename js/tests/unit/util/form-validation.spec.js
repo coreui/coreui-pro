@@ -123,6 +123,21 @@ describe('Form validation utilities', () => {
       expect(describedBy(input)).toBe(feedback.id)
     })
 
+    it('should keep the feedback in the order of the page when one more shows up', () => {
+      fixtureEl.innerHTML = '<form><input id="city" required><div id="first" class="invalid-feedback" hidden>Too short.</div><div id="second" class="invalid-feedback">Enter a city.</div></form>'
+      const form = fixtureEl.querySelector('form')
+      const marks = new WeakMap()
+
+      updateValidationState(form, marks)
+
+      expect(describedBy(fixtureEl.querySelector('#city'))).toBe('second')
+
+      fixtureEl.querySelector('#first').hidden = false
+      updateValidationState(form, marks)
+
+      expect(describedBy(fixtureEl.querySelector('#city'))).toBe('first second')
+    })
+
     it('should prefer the feedback named in data-coreui-invalid-feedback', () => {
       fixtureEl.innerHTML = '<form><input id="city" data-coreui-invalid-feedback="cityError" required><div id="sibling" class="invalid-feedback">Sibling</div><div id="cityError">Enter a city.</div></form>'
       const input = fixtureEl.querySelector('#city')

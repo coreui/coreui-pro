@@ -3,7 +3,7 @@ import {
   type ValidationState, type ValueField
 } from './form-validation.js'
 import { resolveFieldState } from './field-state.js'
-import { joinIds, writeAttribute } from './index.js'
+import { joinIds, writeAttribute, writeOwnIds } from './index.js'
 
 export type FieldValidationConfig = {
   invalid?: boolean
@@ -320,9 +320,8 @@ class FieldValidation {
   }
 
   /**
-   * Writes the ids each element should get from the controller into its `aria-describedby`, after
-   * the ids someone else put there and without repeating them, takes back the ids it wrote before,
-   * also from elements no longer given, and removes the attribute when no id is left.
+   * Writes the ids each element should get from the controller into its `aria-describedby` with
+   * `writeOwnIds`, and takes back the ids it wrote before from elements no longer given.
    *
    * @param entries - Each element with the ids it should get from the controller
    */
@@ -336,14 +335,10 @@ class FieldValidation {
     }
 
     for (const [target, ids] of next) {
-      const written = this._described.get(target) ?? []
-      const base = splitIds(target.getAttribute('aria-describedby')).filter(id => !written.includes(id))
-      const added = [...new Set(ids)].filter(id => !base.includes(id))
+      const written = writeOwnIds(target, 'aria-describedby', ids, this._described.get(target))
 
-      writeAttribute(target, 'aria-describedby', [...base, ...added].join(' ') || null)
-
-      if (added.length > 0) {
-        this._described.set(target, added)
+      if (written.length > 0) {
+        this._described.set(target, written)
       } else {
         this._described.delete(target)
       }

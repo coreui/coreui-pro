@@ -29,7 +29,7 @@ import {
   closeLayersIn, handleEscape, reanchorLayer, registerLayer, unregisterLayer, type LayerEntry
 } from './util/layers.js'
 import {
-  defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop, splitIds, writeAttribute
+  defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop, writeAttribute, writeOwnIds
 } from './util/index.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import { followPointerIntent, type Point } from './util/safe-triangle.js'
@@ -559,25 +559,16 @@ class Tooltip extends BaseComponent {
   }
 
   protected _describe(tip: HTMLElement, described: boolean): void {
-    const write = (element: Element, add: boolean) => {
-      const ids = splitIds(element.getAttribute('aria-describedby')).filter(id => id !== tip.id)
-
-      if (add) {
-        ids.push(tip.id)
-      }
-
-      writeAttribute(element, 'aria-describedby', ids.join(' ') || null)
-    }
-
-    if (this._described) {
-      write(this._described, false)
-    }
-
+    const previous = this._described
     const active = rootActiveElement(this._anchor)
     this._described = described ? (this._config.anchors && active !== this._anchor && this._anchor.contains(active) ? active! : this._anchor) : null
 
+    if (previous && previous !== this._described) {
+      writeOwnIds(previous, 'aria-describedby', [], [tip.id])
+    }
+
     if (this._described) {
-      write(this._described, true)
+      writeOwnIds(this._described, 'aria-describedby', [tip.id], [tip.id])
     }
   }
 

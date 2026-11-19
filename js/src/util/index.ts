@@ -183,6 +183,31 @@ const splitIds = (value: string | null | undefined): string[] => (value ?? '').s
 const joinIds = (...lists: Array<string | readonly string[] | false | null | undefined>): string =>
   [...new Set(lists.flatMap(list => splitIds(typeof list === 'string' ? list : (list || []).join(' '))))].join(' ')
 
+/**
+ * Writes the ids an owner gives an element into an id reference attribute such as
+ * `aria-describedby`. The owner's ids stay together in the order it gives them, where the first of
+ * them already stood, or after the others when none did. Ids someone else wrote keep their place.
+ * Ids the owner wrote before and no longer gives are taken out, and the attribute is removed when
+ * no id is left.
+ *
+ * @param element - The element to write
+ * @param name - The attribute name
+ * @param ids - The ids the owner gives now, none to take back all of its own
+ * @param written - The ids the owner wrote before, as the previous call returned them
+ * @returns The ids the owner wrote: those it gives that nobody else had put there
+ */
+const writeOwnIds = (element: Element, name: string, ids: readonly string[], written: readonly string[] = []): string[] => {
+  const current = splitIds(element.getAttribute(name))
+  const others = new Set(current.filter(id => !written.includes(id)))
+  const own = splitIds(joinIds(ids)).filter(id => !others.has(id))
+  const start = current.findIndex(id => own.includes(id))
+  const at = start === -1 ? current.length : start
+
+  writeAttribute(element, name, joinIds(current.slice(0, at).filter(id => others.has(id)), own, current.slice(at).filter(id => others.has(id))) || null)
+
+  return own
+}
+
 const findShadowRoot = (element: Node): ShadowRoot | null => {
   if (!document.documentElement.attachShadow) {
     return null
@@ -356,7 +381,8 @@ export {
   splitIds,
   triggerTransitionEnd,
   toType,
-  writeAttribute
+  writeAttribute,
+  writeOwnIds
 }
 
 export { executeAfterTransition, getCoveredTransitions, getTransitionDurationFromElement } from './transition.js'

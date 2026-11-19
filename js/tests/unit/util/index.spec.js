@@ -720,6 +720,66 @@ describe('Util', () => {
     })
   })
 
+  describe('writeOwnIds', () => {
+    it('should append the ids it gives after the ones already there and return the ones it wrote', () => {
+      const element = document.createElement('div')
+      element.setAttribute('aria-describedby', 'hint feedback')
+
+      expect(Util.writeOwnIds(element, 'aria-describedby', ['feedback', 'error', 'error'])).toEqual(['error'])
+      expect(element.getAttribute('aria-describedby')).toBe('hint feedback error')
+    })
+
+    it('should keep an id it gives again in its place', () => {
+      const element = document.createElement('div')
+      element.setAttribute('aria-describedby', 'hint error late')
+
+      expect(Util.writeOwnIds(element, 'aria-describedby', ['error'], ['error'])).toEqual(['error'])
+      expect(element.getAttribute('aria-describedby')).toBe('hint error late')
+    })
+
+    it('should write its ids in the order it gives them, where the first of them stood', () => {
+      const element = document.createElement('div')
+      element.setAttribute('aria-describedby', 'hint second late')
+
+      expect(Util.writeOwnIds(element, 'aria-describedby', ['first', 'second'], ['second'])).toEqual(['first', 'second'])
+      expect(element.getAttribute('aria-describedby')).toBe('hint first second late')
+    })
+
+    it('should own again an id it wrote that someone took out, and take it back later', () => {
+      const element = document.createElement('div')
+      element.setAttribute('aria-describedby', 'hint')
+
+      expect(Util.writeOwnIds(element, 'aria-describedby', ['error'], ['error'])).toEqual(['error'])
+      expect(element.getAttribute('aria-describedby')).toBe('hint error')
+
+      Util.writeOwnIds(element, 'aria-describedby', [], ['error'])
+
+      expect(element.getAttribute('aria-describedby')).toBe('hint')
+    })
+
+    it('should list an id someone else repeats once', () => {
+      const element = document.createElement('div')
+      element.setAttribute('aria-describedby', 'hint hint')
+
+      Util.writeOwnIds(element, 'aria-describedby', ['error'])
+
+      expect(element.getAttribute('aria-describedby')).toBe('hint error')
+    })
+
+    it('should take back only the ids it wrote and remove the attribute when none is left', () => {
+      const element = document.createElement('div')
+      element.setAttribute('aria-describedby', 'hint error')
+
+      expect(Util.writeOwnIds(element, 'aria-describedby', [], ['error'])).toEqual([])
+      expect(element.getAttribute('aria-describedby')).toBe('hint')
+
+      element.setAttribute('aria-describedby', 'error')
+      Util.writeOwnIds(element, 'aria-describedby', [], ['error'])
+
+      expect(element.hasAttribute('aria-describedby')).toBeFalse()
+    })
+  })
+
   describe('writeAttribute', () => {
     it('should set the value, remove the attribute for null and leave an equal value untouched', () => {
       fixtureEl.innerHTML = '<div aria-describedby="hint"></div>'

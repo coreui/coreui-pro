@@ -126,6 +126,33 @@ describe('FieldValidation', () => {
       expect(targets.map(describedBy)).toEqual(['feedback', 'feedback'])
     })
 
+    it('should keep the feedback in its place when the page adds a description and the state is drawn again', () => {
+      const { targets, validation } = mount({ config: { validationState: 'invalid' } })
+
+      targets[0].setAttribute('aria-describedby', 'feedback late-help')
+      validation.update()
+
+      expect(describedBy(targets[0])).toEqual('feedback late-help')
+    })
+
+    it('should keep the feedback in the order of the page when one more shows up', () => {
+      const { form, targets, validation } = mount({ config: { validationState: 'invalid' } })
+      const first = document.createElement('div')
+
+      first.className = 'invalid-feedback'
+      first.id = 'first'
+      first.hidden = true
+      form.querySelector('#feedback').before(first)
+      validation.update()
+
+      expect(describedBy(targets[0])).toEqual('feedback')
+
+      first.hidden = false
+      validation.update()
+
+      expect(describedBy(targets[0])).toEqual('first feedback')
+    })
+
     it('should draw a given invalid without a custom validity on the value fields, so the form submits', () => {
       for (const config of [{ validationState: 'invalid' }, { readonly: true, validationState: 'invalid' }]) {
         const { field, form, host, targets } = mount({ config })
