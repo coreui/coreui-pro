@@ -1,3 +1,4 @@
+import { getText, SELECTOR_HIDDEN } from './accessible-name.js'
 import { announce } from './announce.js'
 import { rootActiveElement } from './focus.js'
 import { getUID, splitIds, writeAttribute } from './index.js'
@@ -55,7 +56,6 @@ const SELECTOR_FIELD_CONTROL = '.check, .radio, .switch'
 const SELECTOR_FLOATING = '.form-floating'
 const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
 const SELECTOR_FRAME = '.form-control-group'
-const SELECTOR_HIDDEN = `[hidden], ${SELECTOR_ARIA_HIDDEN}`
 const SELECTOR_INPUT_GROUP = '.input-group'
 const SELECTOR_INPUT_GROUP_CONTROL = '.form-control, .form-select'
 const SELECTOR_INVALID_FEEDBACK = '.invalid-feedback, .invalid-tooltip'
@@ -458,27 +458,6 @@ const moveFocusTo = (control: HTMLElement): boolean => {
   control.ownerDocument.removeEventListener('focusin', handleFocusIn, true)
 
   return moved
-}
-
-/**
- * Reads the text of an element as a screen reader would announce it: without the descendants
- * marked `hidden` or `aria-hidden="true"`, with white space collapsed.
- *
- * @param element - The element
- * @returns Its text, or an empty string when there is no element
- */
-const getText = (element: Element | null): string => {
-  if (!element) {
-    return ''
-  }
-
-  const clone = element.cloneNode(true) as Element
-
-  for (const hidden of clone.querySelectorAll(SELECTOR_HIDDEN)) {
-    hidden.remove()
-  }
-
-  return (clone.textContent ?? '').replace(/\s+/g, ' ').trim()
 }
 
 /**

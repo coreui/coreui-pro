@@ -137,6 +137,16 @@
     "./css/components/*": "./dist/css/components/*",
     "./css/*": "./dist/css/*",
     "./scss/*": "./scss/*",
+    "./utils/accessible-name": {
+      "import": {
+        "types": "./js/dist/util/accessible-name.d.mts",
+        "default": "./js/dist/util/accessible-name.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/accessible-name.d.ts",
+        "default": "./js/dist/util/accessible-name.js"
+      }
+    },
     "./utils/announce": {
       "import": {
         "types": "./js/dist/util/announce.d.mts",
