@@ -27,4 +27,27 @@ describe('DialogBase', () => {
 
     expect(lastPressedElement()).toBe(open)
   })
+
+  for (const keyboard of [true, false]) {
+    it(`should stay open when a file picker inside it is cancelled (keyboard: ${keyboard})`, async () => {
+      fixtureEl.innerHTML = '<dialog class="modal modal-instant"><input type="file" aria-label="File"></dialog>'
+      const modalEl = fixtureEl.querySelector('dialog')
+      const events = []
+      modalEl.addEventListener('hide.coreui.modal', () => events.push('hide'))
+      modalEl.addEventListener('hidePrevented.coreui.modal', () => events.push('hidePrevented'))
+      const modal = new Modal(modalEl, { keyboard })
+      await modal.show()
+
+      const cancel = new Event('cancel', { bubbles: true, cancelable: true })
+      modalEl.querySelector('input').dispatchEvent(cancel)
+
+      expect(cancel.defaultPrevented).toBeFalse()
+      expect(events).toEqual([])
+      expect(modalEl.open).toBeTrue()
+
+      modalEl.dispatchEvent(new Event('cancel', { cancelable: true }))
+
+      expect(events).toEqual([keyboard ? 'hide' : 'hidePrevented'])
+    })
+  }
 })
