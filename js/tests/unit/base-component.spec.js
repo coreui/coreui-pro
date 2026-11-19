@@ -261,6 +261,29 @@ describe('Base Component', () => {
         expect(second).toHaveBeenCalledTimes(1)
       })
 
+      it('should settle a pending wait at once when disposed', async () => {
+        createAnimatedInstance()
+        let settled = false
+
+        instance._queueCallback(noop, element).then(() => {
+          settled = true
+        })
+        instance.dispose()
+        await Promise.resolve()
+
+        expect(settled).toBeTrue()
+      })
+
+      it('should leave no transition listener on the element when disposed', () => {
+        createAnimatedInstance()
+        const spy = spyOn(element, 'removeEventListener').and.callThrough()
+
+        instance._queueCallback(noop, element)
+        instance.dispose()
+
+        expect(spy).toHaveBeenCalledWith('transitionend', jasmine.any(Function))
+      })
+
       it('should settle replaced waits without callbacks when disposed', async () => {
         createAnimatedInstance()
         const first = jasmine.createSpy('first')

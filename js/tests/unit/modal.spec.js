@@ -355,6 +355,22 @@ describe('Modal', () => {
         expect(events).toEqual(['show', 'hidden'])
       })
 
+      it('should clean up and settle show() at once after a native close while it opens', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal" style="transition: opacity .2s"><button type="button">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        const modal = new Modal(modalEl)
+        const events = record(modalEl)
+
+        modal.show().then(() => events.push('show() settled'))
+        modalEl.close()
+        await new Promise(resolve => {
+          setTimeout(resolve, 20)
+        })
+
+        expect(events).toEqual(['show', 'hidden', 'show() settled'])
+        expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+      })
+
       it('should settle show() at once and without shown when it is disposed', async () => {
         fixtureEl.innerHTML = '<dialog class="modal" style="transition: opacity .2s"><button type="button">Close</button></dialog>'
         const modalEl = fixtureEl.querySelector('dialog')
