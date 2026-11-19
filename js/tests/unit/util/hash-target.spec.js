@@ -1,5 +1,7 @@
 import EventHandler from '../../../src/dom/event-handler.js'
-import { decodeFragment, enableHashTarget, getHashTarget } from '../../../src/util/hash-target.js'
+import {
+  decodeFragment, enableHashTarget, getFragmentTarget, getHashTarget
+} from '../../../src/util/hash-target.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('Hash targets', () => {
@@ -33,6 +35,18 @@ describe('Hash targets', () => {
     expect(getHashTarget()).toBe(fixture.firstElementChild)
     fixture.firstElementChild.removeAttribute('data-coreui-hash')
     expect(getHashTarget()).toBeNull()
+  })
+
+  it('should resolve the fragment element with or without the opt-in', () => {
+    fixture.innerHTML = '<div id="plain-target"></div>'
+    expect(getFragmentTarget()).toBeNull()
+
+    setHash('plain-target')
+    expect(getFragmentTarget()).toBe(fixture.firstElementChild)
+    expect(getHashTarget()).toBeNull()
+
+    setHash('missing')
+    expect(getFragmentTarget()).toBeNull()
   })
 
   it('should open the current hash when initialized after load', async () => {
