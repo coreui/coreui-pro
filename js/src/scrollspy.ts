@@ -13,6 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
+import { decodeFragment } from './util/hash-target.js'
 import {
   defineJQueryPlugin, getElement, isDisabled, isVisible, jQueryDispatch
 } from './util/index.js'
@@ -587,15 +588,6 @@ class ScrollSpy extends BaseComponent {
   // Static
   static jQueryInterface(this: any, config: any): void {
     return jQueryDispatch(this, ScrollSpy, config)
-  }
-}
-
-// Decode a URL fragment id, tolerating malformed escapes (returns it as-is).
-function decodeFragment(hash: string): string {
-  try {
-    return decodeURIComponent(hash)
-  } catch {
-    return hash
   }
 }
 

@@ -13,6 +13,7 @@ import { onDocumentReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { enableHashTarget } from './util/hash-target.js'
 import {
   defineJQueryPlugin, getElement, jQueryDispatch, setAriaAttribute
 } from './util/index.js'
@@ -373,6 +374,39 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
 
   for (const element of SelectorEngine.getMultipleElementsFromSelector(this)) {
     Collapse.getOrCreateInstance(element).toggle()
+  }
+})
+
+/**
+ * Find a trigger that targets this collapse.
+ */
+const getCollapseTrigger = (collapseEl: HTMLElement): HTMLElement | null => {
+  for (const trigger of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    if (SelectorEngine.getMultipleElementsFromSelector(trigger).includes(collapseEl)) {
+      return trigger
+    }
+  }
+
+  return null
+}
+
+/**
+ * Open opted-in collapses when the URL fragment matches their id.
+ * Put `data-coreui-hash` on the collapsible target.
+ */
+enableHashTarget(`${EVENT_KEY}${DATA_API_KEY}`, {
+  matches: element => element.classList.contains(CLASS_NAME_COLLAPSE),
+  getAnchor: getCollapseTrigger,
+  async open(element, done) {
+    if (element.classList.contains(CLASS_NAME_SHOW)) {
+      done()
+      return
+    }
+
+    await Collapse.getOrCreateInstance(element).show()
+    if (element.classList.contains(CLASS_NAME_SHOW)) {
+      done()
+    }
   }
 })
 

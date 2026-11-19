@@ -136,6 +136,40 @@ The tab plugin also works with [list groups](/components/list-group/). Put `data
     </div>
   </div>`} />
 
+## Hash links
+
+Add `data-coreui-hash` to a tab pane to show it when the URL fragment matches its `id`, on page load and on every `hashchange`. The plugin scrolls the tab into view, shows the pane, then scrolls the pane into view and focuses it when it can take focus (`tabindex="0"`, as recommended under [Accessibility](#accessibility)) and focus was on the page itself or on a link to that pane, and has not moved to another element since. A pane whose tab is disabled stays hidden. Use a normal in-page link to try it. A link to the fragment already in the URL does not show the pane again, because the browser does not fire `hashchange` for it. With a sticky or fixed header, set `scroll-margin-block-start` on the pane so it does not end up under the header.
+
+<Example class="vstack gap-3" code={`<p class="d-inline-flex gap-2 mb-0">
+    <a href="#hash-home">#hash-home</a>
+    <a href="#hash-profile">#hash-profile</a>
+    <a href="#hash-contact">#hash-contact</a>
+  </p>
+  <ul class="nav nav-tabs" id="hashTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="hash-home-tab" data-coreui-toggle="tab" data-coreui-target="#hash-home" type="button" role="tab" aria-controls="hash-home" aria-selected="true">Home</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="hash-profile-tab" data-coreui-toggle="tab" data-coreui-target="#hash-profile" type="button" role="tab" aria-controls="hash-profile" aria-selected="false">Profile</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="hash-contact-tab" data-coreui-toggle="tab" data-coreui-target="#hash-contact" type="button" role="tab" aria-controls="hash-contact" aria-selected="false">Contact</button>
+    </li>
+  </ul>
+  <div class="tab-content" id="hashTabContent">
+    <div class="tab-pane show active" id="hash-home" role="tabpanel" aria-labelledby="hash-home-tab" tabindex="0" data-coreui-hash>
+      <p>Placeholder content for the <strong>Home</strong> tab.</p>
+    </div>
+    <div class="tab-pane" id="hash-profile" role="tabpanel" aria-labelledby="hash-profile-tab" tabindex="0" data-coreui-hash>
+      <p>Placeholder content for the <strong>Profile</strong> tab.</p>
+    </div>
+    <div class="tab-pane" id="hash-contact" role="tabpanel" aria-labelledby="hash-contact-tab" tabindex="0" data-coreui-hash>
+      <p>Placeholder content for the <strong>Contact</strong> tab.</p>
+    </div>
+  </div>`} />
+
+Hash links also work when CoreUI loads after the page. A later fragment change cancels the pending scroll of an earlier pane, and a pane inside a hidden ancestor is left as it is.
+
 ## Accessibility
 
 Dynamic tabbed interfaces, as described in the [ARIA Authoring Practices Guide tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/), require `role="tablist"`, `role="tab"`, `role="tabpanel"`, and additional `aria-` attributes in order to convey their structure, functionality, and current state to users of assistive technologies (such as screen readers). As a best practice, we recommend using `<button>` elements for the tabs, as these are controls that trigger a dynamic change, rather than links that navigate to a new page or location.
@@ -155,6 +189,8 @@ The tab JavaScript plugin **does not** support tabbed interfaces that contain dr
 ### Via data attributes
 
 You can activate a tab or pill navigation without writing any JavaScript by simply specifying `data-coreui-toggle="tab"` or `data-coreui-toggle="pill"` on an element. Use these data attributes on `.nav-tabs` or `.nav-pills`.
+
+Add `data-coreui-hash` to a tab pane to show it from a URL fragment that matches its `id` (see [Hash links](#hash-links)).
 
 ```html
 <!-- Nav tabs -->

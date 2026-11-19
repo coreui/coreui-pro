@@ -244,6 +244,10 @@ Loaded with a plain `<script>`, `js/dist/util/calendar.js` registers as `Calenda
 
 Loaded with a plain `<script>`, the new `js/dist/util/accessible-name.js` registers as `AccessibleName`. `js/dist/loading-button.js` reads the name it announces from it, and `js/dist/util/form-validation.js` the text of invalid feedback. Load it after `js/dist/util/index.js` and before those two files.
 
+#### `HashTarget` in the per-file UMD builds
+
+Loaded with a plain `<script>`, the new `js/dist/util/hash-target.js` registers as `HashTarget`. `js/dist/collapse.js` and `js/dist/tab.js` open their [hash link](/components/collapse/#hash-links) targets through it, and `js/dist/scrollspy.js` decodes link fragments with it. Load it after `js/dist/dom/event-handler.js` and `js/dist/util/component-functions.js`, and before those three files.
+
 #### No synthetic `transitionend` when a transition does not end
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
@@ -2934,6 +2938,10 @@ field behind that kept submitting.
 
 #### Tab
 
+- **New: `data-coreui-hash` on a tab pane** shows that pane when the URL
+  fragment matches its `id`, on load and on `hashchange`, then scrolls to it and
+  focuses it when it is focusable and focus was not in another control. See
+  [Hash links](/components/tab/#hash-links).
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **Constructing a Tab outside a tab-panel parent now throws a `TypeError`**
   instead of silently returning a half-initialized instance, matching upstream.
@@ -3257,6 +3265,10 @@ field behind that kept submitting.
 
 #### Collapse
 
+- **New: `data-coreui-hash` on a collapsible element** opens it when the URL
+  fragment matches its `id`, on load and on `hashchange`, then scrolls to it and
+  focuses it when it is focusable and focus was not in another control. See
+  [Hash links](/components/collapse/#hash-links).
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The `toggle` option is gone.** It made the constructor change the state the
   markup declares, which surprised people — so nearly every caller passed

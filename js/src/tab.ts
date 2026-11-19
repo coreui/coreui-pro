@@ -12,6 +12,7 @@ import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
+import { enableHashTarget } from './util/hash-target.js'
 import {
   defineJQueryPlugin, getNextActiveElement, getTransitionDurationFromElement, isDisabled, jQueryDispatch, setAriaAttribute
 } from './util/index.js'
@@ -322,6 +323,55 @@ onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
     Tab.getOrCreateInstance(element)
   }
 })
+
+/**
+ * Find the tab trigger that targets a pane.
+ */
+const getTabTriggerFromPane = (pane: HTMLElement): HTMLElement | null => {
+  const labelledBy = pane.getAttribute('aria-labelledby')
+  if (labelledBy) {
+    const byLabel = document.getElementById(labelledBy)
+    if (byLabel?.matches(SELECTOR_DATA_TOGGLE)) {
+      return byLabel
+    }
+  }
+
+  const { id } = pane
+  if (!id) {
+    return null
+  }
+
+  const escapedId = CSS.escape(id)
+  return SelectorEngine.findOne(
+    `:is(${SELECTOR_DATA_TOGGLE}):is([data-coreui-target="#${escapedId}"], [href="#${escapedId}"])`
+  )
+}
+
+/**
+ * Open opted-in tab panes when the URL fragment matches their id.
+ * Put `data-coreui-hash` on the tab pane.
+ */
+enableHashTarget(`${EVENT_KEY}.data-api`, {
+  matches: element => Boolean(getTabTriggerFromPane(element)),
+  getAnchor: getTabTriggerFromPane,
+  async open(element, done) {
+    const trigger = getTabTriggerFromPane(element)
+    if (!trigger || isDisabled(trigger)) {
+      return
+    }
+
+    if (trigger.classList.contains(CLASS_NAME_ACTIVE)) {
+      done()
+      return
+    }
+
+    await Tab.getOrCreateInstance(trigger).show()
+    if (trigger.classList.contains(CLASS_NAME_ACTIVE)) {
+      done()
+    }
+  }
+})
+
 /**
  * jQuery
  */
