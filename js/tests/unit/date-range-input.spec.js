@@ -1218,6 +1218,18 @@ describe('DateRangeInput', () => {
       expect(end.getAttribute('aria-describedby')).toEqual('end-help')
     })
 
+    it('should list a host description a field already carries once', () => {
+      const range = build({}, '<div id="range" aria-describedby="stay-help"><div data-coreui-range-start aria-describedby="stay-help"></div><div data-coreui-range-end></div></div>')
+      const start = root().querySelector('[data-coreui-range-start]')
+
+      expect(start.getAttribute('aria-describedby')).toEqual('stay-help')
+
+      range.dispose()
+
+      expect(root().getAttribute('aria-describedby')).toEqual('stay-help')
+      expect(start.getAttribute('aria-describedby')).toEqual('stay-help')
+    })
+
     it('should leave a description the page changed after init on dispose', () => {
       const range = build({}, '<div id="range" aria-describedby="stay-help"><div data-coreui-range-start></div><div data-coreui-range-end></div></div>')
       const start = root().querySelector('[data-coreui-range-start]')

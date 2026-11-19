@@ -21,7 +21,9 @@ import {
   applyControlGroupSize
 } from './util/form-control-group.js'
 import { SEPARATOR_ICON, SEPARATOR_ICON_RTL } from './util/icons.js'
-import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
+import {
+  defineJQueryPlugin, isRTL, joinIds, jQueryDispatch
+} from './util/index.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
@@ -415,7 +417,7 @@ class DateRangeInput extends BaseComponent {
 
     for (const element of [this._startElement, this._endElement]) {
       const own = element.getAttribute('aria-describedby')
-      const written = own ? `${own} ${this._hostDescribedBy}` : this._hostDescribedBy
+      const written = joinIds(own, this._hostDescribedBy)
 
       element.setAttribute('aria-describedby', written)
       this._describedFields.push([element, own, written])

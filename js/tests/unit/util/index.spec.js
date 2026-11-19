@@ -708,6 +708,18 @@ describe('Util', () => {
     })
   })
 
+  describe('joinIds', () => {
+    it('should join id lists in their order, without empty entries and repeated ids', () => {
+      expect(Util.joinIds(' hint  feedback ', ['feedback', 'error', ''], 'hint error')).toBe('hint feedback error')
+      expect(Util.joinIds('hint', ['hint feedback', ' error'])).toBe('hint feedback error')
+    })
+
+    it('should skip lists that are not given', () => {
+      expect(Util.joinIds(null, undefined, false, '', [], 'hint')).toBe('hint')
+      expect(Util.joinIds(null, false)).toBe('')
+    })
+  })
+
   describe('writeAttribute', () => {
     it('should set the value, remove the attribute for null and leave an equal value untouched', () => {
       fixtureEl.innerHTML = '<div aria-describedby="hint"></div>'

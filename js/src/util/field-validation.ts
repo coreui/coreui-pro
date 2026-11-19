@@ -3,7 +3,7 @@ import {
   type ValidationState, type ValueField
 } from './form-validation.js'
 import { resolveFieldState } from './field-state.js'
-import { writeAttribute } from './index.js'
+import { joinIds, writeAttribute } from './index.js'
 
 export type FieldValidationConfig = {
   invalid?: boolean
@@ -216,9 +216,7 @@ class FieldValidation {
     this._describe([])
 
     if (this._movedDescription) {
-      const ids = splitIds(this._host.getAttribute('aria-describedby'))
-
-      writeAttribute(this._host, 'aria-describedby', [...new Set([...this._describedBy, ...ids])].join(' ') || null)
+      writeAttribute(this._host, 'aria-describedby', joinIds(this._describedBy, this._host.getAttribute('aria-describedby')) || null)
     }
   }
 

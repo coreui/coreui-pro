@@ -173,6 +173,16 @@ const writeAttribute = (element: Element, name: string, value: string | null): v
  */
 const splitIds = (value: string | null | undefined): string[] => (value ?? '').split(/\s+/).filter(Boolean)
 
+/**
+ * Joins id reference lists, such as values of `aria-describedby` and arrays of ids, into one list
+ * in their order, without empty entries and without repeating an id.
+ *
+ * @param lists - Attribute values or arrays of ids; `null`, `undefined` and `false` are skipped
+ * @returns The joined list, or an empty string when there is no id
+ */
+const joinIds = (...lists: Array<string | readonly string[] | false | null | undefined>): string =>
+  [...new Set(lists.flatMap(list => splitIds(typeof list === 'string' ? list : (list || []).join(' '))))].join(' ')
+
 const findShadowRoot = (element: Node): ShadowRoot | null => {
   if (!document.documentElement.attachShadow) {
     return null
@@ -336,6 +346,7 @@ export {
   isElement,
   isRTL,
   isVisible,
+  joinIds,
   jQueryDispatch,
   noop,
   onDOMContentLoaded,

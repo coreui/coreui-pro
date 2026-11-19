@@ -3,7 +3,7 @@ import { announce } from './announce.js'
 import { rootActiveElement } from './focus.js'
 import { getUID, splitIds, writeAttribute } from './index.js'
 
-export { splitIds } from './index.js'
+export { joinIds, splitIds } from './index.js'
 
 export type ValidationMark = {
   ariaInvalid: boolean

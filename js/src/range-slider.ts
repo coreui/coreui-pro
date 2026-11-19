@@ -13,7 +13,7 @@ import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import { type ValidationState } from './util/form-validation.js'
 import {
-  defineJQueryPlugin, getUID, isRTL, jQueryDispatch
+  defineJQueryPlugin, getUID, isRTL, joinIds, jQueryDispatch
 } from './util/index.js'
 import {
   constrainInput,
@@ -433,7 +433,7 @@ class RangeSlider extends BaseComponent {
 
     if (labelledBy && handleLabel) {
       input.id = getUID(`${NAME}-handle-`)
-      input.setAttribute('aria-labelledby', `${labelledBy} ${input.id}`)
+      input.setAttribute('aria-labelledby', joinIds(labelledBy, input.id))
       input.setAttribute('aria-label', handleLabel)
       return
     }

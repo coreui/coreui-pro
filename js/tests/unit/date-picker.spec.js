@@ -809,6 +809,17 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('#picker').getAttribute('aria-describedby')).toEqual('delivery-help')
     })
 
+    it('should list a description the field already carries once', () => {
+      const picker = buildPicker({}, '<div id="picker" aria-describedby="delivery-help"><div data-coreui-picker-field aria-describedby="delivery-help own-help"></div></div>')
+      const field = fixtureEl.querySelector('[data-coreui-picker-field]')
+
+      expect(field.getAttribute('aria-describedby')).toEqual('delivery-help own-help')
+
+      picker.dispose()
+
+      expect(field.getAttribute('aria-describedby')).toEqual('delivery-help own-help')
+    })
+
     it('should put back an aria-controls the author wrote', () => {
       const picker = buildPicker({}, '<div id="picker"><div data-coreui-picker-field></div><button type="button" aria-controls="help" data-coreui-picker-toggle></button></div>')
       const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
