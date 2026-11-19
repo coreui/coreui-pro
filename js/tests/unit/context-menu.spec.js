@@ -1729,6 +1729,7 @@ describe('ContextMenu', () => {
       rightClick(area)
       trigger.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
       trigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      trigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
       expect(submenu).toHaveClass('show')
 
       const keyup = new KeyboardEvent('keyup', { bubbles: true, key: 'Tab' })
