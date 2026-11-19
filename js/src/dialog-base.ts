@@ -366,6 +366,10 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     // unnamespaced because it is a real native event; a per-instance handler
     // lets dispose() remove only this listener, not a consumer's own.
     this._cancelHandler = event => {
+      if (event.target !== this._element) {
+        return
+      }
+
       event.preventDefault()
 
       if (!this._config.keyboard) {
