@@ -172,6 +172,65 @@ describe('Range', () => {
       expect(rangeEl.style.getPropertyValue('--cui-range-fill')).toEqual('0.1')
     })
 
+    it('should rebuild the ticks and their labels from the current max and datalist', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-range">
+          <input type="range" class="form-range-input" min="0" max="100" value="50" list="ticksList">
+        </div>
+        <datalist id="ticksList">
+          <option value="0" label="Cold"></option>
+          <option value="100" label="Warm"></option>
+        </datalist>
+      `
+
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      const range = new Range(fixtureEl.querySelector('.form-range'))
+
+      inputEl.max = '200'
+      fixtureEl.querySelector('datalist').insertAdjacentHTML('beforeend', '<option value="150" label="Hot"></option>')
+      inputEl.value = '150'
+      range.update()
+
+      expect(fixtureEl.querySelectorAll('.form-range-ticks')).toHaveSize(1)
+      expect(fixtureEl.querySelector('.form-range-ticks').style.gridTemplateColumns).toEqual('0fr 0.5fr 0.25fr 0.25fr')
+      expect([...fixtureEl.querySelectorAll('.form-range-tick-label')].map(label => label.textContent)).toEqual(['Cold', 'Warm', 'Hot'])
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('150, Hot')
+    })
+
+    it('should place the labels of the ticks option on the current max', () => {
+      fixtureEl.innerHTML = getRangeHtml()
+
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      const range = new Range(fixtureEl.querySelector('.form-range'), { ticks: ['Low', 'Mid', 'High'] })
+
+      inputEl.max = '200'
+      inputEl.value = '100'
+      range.update()
+
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('100, Mid')
+    })
+
+    it('should remove the ticks when the input no longer links a datalist', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-range">
+          <input type="range" class="form-range-input" min="0" max="100" value="50" list="ticksList">
+        </div>
+        <datalist id="ticksList">
+          <option value="50" label="Mid"></option>
+        </datalist>
+      `
+
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      const range = new Range(fixtureEl.querySelector('.form-range'))
+
+      inputEl.removeAttribute('list')
+      range.update()
+
+      expect(range._ticks).toBeNull()
+      expect(fixtureEl.querySelector('.form-range-ticks')).toBeNull()
+      expect(inputEl.hasAttribute('aria-valuetext')).toBeFalse()
+    })
+
     it('should leave the band unset with track false', () => {
       fixtureEl.innerHTML = getRangeHtml('data-coreui-track="false"')
 
@@ -304,6 +363,74 @@ describe('Range', () => {
       inputEl.value = '100'
       inputEl.dispatchEvent(createEvent('input'))
       expect(inputEl.getAttribute('aria-valuetext')).toEqual('100, High')
+    })
+
+    it('should hand back the text the page set last when the thumb leaves a labelled tick', () => {
+      fixtureEl.innerHTML = getRangeHtml('data-coreui-ticks="Low, Medium, High"')
+
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      inputEl.setAttribute('aria-valuetext', 'Quiet')
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('50, Medium')
+
+      inputEl.setAttribute('aria-valuetext', 'Leise')
+      inputEl.value = '40'
+      inputEl.dispatchEvent(createEvent('input'))
+
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('Leise')
+    })
+
+    it('should hand back the page text after the thumb moves from one labelled tick to another', () => {
+      fixtureEl.innerHTML = getRangeHtml('data-coreui-ticks="Low, Medium, High"')
+
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      inputEl.setAttribute('aria-valuetext', 'author text')
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      inputEl.value = '100'
+      inputEl.dispatchEvent(createEvent('input'))
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('100, High')
+
+      inputEl.value = '99'
+      inputEl.dispatchEvent(createEvent('input'))
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('author text')
+    })
+
+    it('should hand back a text the page set while no label was shown, also on dispose', () => {
+      fixtureEl.innerHTML = getRangeHtml('data-coreui-ticks="Low, Medium, High"')
+
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      inputEl.setAttribute('aria-valuetext', 'Quiet')
+      const range = new Range(fixtureEl.querySelector('.form-range'))
+
+      inputEl.value = '40'
+      inputEl.dispatchEvent(createEvent('input'))
+      inputEl.setAttribute('aria-valuetext', 'Leise')
+
+      inputEl.value = '100'
+      inputEl.dispatchEvent(createEvent('input'))
+      inputEl.value = '99'
+      inputEl.dispatchEvent(createEvent('input'))
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('Leise')
+
+      inputEl.value = '100'
+      inputEl.dispatchEvent(createEvent('input'))
+      range.dispose()
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('Leise')
+    })
+
+    it('should leave the text the page set after the label on dispose', () => {
+      fixtureEl.innerHTML = getRangeHtml('data-coreui-ticks="Low, Medium, High"')
+
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      inputEl.setAttribute('aria-valuetext', 'author text')
+      const range = new Range(fixtureEl.querySelector('.form-range'))
+
+      inputEl.setAttribute('aria-valuetext', 'newer text')
+      range.dispose()
+
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('newer text')
     })
 
     it('should add a tick label to the tooltipsFormat text unless they read the same', () => {

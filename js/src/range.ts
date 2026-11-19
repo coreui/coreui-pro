@@ -101,7 +101,7 @@ class Range extends BaseComponent {
   protected declare _ticks: HTMLElement | null
   protected declare _tooltip: HTMLElement | null
   protected declare _valueText: string | null
-  protected declare _valueTextSet: boolean
+  protected declare _writtenValueText: string | null
   protected declare _onChange: (event: Event) => void
   protected declare _onReset: () => void
 
@@ -119,8 +119,8 @@ class Range extends BaseComponent {
     this._tickPoints = []
     this._ticks = null
     this._tooltip = null
-    this._valueText = this._input?.getAttribute('aria-valuetext') ?? null
-    this._valueTextSet = false
+    this._valueText = null
+    this._writtenValueText = null
 
     this._onChange = event => {
       if (event.target === this._input) {
@@ -142,13 +142,7 @@ class Range extends BaseComponent {
       this._input.after(this._tooltip)
     }
 
-    this._tickPoints = getTickPoints(this._input, this._config.ticks, this._config.list)
-
-    if (this._tickPoints.length > 0) {
-      this._ticks = createTicks(this._tickPoints, false)
-      this._element.append(this._ticks)
-    }
-
+    this._createTicks()
     this._addEventListeners()
     this._shownValue = this._input.value
     this._update()
@@ -170,6 +164,7 @@ class Range extends BaseComponent {
   // Public
   update(): void {
     if (this._input) {
+      this._createTicks()
       this._update()
     }
   }
@@ -250,8 +245,20 @@ class Range extends BaseComponent {
     return typeof this._config.tooltipsFormat === 'function' ? this._config.tooltipsFormat(value) : String(value)
   }
 
+  protected _createTicks(): void {
+    this._ticks?.remove()
+    this._ticks = null
+    this._tickPoints = getTickPoints(this._input!, this._config.ticks, this._config.list)
+
+    if (this._tickPoints.length > 0) {
+      this._ticks = createTicks(this._tickPoints, false)
+      this._element.append(this._ticks)
+    }
+  }
+
   protected _updateValueText(value: number, html: string | null): void {
-    const label = getTickLabel(this._tickPoints, value, getStep(this._input!))
+    const input = this._input!
+    const label = getTickLabel(this._tickPoints, value, getStep(input))
     const text = getValueText(value, label, html)
 
     if (text === null) {
@@ -259,22 +266,27 @@ class Range extends BaseComponent {
       return
     }
 
-    this._input!.setAttribute('aria-valuetext', text)
-    this._valueTextSet = true
+    if (input.getAttribute('aria-valuetext') !== this._writtenValueText) {
+      this._valueText = input.getAttribute('aria-valuetext')
+    }
+
+    input.setAttribute('aria-valuetext', text)
+    this._writtenValueText = text
   }
 
   protected _restoreValueText(): void {
-    if (!this._valueTextSet) {
-      return
+    const input = this._input
+
+    if (input?.getAttribute('aria-valuetext') === this._writtenValueText) {
+      if (this._valueText === null) {
+        input.removeAttribute('aria-valuetext')
+      } else {
+        input.setAttribute('aria-valuetext', this._valueText)
+      }
     }
 
-    if (this._valueText === null) {
-      this._input!.removeAttribute('aria-valuetext')
-    } else {
-      this._input!.setAttribute('aria-valuetext', this._valueText)
-    }
-
-    this._valueTextSet = false
+    this._valueText = null
+    this._writtenValueText = null
   }
 
   // Static

@@ -2714,6 +2714,9 @@ field behind that kept submitting.
 - **Changed.** **A pressed thumb takes `--cui-primary-bg-muted`**, the theme's
   `bg-muted` under a `.theme-*` class, instead of a 30% tint of the primary
   color (`$form-range-thumb-active-bg`).
+- **Changed.** **The track and thumb are rounded by `--cui-radius-pill`**
+  instead of a fixed `1rem`, so a page that changes the pill radius reshapes
+  them too. With the default `50rem` they look the same.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **A Range Slider handle with no name of its own is no longer submitted.** An
   array of names shorter than the handle count gave the leftover handles the
