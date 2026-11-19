@@ -1,6 +1,18 @@
 import Collapse from '../../src/collapse.js'
 import EventHandler from '../../src/dom/event-handler.js'
-import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+import {
+  clearFixture, createEvent, getFixture, jQueryMock
+} from '../helpers/fixture.js'
+
+const setHash = hash => {
+  const url = new URL(window.location.href)
+  url.hash = hash
+  window.history.replaceState(null, '', url)
+}
+
+const clearHash = () => {
+  setHash('')
+}
 
 describe('Collapse', () => {
   let fixtureEl
@@ -11,6 +23,7 @@ describe('Collapse', () => {
 
   afterEach(() => {
     clearFixture()
+    clearHash()
   })
 
   describe('VERSION', () => {
@@ -1154,6 +1167,81 @@ describe('Collapse', () => {
       expect(collapse2).toEqual(collapse)
 
       expect(collapse2._config.parent).toEqual(fixtureEl)
+    })
+  })
+
+  describe('hash target', () => {
+    it('should scroll the trigger, show the collapse, then scroll the target on load', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<a id="collapseHashTrigger" href="#collapseHash" data-coreui-toggle="collapse">Toggle</a>',
+          '<div id="collapseHash" class="collapse" data-coreui-hash></div>'
+        ].join('')
+
+        const triggerEl = fixtureEl.querySelector('#collapseHashTrigger')
+        const collapseEl = fixtureEl.querySelector('#collapseHash')
+        const triggerScrollSpy = spyOn(triggerEl, 'scrollIntoView')
+
+        spyOn(collapseEl, 'scrollIntoView').and.callFake(() => {
+          expect(triggerScrollSpy).toHaveBeenCalled()
+          expect(collapseEl).toHaveClass('show')
+          expect(collapseEl).not.toHaveClass('collapsing')
+          resolve()
+        })
+
+        setHash('collapseHash')
+        window.dispatchEvent(createEvent('load'))
+      })
+    })
+
+    it('should scroll the trigger, show the collapse, then scroll the target on hashchange', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<a id="collapseHashChangeTrigger" href="#collapseHashChange" data-coreui-toggle="collapse">Toggle</a>',
+          '<div id="collapseHashChange" class="collapse" data-coreui-hash></div>'
+        ].join('')
+
+        const triggerEl = fixtureEl.querySelector('#collapseHashChangeTrigger')
+        const collapseEl = fixtureEl.querySelector('#collapseHashChange')
+        const triggerScrollSpy = spyOn(triggerEl, 'scrollIntoView')
+
+        spyOn(collapseEl, 'scrollIntoView').and.callFake(() => {
+          expect(triggerScrollSpy).toHaveBeenCalled()
+          expect(collapseEl).toHaveClass('show')
+          expect(collapseEl).not.toHaveClass('collapsing')
+          resolve()
+        })
+
+        setHash('collapseHashChange')
+        window.dispatchEvent(createEvent('hashchange'))
+      })
+    })
+
+    it('should scroll an already-open hash target into view', () => {
+      fixtureEl.innerHTML = '<div id="collapseHashOpen" class="collapse show" data-coreui-hash></div>'
+
+      const collapseEl = fixtureEl.querySelector('#collapseHashOpen')
+      const scrollSpy = spyOn(collapseEl, 'scrollIntoView')
+      const showSpy = spyOn(Collapse.prototype, 'show').and.callThrough()
+
+      setHash('collapseHashOpen')
+      window.dispatchEvent(createEvent('load'))
+
+      expect(showSpy).not.toHaveBeenCalled()
+      expect(scrollSpy).toHaveBeenCalled()
+    })
+
+    it('should ignore hash targets without data-coreui-hash', () => {
+      fixtureEl.innerHTML = '<div id="collapseNoHash" class="collapse"></div>'
+
+      const collapseEl = fixtureEl.querySelector('#collapseNoHash')
+      const showSpy = spyOn(Collapse.prototype, 'show').and.callThrough()
+
+      setHash('collapseNoHash')
+      window.dispatchEvent(createEvent('load'))
+
+      expect(collapseEl).not.toHaveClass('show')
+      expect(showSpy).not.toHaveBeenCalled()
     })
   })
 })

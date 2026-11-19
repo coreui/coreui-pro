@@ -104,7 +104,8 @@ const nativeEvents = new Set([
   'scroll',
   'scrollend',
   'toggle',
-  'beforematch'
+  'beforematch',
+  'hashchange'
 ])
 
 /**

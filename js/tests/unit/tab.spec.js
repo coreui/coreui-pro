@@ -3,6 +3,16 @@ import {
   clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
 
+const setHash = hash => {
+  const url = new URL(window.location.href)
+  url.hash = hash
+  window.history.replaceState(null, '', url)
+}
+
+const clearHash = () => {
+  setHash('')
+}
+
 describe('Tab', () => {
   let fixtureEl
 
@@ -12,6 +22,7 @@ describe('Tab', () => {
 
   afterEach(() => {
     clearFixture()
+    clearHash()
   })
 
   describe('VERSION', () => {
@@ -1455,6 +1466,212 @@ describe('Tab', () => {
           resolve()
         }, 30)
       })
+    })
+  })
+
+  describe('hash target', () => {
+    it('should scroll the trigger, show the pane, then scroll the pane on load', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<ul class="nav nav-tabs" role="tablist">',
+          '  <li class="nav-item" role="presentation"><button type="button" data-coreui-toggle="tab" data-coreui-target="#homeHash" class="nav-link active" role="tab" aria-selected="true">Home</button></li>',
+          '  <li class="nav-item" role="presentation"><button type="button" id="triggerProfileHash" data-coreui-toggle="tab" data-coreui-target="#profileHash" class="nav-link" role="tab">Profile</button></li>',
+          '</ul>',
+          '<div class="tab-content">',
+          '  <div class="tab-pane active" id="homeHash" role="tabpanel"></div>',
+          '  <div class="tab-pane" id="profileHash" role="tabpanel" data-coreui-hash></div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('#triggerProfileHash')
+        const pane = fixtureEl.querySelector('#profileHash')
+        const triggerScrollSpy = spyOn(trigger, 'scrollIntoView')
+
+        spyOn(pane, 'scrollIntoView').and.callFake(() => {
+          expect(triggerScrollSpy).toHaveBeenCalled()
+          expect(trigger).toHaveClass('active')
+          expect(pane).toHaveClass('active')
+          resolve()
+        })
+
+        setHash('profileHash')
+        window.dispatchEvent(createEvent('load'))
+      })
+    })
+
+    it('should scroll the trigger, show the pane, then scroll the pane on hashchange', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<ul class="nav nav-tabs" role="tablist">',
+          '  <li class="nav-item" role="presentation"><button type="button" data-coreui-toggle="tab" data-coreui-target="#homeHashChange" class="nav-link active" role="tab" aria-selected="true">Home</button></li>',
+          '  <li class="nav-item" role="presentation"><button type="button" id="triggerProfileHashChange" data-coreui-toggle="tab" data-coreui-target="#profileHashChange" class="nav-link" role="tab">Profile</button></li>',
+          '</ul>',
+          '<div class="tab-content">',
+          '  <div class="tab-pane active" id="homeHashChange" role="tabpanel"></div>',
+          '  <div class="tab-pane" id="profileHashChange" role="tabpanel" data-coreui-hash></div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('#triggerProfileHashChange')
+        const pane = fixtureEl.querySelector('#profileHashChange')
+        const triggerScrollSpy = spyOn(trigger, 'scrollIntoView')
+
+        spyOn(pane, 'scrollIntoView').and.callFake(() => {
+          expect(triggerScrollSpy).toHaveBeenCalled()
+          expect(trigger).toHaveClass('active')
+          expect(pane).toHaveClass('active')
+          resolve()
+        })
+
+        setHash('profileHashChange')
+        window.dispatchEvent(createEvent('hashchange'))
+      })
+    })
+
+    it('should focus the pane after it opens from the hash', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<ul class="nav nav-tabs" role="tablist">',
+          '  <li class="nav-item" role="presentation"><button type="button" data-coreui-toggle="tab" data-coreui-target="#homeHashFocus" class="nav-link active" role="tab" aria-selected="true">Home</button></li>',
+          '  <li class="nav-item" role="presentation"><button type="button" id="triggerProfileHashFocus" data-coreui-toggle="tab" data-coreui-target="#profileHashFocus" class="nav-link" role="tab">Profile</button></li>',
+          '</ul>',
+          '<div class="tab-content">',
+          '  <div class="tab-pane active" id="homeHashFocus" role="tabpanel" tabindex="0"></div>',
+          '  <div class="tab-pane" id="profileHashFocus" role="tabpanel" tabindex="0" data-coreui-hash></div>',
+          '</div>'
+        ].join('')
+
+        const pane = fixtureEl.querySelector('#profileHashFocus')
+
+        pane.addEventListener('focus', () => {
+          expect(pane).toHaveClass('active')
+          expect(document.activeElement).toBe(pane)
+          resolve()
+        })
+
+        setHash('profileHashFocus')
+        window.dispatchEvent(createEvent('hashchange'))
+      })
+    })
+
+    it('should open the pane of a pill trigger linked by href', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<ul class="nav nav-pills" role="tablist">',
+          '  <li class="nav-item" role="presentation"><a href="#homeHashPill" data-coreui-toggle="pill" class="nav-link active" role="tab" aria-selected="true">Home</a></li>',
+          '  <li class="nav-item" role="presentation"><a href="#profileHashPill" id="triggerProfileHashPill" data-coreui-toggle="pill" class="nav-link" role="tab">Profile</a></li>',
+          '</ul>',
+          '<div class="tab-content">',
+          '  <div class="tab-pane active" id="homeHashPill" role="tabpanel"></div>',
+          '  <div class="tab-pane" id="profileHashPill" role="tabpanel" data-coreui-hash></div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('#triggerProfileHashPill')
+        const pane = fixtureEl.querySelector('#profileHashPill')
+
+        spyOn(pane, 'scrollIntoView').and.callFake(() => {
+          expect(trigger).toHaveClass('active')
+          expect(pane).toHaveClass('active')
+          resolve()
+        })
+
+        setHash('profileHashPill')
+        window.dispatchEvent(createEvent('hashchange'))
+      })
+    })
+
+    it('should leave a pane whose tab is disabled hidden', () => {
+      fixtureEl.innerHTML = [
+        '<ul class="nav nav-tabs" role="tablist">',
+        '  <li class="nav-item" role="presentation"><button type="button" id="triggerHomeHashDisabled" data-coreui-toggle="tab" data-coreui-target="#homeHashDisabled" class="nav-link active" role="tab" aria-selected="true">Home</button></li>',
+        '  <li class="nav-item" role="presentation"><button type="button" id="triggerOffHashDisabled" data-coreui-toggle="tab" data-coreui-target="#offHashDisabled" class="nav-link" role="tab" disabled>Off</button></li>',
+        '</ul>',
+        '<div class="tab-content">',
+        '  <div class="tab-pane active" id="homeHashDisabled" role="tabpanel"></div>',
+        '  <div class="tab-pane" id="offHashDisabled" role="tabpanel" data-coreui-hash></div>',
+        '</div>'
+      ].join('')
+
+      const showSpy = spyOn(Tab.prototype, 'show').and.callThrough()
+
+      setHash('offHashDisabled')
+      window.dispatchEvent(createEvent('hashchange'))
+
+      expect(showSpy).not.toHaveBeenCalled()
+      expect(fixtureEl.querySelector('#triggerOffHashDisabled')).not.toHaveClass('active')
+      expect(fixtureEl.querySelector('#triggerHomeHashDisabled')).toHaveClass('active')
+    })
+
+    it('should open the pane of a list trigger when the pane is labelled by something else', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<h3 id="listHashHeading">Settings</h3>',
+          '<div class="list-group" role="tablist">',
+          '  <a href="#homeHashList" data-coreui-toggle="list" class="list-group-item active" role="tab" aria-selected="true">Home</a>',
+          '  <a href="#profileHashList" id="triggerProfileHashList" data-coreui-toggle="list" class="list-group-item" role="tab">Profile</a>',
+          '</div>',
+          '<div class="tab-content">',
+          '  <div class="tab-pane active" id="homeHashList" role="tabpanel"></div>',
+          '  <div class="tab-pane" id="profileHashList" role="tabpanel" aria-labelledby="listHashHeading" data-coreui-hash></div>',
+          '</div>'
+        ].join('')
+
+        const trigger = fixtureEl.querySelector('#triggerProfileHashList')
+        const pane = fixtureEl.querySelector('#profileHashList')
+
+        spyOn(pane, 'scrollIntoView').and.callFake(() => {
+          expect(trigger).toHaveClass('active')
+          expect(pane).toHaveClass('active')
+          resolve()
+        })
+
+        setHash('profileHashList')
+        window.dispatchEvent(createEvent('hashchange'))
+      })
+    })
+
+    it('should scroll an already-active hash tab pane into view', () => {
+      fixtureEl.innerHTML = [
+        '<ul class="nav nav-tabs" role="tablist">',
+        '  <li class="nav-item" role="presentation"><button type="button" data-coreui-toggle="tab" data-coreui-target="#homeHashOpen" class="nav-link active" role="tab" aria-selected="true">Home</button></li>',
+        '</ul>',
+        '<div class="tab-content">',
+        '  <div class="tab-pane active" id="homeHashOpen" role="tabpanel" data-coreui-hash></div>',
+        '</div>'
+      ].join('')
+
+      const pane = fixtureEl.querySelector('#homeHashOpen')
+      const scrollSpy = spyOn(pane, 'scrollIntoView')
+      const showSpy = spyOn(Tab.prototype, 'show').and.callThrough()
+
+      setHash('homeHashOpen')
+      window.dispatchEvent(createEvent('load'))
+
+      expect(showSpy).not.toHaveBeenCalled()
+      expect(scrollSpy).toHaveBeenCalled()
+    })
+
+    it('should ignore tab panes without data-coreui-hash', () => {
+      fixtureEl.innerHTML = [
+        '<ul class="nav nav-tabs" role="tablist">',
+        '  <li class="nav-item" role="presentation"><button type="button" data-coreui-toggle="tab" data-coreui-target="#homeNoHash" class="nav-link active" role="tab" aria-selected="true">Home</button></li>',
+        '  <li class="nav-item" role="presentation"><button type="button" id="triggerProfileNoHash" data-coreui-toggle="tab" data-coreui-target="#profileNoHash" class="nav-link" role="tab">Profile</button></li>',
+        '</ul>',
+        '<div class="tab-content">',
+        '  <div class="tab-pane active" id="homeNoHash" role="tabpanel"></div>',
+        '  <div class="tab-pane" id="profileNoHash" role="tabpanel"></div>',
+        '</div>'
+      ].join('')
+
+      const trigger = fixtureEl.querySelector('#triggerProfileNoHash')
+      const showSpy = spyOn(Tab.prototype, 'show').and.callThrough()
+
+      setHash('profileNoHash')
+      window.dispatchEvent(createEvent('load'))
+
+      expect(trigger).not.toHaveClass('active')
+      expect(showSpy).not.toHaveBeenCalled()
     })
   })
 })
