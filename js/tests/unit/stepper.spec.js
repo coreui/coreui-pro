@@ -864,6 +864,69 @@ describe('Stepper', () => {
       })
     })
 
+    it('should leave no step selected and every pane hidden after finish', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 3 })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.finish()
+
+      for (const button of fixtureEl.querySelectorAll('.stepper-step-button')) {
+        expect(button.getAttribute('aria-selected')).toBe('false')
+        expect(button.getAttribute('tabIndex')).toBe('-1')
+        expect(button.disabled).toBeTrue()
+      }
+
+      for (const pane of fixtureEl.querySelectorAll('.stepper-pane')) {
+        expect(pane).not.toHaveClass('show')
+        expect(pane.getAttribute('aria-hidden')).toBe('true')
+      }
+    })
+
+    it('should disable the steps as soon as finish starts and expose no step once it ends', async () => {
+      fixtureEl.innerHTML = getStepContentFixture({ activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = [...fixtureEl.querySelectorAll('.stepper-step-button')]
+      const content = fixtureEl.querySelectorAll('.stepper-step-content')[2]
+      const finished = new Promise(resolve => {
+        stepperElement.addEventListener('finish.coreui.stepper', resolve)
+      })
+
+      stepper.finish()
+
+      expect(buttons.every(button => button.disabled)).toBeTrue()
+
+      await finished
+
+      for (const button of buttons) {
+        expect(button.getAttribute('aria-expanded')).toBe('false')
+        expect(button.getAttribute('tabIndex')).toBe('-1')
+      }
+
+      expect(content.getAttribute('aria-hidden')).toBe('true')
+    })
+
+    it('should hide the content that holds the focus only once it has collapsed', async () => {
+      fixtureEl.innerHTML = getStepContentFixture({ activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const content = fixtureEl.querySelectorAll('.stepper-step-content')[2]
+      const action = document.createElement('button')
+      content.append(action)
+      action.focus()
+      const finished = new Promise(resolve => {
+        stepperElement.addEventListener('finish.coreui.stepper', resolve)
+      })
+
+      stepper.finish()
+
+      expect(content.getAttribute('aria-hidden')).not.toBe('true')
+
+      await finished
+
+      expect(content.getAttribute('aria-hidden')).toBe('true')
+    })
+
     it('should mark every step complete on finish', () => {
       fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 3 })
       const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
@@ -1228,6 +1291,18 @@ describe('Stepper', () => {
       expect(buttons[0].disabled).toBeFalse()
       expect(buttons[1].disabled).toBeFalse()
       expect(buttons[2].disabled).toBeTrue()
+    })
+
+    it('should expose only the open step content after reset', () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.reset()
+      stepper.showStep(2)
+
+      const contents = fixtureEl.querySelectorAll('.stepper-step-content')
+      expect(contents[0].getAttribute('aria-hidden')).toBe('true')
+      expect(contents[1].getAttribute('aria-hidden')).toBe('false')
     })
 
     it('should reset panes to show only initial step pane', () => {
