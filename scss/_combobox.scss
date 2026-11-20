@@ -65,7 +65,6 @@ $combobox-toggle-tokens: defaults(
 
   .combobox-select {
     position: absolute;
-    box-sizing: border-box;
     width: 1px;
     height: 1px;
     padding: 0;
@@ -84,6 +83,10 @@ $combobox-toggle-tokens: defaults(
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &:not(:has(*)) {
+      display: block;
+    }
   }
 
   .combobox-placeholder {
