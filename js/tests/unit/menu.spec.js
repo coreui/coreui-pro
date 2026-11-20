@@ -6957,6 +6957,40 @@ describe('Menu', () => {
       expect(panel).not.toHaveClass('show')
     })
 
+    it('should leave a panel that ends with a closed accordion nested in a closed one', async () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Filters</button>',
+        '<div class="menu"><button type="button" id="first">Apply</button><details class="accordion-item"><summary class="accordion-header" id="outer-section">Outer</summary><div class="accordion-body"><details class="accordion-item"><summary class="accordion-header">Inner</summary><div class="accordion-body">Body</div></details></div></details></div>',
+        '<button id="after" type="button">After</button>'
+      ].join('')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const panel = fixtureEl.querySelector('.menu')
+      new Menu(toggle, { container: true }).show()
+      document.querySelector('#outer-section').focus()
+
+      await userEvent.keyboard('{Tab}')
+      expect(document.activeElement.id).toEqual('after')
+      expect(panel).not.toHaveClass('show')
+    })
+
+    it('should leave a panel that ends with content hidden until found', async () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Filters</button>',
+        '<div class="menu"><button type="button" id="last-stop">More</button><div class="collapse" hidden="until-found"><a href="#">Hidden link</a></div></div>',
+        '<button id="after" type="button">After</button>'
+      ].join('')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const panel = fixtureEl.querySelector('.menu')
+      new Menu(toggle, { container: true }).show()
+      document.querySelector('#last-stop').focus()
+
+      await userEvent.keyboard('{Tab}')
+      expect(document.activeElement.id).toEqual('after')
+      expect(panel).not.toHaveClass('show')
+    })
+
     it('should pass over a link without href when it enters the panel', async () => {
       fixtureEl.innerHTML = [
         '<button class="btn" type="button" data-coreui-toggle="menu">Filters</button>',

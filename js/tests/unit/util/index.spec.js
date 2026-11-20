@@ -226,6 +226,79 @@ describe('Util', () => {
       expect(Util.isVisible(element1)).toBeTrue()
       expect(Util.isVisible(element2)).toBeTrue()
     })
+
+    it('should return false for a summary of a closed details inside another closed details', () => {
+      fixtureEl.innerHTML = [
+        '<details>',
+        '  <summary>Outer</summary>',
+        '  <div>',
+        '    <details id="inner">',
+        '      <summary id="summary"><button type="button" id="button">Inner</button></summary>',
+        '    </details>',
+        '  </div>',
+        '</details>'
+      ].join('')
+
+      expect(Util.isVisible(fixtureEl.querySelector('#summary'))).toBeFalse()
+      expect(Util.isVisible(fixtureEl.querySelector('#button'))).toBeFalse()
+      expect(Util.isVisible(fixtureEl.querySelector('#inner'))).toBeFalse()
+    })
+
+    it('should return false for a details that is a direct child of a closed details', () => {
+      fixtureEl.innerHTML = '<details><summary>Outer</summary><details><summary id="summary">Inner</summary></details></details>'
+
+      expect(Util.isVisible(fixtureEl.querySelector('#summary'))).toBeFalse()
+    })
+
+    it('should return false for a second summary of a closed details', () => {
+      fixtureEl.innerHTML = '<details><summary>First</summary><summary id="element">Second</summary></details>'
+
+      expect(Util.isVisible(fixtureEl.querySelector('#element'))).toBeFalse()
+    })
+
+    it('should return false for the content of a details closing with its content still rendered', () => {
+      fixtureEl.innerHTML = [
+        '<style>.rendered::details-content { content-visibility: visible; }</style>',
+        '<details class="rendered">',
+        '  <summary id="summary">Section</summary>',
+        '  <summary id="second">Second</summary>',
+        '  <button type="button" id="element">Inside</button>',
+        '</details>'
+      ].join('')
+
+      const element = fixtureEl.querySelector('#element')
+      const second = fixtureEl.querySelector('#second')
+
+      expect(element.checkVisibility()).toBeTrue()
+      expect(second.checkVisibility()).toBeTrue()
+      expect(Util.isVisible(element)).toBeFalse()
+      expect(Util.isVisible(second)).toBeFalse()
+      expect(Util.isVisible(fixtureEl.querySelector('#summary'))).toBeTrue()
+    })
+
+    it('should return false for content skipped by content-visibility', () => {
+      fixtureEl.innerHTML = '<div style="content-visibility: hidden;"><button type="button" id="element">Inside</button></div>'
+
+      expect(Util.isVisible(fixtureEl.querySelector('#element'))).toBeFalse()
+    })
+
+    it('should return false for content hidden until found', () => {
+      fixtureEl.innerHTML = '<div hidden="until-found"><a href="#" id="element">Inside</a></div>'
+
+      expect(Util.isVisible(fixtureEl.querySelector('#element'))).toBeFalse()
+    })
+
+    it('should fall back to client rects and visibility without checkVisibility', () => {
+      fixtureEl.innerHTML = '<div id="shown"></div><div id="hidden" style="visibility: hidden;"></div><div id="none" style="display: none;"></div>'
+
+      for (const element of fixtureEl.querySelectorAll('div')) {
+        element.checkVisibility = undefined
+      }
+
+      expect(Util.isVisible(fixtureEl.querySelector('#shown'))).toBeTrue()
+      expect(Util.isVisible(fixtureEl.querySelector('#hidden'))).toBeFalse()
+      expect(Util.isVisible(fixtureEl.querySelector('#none'))).toBeFalse()
+    })
   })
 
   describe('isDisabled', () => {
