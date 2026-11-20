@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 import Data from '../../src/dom/data.js'
+import Dialog from '../../src/dialog.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Dropdown from '../../src/dropdown.js'
 import Modal from '../../src/modal.js'
@@ -41,6 +42,28 @@ describe('Modal', () => {
   describe('Default', () => {
     it('should return plugin default config', () => {
       expect(Modal.Default).toEqual(jasmine.any(Object))
+    })
+
+    it('should keep its option types apart from the Dialog ones', () => {
+      fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'
+      Modal.DefaultType.keyboard = 'string'
+
+      try {
+        expect(() => new Dialog(fixtureEl.querySelector('dialog'), { keyboard: false })).not.toThrow()
+      } finally {
+        Modal.DefaultType.keyboard = 'boolean'
+      }
+    })
+
+    it('should keep its defaults apart from the Dialog ones', () => {
+      fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'
+      Modal.Default.keyboard = false
+
+      try {
+        expect(new Dialog(fixtureEl.querySelector('dialog'))._config.keyboard).toBeTrue()
+      } finally {
+        Modal.Default.keyboard = true
+      }
     })
   })
 
@@ -1755,6 +1778,16 @@ describe('Modal', () => {
         expect([first.open, second.open, second.classList.contains('modal-swap-in')]).toEqual([true, true, false])
       })
 
+      it('should close the modal from a toggle inside it that targets the same modal', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal modal-instant" id="self"><button type="button" data-coreui-toggle="modal" data-coreui-target="#self">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        await Modal.getOrCreateInstance(modalEl).show()
+
+        modalEl.querySelector('button').click()
+
+        expect(modalEl.open).toBeFalse()
+      })
+
       it('should keep the current modal open when the incoming one cancels its show', async () => {
         const [open, first, second, toSecond] = mount()
         open.click()
@@ -2421,6 +2454,18 @@ describe('Modal', () => {
 
       expect(Modal.getInstance(legacyEl)).toEqual(modal)
       expect(Modal.getOrCreateInstance(legacyEl)).toEqual(modal)
+    })
+
+    it('should swap into a migrated modal with the swap class on its dialog', async () => {
+      fixtureEl.innerHTML = [
+        '<dialog class="modal" id="first"><button type="button" data-coreui-toggle="modal" data-coreui-target="#legacyModal">Next</button></dialog>',
+        '<div class="modal fade" id="legacyModal"><div class="modal-dialog"><div class="modal-content"></div></div></div>'
+      ].join('')
+      await Modal.getOrCreateInstance(fixtureEl.querySelector('#first')).show()
+
+      fixtureEl.querySelector('#first button').click()
+
+      expect(fixtureEl.querySelector('dialog#legacyModal').classList.contains('modal-swap-in')).toBeTrue()
     })
 
     it('should open a migrated modal from a data-api trigger', () => {

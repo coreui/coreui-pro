@@ -21,20 +21,6 @@ import {
  */
 
 const NAME = 'drawer'
-const DATA_KEY = 'coreui.drawer'
-const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
-
-const EVENT_RESIZE = `resize${EVENT_KEY}`
-const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-
-const OPEN_SELECTOR = 'dialog[open]:is(.drawer, [class^="drawer-"], [class*=" drawer-"])'
-const SELECTOR_OPEN_RESPONSIVE = 'dialog[open]:not(.drawer):is([class^="drawer-"], [class*=" drawer-"])'
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="drawer"]'
-// Responsive variants replace the base class, so the dismiss fallback must
-// match them too
-const SELECTOR_DISMISS_SCOPE = '.drawer, .drawer-sm, .drawer-md, .drawer-lg, .drawer-xl, .drawer-2xl'
 
 type DrawerConfig = {
   backdrop: boolean | 'static'
@@ -96,51 +82,60 @@ class Drawer extends DialogBase<DrawerConfig> {
   }
 
   // Static
+  static {
+    this._enableDataApi()
+  }
+
   static jQueryInterface(this: any, config: any): void {
     return jQueryDispatch(this, Drawer, config, element => [element])
   }
+
+  protected static _enableDataApi(): void {
+    const name = this.NAME
+    const variants = `[class^="${name}-"], [class*=" ${name}-"]`
+    const openSelector = `dialog[open]:is(.${name}, ${variants})`
+    const dataApiKey = `${this.EVENT_KEY}.data-api`
+
+    EventHandler.on(document, `click${dataApiKey}`, `[data-coreui-toggle="${name}"]`, event => {
+      const trigger = event.delegateTarget as HTMLElement
+      const target = SelectorEngine.getElementFromSelector(trigger)
+
+      if (['A', 'AREA'].includes(trigger.tagName)) {
+        event.preventDefault()
+      }
+
+      if (isDisabled(trigger)) {
+        return
+      }
+
+      // avoid conflict when clicking a toggler of a drawer, while another is open
+      const alreadyOpen = SelectorEngine.findOne(openSelector)
+      if (alreadyOpen && alreadyOpen !== target) {
+        this.getInstance(alreadyOpen)?.hide()
+      }
+
+      this.getOrCreateInstance(target).toggle(trigger)
+    })
+
+    onDocumentReady(window, `load${dataApiKey}`, () => {
+      for (const element of SelectorEngine.find(openSelector)) {
+        this.getOrCreateInstance(element).show()
+      }
+    })
+
+    EventHandler.on(window, `resize${this.EVENT_KEY}`, () => {
+      for (const element of SelectorEngine.find(`dialog[open]:not(.${name}):is(${variants})`)) {
+        if (getComputedStyle(element).position !== 'fixed') {
+          this.getOrCreateInstance(element).hide()
+        }
+      }
+    })
+
+    // Responsive variants replace the base class, so the dismiss fallback must
+    // match them too
+    enableDismissTrigger(this, 'hide', ['', '-sm', '-md', '-lg', '-xl', '-2xl'].map(suffix => `.${name}${suffix}`).join(', '))
+  }
 }
-
-/**
- * Data API implementation
- */
-
-EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
-  const target = SelectorEngine.getElementFromSelector(this)
-
-  if (['A', 'AREA'].includes(this.tagName)) {
-    event.preventDefault()
-  }
-
-  if (isDisabled(this)) {
-    return
-  }
-
-  // avoid conflict when clicking a toggler of a drawer, while another is open
-  const alreadyOpen = SelectorEngine.findOne(OPEN_SELECTOR)
-  if (alreadyOpen && alreadyOpen !== target) {
-    Drawer.getInstance(alreadyOpen)?.hide()
-  }
-
-  const data: any = Drawer.getOrCreateInstance(target)
-  data.toggle(this)
-})
-
-onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
-  for (const selector of SelectorEngine.find(OPEN_SELECTOR)) {
-    Drawer.getOrCreateInstance(selector).show()
-  }
-})
-
-EventHandler.on(window, EVENT_RESIZE, () => {
-  for (const element of SelectorEngine.find(SELECTOR_OPEN_RESPONSIVE)) {
-    if (getComputedStyle(element).position !== 'fixed') {
-      Drawer.getOrCreateInstance(element).hide()
-    }
-  }
-})
-
-enableDismissTrigger(Drawer, 'hide', SELECTOR_DISMISS_SCOPE)
 
 /**
  * jQuery

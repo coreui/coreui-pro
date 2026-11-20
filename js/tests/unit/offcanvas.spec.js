@@ -1,5 +1,6 @@
 import Data from '../../src/dom/data.js'
 import EventHandler from '../../src/dom/event-handler.js'
+import Drawer from '../../src/drawer.js'
 import Dropdown from '../../src/dropdown.js'
 import Offcanvas from '../../src/offcanvas.js'
 import Popover from '../../src/popover.js'
@@ -52,6 +53,28 @@ describe('Offcanvas', () => {
   describe('Default', () => {
     it('should return plugin default config', () => {
       expect(Offcanvas.Default).toEqual(jasmine.any(Object))
+    })
+
+    it('should keep its option types apart from the Drawer ones', () => {
+      fixtureEl.innerHTML = '<dialog class="drawer"></dialog>'
+      Offcanvas.DefaultType.keyboard = 'string'
+
+      try {
+        expect(() => new Drawer(fixtureEl.querySelector('dialog'), { keyboard: false })).not.toThrow()
+      } finally {
+        Offcanvas.DefaultType.keyboard = 'boolean'
+      }
+    })
+
+    it('should keep its defaults apart from the Drawer ones', () => {
+      fixtureEl.innerHTML = '<dialog class="drawer"></dialog>'
+      Offcanvas.Default.keyboard = false
+
+      try {
+        expect(new Drawer(fixtureEl.querySelector('dialog'))._config.keyboard).toBeTrue()
+      } finally {
+        Offcanvas.Default.keyboard = true
+      }
     })
   })
 
@@ -1493,6 +1516,21 @@ describe('Offcanvas', () => {
   })
 
   describe('legacy markup', () => {
+    it('should open a migrated offcanvas from a data-api trigger', async () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" data-coreui-toggle="offcanvas" data-coreui-target="#legacyOffcanvas"></button>',
+        '<div class="offcanvas offcanvas-start" id="legacyOffcanvas"><div class="offcanvas-body">Body</div></div>'
+      ].join('')
+      const shown = new Promise(resolve => {
+        fixtureEl.addEventListener('shown.coreui.offcanvas', resolve, { once: true })
+      })
+
+      fixtureEl.querySelector('button').click()
+      await shown
+
+      expect(fixtureEl.querySelector('dialog.offcanvas').open).toBeTrue()
+    })
+
     it('should rebuild v5 markup into a native <dialog> inside a shell', () => {
       fixtureEl.innerHTML = [
         '<div class="offcanvas offcanvas-start" id="legacyOffcanvas" data-coreui-backdrop="static" aria-labelledby="legacyLabel">',

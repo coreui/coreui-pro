@@ -8,13 +8,8 @@
  * --------------------------------------------------------------------------
  */
 
-import DialogBase from './dialog-base.js'
-import EventHandler from './dom/event-handler.js'
-import SelectorEngine from './dom/selector-engine.js'
-import { enableDismissTrigger, onDocumentReady } from './util/component-functions.js'
-import {
-  defineJQueryPlugin, isDisabled, jQueryDispatch
-} from './util/index.js'
+import Drawer from './drawer.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import { resolveDialogElement } from './util/legacy-markup.js'
 
 /**
@@ -22,20 +17,6 @@ import { resolveDialogElement } from './util/legacy-markup.js'
  */
 
 const NAME = 'offcanvas'
-const DATA_KEY = 'coreui.offcanvas'
-const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
-
-const EVENT_RESIZE = `resize${EVENT_KEY}`
-const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-
-const OPEN_SELECTOR = 'dialog[open]:is(.offcanvas, [class^="offcanvas-"], [class*=" offcanvas-"])'
-const SELECTOR_OPEN_RESPONSIVE = 'dialog[open]:not(.offcanvas):is([class^="offcanvas-"], [class*=" offcanvas-"])'
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="offcanvas"]'
-// Responsive variants replace the base class, so the dismiss fallback must
-// match them too
-const SELECTOR_DISMISS_SCOPE = '.offcanvas, .offcanvas-sm, .offcanvas-md, .offcanvas-lg, .offcanvas-xl, .offcanvas-2xl'
 
 type OffcanvasConfig = {
   backdrop: boolean | 'static'
@@ -59,10 +40,9 @@ const DefaultType = {
  * Class definition
  */
 
-class Offcanvas extends DialogBase<OffcanvasConfig> {
+class Offcanvas extends Drawer {
   constructor(element?: string | Element | null, config?: Partial<OffcanvasConfig> | null) {
     super(resolveDialogElement(element, NAME), config)
-    this._initResizeObserver()
   }
 
   // Getters
@@ -78,70 +58,15 @@ class Offcanvas extends DialogBase<OffcanvasConfig> {
     return NAME
   }
 
-  // Protected — hook overrides
-
-  protected override _getShowOptions(): { modal: boolean, preventBodyScroll: boolean } {
-    // A visible backdrop needs the top layer; `scroll: true` alone opens
-    // non-modally so the page stays interactive and scrollable.
-    return {
-      modal: Boolean(this._config.backdrop) || !this._config.scroll,
-      preventBodyScroll: !this._config.scroll
-    }
-  }
-
-  // Keep the dialog in the top layer during the exit so the ::backdrop fade
-  // plays in every browser (without this, only browsers supporting the
-  // `overlay` transition would animate it).
-  protected override _shouldDeferClose(): boolean {
-    return this._isAnimated()
-  }
-
   // Static
-  static jQueryInterface(this: any, config: any): void {
+  static {
+    this._enableDataApi()
+  }
+
+  static override jQueryInterface(this: any, config: any): void {
     return jQueryDispatch(this, Offcanvas, config, element => [element])
   }
 }
-
-/**
- * Data API implementation
- */
-
-EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
-  const target = resolveDialogElement(SelectorEngine.getElementFromSelector(this), NAME)
-
-  if (['A', 'AREA'].includes(this.tagName)) {
-    event.preventDefault()
-  }
-
-  if (isDisabled(this)) {
-    return
-  }
-
-  // avoid conflict when clicking a toggler of an offcanvas, while another is open
-  const alreadyOpen = SelectorEngine.findOne(OPEN_SELECTOR)
-  if (alreadyOpen && alreadyOpen !== target) {
-    Offcanvas.getInstance(alreadyOpen)?.hide()
-  }
-
-  const data: any = Offcanvas.getOrCreateInstance(target)
-  data.toggle(this)
-})
-
-onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
-  for (const selector of SelectorEngine.find(OPEN_SELECTOR)) {
-    Offcanvas.getOrCreateInstance(selector).show()
-  }
-})
-
-EventHandler.on(window, EVENT_RESIZE, () => {
-  for (const element of SelectorEngine.find(SELECTOR_OPEN_RESPONSIVE)) {
-    if (getComputedStyle(element).position !== 'fixed') {
-      Offcanvas.getOrCreateInstance(element).hide()
-    }
-  }
-})
-
-enableDismissTrigger(Offcanvas, 'hide', SELECTOR_DISMISS_SCOPE)
 
 /**
  * jQuery

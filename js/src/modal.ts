@@ -8,9 +8,8 @@
  * --------------------------------------------------------------------------
  */
 
-import DialogBase from './dialog-base.js'
+import Dialog from './dialog.js'
 import EventHandler from './dom/event-handler.js'
-import SelectorEngine from './dom/selector-engine.js'
 import { enableDismissTrigger } from './util/component-functions.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import { resolveDialogElement } from './util/legacy-markup.js'
@@ -24,14 +23,7 @@ const DATA_KEY = 'coreui.modal'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const EVENT_SHOWN = `shown${EVENT_KEY}`
-const EVENT_HIDDEN = `hidden${EVENT_KEY}`
-const EVENT_CANCEL = `cancel${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-
-const CLASS_NAME_NONMODAL = 'modal-nonmodal'
-const CLASS_NAME_INSTANT = 'modal-instant'
-const CLASS_NAME_SWAP_IN = 'modal-swap-in'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="modal"]'
 
@@ -57,7 +49,7 @@ const DefaultType = {
  * Class definition
  */
 
-class Modal extends DialogBase<ModalConfig> {
+class Modal extends Dialog {
   constructor(element?: string | Element | null, config?: Partial<ModalConfig> | null) {
     super(resolveDialogElement(element, NAME), config)
   }
@@ -75,47 +67,6 @@ class Modal extends DialogBase<ModalConfig> {
     return NAME
   }
 
-  // Public
-  handleUpdate(): void {
-    // Provided for API consistency with the v5 Modal; the native <dialog>
-    // needs no manual adjustments.
-  }
-
-  override dispose(): void {
-    this._element.classList.remove(CLASS_NAME_SWAP_IN)
-    super.dispose()
-  }
-
-  // Protected — hook overrides
-
-  protected override _getShowOptions(): { modal: boolean, preventBodyScroll: boolean } {
-    return {
-      modal: this._config.modal,
-      preventBodyScroll: this._config.modal
-    }
-  }
-
-  protected override _onBeforeShow(): void {
-    if (!this._config.modal) {
-      this._element.classList.add(CLASS_NAME_NONMODAL)
-    }
-  }
-
-  protected override _onAfterHide(): void {
-    this._element.classList.remove(CLASS_NAME_NONMODAL)
-  }
-
-  // Keep the dialog in the top layer until the exit transition ends — close()
-  // strips the browser's modal centering and the ::backdrop synchronously,
-  // which would make the exit animation appear to skip.
-  protected override _shouldDeferClose(): boolean {
-    return this._isAnimated()
-  }
-
-  protected override _onCancel(): void {
-    EventHandler.trigger(this._element, EVENT_CANCEL)
-  }
-
   // Static
   static {
     EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (this: HTMLElement, event: Event) {
@@ -123,68 +74,16 @@ class Modal extends DialogBase<ModalConfig> {
     })
   }
 
-  static jQueryInterface(this: any, config?: any, relatedTarget?: HTMLElement | null): void {
+  static override jQueryInterface(this: any, config?: any, relatedTarget?: HTMLElement | null): void {
     return jQueryDispatch(this, Modal, config, [relatedTarget])
   }
 
-  protected static _handleDataApiClick(trigger: HTMLElement, event: Event): void {
-    const target = resolveDialogElement(SelectorEngine.getElementFromSelector(trigger), NAME)
-    if (!target) {
-      return
-    }
+  protected static override _getTarget(trigger: HTMLElement): Element | null {
+    return resolveDialogElement(super._getTarget(trigger), NAME)
+  }
 
-    if (['A', 'AREA'].includes(trigger.tagName)) {
-      event.preventDefault()
-    }
-
-    // A trigger inside an open modal swaps to the target one
-    const currentDialog = trigger.closest<HTMLDialogElement>('dialog[open]')
-    const currentInstance = currentDialog && currentDialog !== target ? Modal.getInstance(currentDialog) : null
-
-    if (!currentDialog || !currentInstance) {
-      Modal.getOrCreateInstance(target).toggle(trigger)
-      return
-    }
-
-    if (currentDialog.classList.contains(CLASS_NAME_SWAP_IN)) {
-      return
-    }
-
-    const newModal = Modal.getOrCreateInstance(target)
-
-    // Check both cancelable events before changing either modal. This keeps
-    // the current modal open when either side rejects the swap.
-    if (!newModal._canShow(trigger) || currentInstance._isTransitioning || !currentInstance._canHide()) {
-      return
-    }
-
-    // Swap strategy (seamless backdrop, no flash):
-    //   1. .modal-swap-in makes the incoming ::backdrop skip its
-    //      @starting-style fade-in and appear fully opaque on its first frame.
-    //   2. Open the incoming modal.
-    //   3. Close the outgoing one synchronously (.modal-instant forces the
-    //      non-deferred close path), so its ::backdrop is removed in the same
-    //      frame the incoming one appears — the user sees one continuous
-    //      backdrop instead of a double-darkened or half-faded flash.
-    target.classList.add(CLASS_NAME_SWAP_IN)
-    const settleSwapIn = (): void => {
-      target.classList.remove(CLASS_NAME_SWAP_IN)
-      EventHandler.off(target, EVENT_SHOWN, settleSwapIn)
-      EventHandler.off(target, EVENT_HIDDEN, settleSwapIn)
-    }
-
-    EventHandler.on(target, EVENT_SHOWN, settleSwapIn)
-    EventHandler.on(target, EVENT_HIDDEN, settleSwapIn)
-    newModal._show(trigger)
-
-    if (!currentDialog.classList.contains(CLASS_NAME_INSTANT)) {
-      currentDialog.classList.add(CLASS_NAME_INSTANT)
-      EventHandler.one(currentDialog, EVENT_HIDDEN, () => {
-        currentDialog.classList.remove(CLASS_NAME_INSTANT)
-      })
-    }
-
-    currentInstance._hide()
+  protected static override _onTriggerInside(dialog: Element, trigger: HTMLElement): void {
+    this.getOrCreateInstance(dialog).toggle(trigger)
   }
 }
 
