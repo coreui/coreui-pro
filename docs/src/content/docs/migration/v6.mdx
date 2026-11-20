@@ -2483,15 +2483,20 @@ was not set, so a form carried a key nobody chose. It is named only when you
 ask for one, and the option table no longer lists the name as auto-generated.
 `dispose()` also removes that input, where it used to leave it in the page.
 
-#### Chip Input carries its chips in a `<textarea>`
+#### Chip Input posts one entry per chip
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
 
-The chips travel in a hidden `<textarea>` instead of an `<input type="hidden">`,
-because the browser leaves a hidden input out of validation. The submitted value
-is the same, the chips separated by commas, and the `id` and `name` options land
-on the `<textarea>`. A script or a selector that looked for
-`.chip-input input[type="hidden"]` looks for `.chip-input > textarea` instead.
+The chips travel in a hidden `<select multiple>` instead of an `<input type="hidden">`
+that held them separated by commas, so a chip with a comma in it is no longer
+split in two on the server. The form now posts one entry per chip, as a native
+`<select multiple>` does: `tags=one&tags=two` where it posted `tags=one,two`, and
+nothing at all where it posted an empty `tags=`. Read the chips on the server as a
+list (a name ending in `[]`, `data-coreui-name="tags[]"`, for PHP and Rails, `getlist('tags')` in Django), and treat a
+missing key as no chips. The `id` and `name` options land on the `<select>`, and a
+script or a selector that looked for `.chip-input input[type="hidden"]` looks for
+`.chip-input > select` instead. The browser leaves a hidden input out of validation,
+the select takes part in it.
 With it the chip input takes `required` and `validationState`, blocks the submit
 while it is empty and required, and a native form reset puts back the chips it
 started with. A disabled chip input is no longer submitted, like any disabled

@@ -34,10 +34,8 @@ $chip-set-tokens: defaults(
   .chip-filter {
     position: relative;
 
-    > textarea {
+    > select {
       @include value-field-overlay();
-
-      resize: none;
     }
   }
 }

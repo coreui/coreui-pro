@@ -40,7 +40,7 @@ Wrap chips and add `data-coreui-chip-input` to enable behavior.
   </div>`} />
 
 <Callout color="info">
-**Note:** The `<input class="chip-input-field" />` is created automatically by the component when initialized. You can also add it manually in the markup if preferred. A hidden `<textarea>` is generated alongside it to carry the chip values, separated by commas, and it takes its name from `data-coreui-name` (e.g. `data-coreui-name="chipInputBasicExample"`). Without that attribute the field has no name, so the chips are not submitted with the form.
+**Note:** The `<input class="chip-input-field" />` is created automatically by the component when initialized. You can also add it manually in the markup if preferred. A hidden `<select multiple>` is generated alongside it to carry the chip values, and it takes its name from `data-coreui-name` (e.g. `data-coreui-name="chipInputBasicExample"`). Without that attribute the field has no name, so the chips are not submitted with the form.
 </Callout>
 
 ```html
@@ -112,7 +112,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 ## Validation
 
-The chip input carries its chips in a hidden `<textarea>` the browser validates, so `required` blocks the submit of an empty field and the browser shows its message over the chip input. The state shows on the frame and on the text field, and the message that follows the frame is linked to the text field, the way the [form plugin](/forms/validation/) does for a native field.
+The chip input carries its chips in a hidden `<select multiple>` the browser validates, so `required` blocks the submit of an empty field and the browser shows its message over the chip input. The state shows on the frame and on the text field, and the message that follows the frame is linked to the text field, the way the [form plugin](/forms/validation/) does for a native field.
 
 <Example code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-12">
@@ -166,7 +166,7 @@ Set `data-coreui-readonly="true"` (or `readonly: true` in JavaScript) to block a
 
 ## Usage
 
-Initialize the Bootstrap Chip Input component via data attributes or JavaScript. The component creates a hidden `<textarea>` for the chip values; give it a `name` and the chips are submitted with the form.
+Initialize the Bootstrap Chip Input component via data attributes or JavaScript. The component creates a hidden `<select multiple>` for the chip values; give it a `name` and the chips are submitted with the form.
 
 ### Via data attributes
 
@@ -176,8 +176,16 @@ Add `data-coreui-chip-input` to initialize the chip input component. Options can
 <div class="chip-input" data-coreui-chip-input data-coreui-name="skills" data-coreui-placeholder="Add tags..." data-coreui-separator=","></div>
 ```
 
-When initialized, Chip Input creates a hidden `<textarea>` for the chip values. It is submitted only
+When initialized, Chip Input creates a hidden `<select multiple>` for the chip values. It is submitted only
 once you give it a name through `name` (or `data-coreui-name`).
+
+Like a native `<select multiple>`, the chip input posts one entry per chip under that name, so a chip
+may hold a comma: `Smith, John` and `Doe` post `names=Smith%2C+John&names=Doe`. Read the list on the
+server as a list: PHP and Rails read a name ending in `[]`, so give `data-coreui-name="names[]"` there,
+and Django reads `request.POST.getlist('names')`. In the page read it with `formData.getAll(name)`,
+since `get()` and the field's `value` give the first chip only. Without chips nothing is posted under
+the name, as with an empty `<select multiple>`. A read-only chip input leaves `required` off that
+field, so it does not block the submit while it is empty.
 
 ### Via JavaScript
 

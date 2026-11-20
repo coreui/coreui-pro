@@ -98,7 +98,7 @@ const DefaultType: Record<string, string> = {
 
 class ChipInput extends ChipSet {
   protected declare _uniqueId: string
-  protected declare _valueField: HTMLTextAreaElement | null
+  protected declare _valueField: HTMLSelectElement | null
   protected declare _input: HTMLInputElement
   private _text = ''
   protected declare _initialChips: HTMLElement[]
@@ -269,7 +269,7 @@ class ChipInput extends ChipSet {
   }
 
   _restoreChips(): void {
-    const values = this.getValues().join(',')
+    const values = this.getValues().join('\0')
 
     this._text = ''
     let hadFocus = false
@@ -305,7 +305,9 @@ class ChipInput extends ChipSet {
       this._input.focus()
     }
 
-    if (this.getValues().join(',') !== values || this._valueField!.value !== this.getValues().join(',')) {
+    const restored = this.getValues().join('\0')
+
+    if (restored !== values || [...this._valueField!.selectedOptions].map(option => option.value).join('\0') !== restored) {
       this._triggerChange()
     }
   }
@@ -414,16 +416,16 @@ class ChipInput extends ChipSet {
   }
 
   _createValueField(): void {
-    const field = createValueField('textarea', () => this._input, this._element)
+    const field = createValueField('select', () => this._input, this._element)
 
     field.id = this._uniqueId
+    field.multiple = true
     configureValueField(field, {
       disabled: this._disabled,
       name: this._config.name,
-      readOnly: this._config.readonly,
-      required: this._config.required
+      required: this._config.required && !this._config.readonly
     })
-    field.defaultValue = this.getValues().join(',')
+    writeValueField(field, this.getValues())
 
     this._element.append(field)
     this._valueField = field

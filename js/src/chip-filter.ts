@@ -97,7 +97,7 @@ class ChipFilter extends ChipSet {
   protected declare _reported: string
   protected declare _unlistenLabel: () => void
   protected declare _validation: FieldValidation
-  protected declare _valueField: HTMLTextAreaElement
+  protected declare _valueField: HTMLSelectElement
 
   constructor(element?: string | Element | null, config?: Partial<ChipFilterConfig> | null) {
     super(element, config as any)
@@ -378,17 +378,16 @@ class ChipFilter extends ChipSet {
     return null
   }
 
-  _createValueField(): HTMLTextAreaElement {
-    const field = createValueField('textarea', () => this._focusTarget(), this._element)
-    const value = this.getSelectedValues()
+  _createValueField(): HTMLSelectElement {
+    const field = createValueField('select', () => this._focusTarget(), this._element)
 
+    field.multiple = true
     configureValueField(field, {
       disabled: this._disabled,
       name: this._config.name,
       required: this._config.required
     })
-    field.defaultValue = value.join(',')
-    writeValueField(field, value)
+    writeValueField(field, this.getSelectedValues())
     this._element.append(field)
 
     return field

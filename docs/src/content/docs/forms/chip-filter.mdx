@@ -61,7 +61,7 @@ Use `data-coreui-selection-mode="single"` to keep at most one chip selected. Sel
 
 ## Forms
 
-Give the filter a `name` and its selection is submitted with the form, in a hidden `<textarea>`, the values separated by commas. A `<label for>` pointing at the filter's `id` names it and moves focus to it.
+Give the filter a `name` and its selection is submitted with the form through a hidden `<select multiple>`, one entry per selected chip, as a native `<select multiple>` posts them; read them with `formData.getAll(name)` or as a list on the server. With nothing selected nothing is posted under the name. A `<label for>` pointing at the filter's `id` names it and moves focus to it.
 
 <Example code={`<form class="row g-3" data-coreui-validate novalidate>
     <div class="col-12">

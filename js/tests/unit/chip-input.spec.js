@@ -85,7 +85,7 @@ describe('ChipInput', () => {
       expect(one.parentElement.parentElement).toEqual(grid)
       expect(one.parentElement.getAttribute('role')).toEqual('row')
       expect(grid.querySelectorAll('.chip-row')).toHaveSize(2)
-      expect([...new FormData(form).entries()]).toEqual([['tags', 'One,Two']])
+      expect([...new FormData(form).entries()]).toEqual([['tags', 'One'], ['tags', 'Two']])
     })
 
     it('should give the grid back to its chips on dispose', () => {
@@ -218,7 +218,35 @@ describe('ChipInput', () => {
       chipInput.add('one')
       chipInput.add('two')
 
-      expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['tags', 'one,two']])
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['tags', 'one'], ['tags', 'two']])
+    })
+
+    it('should submit a chip with a comma in it as one value', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="chip-input"></div></form>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { name: 'names', separator: ';' })
+
+      chipInput.add('Smith, John')
+      chipInput.add('Doe')
+
+      expect(new FormData(fixtureEl.querySelector('#form')).getAll('names')).toEqual(['Smith, John', 'Doe'])
+    })
+
+    it('should submit a repeated chip once per chip when values may repeat', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="chip-input"></div></form>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { name: 'tags', unique: false })
+
+      chipInput.add('a')
+      chipInput.add('a')
+
+      expect(new FormData(fixtureEl.querySelector('#form')).getAll('tags')).toEqual(['a', 'a'])
+    })
+
+    it('should submit no entry without chips', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="chip-input"></div></form>'
+      // eslint-disable-next-line no-new
+      new ChipInput(fixtureEl.querySelector('.chip-input'), { name: 'names' })
+
+      expect(new FormData(fixtureEl.querySelector('#form')).has('names')).toBeFalse()
     })
   })
 
@@ -497,7 +525,7 @@ describe('ChipInput', () => {
       expect(chipInput.getValues()).toEqual(['one', 'two'])
       expect([...element.querySelectorAll('.chip')]).toEqual([one, two])
       expect(one.querySelector('.chip-remove')).not.toBeNull()
-      expect([...new FormData(form).entries()]).toEqual([['tags', 'one,two']])
+      expect([...new FormData(form).entries()]).toEqual([['tags', 'one'], ['tags', 'two']])
 
       one.querySelector('.chip-remove').click()
 
@@ -529,6 +557,25 @@ describe('ChipInput', () => {
       expect(chipInput._input.getAttribute('aria-invalid')).toBe('true')
     })
 
+    it('should report a reset that brings back a chip with a comma in place of two chips with the same text', async () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip">a,b</span></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { name: 'tags', separator: ';' })
+      const changes = []
+
+      chipInput.remove('a,b')
+      chipInput.add('a')
+      chipInput.add('b')
+      element.addEventListener('change.coreui.chip-input', event => changes.push(event.value))
+      form.reset()
+      await tick()
+
+      expect(chipInput.getValues()).toEqual(['a,b'])
+      expect(new FormData(form).getAll('tags')).toEqual(['a,b'])
+      expect(changes).toEqual([['a,b']])
+    })
+
     it('should write the chips it restores into the value field and report the change, also after a change from code in the same task', async () => {
       fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip">one</span><span class="chip">two</span></div></form>'
       const form = fixtureEl.querySelector('form')
@@ -544,7 +591,7 @@ describe('ChipInput', () => {
       await tick()
 
       expect(chipInput.getValues()).toEqual(['one', 'two'])
-      expect(new FormData(form).get('tags')).toBe('one,two')
+      expect(new FormData(form).getAll('tags')).toEqual(['one', 'two'])
       expect(changes).toEqual([['one', 'two']])
     })
 
@@ -620,7 +667,7 @@ describe('ChipInput', () => {
       fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
       const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { [option]: true, required: true, validationState: 'invalid' })
 
-      expect(chipInput._valueField.willValidate).toBeFalse()
+      expect(chipInput._valueField.willValidate && chipInput._valueField.required).toBeFalse()
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
@@ -629,7 +676,7 @@ describe('ChipInput', () => {
       const element = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(element, { create: false, required: true, validationState: 'invalid' })
 
-      expect(element.querySelector('textarea')).toBeNull()
+      expect(element.querySelector('select')).toBeNull()
       expect(element.classList.contains('is-invalid')).toBeTrue()
       expect(chipInput._input.getAttribute('aria-invalid')).toBe('true')
       expect(chipInput._input.hasAttribute('aria-required')).toBeFalse()
@@ -713,7 +760,7 @@ describe('ChipInput', () => {
       // eslint-disable-next-line no-new
       new ChipInput(el)
 
-      const field = el.querySelector('textarea')
+      const field = el.querySelector('select')
 
       expect(field).not.toBeNull()
       expect(field.willValidate).toBeTrue()
@@ -729,7 +776,7 @@ describe('ChipInput', () => {
       // eslint-disable-next-line no-new
       new ChipInput(el, { name: 'my-tags' })
 
-      expect(el.querySelector('textarea').name).toEqual('my-tags')
+      expect(el.querySelector('select').name).toEqual('my-tags')
     })
 
     it('should use custom id on the value field', () => {
@@ -739,7 +786,7 @@ describe('ChipInput', () => {
       // eslint-disable-next-line no-new
       new ChipInput(el, { id: 'my-id' })
 
-      expect(el.querySelector('textarea').id).toEqual('my-id')
+      expect(el.querySelector('select').id).toEqual('my-id')
     })
 
     it('should initialize as disabled via config', () => {
@@ -1106,7 +1153,7 @@ describe('ChipInput', () => {
       chipInput.add('First')
       chipInput.add('Second')
 
-      expect(chipInput._valueField.value).toEqual('First,Second')
+      expect([...chipInput._valueField.selectedOptions].map(option => option.value)).toEqual(['First', 'Second'])
     })
 
     it('should apply chipClassName string to added chip', () => {
@@ -1888,7 +1935,7 @@ describe('ChipInput', () => {
       fixtureEl.innerHTML = '<div id="ci"></div>'
       const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false }) // eslint-disable-line no-unused-vars
 
-      expect(fixtureEl.querySelector('textarea, input[type="hidden"]')).toBeNull()
+      expect(fixtureEl.querySelector('select, textarea, input[type="hidden"]')).toBeNull()
     })
 
     it('should still accept chips from the host', () => {
