@@ -48,27 +48,28 @@ const decodeFragment = (value: string): string => {
 }
 
 /**
- * Resolve the element named by `location.hash` when it opts in with `data-coreui-hash`.
+ * Resolve the element the URL fragment names.
  *
- * @returns The element whose `id` matches the fragment and carries `data-coreui-hash`, otherwise `null`.
+ * @returns The element whose `id` matches `location.hash`, otherwise `null`.
  */
-const getHashTarget = (): HTMLElement | null => {
+const getFragmentTarget = (): HTMLElement | null => {
   const { hash } = window.location
   if (!hash || hash === '#') {
     return null
   }
 
   const id = decodeFragment(hash.slice(1))
-  if (!id) {
-    return null
-  }
+  return id ? document.getElementById(id) : null
+}
 
-  const element = document.getElementById(id)
-  if (!element?.hasAttribute(ATTR_HASH)) {
-    return null
-  }
-
-  return element
+/**
+ * Resolve the element named by `location.hash` when it opts in with `data-coreui-hash`.
+ *
+ * @returns The element whose `id` matches the fragment and carries `data-coreui-hash`, otherwise `null`.
+ */
+const getHashTarget = (): HTMLElement | null => {
+  const element = getFragmentTarget()
+  return element?.hasAttribute(ATTR_HASH) ? element : null
 }
 
 /**
@@ -120,6 +121,7 @@ export {
   ATTR_HASH,
   decodeFragment,
   enableHashTarget,
+  getFragmentTarget,
   getHashTarget
 }
 export type { HashTargetHandler }

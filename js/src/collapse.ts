@@ -13,9 +13,9 @@ import { onDocumentReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { enableHashTarget } from './util/hash-target.js'
+import { enableHashTarget, getFragmentTarget } from './util/hash-target.js'
 import {
-  defineJQueryPlugin, getElement, jQueryDispatch, setAriaAttribute
+  defineJQueryPlugin, getElement, jQueryDispatch, reflow, setAriaAttribute
 } from './util/index.js'
 import { startSizeTransition, supportsInterpolateSize } from './util/size-transition.js'
 
@@ -144,14 +144,7 @@ class Collapse extends BaseComponent {
       return
     }
 
-    let activeChildren: Collapse[] = []
-
-    // find active children
-    if (this._config.parent) {
-      activeChildren = this._getFirstLevelChildren(SELECTOR_ACTIVES)
-        .filter(element => element !== this._element && !this._sharesTrigger(element))
-        .map(element => Collapse.getOrCreateInstance(element))
-    }
+    const activeChildren = this._getActiveChildren()
 
     if (activeChildren.length && activeChildren[0]._isTransitioning) {
       return
@@ -200,7 +193,12 @@ class Collapse extends BaseComponent {
     await this._queueCallback(complete, this._element, true, dimension)
   }
 
-  async hide(): Promise<void> {
+  hide(): Promise<void> {
+    return this._hide(true)
+  }
+
+  // Private
+  async _hide(animated: boolean): Promise<void> {
     if (this._isTransitioning || !this._isShown()) {
       return
     }
@@ -213,6 +211,10 @@ class Collapse extends BaseComponent {
     const cssPath = supportsInterpolateSize()
     const dimension = this._getDimension()
     const size = cssPath ? 0 : this._element.getBoundingClientRect()[dimension]
+
+    if (!animated && cssPath) {
+      this._element.style.transition = 'none'
+    }
 
     this._element.classList.add(CLASS_NAME_COLLAPSING)
 
@@ -249,17 +251,19 @@ class Collapse extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_HIDDEN)
     }
 
-    if (!cssPath) {
+    if (!animated && cssPath) {
+      reflow(this._element)
+      this._element.style.transition = ''
+    } else if (animated && !cssPath) {
       startSizeTransition(this._element, dimension, size, 0)
     }
 
     // The wait is pinned to the size property: `display` and
     // `content-visibility` fire their own `transitionend`, and a leftover one
     // from the previous run would settle this one on the spot.
-    await this._queueCallback(complete, this._element, true, dimension)
+    await this._queueCallback(complete, this._element, animated, dimension)
   }
 
-  // Private
   _isShown(element: Element = this._element): boolean {
     return element.classList.contains(CLASS_NAME_SHOW)
   }
@@ -297,6 +301,16 @@ class Collapse extends BaseComponent {
     }
   }
 
+  _getActiveChildren(): Collapse[] {
+    if (!this._config.parent) {
+      return []
+    }
+
+    return this._getFirstLevelChildren(SELECTOR_ACTIVES)
+      .filter(element => element !== this._element && !this._sharesTrigger(element))
+      .map(element => Collapse.getOrCreateInstance(element))
+  }
+
   _getFirstLevelChildren(selector: string): HTMLElement[] {
     const children = SelectorEngine.find(CLASS_NAME_DEEPER_CHILDREN, this._config.parent as ParentNode)
     // remove children if greater depth
@@ -316,16 +330,22 @@ class Collapse extends BaseComponent {
     this._element.removeAttribute(ATTRIBUTE_HIDDEN)
   }
 
-  // Find-in-page reveals the content itself; this only brings the component's
-  // state in line with what the reader can already see. `beforematch` is not
-  // cancelable, so there is no `show` event to prevent here.
+  // Find-in-page and fragment links reveal the content themselves; this brings the
+  // component's state and its parent group in line with what the reader can see,
+  // before the browser scrolls. `beforematch` is not cancelable, so there is no
+  // `show` event to prevent here.
   _onBeforeMatch(): void {
     if (this._isShown()) {
       return
     }
 
+    this._setHiddenUntilFound(false)
     this._element.classList.add(CLASS_NAME_SHOW)
     this._setAriaExpanded(this._triggerArray, true)
+
+    for (const activeChild of this._getActiveChildren()) {
+      activeChild._hide(false)
+    }
 
     EventHandler.trigger(this._element, EVENT_SHOWN)
   }
@@ -348,8 +368,15 @@ class Collapse extends BaseComponent {
       return
     }
 
+    const target = getFragmentTarget()
+
     for (const element of SelectorEngine.find(SELECTOR_HIDDEN_UNTIL_FOUND)) {
-      Collapse.getOrCreateInstance(element)
+      const collapse = Collapse.getOrCreateInstance(element)
+
+      if (target && element.contains(target)) {
+        collapse._onBeforeMatch()
+        target.scrollIntoView()
+      }
     }
   }
 

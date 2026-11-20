@@ -119,7 +119,7 @@ By default a collapsed area is removed from the layout, which also removes it fr
     </div>
   </div>`} />
 
-The component keeps up with the browser: when a match reveals the content, it adds `.show` and sets `aria-expanded` on the triggers, so the state the reader sees and the state the markup declares do not drift apart. The attribute goes back on once the area is collapsed again.
+The component keeps up with the browser: when a match reveals the content, it adds `.show`, sets `aria-expanded` on the triggers and closes the other open areas of its `data-coreui-parent` group at once, before the browser scrolls to the match, so the state the reader sees and the state the markup declares do not drift apart. The attribute goes back on once the area is collapsed again. When the page loads with a URL fragment that points inside an area marked with `data-coreui-hidden-until-found="true"`, that area opens, also in browsers that handle the fragment before the script runs.
 
 Requires Chrome 102, Firefox 148 or Safari 26.2. Below those the attribute hides the content the way `hidden` always did, which is what a collapsed area does anyway — the content is simply not findable, exactly as without the option.
 

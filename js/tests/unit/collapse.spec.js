@@ -605,6 +605,104 @@ describe('Collapse', () => {
         collapseEl.removeAttribute('hidden')
       })
     })
+
+    it('should close the other open collapses of its parent at once when the browser reveals it', () => {
+      fixtureEl.innerHTML = [
+        '<div id="group">',
+        '  <a role="button" id="triggerA" data-coreui-toggle="collapse" href="#itemA" aria-expanded="true"></a>',
+        '  <div class="collapse show" id="itemA" data-coreui-parent="#group" data-coreui-hidden-until-found="true"></div>',
+        '  <a role="button" id="triggerB" data-coreui-toggle="collapse" href="#itemB" aria-expanded="false"></a>',
+        '  <div class="collapse" id="itemB" data-coreui-parent="#group" data-coreui-hidden-until-found="true"><p>needle</p></div>',
+        '</div>'
+      ].join('')
+
+      const itemA = fixtureEl.querySelector('#itemA')
+      const itemB = fixtureEl.querySelector('#itemB')
+      Collapse._initializeDataApi()
+
+      itemB.dispatchEvent(new Event('beforematch', { bubbles: true }))
+      itemB.removeAttribute('hidden')
+
+      expect(itemB).toHaveClass('show')
+      expect(itemA).not.toHaveClass('show')
+      expect(itemA).not.toHaveClass('collapsing')
+      expect(itemA.getAttribute('hidden')).toEqual('until-found')
+      expect(fixtureEl.querySelector('#triggerA').getAttribute('aria-expanded')).toEqual('false')
+      expect(fixtureEl.querySelector('#triggerB').getAttribute('aria-expanded')).toEqual('true')
+    })
+
+    it('should count the revealed collapse as open before its parent group closes', () => {
+      fixtureEl.innerHTML = [
+        '<div id="group">',
+        '  <div class="collapse show" id="itemA" data-coreui-parent="#group" data-coreui-hidden-until-found="true"></div>',
+        '  <div class="collapse" id="itemB" data-coreui-parent="#group" data-coreui-hidden-until-found="true"><p>needle</p></div>',
+        '</div>'
+      ].join('')
+
+      const itemA = fixtureEl.querySelector('#itemA')
+      const itemB = fixtureEl.querySelector('#itemB')
+      Collapse._initializeDataApi()
+
+      let revealedWhenHidden = null
+      itemA.addEventListener('hidden.coreui.collapse', () => {
+        revealedWhenHidden = itemB.classList.contains('show')
+      })
+
+      itemB.dispatchEvent(new Event('beforematch', { bubbles: true }))
+
+      expect(revealedWhenHidden).toBeTrue()
+    })
+
+    it('should leave scrolling to the browser when it reveals the collapse', async () => {
+      fixtureEl.innerHTML = [
+        '<div id="group">',
+        '  <div class="collapse show" id="itemA" data-coreui-parent="#group" data-coreui-hidden-until-found="true"></div>',
+        '  <div class="collapse" id="itemB" data-coreui-parent="#group" data-coreui-hidden-until-found="true"><p id="fragmentFound">needle</p></div>',
+        '</div>'
+      ].join('')
+
+      const itemB = fixtureEl.querySelector('#itemB')
+      const scrollSpy = spyOn(fixtureEl.querySelector('#fragmentFound'), 'scrollIntoView')
+      Collapse._initializeDataApi()
+      setHash('fragmentFound')
+
+      itemB.dispatchEvent(new Event('beforematch', { bubbles: true }))
+      itemB.removeAttribute('hidden')
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(scrollSpy).not.toHaveBeenCalled()
+    })
+
+    it('should reveal a findable collapse at start when the URL fragment points inside it', () => {
+      fixtureEl.innerHTML = [
+        '<div id="group">',
+        '  <div class="collapse show" id="open" data-coreui-parent="#group" data-coreui-hidden-until-found="true"></div>',
+        '  <a role="button" id="trigger" data-coreui-toggle="collapse" href="#panel" aria-expanded="false"></a>',
+        '  <div class="collapse" id="panel" data-coreui-parent="#group" data-coreui-hidden-until-found="true"><p id="fragmentInside">needle</p></div>',
+        '</div>',
+        '<div class="collapse" id="other" data-coreui-hidden-until-found="true"><p>other</p></div>'
+      ].join('')
+
+      const open = fixtureEl.querySelector('#open')
+      const panel = fixtureEl.querySelector('#panel')
+      const other = fixtureEl.querySelector('#other')
+      const scrollSpy = spyOn(fixtureEl.querySelector('#fragmentInside'), 'scrollIntoView')
+      setHash('fragmentInside')
+
+      Collapse._initializeDataApi()
+
+      expect(panel).toHaveClass('show')
+      expect(panel).not.toHaveClass('collapsing')
+      expect(panel.hasAttribute('hidden')).toBeFalse()
+      expect(fixtureEl.querySelector('#trigger').getAttribute('aria-expanded')).toEqual('true')
+      expect(open).not.toHaveClass('show')
+      expect(open).not.toHaveClass('collapsing')
+      expect(scrollSpy).toHaveBeenCalled()
+      expect(other).not.toHaveClass('show')
+      expect(other.getAttribute('hidden')).toEqual('until-found')
+    })
   })
 
   describe('dispose', () => {

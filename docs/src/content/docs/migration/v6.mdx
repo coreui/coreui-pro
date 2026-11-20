@@ -3307,7 +3307,9 @@ field behind that kept submitting.
   a collapsed area is hidden with `hidden="until-found"` rather than taken out
   of the layout, so the browser's find-in-page searches it and expands it on a
   match; the component then syncs `.show` and `aria-expanded` so the declared
-  state follows what the reader sees. Off by default, and below Chrome 102 /
+  state follows what the reader sees, closes the other open areas of its
+  `data-coreui-parent` group without a transition, and opens an area whose
+  content the URL fragment points at when the page loads. Off by default, and below Chrome 102 /
   Firefox 148 / Safari 26.2 it hides the content the way `hidden` always did.
 
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
