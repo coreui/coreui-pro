@@ -4497,6 +4497,35 @@ map — several things below are breaking and are called out as such.
   card group read `$grid-gutter-x`. `$grid-gutter-width` stays as a deprecated
   alias of `$grid-gutter-x` until v7 — set the new name, the alias only reads.
 
+#### Row gutters are native `gap`
+
+<span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+
+A `.row` spaces its columns with `gap` instead of column padding and negative
+row margins. The content of every column stays where it was; the column box
+is now the content box, and the row no longer reaches past its parent.
+
+- Keep `.g-*`, `.gx-*` and `.gy-*`. They set the gaps and the column widths
+  together. `.gap-*` changes only the gap, so numbered columns would wrap.
+- Padding that sat on a column only because the gutter put it there is gone.
+  Put content padding on an inner element; `.px-0` on a column no longer
+  removes the gutter. A column that clips its content (`.text-truncate`,
+  `.overflow-hidden`) now clips at the content edge, which cuts the focus
+  outline of a link inside it, so give that content a padded wrapper.
+- Wrappers that only clipped gutter overflow (`.overflow-hidden` around a
+  row, `.mx-0` on an edge-to-edge row, extra container padding for large
+  gutters) can go. Container padding is unchanged.
+- A nested row fits inside the content box of its column.
+- `make-col()` and `make-col-offset()` subtract the row gap (`$gap`, default
+  `var(--cui-gutter-x, 0px)`). Pass `$gap: 0px` outside a gap-based row.
+  `.col-*` and `.offset-*` classes count the gap only inside `.row`, so give
+  the columns of a row you build with `make-row()` their width with
+  `make-col()`.
+- `make-col-ready()` always sets `box-sizing: border-box`, and
+  `$include-column-box-sizing` is removed.
+- `--cui-gutter-x` is a registered length (`@property`), so a font-relative
+  gutter resolves on the row and a bare `0` is `0px`.
+
 #### The z-axis names the new components
 
 - **New keys in `$zindex-levels`: `menu`, `drawer`, `dialog`**, on the same

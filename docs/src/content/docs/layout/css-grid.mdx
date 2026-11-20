@@ -27,17 +27,15 @@ With CoreUI, we've added the option to enable a separate grid system that's buil
 
 - **Responsive classes use container queries.** Each `.grid` is a query container (`container-type: inline-size`), so responsive `.g-col-*` and `.g-start-*` classes respond to the width of the `.grid` itself rather than the viewport.
 
-In the future, CoreUI will likely shift to a hybrid solution as the `gap` property has achieved nearly full browser support for flexbox.
-
 ## Key differences
 
 Compared to the default grid system:
 
 - Flex utilities don't affect the CSS Grid columns in the same way.
 
-- Gaps replaces gutters. The `gap` property replaces the horizontal `padding` from our default grid system and functions more like `margin`.
+- Both grids use native CSS `gap`. The flexbox grid uses `.g-*`, `.gx-*`, and `.gy-*` to keep column widths in sync. CSS Grid uses `--cui-gap` or gap utilities.
 
-- As such, unlike `.row`s, `.grid`s have no negative margins and margin utilities cannot be used to change the grid gutters. Grid gaps are applied horizontally and vertically by default. See the [customizing section](#customizing) for more details.
+- Neither grid uses negative gutter margins. Use gap controls to space columns, and padding to space content inside them. CSS Grid applies gaps in both directions by default. See the [customizing section](#customizing) for more details.
 
 - Inline and custom styles should be viewed as replacements for modifier classes (e.g., `style="--cui-columns: 3;"` vs `class="row-cols-3"`).
 
