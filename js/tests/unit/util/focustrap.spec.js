@@ -115,6 +115,15 @@ describe('FocusTrap', () => {
       expect(document.activeElement).toBe(byId('first'))
     })
 
+    it('should wrap Tab from the last element to the summary of an accordion', () => {
+      mount('<div id="trap" tabindex="-1"><details><summary id="section">Section</summary>Body</details><button id="last">last</button></div>')
+      byId('last').focus()
+
+      guards()[1].focus()
+
+      expect(document.activeElement).toBe(byId('section'))
+    })
+
     it('should wrap Shift+Tab from the first element to the last', () => {
       mount(simple)
       byId('first').focus()

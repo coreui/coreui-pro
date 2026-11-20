@@ -160,25 +160,27 @@ describe('SelectorEngine', () => {
   })
 
   describe('focusableChildren', () => {
-    it('should return only elements with specific tag names', () => {
+    it('should return only elements that take the focus by their tag name', () => {
       fixtureEl.innerHTML = [
         '<div>lorem</div>',
         '<span>lorem</span>',
         '<a>lorem</a>',
+        '<a href="#">lorem</a>',
         '<button>lorem</button>',
         '<input>',
         '<textarea></textarea>',
         '<select></select>',
-        '<details>lorem</details>'
+        '<details><summary>lorem</summary><summary>second</summary>lorem</details>',
+        '<summary>loose</summary>'
       ].join('')
 
       const expectedElements = [
-        fixtureEl.querySelector('a'),
+        fixtureEl.querySelector('a[href]'),
         fixtureEl.querySelector('button'),
         fixtureEl.querySelector('input'),
         fixtureEl.querySelector('textarea'),
         fixtureEl.querySelector('select'),
-        fixtureEl.querySelector('details')
+        fixtureEl.querySelector('details > summary')
       ]
 
       expect(SelectorEngine.focusableChildren(fixtureEl)).toEqual(expectedElements)

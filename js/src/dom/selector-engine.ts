@@ -93,12 +93,12 @@ const SelectorEngine = {
 
   focusableChildren(element: Element): HTMLElement[] {
     const focusables = [
-      'a',
+      'a[href]',
       'button',
       'input',
       'textarea',
       'select',
-      'details',
+      'details > summary:first-of-type',
       '[tabindex]',
       '[contenteditable="true"]'
     ].map(selector => `${selector}:not([tabindex^="-"]):not([data-coreui-focus-guard])`).join(',')
