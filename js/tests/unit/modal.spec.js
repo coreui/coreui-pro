@@ -1788,6 +1788,30 @@ describe('Modal', () => {
         expect(modalEl.open).toBeFalse()
       })
 
+      it('should close the modal on a double click of a toggle inside it that targets the same modal', async () => {
+        fixtureEl.innerHTML = '<dialog class="modal" id="self"><button type="button" data-coreui-toggle="modal" data-coreui-target="#self">Close</button></dialog>'
+        const modalEl = fixtureEl.querySelector('dialog')
+        await Modal.getOrCreateInstance(modalEl).show()
+
+        modalEl.querySelector('button').click()
+        modalEl.querySelector('button').click()
+        await new Promise(resolve => {
+          setTimeout(resolve, 50)
+        })
+
+        expect(modalEl.open).toBeFalse()
+      })
+
+      it('should not swap into a modal that is still closing', async () => {
+        const [, first, second, toSecond] = mount('class="modal" data-coreui-modal="false"', 'class="modal" data-coreui-modal="false"')
+        await Modal.getOrCreateInstance(second).show()
+        await Modal.getOrCreateInstance(first).show()
+        Modal.getInstance(second).hide()
+        toSecond.click()
+
+        expect([first.open, second.classList.contains('hiding'), second.classList.contains('modal-swap-in')]).toEqual([true, true, false])
+      })
+
       it('should keep the current modal open when the incoming one cancels its show', async () => {
         const [open, first, second, toSecond] = mount()
         open.click()

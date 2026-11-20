@@ -897,6 +897,25 @@ describe('Offcanvas', () => {
       expect(spy).not.toHaveBeenCalled()
     })
 
+    it('should close the open offcanvas when another one opens again while it closes', async () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="toggle-a" data-coreui-toggle="offcanvas" data-coreui-target="#a">A</button>',
+        '<button type="button" id="toggle-b" data-coreui-toggle="offcanvas" data-coreui-target="#b">B</button>',
+        '<dialog id="a" class="offcanvas" data-coreui-scroll="true" data-coreui-backdrop="false"></dialog>',
+        '<dialog id="b" class="offcanvas" data-coreui-scroll="true" data-coreui-backdrop="false"></dialog>'
+      ].join('')
+      const [toggleA, toggleB, a, b] = ['#toggle-a', '#toggle-b', '#a', '#b'].map(selector => fixtureEl.querySelector(selector))
+      await Offcanvas.getOrCreateInstance(a).show()
+
+      toggleB.click()
+      toggleA.click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect([a.open, a.classList.contains('hiding'), b.open]).toEqual([true, false, false])
+    })
+
     it('should call hide first, if another drawer is open', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

@@ -109,7 +109,7 @@ class Drawer extends DialogBase<DrawerConfig> {
       }
 
       // avoid conflict when clicking a toggler of a drawer, while another is open
-      const alreadyOpen = SelectorEngine.findOne(openSelector)
+      const alreadyOpen = SelectorEngine.find(openSelector).find(element => !this.getInstance(element)?._isClosing())
       if (alreadyOpen && alreadyOpen !== target) {
         this.getInstance(alreadyOpen)?.hide()
       }

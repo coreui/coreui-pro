@@ -827,6 +827,39 @@ describe('Drawer', () => {
       expect(spy).not.toHaveBeenCalled()
     })
 
+    it('should close the open drawer when another one opens again while it closes', async () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="toggle-a" data-coreui-toggle="drawer" data-coreui-target="#a">A</button>',
+        '<button type="button" id="toggle-b" data-coreui-toggle="drawer" data-coreui-target="#b">B</button>',
+        '<dialog id="a" class="drawer" data-coreui-scroll="true" data-coreui-backdrop="false"></dialog>',
+        '<dialog id="b" class="drawer" data-coreui-scroll="true" data-coreui-backdrop="false"></dialog>'
+      ].join('')
+      const [toggleA, toggleB, a, b] = ['#toggle-a', '#toggle-b', '#a', '#b'].map(selector => fixtureEl.querySelector(selector))
+      await Drawer.getOrCreateInstance(a).show()
+
+      toggleB.click()
+      toggleA.click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect([a.open, a.classList.contains('hiding'), b.open]).toEqual([true, false, false])
+    })
+
+    it('should close on a double click of a toggler inside it', async () => {
+      fixtureEl.innerHTML = '<dialog id="panel" class="drawer"><button type="button" data-coreui-toggle="drawer" data-coreui-target="#panel">Close</button></dialog>'
+      const drawerEl = fixtureEl.querySelector('dialog')
+      await Drawer.getOrCreateInstance(drawerEl).show()
+
+      drawerEl.querySelector('button').click()
+      drawerEl.querySelector('button').click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(drawerEl.open).toBeFalse()
+    })
+
     it('should call hide first, if another drawer is open', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [

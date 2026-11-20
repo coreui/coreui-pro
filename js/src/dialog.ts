@@ -161,7 +161,7 @@ class Dialog extends DialogBase<DialogConfig> {
 
     // Check both cancelable events before changing either dialog. This keeps
     // the current dialog open when either side rejects the swap.
-    if (!newDialog._canShow(trigger) || currentInstance._isTransitioning || !currentInstance._canHide()) {
+    if (newDialog._isTransitioning || !newDialog._canShow(trigger) || currentInstance._isTransitioning || !currentInstance._canHide()) {
       return
     }
 
