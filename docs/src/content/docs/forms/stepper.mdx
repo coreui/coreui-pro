@@ -592,9 +592,11 @@ The Stepper component supports comprehensive keyboard navigation out of the box:
 
 | Key | Function |
 | --- | --- |
-| <kbd>ArrowLeft</kbd> / <kbd>ArrowUp</kbd> | Moves focus to previous step. |
-| <kbd>ArrowRight</kbd> / <kbd>ArrowDown</kbd> | Moves focus to next step. |
+| <kbd>ArrowLeft</kbd> / <kbd>ArrowUp</kbd> | Moves focus to previous step. In a right-to-left layout <kbd>ArrowLeft</kbd> moves to the next step. |
+| <kbd>ArrowRight</kbd> / <kbd>ArrowDown</kbd> | Moves focus to next step. In a right-to-left layout <kbd>ArrowRight</kbd> moves to the previous step. |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Jumps focus to first or last step |
+
+The arrow keys and <kbd>Home</kbd> / <kbd>End</kbd> skip disabled steps, and the arrows wrap from the last step to the first and back. A key pressed with <kbd>Alt</kbd>, <kbd>Ctrl</kbd> or <kbd>Cmd</kbd> is left to the browser.
 
 ## Usage
 

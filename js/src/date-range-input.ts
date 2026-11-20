@@ -22,7 +22,7 @@ import {
 } from './util/form-control-group.js'
 import { SEPARATOR_ICON, SEPARATOR_ICON_RTL } from './util/icons.js'
 import {
-  defineJQueryPlugin, isRTL, joinIds, jQueryDispatch
+  defineJQueryPlugin, isForwardKey, isRTL, joinIds, jQueryDispatch
 } from './util/index.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
@@ -573,7 +573,7 @@ class DateRangeInput extends BaseComponent {
         return
       }
 
-      const forward = event.key === (isRTL(this._element) ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY)
+      const forward = isForwardKey(event.key, isRTL(this._element))
       const startSections = SelectorEngine.find(SELECTOR_SECTION, this._startElement)
       const endSections = SelectorEngine.find(SELECTOR_SECTION, this._endElement)
 

@@ -8,7 +8,7 @@
 import EventHandler from '../dom/event-handler.js'
 import Manipulator from '../dom/manipulator.js'
 import SelectorEngine from '../dom/selector-engine.js'
-import { getNextActiveElement, isRTL } from '../util/index.js'
+import { getNextActiveElement, isForwardKey, isRTL } from '../util/index.js'
 import TimeSelection from './base.js'
 
 /**
@@ -162,9 +162,7 @@ class TimeRoll extends TimeSelection {
 
       if (event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY) {
         event.preventDefault()
-        const rtl = isRTL(target)
-        const goLeft = (event.key === ARROW_LEFT_KEY && !rtl) || (event.key === ARROW_RIGHT_KEY && rtl)
-        this._moveFocusToColumn(target, goLeft ? -1 : 1)
+        this._moveFocusToColumn(target, isForwardKey(event.key, isRTL(target)) ? 1 : -1)
       }
     })
   }

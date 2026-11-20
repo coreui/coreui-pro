@@ -45,7 +45,7 @@ import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
 import { configureValueField, createValueField, type ValidationState } from './util/form-validation.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
+  defineJQueryPlugin, getNextActiveElement, isForwardKey, isRTL, jQueryDispatch, writeAttribute
 } from './util/index.js'
 
 /**
@@ -598,16 +598,13 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   }
 
   _focusSectionByKey(sectionElement: HTMLElement, key: string): void {
-    const rtl = isRTL(this._element)
-
     if (key === HOME_KEY || key === END_KEY) {
       const sections = this._getSectionElements()
       sections[key === HOME_KEY ? 0 : sections.length - 1].focus()
       return
     }
 
-    const shouldMoveNext = key === (rtl ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY)
-    this._focusSibling(sectionElement, shouldMoveNext)
+    this._focusSibling(sectionElement, isForwardKey(key, isRTL(this._element)))
   }
 
   _applyCharacter(sectionElement: HTMLElement, character: string): void {

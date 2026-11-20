@@ -1,7 +1,7 @@
 import { rootActiveElement } from './focus.js'
 import { normalizeSearchText } from './option-tree.js'
 
-export { getNextActiveElement } from './index.js'
+export { getNextActiveElement, isForwardKey } from './index.js'
 
 export type TypeaheadBuffer = {
   clear: () => void

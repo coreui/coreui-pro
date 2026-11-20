@@ -1,4 +1,5 @@
 import { convert12hTo24h } from './time.js'
+import { isForwardKey } from './index.js'
 
 export type DisabledDate = ((date: Date) => boolean) | Date | Date[]
 
@@ -1687,16 +1688,6 @@ const getPageAction = (date: Date, direction: number, shiftKey: boolean, context
     type: 'move'
   }
 }
-
-/**
- * Tells whether an arrow key points forward in time: down, and right, or left
- * in a right-to-left layout.
- *
- * @param key - The key value
- * @param rtl - Whether the layout runs right to left
- * @returns `true` for a key that points forward
- */
-const isForwardKey = (key: string, rtl: boolean) : boolean => key === 'ArrowDown' || key === (rtl ? 'ArrowLeft' : 'ArrowRight')
 
 /**
  * Decides what a key does on a grid with nothing to focus: the arrows move to

@@ -16,7 +16,7 @@ import {
   configureValueField, createValueField, dispatchValueChange, writeValueField, type ValidationState
 } from './util/form-validation.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
+  defineJQueryPlugin, getNextActiveElement, isForwardKey, isRTL, jQueryDispatch, writeAttribute
 } from './util/index.js'
 
 /**
@@ -314,7 +314,7 @@ class OTPInput extends BaseComponent {
       }
 
       if (key === ARROW_RIGHT_KEY || key === ARROW_LEFT_KEY) {
-        const shouldMoveNext = (key === ARROW_RIGHT_KEY) !== isRTL(this._element)
+        const shouldMoveNext = isForwardKey(key, isRTL(this._element))
 
         if (shouldMoveNext && this._config.linear && target!.value === '') {
           return

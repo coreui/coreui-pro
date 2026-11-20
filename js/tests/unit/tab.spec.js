@@ -775,11 +775,13 @@ describe('Tab', () => {
       const spyPrevent = spyOn(Event.prototype, 'preventDefault').and.callThrough()
 
       for (const modifier of ['altKey', 'ctrlKey', 'metaKey']) {
-        const keydown = createEvent('keydown')
-        keydown.key = 'ArrowRight'
-        keydown[modifier] = true
+        for (const key of ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End']) {
+          const keydown = createEvent('keydown')
+          keydown.key = key
+          keydown[modifier] = true
 
-        tabEl1.dispatchEvent(keydown)
+          tabEl1.dispatchEvent(keydown)
+        }
       }
 
       expect(spyShow1).not.toHaveBeenCalled()
@@ -823,6 +825,46 @@ describe('Tab', () => {
 
       expect(spyStop).toHaveBeenCalledTimes(2)
       expect(spyPrevent).toHaveBeenCalledTimes(2)
+    })
+
+    it('if the tab list runs right to left, left arrow goes to the next tab and right arrow to the previous one', () => {
+      fixtureEl.innerHTML = [
+        '<div class="nav" dir="rtl">',
+        '  <span id="tab1" class="nav-link" data-coreui-toggle="tab"></span>',
+        '  <span id="tab2" class="nav-link" data-coreui-toggle="tab"></span>',
+        '  <span id="tab3" class="nav-link" data-coreui-toggle="tab"></span>',
+        '</div>'
+      ].join('')
+
+      const tabEl1 = fixtureEl.querySelector('#tab1')
+      const tabEl2 = fixtureEl.querySelector('#tab2')
+      const tabEl3 = fixtureEl.querySelector('#tab3')
+      const tab1 = new Tab(tabEl1)
+      const tab2 = new Tab(tabEl2)
+      const tab3 = new Tab(tabEl3)
+      const spyShow1 = spyOn(tab1, 'show').and.callThrough()
+      const spyShow2 = spyOn(tab2, 'show').and.callThrough()
+      const spyShow3 = spyOn(tab3, 'show').and.callThrough()
+
+      let keydown = createEvent('keydown')
+      keydown.key = 'ArrowLeft'
+
+      tabEl1.dispatchEvent(keydown)
+      expect(spyShow2).toHaveBeenCalled()
+      expect(spyShow3).not.toHaveBeenCalled()
+
+      keydown = createEvent('keydown')
+      keydown.key = 'ArrowRight'
+
+      tabEl2.dispatchEvent(keydown)
+      expect(spyShow1).toHaveBeenCalled()
+      expect(spyShow3).not.toHaveBeenCalled()
+
+      keydown = createEvent('keydown')
+      keydown.key = 'ArrowDown'
+
+      tabEl2.dispatchEvent(keydown)
+      expect(spyShow3).toHaveBeenCalled()
     })
 
     it('if keydown event is Home, handle it', () => {

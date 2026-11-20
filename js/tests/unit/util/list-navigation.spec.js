@@ -1,7 +1,7 @@
 import { onTestFinished, vi } from 'vitest'
 import {
   createTypeaheadBuffer, endsEntryWait, findOpeningItem, findTypeaheadMatch, getNextActiveElement, getRemovalNeighbor, getRevealScrollTop, getVirtualRows,
-  isEntryWaiting, isOpeningF4, isShortcutPress, isTypingKey, keepsFocus, rangeBetween, scrollIntoContainer
+  isEntryWaiting, isForwardKey, isOpeningF4, isShortcutPress, isTypingKey, keepsFocus, rangeBetween, scrollIntoContainer
 } from '../../../src/util/list-navigation.js'
 import * as Util from '../../../src/util/index.js'
 
@@ -351,6 +351,13 @@ describe('List navigation utilities', () => {
       expect(getRemovalNeighbor(['a'], 'a')).toBeNull()
       expect(getRemovalNeighbor([], 'a')).toBeNull()
       expect(getRemovalNeighbor(['a', 'b'], 'z')).toBe('a')
+    })
+  })
+
+  describe('isForwardKey', () => {
+    it('should be the key direction of util/index', () => {
+      expect(isForwardKey).toBe(Util.isForwardKey)
+      expect(isForwardKey('ArrowLeft', true)).toBeTrue()
     })
   })
 

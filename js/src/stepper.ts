@@ -16,7 +16,7 @@ import {
 } from './util/form-validation.js'
 import type { ValidationMarks } from './util/form-validation.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, getUID, isDisabled, jQueryDispatch
+  defineJQueryPlugin, getNextActiveElement, getUID, isDisabled, isForwardKey, isRTL, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -602,6 +602,10 @@ class Stepper extends BaseComponent {
       return
     }
 
+    if (event.altKey || event.ctrlKey || event.metaKey) {
+      return
+    }
+
     event.stopPropagation()
     event.preventDefault()
 
@@ -619,20 +623,8 @@ class Stepper extends BaseComponent {
         break
       }
 
-      case ARROW_RIGHT_KEY:
-      case ARROW_DOWN_KEY: {
-        nextActiveElement = getNextActiveElement(children, event.delegateTarget, true, true)
-        break
-      }
-
-      case ARROW_LEFT_KEY:
-      case ARROW_UP_KEY: {
-        nextActiveElement = getNextActiveElement(children, event.delegateTarget, false, true)
-        break
-      }
-
       default: {
-        break
+        nextActiveElement = getNextActiveElement(children, event.delegateTarget, isForwardKey(event.key, isRTL(this._element)), true)
       }
     }
 
