@@ -21,7 +21,7 @@ Colorize text with color utilities. To colorize a link, give it a [theme class](
 ]} />
 
 <Callout color="warning">
-**Deprecation:** the v5 spellings — `.text-{color}`, `.text-{color}-emphasis`, `.text-body`, `.text-black`, `.text-white`, `.text-reset`, `.text-body-secondary` and `.text-body-tertiary` — still ship and render the same, but are removed in v7. Write `.fg-{color}`, `.fg-emphasis-{color}`, `.fg-body`, `.fg-black`, `.fg-white`, `.fg-reset`, `.fg-2` and `.fg-3`. `.text-muted`, `.text-black-50` and `.text-white-50` are gone, as in Bootstrap 6: write `.fg-2`, `.fg-black.fg-50` and `.fg-white.fg-50`.
+**Deprecation:** the v5 spellings — `.text-{color}`, `.text-{color}-emphasis`, `.text-body`, `.text-black`, `.text-white`, `.text-reset`, `.text-body-secondary` and `.text-body-tertiary` — still ship and render the same, but are removed in v7. Write `.fg-{color}`, `.fg-emphasis-{color}`, `.fg-body`, `.fg-black`, `.fg-white`, `.fg-reset`, `.fg-2` and `.fg-3`. `.text-muted`, `.text-black-50` and `.text-white-50` are gone, as in Bootstrap 6: write `.fg-2`, `.fg-black.fg-opacity-50` and `.fg-white.fg-opacity-50`.
 </Callout>
 
 <Callout color="info">
@@ -32,7 +32,7 @@ Relying on color to convey meaning creates a visual cue that assistive technolog
 
 ## Foreground ladder
 
-The neutral text hierarchy is a ladder, mirroring the [surface ladder](/utilities/background/#surface-ladder): `.fg-body` is the body text color and the numbers step away from it — `.fg-1` barely, `.fg-4` down to a watermark. The `.fg-{percentage}` opacity utilities compose with all of them.
+The neutral text hierarchy is a ladder, mirroring the [surface ladder](/utilities/background/#surface-ladder): `.fg-body` is the body text color and the numbers step away from it — `.fg-1` barely, `.fg-4` down to a watermark. The `.fg-opacity-{percentage}` opacity utilities compose with all of them.
 
 <Example code={`<p class="fg-body">.fg-body</p>
 <p class="fg-1">.fg-1</p>
@@ -44,7 +44,7 @@ The neutral text hierarchy is a ladder, mirroring the [surface ladder](/utilitie
 
 ## Opacity
 
-Every `.fg-*` utility writes its color into `--cui-fg` and reads it back, so a companion `.fg-{percentage}` class can mix that color with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
+Every `.fg-*` utility writes its color into `--cui-fg` and reads it back, so a companion `.fg-opacity-{percentage}` class can mix that color with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
 
 ```css
 .fg-primary {
@@ -52,7 +52,7 @@ Every `.fg-*` utility writes its color into `--cui-fg` and reads it back, so a c
   color: var(--cui-fg);
 }
 
-.fg-50 {
+.fg-opacity-50 {
   color: color-mix(in oklch, var(--cui-fg) 50%, transparent);
 }
 ```
@@ -60,15 +60,15 @@ Every `.fg-*` utility writes its color into `--cui-fg` and reads it back, so a c
 Override `--cui-fg` to repaint the utility with another color; the opacity class keeps working, because it reads whatever the token holds.
 
 <Example class="d-flex flex-column gap-3" code={`<div class="fg-primary">This is default primary text</div>
-<div class="fg-primary fg-90">This is 90% opacity primary text</div>
-<div class="fg-primary fg-80">This is 80% opacity primary text</div>
-<div class="fg-primary fg-70">This is 70% opacity primary text</div>
-<div class="fg-primary fg-60">This is 60% opacity primary text</div>
-<div class="fg-primary fg-50">This is 50% opacity primary text</div>
-<div class="fg-primary fg-40">This is 40% opacity primary text</div>
-<div class="fg-primary fg-30">This is 30% opacity primary text</div>
-<div class="fg-primary fg-20">This is 20% opacity primary text</div>
-<div class="fg-primary fg-10">This is 10% opacity primary text</div>`} />
+<div class="fg-primary fg-opacity-90">This is 90% opacity primary text</div>
+<div class="fg-primary fg-opacity-80">This is 80% opacity primary text</div>
+<div class="fg-primary fg-opacity-70">This is 70% opacity primary text</div>
+<div class="fg-primary fg-opacity-60">This is 60% opacity primary text</div>
+<div class="fg-primary fg-opacity-50">This is 50% opacity primary text</div>
+<div class="fg-primary fg-opacity-40">This is 40% opacity primary text</div>
+<div class="fg-primary fg-opacity-30">This is 30% opacity primary text</div>
+<div class="fg-primary fg-opacity-20">This is 20% opacity primary text</div>
+<div class="fg-primary fg-opacity-10">This is 10% opacity primary text</div>`} />
 
 `.text-opacity-{25|50|75|100}` are the deprecated v5 names of the same knob and are removed in v7.
 
@@ -82,9 +82,9 @@ Override `--cui-fg` to repaint the utility with another color; the opacity class
 
 These compose with the opacity utilities too.
 
-<Example class="d-flex flex-column gap-3" code={`<p class="bg-primary fg-contrast-primary fg-100 p-3">.fg-contrast-primary .fg-100</p>
-<p class="bg-primary fg-contrast-primary fg-70 p-3">.fg-contrast-primary .fg-70</p>
-<p class="bg-primary fg-contrast-primary fg-40 p-3">.fg-contrast-primary .fg-40</p>`} />
+<Example class="d-flex flex-column gap-3" code={`<p class="bg-primary fg-contrast-primary fg-opacity-100 p-3">.fg-contrast-primary .fg-opacity-100</p>
+<p class="bg-primary fg-contrast-primary fg-opacity-70 p-3">.fg-contrast-primary .fg-opacity-70</p>
+<p class="bg-primary fg-contrast-primary fg-opacity-40 p-3">.fg-contrast-primary .fg-opacity-40</p>`} />
 
 ## Reset color
 

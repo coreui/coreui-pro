@@ -254,7 +254,7 @@ back through an expression of its own:
 ```scss
 $utilities: (
   "bg-opacity": (
-    class: bg,
+    class: bg-opacity,
     property: background-color,
     values: theme-opacity-values(--#{$prefix}bg)
   )
@@ -262,13 +262,13 @@ $utilities: (
 ```
 
 ```css
-.bg-50 { background-color: color-mix(in oklch, var(--cui-bg) 50%, transparent); }
+.bg-opacity-50 { background-color: color-mix(in oklch, var(--cui-bg) 50%, transparent); }
 ```
 
 The two rules write the same property, so the order of the map decides: the
-opacity family is declared after the color family, and `.bg-primary.bg-50`
+opacity family is declared after the color family, and `.bg-primary.bg-opacity-50`
 mixes the primary color whichever order the classes appear in the attribute.
-On its own, `.bg-50` reads a token nobody set, so the declaration is invalid at
+On its own, `.bg-opacity-50` reads a token nobody set, so the declaration is invalid at
 computed-value time and the background stays as it was.
 
 

@@ -61,7 +61,7 @@ Write the v6 class directly instead of the v5 one:
 | `.text-high-emphasis` | `.text-body` | `.text-body` |
 | `.text-medium-emphasis` | `.text-body-secondary` | `.fg-2` |
 | `.text-disabled` | `.text-body-tertiary` | `.fg-3` |
-| `.text-high-emphasis-inverse`, `.text-medium-emphasis-inverse`, `.text-disabled-inverse` | deprecated | `data-coreui-theme="dark"` on the dark surface plus `.text-body`, `.fg-2`, `.fg-3`; or the closest fixed value, `.fg-white` with `.fg-90`, `.fg-60`, `.fg-40` |
+| `.text-high-emphasis-inverse`, `.text-medium-emphasis-inverse`, `.text-disabled-inverse` | deprecated | `data-coreui-theme="dark"` on the dark surface plus `.text-body`, `.fg-2`, `.fg-3`; or the closest fixed value, `.fg-white` with `.fg-opacity-90`, `.fg-opacity-60`, `.fg-opacity-40` |
 | `.elevation-0` to `.elevation-24` | `.elevation-0` to `.elevation-5` | `.shadow-none`, `.shadow-sm`, `.shadow`, `.shadow-lg`, picked by depth |
 | `.calendar` started on load | `data-coreui-toggle="calendar"` | `data-coreui-calendar` (remove `.calendar` from the host, as in the first hop) |
 | `data-coreui="navigation"` | either form | `data-coreui-navigation` |

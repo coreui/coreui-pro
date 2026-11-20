@@ -45,7 +45,7 @@ Do you need a gradient in your custom CSS? Read the token: `background-image: va
 
 ## Opacity
 
-Every `.bg-*` utility writes its color into `--cui-bg` and reads it back, so a companion `.bg-{percentage}` class can mix that color with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
+Every `.bg-*` utility writes its color into `--cui-bg` and reads it back, so a companion `.bg-opacity-{percentage}` class can mix that color with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
 
 ```css
 .bg-success {
@@ -53,7 +53,7 @@ Every `.bg-*` utility writes its color into `--cui-bg` and reads it back, so a c
   background-color: var(--cui-bg);
 }
 
-.bg-50 {
+.bg-opacity-50 {
   background-color: color-mix(in oklch, var(--cui-bg) 50%, transparent);
 }
 ```
@@ -61,13 +61,13 @@ Every `.bg-*` utility writes its color into `--cui-bg` and reads it back, so a c
 Override `--cui-bg` to repaint the utility with another color; the opacity class keeps working, because it reads whatever the token holds.
 
 <Example class="d-flex flex-column gap-3" code={`<div class="bg-success fg-contrast-success p-3">This is default success background</div>
-<div class="bg-success p-3 bg-90">This is 90% opacity success background</div>
-<div class="bg-success p-3 bg-70">This is 70% opacity success background</div>
-<div class="bg-success p-3 bg-50">This is 50% opacity success background</div>
-<div class="bg-success p-3 bg-30">This is 30% opacity success background</div>
-<div class="bg-success p-3 bg-10">This is 10% opacity success background</div>`} />
+<div class="bg-success p-3 bg-opacity-90">This is 90% opacity success background</div>
+<div class="bg-success p-3 bg-opacity-70">This is 70% opacity success background</div>
+<div class="bg-success p-3 bg-opacity-50">This is 50% opacity success background</div>
+<div class="bg-success p-3 bg-opacity-30">This is 30% opacity success background</div>
+<div class="bg-success p-3 bg-opacity-10">This is 10% opacity success background</div>`} />
 
-`.bg-opacity-{10|15|25|50|75|100}` and `.bg-{color}-subtle` / `.bg-{color}-muted` are the deprecated v5 spellings of `.bg-{percentage}`, `.bg-subtle-{color}` and `.bg-muted-{color}`; they still render and are removed in v7.
+The v5 steps outside the scale of ten, `.bg-opacity-{15|25|75}`, and `.bg-{color}-subtle` / `.bg-{color}-muted` are deprecated spellings of `.bg-opacity-{percentage}`, `.bg-subtle-{color}` and `.bg-muted-{color}`; they still render and are removed in v7.
 
 ## Customizing
 
