@@ -23,14 +23,7 @@ const DATA_KEY = 'coreui.dialog'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const EVENT_SHOWN = `shown${EVENT_KEY}`
-const EVENT_HIDDEN = `hidden${EVENT_KEY}`
-const EVENT_CANCEL = `cancel${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-
-const CLASS_NAME_NONMODAL = 'dialog-nonmodal'
-const CLASS_NAME_INSTANT = 'dialog-instant'
-const CLASS_NAME_SWAP_IN = 'dialog-swap-in'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="dialog"]'
 
@@ -77,7 +70,7 @@ class Dialog extends DialogBase<DialogConfig> {
   }
 
   override dispose(): void {
-    this._element.classList.remove(CLASS_NAME_SWAP_IN)
+    this._element.classList.remove(`${this.constructor.NAME}-swap-in`)
     super.dispose()
   }
 
@@ -92,12 +85,12 @@ class Dialog extends DialogBase<DialogConfig> {
 
   protected override _onBeforeShow(): void {
     if (!this._config.modal) {
-      this._element.classList.add(CLASS_NAME_NONMODAL)
+      this._element.classList.add(`${this.constructor.NAME}-nonmodal`)
     }
   }
 
   protected override _onAfterHide(): void {
-    this._element.classList.remove(CLASS_NAME_NONMODAL)
+    this._element.classList.remove(`${this.constructor.NAME}-nonmodal`)
   }
 
   // Keep the dialog in the top layer until the exit transition ends — close()
@@ -108,7 +101,7 @@ class Dialog extends DialogBase<DialogConfig> {
   }
 
   protected override _onCancel(): void {
-    EventHandler.trigger(this._element, EVENT_CANCEL)
+    EventHandler.trigger(this._element, this.constructor.eventName('cancel'))
   }
 
   // Static
@@ -122,8 +115,14 @@ class Dialog extends DialogBase<DialogConfig> {
     return jQueryDispatch(this, Dialog, config, [relatedTarget])
   }
 
+  protected static _getTarget(trigger: HTMLElement): Element | null {
+    return SelectorEngine.getElementFromSelector(trigger)
+  }
+
+  protected static _onTriggerInside(_dialog: Element, _trigger: HTMLElement): void {}
+
   protected static _handleDataApiClick(trigger: HTMLElement, event: Event): void {
-    const target = SelectorEngine.getElementFromSelector(trigger)
+    const target = this._getTarget(trigger)
     if (!target) {
       return
     }
@@ -136,23 +135,29 @@ class Dialog extends DialogBase<DialogConfig> {
     const currentDialog = trigger.closest<HTMLDialogElement>('dialog[open]')
 
     // A trigger inside the open dialog that targets the same dialog has
-    // nothing to swap to. Keep the dialog open instead of toggling it closed.
+    // nothing to swap to.
     if (currentDialog === target) {
+      this._onTriggerInside(target, trigger)
       return
     }
 
-    const currentInstance = currentDialog ? Dialog.getInstance(currentDialog) : null
+    const currentInstance = currentDialog ? this.getInstance(currentDialog) : null
 
     if (!currentDialog || !currentInstance) {
-      Dialog.getOrCreateInstance(target).toggle(trigger)
+      this.getOrCreateInstance(target).toggle(trigger)
       return
     }
 
-    if (currentDialog.classList.contains(CLASS_NAME_SWAP_IN)) {
+    const swapInClass = `${this.NAME}-swap-in`
+    const instantClass = `${this.NAME}-instant`
+    const shownEvent = this.eventName('shown')
+    const hiddenEvent = this.eventName('hidden')
+
+    if (currentDialog.classList.contains(swapInClass)) {
       return
     }
 
-    const newDialog = Dialog.getOrCreateInstance(target)
+    const newDialog = this.getOrCreateInstance(target)
 
     // Check both cancelable events before changing either dialog. This keeps
     // the current dialog open when either side rejects the swap.
@@ -168,21 +173,21 @@ class Dialog extends DialogBase<DialogConfig> {
     //      non-deferred close path), so its ::backdrop is removed in the same
     //      frame the incoming one appears — the user sees one continuous
     //      backdrop instead of a double-darkened or half-faded flash.
-    target.classList.add(CLASS_NAME_SWAP_IN)
+    target.classList.add(swapInClass)
     const settleSwapIn = (): void => {
-      target.classList.remove(CLASS_NAME_SWAP_IN)
-      EventHandler.off(target, EVENT_SHOWN, settleSwapIn)
-      EventHandler.off(target, EVENT_HIDDEN, settleSwapIn)
+      target.classList.remove(swapInClass)
+      EventHandler.off(target, shownEvent, settleSwapIn)
+      EventHandler.off(target, hiddenEvent, settleSwapIn)
     }
 
-    EventHandler.on(target, EVENT_SHOWN, settleSwapIn)
-    EventHandler.on(target, EVENT_HIDDEN, settleSwapIn)
+    EventHandler.on(target, shownEvent, settleSwapIn)
+    EventHandler.on(target, hiddenEvent, settleSwapIn)
     newDialog._show(trigger)
 
-    if (!currentDialog.classList.contains(CLASS_NAME_INSTANT)) {
-      currentDialog.classList.add(CLASS_NAME_INSTANT)
-      EventHandler.one(currentDialog, EVENT_HIDDEN, () => {
-        currentDialog.classList.remove(CLASS_NAME_INSTANT)
+    if (!currentDialog.classList.contains(instantClass)) {
+      currentDialog.classList.add(instantClass)
+      EventHandler.one(currentDialog, hiddenEvent, () => {
+        currentDialog.classList.remove(instantClass)
       })
     }
 

@@ -1464,6 +1464,13 @@ check, radio, carousel and toggler icons already work:
   is dismissed with Escape; toggling from a trigger inside an open modal swaps
   to the target modal with a seamless backdrop (no flash); modals can be
   stacked — the top layer manages paint order.
+- **Per-plugin UMD files:** `js/dist/modal.js` builds on `js/dist/dialog.js`
+  and `js/dist/offcanvas.js` on `js/dist/drawer.js`, so load that file first.
+  A `require()` and an `import` resolve this on their own. Loading Modal or
+  Offcanvas in any of these ways also starts the Dialog or Drawer data API and
+  registers `$.fn.dialog` or `$.fn.drawer` with jQuery, as the bundles do; a
+  page that uses jQuery UI's `.dialog()` gets it back with
+  `$.fn.dialog.noConflict()`.
 - **Sass:** `$modal-transition` and `$modal-show-transform` are replaced by
   `$modal-transition-duration`/`$modal-transition-timing`; the offcanvas
   transition token splits the same way

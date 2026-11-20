@@ -190,7 +190,7 @@ describe('Plugin functions', () => {
         .map(([path]) => path)
 
       expect(direct).toEqual([])
-      expect(Object.values(sources).filter(source => /^onDocumentReady\(/m.test(source))).toHaveSize(35)
+      expect(Object.values(sources).filter(source => /^\s*onDocumentReady\(/m.test(source))).toHaveSize(34)
     })
   })
 })
