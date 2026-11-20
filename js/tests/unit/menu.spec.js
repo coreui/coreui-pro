@@ -6926,6 +6926,51 @@ describe('Menu', () => {
       expect(panel).not.toHaveClass('show')
     })
 
+    it('should enter a panel that starts with an accordion on its summary', async () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Filters</button>',
+        '<div class="menu"><details class="accordion-item"><summary class="accordion-header" id="section">Section</summary><div class="accordion-body">Body</div></details><button type="button" id="last">Apply</button></div>'
+      ].join('')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      new Menu(toggle, { container: true }).show()
+      toggle.focus()
+
+      await userEvent.keyboard('{Tab}')
+      expect(document.activeElement.id).toEqual('section')
+    })
+
+    it('should leave a panel that ends with an accordion from its summary', async () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Filters</button>',
+        '<div class="menu"><button type="button" id="first">Apply</button><details class="accordion-item"><summary class="accordion-header" id="last-section">Section</summary><div class="accordion-body">Body</div></details></div>',
+        '<button id="after" type="button">After</button>'
+      ].join('')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const panel = fixtureEl.querySelector('.menu')
+      new Menu(toggle, { container: true }).show()
+      document.querySelector('#last-section').focus()
+
+      await userEvent.keyboard('{Tab}')
+      expect(document.activeElement.id).toEqual('after')
+      expect(panel).not.toHaveClass('show')
+    })
+
+    it('should pass over a link without href when it enters the panel', async () => {
+      fixtureEl.innerHTML = [
+        '<button class="btn" type="button" data-coreui-toggle="menu">Filters</button>',
+        '<div class="menu"><a id="placeholder">Soon</a><button type="button" id="first">Apply</button></div>'
+      ].join('')
+
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      new Menu(toggle, { container: true }).show()
+      toggle.focus()
+
+      await userEvent.keyboard('{Tab}')
+      expect(document.activeElement.id).toEqual('first')
+    })
+
     it('should leave the panel when the toggle is the last stop before it', async () => {
       fixtureEl.innerHTML = [
         '<button class="btn" type="button" data-coreui-toggle="menu">Filters</button>',

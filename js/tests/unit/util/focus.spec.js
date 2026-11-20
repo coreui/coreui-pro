@@ -138,6 +138,14 @@ describe('Focus utilities', () => {
       expect(document.activeElement).toEqual(fixtureEl.querySelector('#close'))
     })
 
+    it('should focus the summary of an accordion that comes first', () => {
+      const dialog = openDialog('<details><summary id="section">Section</summary>Body</details><button id="close"></button>')
+
+      focusDialog(dialog)
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#section'))
+    })
+
     it('should focus the dialog itself when nothing inside takes the focus', () => {
       const dialog = openDialog('<p>Text</p>')
 
