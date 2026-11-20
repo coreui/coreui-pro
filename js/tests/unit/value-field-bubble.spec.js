@@ -14,14 +14,14 @@ const components = {
     const host = form.firstElementChild
     const instance = new ChipFilter(host, { required: true })
 
-    return { field: host.querySelector('textarea'), host, instance }
+    return { field: host.querySelector('select'), host, instance }
   },
   ChipInput(form) {
     form.innerHTML = '<div class="chip-input"></div>'
     const host = form.firstElementChild
     const instance = new ChipInput(host, { required: true })
 
-    return { field: host.querySelector('textarea'), host, instance }
+    return { field: host.querySelector('select'), host, instance }
   },
   Combobox(form) {
     form.innerHTML = `<button class="form-control combobox-toggle" type="button" aria-label="Item" data-coreui-toggle="combobox"></button>${OPTIONS}`

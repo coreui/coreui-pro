@@ -60,10 +60,8 @@ $chip-input-tokens: defaults(
       }
     }
 
-    > textarea {
+    > select {
       @include value-field-overlay();
-
-      resize: none;
     }
   }
 

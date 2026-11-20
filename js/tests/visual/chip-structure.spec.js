@@ -6,6 +6,7 @@
 
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
+import ChipFilter from '../../src/chip-filter.js'
 import ChipInput from '../../src/chip-input.js'
 import ChipSet from '../../src/chip-set.js'
 import { clearFixture, getFixture } from '../helpers/fixture.js'
@@ -42,13 +43,16 @@ describe('chip wrappers', () => {
     expect(chipInput._input.getBoundingClientRect().left).toBeGreaterThanOrEqual(chip.getBoundingClientRect().right)
   })
 
-  it('should hide the value field of a chip filter', async () => {
-    const { default: ChipFilter } = await import('../../src/chip-filter.js')
+  it.each([['chip filter', ChipFilter, 'chip-set chip-filter'], ['chip input', ChipInput, 'chip-input']])('should lay the value field of a %s over it, unseen and out of the pointer\'s way', (_, Component, className) => {
+    fixtureEl.innerHTML = `<div class="${className}"><span class="chip">One</span></div>`
+    const element = fixtureEl.firstElementChild
+    new Component(element, { name: 'tags' })
 
-    fixtureEl.innerHTML = '<div class="chip-set chip-filter"><span class="chip">One</span></div>'
-    const element = fixtureEl.querySelector('.chip-filter')
-    new ChipFilter(element, { name: 'tags' })
+    const field = element.querySelector('select')
+    const style = getComputedStyle(field)
+    const fieldBox = field.getBoundingClientRect()
 
-    expect(getComputedStyle(element.querySelector('textarea')).opacity).toBe('0')
+    expect([style.opacity, style.pointerEvents, style.position]).toEqual(['0', 'none', 'absolute'])
+    expect([fieldBox.width, fieldBox.height]).toEqual([element.clientWidth, element.clientHeight])
   })
 })

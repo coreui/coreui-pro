@@ -530,7 +530,7 @@ describe('ChipFilter', () => {
       expect(el.id).toEqual('sizes')
       expect(label.id).not.toEqual('')
       expect(el.getAttribute('aria-labelledby')).toEqual(label.id)
-      expect(fixtureEl.querySelector('textarea').id).toEqual('')
+      expect(fixtureEl.querySelector('select').id).toEqual('')
     })
 
     it('should not add a label to a host that has a name', () => {
@@ -560,7 +560,7 @@ describe('ChipFilter', () => {
       // eslint-disable-next-line no-new
       new ChipFilter(el)
 
-      expect(el.querySelector('textarea').hasAttribute('name')).toBeFalse()
+      expect(el.querySelector('select').hasAttribute('name')).toBeFalse()
     })
 
     it('should write the selection to the form', () => {
@@ -682,6 +682,14 @@ describe('ChipFilter', () => {
       expect([...new FormData(form).entries()]).toEqual([['tags', 'First']])
     })
 
+    it('should submit one entry per selected chip, a chip with a comma in it as one value', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-filter"><span class="chip" data-coreui-selected="true">Smith, John</span><span class="chip">Roe</span><span class="chip" data-coreui-selected="true">Doe</span></div></form>'
+      // eslint-disable-next-line no-new
+      new ChipFilter(fixtureEl.querySelector('.chip-filter'), { name: 'names' })
+
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('names')).toEqual(['Smith, John', 'Doe'])
+    })
+
     it('should send nothing it no longer lists after a reset', async () => {
       fixtureEl.innerHTML = '<form><div class="chip-filter"><span class="chip" data-coreui-selected="true">First</span><span class="chip">Second</span></div></form>'
       const form = fixtureEl.querySelector('form')
@@ -693,7 +701,7 @@ describe('ChipFilter', () => {
       await tick()
 
       expect(chipFilter.getSelectedValues()).toEqual([])
-      expect([...new FormData(form).entries()]).toEqual([['tags', '']])
+      expect([...new FormData(form).entries()]).toEqual([])
     })
 
     it('should stay silent on a reset to the selection it holds', async () => {
@@ -755,7 +763,7 @@ describe('ChipFilter', () => {
       chipFilter.dispose()
       fixtureEl.querySelector('label').click()
 
-      expect(el.querySelector('textarea')).toBeNull()
+      expect(el.querySelector('select')).toBeNull()
       expect(document.activeElement).not.toEqual(chip)
     })
 

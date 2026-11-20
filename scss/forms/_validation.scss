@@ -269,13 +269,13 @@
   @if $state == "invalid" {
     [data-coreui-validate] .form-control-group:has(> .form-control:user-invalid),
     [data-coreui-validate] .form-control-group:has(> .form-floating > .form-control:user-invalid),
-    [data-coreui-validate] .form-control-group:has(> select:user-invalid) {
+    [data-coreui-validate] .form-control-group:not(.chip-input):has(> select:user-invalid) {
       @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
     }
   } @else if $state == "valid" {
     [data-coreui-validate~="valid"] .form-control-group#{$without-error}:has(> .form-control:user-valid),
     [data-coreui-validate~="valid"] .form-control-group#{$without-error}:has(> .form-floating > .form-control:user-valid),
-    [data-coreui-validate~="valid"] .form-control-group#{$without-error}:has(> select:user-valid) {
+    [data-coreui-validate~="valid"] .form-control-group:not(.chip-input)#{$without-error}:has(> select:user-valid) {
       @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
     }
   }
@@ -308,14 +308,14 @@
     [data-coreui-validate~="valid"] {
       .form-control-group#{$without-error}:has(> .form-control:user-valid),
       .form-control-group#{$without-error}:has(> .form-floating > .form-control:user-valid),
-      .form-control-group#{$without-error}:has(> select:user-valid) {
+      .form-control-group:not(.chip-input)#{$without-error}:has(> select:user-valid) {
         ~ .valid-feedback,
         ~ .valid-tooltip { display: block; }
       }
 
       .form-field:not(:has(.is-invalid, :user-invalid)):has(.form-control-group > .form-control:user-valid),
       .form-field:not(:has(.is-invalid, :user-invalid)):has(.form-control-group > .form-floating > .form-control:user-valid),
-      .form-field:not(:has(.is-invalid, :user-invalid)):has(.form-control-group > select:user-valid) {
+      .form-field:not(:has(.is-invalid, :user-invalid)):has(.form-control-group:not(.chip-input) > select:user-valid) {
         .valid-feedback,
         .valid-tooltip { display: block; }
       }
