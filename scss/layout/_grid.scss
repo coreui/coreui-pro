@@ -2,7 +2,11 @@
 @use "../config" as *;
 @use "breakpoints" as *;
 
-$include-column-box-sizing: false !default;
+@property --#{$prefix}gutter-x {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 0;
+}
 
 @layer layout {
   @if $enable-grid-classes {
@@ -10,7 +14,7 @@ $include-column-box-sizing: false !default;
       @include make-row();
 
       > * {
-        @include make-col-ready($include-column-box-sizing);
+        @include make-col-ready();
       }
     }
   }

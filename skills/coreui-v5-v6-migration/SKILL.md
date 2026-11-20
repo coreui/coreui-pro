@@ -437,6 +437,15 @@ A custom ratio moves from `--cui-aspect-ratio: 50%` to `--cui-ratio: 2 / 1` on `
 </div>
 ```
 
+### Grid gutters
+
+A `.row` spaces its columns with `gap`, not with column padding and negative row margins. Column content stays where it was, so most layouts need no change. Fix these:
+
+- Remove wrappers that only contained gutter overflow: `.overflow-hidden` around a `.row`, `.mx-0` on an edge-to-edge row, extra container padding for large gutters.
+- A column with `.px-0` or `.p-0` meant to drop the gutter: put `.gx-0` or `.g-0` on the row instead.
+- Change row gaps with `.g-*`, `.gx-*` and `.gy-*`, not `.gap-*`: only the gutter classes keep the column widths in sync.
+- Sass: pass `$gap: 0px` to `make-col()` and `make-col-offset()` outside a gap-based row, and delete `$include-column-box-sizing`.
+
 ### Other components
 
 - **Alert.** An alert is a flex row. Wrap several block children (heading, paragraphs, `<hr>`) in `<div class="vstack">`. Keep the `.btn-close` a direct child of `.alert`. Every alert fades out on close; add `.alert-instant` where v5 omitted `.fade`.

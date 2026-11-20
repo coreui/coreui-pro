@@ -36,9 +36,9 @@ Breaking it down, here's how the grid system comes together:
 
 - **Containers center and horizontally pad your content.** Use `.container` for a responsive pixel width, `.container-fluid` for `width: 100%` across all viewports and devices, or a responsive container (e.g., `.container-md`) for a combination of fluid and pixel widths.
 
-- **Rows are wrappers for columns.** Each column has horizontal `padding` (called a gutter) for controlling the space between them. This `padding` is then counteracted on the rows with negative margins to ensure the content in your columns is visually aligned down the left side. Rows also support modifier classes to [uniformly apply column sizing](#row-columns) and [gutter classes](/layout/gutters/) to change the spacing of your content.
+- **Rows are wrappers for columns.** Native CSS `gap` creates the gutters between columns. Numbered column widths account for those gaps, so spans that add up to 12 fit on one line. Rows fit inside their parent without negative margins, and columns do not add gutter padding. Rows also support modifier classes to [uniformly apply column sizing](#row-columns) and [gutter classes](/layout/gutters/) to change the spacing of your content.
 
-- **Columns are incredibly flexible.** There are 12 template columns available per row, allowing you to create different combinations of elements that span any number of columns. Column classes indicate the number of template columns to span (e.g., `col-4` spans four). `width`s are set in percentages so you always have the same relative sizing.
+- **Columns are incredibly flexible.** There are 12 template columns available per row, allowing you to create different combinations of elements that span any number of columns. Column classes indicate the number of template columns to span (e.g., `col-4` spans four). Widths account for each span and the horizontal gap, so mixed spans that total 12 fit on one line.
 
 - **Gutters are also responsive and customizable.** [Gutter classes are available](/layout/gutters/) across all breakpoints, with all the same sizes as our [margin and padding spacing](/utilities/margin/). Change horizontal gutters with `.gx-*` classes, vertical gutters with `.gy-*`, or all gutters with `.g-*` classes. `.g-0` is also available to remove gutters.
 
@@ -385,7 +385,7 @@ Using our built-in grid Sass variables and maps, it's possible to completely cus
 
 ### Columns and gutters
 
-The number of grid columns can be modified via Sass variables. `$grid-columns` is used to generate the widths (in percent) of each individual column, and `$grid-gutter-x` sets the width of the column gutters. Row gutters come from the `g-*` utilities rather than a build-time variable.
+The number of grid columns can be modified via Sass variables. `$grid-columns` sets the span fractions the gap-aware column widths use, and `$grid-gutter-x` sets the width of the column gutters. Row gutters come from the `g-*` utilities rather than a build-time variable.
 
 ```scss
 $grid-columns: 12 !default;
@@ -448,6 +448,8 @@ Mixins are used in conjunction with the grid variables to generate semantic CSS 
 // Offset with margins
 @include make-col-offset($size, $columns: $grid-columns);
 ```
+
+`make-col()` and `make-col-offset()` subtract the row's horizontal gap. When you use them outside a gap-based row, pass `$gap: 0px` to keep percentage sizing.
 
 ### Example usage
 

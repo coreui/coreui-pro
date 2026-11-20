@@ -3,9 +3,7 @@
 );
 
 @forward "config";
-@forward "layout" with (
-  $include-column-box-sizing: true !default,
-);
+@forward "layout";
 @use "functions/maps" as *;
 @use "utilities" as *;
 

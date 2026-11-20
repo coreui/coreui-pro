@@ -10,3 +10,8 @@
 // The pages that document the deprecated v5 spellings render them live, and the
 // engine's stylesheet loads `scss/coreui` alone.
 @forward "@coreui-docs-source/scss/legacy";
+
+// v6 columns carry no gutter padding, and the shared engine pads grid examples only vertically.
+.docs-example-row [class^="col"] {
+  padding-inline: .75rem;
+}

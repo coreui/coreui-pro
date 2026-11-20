@@ -1,6 +1,5 @@
+// stylelint-disable length-zero-no-unit -- Zero gaps need a length type inside calc().
 @use "sass:map";
-@use "sass:math";
-@use "sass:meta";
 @use "../functions/math" as *;
 @use "../layout/breakpoints" as *;
 @use "../config" as *;
@@ -10,33 +9,29 @@
 // Generate semantic grid columns with these mixins.
 
 @mixin make-row($gutter-x: $grid-gutter-x, $gutter-y: 0) {
-  --#{$prefix}gutter-x: #{$gutter-x};
+  // stylelint-disable-next-line scss/at-function-named-arguments
+  --#{$prefix}gutter-x: #{if(sass($gutter-x == 0): 0px; else: $gutter-x)};
   --#{$prefix}gutter-y: #{$gutter-y};
   display: flex;
   flex-wrap: wrap;
-  // TODO: Revisit calc order after https://github.com/react-bootstrap/react-bootstrap/issues/6039 is fixed
-  margin-inline: calc(-.5 * var(--#{$prefix}gutter-x));
-  margin-top: calc(-1 * var(--#{$prefix}gutter-y));
+  gap: var(--#{$prefix}gutter-y) var(--#{$prefix}gutter-x);
 }
 
-@mixin make-col-ready($include-column-box-sizing: false) {
-  // Add box sizing if only the grid is loaded
-  // stylelint-disable-next-line scss/at-function-named-arguments
-  box-sizing: if(sass(meta.variable-exists(include-column-box-sizing) and $include-column-box-sizing): border-box);
+@mixin make-col-ready() {
+  box-sizing: border-box;
   // Prevent columns from becoming too narrow when at smaller grid tiers by
   // always setting `width: 100%;`. This works because we set the width
   // later on to override this initial width.
   flex-shrink: 0;
   width: 100%;
   max-width: 100%; // Prevent `.col-auto`, `.col` (& responsive variants) from breaking out the grid
-  padding-inline: calc(var(--#{$prefix}gutter-x) * .5);
-  margin-top: var(--#{$prefix}gutter-y);
 }
 
-@mixin make-col($size: false, $columns: $grid-columns) {
+@mixin make-col($size: false, $columns: $grid-columns, $gap: var(--#{$prefix}gutter-x, 0px)) {
   @if $size {
     flex: 0 0 auto;
-    width: math.percentage(divide($size, $columns));
+    // A span includes its internal gaps and leaves one gap before the next column.
+    width: calc((100% + $gap) * #{divide($size, $columns)} - $gap);
 
   } @else {
     flex: 1 1 0;
@@ -49,10 +44,10 @@
   width: auto;
 }
 
-@mixin make-col-offset($size, $columns: $grid-columns) {
+@mixin make-col-offset($size, $columns: $grid-columns, $gap: var(--#{$prefix}gutter-x, 0px)) {
   $num: divide($size, $columns);
   // stylelint-disable-next-line scss/at-function-named-arguments
-  margin-inline-start: if(sass($num == 0): 0; else: math.percentage($num));
+  margin-inline-start: if(sass($num == 0): 0; else: calc((100% + $gap) * #{$num}));
 }
 
 // Row columns
@@ -63,7 +58,7 @@
 @mixin row-cols($count) {
   > * {
     flex: 0 0 auto;
-    width: math.percentage(divide(1, $count));
+    width: calc((100% + var(--#{$prefix}gutter-x, 0px)) / #{$count} - var(--#{$prefix}gutter-x, 0px));
   }
 }
 
@@ -101,7 +96,12 @@
       @if $columns > 0 {
         @for $i from 1 through $columns {
           .col#{$infix}-#{$i} {
-            @include make-col($i, $columns);
+            // Keep percentage sizing when column classes are used outside rows.
+            @include make-col($i, $columns, 0px);
+
+            :where(.row) > & {
+              @include make-col($i, $columns);
+            }
           }
         }
 
@@ -109,7 +109,11 @@
         @for $i from 0 through ($columns - 1) {
           @if not ($infix == "" and $i == 0) { // Avoid emitting useless .offset-0
             .offset#{$infix}-#{$i} {
-              @include make-col-offset($i, $columns);
+              @include make-col-offset($i, $columns, 0px);
+
+              :where(.row) > & {
+                @include make-col-offset($i, $columns);
+              }
             }
           }
         }
@@ -121,7 +125,8 @@
       @each $key, $value in $gutters {
         .g#{$infix}-#{$key},
         .gx#{$infix}-#{$key} {
-          --#{$prefix}gutter-x: #{$value};
+          // stylelint-disable-next-line scss/at-function-named-arguments
+          --#{$prefix}gutter-x: #{if(sass($value == 0): 0px; else: $value)};
         }
 
         .g#{$infix}-#{$key},
