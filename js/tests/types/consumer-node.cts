@@ -21,7 +21,6 @@ import { onLabelClick } from '@coreui/coreui-pro/utils/field-label'
 import { getResponsivePlacement, parseResponsivePlacement } from '@coreui/coreui-pro/utils/floating-ui'
 import { containsFocus } from '@coreui/coreui-pro/utils/focus'
 import { focusFirstInvalidControl } from '@coreui/coreui-pro/utils/form-validation'
-import { getFragmentTarget } from '@coreui/coreui-pro/utils/hash-target'
 import { lockScroll, unlockScroll } from '@coreui/coreui-pro/utils/scroll-lock'
 import { executeAfterTransition } from '@coreui/coreui-pro/utils/transition'
 
@@ -46,7 +45,6 @@ onLabelClick(element, () => {})()
 getResponsivePlacement(parseResponsivePlacement('top md:right'), 'top', 0).toUpperCase()
 containsFocus(element).valueOf()
 focusFirstInvalidControl(document.createElement('form'))
-getFragmentTarget()?.scrollIntoView()
 lockScroll(element)
 unlockScroll(element)
 executeAfterTransition(() => {}, element)()
