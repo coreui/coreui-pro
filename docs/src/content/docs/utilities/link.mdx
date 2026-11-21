@@ -73,7 +73,7 @@ Change the underline's opacity with `.underline-opacity-{percentage}`. The under
 <p><a class="underline-offset-2 underline underline-opacity-70" href="#">Underline opacity 70</a></p>
 <p><a class="underline-offset-2 underline underline-opacity-100" href="#">Underline opacity 100</a></p>`} />
 
-The steps outside the scale of ten, `.underline-opacity-{0|25|75}`, are deprecated; they still render and are removed in v7. v5's `.link-underline-opacity-*` has no alias.
+v5's `.link-underline-opacity-*` has no alias: write `.underline-opacity-{percentage}`. The scale has no `0`, `25` or `75` step, and the alpha's deprecated `.underline-opacity-{0|25|75}` are removed: for `25` and `75` pick the step on either side (`-20` or `-30` for `-25`); `0` has no counterpart.
 
 ### Hover variants
 

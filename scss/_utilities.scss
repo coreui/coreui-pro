@@ -1031,13 +1031,6 @@ $utilities: map.merge(
       state: hover,
       values: theme-opacity-values(--#{$prefix}underline, currentcolor)
     ),
-    // deprecated
-    "underline-opacity-legacy": (
-      class: underline-opacity,
-      property: text-decoration-color,
-      state: hover,
-      values: theme-opacity-values(--#{$prefix}underline, currentcolor, (0: 0, 25: .25, 75: .75))
-    ),
     // scss-docs-end utils-links
     // scss-docs-start utils-bg-color
     "bg-color": (

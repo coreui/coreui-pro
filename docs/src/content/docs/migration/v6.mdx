@@ -4244,10 +4244,10 @@ Multi Select's option indicators moved with it — they render as a decorative
 
   ```html
   <!-- v5 -->
-  <a href="#" class="link-primary underline-opacity-25">Primary link</a>
+  <a href="#" class="link-primary link-underline-opacity-25">Primary link</a>
 
   <!-- v6 -->
-  <a href="#" class="theme-primary underline underline-opacity-25">Primary link</a>
+  <a href="#" class="theme-primary underline underline-opacity-20">Primary link</a>
   ```
 
   Two things change beyond the class name. The theme slot is a **tone picked for
@@ -6597,7 +6597,7 @@ markup.
   body line height (`.lh-sm` and `.lh-lg` read the type scale's stops) and
   `.shadow-opacity-*` counts the same ten steps.
 
-  Every v5 spelling **still ships as a deprecated alias** and renders the same,
+  These v5 spellings **still ship as deprecated aliases** and render the same,
   so existing markup is unaffected until v7: `.text-{color}`,
   `.text-{color}-emphasis`, `.text-body`, `.text-black`, `.text-white`,
   `.text-reset`, `.text-body-secondary`, `.text-body-tertiary`,
@@ -6605,16 +6605,18 @@ markup.
   `.border-{color}-subtle`, `.text-opacity-*`, `.link-opacity-*(-hover)`, the
   steps outside the scale of ten (`.bg-opacity-15`, `-25` and `-75`,
   `.border-opacity-25` and `-75`), `.lh-base`, `.shadow-opacity-25` and `-75`.
-  `.underline-opacity-0`, `-25` and `-75`, the alpha's steps outside the scale,
-  are deprecated as well. The deprecated opacity steps keep
+  The deprecated opacity steps keep
   their old values (`15`, `25`, `75`); the scale of ten has no such step, so
   pick the one on either side (`-20` or `-30` for `-25`). v5's `.link-underline-opacity-*` has no alias: write
-  `.underline-opacity-{n}`.
+  `.underline-opacity-{n}`, which runs from `10` to `100` in steps of ten with no other step,
+  so pick the step on either side for `-25` and `-75`; `.link-underline-opacity-0` has no counterpart.
 
   **From a v6 alpha:** the short opacity names of the alpha, `.bg-{n}`, `.fg-{n}`,
   `.border-{n}` and `.underline-{n}` (`.underline-{n}-hover`), are removed
   without an alias. Write `.bg-opacity-{n}`, `.fg-opacity-{n}`,
-  `.border-opacity-{n}` and `.underline-opacity-{n}`.
+  `.border-opacity-{n}` and `.underline-opacity-{n}`. The alpha's deprecated
+  `.underline-opacity-0`, `-25` and `-75` (with `-hover`) are removed as well: pick the step of ten
+  on either side for `-25` and `-75`; `.underline-opacity-0` has no counterpart.
 
   What does change: the `--cui-text`, `--cui-text-opacity`, `--cui-bg-opacity`,
   `--cui-border-opacity`, `--cui-underline-opacity` and `--cui-link-opacity`

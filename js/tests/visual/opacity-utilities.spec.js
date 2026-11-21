@@ -16,8 +16,7 @@ const families = [
 
 const deprecatedSteps = {
   bg: [15, 25, 75],
-  border: [25, 75],
-  underline: [0, 25, 75]
+  border: [25, 75]
 }
 
 const collectRules = (rules, found = []) => {
@@ -79,9 +78,17 @@ describe('Color opacity utilities', () => {
     }
   })
 
-  it('gives the underline steps a hover variant', () => {
-    for (const step of [0, 10, 25, 50, 75, 100]) {
+  it('gives every underline step of ten a hover variant', () => {
+    for (const step of [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) {
+      expect(ruleFor(`.underline-opacity-${step}`).length).withContext(`step ${step}`).toBe(1)
       expect(ruleFor(`.underline-opacity-${step}-hover:hover`).length).withContext(`step ${step}`).toBe(1)
+    }
+  })
+
+  it('has no underline step outside the scale of ten', () => {
+    for (const step of [0, 25, 75]) {
+      expect(ruleFor(`.underline-opacity-${step}`).length).withContext(`.underline-opacity-${step}`).toBe(0)
+      expect(ruleFor(`.underline-opacity-${step}-hover:hover`).length).withContext(`.underline-opacity-${step}-hover`).toBe(0)
     }
   })
 

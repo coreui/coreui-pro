@@ -167,7 +167,7 @@ The `dark` and `light` theme colors are gone. Rename `-dark` to `-inverse` and `
 | `.mw-100`, `.mh-100` | `.max-w-100`, `.max-h-100` |
 | `.link-offset-{n}`, `.link-offset-{n}-hover` | `.underline-offset-{n}`, `.underline-offset-{n}-hover` |
 | `.link-underline-{color}` | `.underline-{color}` |
-| `.link-underline-opacity-{n}`, `-hover` | `.underline-opacity-{n}`, `.underline-opacity-{n}-hover` |
+| `.link-underline-opacity-{n}`, `-hover` | `.underline-opacity-{n}`, `.underline-opacity-{n}-hover` (steps of ten; for `25` and `75` pick the step on either side, `0` has no counterpart) |
 | `.link-body-emphasis` | `.text-body-emphasis` |
 | `.text-muted` | `.fg-2` |
 | `.text-high-emphasis`, `.text-medium-emphasis`, `.text-disabled` | `.text-body`, `.fg-2`, `.fg-3` |
