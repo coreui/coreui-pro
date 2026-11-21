@@ -95,6 +95,7 @@ $avatar-variants: defaults(
     height: var(--#{$prefix}avatar-size);
     font-size: var(--#{$prefix}avatar-font-size);
     color: var(--#{$prefix}theme-contrast, var(--#{$prefix}avatar-color));
+    text-decoration: none;
     vertical-align: middle;
     background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}avatar-bg));
     @include border-radius(var(--#{$prefix}avatar-border-radius));
