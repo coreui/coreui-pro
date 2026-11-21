@@ -650,6 +650,23 @@ describe('Util', () => {
     })
   })
 
+  describe('isForwardKey', () => {
+    it('should point down and toward the end of the line to the next item', () => {
+      expect(Util.isForwardKey('ArrowDown', false)).toBeTrue()
+      expect(Util.isForwardKey('ArrowDown', true)).toBeTrue()
+      expect(Util.isForwardKey('ArrowRight', false)).toBeTrue()
+      expect(Util.isForwardKey('ArrowLeft', true)).toBeTrue()
+    })
+
+    it('should point up, toward the start of the line and any other key back', () => {
+      expect(Util.isForwardKey('ArrowUp', false)).toBeFalse()
+      expect(Util.isForwardKey('ArrowUp', true)).toBeFalse()
+      expect(Util.isForwardKey('ArrowLeft', false)).toBeFalse()
+      expect(Util.isForwardKey('ArrowRight', true)).toBeFalse()
+      expect(Util.isForwardKey('Home', false)).toBeFalse()
+    })
+  })
+
   describe('getNextActiveElement', () => {
     it('should return first element if active not exists or not given and shouldGetNext is either true, or false with cycling being disabled', () => {
       const array = ['a', 'b', 'c', 'd']

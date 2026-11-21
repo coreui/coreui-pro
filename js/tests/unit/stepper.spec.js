@@ -2760,6 +2760,108 @@ describe('Stepper', () => {
       expect(document.activeElement === buttons[1] || true).toBeTrue()
     })
 
+    it('should move to the next step with the arrow that points toward the end of the line', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement)
+
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+      const press = (button, key) => {
+        button.focus()
+        button.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }))
+      }
+
+      press(buttons[0], 'ArrowRight')
+      expect(document.activeElement).toBe(buttons[1])
+
+      stepperElement.setAttribute('dir', 'rtl')
+
+      press(buttons[0], 'ArrowLeft')
+      expect(document.activeElement).toBe(buttons[1])
+
+      press(buttons[1], 'ArrowRight')
+      expect(document.activeElement).toBe(buttons[0])
+    })
+
+    it('should skip disabled steps and wrap around the enabled ones', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: true })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement)
+
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+      const press = (button, key) => {
+        button.focus()
+        const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+        button.dispatchEvent(event)
+        return event
+      }
+
+      expect(buttons[2].disabled).toBeTrue()
+
+      expect(press(buttons[1], 'ArrowRight').defaultPrevented).toBeTrue()
+      expect(document.activeElement).toBe(buttons[0])
+
+      press(buttons[0], 'End')
+      expect(document.activeElement).toBe(buttons[1])
+
+      press(buttons[1], 'Home')
+      expect(document.activeElement).toBe(buttons[0])
+
+      press(buttons[0], 'ArrowLeft')
+      expect(document.activeElement).toBe(buttons[1])
+    })
+
+    it('should leave an arrow, Home or End with a modifier to the browser', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement)
+
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+      buttons[1].focus()
+
+      for (const modifier of ['altKey', 'ctrlKey', 'metaKey']) {
+        for (const key of ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End']) {
+          const event = new KeyboardEvent('keydown', {
+            key, [modifier]: true, bubbles: true, cancelable: true
+          })
+          buttons[1].dispatchEvent(event)
+
+          expect(event.defaultPrevented).toBeFalse()
+          expect(document.activeElement).toBe(buttons[1])
+        }
+      }
+    })
+
+    it('should move to the next step with ArrowDown and back with ArrowUp in either direction', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement)
+
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+      const press = (button, key) => {
+        button.focus()
+        button.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }))
+      }
+
+      for (const dir of ['ltr', 'rtl']) {
+        stepperElement.setAttribute('dir', dir)
+
+        press(buttons[0], 'ArrowDown')
+        expect(document.activeElement).toBe(buttons[1])
+
+        press(buttons[1], 'ArrowUp')
+        expect(document.activeElement).toBe(buttons[0])
+      }
+    })
+
     it('should navigate left with ArrowLeft key', () => {
       fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
       const stepperElement = fixtureEl.querySelector('.stepper')

@@ -14,7 +14,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
 import { enableHashTarget } from './util/hash-target.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, getTransitionDurationFromElement, isDisabled, jQueryDispatch, setAriaAttribute
+  defineJQueryPlugin, getNextActiveElement, getTransitionDurationFromElement, isDisabled, isForwardKey, isRTL, jQueryDispatch, setAriaAttribute
 } from './util/index.js'
 
 /**
@@ -196,7 +196,7 @@ class Tab extends BaseComponent {
     if ([HOME_KEY, END_KEY].includes(event.key)) {
       nextActiveElement = children[event.key === HOME_KEY ? 0 : children.length - 1]
     } else {
-      const isNext = [ARROW_RIGHT_KEY, ARROW_DOWN_KEY].includes(event.key)
+      const isNext = isForwardKey(event.key, isRTL(this._parent))
       nextActiveElement = getNextActiveElement(children, event.target, isNext, true)
     }
 

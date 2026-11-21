@@ -7,7 +7,7 @@
 
 import SelectorEngine from '../dom/selector-engine.js'
 import { CLOCK_ICON } from '../util/icons.js'
-import { isRTL } from '../util/index.js'
+import { isForwardKey, isRTL } from '../util/index.js'
 import TimeSelection from './base.js'
 
 /**
@@ -93,10 +93,8 @@ class TimeSelects extends TimeSelection {
         }
 
         event.preventDefault()
-        const rtl = isRTL(select)
-        const goLeft = (event.key === ARROW_LEFT_KEY && !rtl) || (event.key === ARROW_RIGHT_KEY && rtl)
         const list = SelectorEngine.find(SELECTOR_TIME_SELECT, this._element as HTMLElement)
-        const index = list.indexOf(select) + (goLeft ? -1 : 1)
+        const index = list.indexOf(select) + (isForwardKey(event.key, isRTL(select)) ? 1 : -1)
 
         if (index < 0 || index > list.length - 1) {
           return

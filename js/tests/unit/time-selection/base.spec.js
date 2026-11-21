@@ -90,6 +90,26 @@ describe('TimeSelection', () => {
       expect(fixtureEl.querySelector('select.hours').value).toEqual('9')
       expect(fixtureEl.querySelector('select.minutes').value).toEqual('45')
     })
+
+    it('should move between the selects by the direction of the body', () => {
+      buildSelects()
+      const [hours, minutes] = fixtureEl.querySelectorAll('select.date-picker-time-select')
+      const press = (select, key) => {
+        select.focus()
+        select.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }))
+      }
+
+      press(hours, 'ArrowRight')
+      expect(document.activeElement).toBe(minutes)
+
+      fixtureEl.querySelector('#body').setAttribute('dir', 'rtl')
+
+      press(hours, 'ArrowLeft')
+      expect(document.activeElement).toBe(minutes)
+
+      press(minutes, 'ArrowRight')
+      expect(document.activeElement).toBe(hours)
+    })
   })
 
   describe('changes', () => {

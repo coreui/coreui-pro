@@ -21,7 +21,7 @@ import {
   createTypeaheadBuffer, getRemovalNeighbor, isTypingKey, type TypeaheadBuffer
 } from './util/list-navigation.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
+  defineJQueryPlugin, getNextActiveElement, isForwardKey, isRTL, jQueryDispatch, writeAttribute
 } from './util/index.js'
 
 /**
@@ -496,23 +496,15 @@ class ChipSet extends BaseComponent {
       return
     }
 
-    const rtl = isRTL(this._element)
-
     if ([ARROW_DOWN_KEY, ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, HOME_KEY, END_KEY].includes(event.key)) {
       this._typeaheadBuffer.clear()
     }
 
     switch (event.key) {
-      case ARROW_LEFT_KEY: {
-        event.preventDefault()
-        // In RTL the visual direction is mirrored, so ArrowLeft moves to the next chip.
-        this._moveFocus(this._focusSibling(chip as HTMLElement, rtl), event.shiftKey, chip as HTMLElement)
-        break
-      }
-
+      case ARROW_LEFT_KEY:
       case ARROW_RIGHT_KEY: {
         event.preventDefault()
-        this._moveFocus(this._focusSibling(chip as HTMLElement, !rtl), event.shiftKey, chip as HTMLElement)
+        this._moveFocus(this._focusSibling(chip as HTMLElement, isForwardKey(event.key, isRTL(this._element))), event.shiftKey, chip as HTMLElement)
         break
       }
 

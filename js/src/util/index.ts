@@ -359,6 +359,16 @@ const getNextActiveElement = <T>(list: T[], activeElement: T, shouldGetNext: boo
   return list[Math.max(0, Math.min(index, listLength - 1))]
 }
 
+/**
+ * Tells whether an arrow key points to the next item: down, and right, or left in a right-to-left
+ * layout. Up, the opposite horizontal arrow and every other key point back.
+ *
+ * @param key - The key value
+ * @param rtl - Whether the layout runs right to left
+ * @returns `true` for a key that points to the next item
+ */
+const isForwardKey = (key: string, rtl: boolean): boolean => key === 'ArrowDown' || key === (rtl ? 'ArrowLeft' : 'ArrowRight')
+
 export {
   defineJQueryPlugin,
   execute,
@@ -369,6 +379,7 @@ export {
   getUID,
   isDisabled,
   isElement,
+  isForwardKey,
   isRTL,
   isVisible,
   joinIds,
