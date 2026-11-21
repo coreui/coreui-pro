@@ -95,31 +95,20 @@ const getElement = (object: unknown): HTMLElement | null => {
   return null
 }
 
+/**
+ * Checks whether an element is rendered and can be seen: not hidden by `display`, `visibility`,
+ * `content-visibility` or a closed `details` around it, the first `summary` of a closed `details` excepted.
+ * @param element - The value to check
+ * @returns `true` when the value is an element that is visible
+ */
 const isVisible = (element: unknown): boolean => {
-  if (!isElement(element) || element.getClientRects().length === 0) {
+  if (!isElement(element) || element.closest('details:not([open]) > :not(summary:first-of-type)')) {
     return false
   }
 
-  const elementIsVisible = getComputedStyle(element).getPropertyValue('visibility') === 'visible'
-  // Handle `details` element as its content may falsie appear visible when it is closed
-  const closedDetails = element.closest('details:not([open])')
-
-  if (!closedDetails) {
-    return elementIsVisible
-  }
-
-  if (closedDetails !== element) {
-    const summary = element.closest('summary')
-    if (summary && summary.parentNode !== closedDetails) {
-      return false
-    }
-
-    if (summary === null) {
-      return false
-    }
-  }
-
-  return elementIsVisible
+  return typeof element.checkVisibility === 'function' ?
+    element.checkVisibility({ visibilityProperty: true }) :
+    element.getClientRects().length > 0 && getComputedStyle(element).visibility === 'visible'
 }
 
 const isDisabled = (element: Element | null | undefined): boolean => {
