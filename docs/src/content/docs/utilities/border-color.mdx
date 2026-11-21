@@ -58,13 +58,13 @@ The same utilities repaint the border a component ships with:
     Dangerous heading
   </div>
 
-  <div class="p-4 bg-info bg-10 border border-info border-start-0 rounded-end">
+  <div class="p-4 bg-info bg-opacity-10 border border-info border-start-0 rounded-end">
     Changing border color and width
   </div>`} />
 
 ## Opacity
 
-Every `.border-{color}` utility writes its color into `--cui-border` and reads it back, so a companion `.border-{percentage}` class can mix that color with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
+Every `.border-{color}` utility writes its color into `--cui-border` and reads it back, so a companion `.border-opacity-{percentage}` class can mix that color with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
 
 ```css
 .border-success {
@@ -72,7 +72,7 @@ Every `.border-{color}` utility writes its color into `--cui-border` and reads i
   border-color: var(--cui-border);
 }
 
-.border-50 {
+.border-opacity-50 {
   border-color: color-mix(in oklch, var(--cui-border) 50%, transparent);
 }
 ```
@@ -80,12 +80,12 @@ Every `.border-{color}` utility writes its color into `--cui-border` and reads i
 Override `--cui-border` to repaint the utility with another color; the opacity class keeps working, because it reads whatever the token holds.
 
 <Example code={`<div class="border border-success p-3 mb-3">This is default success border</div>
-<div class="border border-success p-3 mb-3 border-70">This is 70% opacity success border</div>
-<div class="border border-success p-3 mb-3 border-50">This is 50% opacity success border</div>
-<div class="border border-success p-3 mb-3 border-30">This is 30% opacity success border</div>
-<div class="border border-success p-3 border-10">This is 10% opacity success border</div>`} />
+<div class="border border-success p-3 mb-3 border-opacity-70">This is 70% opacity success border</div>
+<div class="border border-success p-3 mb-3 border-opacity-50">This is 50% opacity success border</div>
+<div class="border border-success p-3 mb-3 border-opacity-30">This is 30% opacity success border</div>
+<div class="border border-success p-3 border-opacity-10">This is 10% opacity success border</div>`} />
 
-`.border-opacity-{10|25|50|75|100}` and `.border-{color}-subtle` are the deprecated v5 spellings of `.border-{percentage}` and `.border-subtle-{color}`; they still render and are removed in v7.
+The v5 steps outside the scale of ten, `.border-opacity-{25|75}`, and `.border-{color}-subtle` are deprecated spellings of `.border-opacity-{percentage}` and `.border-subtle-{color}`; they still render and are removed in v7.
 
 ## Customizing
 

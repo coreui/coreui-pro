@@ -65,21 +65,21 @@ Change how heavy the underline is drawn, on links or any underlined text. Hover 
 
 ### Underline opacity
 
-Change the underline's opacity with `.underline-{percentage}`. The underline color comes from `--cui-underline`, which `.underline` sets to `currentColor` and `.underline-{color}` to a theme color; without either class the opacity utility fades `currentColor`.
+Change the underline's opacity with `.underline-opacity-{percentage}`. The underline color comes from `--cui-underline`, which `.underline` sets to `currentColor` and `.underline-{color}` to a theme color; without either class the opacity utility fades `currentColor`.
 
-<Example code={`<p><a class="underline-offset-2 underline underline-10" href="#">Underline opacity 10</a></p>
-<p><a class="underline-offset-2 underline underline-30" href="#">Underline opacity 30</a></p>
-<p><a class="underline-offset-2 underline underline-50" href="#">Underline opacity 50</a></p>
-<p><a class="underline-offset-2 underline underline-70" href="#">Underline opacity 70</a></p>
-<p><a class="underline-offset-2 underline underline-100" href="#">Underline opacity 100</a></p>`} />
+<Example code={`<p><a class="underline-offset-2 underline underline-opacity-10" href="#">Underline opacity 10</a></p>
+<p><a class="underline-offset-2 underline underline-opacity-30" href="#">Underline opacity 30</a></p>
+<p><a class="underline-offset-2 underline underline-opacity-50" href="#">Underline opacity 50</a></p>
+<p><a class="underline-offset-2 underline underline-opacity-70" href="#">Underline opacity 70</a></p>
+<p><a class="underline-offset-2 underline underline-opacity-100" href="#">Underline opacity 100</a></p>`} />
 
-`.underline-opacity-{0|10|25|50|75|100}` are the deprecated v5 spellings; they still render and are removed in v7.
+v5's `.link-underline-opacity-*` has no alias: write `.underline-opacity-{percentage}`. The scale has no `0`, `25` or `75` step, and the alpha's deprecated `.underline-opacity-{0|25|75}` are removed: for `25` and `75` pick the step on either side (`-20` or `-30` for `-25`); `0` has no counterpart.
 
 ### Hover variants
 
-Just like the `.link-{percentage}-hover` utilities, `.underline-offset` and `.underline-{percentage}` utilities include `:hover` variants by default. Mix and match to create unique link styles.
+Just like the `.link-{percentage}-hover` utilities, `.underline-offset` and `.underline-opacity-{percentage}` utilities include `:hover` variants by default. Mix and match to create unique link styles.
 
-<Example code={`<a class="underline-offset-2 underline-offset-3-hover underline underline-20 underline-100-hover" href="#">
+<Example code={`<a class="underline-offset-2 underline-offset-3-hover underline underline-opacity-20 underline-opacity-100-hover" href="#">
   Underline opacity 20, 100 on hover
 </a>`} />
 
@@ -87,9 +87,9 @@ Just like the `.link-{percentage}-hover` utilities, `.underline-offset` and `.un
 
 Give a link a theme color with a [`.theme-*`](/customize/theme/) class. Reboot resolves a link's color from `--cui-theme-fg`, which every theme class sets, so the link follows the theme rather than needing a class of its own.
 
-<Example code={[...getData('theme-colors').map((c) => `<p><a href="#" class="theme-${c.name} underline-offset-2 underline underline-20 underline-100-hover">${c.title} link</a></p>`), ``, `<p><a href="#" class="text-body-emphasis underline-offset-2 underline underline-30 underline-70-hover">Emphasis link</a></p>`]} />
+<Example code={[...getData('theme-colors').map((c) => `<p><a href="#" class="theme-${c.name} underline-offset-2 underline underline-opacity-20 underline-opacity-100-hover">${c.title} link</a></p>`), ``, `<p><a href="#" class="text-body-emphasis underline-offset-2 underline underline-opacity-30 underline-opacity-70-hover">Emphasis link</a></p>`]} />
 
-`.underline` here carries the underline color, which defaults to `currentColor` — so it follows the theme too, and the `.underline-{percentage}` utilities have something to fade. Name a color with `.underline-{color}` to break that pairing deliberately.
+`.underline` here carries the underline color, which defaults to `currentColor` — so it follows the theme too, and the `.underline-opacity-{percentage}` utilities have something to fade. Name a color with `.underline-{color}` to break that pairing deliberately.
 
 The theme slot is a tone picked for text, not the raw brand color: it darkens on a light background and lightens on a dark one, which is why the same class reads on both.
 

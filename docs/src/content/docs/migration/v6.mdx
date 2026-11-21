@@ -4244,10 +4244,10 @@ Multi Select's option indicators moved with it — they render as a decorative
 
   ```html
   <!-- v5 -->
-  <a href="#" class="link-primary underline-opacity-25">Primary link</a>
+  <a href="#" class="link-primary link-underline-opacity-25">Primary link</a>
 
   <!-- v6 -->
-  <a href="#" class="theme-primary underline underline-opacity-25">Primary link</a>
+  <a href="#" class="theme-primary underline underline-opacity-20">Primary link</a>
   ```
 
   Two things change beyond the class name. The theme slot is a **tone picked for
@@ -6419,7 +6419,7 @@ Bootstrap deprecated in 5.0 and removes in 6:
 | `.text-disabled` | `.fg-3` |
 | `.text-high-emphasis-inverse`, `.text-medium-emphasis-inverse`, `.text-disabled-inverse` | `.text-white` with an opacity utility |
 | `.text-muted` | `.fg-2` |
-| `.text-black-50`, `.text-white-50` | `.fg-black.fg-50`, `.fg-white.fg-50` |
+| `.text-black-50`, `.text-white-50` | `.fg-black.fg-opacity-50`, `.fg-white.fg-opacity-50` |
 
 (The `.dark:` variants of the emphasis utilities go with them.) The
 `$navbar-light-*` Sass variables stay.
@@ -6577,40 +6577,51 @@ markup.
   `color-scheme`, which is what the browser reads to paint form controls and
   scrollbars — it changes no colors of its own.
 - **`.link-underline-*` is `.underline-*`.** `.link-underline-danger` becomes
-  `.underline-danger`, and the opacity steps become `.underline-{n}`
-  (`.link-underline-opacity-50-hover` → `.underline-50-hover`). Like
+  `.underline-danger`, and the opacity steps become `.underline-opacity-{n}`
+  (`.link-underline-opacity-50-hover` → `.underline-opacity-50-hover`). Like
   `.underline-offset-*`, the class sets a `text-decoration-*` property on any
   element rather than only on a link, and it now sits beside
   `.underline-thickness-*`, which already carried that name.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **The color utilities take upstream's names, and opacity is a step of the
-  same family.** Text color is `.fg-{color}` (`.fg-emphasis-{color}`,
+  **The color utilities take upstream's names, and opacity takes an
+  `-opacity-` segment.** Text color is `.fg-{color}` (`.fg-emphasis-{color}`,
   `.fg-contrast-{color}`, `.fg-reset`, plus the `.fg-body` / `.fg-1` … `.fg-4`
   ladder that already carried the name); the light surfaces are
   `.bg-subtle-{color}` and `.bg-muted-{color}`, the light border
-  `.border-subtle-{color}`. Opacity is no longer a separate `-opacity-` family
-  with its own token: `.fg-{n}`, `.bg-{n}`, `.border-{n}`, `.link-{n}`
-  (`.link-{n}-hover`) and `.underline-{n}` (`.underline-{n}-hover`) run from
-  `10` to `100` in steps of ten and mix the color the companion class wrote into
+  `.border-subtle-{color}`. Opacity no longer has a token of its own:
+  `.fg-opacity-{n}`, `.bg-opacity-{n}`, `.border-opacity-{n}`, `.link-{n}`
+  (`.link-{n}-hover`) and `.underline-opacity-{n}` (`.underline-opacity-{n}-hover`)
+  run from `10` to `100` in steps of ten and mix the color the companion class wrote into
   `--cui-fg` / `--cui-bg` / `--cui-border` / `--cui-link-color` /
   `--cui-underline` with `transparent` through `color-mix()`. `.lh-md` is the
   body line height (`.lh-sm` and `.lh-lg` read the type scale's stops) and
   `.shadow-opacity-*` counts the same ten steps.
 
-  Every v5 spelling **still ships as a deprecated alias** and renders the same,
+  These v5 spellings **still ship as deprecated aliases** and render the same,
   so existing markup is unaffected until v7: `.text-{color}`,
   `.text-{color}-emphasis`, `.text-body`, `.text-black`, `.text-white`,
   `.text-reset`, `.text-body-secondary`, `.text-body-tertiary`,
   `.bg-{color}-subtle`, `.bg-{color}-muted`,
-  `.border-{color}-subtle`, `.text-opacity-*`, `.bg-opacity-*`,
-  `.border-opacity-*`, `.link-opacity-*(-hover)`, `.underline-opacity-*(-hover)`,
-  `.lh-base`, `.shadow-opacity-25` and `-75`. The deprecated opacity steps keep
-  their old values (`25`, `75`); the new scale rounds them to `30` and `70`.
+  `.border-{color}-subtle`, `.text-opacity-*`, `.link-opacity-*(-hover)`, the
+  steps outside the scale of ten (`.bg-opacity-15`, `-25` and `-75`,
+  `.border-opacity-25` and `-75`), `.lh-base`, `.shadow-opacity-25` and `-75`.
+  The deprecated opacity steps keep
+  their old values (`15`, `25`, `75`); the scale of ten has no such step, so
+  pick the one on either side (`-20` or `-30` for `-25`). v5's `.link-underline-opacity-*` has no alias: write
+  `.underline-opacity-{n}`, which runs from `10` to `100` in steps of ten with no other step,
+  so pick the step on either side for `-25` and `-75`; `.link-underline-opacity-0` has no counterpart.
+
+  **From a v6 alpha:** the short opacity names of the alpha, `.bg-{n}`, `.fg-{n}`,
+  `.border-{n}` and `.underline-{n}` (`.underline-{n}-hover`), are removed
+  without an alias. Write `.bg-opacity-{n}`, `.fg-opacity-{n}`,
+  `.border-opacity-{n}` and `.underline-opacity-{n}`. The alpha's deprecated
+  `.underline-opacity-0`, `-25` and `-75` (with `-hover`) are removed as well: pick the step of ten
+  on either side for `-25` and `-75`; `.underline-opacity-0` has no counterpart.
 
   What does change: the `--cui-text`, `--cui-text-opacity`, `--cui-bg-opacity`,
   `--cui-border-opacity`, `--cui-underline-opacity` and `--cui-link-opacity`
   tokens are gone (`--cui-text` is `--cui-fg`), so an inline
-  `style="--cui-bg-opacity: .5"` no longer fades a `.bg-*` — use `.bg-50`, or
+  `style="--cui-bg-opacity: .5"` no longer fades a `.bg-*` — use `.bg-opacity-50`, or
   set `--cui-bg` to a translucent color. Reboot's `a` reads
   `var(--cui-theme-fg, var(--cui-link-color))` directly instead of mixing the
   link color through `--cui-link-opacity` on every link.

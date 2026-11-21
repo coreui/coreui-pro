@@ -167,16 +167,17 @@ The `dark` and `light` theme colors are gone. Rename `-dark` to `-inverse` and `
 | `.mw-100`, `.mh-100` | `.max-w-100`, `.max-h-100` |
 | `.link-offset-{n}`, `.link-offset-{n}-hover` | `.underline-offset-{n}`, `.underline-offset-{n}-hover` |
 | `.link-underline-{color}` | `.underline-{color}` |
-| `.link-underline-opacity-{n}`, `-hover` | `.underline-{n}`, `.underline-{n}-hover` |
+| `.link-underline-opacity-{n}`, `-hover` | `.underline-opacity-{n}`, `.underline-opacity-{n}-hover` (steps of ten; for `25` and `75` pick the step on either side, `0` has no counterpart) |
 | `.link-body-emphasis` | `.text-body-emphasis` |
 | `.text-muted` | `.fg-2` |
 | `.text-high-emphasis`, `.text-medium-emphasis`, `.text-disabled` | `.text-body`, `.fg-2`, `.fg-3` |
-| `.text-black-50`, `.text-white-50` | `.fg-black.fg-50`, `.fg-white.fg-50` |
+| `.text-black-50`, `.text-white-50` | `.fg-black.fg-opacity-50`, `.fg-white.fg-opacity-50` |
 | `.bg-body-secondary`, `.bg-body-tertiary` | `.bg-3`, `.bg-2` (old names deprecated) |
 | `.text-body-secondary`, `.text-body-tertiary` | `.fg-2`, `.fg-3` (old names deprecated) |
 | `.text-{color}`, `.text-{color}-emphasis` | `.fg-{color}`, `.fg-emphasis-{color}` (old names deprecated) |
 | `.bg-{color}-subtle`, `.border-{color}-subtle` | `.bg-subtle-{color}`, `.border-subtle-{color}` (old names deprecated) |
-| `.text-opacity-{n}`, `.bg-opacity-{n}`, `.link-opacity-{n}` | `.fg-{n}`, `.bg-{n}`, `.link-{n}` with `n` in steps of 10 (old names deprecated) |
+| `.text-opacity-{n}`, `.link-opacity-{n}` | `.fg-opacity-{n}`, `.link-{n}` with `n` in steps of 10 (old names deprecated) |
+| `.bg-opacity-{n}`, `.border-opacity-{n}` | unchanged for `n` in steps of 10; the v5 steps outside it (`.bg-opacity-15`, `-25`, `-75`, `.border-opacity-25`, `-75`) are deprecated: write a step on either side (`25` → `20` or `30`) |
 | `.lh-base` | `.lh-md` (old name deprecated) |
 | `.placeholder-glow` | `.placeholder-pulse` (old name kept as alias) |
 
@@ -669,7 +670,7 @@ Hard-coded media queries at `992px`, `1200px` or `1400px` no longer match `lg`, 
 | `--cui-border-radius`, `-sm`, `-lg`, `-pill` | `--cui-radius-4`, `--cui-radius-3`, `--cui-radius-5`, `--cui-radius-pill`; `--cui-radius` scales all |
 | `--cui-font-monospace` | `--cui-font-mono` |
 | `--cui-highlight-color`, `--cui-highlight-bg` | `--cui-mark-color`, `--cui-mark-bg`, set on `mark` |
-| `--cui-text-opacity`, `--cui-bg-opacity`, `--cui-border-opacity`, `--cui-link-opacity` | removed; use `.fg-{n}`, `.bg-{n}`, `.border-{n}`, `.link-{n}`, or set `--cui-bg` to a translucent color |
+| `--cui-text-opacity`, `--cui-bg-opacity`, `--cui-border-opacity`, `--cui-link-opacity` | removed; use `.fg-opacity-{n}`, `.bg-opacity-{n}`, `.border-opacity-{n}`, `.link-{n}`, or set `--cui-bg` to a translucent color |
 | `--cui-focus-ring-x`, `--cui-focus-ring-y`, `--cui-focus-ring-blur` | removed; `--cui-focus-ring-offset` |
 | `--cui-btn-focus-box-shadow`, `--cui-pagination-focus-box-shadow`, `--cui-accordion-btn-focus-box-shadow`, `--cui-btn-focus-shadow-rgb` | removed; set `--cui-focus-ring-color` or `--cui-focus-ring-width` |
 | `--cui-form-valid-color`, `--cui-form-valid-border-color`, `--cui-form-invalid-color` | removed; retint the `success` and `danger` theme colors |

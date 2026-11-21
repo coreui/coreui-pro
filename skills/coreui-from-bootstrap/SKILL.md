@@ -229,7 +229,7 @@ CoreUI v6 follows the Bootstrap 5 to 6 changes, with three exceptions: responsiv
    | `.link-primary` | `.theme-primary.underline` |
    | `.link-body-emphasis` | `.text-body-emphasis` |
    | `.text-muted` | `.fg-2` |
-   | `.text-black-50`, `.text-white-50` | `.fg-black.fg-50`, `.fg-white.fg-50` |
+   | `.text-black-50`, `.text-white-50` | `.fg-black.fg-opacity-50`, `.fg-white.fg-opacity-50` |
    | `.bg-light`, `.bg-dark` panels | `.bg-3` or `.bg-4`; `data-coreui-theme="dark"` on a dark container |
 
    `dist/css/coreui-legacy.min.css`, loaded after `coreui.min.css`, keeps `.btn-{color}`, `.btn-outline-{color}`, `.alert-{color}`, `.list-group-item-{color}`, `.form-check*`, `.form-switch` and `.dropdown-menu-{bp}-{start|end}` working while you migrate. It does not cover the `-light` and `-dark` variants.
