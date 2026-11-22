@@ -3,7 +3,7 @@
  * page with the stylesheet lays the dialog out and runs its transitions.
  */
 
-import { page, userEvent } from 'vitest/browser'
+import { cdp, page, userEvent } from 'vitest/browser'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
 import Dialog from '../../src/dialog.js'
@@ -252,6 +252,58 @@ describe('dialog layout', () => {
       await page.viewport(innerWidth, innerHeight)
     }
   })
+
+  for (const [viewportWidth, expected, sheetWidth] of [
+    [390, 'the viewport'],
+    [1366, 'its sheet width', 760]
+  ]) {
+    it(`should open a .drawer-sheet as wide as ${expected} and flush with the bottom on a ${viewportWidth}px viewport`, async () => {
+      const { innerWidth, innerHeight } = window
+      await page.viewport(viewportWidth, 800)
+
+      try {
+        const element = mount('<dialog class="drawer drawer-bottom drawer-sheet drawer-instant"><div class="drawer-body">Body</div></dialog>')
+        instance = new Drawer(element)
+        await instance.show()
+        await nextFrames()
+        const { clientWidth, clientHeight } = document.documentElement
+        const rect = element.getBoundingClientRect()
+
+        expect(rect.width).toBe(sheetWidth ?? clientWidth)
+        expect(rect.left).toBe((clientWidth - rect.width) / 2)
+        expect(Math.round(rect.bottom - getComputedStyle(element).borderBottomWidth.replace('px', ''))).toBe(clientHeight)
+      } finally {
+        await page.viewport(innerWidth, innerHeight)
+      }
+    })
+  }
+
+  for (const [className, viewportWidth, expected] of [
+    ['drawer', 390, '21px'],
+    ['drawer-md', 844, '0px']
+  ]) {
+    it(`should pad the bottom of a .${className}.drawer-sheet by the safe area ${expected === '0px' ? 'only while it is a panel' : 'of the device'} on a ${viewportWidth}px viewport`, async () => {
+      const { innerWidth, innerHeight } = window
+      const session = cdp()
+      await page.viewport(viewportWidth, 800)
+      await session.send('Emulation.setSafeAreaInsetsOverride', { insets: { bottom: 21 } })
+
+      try {
+        const element = mount(`<dialog class="${className} drawer-bottom drawer-sheet drawer-instant"><div class="drawer-body">Body</div></dialog>`)
+        if (className === 'drawer') {
+          instance = new Drawer(element)
+          await instance.show()
+        }
+
+        await nextFrames()
+
+        expect(getComputedStyle(element).paddingBlockEnd).toBe(expected)
+      } finally {
+        await session.send('Emulation.setSafeAreaInsetsOverride', { insets: {} })
+        await page.viewport(innerWidth, innerHeight)
+      }
+    })
+  }
 
   it('should refuse the first Escape on a modal with keyboard false and let a repeated one close it', async () => {
     const element = mount('<dialog class="modal modal-instant" data-coreui-backdrop="static" data-coreui-keyboard="false"><div class="modal-body"><button type="button">Inside</button></div></dialog>')

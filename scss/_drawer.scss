@@ -222,6 +222,10 @@ $drawer-tokens: defaults(
           @include transition(none !important);
           // stylelint-enable declaration-no-important
 
+          &.drawer-sheet {
+            padding-block-end: 0;
+          }
+
           .drawer-header {
             display: none;
           }
@@ -264,7 +268,9 @@ $drawer-tokens: defaults(
   .drawer-sheet {
     inset-block-end: 0;
     inset-inline: 0;
-    width: 100vw;
+    width: 100%;
+    max-width: none;
+    padding-block-end: env(safe-area-inset-bottom);
     margin-inline: auto;
     margin-bottom: calc(-1 * var(--#{$prefix}drawer-border-width));
     border-end-start-radius: 0;

@@ -860,7 +860,7 @@ describe('Drawer', () => {
       expect(drawerEl.open).toBeFalse()
     })
 
-    it('should call hide first, if another drawer is open', () => {
+    it('should hide the open drawer when a toggler opens another one', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
           '<button id="btn2" data-coreui-toggle="drawer" data-coreui-target="#drawer2"></button>',
@@ -882,6 +882,132 @@ describe('Drawer', () => {
         })
         drawer1.show()
       })
+    })
+
+    it('should keep the open drawer and not open the other when the open one prevents hide', async () => {
+      fixtureEl.innerHTML = [
+        '<dialog id="a" class="drawer drawer-instant"><button type="button" data-coreui-toggle="drawer" data-coreui-target="#b">B</button></dialog>',
+        '<dialog id="b" class="drawer drawer-instant"></dialog>'
+      ].join('')
+      const [a, b] = ['#a', '#b'].map(selector => fixtureEl.querySelector(selector))
+      await Drawer.getOrCreateInstance(a).show()
+      a.addEventListener('hide.coreui.drawer', event => event.preventDefault())
+
+      a.querySelector('button').click()
+      await frames(2)
+
+      expect([a.open, b.open]).toEqual([true, false])
+    })
+
+    it('should keep the open drawer when the other one prevents show', async () => {
+      fixtureEl.innerHTML = [
+        '<dialog id="a" class="drawer drawer-instant"><button type="button" data-coreui-toggle="drawer" data-coreui-target="#b">B</button></dialog>',
+        '<dialog id="b" class="drawer drawer-instant"></dialog>'
+      ].join('')
+      const [a, b] = ['#a', '#b'].map(selector => fixtureEl.querySelector(selector))
+      await Drawer.getOrCreateInstance(a).show()
+      b.addEventListener('show.coreui.drawer', event => event.preventDefault())
+      const hideSpy = jasmine.createSpy('hide')
+      a.addEventListener('hide.coreui.drawer', hideSpy)
+
+      a.querySelector('button').click()
+      await frames(2)
+
+      expect([a.open, b.open, a.classList.contains('hiding')]).toEqual([true, false, false])
+      expect(hideSpy).not.toHaveBeenCalled()
+    })
+
+    it('should switch to the other drawer when neither prevents it', async () => {
+      fixtureEl.innerHTML = [
+        '<dialog id="a" class="drawer drawer-instant"><button type="button" data-coreui-toggle="drawer" data-coreui-target="#b">B</button></dialog>',
+        '<dialog id="b" class="drawer drawer-instant"></dialog>'
+      ].join('')
+      const [a, b] = ['#a', '#b'].map(selector => fixtureEl.querySelector(selector))
+      await Drawer.getOrCreateInstance(a).show()
+      const shown = eventWithin(b, 'shown.coreui.drawer', 1000)
+      const events = []
+      b.addEventListener('show.coreui.drawer', () => events.push('show b'))
+      a.addEventListener('hide.coreui.drawer', () => events.push('hide a'))
+
+      a.querySelector('button').click()
+
+      expect(await shown).toBeTrue()
+      expect([a.open, b.open]).toEqual([false, true])
+      expect(events).toEqual(['show b', 'hide a'])
+    })
+
+    it('should close only the toggled drawer when another one is open', async () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="toggle-b" data-coreui-toggle="drawer" data-coreui-target="#b">B</button>',
+        '<dialog id="a" class="drawer drawer-instant" data-coreui-scroll="true" data-coreui-backdrop="false"></dialog>',
+        '<dialog id="b" class="drawer drawer-instant" data-coreui-scroll="true" data-coreui-backdrop="false"></dialog>'
+      ].join('')
+      const [toggleB, a, b] = ['#toggle-b', '#a', '#b'].map(selector => fixtureEl.querySelector(selector))
+      await Drawer.getOrCreateInstance(a).show()
+      await Drawer.getOrCreateInstance(b).show()
+
+      toggleB.click()
+      await frames(2)
+
+      expect([a.open, b.open]).toEqual([true, false])
+    })
+
+    it('should not bring a drawer back on a double click of a toggler inside it while another one is open', async () => {
+      fixtureEl.innerHTML = [
+        '<dialog id="a" class="drawer" data-coreui-scroll="true" data-coreui-backdrop="false"></dialog>',
+        '<dialog id="b" class="drawer" data-coreui-scroll="true" data-coreui-backdrop="false"><button type="button" data-coreui-toggle="drawer" data-coreui-target="#b">Close</button></dialog>'
+      ].join('')
+      const [a, b] = ['#a', '#b'].map(selector => fixtureEl.querySelector(selector))
+      await Drawer.getOrCreateInstance(a).show()
+      await Drawer.getOrCreateInstance(b).show()
+      const hidden = eventWithin(b, 'hidden.coreui.drawer', 1000)
+
+      b.querySelector('button').click()
+      b.querySelector('button').click()
+
+      expect(await hidden).toBeTrue()
+      expect([a.open, b.open]).toEqual([true, false])
+    })
+
+    it('should close a drawer opened in the markup when another one opens', async () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="toggle-b" data-coreui-toggle="drawer" data-coreui-target="#b">B</button>',
+        '<dialog id="a" class="drawer drawer-instant" open></dialog>',
+        '<dialog id="b" class="drawer drawer-instant"></dialog>'
+      ].join('')
+      const [toggleB, a, b] = ['#toggle-b', '#a', '#b'].map(selector => fixtureEl.querySelector(selector))
+      const shown = eventWithin(b, 'shown.coreui.drawer', 1000)
+
+      toggleB.click()
+
+      expect(await shown).toBeTrue()
+      expect([a.open, b.open]).toEqual([false, true])
+    })
+
+    it('should leave the open drawer alone when a toggler has no dialog to open', async () => {
+      fixtureEl.innerHTML = [
+        '<dialog id="a" class="drawer drawer-instant">',
+        '  <button type="button" id="missing" data-coreui-toggle="drawer" data-coreui-target="#nothing">Missing</button>',
+        '  <button type="button" id="not-dialog" data-coreui-toggle="drawer" data-coreui-target="#plain">Plain</button>',
+        '</dialog>',
+        '<div id="plain" class="drawer"></div>'
+      ].join('')
+      const a = fixtureEl.querySelector('#a')
+      await Drawer.getOrCreateInstance(a).show()
+      const errors = []
+      const onError = event => {
+        errors.push(event.message)
+        event.preventDefault()
+      }
+
+      window.addEventListener('error', onError)
+      a.querySelector('#missing').click()
+      a.querySelector('#not-dialog').click()
+      window.removeEventListener('error', onError)
+      await frames(2)
+
+      expect(a.open).toBeTrue()
+      expect(errors).toEqual([])
     })
 
     it('should leave the focus in the page when a non-modal drawer closes without it', async () => {
@@ -1426,6 +1552,21 @@ describe('Drawer', () => {
 
         trigger.click()
       })
+    })
+
+    it('should not prevent default when the <a> trigger has no target', () => {
+      fixtureEl.innerHTML = '<a href="#missing" data-coreui-toggle="drawer">Toggle</a>'
+      let prevented
+      const onClick = event => {
+        prevented = event.defaultPrevented
+        event.preventDefault()
+      }
+
+      document.addEventListener('click', onClick)
+      fixtureEl.querySelector('a').click()
+      document.removeEventListener('click', onClick)
+
+      expect(prevented).toBeFalse()
     })
   })
 
