@@ -166,11 +166,14 @@ class Menu extends BaseComponent {
   protected declare _isMenu: boolean
   protected declare _isSubmenu: boolean
   protected declare _menuOriginalParent: ParentNode | null
+  protected declare _menuOriginalNextSibling: ChildNode | null
   protected declare _menuDirection: string | null
   protected declare _openedBy: 'key' | 'pointer' | null
   protected declare _layer: LayerEntry
   protected declare _escapeListener: EventCallable
   protected declare _pendingHidden: Record<string, unknown> | null
+  protected declare _touchMouseover: () => void
+  protected declare _touchMouseoverTargets: Set<Element>
 
   constructor(element?: string | Element | null, config?: Partial<MenuConfig> | null) {
     if (typeof computePosition === 'undefined') {
@@ -195,6 +198,8 @@ class Menu extends BaseComponent {
     this._disabledItems = new WeakSet()
     this._openedBy = null
     this._pendingHidden = null
+    this._touchMouseover = () => noop()
+    this._touchMouseoverTargets = new Set()
 
     this._menu = (this._config.menu || this._findMenu()) as HTMLElement
 
@@ -209,6 +214,7 @@ class Menu extends BaseComponent {
     this._isSubmenu = this._parent.classList?.contains(this.constructor.SELECTOR_SUBMENU.slice(1))
 
     this._menuOriginalParent = this._menu?.parentNode
+    this._menuOriginalNextSibling = null
     this._menuDirection = null
     this._isMenu = this._isMenuPanel()
 
@@ -300,7 +306,8 @@ class Menu extends BaseComponent {
 
     if ('ontouchstart' in document.documentElement && !this._parent.closest?.(SELECTOR_NAVBAR_NAV)) {
       for (const element of document.body.children) {
-        EventHandler.on(element, 'mouseover', noop)
+        EventHandler.on(element, 'mouseover', this._touchMouseover)
+        this._touchMouseoverTargets.add(element)
       }
     }
 
@@ -327,6 +334,8 @@ class Menu extends BaseComponent {
   }
 
   override dispose(): void {
+    this._removeTouchMouseoverListeners()
+
     if (this._isShown()) {
       unregisterLayer(this._layer, 'parent')
       this._toggleEscapeListeners(false)
@@ -394,12 +403,7 @@ class Menu extends BaseComponent {
     this._toggleEscapeListeners(false)
 
     this._closeAllSubmenus()
-
-    if ('ontouchstart' in document.documentElement) {
-      for (const element of document.body.children) {
-        EventHandler.off(element, 'mouseover', noop)
-      }
-    }
+    this._removeTouchMouseoverListeners()
 
     this._menu.classList.remove(CLASS_NAME_SHOW)
     this._setShown(false)
@@ -415,6 +419,14 @@ class Menu extends BaseComponent {
     await this._queueCallback(() => {
       this._finishHide()
     }, this._menu, this._isAnimated(), 'opacity')
+  }
+
+  protected _removeTouchMouseoverListeners(): void {
+    for (const element of this._touchMouseoverTargets) {
+      EventHandler.off(element, 'mouseover', this._touchMouseover)
+    }
+
+    this._touchMouseoverTargets.clear()
   }
 
   protected _finishHide(): void {
@@ -794,6 +806,7 @@ class Menu extends BaseComponent {
     }
 
     if (this._menu.parentNode !== container) {
+      this._menuOriginalNextSibling = this._menu.nextSibling
       container.append(this._menu)
     }
 
@@ -811,7 +824,8 @@ class Menu extends BaseComponent {
     }
 
     if (this._menu.parentNode !== this._menuOriginalParent) {
-      this._menuOriginalParent.append(this._menu)
+      const nextSibling = this._menuOriginalNextSibling
+      this._menuOriginalParent.insertBefore(this._menu, nextSibling?.parentNode === this._menuOriginalParent ? nextSibling : null)
     }
 
     if (this._menuDirection && this._menu.dir === this._menuDirection) {
@@ -1095,6 +1109,7 @@ class Menu extends BaseComponent {
 
     this._openSubmenus.delete(submenu)
     this._hoverOpenedSubmenus.delete(submenu)
+    this._cancelSubmenuCloseTimeout(submenu)
     closeLayersIn(submenu)
 
     if (trigger) {

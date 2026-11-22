@@ -1,7 +1,6 @@
 import ContextMenu from '../../src/context-menu.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Menu from '../../src/menu.js'
-import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -796,14 +795,14 @@ describe('ContextMenu', () => {
 
       const done = new Promise(resolve => {
         area.addEventListener('hidden.coreui.context-menu', () => {
-          expect(offSpy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', noop)
+          expect(offSpy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', jasmine.any(Function))
           delete document.documentElement.ontouchstart
           resolve()
         })
       })
 
       whenShown(area, () => {
-        expect(onSpy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', noop)
+        expect(onSpy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', jasmine.any(Function))
         contextMenu.hide()
       })
 

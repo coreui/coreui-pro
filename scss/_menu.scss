@@ -38,6 +38,8 @@ $menu-tokens: defaults(
     --#{$prefix}menu-item-color: var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)),
     --#{$prefix}menu-item-hover-color: var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)),
     --#{$prefix}menu-item-hover-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}menu-item-focus-color: light-dark(var(--#{$prefix}white), var(--#{$prefix}gray-900)),
+    --#{$prefix}menu-item-focus-bg: light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-200)),
     --#{$prefix}menu-item-active-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}menu-item-active-bg: var(--#{$prefix}primary-bg),
     --#{$prefix}menu-item-disabled-color: var(--#{$prefix}fg-3),
@@ -198,8 +200,7 @@ $menu-tokens: defaults(
     outline: 0;
     @include border-radius(var(--#{$prefix}menu-item-border-radius, 0));
 
-    &:hover,
-    &:focus {
+    &:hover {
       color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}menu-item-hover-color));
       background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}menu-item-hover-bg));
     }
@@ -211,6 +212,21 @@ $menu-tokens: defaults(
 
       .menu-item-icon {
         color: inherit !important; // stylelint-disable-line declaration-no-important
+      }
+    }
+
+    &:focus-visible:not(.disabled, :disabled) {
+      color: var(--#{$prefix}menu-item-focus-color);
+      background-color: var(--#{$prefix}menu-item-focus-bg);
+
+      .menu-item-icon {
+        color: inherit !important; // stylelint-disable-line declaration-no-important
+      }
+
+      @media (forced-colors: active) {
+        color: HighlightText;
+        background-color: Highlight;
+        forced-color-adjust: none;
       }
     }
 
@@ -311,13 +327,13 @@ $menu-tokens: defaults(
       margin-top: calc(-1 * var(--#{$prefix}menu-padding-y));
     }
 
-    &:hover > .menu-item,
-    &:focus-within > .menu-item {
+    &:hover > .menu-item:where(:not(:focus-visible)),
+    &:focus-within > .menu-item:where(:not(:focus-visible)) {
       color: var(--#{$prefix}menu-item-hover-color);
       background-color: var(--#{$prefix}menu-item-hover-bg);
     }
 
-    &.show > .menu-item {
+    &.show > .menu-item:where(:not(:focus-visible)) {
       color: var(--#{$prefix}menu-item-hover-color);
       background-color: var(--#{$prefix}menu-item-hover-bg);
     }

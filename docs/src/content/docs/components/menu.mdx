@@ -593,6 +593,8 @@ Menus include built-in keyboard support for navigating menu items.
 
 Arrow keys, `Home` and `End` pressed in a field, an editable region or a widget with its own keys inside the menu (a slider, a list box, a radio group, a toolbar) stay with that control. The arrow keys, `Home` and `End` pass over an item that cannot take the focus, such as a `.menu-item` link without `href` in a panel without `role="menu"`.
 
+An item focused from the keyboard takes `--cui-menu-item-focus-color` and `--cui-menu-item-focus-bg`, which differ from the hover and active colors, and in forced colors mode it takes the system highlight colors.
+
 ## Usage
 
 Via data attributes or JavaScript, the menu plugin toggles hidden content (menus) by toggling the `.show` class on the `.menu`. The `data-coreui-toggle="menu"` attribute is relied on for closing menus at an application level, so it’s a good idea to always use it.

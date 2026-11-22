@@ -243,6 +243,38 @@ describe('Menu', () => {
       })
     })
 
+    it('should keep the mobile listeners of an open menu when another menu hides, and remove them on dispose', async () => {
+      fixtureEl.innerHTML = [
+        '<div><button class="btn" id="first" data-coreui-toggle="menu">One</button><div class="menu"><a class="menu-item" href="#">A</a></div></div>',
+        '<div><button class="btn" id="second" data-coreui-toggle="menu">Two</button><div class="menu"><a class="menu-item" href="#">B</a></div></div>'
+      ].join('')
+      const defaultValueOnTouchStart = document.documentElement.ontouchstart
+      document.documentElement.ontouchstart = noop
+      const first = new Menu(fixtureEl.querySelector('#first'), { autoClose: false })
+      const second = new Menu(fixtureEl.querySelector('#second'), { autoClose: false })
+
+      try {
+        await first.show()
+        await second.show()
+        const firstHandler = first._touchMouseover
+        const handler = second._touchMouseover
+        const spyOff = spyOn(EventHandler, 'off').and.callThrough()
+        const removedFromSecond = () => spyOff.calls.allArgs().filter(([, type, callable]) => type === 'mouseover' && callable === handler)
+
+        await first.hide()
+
+        const removedByFirst = spyOff.calls.allArgs().filter(([, type]) => type === 'mouseover')
+        expect(removedByFirst.length).toBe(document.body.children.length)
+        expect(removedByFirst.every(args => args[2] === firstHandler)).toBeTrue()
+
+        second.dispose()
+
+        expect(removedFromSecond().length).toBe(document.body.children.length)
+      } finally {
+        document.documentElement.ontouchstart = defaultValueOnTouchStart
+      }
+    })
+
     it('should toggle a menu and add/remove event listener on mobile', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
@@ -265,7 +297,7 @@ describe('Menu', () => {
         btnMenu.addEventListener('shown.coreui.menu', () => {
           expect(btnMenu).toHaveClass('show')
           expect(btnMenu.getAttribute('aria-expanded')).toEqual('true')
-          expect(spy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', noop)
+          expect(spy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', jasmine.any(Function))
 
           menu.toggle()
         })
@@ -273,7 +305,7 @@ describe('Menu', () => {
         btnMenu.addEventListener('hidden.coreui.menu', () => {
           expect(btnMenu).not.toHaveClass('show')
           expect(btnMenu.getAttribute('aria-expanded')).toEqual('false')
-          expect(spyOff).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', noop)
+          expect(spyOff).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', jasmine.any(Function))
 
           document.documentElement.ontouchstart = defaultValueOnTouchStart
           resolve()
@@ -1008,6 +1040,57 @@ describe('Menu', () => {
 
         menu.show()
       })
+    })
+
+    it('should put the menu back where it was in its parent when hidden', async () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <div class="menu">',
+        '    <a class="menu-item" href="#">Link</a>',
+        '  </div>',
+        '  <span id="after"></span>',
+        '</div>'
+      ].join('')
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const menuEl = fixtureEl.querySelector('.menu')
+      const menu = new Menu(btnMenu, { container: 'body' })
+      const hidden = new Promise(resolve => {
+        btnMenu.addEventListener('hidden.coreui.menu', resolve, { once: true })
+      })
+
+      await menu.show()
+      menu.hide()
+      await hidden
+
+      expect(menuEl.nextElementSibling).toBe(fixtureEl.querySelector('#after'))
+    })
+
+    it('should put the menu at the end of its parent when its next sibling is gone', async () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <div class="menu">',
+        '    <a class="menu-item" href="#">Link</a>',
+        '  </div>',
+        '  <span id="after"></span>',
+        '</div>'
+      ].join('')
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const menuEl = fixtureEl.querySelector('.menu')
+      const parent = menuEl.parentNode
+      const next = menuEl.nextSibling
+      const menu = new Menu(btnMenu, { container: 'body' })
+      const hidden = new Promise(resolve => {
+        btnMenu.addEventListener('hidden.coreui.menu', resolve, { once: true })
+      })
+
+      await menu.show()
+      next.remove()
+      menu.hide()
+      await hidden
+
+      expect(parent.lastChild).toBe(menuEl)
     })
 
     it('should work with container via data attribute', () => {
@@ -3697,6 +3780,49 @@ describe('Menu', () => {
 
       submenuTrigger.click()
       expect(submenu).not.toHaveClass('show')
+    })
+
+    it('should not close a submenu reopened from the keyboard after the pointer left it', async () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '      <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const submenu = fixtureEl.querySelector('.submenu > .menu')
+      const subItem = submenu.querySelector('.menu-item')
+      const press = (target, key) => target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+
+      await new Menu(btnMenu).show()
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, movementX: 1 }))
+      expect(submenu).toHaveClass('show')
+
+      subItem.focus()
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseout', {
+        bubbles: true, relatedTarget: document.body, clientX: 0, clientY: 0
+      }))
+      press(subItem, 'ArrowLeft')
+      expect(submenu).not.toHaveClass('show')
+      expect(document.activeElement).toBe(submenuTrigger)
+      press(submenuTrigger, 'ArrowRight')
+      expect(submenu).toHaveClass('show')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 400)
+      })
+
+      expect(submenu).toHaveClass('show')
     })
 
     it('should not open a submenu when its trigger moves under a pointer that stays still', () => {
