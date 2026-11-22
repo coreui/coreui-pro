@@ -3685,6 +3685,11 @@ Multi Select's option indicators moved with it — they render as a decorative
   `<html>` through the language rather than the attribute.
 - `pre` reserves scrollbar space (`scrollbar-gutter: stable`), so a horizontal
   scrollbar no longer covers the last line of a code block.
+- **`<samp>` and `<kbd>` are smaller.** `<samp>` reads `--cui-code-font-size`,
+  like `<code>` and `<pre>`, so it renders at `.875em` instead of `1em`, and a
+  `<samp>` inside `<pre>` keeps the size of the block. `--cui-kbd-font-size` is
+  `.75em` instead of `var(--cui-small-font-size)`, and a `<kbd>` nested in
+  another follows it.
 - **Reboot's type and spacing are CSS variables on `:root`.** Heading margin,
   family, style, weight and line height, paragraph margin, `hr`, `legend`, `dt`,
   `sub`/`sup`, `mark` padding, the code font size and `--cui-list-padding-x` are
