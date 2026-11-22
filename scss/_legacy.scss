@@ -155,7 +155,7 @@ $switch-selector: ".form-switch .form-check-input" !default;
   // Deprecated in v6: the class on the input, with a sibling `.btn` label.
   #{$btn-check-deprecated} {
     position: absolute;
-    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
     pointer-events: none;
 
     + .btn:hover {
