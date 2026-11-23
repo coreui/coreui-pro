@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO carousel.js v5.29.2 (https://coreui.io)
+  * CoreUI PRO carousel.js v5.30.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -234,8 +234,10 @@
         return;
       }
       const activeIndicator = SelectorEngine.findOne(SELECTOR_ACTIVE, this._indicatorsElement);
-      activeIndicator.classList.remove(CLASS_NAME_ACTIVE);
-      activeIndicator.removeAttribute('aria-current');
+      if (activeIndicator) {
+        activeIndicator.classList.remove(CLASS_NAME_ACTIVE);
+        activeIndicator.removeAttribute('aria-current');
+      }
       const newActiveIndicator = SelectorEngine.findOne(`[data-coreui-slide-to="${index}"]`, this._indicatorsElement);
       if (newActiveIndicator) {
         newActiveIndicator.classList.add(CLASS_NAME_ACTIVE);

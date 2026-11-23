@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO autocomplete.js v5.29.2 (https://coreui.io)
+  * CoreUI PRO autocomplete.js v5.30.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -644,7 +644,7 @@
     }
     _createPopper() {
       if (typeof Popper__namespace === 'undefined') {
-        throw new TypeError('CoreUI\'s Auto Complete component require Popper (https://popper.js.org)');
+        throw new TypeError('CoreUI\'s Auto Complete component require Popper');
       }
       const popperConfig = {
         modifiers: [{

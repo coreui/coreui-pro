@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO scrollspy.js v5.29.2 (https://coreui.io)
+  * CoreUI PRO scrollspy.js v5.30.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -129,7 +129,7 @@
       // unregister any previous listeners
       EventHandler.off(this._config.target, EVENT_CLICK);
       EventHandler.on(this._config.target, EVENT_CLICK, SELECTOR_TARGET_LINKS, event => {
-        const observableSection = this._observableSections.get(event.target.hash);
+        const observableSection = this._observableSections.get(event.delegateTarget.hash);
         if (observableSection) {
           event.preventDefault();
           const root = this._rootElement || window;

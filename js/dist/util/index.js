@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO index.js v5.29.2 (https://coreui.io)
+  * CoreUI PRO index.js v5.30.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -104,7 +104,7 @@
       return false;
     }
     const elementIsVisible = getComputedStyle(element).getPropertyValue('visibility') === 'visible';
-    // Handle `details` element as its content may falsie appear visible when it is closed
+    // Handle `details` element as its content may falsely appear visible when it is closed
     const closedDetails = element.closest('details:not([open])');
     if (!closedDetails) {
       return elementIsVisible;

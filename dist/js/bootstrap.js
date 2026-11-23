@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO v5.29.2 (https://coreui.io)
+  * CoreUI PRO v5.30.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -174,7 +174,7 @@
       return false;
     }
     const elementIsVisible = getComputedStyle(element).getPropertyValue('visibility') === 'visible';
-    // Handle `details` element as its content may falsie appear visible when it is closed
+    // Handle `details` element as its content may falsely appear visible when it is closed
     const closedDetails = element.closest('details:not([open])');
     if (!closedDetails) {
       return elementIsVisible;
@@ -726,7 +726,7 @@
    * Constants
    */
 
-  const VERSION = '5.29.2';
+  const VERSION = '5.30.0';
 
   /**
    * Class definition
@@ -1775,7 +1775,7 @@
     }
     _createPopper() {
       if (typeof Popper__namespace === 'undefined') {
-        throw new TypeError('CoreUI\'s Auto Complete component require Popper (https://popper.js.org)');
+        throw new TypeError('CoreUI\'s Auto Complete component require Popper');
       }
       const popperConfig = {
         modifiers: [{
@@ -4330,6 +4330,7 @@
         return;
       }
       this._config = this._getConfig(config);
+      this._startX = 0;
       this._deltaX = 0;
       this._supportPointerEvents = Boolean(window.PointerEvent);
       this._initEvents();
@@ -4353,23 +4354,24 @@
 
     // Private
     _start(event) {
+      this._deltaX = 0;
       if (!this._supportPointerEvents) {
-        this._deltaX = event.touches[0].clientX;
+        this._startX = event.touches[0].clientX;
         return;
       }
       if (this._eventIsPointerPenTouch(event)) {
-        this._deltaX = event.clientX;
+        this._startX = event.clientX;
       }
     }
     _end(event) {
       if (this._eventIsPointerPenTouch(event)) {
-        this._deltaX = event.clientX - this._deltaX;
+        this._deltaX = event.clientX - this._startX;
       }
       this._handleSwipe();
       execute(this._config.endCallback);
     }
     _move(event) {
-      this._deltaX = event.touches && event.touches.length > 1 ? 0 : event.touches[0].clientX - this._deltaX;
+      this._deltaX = event.touches && event.touches.length > 1 ? 0 : event.touches[0].clientX - this._startX;
     }
     _handleSwipe() {
       const absDeltaX = Math.abs(this._deltaX);
@@ -4629,8 +4631,10 @@
         return;
       }
       const activeIndicator = SelectorEngine.findOne(SELECTOR_ACTIVE, this._indicatorsElement);
-      activeIndicator.classList.remove(CLASS_NAME_ACTIVE$7);
-      activeIndicator.removeAttribute('aria-current');
+      if (activeIndicator) {
+        activeIndicator.classList.remove(CLASS_NAME_ACTIVE$7);
+        activeIndicator.removeAttribute('aria-current');
+      }
       const newActiveIndicator = SelectorEngine.findOne(`[data-bs-slide-to="${index}"]`, this._indicatorsElement);
       if (newActiveIndicator) {
         newActiveIndicator.classList.add(CLASS_NAME_ACTIVE$7);
@@ -7182,7 +7186,7 @@
     }
     _createPopper() {
       if (typeof Popper__namespace === 'undefined') {
-        throw new TypeError('CoreUI\'s time picker require Popper (https://popper.js.org)');
+        throw new TypeError('CoreUI\'s time picker require Popper');
       }
       const popperConfig = {
         modifiers: [{
@@ -8173,7 +8177,7 @@
     }
     _createPopper() {
       if (typeof Popper__namespace === 'undefined') {
-        throw new TypeError('CoreUI\'s date picker require Popper (https://popper.js.org)');
+        throw new TypeError('CoreUI\'s date picker require Popper');
       }
       const popperConfig = {
         modifiers: [{
@@ -8676,7 +8680,7 @@
     }
     _createPopper() {
       if (typeof Popper__namespace === 'undefined') {
-        throw new TypeError('CoreUI\'s dropdowns require Popper (https://popper.js.org/docs/v2/)');
+        throw new TypeError('CoreUI\'s dropdowns require Popper');
       }
       let referenceElement = this._element;
       if (this._config.reference === 'parent') {
@@ -10343,7 +10347,7 @@
     }
     _createPopper() {
       if (typeof Popper__namespace === 'undefined') {
-        throw new TypeError('CoreUI\'s multi select require Popper (https://popper.js.org)');
+        throw new TypeError('CoreUI\'s multi select require Popper');
       }
       const popperConfig = {
         modifiers: [{
@@ -12466,7 +12470,7 @@
   class Tooltip extends BaseComponent {
     constructor(element, config) {
       if (typeof Popper__namespace === 'undefined') {
-        throw new TypeError('CoreUI\'s dropdowns require Popper (https://popper.js.org/docs/v2/)');
+        throw new TypeError('CoreUI\'s tooltips require Popper');
       }
       super(element, config);
 
@@ -12838,6 +12842,19 @@
     }
     _isWithActiveTrigger() {
       return Object.values(this._activeTrigger).includes(true);
+    }
+    _getConfig(config) {
+      const dataAttributes = {};
+      if (this._element.getAttribute('data-bs-title') !== null) {
+        dataAttributes.title = this._element.getAttribute('data-bs-title');
+      }
+      if (this._element.getAttribute('data-bs-content') !== null) {
+        dataAttributes.content = this._element.getAttribute('data-bs-content');
+      }
+      return super._getConfig({
+        ...dataAttributes,
+        ...(typeof config === 'object' ? config : {})
+      });
     }
     _configAfterMerge(config) {
       config.container = config.container === false ? document.body : getElement(config.container);
@@ -14163,7 +14180,7 @@
       // unregister any previous listeners
       EventHandler.off(this._config.target, EVENT_CLICK);
       EventHandler.on(this._config.target, EVENT_CLICK, SELECTOR_TARGET_LINKS, event => {
-        const observableSection = this._observableSections.get(event.target.hash);
+        const observableSection = this._observableSections.get(event.delegateTarget.hash);
         if (observableSection) {
           event.preventDefault();
           const root = this._rootElement || window;
