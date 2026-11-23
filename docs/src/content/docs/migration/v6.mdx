@@ -1459,6 +1459,11 @@ check, radio, carousel and toggler icons already work:
   focus. `handleUpdate()` remains as a no-op for API compatibility; the
   scrollbar compensation now runs when a dialog locks the page (see
   [One scroll lock for dialogs and the mobile Sidebar](#one-scroll-lock-for-dialogs-and-the-mobile-sidebar)).
+- **Switching offcanvases checks both events first.** A toggler that opens an
+  offcanvas while another one is open fires `show.coreui.offcanvas` on the new
+  one before `hide.coreui.offcanvas` on the open one, and switches only when
+  neither is prevented. In v5 the open offcanvas hid first, so preventing
+  `show` on the new one left both closed.
 - **New capabilities:** a `modal: false` option opens the dialog non-modally
   (page stays interactive); a `cancel.coreui.modal` event fires when a modal
   is dismissed with Escape; toggling from a trigger inside an open modal swaps

@@ -116,7 +116,7 @@ Add `.drawer-translucent` for a frosted-glass panel that blurs the content behin
 
 ### Sheet
 
-Combine `.drawer-bottom` with `.drawer-sheet` for a flush-to-edge bottom sheet with no inset and squared bottom corners. On large viewports the sheet is centered with a maximum width (`--cui-drawer-sheet-width`).
+Combine `.drawer-bottom` with `.drawer-sheet` for a flush-to-edge bottom sheet with no inset and squared bottom corners. On large viewports the sheet is centered with a maximum width (`--cui-drawer-sheet-width`). On a device with a home indicator the sheet pads its bottom by the safe area, which the browser reports when the page's viewport meta has `viewport-fit=cover`.
 
 <dialog class="drawer drawer-bottom drawer-sheet" id="exampleDrawerSheet" aria-labelledby="exampleDrawerSheetLabel">
   <div class="drawer-header">
@@ -306,6 +306,8 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | `hidePrevented.coreui.drawer` | This event is triggered when the drawer is shown, its backdrop is `static`, and a click outside of the drawer occurs. The event is also triggered when the escape key is pressed and the `keyboard` option is set to `false`. |
 | `show.coreui.drawer` | This event fires immediately when the `show` instance method is invoked. |
 | `shown.coreui.drawer` | This event is fired when a drawer becomes visible to the user (it will wait for CSS transitions to complete).
+
+A toggler that opens a drawer while another one is open fires `show.coreui.drawer` on the drawer it opens, then `hide.coreui.drawer` on the open one, and switches only when neither event is prevented.
 
 ```js
 const myDrawer = document.getElementById('myDrawer')

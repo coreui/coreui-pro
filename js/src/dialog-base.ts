@@ -95,8 +95,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
   // Public
   toggle(relatedTarget?: HTMLElement | null): Promise<void> {
-    const reopens = this._isClosing() && !this._element.contains(relatedTarget ?? null)
-    return this._element.open && !reopens ? this.hide() : this.show(relatedTarget)
+    return this._toggleOpens(relatedTarget) ? this.show(relatedTarget) : this.hide()
   }
 
   async show(relatedTarget?: HTMLElement | null): Promise<void> {
@@ -243,6 +242,10 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
   protected _isClosing(): boolean {
     return this._isTransitioning && this._hiddenByComponent
+  }
+
+  protected _toggleOpens(relatedTarget?: HTMLElement | null): boolean {
+    return !this._element.open || (this._isClosing() && !this._element.contains(relatedTarget ?? null))
   }
 
   protected _showElement({ modal = true, preventBodyScroll = true }: { modal?: boolean, preventBodyScroll?: boolean } = {}): void {

@@ -100,6 +100,10 @@ class Drawer extends DialogBase<DrawerConfig> {
       const trigger = event.delegateTarget as HTMLElement
       const target = SelectorEngine.getElementFromSelector(trigger)
 
+      if (!target) {
+        return
+      }
+
       if (['A', 'AREA'].includes(trigger.tagName)) {
         event.preventDefault()
       }
@@ -108,13 +112,26 @@ class Drawer extends DialogBase<DrawerConfig> {
         return
       }
 
-      // avoid conflict when clicking a toggler of a drawer, while another is open
-      const alreadyOpen = SelectorEngine.find(openSelector).find(element => !this.getInstance(element)?._isClosing())
-      if (alreadyOpen && alreadyOpen !== target) {
-        this.getInstance(alreadyOpen)?.hide()
+      const drawer = this.getOrCreateInstance(target)
+      const dialog = drawer._element
+      if (!(dialog instanceof HTMLDialogElement)) {
+        return
       }
 
-      this.getOrCreateInstance(target).toggle(trigger)
+      const alreadyOpen = SelectorEngine.find(openSelector).find(element => element !== dialog && !this.getInstance(element)?._isClosing())
+
+      if (!alreadyOpen || !drawer._toggleOpens(trigger)) {
+        drawer.toggle(trigger)
+        return
+      }
+
+      const current = this.getOrCreateInstance(alreadyOpen)
+      if (!drawer._canShow(trigger) || !current._canHide()) {
+        return
+      }
+
+      current._hide()
+      drawer._show(trigger)
     })
 
     onDocumentReady(window, `load${dataApiKey}`, () => {

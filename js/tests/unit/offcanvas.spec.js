@@ -916,7 +916,7 @@ describe('Offcanvas', () => {
       expect([a.open, a.classList.contains('hiding'), b.open]).toEqual([true, false, false])
     })
 
-    it('should call hide first, if another drawer is open', () => {
+    it('should hide the open offcanvas when a toggler opens another one', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
           '<button id="btn2" data-coreui-toggle="offcanvas" data-coreui-target="#drawer2"></button>',
@@ -938,6 +938,21 @@ describe('Offcanvas', () => {
         })
         drawer1.show()
       })
+    })
+
+    it('should keep the open offcanvas and not open the other when the open one prevents hide', async () => {
+      fixtureEl.innerHTML = [
+        '<dialog id="a" class="offcanvas offcanvas-instant"><button type="button" data-coreui-toggle="offcanvas" data-coreui-target="#b">B</button></dialog>',
+        '<dialog id="b" class="offcanvas offcanvas-instant"></dialog>'
+      ].join('')
+      const [a, b] = ['#a', '#b'].map(selector => fixtureEl.querySelector(selector))
+      await Offcanvas.getOrCreateInstance(a).show()
+      a.addEventListener('hide.coreui.offcanvas', event => event.preventDefault())
+
+      a.querySelector('button').click()
+      await frames(2)
+
+      expect([a.open, b.open]).toEqual([true, false])
     })
 
     it('should focus on trigger element after closing drawer', () => {
