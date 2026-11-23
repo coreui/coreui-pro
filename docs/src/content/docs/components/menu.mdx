@@ -175,6 +175,8 @@ Resize your browser window to see the placement change at different breakpoints.
 
 You can use `<a>` or `<button>` elements as menu items.
 
+A menu that opens next to its toggle grows with its longest item, from `--cui-menu-min-width` up to the viewport less `1rem`. On a narrow screen long labels and headers wrap instead of pushing it off the screen. Submenus still open beside their parent and can run past the edge of a narrow screen.
+
 <Callout>
 We use utility classes to display menus in our docs examples, but they’re not required for your own use.
 </Callout>
@@ -341,7 +343,7 @@ Separate groups of related menu items with a divider.
 
 ### Text
 
-Place any freeform text within a menu with text and use [spacing utilities](/utilities/margin/). Note that you’ll likely need additional sizing styles to constrain the menu width.
+Place any freeform text within a menu with text and use [spacing utilities](/utilities/margin/). Note that you’ll likely need additional sizing styles to constrain the menu width: a menu that opens next to its toggle takes the width of its content, so free text spreads to the width of the viewport less `1rem` unless you set a width on the menu.
 
 <Example code={`<div class="menu show position-static p-4 fg-2"
        style="--cui-menu-min-width: 240px;">

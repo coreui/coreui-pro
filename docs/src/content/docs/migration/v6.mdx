@@ -1361,6 +1361,13 @@ check, radio, carousel and toggler icons already work:
   suppresses the browser's own menu. Built on Menu, so items, submenus,
   keyboard navigation and dismissal are the same; `show({ x, y })` opens it at
   a point from JavaScript.
+- **Menu labels wrap instead of overflowing.** Items and headers no longer use
+  `white-space: nowrap`, and a menu is at most the viewport less `1rem` wide, so
+  a long label wraps on a narrow screen instead of pushing the menu off it. A
+  menu that opens next to its toggle takes the width of its content, not of a
+  narrow positioned parent such as `.btn-group`, so free text in it spreads
+  until you set a width on the menu. A menu in the flow of the page still fills
+  its parent. Submenus still open beside their parent.
 - **Dropdown is now a compatibility layer over Menu.** The v5 markup, classes
   and `*.coreui.dropdown` events keep working unchanged — the plugin shares
   Menu's engine underneath. Where their options overlap, Dropdown also

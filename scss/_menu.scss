@@ -74,6 +74,7 @@ $menu-tokens: defaults(
     flex-direction: column;
     gap: var(--#{$prefix}menu-gap);
     min-width: var(--#{$prefix}menu-min-width);
+    max-width: calc(100dvw - 1rem);
     max-height: var(--#{$prefix}menu-max-height);
     padding: var(--#{$prefix}menu-padding-y) var(--#{$prefix}menu-padding-x);
     margin: 0;
@@ -82,6 +83,8 @@ $menu-tokens: defaults(
     font-size: var(--#{$prefix}menu-font-size);
     color: var(--#{$prefix}menu-color);
     text-align: start;
+    overflow-wrap: anywhere;
+    white-space: normal;
     list-style-type: "";
     background-color: var(--#{$prefix}menu-bg);
     background-clip: padding-box;
@@ -150,6 +153,10 @@ $menu-tokens: defaults(
       opacity: 1;
       transform: none;
     }
+
+    &:where([data-coreui-placement]) {
+      width: max-content;
+    }
   }
 
   @starting-style {
@@ -193,7 +200,6 @@ $menu-tokens: defaults(
     color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}menu-item-color));
     text-align: inherit;
     text-decoration: none;
-    white-space: nowrap;
     cursor: pointer;
     background-color: transparent;
     border: 0;
@@ -256,7 +262,7 @@ $menu-tokens: defaults(
     display: flex;
     flex: 1;
     flex-direction: column;
-    min-width: fit-content;
+    min-width: 0;
   }
 
   .menu-item-description {
@@ -284,7 +290,6 @@ $menu-tokens: defaults(
     margin-bottom: 0;
     font-size: var(--#{$prefix}font-size-sm);
     color: var(--#{$prefix}menu-header-color);
-    white-space: nowrap;
   }
 
   .menu-text {
