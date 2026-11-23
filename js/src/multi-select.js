@@ -910,7 +910,7 @@ class MultiSelect extends BaseComponent {
 
   _createPopper() {
     if (typeof Popper === 'undefined') {
-      throw new TypeError('CoreUI\'s multi select require Popper (https://popper.js.org)')
+      throw new TypeError('CoreUI\'s multi select require Popper')
     }
 
     const popperConfig = {
