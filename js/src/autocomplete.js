@@ -753,7 +753,7 @@ class Autocomplete extends BaseComponent {
 
   _createPopper() {
     if (typeof Popper === 'undefined') {
-      throw new TypeError('CoreUI\'s Auto Complete component require Popper (https://popper.js.org)')
+      throw new TypeError('CoreUI\'s Auto Complete component require Popper')
     }
 
     const popperConfig = {

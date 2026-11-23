@@ -1064,7 +1064,7 @@ class DateRangePicker extends BaseComponent {
 
   _createPopper() {
     if (typeof Popper === 'undefined') {
-      throw new TypeError('CoreUI\'s date picker require Popper (https://popper.js.org)')
+      throw new TypeError('CoreUI\'s date picker require Popper')
     }
 
     const popperConfig = {

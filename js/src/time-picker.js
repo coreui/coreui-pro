@@ -919,7 +919,7 @@ class TimePicker extends BaseComponent {
   _createPopper() {
     if (typeof Popper === 'undefined') {
       throw new TypeError(
-        'CoreUI\'s time picker require Popper (https://popper.js.org)'
+        'CoreUI\'s time picker require Popper'
       )
     }
 
