@@ -3704,7 +3704,7 @@ describe('Autocomplete', () => {
       const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.list-box-option'))
         .find(option => !option.hasAttribute('hidden'))
 
-      expect(visibleOption.innerHTML).toContain('<strong>')
+      expect(visibleOption.innerHTML).toBe('<span><strong>App</strong>le</span>')
     })
 
     it('should not highlight when optionsTemplate is set', () => {
@@ -5059,7 +5059,7 @@ describe('Autocomplete', () => {
       autocomplete._setListBoxOptions()
 
       const optionEl = autocomplete._optionsElement.querySelector('.list-box-option')
-      expect(optionEl.innerHTML).toContain('<strong>')
+      expect(optionEl.innerHTML).toBe('<span><strong>App</strong>le</span>')
     })
   })
 

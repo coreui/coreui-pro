@@ -934,7 +934,7 @@ class Autocomplete extends ComboboxBase {
     }
 
     for (const option of this._getDisplayedOptions()) {
-      option.innerHTML = highlightMatches(option.textContent!, this._search)
+      option.innerHTML = `<span>${highlightMatches(option.textContent!, this._search)}</span>`
     }
   }
 
