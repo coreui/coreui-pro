@@ -905,7 +905,7 @@ class Menu extends BaseComponent {
   protected _onSubmenuTriggerEnter(event: CoreUIEvent): void {
     const trigger = (event.target as Element).closest<HTMLElement>(this.constructor.SELECTOR_SUBMENU_TOGGLE)
     const { movementX, movementY } = event as unknown as MouseEvent
-    if (!trigger || trigger === this._hoverTrigger || (this._pointerType === 'mouse' && !movementX && !movementY)) {
+    if (!trigger || trigger === this._hoverTrigger || (this._pointerType === 'mouse' ? !movementX && !movementY : this._pointerType === 'touch' && this._config.submenuTrigger === 'both')) {
       return
     }
 
