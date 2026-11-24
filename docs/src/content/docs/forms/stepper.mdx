@@ -582,6 +582,7 @@ The CoreUI Stepper Component is built with accessibility in mind:
 - When the step changes while focus is inside the stepper, for example on a **Next** button in the pane, focus moves to the new step's button, so a screen reader reads which step the user is on. A step changed from outside the stepper leaves focus where it is.
 - When a step whose form has `novalidate` fails validation, the invalid controls get `aria-invalid="true"` and focus moves to the first of them that can take focus, as the browser does for a form without `novalidate`.
 - While the stepper marks a control invalid, its invalid feedback is added to its `aria-describedby`, the elements named in `data-coreui-invalid-feedback` or else the `.invalid-feedback` and `.invalid-tooltip` the stylesheet shows for it, so the validation message is read with the field when focus moves to it. When focus is already on the first invalid control, or no invalid control can take focus, the message is announced through [`announce()`](/accessibility/screen-readers/#announcing-messages) instead, or the browser's validation message when the control has none. The stepper does not rely on `aria-errormessage`, which VoiceOver does not read, and the panes are not live regions, so they do not repeat the message.
+- The roles and links are written when the stepper starts. After adding, removing or replacing steps, call `update()` so the new steps get them too.
 - Keyboard navigation is fully supported
 
 Thanks to these features, your form wizard will be fully compliant with WCAG and modern accessibility standards without additional work.
@@ -643,6 +644,7 @@ const stepperList = stepperElementList.map(stepperEl => {
 | `prev()` | Go to the previous step. |
 | `reset()` | Reset the stepper to its initial state. |
 | `showStep(buttonOrStepNumber)` | Programmatically jump to a specific step button or step number. |
+| `update()` | Read the steps again after the page added, removed or replaced them. New steps get their roles, `id` values, connectors and state. The open step is kept by its place: when steps before it or the open step itself change, the step now in that place opens, and `reset()` returns to the step in the start place. When steps gain or lose their own `.stepper-step-content`, the stepper switches between the tab set and the list of expandable steps. It fires no event and does not move focus. |
 
 ### Events
 

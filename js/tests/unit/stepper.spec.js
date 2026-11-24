@@ -1541,6 +1541,345 @@ describe('Stepper', () => {
     })
   })
 
+  describe('update()', () => {
+    const appendStep = (stepperElement, index, { content = false } = {}) => {
+      const step = document.createElement('li')
+      step.className = 'stepper-step'
+      step.innerHTML = content ?
+        `<button type="button" class="stepper-step-button"><span class="stepper-step-indicator">${index}</span></button><div class="stepper-step-content"></div>` :
+        `<button type="button" class="stepper-step-button" data-coreui-target="#step${index}"><span class="stepper-step-indicator">${index}</span></button>`
+      stepperElement.querySelector('.stepper-steps').append(step)
+
+      if (!content) {
+        const pane = document.createElement('div')
+        pane.id = `step${index}`
+        pane.className = 'stepper-pane'
+        stepperElement.append(pane)
+      }
+
+      return step.querySelector('.stepper-step-button')
+    }
+
+    it('should give a step added after start the attributes, connector and state of the others', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const added = appendStep(stepperElement, 4)
+
+      stepper.update()
+
+      const pane = fixtureEl.querySelector('#step4')
+      expect(added.getAttribute('role')).toBe('tab')
+      expect(added.closest('.stepper-step').getAttribute('role')).toBe('presentation')
+      expect(added.getAttribute('aria-selected')).toBe('false')
+      expect(added.getAttribute('tabIndex')).toBe('-1')
+      expect(added.id).not.toBe('')
+      expect(added.getAttribute('aria-controls')).toBe('step4')
+      expect(pane.getAttribute('role')).toBe('tabpanel')
+      expect(pane.getAttribute('aria-labelledby')).toBe(added.id)
+      expect(pane.getAttribute('aria-hidden')).toBe('true')
+      expect(added.disabled).toBeTrue()
+      expect(fixtureEl.querySelectorAll('.stepper-step-button')[2].nextElementSibling).toHaveClass('stepper-step-connector')
+      expect(added.querySelector('.stepper-step-indicator-text')).not.toBeNull()
+    })
+
+    it('should keep the active step and let the user reach a step added after start', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false, skipValidation: true })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      stepper.showStep(2)
+      const added = appendStep(stepperElement, 4)
+      stepper.update()
+
+      expect(buttons[1]).toHaveClass('active')
+      expect(buttons[1].getAttribute('aria-selected')).toBe('true')
+      expect(buttons[0]).toHaveClass('complete')
+      expect(fixtureEl.querySelector('#step2')).toHaveClass('show')
+
+      stepper.next()
+      stepper.next()
+
+      expect(added).toHaveClass('active')
+      expect(fixtureEl.querySelector('#step4')).toHaveClass('show')
+    })
+
+    it('should open the step now in the place of a removed open step', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      stepper.next()
+      stepper.next()
+      buttons[2].closest('.stepper-step').remove()
+      fixtureEl.querySelector('#step3').remove()
+      stepper.update()
+
+      expect(buttons[1]).toHaveClass('active')
+      expect(buttons[1]).not.toHaveClass('complete')
+      expect(buttons[1].getAttribute('aria-selected')).toBe('true')
+      expect(buttons[1].getAttribute('tabIndex')).toBe('0')
+      expect(buttons[0]).toHaveClass('complete')
+      expect(buttons[0].getAttribute('tabIndex')).toBe('-1')
+      expect(fixtureEl.querySelector('#step2')).toHaveClass('show')
+    })
+
+    it('should open a step inserted in the place of the open step instead of marking it complete', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      stepper.next()
+      const inserted = appendStep(stepperElement, 4)
+      buttons[1].closest('.stepper-step').before(inserted.closest('.stepper-step'))
+      stepper.update()
+
+      expect(inserted).toHaveClass('active')
+      expect(inserted).not.toHaveClass('complete')
+      expect(inserted.getAttribute('aria-selected')).toBe('true')
+      expect(fixtureEl.querySelector('#step4')).toHaveClass('show')
+      expect(buttons[1]).not.toHaveClass('active')
+      expect(buttons[1].getAttribute('aria-selected')).toBe('false')
+      expect(fixtureEl.querySelector('#step2')).not.toHaveClass('show')
+    })
+
+    it('should reset to the step now in the start place when the start step was replaced', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false, skipValidation: true })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const firstStep = fixtureEl.querySelector('.stepper-step')
+      const replacement = firstStep.cloneNode(true)
+      const replacementButton = replacement.querySelector('.stepper-step-button')
+      replacementButton.classList.remove('active')
+      replacementButton.removeAttribute('id')
+
+      stepper.showStep(3)
+      firstStep.replaceWith(replacement)
+      stepper.update()
+      stepper.reset()
+
+      expect(replacementButton).toHaveClass('active')
+      expect(replacementButton.getAttribute('aria-selected')).toBe('true')
+      expect(fixtureEl.querySelectorAll('.stepper-step-button')[2]).not.toHaveClass('active')
+    })
+
+    it('should open the content of the step now in the place of a removed open step', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+      const contents = fixtureEl.querySelectorAll('.stepper-step-content')
+
+      stepper.next()
+      stepper.next()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+      buttons[2].closest('.stepper-step').remove()
+      stepper.update()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(buttons[1]).toHaveClass('active')
+      expect(buttons[1].getAttribute('aria-expanded')).toBe('true')
+      expect(contents[1]).toHaveClass('show')
+      expect(contents[1].getAttribute('aria-hidden')).toBe('false')
+      expect(contents[1].style.height).toBe('')
+      expect(contents[0].getAttribute('aria-hidden')).toBe('true')
+    })
+
+    it('should keep open a step that a collapse still running would close', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      stepper.next()
+      const inserted = appendStep(stepperElement, 4, { content: true }).closest('.stepper-step')
+      fixtureEl.querySelector('.stepper-steps').prepend(inserted)
+      stepper.update()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(buttons[0]).toHaveClass('active')
+      expect(buttons[0].getAttribute('aria-expanded')).toBe('true')
+      expect(buttons[1]).not.toHaveClass('active')
+    })
+
+    it('should not move to a step the page added until update() reads it', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false, skipValidation: true })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.showStep(3)
+      const added = appendStep(stepperElement, 4)
+      stepper.next()
+
+      expect(added).not.toHaveClass('active')
+      expect(fixtureEl.querySelectorAll('.stepper-step-button')[2]).toHaveClass('complete')
+    })
+
+    it('should drop the connector after a step that became the last one', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      expect(buttons[1].nextElementSibling).toHaveClass('stepper-step-connector')
+
+      buttons[2].closest('.stepper-step').remove()
+      fixtureEl.querySelector('#step3').remove()
+      stepper.update()
+
+      expect(buttons[1].nextElementSibling).toBeNull()
+      expect(buttons[0].nextElementSibling).toHaveClass('stepper-step-connector')
+    })
+
+    it('should drop the tab roles when the steps get their own content', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+      const stepList = fixtureEl.querySelector('.stepper-steps')
+
+      for (const pane of fixtureEl.querySelectorAll('.stepper-pane')) {
+        pane.remove()
+      }
+
+      for (const button of buttons) {
+        button.removeAttribute('data-coreui-target')
+        const content = document.createElement('div')
+        content.className = 'stepper-step-content'
+        button.after(content)
+      }
+
+      stepper.update()
+
+      expect(stepList.hasAttribute('role')).toBeFalse()
+      expect(stepList.hasAttribute('aria-orientation')).toBeFalse()
+
+      for (const button of buttons) {
+        expect(button.hasAttribute('role')).toBeFalse()
+        expect(button.hasAttribute('aria-selected')).toBeFalse()
+        expect(button.hasAttribute('aria-controls')).toBeFalse()
+        expect(button.closest('.stepper-step').hasAttribute('role')).toBeFalse()
+      }
+
+      const contents = fixtureEl.querySelectorAll('.stepper-step-content')
+      expect(contents[0]).toHaveClass('show')
+      expect(contents[0].getAttribute('aria-hidden')).toBe('false')
+      expect(contents[1].getAttribute('aria-hidden')).toBe('true')
+
+      expect(buttons[0].getAttribute('aria-expanded')).toBe('true')
+      expect(buttons[1].getAttribute('aria-expanded')).toBe('false')
+    })
+
+    it('should drop the tabpanel role from panes that stay when the steps get their own content', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const panes = fixtureEl.querySelectorAll('.stepper-pane')
+
+      expect(panes[0].getAttribute('role')).toBe('tabpanel')
+
+      for (const button of fixtureEl.querySelectorAll('.stepper-step-button')) {
+        const content = document.createElement('div')
+        content.className = 'stepper-step-content'
+        button.after(content)
+      }
+
+      stepper.update()
+
+      for (const pane of panes) {
+        expect(pane.hasAttribute('role')).toBeFalse()
+      }
+    })
+
+    it('should drop aria-expanded when the steps lose their own content', () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      for (const content of fixtureEl.querySelectorAll('.stepper-step-content')) {
+        content.remove()
+      }
+
+      stepper.update()
+
+      expect(fixtureEl.querySelector('.stepper-steps').getAttribute('role')).toBe('tablist')
+
+      for (const button of buttons) {
+        expect(button.hasAttribute('aria-expanded')).toBeFalse()
+        expect(button.getAttribute('role')).toBe('tab')
+      }
+
+      expect(buttons[0].getAttribute('aria-selected')).toBe('true')
+    })
+
+    it('should keep a page role on the step list when the shape does not change', () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepList = fixtureEl.querySelector('.stepper-steps')
+      stepList.setAttribute('role', 'list')
+      const stepper = new Stepper(stepperElement)
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      const added = appendStep(stepperElement, 4, { content: true })
+      stepper.update()
+
+      expect(stepList.getAttribute('role')).toBe('list')
+      expect(added.id).not.toBe('')
+      expect(added.hasAttribute('role')).toBeFalse()
+      expect(added.getAttribute('aria-expanded')).toBe('false')
+      expect(buttons[2].nextElementSibling).toHaveClass('stepper-step-connector')
+    })
+
+    it('should keep a finished stepper finished and mark a step added after it complete', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false, skipValidation: true, activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.finish()
+      const added = appendStep(stepperElement, 4)
+      stepper.update()
+
+      for (const button of fixtureEl.querySelectorAll('.stepper-step-button')) {
+        expect(button.disabled).toBeTrue()
+        expect(button).toHaveClass('complete')
+        expect(button.getAttribute('aria-selected')).toBe('false')
+      }
+
+      expect(added.querySelector('.stepper-step-indicator-icon')).not.toBeNull()
+      expect(fixtureEl.querySelector('.stepper-pane.show')).toBeNull()
+    })
+
+    it('should stop tracking a validated form that left the stepper', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      fixtureEl.querySelector('#step1').innerHTML = '<form novalidate><input required></form>'
+      const stepper = new Stepper(stepperElement)
+      const form = fixtureEl.querySelector('#step1 form')
+      const input = form.querySelector('input')
+
+      stepper.next()
+
+      expect(input).toHaveClass('is-invalid')
+
+      form.remove()
+      stepper.update()
+
+      expect(input).not.toHaveClass('is-invalid')
+      expect(input.hasAttribute('aria-invalid')).toBeFalse()
+      expect(stepper._validatedForms.size).toBe(0)
+    })
+  })
+
   describe('linear mode', () => {
     it('should prevent skipping steps forward', () => {
       fixtureEl.innerHTML = getThreeStepFixture()
