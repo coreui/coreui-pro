@@ -55,7 +55,7 @@ Most CSS variables use a prefix to avoid collisions with your own codebase. This
 
 Customize the prefix via the `$prefix` Sass variable. By default, it's set to `cui-` (note the trailing dash).
 
-A few custom properties keep their `--cui-` name under any `$prefix`, because the JavaScript reads or writes them by that name: `--cui-range-fill` and `--cui-range-fill-start`, `--cui-progress-segments` and the `--cui-progress-segment-*` tokens, `--cui-carousel-items` and `--cui-carousel-items-peek`, `--cui-anchor-width` on a combobox panel, and the stack properties the Toaster writes on its toasts. In a build with its own prefix, set them under that name.
+A few custom properties keep their `--cui-` name under any `$prefix`, because the JavaScript reads or writes them by that name: `--cui-range-fill` and `--cui-range-fill-start`, `--cui-progress-segments` and the `--cui-progress-segment-*` tokens, `--cui-carousel-items` and `--cui-carousel-items-peek`, `--cui-anchor-width` on a combobox panel, `--cui-menu-stack-submenus`, `--cui-menu-available-width` and `--cui-menu-available-height` on a menu, and the stack properties the Toaster writes on its toasts. In a build with its own prefix, set them under that name.
 
 The `data-*` attributes you write in your markup — `data-coreui-theme`, `data-coreui-target` — carry a second knob, `$data-infix` (`-coreui-` by default), so a build can rename them: set to `-bs-`, it reads `data-bs-theme`. Attributes the JavaScript sets on elements while it runs (`data-coreui-popper`, `data-coreui-placement`, `data-coreui-validate`) are always `data-coreui-*` and do not follow it.
 

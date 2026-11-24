@@ -517,7 +517,7 @@ describe('ContextMenu', () => {
       contextMenu.show()
 
       expect(menu.getAttribute('role')).toEqual('menu')
-      expect(menu.getAttribute('aria-label')).toBeNull()
+      expect(menu.getAttribute('aria-label')).toEqual('Context menu')
 
       for (const item of [copy, paste, cut, more, deep]) {
         expect(item.getAttribute('role')).toEqual('menuitem')
@@ -564,13 +564,18 @@ describe('ContextMenu', () => {
       const one = new ContextMenu(fixtureEl.querySelector('.area-one'))
       const two = new ContextMenu(fixtureEl.querySelector('.area-two'))
 
-      two.show()
-      expect(menu.getAttribute('aria-label')).toBeNull()
-      two.hide()
-
       one.show()
       expect(menu.getAttribute('aria-label')).toEqual('Row actions')
       one.hide()
+
+      two.show()
+      expect(menu.getAttribute('aria-label')).toEqual('Row actions')
+      two.hide()
+
+      menu.removeAttribute('aria-label')
+      two.show()
+      expect(menu.getAttribute('aria-label')).toEqual('Context menu')
+      two.hide()
 
       menu.setAttribute('aria-label', 'Page name')
       one.show()

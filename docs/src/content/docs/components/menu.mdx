@@ -399,6 +399,8 @@ Assign `--cui-menu-max-height` and `--cui-menu-overflow-y` custom properties to 
 
 You can also use the `.menu-scrollable` class to make the menu scrollable. This assumes a generally safe maximum height of `80dvh` and sets the overflow for you.
 
+A menu opened from a toggle is never taller than the room between its toggle and the edge of the viewport, or of the `boundary`. When its items need more, the menu scrolls. When it fits on neither side of the toggle, it opens on the side with more room. Submenus of a scrolling menu open in place of their parent, see [Stacked submenus](#stacked-submenus).
+
 ## Submenus
 
 Create nested menus with the `.submenu` wrapper class. Submenus support hover and click activation, keyboard navigation, and viewport-aware positioning. The first click on a trigger after a hover opened its submenu keeps it open, so pointing at a trigger and clicking it opens the submenu; the next click closes it. On a touch screen a tap opens the submenu and the next tap closes it. With hover activation (`submenuTrigger: 'hover'` or `'both'`), when the pointer leaves a trigger for its open submenu, the submenu stays while the pointer keeps heading for it, and a submenu trigger it crosses on the way does not open; the submenu closes, or the trigger under the pointer opens, once the pointer stops or turns away.
@@ -438,7 +440,7 @@ Wrap a `.menu-item` trigger and a nested `.menu` inside a `.submenu` element.
 
 ### Nested
 
-Submenus can be nested to multiple levels. Each level opens to the side and flips direction when there’s not enough viewport space.
+Submenus can be nested to multiple levels. Each level opens to the side and flips direction when there’s not enough viewport space. On a narrow viewport each level opens in place of its parent instead, see [Stacked submenus](#stacked-submenus).
 
 <Example code={`<button class="btn-solid theme-secondary" type="button" id="menuNestedToggle" data-coreui-toggle="menu" aria-haspopup="menu" aria-expanded="false">
     Multi-level menu
@@ -460,6 +462,38 @@ Submenus can be nested to multiple levels. Each level opens to the side and flip
       </div>
     </div>
     <button class="menu-item" type="button">Another level 1</button>
+  </div>`} />
+
+### Stacked submenus
+
+Below the `sm` breakpoint, and in a menu that scrolls (`.menu-scrollable`, `--cui-menu-overflow-y`, or a menu taller than the room it has), a submenu opens in place of its parent. The parent's items hide, the submenu starts at the top of the menu, and a back item at its top returns to the parent level. Hover does nothing in this mode: a click, a tap, <kbd>Enter</kbd>, <kbd>Space</kbd> or <kbd>→</kbd> opens the submenu, also with `submenuTrigger: 'hover'`, and the focus moves to its first item. The back item, <kbd>←</kbd> and <kbd>Esc</kbd> go back one level, return the focus to the submenu's trigger and restore the scroll position of the parent.
+
+The plugin adds the back item the first time a submenu opens. It shows the name of the level it returns to: the text of the parent submenu's trigger, or for the first level the name the menu gets from `aria-label` or `aria-labelledby`, else the text of its toggle. It is named "Back to …" for assistive technology. Change both with the `backLabel` and `ariaBackLabel` options, where `{label}` stands for that name. To give one level its own back item, with an icon or another text, put a `.menu-back` element with a `.menu-item` inside as the first child of the submenu; the plugin then uses it. Keep the level's name in its text, so that the item's name says where it goes.
+
+The mode follows the `--cui-menu-stack-submenus` custom property of the menu: the stylesheet sets it to `1` below `sm`. Set it to `0` to keep submenus to the side on a narrow viewport, or to `1` to stack them at any width. A menu that scrolls stacks its submenus whatever the property says, since a submenu beside it would be cut off by the scroll. A menu kept in the flow of the page (`position: static`) never stacks its submenus.
+
+<Example code={`<button class="btn-solid theme-secondary" type="button" id="menuStackedToggle" data-coreui-toggle="menu" aria-haspopup="menu" aria-expanded="false">
+    Places
+  </button>
+  <div class="menu" role="menu" aria-labelledby="menuStackedToggle" style="--cui-menu-stack-submenus: 1">
+    <button class="menu-item" type="button">Home</button>
+    <div class="submenu">
+      <button class="menu-item" type="button">Europe</button>
+      <div class="menu">
+        <div class="menu-back">
+          <button class="menu-item" type="button">All continents</button>
+        </div>
+        <div class="submenu">
+          <button class="menu-item" type="button">Poland</button>
+          <div class="menu">
+            <button class="menu-item" type="button">Kraków</button>
+            <button class="menu-item" type="button">Gdańsk</button>
+          </div>
+        </div>
+        <button class="menu-item" type="button">France</button>
+      </div>
+    </div>
+    <button class="menu-item" type="button">Settings</button>
   </div>`} />
 
 ## Menu options
@@ -571,7 +605,7 @@ A `.menu` panel is just as often a list of links, a block of text or a form, so 
 
 Leave lists of links, text and forms without these roles. A list of links is navigation, not a menu of commands, and a `role="menu"` panel may hold only menu items, so form fields in it make the markup invalid and the arrow keys skip them. Inside a `role="menu"` panel, headers and `.menu-text` are decoration for screen readers, which move from item to item; put anything a user needs into the item names.
 
-From `role="menu"` the plugin writes the rest when it starts: an `id` on the toggle and the panel where they have none, `aria-haspopup="menu"` and `aria-controls` on the toggle, `tabindex="-1"` on the panel, and `aria-labelledby` pointing at the toggle, or at what the toggle's own `aria-labelledby` names, when the panel has neither `aria-label` nor `aria-labelledby`. Each time the menu opens, and on `update()`, it gives every item `role="menuitem"` and `tabindex="-1"`, a `.disabled` item `aria-disabled="true"`, headers, `.submenu` wrappers and the lists around items `role="none"`, and every submenu `role="menu"` labelled by its trigger. What you write stays: a `menuitemcheckbox` or `menuitemradio` role, `aria-disabled` on an item, and `role="group"` with a label or `role="separator"` on a list wrapper. Call `update()` after adding items to an open menu.
+From `role="menu"` the plugin writes the rest when it starts: an `id` on the toggle and the panel where they have none, `aria-haspopup="menu"` and `aria-controls` on the toggle, `tabindex="-1"` on the panel, and `aria-labelledby` pointing at the toggle, or at what the toggle's own `aria-labelledby` names, when the panel has neither `aria-label` nor `aria-labelledby`. Each time the menu opens, and on `update()`, it gives every item `role="menuitem"` and `tabindex="-1"`, a `.disabled` item `aria-disabled="true"`, headers, `.submenu` wrappers and the lists around items `role="none"`, and every submenu `role="menu"` labelled by its trigger. A submenu open in place of its parent gets `role="none"` and no label instead, so its items are items of the panel menu, and becomes a `role="menu"` again when it closes. What you write stays: a `menuitemcheckbox` or `menuitemradio` role, `aria-disabled` on an item, and `role="group"` with a label or `role="separator"` on a list wrapper. Call `update()` after adding items to an open menu.
 
 The panel is then one stop in the <kbd>Tab</kbd> order. Opening from the keyboard moves the focus to the first item, a pointer click moves it to the panel, and <kbd>Tab</kbd> closes the menu (see [Keyboard support](#keyboard-support)). A click on a `.disabled` item does nothing. Headers, `.menu-text` and dividers must not hold links or fields: the arrow keys skip them and <kbd>Tab</kbd> closes the menu.
 
@@ -585,12 +619,12 @@ Menus include built-in keyboard support for navigating menu items.
 
 | Key | Action |
 | --- | --- |
-| `↓` / `↑` | Navigate to next/previous menu item, stopping at the ends of the list unless `loopFocus` is set |
+| `↓` / `↑` | Navigate to next/previous menu item, stopping at the ends of the list unless `loopFocus` is set. In a [stacked submenu](#stacked-submenus) `↑` from the first item reaches the back item |
 | `→` | Enter submenu (or `←` in RTL) |
 | `←` | Exit submenu and return to parent (or `→` in RTL) |
 | `Enter` / `Space` | On a button toggle, open the menu; with `role="menu"` the focus moves to the first item. On an item, activate it or open its submenu. `Space` opens a menu with `role="menu"` from a link toggle (`<a role="button">`) and activates a link item in a `role="menu"` panel; on a link toggle or item without the role it does not activate it, use `Enter` |
 | `Esc` | In a submenu, close only that submenu and return focus to its trigger; elsewhere, close the menu and return focus to the toggle |
-| `Home` / `End` | Jump to first/last menu item |
+| `Home` / `End` | Jump to first/last menu item, passing over the back item of a stacked submenu |
 | `Tab` / `Shift`+`Tab` | With `role="menu"`, close the menu whatever `autoClose` says: `Tab` moves on to the element after the toggle, `Shift`+`Tab` to the toggle. A `hide.coreui.menu` listener that calls `preventDefault()` keeps the menu open and the focus on the item. Without `role="menu"`, move to the next or previous element: moving within the menu closes the submenu the focus leaves, leaving the menu closes it when `autoClose` is `true` or `'outside'`, and `Shift`+`Tab` back onto the toggle keeps it open. With `container`, `Tab` from the toggle enters the panel and `Tab` from its last element moves on after the toggle |
 
 Arrow keys, `Home` and `End` pressed in a field, an editable region or a widget with its own keys inside the menu (a slider, a list box, a radio group, a toolbar) stay with that control. The arrow keys, `Home` and `End` pass over an item that cannot take the focus, such as a `.menu-item` link without `href` in a panel without `role="menu"`.
@@ -650,8 +684,10 @@ menu.toggle()
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `ariaBackLabel` | string | `'Back to {label}'` | Accessible name of the back item the plugin adds to a [stacked submenu](#stacked-submenus); `{label}` is the name of the level it returns to. |
 | `autoClose` | boolean, string | `true` | Configure the auto close behavior of the menu: <ul class="my-3"><li>`true` - the menu will be closed by clicking outside or inside the menu.</li><li>`false` - the menu will be closed by clicking the toggle button and manually calling `hide` or `toggle` method. <kbd>Esc</kbd> still closes it.</li><li>`'inside'` - the menu will be closed (only) by clicking inside the menu.</li> <li>`'outside'` - the menu will be closed (only) by clicking outside the menu.</li></ul> Note: the menu can always be closed with the <kbd>Esc</kbd> key, and a menu with `role="menu"` with <kbd>Tab</kbd>. |
-| `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the menu (applies only to the shift middleware). By default it’s `clippingParents` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI’s [shift docs](https://floating-ui.com/docs/shift). |
+| `backLabel` | string | `'{label}'` | Text of the back item the plugin adds to a [stacked submenu](#stacked-submenus); `{label}` is the name of the level it returns to. |
+| `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the menu, for the side it opens on, its shift along the toggle and its height. By default it’s `clippingParents` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI’s [shift docs](https://floating-ui.com/docs/shift). |
 | `container` | string, element, boolean | `false` | Appends the menu to a specific element when shown. Use `'body'` or `true` to append to the document body, which helps escape containers with `overflow: hidden`. The menu is moved back to its original position when hidden. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. |
 | `floatingConfig` | null, object, function | `null` | To change Bootstrap’s default Floating UI config, see [Floating UI’s configuration](https://floating-ui.com/docs/computePosition). When a function is used to create the Floating UI configuration, it’s called with an object that contains the Bootstrap’s default Floating UI configuration. It helps you use and merge the default with your own configuration. The function must return a configuration object for Floating UI. |

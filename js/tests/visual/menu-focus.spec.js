@@ -4,7 +4,7 @@
  * the stylesheet decides that, so only a real browser with it can tell.
  */
 
-import { cdp, userEvent } from 'vitest/browser'
+import { cdp, page, userEvent } from 'vitest/browser'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
 import Menu from '../../src/menu.js'
@@ -118,6 +118,8 @@ describe('menu focus', () => {
   })
 
   it('should show the focus on the trigger of an open submenu', async () => {
+    const size = [window.innerWidth, window.innerHeight]
+    await page.viewport(1024, 600)
     mount(MENU)
     await menu.show()
     const trigger = host.querySelector('#more')
@@ -129,6 +131,7 @@ describe('menu focus', () => {
 
     expect(trigger.closest('.submenu')).toHaveClass('show')
     expect(getComputedStyle(trigger).backgroundColor).toBe(resolved('background-color', 'var(--cui-menu-item-focus-bg)'))
+    await page.viewport(...size)
   })
 
   it('should paint a keyboard-focused item with system highlight colors in forced colors', async () => {

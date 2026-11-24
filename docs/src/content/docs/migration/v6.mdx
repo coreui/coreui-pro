@@ -1321,6 +1321,18 @@ check, radio, carousel and toggler icons already work:
   tap could do the same where the browser sends the tap's click after its emulated hover. The next
   click or tap closes it, a click that no hover preceded, as from a screen reader, still toggles, and
   Enter and Space keep opening it.
+- **Submenus stack on a narrow viewport and in a scrolling menu.** Below the `sm` breakpoint, and in
+  a menu that scrolls, a Menu or Context Menu submenu opens in place of its parent with a back item
+  at its top, instead of beside it where it left the screen or was cut off by the scroll. Set
+  `--cui-menu-stack-submenus: 0` on the menu to keep the old layout below `sm` for a menu that does
+  not scroll; a menu that scrolls always stacks its submenus. Dropdown keeps its
+  submenus beside the parent. See [Stacked submenus](/components/menu/#stacked-submenus).
+- **A Menu is never taller than the room it has.** The menu takes the height between its toggle and
+  the edge of the viewport or `boundary`, and scrolls when its items need more. When it fits on
+  neither side of the toggle, it opens on the side with more room; it used to stay on its first
+  side and run off the screen. `--cui-menu-max-height` now defaults to `100dvh` instead of `none`,
+  and `none` is no longer a valid value: a menu with `--cui-menu-max-height: none` loses the height
+  limit and runs off the screen. Use a length, or `100dvh` for no limit of its own.
 - **Submenu triggers announce their submenu from the start.** The plugin writes
   `aria-haspopup="menu"` and `aria-expanded="false"` on every submenu trigger when the menu is
   initialized. Before, a trigger got `aria-haspopup="true"` and `aria-expanded` only once its
@@ -1345,8 +1357,8 @@ check, radio, carousel and toggler icons already work:
 - **Context Menu sets its menu roles itself.** Each opening writes `role="menu"` and
   `tabindex="-1"` on the panel, `role="menuitem"` and `tabindex="-1"` on the items (a
   `menuitemcheckbox` or `menuitemradio` role you set stays), and `role="none"` on headers, list
-  wrappers and `.submenu` wrappers; your markup no longer needs them. The new `ariaMenuLabel` option
-  names the panel when it has no `aria-label` of its own. Opening with <kbd>Shift</kbd>+<kbd>F10</kbd> or the
+  wrappers and `.submenu` wrappers; your markup no longer needs them. The new `ariaMenuLabel` option,
+  `'Context menu'` by default, names the panel when it has no `aria-label` of its own. Opening with <kbd>Shift</kbd>+<kbd>F10</kbd> or the
   <kbd>Menu</kbd> key now moves focus to the first item instead of the panel, <kbd>Tab</kbd> does
   nothing while focus is in the open menu instead of closing it, and <kbd>Esc</kbd> also closes the
   menu while focus is on the trigger. See
