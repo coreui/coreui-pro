@@ -151,7 +151,7 @@ const root = host.attachShadow({ mode: 'open' })
 root.adoptedStyleSheets = [sheet]
 ```
 
-Design tokens need no extra work: the stylesheet declares them on `:host` alongside `:root`, so every `--cui-*` variable resolves inside the shadow root once the sheet is adopted.
+Design tokens need no extra work: the stylesheet declares them on `:host` alongside `:root`, so every `--cui-*` variable resolves inside the shadow root once the sheet is adopted. To change a token for the component, set it on the host element, not on `:root`; see [CSS variables](/customize/css-variables/).
 
 ## Events
 
