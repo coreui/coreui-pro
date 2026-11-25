@@ -12,7 +12,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
 import { rootActiveElement } from './util/focus.js'
 import {
-  clearValidationState, isFormValid, updateValidationState, validateForm
+  clearValidationState, followFormInput, isFormValid, updateValidationState, validateForm
 } from './util/form-validation.js'
 import type { ValidationMarks } from './util/form-validation.js'
 import {
@@ -32,7 +32,6 @@ const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_STEP_CHANGE = `stepChange${EVENT_KEY}`
 const EVENT_STEP_VALIDATION_COMPLETE = `stepValidationComplete${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}`
-const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}`
 
@@ -87,7 +86,7 @@ class Stepper extends BaseComponent {
   protected declare _initialStepButton: HTMLButtonElement | null
   protected declare _isFinished: boolean
   protected declare _validationMarks: ValidationMarks
-  protected declare _validatedForms: Set<HTMLFormElement>
+  protected declare _validatedForms: Map<HTMLFormElement, () => void>
   protected declare _tabPattern: boolean
 
   constructor(element?: string | Element | null, config?: Partial<StepperConfig> | null) {
@@ -99,7 +98,7 @@ class Stepper extends BaseComponent {
     this._initialStepButton = this._activeStepButton
     this._isFinished = false
     this._validationMarks = new WeakMap()
-    this._validatedForms = new Set()
+    this._validatedForms = new Map()
 
     this.update()
 
@@ -249,7 +248,7 @@ class Stepper extends BaseComponent {
       (form as HTMLFormElement).reset()
     }
 
-    for (const form of this._validatedForms) {
+    for (const form of this._validatedForms.keys()) {
       this._untrackValidatedForm(form)
     }
 
@@ -293,7 +292,7 @@ class Stepper extends BaseComponent {
       }
     }
 
-    for (const form of this._validatedForms) {
+    for (const form of this._validatedForms.keys()) {
       if (!this._element.contains(form)) {
         this._untrackValidatedForm(form)
       }
@@ -315,7 +314,7 @@ class Stepper extends BaseComponent {
   }
 
   override dispose(): void {
-    for (const form of this._validatedForms) {
+    for (const form of this._validatedForms.keys()) {
       this._untrackValidatedForm(form)
     }
 
@@ -389,8 +388,7 @@ class Stepper extends BaseComponent {
 
   _trackValidatedForm(form: HTMLFormElement): void {
     if (!this._validatedForms.has(form)) {
-      this._validatedForms.add(form)
-      EventHandler.on(form, EVENT_INPUT, () => updateValidationState(form, this._validationMarks))
+      this._validatedForms.set(form, followFormInput(form, () => updateValidationState(form, this._validationMarks)))
       EventHandler.on(form, EVENT_RESET, (event: Event) => {
         setTimeout(() => {
           if (this._element && !event.defaultPrevented && this._validatedForms.has(form)) {
@@ -402,7 +400,7 @@ class Stepper extends BaseComponent {
   }
 
   _untrackValidatedForm(form: HTMLFormElement): void {
-    EventHandler.off(form, EVENT_INPUT)
+    this._validatedForms.get(form)?.()
     EventHandler.off(form, EVENT_RESET)
     clearValidationState(form, this._validationMarks)
     this._validatedForms.delete(form)

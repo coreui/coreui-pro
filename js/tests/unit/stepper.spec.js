@@ -2908,6 +2908,31 @@ describe('Stepper', () => {
       expect(input.hasAttribute('aria-invalid')).toBeFalse()
     })
 
+    it('should clear the invalid state as the user corrects a control the form attribute ties to the step form, until the stepper resets', () => {
+      fixtureEl.innerHTML = validationFixture('id="details" novalidate')
+      fixtureEl.insertAdjacentHTML('beforeend', '<input id="outside" form="details" required>')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const outside = fixtureEl.querySelector('#outside')
+      const type = value => {
+        outside.value = value
+        outside.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+
+      stepper.next()
+
+      expect(outside).toHaveClass('is-invalid')
+
+      type('corrected')
+
+      expect(outside).not.toHaveClass('is-invalid')
+      expect(outside.hasAttribute('aria-invalid')).toBeFalse()
+
+      stepper.reset()
+      type('')
+
+      expect(outside).not.toHaveClass('is-invalid')
+    })
+
     it('should clear the validation state on reset', () => {
       fixtureEl.innerHTML = validationFixture('novalidate')
 

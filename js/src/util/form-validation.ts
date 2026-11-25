@@ -413,6 +413,34 @@ export const clearValidationState = (form: HTMLFormElement, marks: ValidationMar
 }
 
 /**
+ * Calls a function on every `input` event of a form: from a control inside it, heard on the form,
+ * and from a control the `form` attribute ties to it from outside, which the event does not reach
+ * the form from, heard on the document or on the shadow root the form sits in.
+ *
+ * @param form - The form
+ * @param onInput - Called with the event
+ * @returns A function that stops listening
+ */
+export const followFormInput = (form: HTMLFormElement, onInput: (event: Event) => void): (() => void) => {
+  const root = form.getRootNode()
+  const handleOutsideInput = (event: Event) => {
+    const target = event.target as FormControl
+
+    if (target.form === form && !form.contains(target)) {
+      onInput(event)
+    }
+  }
+
+  form.addEventListener('input', onInput)
+  root.addEventListener('input', handleOutsideInput)
+
+  return () => {
+    form.removeEventListener('input', onInput)
+    root.removeEventListener('input', handleOutsideInput)
+  }
+}
+
+/**
  * Reads the element that has focus in the tree a form sits in, or in the document when focus is
  * outside that tree.
  *
