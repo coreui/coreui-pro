@@ -94,19 +94,14 @@ class Stepper extends BaseComponent {
     super(element, config)
 
     this._stepButtons = this._getStepButtons()
-    this._tabPattern = !SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, this._element)
+    this._tabPattern = this._isTabPattern()
     this._activeStepButton = this._stepButtons.find(button => button.classList.contains(CLASS_NAME_ACTIVE)) ?? null
     this._initialStepButton = this._activeStepButton
     this._isFinished = false
     this._validationMarks = new WeakMap()
     this._validatedForms = new Set()
 
-    this._addStepperConnector()
-    this._resetPanes(this._getTargetPane(this._activeStepButton))
-    this._wrapIndicatorText()
-    this._updateCompleteStates(this._getActiveIndex(this._stepButtons))
-    this._updateStepButtonsDisabledState()
-    this._setupAccessibilityAttributes()
+    this.update()
 
     EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_STEPPER_STEP_BUTTON, event => this._keydown(event))
   }
@@ -250,21 +245,6 @@ class Stepper extends BaseComponent {
 
     const holdsFocus = this._holdsFocus()
 
-    this._resetPanes()
-
-    for (const content of SelectorEngine.find(SELECTOR_STEPPER_STEP_CONTENT, this._element as ParentNode)) {
-      this._queueCallback(() => {
-        content.style.height = ''
-        content.style.overflow = ''
-      }, content, false)
-      content.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
-      content.setAttribute('aria-hidden', 'true')
-    }
-
-    for (const btn of this._stepButtons) {
-      btn.classList.remove(CLASS_NAME_ACTIVE)
-    }
-
     for (const form of this._element.querySelectorAll(`${SELECTOR_STEPPER_PANE} form, ${SELECTOR_STEPPER_STEP_CONTENT} form`)) {
       (form as HTMLFormElement).reset()
     }
@@ -274,19 +254,7 @@ class Stepper extends BaseComponent {
     }
 
     const firstStep = this._initialStepButton || this._stepButtons[0]
-    firstStep.classList.add(CLASS_NAME_ACTIVE)
-
-    const pane = this._getTargetPane(firstStep)
-    if (pane) {
-      this._resetPanes(pane)
-    } else {
-      const stepContent = firstStep.parentNode!.querySelector(SELECTOR_STEPPER_STEP_CONTENT)
-      if (stepContent) {
-        stepContent.classList.add(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
-        stepContent.setAttribute('aria-hidden', 'false')
-      }
-    }
-
+    this._openStep(firstStep)
     this._updateCompleteStates(this._stepButtons.indexOf(firstStep))
 
     this._activeStepButton = firstStep
@@ -299,6 +267,51 @@ class Stepper extends BaseComponent {
     }
 
     EventHandler.trigger(this._element, EVENT_RESET)
+  }
+
+  update(): void {
+    const active = this._activeStepButton
+    const activeIndex = this._getActiveIndex(this._stepButtons)
+    const initialIndex = this._stepButtons.indexOf(this._initialStepButton!)
+
+    this._stepButtons = this._getStepButtons()
+    this._initialStepButton = this._stepButtons[initialIndex] ?? null
+
+    const tabPattern = this._isTabPattern()
+    const shapeChanged = tabPattern !== this._tabPattern
+
+    if (shapeChanged) {
+      this._removeAccessibilityAttributes()
+      this._tabPattern = tabPattern
+    }
+
+    if (active) {
+      this._activeStepButton = this._stepButtons[Math.min(activeIndex, this._stepButtons.length - 1)] ?? null
+
+      if (this._activeStepButton !== active || shapeChanged) {
+        this._openStep(this._activeStepButton)
+      }
+    }
+
+    for (const form of this._validatedForms) {
+      if (!this._element.contains(form)) {
+        this._untrackValidatedForm(form)
+      }
+    }
+
+    this._addStepperConnector()
+    this._resetPanes(this._activeStepButton && this._getTargetPane(this._activeStepButton))
+    this._wrapIndicatorText()
+
+    if (this._isFinished) {
+      this._updateCompleteStates(this._stepButtons.length)
+      this._disableStepButtons()
+    } else {
+      this._updateCompleteStates(this._getActiveIndex(this._stepButtons))
+      this._updateStepButtonsDisabledState()
+    }
+
+    this._setupAccessibilityAttributes()
   }
 
   override dispose(): void {
@@ -314,8 +327,12 @@ class Stepper extends BaseComponent {
     return SelectorEngine.find(SELECTOR_STEPPER_STEP_BUTTON, this._element as ParentNode) as HTMLButtonElement[]
   }
 
+  _isTabPattern(): boolean {
+    return !SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, this._element)
+  }
+
   _getEnabledStepButtons(): HTMLButtonElement[] {
-    return this._getStepButtons().filter(el => !isDisabled(el))
+    return this._stepButtons.filter(el => !isDisabled(el))
   }
 
   _getActiveIndex(steps: HTMLButtonElement[]): number {
@@ -515,15 +532,42 @@ class Stepper extends BaseComponent {
     }
   }
 
+  _openStep(button: HTMLButtonElement | null): void {
+    this._resetPanes(button && this._getTargetPane(button))
+
+    for (const content of SelectorEngine.find(SELECTOR_STEPPER_STEP_CONTENT, this._element as ParentNode)) {
+      this._queueCallback(() => {
+        content.style.height = ''
+        content.style.overflow = ''
+      }, content, false)
+      content.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
+      content.setAttribute('aria-hidden', 'true')
+    }
+
+    for (const btn of this._stepButtons) {
+      btn.classList.toggle(CLASS_NAME_ACTIVE, btn === button)
+    }
+
+    const stepContent = button?.parentNode!.querySelector(SELECTOR_STEPPER_STEP_CONTENT)
+    if (stepContent) {
+      stepContent.classList.add(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
+      stepContent.setAttribute('aria-hidden', 'false')
+    }
+  }
+
   _addStepperConnector(): void {
     for (const [index, stepButton] of this._stepButtons.entries()) {
-      if (index < this._stepButtons.length - 1) {
-        const next = stepButton.nextElementSibling
-        if (!next || !next.classList.contains(CLASS_NAME_STEPPER_STEP_CONNECTOR)) {
-          const connectorElement = document.createElement('div')
-          connectorElement.classList.add(CLASS_NAME_STEPPER_STEP_CONNECTOR)
-          stepButton.after(connectorElement)
+      const next = stepButton.nextElementSibling
+      const hasConnector = next?.classList.contains(CLASS_NAME_STEPPER_STEP_CONNECTOR)
+
+      if (index === this._stepButtons.length - 1) {
+        if (hasConnector) {
+          next!.remove()
         }
+      } else if (!hasConnector) {
+        const connectorElement = document.createElement('div')
+        connectorElement.classList.add(CLASS_NAME_STEPPER_STEP_CONNECTOR)
+        stepButton.after(connectorElement)
       }
     }
   }
@@ -589,6 +633,25 @@ class Stepper extends BaseComponent {
       }
 
       this._setSelected(stepButton, stepButton === this._activeStepButton)
+    }
+  }
+
+  _removeAccessibilityAttributes(): void {
+    if (this._tabPattern) {
+      const stepList = SelectorEngine.findOne(SELECTOR_STEPPER_STEPS, this._element)
+      stepList?.removeAttribute('role')
+      stepList?.removeAttribute('aria-orientation')
+    }
+
+    for (const stepButton of this._stepButtons) {
+      stepButton.removeAttribute(this._tabPattern ? 'aria-selected' : 'aria-expanded')
+
+      if (this._tabPattern) {
+        stepButton.removeAttribute('role')
+        stepButton.removeAttribute('aria-controls')
+        stepButton.closest(SELECTOR_STEPPER_STEP)?.removeAttribute('role')
+        this._getTargetPane(stepButton)?.removeAttribute('role')
+      }
     }
   }
 
