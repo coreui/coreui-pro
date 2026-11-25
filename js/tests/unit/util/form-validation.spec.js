@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  alignValueField, armValueFieldBubble, clearValidationState, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidities, followUserValidity,
+  alignValueField, armValueFieldBubble, clearValidationState, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followFormInput, followUserValidities, followUserValidity,
   getFeedbackIds, getFeedbackText, getUserValidity, getValidationState, isFormValid,
   ownValidationState, splitIds, updateValidationState, validateForm,
   writeValueField
@@ -427,6 +427,108 @@ describe('Form validation utilities', () => {
 
       expect(empty).not.toHaveClass('is-invalid')
       expect(empty.hasAttribute('aria-invalid')).toBeFalse()
+    })
+  })
+
+  describe('followFormInput', () => {
+    const type = (control, value) => {
+      control.value = value
+      control.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    }
+
+    it('should call the function for a control inside the form and for one the form attribute ties to it', () => {
+      fixtureEl.innerHTML = '<form id="order"><input id="inside"></form><input id="outside" form="order">'
+      const onInput = vi.fn()
+      followFormInput(fixtureEl.querySelector('form'), onInput)
+
+      type(fixtureEl.querySelector('#inside'), 'a')
+      type(fixtureEl.querySelector('#outside'), 'b')
+
+      expect(onInput.mock.calls.map(([event]) => event.target.id)).toEqual(['inside', 'outside'])
+    })
+
+    it('should not call the function for a control of another form', () => {
+      fixtureEl.innerHTML = '<form id="order"></form><form id="other"><input id="inside"></form><input id="outside" form="other"><input id="loose">'
+      const onInput = vi.fn()
+      followFormInput(fixtureEl.querySelector('#order'), onInput)
+
+      for (const control of fixtureEl.querySelectorAll('input')) {
+        type(control, 'a')
+      }
+
+      expect(onInput).not.toHaveBeenCalled()
+    })
+
+    it('should call the function for a control inside the form when a listener above the form stops the event', () => {
+      fixtureEl.innerHTML = '<div><form><input id="inside"></form></div>'
+      fixtureEl.querySelector('div').addEventListener('input', event => event.stopPropagation())
+      const onInput = vi.fn()
+      followFormInput(fixtureEl.querySelector('form'), onInput)
+
+      type(fixtureEl.querySelector('#inside'), 'a')
+
+      expect(onInput).toHaveBeenCalledOnce()
+    })
+
+    it('should call the function once for a control inside the form that the form attribute ties to it as well', () => {
+      fixtureEl.innerHTML = '<form id="order"><input id="inside" form="order"></form>'
+      const onInput = vi.fn()
+      followFormInput(fixtureEl.querySelector('form'), onInput)
+
+      type(fixtureEl.querySelector('#inside'), 'a')
+
+      expect(onInput).toHaveBeenCalledOnce()
+    })
+
+    it('should call the function after the listeners of the control', () => {
+      fixtureEl.innerHTML = '<form><input id="code"></form>'
+      const code = fixtureEl.querySelector('#code')
+      code.addEventListener('input', () => code.setCustomValidity('Taken'))
+      let valid
+      followFormInput(fixtureEl.querySelector('form'), () => {
+        valid = code.validity.valid
+      })
+
+      type(code, 'a')
+
+      expect(valid).toBeFalse()
+    })
+
+    it('should call the function for a control in the shadow root the form sits in', () => {
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const shadowRoot = host.attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = '<form id="order"></form><input id="outside" form="order">'
+      const onInput = vi.fn()
+      followFormInput(shadowRoot.querySelector('form'), onInput)
+
+      type(shadowRoot.querySelector('#outside'), 'a')
+
+      expect(onInput).toHaveBeenCalledOnce()
+    })
+
+    it('should call the function for a control in a shadow root inside the form', () => {
+      fixtureEl.innerHTML = '<form><div id="host"></div></form>'
+      const shadowRoot = fixtureEl.querySelector('#host').attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = '<input>'
+      const onInput = vi.fn()
+      followFormInput(fixtureEl.querySelector('form'), onInput)
+
+      type(shadowRoot.querySelector('input'), 'a')
+
+      expect(onInput).toHaveBeenCalledOnce()
+    })
+
+    it('should stop calling the function once the returned function runs', () => {
+      fixtureEl.innerHTML = '<form id="order"><input id="inside"></form><input id="outside" form="order">'
+      const onInput = vi.fn()
+      const stop = followFormInput(fixtureEl.querySelector('form'), onInput)
+
+      stop()
+      type(fixtureEl.querySelector('#inside'), 'a')
+      type(fixtureEl.querySelector('#outside'), 'b')
+
+      expect(onInput).not.toHaveBeenCalled()
     })
   })
 

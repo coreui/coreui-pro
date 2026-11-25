@@ -168,6 +168,21 @@ describe('Form', () => {
       expect(describedBy(name)).toBe('nameError')
     })
 
+    it('should keep the state current for a control the form attribute ties to the form from outside', () => {
+      fixtureEl.innerHTML = '<form id="order" data-coreui-validate novalidate></form><input id="quantity" form="order" required><div class="invalid-feedback">Enter a quantity.</div>'
+      const quantity = fixtureEl.querySelector('#quantity')
+      submit(fixtureEl.querySelector('form'))
+
+      expect(quantity).toHaveClass('is-invalid')
+      expect(describedBy(quantity)).not.toBeNull()
+
+      type(quantity, '2')
+
+      expect(quantity).not.toHaveClass('is-invalid')
+      expect(quantity.hasAttribute('aria-invalid')).toBeFalse()
+      expect(quantity.hasAttribute('aria-describedby')).toBeFalse()
+    })
+
     it('should trigger validate.coreui.form with the validity', () => {
       const form = mountForm()
       const listener = vi.fn()
@@ -333,6 +348,19 @@ describe('Form', () => {
       expect(describedBy(name)).toBe('hint')
 
       type(name, '')
+
+      expect(name).not.toHaveClass('is-invalid')
+    })
+
+    it('should follow the input again once the form is validated after a reset', () => {
+      const form = mountForm()
+      const name = fixtureEl.querySelector('#name')
+      const instance = new Form(form)
+      instance.validate()
+      instance.reset()
+      instance.validate()
+
+      type(name, 'Ada')
 
       expect(name).not.toHaveClass('is-invalid')
     })
