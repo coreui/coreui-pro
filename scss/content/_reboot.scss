@@ -89,7 +89,8 @@ $reboot-mark-tokens: defaults(
   // Ability to the value of the root font sizes, affecting the value of `rem`.
   // null by default, thus nothing is generated.
 
-  :root {
+  :root,
+  :host {
     @include tokens($reboot-tokens);
 
     accent-color: var(--#{$prefix}primary-base);

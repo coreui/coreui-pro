@@ -7,7 +7,8 @@
 // that bundle too.
 
 @layer root {
-  :root {
+  :root,
+  :host {
     @each $name, $value in $breakpoints {
       --#{$prefix}breakpoint-#{$name}: #{$value};
     }
