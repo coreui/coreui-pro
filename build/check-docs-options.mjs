@@ -31,8 +31,8 @@ const inherited = {
     reason: 'set by the component that owns the chip, ChipSet, ChipInput, MultiSelect and ChipFilter; a page sets the behaviour on those'
   },
   dropdown: {
-    keys: ['submenuDelay', 'submenuTrigger'],
-    reason: 'inherited from Menu; the dropdown markup has no `.submenu > .menu-item` for them to act on'
+    keys: ['ariaBackLabel', 'backLabel', 'submenuDelay', 'submenuTrigger'],
+    reason: 'inherited from Menu; the dropdown markup has no `.submenu > .menu-item` for them to act on, and a dropdown never stacks submenus, so it renders no back item'
   },
   'time-input': {
     keys: ['ariaDayLabel', 'ariaMonthLabel', 'ariaQuarterLabel', 'ariaWeekLabel', 'ariaYearLabel', 'dayPlaceholder', 'monthNames', 'monthPlaceholder', 'quarterPlaceholder', 'type', 'weekPlaceholder', 'yearPlaceholder'],

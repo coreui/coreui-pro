@@ -145,6 +145,7 @@ const plugins = {
 }
 
 const inert = {
+  dropdown: { 'menu-back': 'a dropdown never stacks its submenus, so it never inserts a back item' },
   'forms/chip-input': { 'form-floating': 'only a field with a floating label renders it' },
   'forms/form-control-group': { 'form-floating': 'only a field with a floating label renders it' },
   'forms/number-input': { 'form-floating': 'only a field with a floating label renders it' }

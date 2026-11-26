@@ -416,7 +416,7 @@ describe('Dropdown', () => {
         btnDropdown.addEventListener('shown.coreui.dropdown', () => {
           expect(btnDropdown).toHaveClass('show')
           expect(btnDropdown.getAttribute('aria-expanded')).toEqual('true')
-          expect(spy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', noop)
+          expect(spy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', jasmine.any(Function))
 
           dropdown.toggle()
         })
@@ -424,7 +424,7 @@ describe('Dropdown', () => {
         btnDropdown.addEventListener('hidden.coreui.dropdown', () => {
           expect(btnDropdown).not.toHaveClass('show')
           expect(btnDropdown.getAttribute('aria-expanded')).toEqual('false')
-          expect(spyOff).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', noop)
+          expect(spyOff).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', jasmine.any(Function))
 
           document.documentElement.ontouchstart = defaultValueOnTouchStart
           resolve()

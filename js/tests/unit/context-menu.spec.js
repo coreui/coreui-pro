@@ -1,7 +1,6 @@
 import ContextMenu from '../../src/context-menu.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Menu from '../../src/menu.js'
-import { noop } from '../../src/util/index.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -518,7 +517,7 @@ describe('ContextMenu', () => {
       contextMenu.show()
 
       expect(menu.getAttribute('role')).toEqual('menu')
-      expect(menu.getAttribute('aria-label')).toBeNull()
+      expect(menu.getAttribute('aria-label')).toEqual('Context menu')
 
       for (const item of [copy, paste, cut, more, deep]) {
         expect(item.getAttribute('role')).toEqual('menuitem')
@@ -565,13 +564,18 @@ describe('ContextMenu', () => {
       const one = new ContextMenu(fixtureEl.querySelector('.area-one'))
       const two = new ContextMenu(fixtureEl.querySelector('.area-two'))
 
-      two.show()
-      expect(menu.getAttribute('aria-label')).toBeNull()
-      two.hide()
-
       one.show()
       expect(menu.getAttribute('aria-label')).toEqual('Row actions')
       one.hide()
+
+      two.show()
+      expect(menu.getAttribute('aria-label')).toEqual('Row actions')
+      two.hide()
+
+      menu.removeAttribute('aria-label')
+      two.show()
+      expect(menu.getAttribute('aria-label')).toEqual('Context menu')
+      two.hide()
 
       menu.setAttribute('aria-label', 'Page name')
       one.show()
@@ -796,14 +800,14 @@ describe('ContextMenu', () => {
 
       const done = new Promise(resolve => {
         area.addEventListener('hidden.coreui.context-menu', () => {
-          expect(offSpy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', noop)
+          expect(offSpy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', jasmine.any(Function))
           delete document.documentElement.ontouchstart
           resolve()
         })
       })
 
       whenShown(area, () => {
-        expect(onSpy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', noop)
+        expect(onSpy).toHaveBeenCalledWith(jasmine.any(Object), 'mouseover', jasmine.any(Function))
         contextMenu.hide()
       })
 

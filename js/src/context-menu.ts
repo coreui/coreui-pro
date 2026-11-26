@@ -46,7 +46,7 @@ type ContextMenuConfig = Omit<MenuConfig, 'placement'> & {
 
 const Default = {
   ...Menu.Default,
-  ariaMenuLabel: null,
+  ariaMenuLabel: 'Context menu',
   reference: 'pointer',
   strategy: 'fixed'
 } as ContextMenuConfig

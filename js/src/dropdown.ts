@@ -170,6 +170,10 @@ class Dropdown extends Menu {
     return super._updateFloatingPosition(referenceElement)
   }
 
+  protected override _sizesPanel(): boolean {
+    return false
+  }
+
   private _isStatic(): boolean {
     return this._inNavbar || this._config.display === 'static'
   }
