@@ -54,7 +54,7 @@ const COMPONENTS = {
   datepicker: '<div id="field" data-coreui-date-picker data-coreui-locale="en-US" data-coreui-name="v" data-coreui-required="true"></div>',
   daterangepicker: '<div id="field" data-coreui-date-range-picker data-coreui-locale="en-US" data-coreui-start-name="v" data-coreui-end-name="w" data-coreui-required="true"></div>',
   timepicker: '<div id="field" data-coreui-time-picker data-coreui-locale="en-US" data-coreui-name="v" data-coreui-required="true"></div>',
-  otp: '<div id="field" class="form-otp" data-coreui-otp aria-labelledby="lbl" data-coreui-name="v" data-coreui-required="true"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control"></div>',
+  otp: '<div id="field" class="otp" data-coreui-otp><input class="otp-input" aria-labelledby="lbl" required name="v" maxlength="4"></div>',
   rating: '<div id="field" aria-labelledby="lbl" data-coreui-rating data-coreui-name="v" data-coreui-required="true"></div>',
   rangeslider: '<div id="field" data-coreui-range-slider data-coreui-value="25,75" data-coreui-name="v"></div>'
 }
@@ -79,7 +79,7 @@ const FILLED = {
   datepicker: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-date="2026-07-14"'],
   daterangepicker: ['data-coreui-end-name="w"', 'data-coreui-end-name="w" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"'],
   timepicker: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-time="10:30:00"'],
-  otp: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-value="1234"'],
+  otp: ['name="v" maxlength="4"', 'name="v" maxlength="4" value="1234"'],
   rating: ['data-coreui-name="v"', 'data-coreui-name="v" data-coreui-value="3"'],
   rangeslider: ['', '']
 }
@@ -255,7 +255,7 @@ const USER_CHANGES = {
   datepicker: host => press('{ArrowDown}')(firstSection(host)),
   daterangepicker: host => press('{ArrowDown}')(firstSection(host)),
   timepicker: host => press('{ArrowDown}')(firstSection(host)),
-  otp: host => press('9')(host.querySelector('.form-otp-control')),
+  otp: host => press('9')(host.querySelector('.otp-input')),
   rating: host => userEvent.click(host.querySelectorAll('.rating-item-label')[4]),
   rangeslider: host => press('{ArrowRight}')(host.querySelector('.form-range-input'))
 }
@@ -292,8 +292,8 @@ const KNOWN_FAILURES = [
   ['given valid at load: valid colour', ['chipfilter', 'rangeslider', 'rating'], ALL_MODES, ['valid']],
   ['given valid, empty required, after submit: no invalid colour', ['autocomplete', 'checkbox', 'input', 'multiselect', 'number', 'otp', 'password', 'radio', 'select', 'switch', 'textarea'], ['m1', 'm2'], ['valid']],
   ['given valid, empty required, after submit: no BAD', ['autocomplete', 'checkbox', 'chipinput', 'combobox', 'input', 'multiselect', 'number', 'otp', 'password', 'radio', 'select', 'switch', 'textarea'], ['m1', 'm2'], ['valid']],
-  ['given valid, empty required, after submit: valid colour', ['autocomplete', 'checkbox', 'input', 'multiselect', 'number', 'password', 'radio', 'select', 'switch', 'textarea'], ['m1', 'm2'], ['valid']],
-  ['given valid, empty required, after submit: valid colour', ['chipfilter', 'otp', 'rating'], ALL_MODES, ['valid']],
+  ['given valid, empty required, after submit: valid colour', ['autocomplete', 'checkbox', 'input', 'multiselect', 'number', 'otp', 'password', 'radio', 'select', 'switch', 'textarea'], ['m1', 'm2'], ['valid']],
+  ['given valid, empty required, after submit: valid colour', ['chipfilter', 'rating'], ALL_MODES, ['valid']],
   ['given valid, empty required, after submit: OK shown', ['autocomplete', 'chipinput', 'datepicker', 'daterangeinput', 'daterangepicker', 'multiselect', 'number', 'password', 'timepicker'], ['m1', 'm2'], ['valid']]
 ]
 

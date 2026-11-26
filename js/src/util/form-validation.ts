@@ -59,7 +59,7 @@ const SELECTOR_FRAME = '.form-control-group'
 const SELECTOR_INPUT_GROUP = '.input-group'
 const SELECTOR_INPUT_GROUP_CONTROL = '.form-control, .form-select'
 const SELECTOR_INVALID_FEEDBACK = '.invalid-feedback, .invalid-tooltip'
-const SELECTOR_OTP = '.form-otp'
+const SELECTOR_OTP = '.otp'
 const SELECTOR_POPUP = '.popup'
 const SELECTOR_RANGE = '.form-range'
 const SELECTOR_RANGE_INPUT = '.form-range-input'
@@ -137,7 +137,7 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
 
 /**
  * Finds the element that stands for a control in the layout: the `.form-date-time` field for the
- * value field laid over it, the `.form-otp` group for its value field and its slots, the
+ * value field laid over it, the `.otp` container for its field under the drawn slots, the
  * `.chip-input` for its value field and its text field, the `.autocomplete` for the text field it
  * builds, the `.rating` for its radios, and the `.combobox-toggle` for the `.combobox-select` right
  * after it, which the messages follow, otherwise the control itself.
@@ -236,7 +236,7 @@ const getStructuralFeedback = (control: FormControl): Element[] => {
  * Finds the invalid feedback of a control: the elements named in `data-coreui-invalid-feedback`,
  * or else the ones the stylesheet shows when the control is invalid, for a radio or checkbox those
  * of every choice that shares its name. The value field of a `.form-date-time` takes both from the
- * field, a control of a `.form-otp`, a `.chip-input` or a `.rating` from the group, and the value
+ * field, the field of an `.otp`, a control of a `.chip-input` or a `.rating` from the group, and the value
  * field of a combobox from its toggle. A found element without an id gets one.
  *
  * @param control - The control

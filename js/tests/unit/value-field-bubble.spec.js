@@ -3,7 +3,6 @@ import ChipInput from '../../src/chip-input.js'
 import Combobox from '../../src/combobox.js'
 import DateInput from '../../src/date-input.js'
 import MultiSelect from '../../src/multi-select.js'
-import OTPInput from '../../src/otp-input.js'
 import { clearFixture, getFixture, getValueField } from '../helpers/fixture.js'
 
 const OPTIONS = '<div class="popup combobox-popup"><div class="list-box"><div class="list-box-options" role="listbox" aria-label="Item"><div class="list-box-option" data-coreui-value="1">One</div></div></div></div>'
@@ -43,13 +42,6 @@ const components = {
     const instance = new MultiSelect(field, { required: true, ...options })
 
     return { field, host: form.querySelector('.multi-select'), instance }
-  },
-  OTPInput(form) {
-    form.innerHTML = '<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
-    const host = form.firstElementChild
-    const instance = new OTPInput(host, { required: true })
-
-    return { field: host.querySelector('input[aria-hidden]'), host, instance }
   }
 }
 
@@ -130,15 +122,6 @@ describe('Validation message of a hidden value field', () => {
     section.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
 
     expect(document.activeElement).not.toBe(section)
-    expect(synthetic.length).toBe(0)
-  })
-
-  it('OTPInput should keep the message when the focus moves to the next slot', () => {
-    const { field, host, synthetic } = mount('OTPInput')
-
-    field.focus()
-    host.querySelectorAll('.form-otp-control')[1].focus()
-
     expect(synthetic.length).toBe(0)
   })
 

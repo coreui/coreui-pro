@@ -1,316 +1,185 @@
 ---
 title: "Bootstrap 6 One Time Password (OTP) Input"
 name: "One Time Password (OTP) Input"
-description: "Create secure and user-friendly one-time password input fields with automatic navigation, paste support, validation, and customizable options for modern authentication flows."
+description: "Collect one-time passwords, PIN codes and verification codes with a single accessible input drawn as separate character slots, with paste, autofill, masking and validation."
 otherFrameworks:
   - otp-input
 ---
 
 ## Example
 
-Use the `form-otp` wrapper with `data-coreui-otp` to create an one-time password input field with automatic character navigation and validation.
+The one-time password input is one real text field drawn as separate character slots. Wrap a single `<input>` in a container with `.otp` and add `data-coreui-otp`. The plugin reads the input's `maxlength` for the number of slots, lays the input transparently over the slots and draws one `.otp-slot` per character. Give the input a name with a `<label for>` or `aria-label`.
 
-<Example pro code={`<label class="form-label" id="basicOTPLabel">Enter OTP Code</label>
-  <div class="form-otp" data-coreui-otp aria-labelledby="basicOTPLabel" data-coreui-id="basicOTP" data-coreui-name="otp">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
+<Example pro code={`<label class="form-label" for="otpBasic">Verification code</label>
+  <div class="otp" data-coreui-otp>
+    <input type="text" class="otp-input" id="otpBasic" name="code" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
   </div>`} />
+
+- **One control**: assistive technology announces one text field with one name and one value, not a field per character.
+- **Autofill**: `autocomplete="one-time-code"` lets the browser fill a code from an SMS or a password manager.
+- **Paste and insert**: a full code pasted, autofilled or inserted at once replaces the field, even a formatted one such as `123-456` or `123 456`; characters the type does not accept and whitespace are dropped, and full-width digits from an input method become digits.
+- **Click to edit**: click a slot to select it; the next character replaces it.
+- **Keyboard editing**: arrow keys, selection, delete and undo work as in a text field.
 
 ## With form field
 
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
 
 <Example pro code={`<div class="form-field">
-    <span class="form-label" id="otpVerificationCodeLabel">Verification code</span>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpVerificationCodeLabel" data-coreui-name="otpField">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
+    <label class="form-label" for="otpField">Verification code</label>
+    <div class="otp" data-coreui-otp>
+      <input type="text" class="otp-input" id="otpField" name="code" maxlength="6" aria-describedby="otpFieldText">
     </div>
-    <div class="form-text">We sent it to your phone a moment ago.</div>
+    <div class="form-text" id="otpFieldText">We sent it to your phone a moment ago.</div>
   </div>`} />
 
-## One-time password types
+## Connected slots
 
-The one-time password input supports different input types for various use cases.
+Add `.otp-connected` to join the slots into one field with shared borders.
+
+<Example pro code={`<label class="form-label" for="otpConnected">Verification code</label>
+  <div class="otp otp-connected" data-coreui-otp>
+    <input type="text" class="otp-input" id="otpConnected" maxlength="6">
+  </div>`} />
+
+## Code length
+
+The input's `maxlength` sets the number of slots, for example four for a PIN. The `length` option overrides it.
+
+<Example pro code={`<label class="form-label" for="otpPin">PIN</label>
+  <div class="otp otp-connected" data-coreui-otp>
+    <input type="text" class="otp-input" id="otpPin" maxlength="4">
+  </div>`} />
+
+## Groups and separator
+
+Use `data-coreui-groups` to split a code such as `123-456` into groups, and `data-coreui-separator` to change the character between them. The separator is drawn only; the value has no separator. Assistive technology reads the code as one string.
 
 <Example pro code={`<div class="mb-4">
-    <label class="form-label" id="otpNumericOtpDefaultLabel">Numeric OTP (default)</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpNumericOtpDefaultLabel" data-coreui-type="number">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-    </div>
-  </div>
-  <div class="mb-4">
-    <label class="form-label" id="otpTextOtpLabel">Text OTP</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpTextOtpLabel" data-coreui-type="text">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
+    <label class="form-label" for="otpGroups">Verification code</label>
+    <div class="otp otp-connected" data-coreui-otp data-coreui-groups="[3,3]">
+      <input type="text" class="otp-input" id="otpGroups" maxlength="6">
     </div>
   </div>
   <div>
-    <label class="form-label" id="otpMaskedOtpHiddenCharactersLabel">Masked OTP (hidden characters)</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpMaskedOtpHiddenCharactersLabel" data-coreui-masked="true">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
+    <label class="form-label" for="otpGroupsDash">Licence key</label>
+    <div class="otp otp-connected" data-coreui-otp data-coreui-type="alphanumeric" data-coreui-groups="[3,3,3]" data-coreui-separator="-">
+      <input type="text" class="otp-input" id="otpGroupsDash" maxlength="9">
     </div>
+  </div>`} />
+
+## Types
+
+The input accepts digits by default. Set `data-coreui-type="alphanumeric"` to accept letters and digits, or `data-coreui-type="alpha"` to accept letters only. The type sets the default `inputmode` and `pattern` of the input.
+
+<Example pro code={`<label class="form-label" for="otpAlphanumeric">Code</label>
+  <div class="otp otp-connected" data-coreui-otp data-coreui-type="alphanumeric">
+    <input type="text" class="otp-input" id="otpAlphanumeric" maxlength="6">
+  </div>`} />
+
+## Masking
+
+Set `data-coreui-mask="true"` to draw a dot for each character. The input becomes a password field, so the code cannot be copied and assistive technology does not read it out.
+
+<Example pro code={`<label class="form-label" for="otpMasked">PIN</label>
+  <div class="otp otp-connected" data-coreui-otp data-coreui-mask="true">
+    <input type="text" class="otp-input" id="otpMasked" maxlength="4">
   </div>`} />
 
 ## Placeholders
 
-Provide visual hints to users by setting placeholder text for OTP input fields. You can use a single character for all fields or specify different placeholders for each field.
+The input's `placeholder` is drawn in the empty slots: one character repeats in every slot, a longer text gives one character per slot.
 
 <Example pro code={`<div class="mb-4">
-    <label class="form-label" id="otpSingleCharacterPlaceholderLabel">Single character placeholder</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpSingleCharacterPlaceholderLabel" data-coreui-placeholder="0">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-    </div>
-  </div>
-  <div class="mb-4">
-    <label class="form-label" id="otpDifferentPlaceholdersPerFieldLabel">Different placeholders per field</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpDifferentPlaceholdersPerFieldLabel" data-coreui-placeholder="123456">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
+    <label class="form-label" for="otpPlaceholderOne">Single character placeholder</label>
+    <div class="otp" data-coreui-otp>
+      <input type="text" class="otp-input" id="otpPlaceholderOne" maxlength="6" placeholder="0">
     </div>
   </div>
   <div>
-    <label class="form-label" id="otpLetterPlaceholdersLabel">Letter placeholders</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpLetterPlaceholdersLabel" data-coreui-type="text" data-coreui-placeholder="ABCDEF">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
+    <label class="form-label" for="otpPlaceholderEach">Placeholder per slot</label>
+    <div class="otp" data-coreui-otp>
+      <input type="text" class="otp-input" id="otpPlaceholderEach" maxlength="6" placeholder="123456">
     </div>
   </div>`} />
 
 ## Pre-filled values
 
-Set initial values using the `data-coreui-value` attribute.
+The input's `value` fills the slots. Characters the type does not accept are dropped.
 
-<Example pro code={`<label class="form-label" id="otpOtpWithPreFilledLabel">OTP with pre-filled value</label>
-  <div class="form-otp" data-coreui-otp aria-labelledby="otpOtpWithPreFilledLabel" data-coreui-value="123456">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
+<Example pro code={`<label class="form-label" for="otpPrefilled">Verification code</label>
+  <div class="otp" data-coreui-otp>
+    <input type="text" class="otp-input" id="otpPrefilled" maxlength="6" value="123456">
   </div>`} />
 
-## Input modes
+## Paste transformer
 
-Control user input behavior with linear and non-linear modes.
+`pasteTransformer` is a JavaScript option that turns pasted, autofilled or inserted text before the type filter runs, for example to drop a prefix your messages add.
 
-<Example pro code={`<div class="mb-4">
-    <label class="form-label" id="otpLinearModeSequentialInputLabel">Linear mode (sequential input)</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpLinearModeSequentialInputLabel" data-coreui-linear="true">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-    </div>
-  </div>
-  <div>
-    <label class="form-label" id="otpNonLinearModeFreeLabel">Non-linear mode (free navigation)</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpNonLinearModeFreeLabel" data-coreui-linear="false">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-    </div>
-  </div>`} />
+```javascript
+const otp = new coreui.OTPInput(document.querySelector('.otp'), {
+  type: 'alphanumeric',
+  pasteTransformer: text => text.replace(/^Code:\s*/i, '')
+})
+```
 
 ## Auto-submit
 
-Enable automatic form submission when all one-time password fields are completed.
+With `data-coreui-auto-submit="true"` the form is submitted when the user completes a new code, once per code.
 
 <Example pro code={`<form>
-    <label class="form-label" id="otpAutoSubmitOtpLabel">Auto-submit OTP</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpAutoSubmitOtpLabel" data-coreui-auto-submit="true">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
+    <label class="form-label" for="otpAutoSubmit">Verification code</label>
+    <div class="otp" data-coreui-otp data-coreui-auto-submit="true">
+      <input type="text" class="otp-input" id="otpAutoSubmit" name="code" maxlength="6">
     </div>
+    <button class="btn btn-primary mt-3" type="submit">Verify</button>
   </form>`} />
 
-## Custom layouts
+## Sizing
 
-Create custom one-time password layouts with separators and different field counts.
+Use `.otp-sm` or `.otp-lg` to match the small or large form controls.
 
 <Example pro code={`<div class="mb-4">
-    <label class="form-label" id="otp6DigitOtpWithLabel">6-digit OTP with separators</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otp6DigitOtpWithLabel">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <div class="px-3 fg-3 fw-bold">-</div>
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
+    <label class="form-label" for="otpLarge">Large</label>
+    <div class="otp otp-lg" data-coreui-otp>
+      <input type="text" class="otp-input" id="otpLarge" maxlength="6">
     </div>
   </div>
   <div class="mb-4">
-    <label class="form-label" id="otp9DigitOtpWithLabel">9-digit OTP with separators</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otp9DigitOtpWithLabel">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <div class="px-3 fg-3 fw-bold">•</div>
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <div class="px-3 fg-3 fw-bold">•</div>
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
+    <label class="form-label" for="otpDefault">Default</label>
+    <div class="otp" data-coreui-otp>
+      <input type="text" class="otp-input" id="otpDefault" maxlength="6">
     </div>
   </div>
   <div>
-    <label class="form-label" id="otp4DigitPinLabel">4-digit PIN</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otp4DigitPinLabel" data-coreui-masked="true">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-    </div>
-  </div>`} />
-
-## Grouped cells
-
-Wrap cells in `.form-otp-group` to join them into one field: the cells share their borders and only the outer corners keep the radius. One group joins the whole code; several groups split it into segments, spaced by the `--cui-form-otp-gap` of the wrapper.
-
-<Example pro code={`<div class="mb-4">
-    <label class="form-label" id="otp6DigitOtpOneLabel">6-digit OTP, one group</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otp6DigitOtpOneLabel">
-      <div class="form-otp-group">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-      </div>
-    </div>
-  </div>
-  <div>
-    <label class="form-label" id="otp6DigitOtpTwoLabel">6-digit OTP, two groups</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otp6DigitOtpTwoLabel">
-      <div class="form-otp-group">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-      </div>
-      <div class="form-otp-group">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-      </div>
-    </div>
-  </div>`} />
-
-## Sizing variants
-
-One-time password input supports different sizes. You may choose from small, normal (default), and large inputs to match our similarly sized text inputs.  To adjust the size of a component, use `.form-otp-lg` or `.form-otp-sm`.
-
-<Example pro code={`<div class="mb-4">
-    <label class="form-label" id="otpLargeOtpInputLabel">Large OTP input</label>
-    <div class="form-otp form-otp-lg" data-coreui-otp aria-labelledby="otpLargeOtpInputLabel">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-    </div>
-  </div>
-  <div class="mb-4">
-    <label class="form-label" id="otpDefaultOtpInputLabel">Default OTP input</label>
-    <div class="form-otp" data-coreui-otp aria-labelledby="otpDefaultOtpInputLabel">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-    </div>
-  </div>
-  <div>
-    <label class="form-label" id="otpSmallOtpInputLabel">Small OTP input</label>
-    <div class="form-otp form-otp-sm" data-coreui-otp aria-labelledby="otpSmallOtpInputLabel">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
-      <input class="form-otp-control">
+    <label class="form-label" for="otpSmall">Small</label>
+    <div class="otp otp-sm" data-coreui-otp>
+      <input type="text" class="otp-input" id="otpSmall" maxlength="6">
     </div>
   </div>`} />
 
 ## Disabled
 
-Disable the entire one-time password input by adding the `data-coreui-disabled="true"` attribute.
+Add the `disabled` attribute to the input, or call `disable()`.
 
-<Example pro code={`<label class="form-label" id="otpDisabledOtpInputLabel">Disabled OTP input</label>
-  <div class="form-otp" data-coreui-otp aria-labelledby="otpDisabledOtpInputLabel" data-coreui-disabled="true" data-coreui-value="123456">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
+<Example pro code={`<label class="form-label" for="otpDisabled">Verification code</label>
+  <div class="otp otp-connected" data-coreui-otp>
+    <input type="text" class="otp-input" id="otpDisabled" maxlength="6" value="123456" disabled>
   </div>`} />
+
+## Password manager badge
+
+Add `.otp-badge-space` when a password manager draws its badge over the last slot. The class reserves space at the end of the input.
 
 ## Validation
 
-The code is validated as one value, kept in an input laid invisibly over the group. With `data-coreui-required="true"` an empty or incomplete code blocks the submit, and an incomplete code blocks it even when the field is not required; the browser, or the [form plugin](/forms/validation/#usage) in a form with `novalidate`, puts focus on the first empty slot, the browser with its own message over the group. The state shows on the group as `.is-{state}`, which colors every slot and shows the `.invalid-feedback` that follows the group, and while it is `'invalid'` every slot carries `aria-invalid="true"` and is described by that message. Every change of the code sends `input` and `change` from the input that holds the value.
+The code is validated as the value of the input. The plugin gives the input a `pattern` for the full length, so an incomplete code blocks the submit even when the input is not `required`, and with `required` an empty code blocks it as well; set your own `pattern` on the input to replace it. The browser, or the [form plugin](/forms/validation/#usage) in a form with `novalidate`, puts focus on the input. The state shows on the container as `.is-{state}`, which colors every slot and shows the `.invalid-feedback` that follows the container, and while it is `'invalid'` the input carries `aria-invalid="true"` and is described by that message.
 
 <Example pro code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-12">
-      <span class="form-label" id="otpValidationLabel">Verification code</span>
-      <div class="form-otp" data-coreui-otp aria-labelledby="otpValidationLabel" data-coreui-name="code" data-coreui-required="true">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
-        <input class="form-otp-control">
+      <label class="form-label" for="otpValidation">Verification code</label>
+      <div class="otp" data-coreui-otp>
+        <input type="text" class="otp-input" id="otpValidation" name="code" maxlength="6" required>
       </div>
       <div class="invalid-feedback">Enter the six digits we sent you.</div>
     </div>
@@ -321,146 +190,110 @@ The code is validated as one value, kept in an input laid invisibly over the gro
 
 The state comes from three places, in this order:
 
-- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. In the markup, for example from a server that has already checked the code, set it with `data-coreui-validation-state` on the `.form-otp` element.
-- A validation that reports the code invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the group shows it invalid whenever the code is invalid, until a native reset of the form. This holds in a form with `data-coreui-validate`, in a form the form plugin validated, in a form with `novalidate` the stepper validated, and outside a form; in any other form the group shows what a native field shows after a blocked submit, the browser's message and the focus, see [Form components](/forms/validation/#form-components).
-- In a form with `data-coreui-validate`, the `:user-invalid` state of the input that holds the value, and with `data-coreui-validate="valid"` also its `:user-valid` state.
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. In the markup, for example from a server that has already checked the code, set it with `data-coreui-validation-state` on the `.otp` element.
+- A validation that reports the code invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the container shows it invalid whenever the code is invalid, until a native reset of the form. This holds in a form with `data-coreui-validate`, in a form the form plugin validated, in a form with `novalidate` the stepper validated, and outside a form; in any other form the field shows what a native field shows after a blocked submit, the browser's message and the focus, see [Form components](/forms/validation/#form-components).
+- In a form with `data-coreui-validate`, the `:user-invalid` state of the input, and with `data-coreui-validate="valid"` also its `:user-valid` state.
 
-A state you give stays until you change it: the user's changes of the code, a native form reset and your own code with `clear()`, `reset()` or `setValue()` keep it. Every change of the code fires `change.coreui.otp-input`: typing or deleting a character, a paste or an autofill. To clear the state when the user changes the code, call `setValidationState(null)` in a `change.coreui.otp-input` listener. A listener there also clears the state on a native form reset and on `clear()` and `reset()`, which fire `change.coreui.otp-input` when they change the code; `setValue()` fires nothing. To change it, call `setValidationState()`. The component does not read `aria-invalid` or a `.is-invalid` or `.is-valid` class on the group or a slot, at start or later. A state class you write there stays yours: it paints the group or the slot, but the slots get no `aria-invalid` and no linked message, see [Form components](/forms/validation/#form-components). A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the field that carries the code, `form.elements[name]`, as [Form components](/forms/validation/#form-components) shows. A message placed where the stylesheet does not show it for the group can be named in `data-coreui-invalid-feedback` on the `.form-otp` element. A native reset of the form puts back the code the field started with and keeps the state.
+A state you give stays until you change it: the user's changes of the code, a native form reset and your own code with `clear()`, `reset()` or `setValue()` keep it. Every change of the code by the user fires `change.coreui.otp-input`: typing or deleting a character, a paste or an autofill. To clear the state when the user changes the code, call `setValidationState(null)` in a `change.coreui.otp-input` listener. A listener there also clears the state on a native form reset and on `clear()` and `reset()`, which fire `change.coreui.otp-input` when they change the code; `setValue()` fires nothing. To change it, call `setValidationState()`. The component does not read `aria-invalid` or a `.is-invalid` or `.is-valid` class on the container or the input. A state class you write there stays yours: it paints the slots, but the input gets no `aria-invalid` and no linked message, see [Form components](/forms/validation/#form-components). A given state does not block the submit; to stop it on your own verdict, call `setCustomValidity()` on the input, as [Form components](/forms/validation/#form-components) shows. A message placed where the stylesheet does not show it for the container can be named in `data-coreui-invalid-feedback` on the `.otp` element. A native reset of the form puts back the code the input started with and keeps the state.
 
-<Example pro code={`<span class="form-label" id="otpServerLabel">Verification code</span>
-  <div class="form-otp" data-coreui-otp data-coreui-validation-state="invalid" aria-labelledby="otpServerLabel" data-coreui-name="code" data-coreui-value="482910">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
-    <input class="form-otp-control">
+<Example pro code={`<label class="form-label" for="otpServer">Verification code</label>
+  <div class="otp" data-coreui-otp data-coreui-validation-state="invalid">
+    <input type="text" class="otp-input" id="otpServer" name="code" maxlength="6" value="482910">
   </div>
   <div class="invalid-feedback">This code has expired. Request a new one.</div>`} />
 
 ## Accessibility
 
-The one-time password input component is designed with accessibility in mind and follows WCAG guidelines for form inputs.
+The control is one text input, so assistive technology announces one field with one name, role and value. The slots are drawn only and hidden with `aria-hidden`.
 
-- **ARIA Labels**: Each input field automatically receives descriptive `aria-label` attributes
-- **Name**: give the group its name with `aria-labelledby` pointing at the visible label, or with `aria-label`. A `<label for>` reaches the hidden value field, so it moves the focus on click but does not name the slots for assistive technologies.
-- **Label click**: clicking a label that names the field, through `aria-labelledby` or a `<label for>` pointing at the element, moves focus to the first empty slot, as clicking the label of an input focuses it.
-- **Role Attribute**: The container has `role="group"` to indicate related form controls
-- **Required**: with `data-coreui-required="true"`, every slot carries `aria-required="true"`, since the value input that holds `required` is hidden from assistive technologies
-- **Keyboard Navigation**: Full keyboard support with arrow keys, tab, and backspace
-- **Screen Reader Support**: Clear announcements when values change; while the state is `'invalid'`, every slot carries `aria-invalid="true"` and the error message after the group
-- **Description**: an `aria-describedby` on the group moves to the first slot, and to every slot while the state is `'invalid'`, after the ids each slot already has; the group gets it back on dispose
-- **Focus Management**: Automatic focus handling for seamless navigation
-- **Autofill**: only the first field advertises `autocomplete="one-time-code"`, so SMS autofill and password managers target a single field; a code delivered that way is spread across the slots automatically, exactly like a paste
-
-### Customizing accessibility
-
-Each slot is named `Character N of M` by default, next to the name of the group. Pass `ariaControlLabel` to translate it or to name the slots differently. The plugin writes these names on every slot when it starts, over an `aria-label` written on a slot in the markup, so set them through the option.
-
-```javascript
-const otp = new coreui.OTPInput(element, {
-  ariaControlLabel: (index, total) => `Zeichen ${index + 1} von ${total}`
-})
-```
+- **Name**: give the input its name with a `<label for>`, `aria-label` or `aria-labelledby`, and add context with `aria-describedby`.
+- **Autofill and keyboard**: the plugin sets `autocomplete="one-time-code"`, the `inputmode` of the type and turns off autocorrect and autocapitalize, unless the input already has them. Write `autocomplete` and `inputmode` in the markup too, so they work before the plugin starts.
+- **Groups**: the separator is drawn only; assistive technology reads the code as one string.
+- **Masking**: with `mask` the input is a password field, so the characters are not read out and the code cannot be copied.
+- **Verification flow**: give codes a generous expiry ([WCAG 2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable.html)) and do not make users enter a code again that they already gave in the same process ([WCAG 3.3.7 Redundant Entry](https://www.w3.org/WAI/WCAG22/Understanding/redundant-entry.html)).
 
 ### Keyboard support
 
-The one-time password input component provides comprehensive keyboard navigation support:
-
 | Key | Action |
 | --- | --- |
-| <kbd>Arrow Right</kbd> | Move focus to next input field. In a right-to-left layout it moves to the previous one. |
-| <kbd>Arrow Left</kbd> | Move focus to previous input field. In a right-to-left layout it moves to the next one. |
-| <kbd>Backspace</kbd> | Delete current character and move to previous field (if empty) |
-| <kbd>Tab</kbd> | Enter the field on its first slot, or leave it from any slot |
-| <kbd>Shift</kbd> + <kbd>Tab</kbd> | Leave the field backwards from any slot |
-| <kbd>Ctrl</kbd> + <kbd>V</kbd> / <kbd>Cmd</kbd> + <kbd>V</kbd> | Paste clipboard content and auto-fill fields |
+| <kbd>Arrow Right</kbd> / <kbd>Arrow Left</kbd> | Move to the next or the previous slot. In a right-to-left layout they follow the drawn slots. |
+| <kbd>Backspace</kbd> | Delete the character before the caret, or the selected slot |
+| <kbd>Delete</kbd> | Delete the character after the caret, or the selected slot |
+| <kbd>Tab</kbd> | Enter the field on the first empty slot, or leave it |
+| <kbd>Ctrl</kbd> + <kbd>V</kbd> / <kbd>Cmd</kbd> + <kbd>V</kbd> | Paste a code; a complete code replaces the field |
+| <kbd>Ctrl</kbd> + <kbd>Z</kbd> / <kbd>Cmd</kbd> + <kbd>Z</kbd> | Undo typing or a paste |
 
 ## Usage
 
 ### Via data attributes
 
-The simplest way to use the one-time password input is through data attributes. Add `data-coreui-otp` to a container with `.form-otp` class containing `.form-otp-control` inputs.
+Add `data-coreui-otp` to a container with `.otp` that holds a single `<input>`.
 
 ```html
-<div class="form-otp" data-coreui-otp aria-label="Verification code" data-coreui-name="code">
-  <input class="form-otp-control">
-  <input class="form-otp-control">
-  <input class="form-otp-control">
-  <input class="form-otp-control">
-  <input class="form-otp-control">
-  <input class="form-otp-control">
+<div class="otp" data-coreui-otp>
+  <input type="text" class="otp-input" name="code" maxlength="6" aria-label="Verification code">
 </div>
 ```
 
+The container takes exactly one input. Markup with a `.form-otp-control` per character, from earlier versions, throws a `TypeError`; see the [migration guide](/migration/v6/).
+
 ### Via JavaScript
 
-Create one-time password inputs programmatically with JavaScript:
-
 ```javascript
-const otpElement = document.querySelector('.form-otp')
+const otpElement = document.querySelector('.otp')
 const otp = new coreui.OTPInput(otpElement, {
-  name: 'code',
-  type: 'number',
-  autoSubmit: true,
-  linear: true,
-  masked: false
+  type: 'alphanumeric',
+  groups: [3, 3]
 })
 ```
 
 ### Options
 
-Options can be passed via data attributes or JavaScript. For data attributes, append the option name to `data-coreui-`, as in `data-coreui-type="number"`.
+Options can be passed via data attributes or JavaScript. For data attributes, append the option name to `data-coreui-`, as in `data-coreui-type="alpha"`. The input's own attributes give the rest: `name`, `id`, `required`, `disabled`, `readonly`, `placeholder`, `value` and `maxlength`.
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `ariaControlLabel` | function | `(index, total) => Character ${index + 1} of ${total}` | Function to generate aria-label for each input field. Receives current index (0-based) and total number of inputs |
-| `autoSubmit` | boolean | `false` | Automatically submit the form when all OTP fields are filled |
-| `disabled` | boolean | `false` | Disable all OTP input fields |
-| `id` | string, null | `null` | ID attribute for the value input |
-| `linear` | boolean | `true` | Enforce sequential input (users must fill fields in order) |
-| `masked` | boolean | `false` | Show input as password (masked characters) |
-| `name` | string, null | `null` | Name of the value input the code is submitted under. Without it the code is not submitted with the form. |
-| `placeholder` | number, string, null | `null` | Placeholder text for input fields. Single character applies to all fields, longer strings apply character-by-character |
-| `required` | boolean | `false` | Makes the code required: an empty or incomplete code blocks the submit. |
-| `type` | string | `'number'` | Input validation type: 'number' for digits only, or any other string for free text |
+| `autoSubmit` | boolean | `false` | Submits the form when the user completes a new code. |
+| `groups` | array, null | `null` | Group sizes that get a separator between them, such as `[3, 3]`. |
+| `length` | number, null | `null` | Number of slots. With `null` it is read from the input's `maxlength`, and six without one. |
+| `mask` | boolean | `false` | Draws a dot (`•`) for each character and makes the input a password field. |
+| `pasteTransformer` | function, null | `null` | Turns pasted, autofilled or inserted text before the type filter runs. |
+| `separator` | string | `'·'` | Character drawn between groups. |
+| `type` | string | `'numeric'` | Accepted characters: `'numeric'`, `'alphanumeric'` or `'alpha'`. Any other value throws a `TypeError`. |
 | `validationState` | string, null | `null` | The state the code shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` does not block the submit. It stays until you change it. See [Validation](#validation). |
-| `value` | string, number, null | `null` | Value the slots start with. Characters the `type` does not accept are dropped, the same way typing and pasting drop them. |
 
 ### Methods
 
 | Method | Description |
 | --- | --- |
-| `clear` | Clear all OTP input fields |
-| `reset` | Puts back the code the input started with, its `value` or the code in the markup, as a native form reset does. |
-| `disable()` | Disables the field. |
-| `enable()` | Enables the field. |
+| `clear()` | Clears the code. |
+| `disable()` | Disables the input. |
+| `dispose()` | Removes the drawn slots and the `inputmode`, `pattern`, `autocorrect`, `autocapitalize` and `spellcheck` the plugin added to an input that had none, and destroys the instance. The input keeps its `maxlength`, `autocomplete` and type. |
+| `enable()` | Enables the input. |
+| `focus()` | Focuses the input on the first empty slot. |
+| `getValue()` | Returns the code. |
+| `reset()` | Puts back the code the input started with, as a native form reset does. |
 | `setValidationState(state)` | Gives the field a validation state (`'valid'`, `'invalid'` or a state added to `$form-validation-states`), or drops it with `null`. The value stays. See [Validation](#validation). |
-| `setValue(value)` | Sets the code. The slots show that value, cleared where it does not reach, and characters the `type` does not accept are dropped; the slots keep their attributes and the focus, and it fires no event. The slots are read when the field starts: to add or remove one, dispose the instance and create a new one. |
+| `setValue(value)` | Sets the code; characters the type does not accept are dropped. It fires no event. |
 
 ```javascript
-const otp = coreui.OTPInput.getInstance(document.querySelector('.form-otp'))
-otp.clear() // Clear all fields
-otp.reset() // Reset to initial value
-otp.setValue('123456') // Set the code
+const otp = coreui.OTPInput.getInstance(document.querySelector('.otp'))
+otp.setValue('123456')
+otp.clear()
 ```
 
 ### Events
 
+Treat codes as credentials: keep event values out of logs and analytics.
+
 | Event | Description |
 | --- | --- |
-| `change.coreui.otp-input` | Fired when the code changes: typing, a paste, `clear()`, `reset()` or a native form reset, together with the native `input` and `change` of the hidden field. A call that leaves the code as it was, and `setValue()`, do not fire it. |
-| `complete.coreui.otp-input` | Fired when all OTP fields are filled |
+| `change.coreui.otp-input` | Fired when the user changes the code, and when `clear()`, `reset()` or a native form reset change it. `setValue()` does not fire it. The event's `value` holds the code. |
+| `complete.coreui.otp-input` | Fired when the user completes a new code. The event's `value` holds the code. A reset, `clear()`, `reset()` and `setValue()` do not fire it. |
 
 ```javascript
-document.addEventListener('change.coreui.otp-input', event => {
-  // eslint-disable-next-line no-console
-  console.log('OTP value changed:', event.value)
-})
-
-document.addEventListener('complete.coreui.otp-input', event => {
-  // eslint-disable-next-line no-console
-  console.log('OTP completed:', event.value)
+document.querySelector('.otp').addEventListener('complete.coreui.otp-input', event => {
+  verifyCode(event.value)
 })
 ```
 
@@ -468,14 +301,10 @@ document.addEventListener('complete.coreui.otp-input', event => {
 
 ### CSS variables
 
-Each cell is an input, so it carries the shared `--cui-control-*` tokens on `.form-otp-control` itself. Override them on a single OTP input to restyle just that one; to restyle every text control at once, set the `--cui-btn-input-*` frame on `:root` instead.
+<ScssDocs file="scss/forms/_otp-input.scss" capture="otp-tokens" />
 
-<ScssDocs file="scss/forms/_otp-input.scss" capture="form-otp-control-tokens" />
+### Sass lists
 
-<ScssDocs file="scss/forms/_otp-input.scss" capture="form-otp-tokens" />
+The sizes follow the `--cui-btn-input-*` sizes of the form controls. Add a name to the list to add a size that reads `--cui-btn-input-{size}-min-height` and `--cui-btn-input-{size}-font-size`.
 
-### Sass maps
-
-Each size is one entry, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
-
-<ScssDocs file="scss/forms/_otp-input.scss" capture="form-otp-sizes" />
+<ScssDocs file="scss/forms/_otp-input.scss" capture="otp-sizes" />

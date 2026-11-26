@@ -585,9 +585,8 @@ and a language that puts the number last cannot be served at all.
 `data-coreui-selected-label`: `{count}` and `{total}` are replaced in it, so
 markup-only pages keep a translatable counter.
 
-The argument order matches the two function options the library already ships —
-`Rating.ariaItemLabel(value, itemCount)` and `OTPInput.ariaControlLabel(index, total)`
-(both `ariaLabel` in v5).
+The argument order matches the function option the library already ships,
+`Rating.ariaItemLabel(value, itemCount)` (`ariaLabel` in v5).
 `total` is passed everywhere, including the two components whose default text
 ignores it, so one function can serve all four.
 
@@ -2811,8 +2810,7 @@ field behind that kept submitting.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
   **The range slider's `ariaLabels` option is `ariaThumbLabel`.** It takes an
   array with one name per thumb, as before, a comma-separated string, or a
-  function `(index, total) => string`, the shape the OTP input uses for
-  `ariaControlLabel`; `data-coreui-aria-labels` becomes
+  function `(index, total) => string`; `data-coreui-aria-labels` becomes
   `data-coreui-aria-thumb-label`. The name follows the `--cui-range-thumb-*`
   tokens, and `aria-label` on the slider element stays the name of the group.
 - **The range slider element is a group named after the field.** The
@@ -3066,75 +3064,72 @@ field behind that kept submitting.
 
 #### OTP input
 
+- <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
+  **The field is one `<input>` drawn as slots.** The `.form-otp` wrapper with a
+  `.form-otp-control` input per character is replaced by a `.otp` container
+  that holds a single `<input class="otp-input">`; the plugin lays the input
+  transparently over the slots it draws (`.otp-slot`, hidden from assistive
+  technology). Assistive technology announces one field with one name and one
+  value, typing, selection, undo and paste are the browser's own, and SMS
+  autofill and password managers fill one ordinary field. Markup with
+  `.form-otp-control` inputs, or a container with more than one input, throws a
+  `TypeError` instead of turning the first slot into the field.
+
+  ```html
+  <!-- v5 -->
+  <div class="form-otp" data-coreui-otp aria-labelledby="codeLabel" data-coreui-name="code">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+  </div>
+
+  <!-- v6 -->
+  <label for="code">Verification code</label>
+  <div class="otp" data-coreui-otp>
+    <input type="text" class="otp-input" id="code" name="code" maxlength="4">
+  </div>
+  ```
 - **The plugin is enabled with a bare `data-coreui-otp`.** `data-coreui-toggle="otp"`
-  no longer initialises anything. The toggle attribute marks a control the user
-  activates — a button, a link, an input that opens a panel — and the OTP field
-  is none of those: it is a wrapper the plugin builds its slots inside. Chip
-  Input, Multi Select and the masked date and time fields already read that way.
-- **A code delivered by SMS autofill or a password manager now fills the whole
-  field.** Only the first slot carries `autocomplete="one-time-code"` (the rest
-  are `off`), and a multi-character value arriving in any slot is spread across
-  the field, as a paste already was. Previously such a value stayed in one slot
-  and the submitted value was empty. The slots also gained `enterkeyhint`,
-  `autocorrect="off"` and `spellcheck="false"`.
+  no longer initialises anything.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **Only the hidden input carries the field's `name`.** Each visible slot was
-  given `<name>-<index>` on top of it, so a six-slot field submitted seven
-  keys where the option is documented as the name of the hidden input. The
-  slots are unnamed now, and a `name` or an `id` written on a slot in the
-  markup is left alone instead of being overwritten. The hidden input carries
-  whatever the slots show, so slots rendered with their own `value` attributes
-  are submitted as well, which they were not before.
-- **In a right-to-left field, `linear` now holds the forward move rather than
-  the `ArrowRight` key.** Forward is `ArrowLeft` when the field reads
-  right-to-left, so that is the key a linear field stops on an empty slot,
-  and `ArrowRight` walks back freely. Previously the guard was attached to the
-  key name, which let the caret jump ahead over empty slots in RTL and refused
-  to walk back.
-- **The field is a single tab stop.** <kbd>Tab</kbd> enters it on the first slot
-  and leaves it from any slot; <kbd>Shift</kbd>+<kbd>Tab</kbd> leaves it
-  backwards in one press. Previously every filled slot was a stop of its own,
-  and with `linear: false` every slot was, so getting past a six-digit code took
-  up to six presses. The arrow keys move between the slots, as before.
-- **Slots are named `Character N of M` by default**, not `Digit N of M`, since a
-  code with `data-coreui-type="text"` holds letters as well. Tests that find a
-  slot by its name, such as `getByLabelText('Digit 1 of 6')`, need the new name,
-  or pass `` ariaControlLabel: (index, total) => `Digit ${index + 1} of ${total}` `` to
-  keep the old one.
+  **The input carries the form attributes.** `name`, `id`, `required`,
+  `disabled`, `readonly`, `placeholder` and the starting `value` are attributes
+  of the input, and its `maxlength` sets the number of slots; the `name`, `id`,
+  `required`, `disabled`, `placeholder` and `value` options are gone. The name
+  goes on the input as well: a `<label for>`, `aria-label` or `aria-labelledby`
+  on the input, where an `aria-labelledby` on `.form-otp` used to name the group.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **`ariaLabel` is renamed `ariaControlLabel`.** The option names each slot, the
-  `.form-otp-control`, not the field, and on the `.form-otp` element
-  `aria-label` is the name of the group.
+  **Types are `'numeric'`, `'alphanumeric'` and `'alpha'`.** `'number'` becomes
+  `'numeric'`. `'text'`, which took any character, has no successor; use
+  `'alphanumeric'`, or `pasteTransformer` to clean a pasted code. Any other type
+  throws a `TypeError`.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **The code is validated as one value.** It moved from an
-  `<input type="hidden">`, which the browser leaves out of validation, to a
-  text input laid invisibly over the group, with `tabindex="-1"` and
-  `aria-hidden="true"`, a `pattern` for the full length of the code and the
-  `required` that the slots used to carry. A `required` code that is empty or
-  incomplete stops the submit, so does an incomplete code that is not
-  required, and the browser puts focus on the first empty slot with its own
-  message over the group. Once a validation reports the code in a form with
-  `data-coreui-validate`, one the form plugin validated or one with
-  `novalidate` the stepper validated, the group gets `.is-invalid` and every slot carries `aria-invalid="true"` and is described
-  by the message after the group while the code stays invalid. The stylesheet
-  colors every slot and shows that message, which it never did for a slot
-  marked invalid. Code that selects `input[type="hidden"]` inside the field
-  needs `.form-otp > input:not(.form-otp-control)`, a slot no longer gets
-  `required`, and a `data-coreui-invalid-feedback` written on the slots goes
-  on the `.form-otp` element.
-- **The code takes a validation state.** The new `validationState` option
-  (`data-coreui-validation-state` on the `.form-otp` element) shows the state
-  on the group and the slots, and `'invalid'` does not block the submit. An
-  `.is-invalid` or `.is-valid` class on the `.form-otp` element or on a slot is
-  not read and stays as you wrote it. The state stays until `setValidationState()` changes
-  it, and a native form reset puts back the
-  code the field started with. A change of the code sends `input` and `change`
-  from the input that holds the value.
+  **`masked` is renamed `mask`.** The input becomes a password field, so the code
+  cannot be copied and is not read out.
 - <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
-  **The `readonly` option is removed, and every slot is editable.** A code the
-  user cannot type has no use in a form, so `data-coreui-readonly`,
-  `{ readonly: true }` and a `readonly` written on a slot no longer make it
-  read-only; use `disabled` to show a code the user cannot change.
+  **`ariaControlLabel` and `linear` are removed.** There are no per-character
+  fields to name, and one input never lets the caret go past the first empty
+  slot.
+- **New options `length`, `groups`, `separator` and `pasteTransformer`**, and
+  new classes `.otp-connected`, `.otp-sm`, `.otp-lg` and `.otp-badge-space`.
+  `.form-otp-group`, `.form-otp-sm` and `.form-otp-lg` are gone.
+- **A code inserted at once replaces the field.** A complete code pasted,
+  autofilled or inserted replaces what is there, and whitespace and characters
+  the type does not accept are dropped before the length is applied, so
+  `123 456` typed in one go gives `123456`.
+- **`change.coreui.otp-input` reports what the user and a reset do;
+  `complete.coreui.otp-input` only what the user does.** A native form reset,
+  `clear()` and `reset()` fire `change` when they change the code and never
+  `complete` or the auto-submit; `setValue()` fires nothing.
+- **The code is validated as the input's value.** The plugin writes a `pattern`
+  for the full length, so an incomplete code stops the submit even when the
+  input is not `required`. The state (`validationState`,
+  `data-coreui-validation-state` on the `.otp` element, or a reported
+  validation) shows on the `.otp` container as `.is-{state}`, and while it is
+  `'invalid'` the input carries `aria-invalid="true"` and is described by the
+  message after the container. A `data-coreui-invalid-feedback` written on the
+  `.form-otp` element goes on the `.otp` element.
 
 #### Rating
 
@@ -4961,33 +4956,15 @@ editing four blocks. It is a map of maps now — one name, eight slots.
   `--cui-theme-focus-ring`; the emphasis text reaches them as
   `--cui-theme-fg-emphasis`.
 
-#### The OTP input defaults to the shared frame
+#### The OTP input draws its slots
 
-Twenty-five `$form-otp-control-*` variables were one-to-one aliases of the
-`$input-*` family — `$form-otp-control-bg: $input-bg` and so on down to the
-focus ring. They now default to the `--cui-btn-input-*` tokens on `:root`
-instead, so the cell picks up a runtime restyle of the text controls without
-going through a second Sass tier. The variables themselves stay, and so does
-every rendered value.
-
-One consequence for Sass customization: setting `$input-bg` (or another
-`$input-*` knob) no longer reaches the OTP cell, because the cell now reads the
-root token rather than that variable. Restyle the whole family through the
-`--cui-btn-input-*` tokens, or set the matching `$form-otp-control-*` variable
-alongside it.
-
-#### The OTP cell is a `.form-control` frame
-
-`.form-otp-control` now declares the whole `$form-control-tokens` map and
-renders through the same `form-control-frame()` mixin as `.form-control`, so
-a change to the text-control frame reaches the cell without a second copy.
-The nineteen `$form-otp-control-*` variables that only re-pointed a
-`--cui-btn-input-*` token (`$form-otp-control-bg`, `-font-size`,
-`-focus-ring` and the rest) are gone with it; what remains is what the cell
-sets differently — `$form-otp-control-width`, `$form-otp-control-padding-x`
-and the size trios. Rendered values are unchanged. To restyle one cell set
-the `--cui-control-*` token on it; to restyle the family, the
-`--cui-btn-input-*` token on `:root`.
+The `.form-otp-control` cell and its tokens are gone with the per-character
+inputs. The drawn slots read the `--cui-otp-*` tokens on `.otp`
+(`--cui-otp-size`, `--cui-otp-font-size`, `--cui-otp-gap` and the
+`--cui-otp-slot-*` colors, border and radius), which default to the
+`--cui-btn-input-*` frame, and the sizes are the `$otp-sizes` list. The
+`$form-otp-tokens`, `$form-otp-control-tokens` and `$form-otp-sizes` maps are
+replaced by `$otp-tokens` and `$otp-sizes`.
 
 #### The input frame is complete on `:root`
 
@@ -5025,8 +5002,7 @@ field meant restating the property list. It splits into
 `--cui-control-transition-property`, `-duration` and `-timing`, and the rules
 set the three `transition-*` longhands. `$input-transition` splits the same way,
 and so do the components that derived from it — `$chip-input-transition`,
-`$search-button-transition`, `$form-otp-control-transition`,
-`$accordion-transition`, `$btn-transition`.
+`$search-button-transition`, `$accordion-transition`, `$btn-transition`.
 
 The floating label follows the same rule: `--cui-form-floating-transition` and
 `$form-floating-transition` are replaced by
