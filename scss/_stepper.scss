@@ -47,6 +47,7 @@ $stepper-tokens: defaults(
     --#{$prefix}stepper-step-connector-complete-bg: var(--#{$prefix}primary-base),
     --#{$prefix}stepper-step-connector-transition: background-color .15s ease-in-out,
     --#{$prefix}stepper-step-content-transition: height .3s ease-in-out,
+    --#{$prefix}stepper-actions-gap: .5rem,
   ),
   $stepper-tokens
 );
@@ -183,6 +184,12 @@ $stepper-tokens: defaults(
 
   .stepper-pane:not(.show) {
     display: none;
+  }
+
+  .stepper-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--#{$prefix}stepper-actions-gap);
   }
 
   .stepper-vertical {

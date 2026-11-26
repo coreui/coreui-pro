@@ -730,7 +730,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'When a step form with novalidate fails validation, focus moves to the first invalid field and its error message is added to that field\'s aria-describedby, so it is read with the field; when focus cannot move there, the message is announced in a polite live region. Without novalidate the browser shows its own validation message. A step change made while focus is inside the stepper moves focus to the new step button.'
+        note: 'When a step form with novalidate fails validation, focus moves to the first invalid field and its error message is added to that field\'s aria-describedby, so it is read with the field; when focus cannot move there, the message is announced in a polite live region. Without novalidate the browser shows its own validation message. A step change moves focus to the new step button when it takes focus away: focus was in the pane or step content being closed or on a step button, or the focused button was hidden, disabled or removed. A button that stays visible keeps focus.'
       }
     ]
   },

@@ -946,6 +946,25 @@ describe('Stepper', () => {
   })
 
   describe('finish()', () => {
+    it('should not move focus and leave every step button disabled', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = [...fixtureEl.querySelectorAll('.stepper-step-button')]
+      const action = document.createElement('button')
+      fixtureEl.querySelector('#step3').append(action)
+      const focusSpies = [...buttons, stepperElement].map(element => spyOn(element, 'focus'))
+
+      action.focus()
+      stepper.finish()
+
+      for (const focusSpy of focusSpies) {
+        expect(focusSpy).not.toHaveBeenCalled()
+      }
+
+      expect(buttons.every(button => button.disabled)).toBeTrue()
+    })
+
     it('should finish on the last step', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 3 })
@@ -1262,11 +1281,10 @@ describe('Stepper', () => {
       expect(document.activeElement).toEqual(buttons[1])
     })
 
-    it('should move focus to the first step when reset after finish from inside the stepper', () => {
+    it('should leave focus on a visible button in the stepper when reset after finish', () => {
       fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
       const stepperElement = fixtureEl.querySelector('.stepper')
       const stepper = new Stepper(stepperElement)
-      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
       const trigger = document.createElement('button')
       stepperElement.append(trigger)
 
@@ -1275,7 +1293,7 @@ describe('Stepper', () => {
       trigger.focus()
       stepper.reset()
 
-      expect(document.activeElement).toEqual(buttons[0])
+      expect(document.activeElement).toEqual(trigger)
     })
 
     it('should leave focus where it is when reset from outside', () => {
@@ -1290,6 +1308,102 @@ describe('Stepper', () => {
 
       expect(fixtureEl.querySelectorAll('.stepper-step-button')[0]).toHaveClass('active')
       expect(document.activeElement).toEqual(outside)
+    })
+
+    for (const [gone, hide] of [
+      ['hides', button => {
+        button.hidden = true
+      }],
+      ['hides the wrapper of', button => {
+        button.parentElement.hidden = true
+      }],
+      ['removes', button => {
+        button.remove()
+      }]
+    ]) {
+      it(`should move focus to the initial step when the reset handler ${gone} the focused button outside`, () => {
+        fixtureEl.innerHTML = `${getThreeStepFixture({ linear: false, activeStep: 2 })}<div><button type="button" id="outside">Reset</button></div>`
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement)
+        const outside = fixtureEl.querySelector('#outside')
+
+        stepperElement.addEventListener('reset.coreui.stepper', () => hide(outside))
+        stepper.showStep(3)
+        outside.focus()
+        stepper.reset()
+
+        expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[1])
+      })
+    }
+
+    it('should leave focus where the reset handler moved it after hiding the focused button', () => {
+      fixtureEl.innerHTML = `${getThreeStepFixture({ linear: false })}<button type="button" id="outside">Reset</button><p id="message" tabindex="-1">Start again</p>`
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const outside = fixtureEl.querySelector('#outside')
+      const message = fixtureEl.querySelector('#message')
+
+      stepperElement.addEventListener('reset.coreui.stepper', () => {
+        outside.hidden = true
+        message.focus()
+      })
+      stepper.showStep(3)
+      outside.focus()
+      stepper.reset()
+
+      expect(document.activeElement).toEqual(message)
+    })
+
+    it('should move focus to the initial step inside a shadow root when the reset handler hides the focused button', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const shadowRoot = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = `${getThreeStepFixture({ linear: false })}<button type="button" id="outside">Reset</button>`
+      const stepperElement = shadowRoot.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const outside = shadowRoot.querySelector('#outside')
+
+      stepperElement.addEventListener('reset.coreui.stepper', () => {
+        outside.hidden = true
+      })
+      stepper.showStep(3)
+      outside.focus()
+      stepper.reset()
+
+      expect(shadowRoot.activeElement).toEqual(shadowRoot.querySelectorAll('.stepper-step-button')[0])
+    })
+
+    it('should leave focus where the reset handler moved it outside the shadow root', () => {
+      fixtureEl.innerHTML = '<div></div><p id="message" tabindex="-1">Start again</p>'
+      const shadowRoot = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = `${getThreeStepFixture({ linear: false })}<button type="button" id="outside">Reset</button>`
+      const stepperElement = shadowRoot.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const outside = shadowRoot.querySelector('#outside')
+      const message = fixtureEl.querySelector('#message')
+
+      stepperElement.addEventListener('reset.coreui.stepper', () => {
+        outside.hidden = true
+        message.focus()
+      })
+      stepper.showStep(3)
+      outside.focus()
+      stepper.reset()
+
+      expect(document.activeElement).toEqual(message)
+    })
+
+    it('should leave focus on the body when nothing held it before reset', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const focusSpy = spyOn(fixtureEl.querySelectorAll('.stepper-step-button')[0], 'focus')
+
+      stepper.showStep(3)
+      document.activeElement.blur()
+      stepper.reset()
+
+      expect(document.activeElement).toEqual(document.body)
+      expect(focusSpy).not.toHaveBeenCalled()
     })
 
     it('should reset to initial state', () => {
@@ -4225,6 +4339,615 @@ describe('Stepper', () => {
       // Whitespace-only text node should not be wrapped
       const textWrapper = fixtureEl.querySelector('.stepper-step-indicator-text')
       expect(textWrapper).toBeNull()
+    })
+  })
+
+  describe('stepChanged', () => {
+    const wait = () => new Promise(resolve => {
+      setTimeout(resolve, 50)
+    })
+
+    it('should fire stepChanged once with the 1-based index after the step changes', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+      const seen = []
+
+      stepperElement.addEventListener('stepChanged.coreui.stepper', event => {
+        seen.push([event.index, buttons[event.index - 1].classList.contains('active'), buttons[event.index - 1].getAttribute('aria-selected')])
+      })
+      stepper.next()
+      stepper.prev()
+      stepper.showStep(3)
+      buttons[1].click()
+
+      expect(seen).toEqual([[2, true, 'true'], [1, true, 'true'], [3, true, 'true'], [2, true, 'true']])
+    })
+
+    it('should fire stepChange before the change and stepChanged after it', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const button = fixtureEl.querySelectorAll('.stepper-step-button')[1]
+      const seen = []
+
+      stepperElement.addEventListener('stepChange.coreui.stepper', () => seen.push(['stepChange', button.classList.contains('active')]))
+      stepperElement.addEventListener('stepChanged.coreui.stepper', () => seen.push(['stepChanged', button.classList.contains('active')]))
+      stepper.next()
+
+      expect(seen).toEqual([['stepChange', false], ['stepChanged', true]])
+    })
+
+    it('should not fire stepChanged for the active step, at start, on finish() or on update()', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false, activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const spy = jasmine.createSpy('stepChanged')
+      stepperElement.addEventListener('stepChanged.coreui.stepper', spy)
+      const stepper = new Stepper(stepperElement)
+
+      stepper.showStep(3)
+      stepper.update()
+      stepper.finish()
+
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should fire stepChange, reset and stepChanged in this order when reset changes the step', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const seen = []
+
+      stepper.showStep(3)
+      for (const name of ['stepChange', 'reset', 'stepChanged']) {
+        stepperElement.addEventListener(`${name}.coreui.stepper`, event => seen.push([name, event.index]))
+      }
+
+      stepper.reset()
+
+      expect(seen).toEqual([['stepChange', 1], ['reset', undefined], ['stepChanged', 1]])
+    })
+
+    it('should fire neither stepChange nor stepChanged when reset changes nothing', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const spy = jasmine.createSpy('step events')
+      stepperElement.addEventListener('stepChange.coreui.stepper', spy)
+      stepperElement.addEventListener('stepChanged.coreui.stepper', spy)
+
+      stepper.reset()
+
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should fire stepChanged when reset follows finish() and the start step is the last one', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false, activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const spy = jasmine.createSpy('stepChanged')
+      stepperElement.addEventListener('stepChanged.coreui.stepper', spy)
+
+      stepper.finish()
+      stepper.reset()
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should give stepChange and stepChanged the number of the start step when reset changes the step', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false, activeStep: 2 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const seen = []
+
+      stepper.showStep(3)
+      for (const name of ['stepChange', 'stepChanged']) {
+        stepperElement.addEventListener(`${name}.coreui.stepper`, event => seen.push([name, event.index]))
+      }
+
+      stepper.reset()
+
+      expect(seen).toEqual([['stepChange', 2], ['stepChanged', 2]])
+    })
+
+    it('should not fire stepChange at start, on update() or on finish()', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false, activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const spy = jasmine.createSpy('stepChange')
+      stepperElement.addEventListener('stepChange.coreui.stepper', spy)
+      const stepper = new Stepper(stepperElement)
+
+      stepper.update()
+      stepper.finish()
+
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should fire stepChanged after the content of the new step has expanded in the vertical layout', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const spy = jasmine.createSpy('stepChanged')
+      stepperElement.addEventListener('stepChanged.coreui.stepper', spy)
+
+      stepper.next()
+
+      expect(spy).not.toHaveBeenCalled()
+
+      await wait()
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should fire one stepChanged for the step that stays after a second change during the expansion', async () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement, { linear: false })
+      const seen = []
+      stepperElement.addEventListener('stepChanged.coreui.stepper', event => seen.push(event.index))
+
+      stepper.next()
+      stepper.next()
+      await wait()
+
+      expect(seen).toEqual([3])
+    })
+  })
+
+  describe('focus after a step change', () => {
+    it('should leave focus on a button that stays visible in the stepper', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      stepperElement.append(action)
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(action)
+    })
+
+    it('should move focus to the active step button when the stepChanged handler hides the focused button', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      stepperElement.append(action)
+      stepperElement.addEventListener('stepChanged.coreui.stepper', () => {
+        action.hidden = true
+      })
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[1])
+    })
+
+    it('should move focus to the active step button when the stepChanged handler disables the focused button', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      stepperElement.append(action)
+      stepperElement.addEventListener('stepChanged.coreui.stepper', () => {
+        action.disabled = true
+      })
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[1])
+    })
+
+    it('should move focus to the active step button when the stepChange handler hides the focused button', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      stepperElement.append(action)
+      stepperElement.addEventListener('stepChange.coreui.stepper', () => {
+        action.hidden = true
+        action.blur()
+      })
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[1])
+    })
+
+    it('should move focus to the active step button when the reset handler hides the focused button and the step stays', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      stepperElement.append(action)
+      stepperElement.addEventListener('reset.coreui.stepper', () => {
+        action.hidden = true
+      })
+
+      action.focus()
+      stepper.reset()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[0])
+    })
+
+    it('should move focus to the new step button when focus was on a step button', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      buttons[0].focus()
+      stepper.showStep(3)
+
+      expect(document.activeElement).toEqual(buttons[2])
+    })
+
+    it('should leave focus in the pane of the start step when reset changes nothing', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const action = document.createElement('button')
+      fixtureEl.querySelector('#step1').append(action)
+
+      action.focus()
+      stepper.reset()
+
+      expect(document.activeElement).toEqual(action)
+    })
+
+    it('should move focus to the start step button on reset when focus was on a step button', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+      stepper.showStep(3)
+
+      buttons[2].focus()
+      stepper.reset()
+
+      expect(document.activeElement).toEqual(buttons[0])
+    })
+
+    it('should move focus once, to where the stepChanged handler moved it, when focus was in the closed pane', () => {
+      fixtureEl.innerHTML = `${getThreeStepFixture({ linear: false })}<p id="heading" tabindex="-1">Step two</p>`
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      fixtureEl.querySelector('#step1').append(action)
+      const heading = fixtureEl.querySelector('#heading')
+      const stepButtonFocus = jasmine.createSpy('focus')
+      fixtureEl.querySelectorAll('.stepper-step-button')[1].addEventListener('focus', stepButtonFocus)
+      stepperElement.addEventListener('stepChanged.coreui.stepper', () => heading.focus())
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(heading)
+      expect(stepButtonFocus).not.toHaveBeenCalled()
+    })
+
+    it('should move focus to the active step button when focus fell to the body in a stepChanged handler', () => {
+      fixtureEl.innerHTML = getThreeStepFixture({ linear: false })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      stepperElement.append(action)
+      stepperElement.addEventListener('stepChanged.coreui.stepper', () => {
+        action.inert = true
+        action.blur()
+      })
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[1])
+    })
+
+    it('should move focus to the step a stepChanged handler moves on to', () => {
+      fixtureEl.innerHTML = `<style>.stepper-pane:not(.show) { display: none; }</style>${getThreeStepFixture({ linear: false })}`
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      fixtureEl.querySelector('#step1').append(action)
+      stepperElement.addEventListener('stepChanged.coreui.stepper', event => {
+        if (event.index === 2) {
+          stepper.next()
+        }
+      })
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[2])
+    })
+
+    it('should leave focus where the stepChanged handler moved it', () => {
+      fixtureEl.innerHTML = `${getThreeStepFixture({ linear: false })}<p id="heading" tabindex="-1">Step two</p>`
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      fixtureEl.querySelector('#step1').append(action)
+      const heading = fixtureEl.querySelector('#heading')
+      stepperElement.addEventListener('stepChanged.coreui.stepper', () => {
+        action.remove()
+        heading.focus()
+      })
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(heading)
+    })
+
+    it('should leave focus where the stepChange handler moved it to a usable element', () => {
+      fixtureEl.innerHTML = `${getThreeStepFixture({ linear: false })}<button type="button" id="outside">Outside</button>`
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      stepperElement.append(action)
+      const outside = fixtureEl.querySelector('#outside')
+      stepperElement.addEventListener('stepChange.coreui.stepper', () => {
+        outside.focus()
+        action.hidden = true
+      })
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(outside)
+    })
+  })
+
+  describe('.stepper-actions', () => {
+    const getActionsFixture = (options = {}) => getThreeStepFixture(options).replace(/<\/div>\s*$/, `
+        <div class="stepper-actions">
+          <button type="button" data-coreui-stepper-action="prev">Previous</button>
+          <button type="button" data-coreui-stepper-action="next">Next</button>
+          <button type="button" data-coreui-stepper-action="finish">Finish</button>
+        </div>
+      </div>
+    `)
+    const action = name => fixtureEl.querySelector(`.stepper-actions [data-coreui-stepper-action="${name}"]`)
+
+    it('should disable prev on the first step and show next, not finish', () => {
+      fixtureEl.innerHTML = getActionsFixture()
+      // eslint-disable-next-line no-new
+      new Stepper(fixtureEl.querySelector('.stepper'))
+
+      expect(action('prev').disabled).toBeTrue()
+      expect(action('next').hidden).toBeFalse()
+      expect(action('finish').hidden).toBeTrue()
+    })
+
+    it('should hide next and show finish on the last step', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.showStep(3)
+
+      expect(action('prev').disabled).toBeFalse()
+      expect(action('next').hidden).toBeTrue()
+      expect(action('finish').hidden).toBeFalse()
+      expect(action('finish').disabled).toBeFalse()
+    })
+
+    it('should count a step button with .disabled out when it picks the last step', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false })
+      fixtureEl.querySelectorAll('.stepper-step-button')[2].classList.add('disabled')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.showStep(2)
+
+      expect(action('next').hidden).toBeTrue()
+      expect(action('finish').hidden).toBeFalse()
+    })
+
+    it('should hide the actions after finish() and show them again after reset()', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const actions = fixtureEl.querySelector('.stepper-actions')
+
+      stepper.showStep(3)
+      stepper.finish()
+
+      expect(actions.hidden).toBeTrue()
+
+      stepper.reset()
+
+      expect(actions.hidden).toBeFalse()
+      expect(action('next').hidden).toBeFalse()
+    })
+
+    it('should recompute the actions on update()', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false, activeStep: 3 })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const step = document.createElement('li')
+      step.className = 'stepper-step'
+      step.innerHTML = '<button type="button" class="stepper-step-button" data-coreui-target="#step4">4</button>'
+      fixtureEl.querySelector('.stepper-steps').append(step)
+
+      stepper.update()
+
+      expect(action('next').hidden).toBeFalse()
+      expect(action('finish').hidden).toBeTrue()
+    })
+
+    it('should rewrite the state of the actions on every step change', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      action('next').hidden = true
+      stepper.next()
+
+      expect(action('next').hidden).toBeFalse()
+    })
+
+    it('should leave the action buttons in the panes as they are', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false })
+      const paneAction = document.createElement('button')
+      paneAction.dataset.coreuiStepperAction = 'next'
+      fixtureEl.querySelector('#step3').append(paneAction)
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.showStep(3)
+
+      expect(paneAction.hidden).toBeFalse()
+    })
+
+    it('should move focus to finish when the focused next hides on the last step', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false, activeStep: 2 })
+      // eslint-disable-next-line no-new
+      new Stepper(fixtureEl.querySelector('.stepper'))
+
+      action('next').focus()
+      action('next').click()
+
+      expect(document.activeElement).toEqual(action('finish'))
+    })
+
+    it('should leave focus on next when it stays visible', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false })
+      // eslint-disable-next-line no-new
+      new Stepper(fixtureEl.querySelector('.stepper'))
+
+      action('next').focus()
+      action('next').click()
+
+      expect(document.activeElement).toEqual(action('next'))
+    })
+
+    it('should move focus to the active step button when finish cannot take it', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false, activeStep: 2 })
+      // eslint-disable-next-line no-new
+      new Stepper(fixtureEl.querySelector('.stepper'))
+      action('finish').disabled = true
+
+      action('next').focus()
+      action('next').click()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[2])
+    })
+
+    it('should not guard a finish button outside the actions container of the stepper', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false, activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement)
+      const nested = document.createElement('div')
+      nested.className = 'stepper-actions'
+      nested.innerHTML = '<button type="button" data-coreui-stepper-action="finish">Finish</button>'
+      fixtureEl.querySelector('#step3').append(nested)
+      const spy = jasmine.createSpy('finish')
+      stepperElement.addEventListener('finish.coreui.stepper', spy)
+
+      nested.querySelector('button').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 2 }))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should finish on a single pointer click', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false, activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement)
+      const spy = jasmine.createSpy('finish')
+      stepperElement.addEventListener('finish.coreui.stepper', spy)
+
+      action('finish').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should move focus to the new step button, not to finish, when focus was on a step button', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false })
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+
+      buttons[1].focus()
+      stepper.showStep(3)
+
+      expect(document.activeElement).toEqual(buttons[2])
+    })
+
+    it('should disable prev on the first enabled step when the first step button has .disabled', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false, activeStep: 2 })
+      fixtureEl.querySelectorAll('.stepper-step-button')[0].classList.add('disabled')
+      // eslint-disable-next-line no-new
+      new Stepper(fixtureEl.querySelector('.stepper'))
+
+      expect(action('prev').disabled).toBeTrue()
+    })
+
+    it('should leave a .stepper-actions container inside a pane as it is', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false })
+      const nested = document.createElement('div')
+      nested.className = 'stepper-actions'
+      nested.innerHTML = '<button type="button" data-coreui-stepper-action="next">Next</button>'
+      fixtureEl.querySelector('#step1').append(nested)
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.showStep(3)
+
+      expect(nested.querySelector('button').hidden).toBeFalse()
+      expect(fixtureEl.querySelector('.stepper > .stepper-actions [data-coreui-stepper-action="next"]').hidden).toBeTrue()
+    })
+
+    it('should not prevent a repeated keydown of another key on finish', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false, activeStep: 3 })
+      // eslint-disable-next-line no-new
+      new Stepper(fixtureEl.querySelector('.stepper'))
+      const repeated = new KeyboardEvent('keydown', {
+        bubbles: true, cancelable: true, key: 'Tab', repeat: true
+      })
+
+      action('finish').dispatchEvent(repeated)
+
+      expect(repeated.defaultPrevented).toBeFalse()
+    })
+
+    it('should not finish on the second click of a double click', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false, activeStep: 3 })
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement)
+      const spy = jasmine.createSpy('finish')
+      stepperElement.addEventListener('finish.coreui.stepper', spy)
+
+      action('finish').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 2 }))
+
+      expect(spy).not.toHaveBeenCalled()
+
+      action('finish').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should run next on every click of a double click', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false })
+      // eslint-disable-next-line no-new
+      new Stepper(fixtureEl.querySelector('.stepper'))
+
+      action('next').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
+      action('next').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 2 }))
+
+      expect(fixtureEl.querySelectorAll('.stepper-step-button')[2]).toHaveClass('active')
+    })
+
+    it('should prevent a repeated Enter keydown on finish and let the first one through', () => {
+      fixtureEl.innerHTML = getActionsFixture({ linear: false, activeStep: 3 })
+      // eslint-disable-next-line no-new
+      new Stepper(fixtureEl.querySelector('.stepper'))
+      const first = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter' })
+      const repeated = new KeyboardEvent('keydown', {
+        bubbles: true, cancelable: true, key: 'Enter', repeat: true
+      })
+
+      action('finish').dispatchEvent(first)
+      action('finish').dispatchEvent(repeated)
+
+      expect(first.defaultPrevented).toBeFalse()
+      expect(repeated.defaultPrevented).toBeTrue()
     })
   })
 })

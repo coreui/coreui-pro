@@ -2388,6 +2388,19 @@ driven by a single Next control never finished. A step button with
 as `next()`. It now does nothing until the last enabled step is active, the
 same as in React and Vue. Call `next()` to move forward.
 
+#### Stepper: focus moves to the new step only when the change takes it away
+
+A step change used to move focus to the new step's button whenever focus was
+inside the stepper. Focus now moves only when it was in the pane or step
+content being closed, or when the focused element is hidden, disabled or
+removed by the change or by a `stepChange.coreui.stepper`,
+`stepChanged.coreui.stepper` or `reset.coreui.stepper` handler. A button that
+stays visible, such as **Next** in the new [`.stepper-actions`](/forms/stepper/#shared-action-buttons)
+container, keeps focus. `reset()` used to fire only `reset.coreui.stepper`.
+When it changes the step, it now fires `stepChange.coreui.stepper` before it and
+the new `stepChanged.coreui.stepper` after it; when the start step is already
+open, it still fires only `reset.coreui.stepper`.
+
 #### Stepper: the active indicator's background follows the theme
 
 <span class="badge fg-emphasis-danger bg-subtle-danger">Breaking</span>
