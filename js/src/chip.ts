@@ -11,6 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { type ChipRemoveLabel, getChipRemoveLabel } from './util/chip-values.js'
+import { rootActiveElement } from './util/focus.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch, writeAttribute } from './util/index.js'
 import { settleClick } from './util/layers.js'
@@ -289,6 +290,20 @@ class Chip extends BaseComponent {
     }
   }
 
+  _setDisabled(disabled: boolean): void {
+    this._disabled = disabled
+
+    if (disabled) {
+      this._removeControl?.remove()
+      this._removeControl = null
+    } else {
+      this._ensureRemoveControl()
+    }
+
+    this._applyState()
+    this._makeFocusable(disabled)
+  }
+
   _ensureCheckIcon(): any {
     if (SelectorEngine.findOne(SELECTOR_CHIP_CHECK, this._element)) {
       return
@@ -342,13 +357,15 @@ class Chip extends BaseComponent {
     this._element.append(this._removeControl)
   }
 
-  _makeFocusable(): void {
+  _makeFocusable(keepFocus = false): void {
     const focusable = !this._disabled && (
       this._config.selectable ||
       this._element.getAttribute('role') === 'gridcell' ||
       (this._config.owned && this._config.removable)
     )
-    writeAttribute(this._element, 'tabindex', focusable ? '0' : null)
+    const focused = keepFocus && rootActiveElement(this._element) === this._element
+
+    writeAttribute(this._element, 'tabindex', focusable ? '0' : (focused ? '-1' : null))
     writeAttribute(this._element, 'data-coreui-chip-focusable', focusable ? 'true' : null)
   }
 

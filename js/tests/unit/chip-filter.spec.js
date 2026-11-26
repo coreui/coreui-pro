@@ -733,6 +733,200 @@ describe('ChipFilter', () => {
     })
   })
 
+  describe('fieldset', () => {
+    const create = (fieldsetAttributes = '', attrs = '') => {
+      fixtureEl.innerHTML = `<form><fieldset ${fieldsetAttributes}><div class="chip-set chip-filter" data-coreui-name="dept"${attrs}><span class="chip">Design</span><span class="chip" data-coreui-selected="true">Development</span><span class="chip">Sales</span></div></fieldset></form>`
+
+      const element = fixtureEl.querySelector('.chip-filter')
+
+      return {
+        element,
+        fieldset: fixtureEl.querySelector('fieldset'),
+        form: fixtureEl.querySelector('form'),
+        chipFilter: new ChipFilter(element)
+      }
+    }
+
+    const chips = element => [...element.querySelectorAll('.chip')]
+    const submitted = form => new FormData(form).getAll('dept')
+
+    it('should start disabled inside a disabled fieldset without disabling its value field', () => {
+      const { element, chipFilter } = create('disabled')
+
+      expect(element.getAttribute('aria-disabled')).toEqual('true')
+      expect(chips(element).every(chip => chip.getAttribute('aria-disabled') === 'true' && !chip.hasAttribute('tabindex'))).toBeTrue()
+      expect(chipFilter._valueField.hasAttribute('disabled')).toBeFalse()
+      expect(chipFilter._valueField.nextElementSibling.localName).toEqual('coreui-fieldset-watch')
+    })
+
+    it('should disable a chip that turns its own disabled off while the fieldset is disabled', () => {
+      fixtureEl.innerHTML = '<fieldset disabled><div class="chip-filter"><span class="chip" data-coreui-disabled="false">Design</span></div></fieldset>'
+
+      const element = fixtureEl.querySelector('.chip-filter')
+      const chipFilter = new ChipFilter(element)
+      const chip = element.querySelector('.chip')
+
+      chip.click()
+
+      expect(chipFilter.getSelectedValues()).toEqual([])
+      expect(chip.hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should refuse a click and Space on a chip once the fieldset is disabled', () => {
+      const { element, fieldset, chipFilter } = create()
+      const [design] = chips(element)
+
+      fieldset.disabled = true
+      design.click()
+      keydown(design, ' ')
+
+      expect(chipFilter.getSelectedValues()).toEqual(['Development'])
+    })
+
+    it('should keep the selection through a toggle of the fieldset', () => {
+      const { element, fieldset, form, chipFilter } = create()
+
+      fieldset.disabled = true
+      expect(submitted(form)).toEqual([])
+
+      fieldset.disabled = false
+
+      expect(element.hasAttribute('aria-disabled')).toBeFalse()
+      expect(chipFilter.getSelectedValues()).toEqual(['Development'])
+      expect(submitted(form)).toEqual(['Development'])
+      expect(chips(element).map(chip => chip.tabIndex)).toEqual([-1, 0, -1])
+      chips(element)[0].click()
+      expect(chipFilter.getSelectedValues()).toEqual(['Design', 'Development'])
+    })
+
+    it('should blur a focused chip after the task that disables the fieldset', async () => {
+      const { element, fieldset } = create()
+      const development = chips(element)[1]
+
+      development.focus()
+      fieldset.disabled = true
+
+      expect(development.getAttribute('tabindex')).toEqual('-1')
+
+      await Promise.resolve()
+
+      expect(document.activeElement).not.toEqual(development)
+      expect(development.hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should keep the focus and the tab stop on a chip when the fieldset is disabled and enabled in one task', async () => {
+      const { element, fieldset } = create()
+      const [design, development] = chips(element)
+
+      design.focus()
+      fieldset.disabled = true
+      fieldset.disabled = false
+      await Promise.resolve()
+
+      expect(document.activeElement).toEqual(design)
+      expect([design.tabIndex, development.tabIndex]).toEqual([0, -1])
+    })
+
+    it('should leave no tab stop on a chip the focus left in the task that disabled the fieldset', async () => {
+      const { element, fieldset } = create()
+      const development = chips(element)[1]
+      const other = document.createElement('input')
+
+      fixtureEl.append(other)
+      development.focus()
+      fieldset.disabled = true
+      other.focus()
+      await Promise.resolve()
+
+      expect(development.hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should disable and enable on a call and keep the selection', () => {
+      const { element, form, chipFilter } = create()
+
+      chipFilter.disable()
+
+      expect(chipFilter._valueField.disabled).toBeTrue()
+      expect(submitted(form)).toEqual([])
+      expect(element.getAttribute('aria-disabled')).toEqual('true')
+
+      chipFilter.enable()
+
+      expect(chipFilter._valueField.disabled).toBeFalse()
+      expect(submitted(form)).toEqual(['Development'])
+      expect(chips(element)[1].tabIndex).toEqual(0)
+    })
+
+    it('should stay disabled after enable() while the fieldset is disabled', () => {
+      const { element, fieldset, chipFilter } = create('disabled', ' data-coreui-disabled="true"')
+
+      chipFilter.enable()
+      expect(element.getAttribute('aria-disabled')).toEqual('true')
+
+      fieldset.disabled = false
+      expect(element.hasAttribute('aria-disabled')).toBeFalse()
+    })
+
+    it('should not take the focus from its label inside a disabled fieldset', () => {
+      fixtureEl.innerHTML = '<fieldset disabled><label for="dept">Department</label><div id="dept" class="chip-set chip-filter"><span class="chip">Design</span></div></fieldset>'
+
+      const element = fixtureEl.querySelector('.chip-filter')
+
+      new ChipFilter(element) // eslint-disable-line no-new
+      fixtureEl.querySelector('label').click()
+
+      expect(document.activeElement).not.toEqual(element)
+      expect(element.hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should update its validation when the fieldset changes', () => {
+      const { fieldset, chipFilter } = create()
+      const spy = spyOn(chipFilter._validation, 'update')
+
+      fieldset.disabled = true
+
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('should stay enabled inside the first legend of a disabled fieldset', () => {
+      fixtureEl.innerHTML = '<fieldset disabled><legend><div class="chip-filter"><span class="chip">Design</span></div></legend></fieldset>'
+
+      const element = fixtureEl.querySelector('.chip-filter')
+
+      new ChipFilter(element) // eslint-disable-line no-new
+
+      expect(element.hasAttribute('aria-disabled')).toBeFalse()
+      expect(element.querySelector('.chip').tabIndex).toEqual(0)
+    })
+
+    it('should list its watcher in form.elements and leave it out of the submitted data', () => {
+      const { form, fieldset } = create()
+
+      expect([...form.elements].filter(element => element.localName === 'coreui-fieldset-watch')).toHaveSize(1)
+      expect([...fieldset.elements].some(element => element.localName === 'coreui-fieldset-watch')).toBeTrue()
+      expect([...new FormData(form).keys()]).toEqual(['dept'])
+    })
+
+    it('should follow a move out of a disabled fieldset', () => {
+      const { element, form, chipFilter } = create('disabled')
+
+      form.append(element)
+
+      expect(element.hasAttribute('aria-disabled')).toBeFalse()
+      expect(chipFilter.getSelectedValues()).toEqual(['Development'])
+      expect(chips(element)[1].tabIndex).toEqual(0)
+    })
+
+    it('should remove its watcher on dispose', () => {
+      const { element, chipFilter } = create('disabled')
+
+      chipFilter.dispose()
+
+      expect(fixtureEl.querySelector('coreui-fieldset-watch')).toBeNull()
+      expect(element.querySelector('coreui-fieldset-watch')).toBeNull()
+    })
+  })
+
   describe('lifecycle', () => {
     it('should initialize through the data api', () => {
       const el = setMarkup(['First'], ' data-coreui-chip-filter')

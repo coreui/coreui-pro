@@ -78,6 +78,8 @@ Give the filter a `name` and its selection is submitted with the form through a 
     </div>
   </form>`} />
 
+Add `data-coreui-disabled="true"` to disable the filter, and call `disable()` or `enable()` to change it later; the selection stays. Inside a `<fieldset disabled>` the filter is disabled with the fieldset and follows it when the fieldset is enabled or disabled later, or when the filter moves into or out of one; a filter in the fieldset's first `<legend>` stays enabled, as native fields do. To follow the fieldset the component adds a hidden `<coreui-fieldset-watch>` element after its hidden `<select>`. It is listed in `form.elements` and `fieldset.elements`, where it shifts the index of the controls after it, and adds nothing to the submitted data.
+
 The state comes from `validationState` (`data-coreui-validation-state` in the markup) or from a validation that reports the field invalid, in the forms where the [other form fields](/forms/chip-input/#validation) show it. A `.is-invalid` or `.is-valid` class written on the filter is not read and stays yours, see [Form components](/forms/validation/#form-components). A given state stays until you change it: every change of the selection fires `change.coreui.chip-filter`, so to clear the state when the user changes the selection, call `setValidationState(null)` in a `change.coreui.chip-filter` listener. A listener there also clears the state on a native form reset and on `selectChip()`, `selectAll()`, `deselectAll()` and `clear()`, which fire `change.coreui.chip-filter` when they change the selection. A native reset of the form puts back the selection the filter started with, limited to the options it still lists, and keeps the state.
 
 ## Usage
@@ -128,7 +130,9 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | `add(chip)` | Adds an option. Accepts a `.chip` element or a label string. Returns the chip element or `null` if rejected. |
 | `clear()` | Removes every option. |
 | `deselectAll()` | Deselects every selected chip. |
+| `disable()` | Disables the filter. |
 | `dispose()` | Destroys the instance and the chip instances it created, and removes the hidden field. The chips stay in the document. |
+| `enable()` | Enables the filter. |
 | `getInstance(element)` | Static method that returns the instance associated with a DOM element, or `null`. |
 | `getOrCreateInstance(element, config)` | Static method that returns the instance associated with a DOM element, creating it when there is none. |
 | `getSelectedValues()` | Returns the values of the selected chips. |

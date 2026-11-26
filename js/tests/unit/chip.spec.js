@@ -60,6 +60,17 @@ describe('Chip', () => {
   })
 
   describe('constructor', () => {
+    it('should keep a focused native chip in the tab order when it starts', () => {
+      fixtureEl.innerHTML = '<button type="button" class="chip">Tag</button>'
+
+      const chip = fixtureEl.querySelector('.chip')
+
+      chip.focus()
+      new Chip(chip) // eslint-disable-line no-new
+
+      expect(chip.hasAttribute('tabindex')).toBeFalse()
+    })
+
     it('should leave the disabled state to the option, not a class in the markup', () => {
       fixtureEl.innerHTML = '<span class="chip disabled">Tag</span>'
 
