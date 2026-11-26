@@ -1,23 +1,17 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI otp-input.js
+ * CoreUI otp-input.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
-import EventHandler from './dom/event-handler.js'
+import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
-import { onLabelClick } from './util/field-label.js'
 import FieldValidation from './util/field-validation.js'
-import { rootActiveElement } from './util/focus.js'
-import {
-  configureValueField, createValueField, dispatchValueChange, writeValueField, type ValidationState
-} from './util/form-validation.js'
-import {
-  defineJQueryPlugin, getNextActiveElement, isForwardKey, isRTL, jQueryDispatch, writeAttribute
-} from './util/index.js'
+import { type ValidationState } from './util/form-validation.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -28,70 +22,65 @@ const DATA_KEY = 'coreui.otp-input'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const ARROW_RIGHT_KEY = 'ArrowRight'
-const ARROW_LEFT_KEY = 'ArrowLeft'
-const BACKSPACE_KEY = 'Backspace'
-
-const EVENT_BEFORE_INPUT = `beforeinput${EVENT_KEY}`
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_COMPLETE = `complete${EVENT_KEY}`
-const EVENT_FOCUS = `focus${EVENT_KEY}`
-const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`
-const EVENT_INPUT = `input${EVENT_KEY}`
-const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_PASTE = `paste${EVENT_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_DOM_CONTENT_LOADED_DATA_API = `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_OTP = '[data-coreui-otp]'
-const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
+const SELECTOR_INPUT = 'input'
+const SELECTOR_LEGACY_CONTROL = '.form-otp-control'
 
-/**
- * Types
- */
+const CLASS_NAME_INPUT = 'otp-input'
+const CLASS_NAME_RENDERED = 'otp-rendered'
+const CLASS_NAME_SLOTS = 'otp-slots'
+const CLASS_NAME_SLOT = 'otp-slot'
+const CLASS_NAME_SLOT_FILLED = 'otp-slot-filled'
+const CLASS_NAME_SLOT_ACTIVE = 'otp-slot-active'
+const CLASS_NAME_SLOT_SELECTED = 'otp-slot-selected'
+const CLASS_NAME_SEPARATOR = 'otp-separator'
+
+const MASK_CHARACTER = '•'
+
+// Per-type input mode, validation pattern, and a filter that strips disallowed characters
+const TYPES = {
+  numeric: { inputmode: 'numeric', pattern: '[0-9]*', filter: /[^0-9]/g },
+  alphanumeric: { inputmode: 'text', pattern: '[A-Za-z0-9]*', filter: /[^A-Za-z0-9]/g },
+  alpha: { inputmode: 'text', pattern: '[A-Za-z]*', filter: /[^A-Za-z]/g }
+}
+
+const MULTI_CHARACTER_INPUT_TYPES = new Set(['insertText', 'insertReplacementText', 'insertFromDrop'])
 
 type OtpInputConfig = {
-  ariaControlLabel: (index: number, total: number) => string
   autoSubmit: boolean
-  disabled: boolean
-  id: string | null
-  linear: boolean
-  masked: boolean
-  name: string | null
-  placeholder: number | string | null
-  required: boolean
+  groups: number[] | null
+  length: number | null
+  mask: boolean
+  pasteTransformer: ((text: string) => string) | null
+  separator: string
   type: string
   validationState: ValidationState | null
-  value: number | string | null
 }
 
 const Default: OtpInputConfig = {
-  ariaControlLabel: (index: number, total: number) => `Character ${index + 1} of ${total}`,
   autoSubmit: false,
-  disabled: false,
-  id: null,
-  linear: true,
-  masked: false,
-  name: null,
-  placeholder: null,
-  required: false,
-  type: 'number',
-  validationState: null,
-  value: null
+  groups: null,
+  length: null,
+  mask: false,
+  pasteTransformer: null,
+  separator: '·',
+  type: 'numeric',
+  validationState: null
 }
 
 const DefaultType = {
-  ariaControlLabel: 'function',
   autoSubmit: 'boolean',
-  disabled: 'boolean',
-  id: '(string|null)',
-  linear: 'boolean',
-  masked: 'boolean',
-  name: '(string|null)',
-  placeholder: '(number|string|null)',
-  required: 'boolean',
+  groups: '(array|null)',
+  length: '(number|null)',
+  mask: 'boolean',
+  pasteTransformer: '(function|null)',
+  separator: 'string',
   type: 'string',
-  validationState: '(string|null|undefined)',
-  value: '(number|string|null)'
+  validationState: '(string|null|undefined)'
 }
 
 /**
@@ -99,47 +88,75 @@ const DefaultType = {
  */
 
 class OTPInput extends BaseComponent {
-  protected declare _disabled: boolean
-  protected declare _inputElement: HTMLInputElement | null
-  protected declare _placeholders: Map<HTMLInputElement, string | null>
-  protected declare _removeLabelClick: () => void
-  protected declare _resetCode: string | null
+  protected declare _config: OtpInputConfig
+  protected declare _input: HTMLInputElement
+  protected declare _type: { inputmode: string, pattern: string, filter: RegExp }
+  protected declare _length: number
+  protected declare _slots: HTMLElement[]
+  protected declare _pointerActive: boolean
+  protected declare _pointerIndex: number
+  protected declare _touchPointer: boolean
+  protected declare _slotsContainer: HTMLElement
+  protected declare _inputDefaults: Map<string, string>
+  protected declare _inputListeners: Record<string, (event: CoreUIEvent) => void>
+  protected declare _onSelectionChange: () => void
+  protected declare _onReset: (event: Event) => void
+  protected declare _resetRoot: Document | ShadowRoot
+  protected declare _executingCommand: boolean
+  protected declare _leftWithWindow: boolean
+  protected declare _lastCompleteValue: string | null
+  protected declare _pendingInsert: { before: string, start: number, end: number, text: string } | null
   protected declare _validation: FieldValidation
   protected declare _value: string
 
   constructor(element?: string | Element | null, config?: Partial<OtpInputConfig> | null) {
     super(element, config)
 
-    this._config = this._getConfig(config)
-    this._disabled = this._config.disabled
-    this._inputElement = null
-    this._placeholders = new Map()
-    this._resetCode = null
-    this._value = ''
+    const inputs = SelectorEngine.find<HTMLInputElement>(SELECTOR_INPUT, this._element)
+    if (inputs.length !== 1 || SelectorEngine.findOne(SELECTOR_LEGACY_CONTROL, this._element)) {
+      throw new TypeError(`${NAME}: the container takes one <input>, see the v6 migration guide`)
+    }
+
+    if (!Object.hasOwn(TYPES, this._config.type)) {
+      throw new TypeError(`${NAME}: unknown type "${this._config.type}", see the v6 migration guide`)
+    }
+
+    this._input = inputs[0]
+
+    this._type = TYPES[this._config.type as keyof typeof TYPES]
+    this._length = this._resolveLength()
+    this._slots = []
+    // Tracks whether focus was triggered by a click so we can respect the
+    // clicked slot instead of jumping to the first empty one
+    this._pointerActive = false
+    // Slot index from the most recent tap, applied once focus settles
+    this._pointerIndex = 0
+    this._touchPointer = false
+    this._pendingInsert = null
+    this._executingCommand = false
+    this._leftWithWindow = false
+
+    this._setupInput()
+    this._value = this._input.value
+    this._lastCompleteValue = this._completeValue()
     this._validation = new FieldValidation(this._element, {
       config: () => this._config,
-      fields: () => (this._inputElement ? [this._inputElement] : []),
+      fields: () => [this._input],
       frames: () => [this._element],
-      invalidTargets: () => this._getInputs(),
-      owned: () => [this._inputElement!, ...this._getInputs()],
-      restore: () => this._restoreValue()
+      invalidTargets: () => [this._input]
     })
-
-    this._element.setAttribute('role', 'group')
-    this._setInputsAttributes()
-    this._seedSlots(this._config.value)
-    this._createValueField()
-    this._setInputsTabIndexes()
+    this._renderSlots()
     this._addEventListeners()
-    this._removeLabelClick = onLabelClick(this._element, () => this._getFirstEmptySlot()?.focus())
+    this._render()
+    this._validation.refresh()
   }
 
   // Getters
-  static override get Default(): typeof Default {
+  static override get Default(): OtpInputConfig {
     return Default
   }
 
-  static override get DefaultType(): typeof DefaultType {
+  static override get DefaultType(): Record<string, string> {
     return DefaultType
   }
 
@@ -148,36 +165,24 @@ class OTPInput extends BaseComponent {
   }
 
   // Public
-  clear(): void {
-    const inputs = this._getInputs()
-    for (const input of inputs) {
-      input.value = ''
-    }
-
-    this._setValue(null)
-    this._syncFirstInputMaxLength()
-    this._setInputsTabIndexes()
+  getValue(): string {
+    return this._input.value
   }
 
-  override dispose(): void {
-    if (!this._element) {
-      return
-    }
+  setValue(value: string | number): void {
+    this._typeCheckConfig({ value }, { value: '(number|string)' })
+    this._input.value = this._sanitize(String(value))
+    this._settleValue()
+  }
 
-    this._removeLabelClick()
-    this._validation.dispose()
-    this._inputElement?.remove()
-    this._inputElement = null
-
-    for (const input of this._placeholders.keys()) {
-      this._restorePlaceholder(input)
-    }
-
-    super.dispose()
+  clear(): void {
+    this._input.value = ''
+    this._commitValue(false)
   }
 
   reset(): void {
-    this._restoreValue()
+    this._input.value = this._sanitize(this._input.defaultValue)
+    this._commitValue(false)
   }
 
   disable(): void {
@@ -189,411 +194,549 @@ class OTPInput extends BaseComponent {
   }
 
   setValidationState(validationState: ValidationState | null): void {
-    this._config = this._getConfig({ ...this._config, validationState })
+    this._config = this._getConfig({ ...this._config, validationState }) as OtpInputConfig
     this._validation.update()
   }
 
-  setValue(value: OtpInputConfig['value']): void {
-    this._typeCheckConfig({ value }, { value: DefaultType.value })
-    this._seedSlots(value, true)
-    this._setInputsTabIndexes()
-    this._value = this._readSlots()
-    writeValueField(this._inputElement!, this._value)
-    this._validation.update()
+  focus(): void {
+    this._input.focus()
+    // Select the first empty slot (or the last one when the value is full)
+    this._selectSlot(this._firstEmptyIndex())
+    this._render()
+  }
+
+  override dispose(): void {
+    for (const [type, listener] of Object.entries(this._inputListeners ?? {})) {
+      EventHandler.off(this._input, type, listener)
+    }
+
+    EventHandler.off(document, 'selectionchange', this._onSelectionChange)
+    this._resetRoot?.removeEventListener('reset', this._onReset, true)
+    this._validation?.dispose()
+
+    for (const [attribute, value] of this._inputDefaults ?? []) {
+      if (this._input.getAttribute(attribute) === value) {
+        this._input.removeAttribute(attribute)
+      }
+    }
+
+    this._slotsContainer?.remove()
+    this._element.classList.remove(CLASS_NAME_RENDERED)
+    super.dispose()
   }
 
   // Private
-  _setDisabled(disabled: boolean): void {
-    if (disabled === this._disabled) {
+  protected _resolveLength(): number {
+    if (this._config.length) {
+      return this._config.length
+    }
+
+    const maxLength = Number.parseInt(this._input.getAttribute('maxlength')!, 10)
+    return Number.isNaN(maxLength) || maxLength < 1 ? 6 : maxLength
+  }
+
+  protected _setupInput(): void {
+    const input = this._input
+
+    // A single text field backs the whole control so screen readers, password
+    // managers, and SMS autofill treat it like any other input.
+    if (this._config.mask) {
+      input.type = 'password'
+    } else if (input.type === 'number' || input.type === 'password') {
+      input.type = 'text'
+    }
+
+    input.classList.add(CLASS_NAME_INPUT)
+    input.setAttribute('maxlength', String(this._length))
+    this._inputDefaults = new Map()
+    const defaults = {
+      autocapitalize: 'off',
+      autocorrect: 'off',
+      inputmode: this._type.inputmode,
+      pattern: `${this._type.pattern.slice(0, -1)}{${this._length}}`,
+      spellcheck: 'false'
+    }
+
+    for (const [attribute, value] of Object.entries(defaults)) {
+      if (!input.hasAttribute(attribute)) {
+        input.setAttribute(attribute, value)
+        this._inputDefaults.set(attribute, value)
+      }
+    }
+
+    if (!input.getAttribute('autocomplete')) {
+      input.setAttribute('autocomplete', 'one-time-code')
+    }
+
+    // Filter any pre-filled value through the configured type
+    if (input.value) {
+      input.value = this._sanitize(input.value)
+    }
+  }
+
+  protected _renderSlots(): void {
+    const container = document.createElement('div')
+    container.className = CLASS_NAME_SLOTS
+    container.setAttribute('aria-hidden', 'true')
+
+    const { groups } = this._config
+    let groupIndex = 0
+    let inGroup = 0
+
+    for (let i = 0; i < this._length; i++) {
+      const slot = document.createElement('div')
+      slot.className = CLASS_NAME_SLOT
+      container.append(slot)
+      this._slots.push(slot)
+
+      // Insert a visual separator between configured groups
+      if (Array.isArray(groups) && groups.length > 0) {
+        inGroup++
+        if (inGroup === groups[groupIndex] && i < this._length - 1) {
+          const separator = document.createElement('div')
+          separator.className = CLASS_NAME_SEPARATOR
+          separator.textContent = this._config.separator
+          container.append(separator)
+          groupIndex = Math.min(groupIndex + 1, groups.length - 1)
+          inGroup = 0
+        }
+      }
+    }
+
+    this._slotsContainer = container
+    this._element.append(container)
+    this._element.classList.add(CLASS_NAME_RENDERED)
+  }
+
+  protected _addEventListeners(): void {
+    // Listeners are attached with bare event names (not namespaced) because
+    // `input`, `beforeinput`, `paste`, and `selectionchange` are not in
+    // EventHandler's native-events list. Keep references to remove on dispose.
+    this._inputListeners = {
+      input: event => this._handleInput(event as unknown as InputEvent),
+      compositionend: () => this._handleInput(),
+      beforeinput: event => this._handleBeforeInput(event),
+      keydown: event => this._handleKeydown(event as unknown as KeyboardEvent),
+      paste: event => this._handlePaste(event),
+      pointerdown: event => this._handlePointerDown(event),
+      pointercancel: () => {
+        this._touchPointer = false
+      },
+      click: event => this._handleClick(event)
+    }
+    this._inputListeners.focus = () => {
+      if (this._leftWithWindow) {
+        this._leftWithWindow = false
+        this._render()
+        return
+      }
+
+      if (this._pointerActive) {
+        // A tap focused the input natively; position the caret on the clicked
+        // slot now that focus has settled (doing this before native focus would
+        // make iOS/iPadOS raise then immediately dismiss the keyboard)
+        this._pointerActive = false
+        this._selectSlot(this._pointerIndex)
+        this._render()
+        return
+      }
+
+      // Keyboard (Tab) focus lands on the first empty slot
+      this._selectSlot(this._firstEmptyIndex())
+      this._render()
+    }
+
+    const onSync = () => this._render()
+    this._onSelectionChange = () => {
+      if (this._isFocused()) {
+        this._render()
+      }
+    }
+
+    this._inputListeners.blur = () => {
+      this._leftWithWindow = !document.hasFocus()
+      this._render()
+    }
+
+    for (const type of ['keyup', 'select']) {
+      this._inputListeners[type] = onSync
+    }
+
+    for (const [type, listener] of Object.entries(this._inputListeners)) {
+      EventHandler.on(this._input, type, listener)
+    }
+
+    EventHandler.on(document, 'selectionchange', this._onSelectionChange)
+    this._onReset = event => {
+      const { target } = event
+      if (target !== this._input.form) {
+        return
+      }
+
+      // Wait for the browser to restore the default value.
+      setTimeout(() => {
+        if (event.defaultPrevented || target !== this._input?.form) {
+          return
+        }
+
+        const sanitized = this._sanitize(this._input.value)
+        if (sanitized !== this._input.value) {
+          this._input.value = sanitized
+        }
+
+        this._commitValue(false)
+      })
+    }
+
+    this._resetRoot = this._input.getRootNode() as Document | ShadowRoot
+    this._resetRoot.addEventListener('reset', this._onReset, true)
+  }
+
+  protected _handleInput(event?: InputEvent): void {
+    if (event?.isComposing) {
       return
     }
 
-    this._disabled = disabled
-
-    for (const input of this._getInputs()) {
-      input.disabled = disabled
+    const pending = this._pendingInsert
+    this._pendingInsert = null
+    if (pending) {
+      this._input.value = pending.before
+      this._input.setSelectionRange(pending.start, pending.end)
+      this._insert(pending.text, false)
+      return
     }
 
-    this._inputElement!.disabled = disabled
+    const { value, selectionStart } = this._input
+    const sanitized = this._sanitize(value)
+
+    if (sanitized !== value) {
+      this._input.value = sanitized
+    }
+
+    if (this._isFocused()) {
+      const inputType = event?.inputType
+      if (inputType === 'insertText' || inputType?.startsWith('delete')) {
+        const caret = selectionStart ?? sanitized.length
+        this._selectSlot(this._sanitize(value.slice(0, caret)).length)
+      } else if (!inputType || inputType === 'insertReplacementText') {
+        this._selectSlot(this._firstEmptyIndex())
+      }
+    }
+
+    this._afterValueChange()
+  }
+
+  protected _handlePaste(event: CoreUIEvent): void {
+    const pastedValue = event.clipboardData?.getData('text')
+    if (!pastedValue || !this._isEditable()) {
+      return
+    }
+
+    const transformed = this._config.pasteTransformer?.(pastedValue) ?? pastedValue
+    const sanitized = this._sanitize(transformed)
+    const { start, end } = this._insertRange(sanitized)
+    const inserted = sanitized.slice(0, this._length - this._input.value.length + end - start)
+
+    if (start === this._input.selectionStart && end === this._input.selectionEnd && inserted === pastedValue) {
+      return
+    }
+
+    event.preventDefault()
+    this._insert(pastedValue, true)
+  }
+
+  protected _handleBeforeInput(event: CoreUIEvent): void {
+    const { inputType, data, isComposing, cancelable } = event as unknown as InputEvent
+    if (this._executingCommand || isComposing || !this._isEditable()) {
+      return
+    }
+
+    if (MULTI_CHARACTER_INPUT_TYPES.has(inputType) && (data === null || data.length > 1)) {
+      this._handleMultiCharacterInput(event, data ?? (event as unknown as InputEvent).dataTransfer?.getData('text') ?? '', cancelable)
+      return
+    }
+
+    if (inputType !== 'insertText' || data?.length !== 1) {
+      return
+    }
+
+    const sanitized = this._sanitize(data)
+    if (!sanitized) {
+      event.preventDefault()
+      return
+    }
+
+    // Let the browser replace the selection so edits keep native undo and input events.
+    if (this._input.selectionStart === this._input.selectionEnd) {
+      this._selectSlot(this._input.selectionStart ?? 0)
+    }
+
+    if (sanitized !== data) {
+      event.preventDefault()
+      this._writeText(sanitized, this._input.selectionStart ?? 0, this._input.selectionEnd ?? 0, true)
+    }
+  }
+
+  protected _handleMultiCharacterInput(event: CoreUIEvent, text: string, cancelable: boolean): void {
+    if (!text) {
+      return
+    }
+
+    if (cancelable) {
+      event.preventDefault()
+      this._insert(text, true)
+      return
+    }
+
+    this._pendingInsert = {
+      before: this._input.value,
+      start: this._input.selectionStart ?? this._input.value.length,
+      end: this._input.selectionEnd ?? this._input.value.length,
+      text
+    }
+  }
+
+  protected _handleKeydown(event: KeyboardEvent): void {
+    const { key, altKey, ctrlKey, metaKey, shiftKey, isComposing, defaultPrevented } = event
+    if (defaultPrevented || isComposing || altKey || ctrlKey || metaKey || shiftKey || (key !== 'ArrowLeft' && key !== 'ArrowRight')) {
+      return
+    }
+
+    // The visible slots run right to left, even when the code reads left to right.
+    const isBackward = (key === 'ArrowRight') === (getComputedStyle(this._slotsContainer).direction === 'rtl')
+    const start = this._input.selectionStart ?? 0
+    const end = this._input.selectionEnd ?? start
+    const rangeEdge = isBackward ? start : end
+    const nextSlot = start + (isBackward ? -1 : 1)
+    const index = end - start > 1 ? rangeEdge : nextSlot
+
+    event.preventDefault()
+    this._selectSlot(Math.min(index, this._firstEmptyIndex()))
+    this._render()
+  }
+
+  protected _handleClick(event: CoreUIEvent): void {
+    if (!this._touchPointer) {
+      return
+    }
+
+    this._touchPointer = false
+    const index = this._slotIndexFromPoint(event.clientX)
+    if (index === null) {
+      return
+    }
+
+    // WebKit reports a mouse click after a tap and updates the caret after the click.
+    requestAnimationFrame(() => {
+      if (this._input && this._isFocused()) {
+        this._selectSlot(Math.min(index, this._firstEmptyIndex()))
+        this._render()
+      }
+    })
+  }
+
+  protected _handlePointerDown(event: CoreUIEvent): void {
+    // A disabled input still receives `pointerdown`, but never the focus that
+    // would consume the remembered tap
+    if (event.button !== 0 || this._input.matches(':disabled')) {
+      return
+    }
+
+    this._touchPointer = event.pointerType === 'touch'
+    const index = this._slotIndexFromPoint(event.clientX)
+    if (index === null) {
+      return
+    }
+
+    // Don't let the caret land past the first empty slot
+    const target = Math.min(index, this._firstEmptyIndex())
+
+    if (this._isFocused()) {
+      // A touch click places the caret. Leave a long press to the browser.
+      if (!this._touchPointer) {
+        event.preventDefault()
+        this._selectSlot(target)
+        this._render()
+      }
+
+      return
+    }
+
+    // Not yet focused: let the browser focus the input natively so the
+    // on-screen keyboard is raised by the user's tap. Position the caret in the
+    // focus handler once focus settles.
+    this._pointerActive = true
+    this._pointerIndex = target
+  }
+
+  // Map a viewport x-coordinate to the slot under it, clamped to the last slot
+  protected _slotIndexFromPoint(x: number): number | null {
+    const rtl = getComputedStyle(this._slotsContainer).direction === 'rtl'
+    for (const [index, slot] of this._slots.entries()) {
+      const { left, right } = slot.getBoundingClientRect()
+      if ((rtl ? x >= left : x <= right) || index === this._slots.length - 1) {
+        return index
+      }
+    }
+
+    return null
+  }
+
+  protected _insert(text: string, keepHistory: boolean): void {
+    const transformed = this._config.pasteTransformer?.(text) ?? text
+    // Sanitize before applying the length limit. The browser applies maxlength
+    // to raw clipboard text before the input event, which can discard valid
+    // characters that follow separators or whitespace.
+    const sanitized = this._sanitize(transformed)
+    const { start, end } = this._insertRange(sanitized)
+    const inserted = sanitized.slice(0, this._length - this._input.value.length + end - start)
+
+    if (!inserted) {
+      return
+    }
+
+    this._writeText(inserted, start, end, keepHistory)
+  }
+
+  protected _insertRange(sanitized: string): { start: number, end: number } {
+    if (sanitized.length === this._length) {
+      return { start: 0, end: this._input.value.length }
+    }
+
+    const start = this._input.selectionStart ?? this._input.value.length
+    return { start, end: this._input.selectionEnd ?? start }
+  }
+
+  protected _writeText(text: string, start: number, end: number, keepHistory: boolean): void {
+    const input = this._input
+    if (keepHistory && input.matches(':focus')) {
+      input.setSelectionRange(start, end)
+      // Use the browser's editing command to keep this paste in its undo history.
+      this._executingCommand = true
+      try {
+        if (input.ownerDocument.execCommand('insertText', false, text)) {
+          return
+        }
+      } finally {
+        this._executingCommand = false
+      }
+    }
+
+    input.setRangeText(text, start, end, 'end')
+    input.dispatchEvent(new InputEvent('input', {
+      bubbles: true,
+      composed: true,
+      inputType: 'insertFromPaste',
+      data: text
+    }))
+  }
+
+  protected _afterValueChange(): void {
+    if (this._commitValue() && this._input) {
+      this._checkComplete()
+    }
+  }
+
+  protected _commitValue(isEdit = true): boolean {
+    const { value } = this._input
+    const isChanged = value !== this._value
+    this._value = value
+    this._render()
+    this._validation.update()
+
+    if (!isEdit) {
+      this._lastCompleteValue = this._completeValue()
+    }
+
+    if (isChanged) {
+      EventHandler.trigger(this._element, EVENT_CHANGE, { value })
+    }
+
+    return isChanged
+  }
+
+  protected _settleValue(): void {
+    this._value = this._input.value
+    this._lastCompleteValue = this._completeValue()
+    this._render()
     this._validation.update()
   }
 
-  _addEventListeners(): void {
-    EventHandler.on(this._element, EVENT_BEFORE_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
-      const { data, inputType } = event as unknown as { data: string | null, inputType: string }
-
-      if (inputType === 'insertText' && data && data.length === 1 && !this._isValidInput(data)) {
-        event.preventDefault()
-      }
-    })
-
-    EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_FORM_OTP_CONTROL, event => {
-      const { target } = event as unknown as { target: HTMLInputElement }
-
-      this._setInputsTabIndexes()
-
-      if (target!.value) {
-        setTimeout(() => {
-          target!.select()
-        }, 0)
-
-        return
-      }
-
-      if (this._config.linear) {
-        const inputs = this._getInputs()
-        const firstEmptyInput = inputs.find((input: HTMLInputElement) => !input.value)
-        if (firstEmptyInput && firstEmptyInput !== target) {
-          firstEmptyInput.focus()
-        }
-      }
-    })
-
-    EventHandler.on(this._element, EVENT_FOCUSOUT, SELECTOR_FORM_OTP_CONTROL, () => {
-      this._setInputsTabIndexes()
-    })
-
-    EventHandler.on(this._element, EVENT_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
-      const { target } = event as unknown as { target: HTMLInputElement }
-
-      // SMS autofill, password managers, dictation and IME commits insert the
-      // whole code at once and fire `input`, not `paste`. Spread it across the
-      // slots instead of leaving it in one of them.
-      if (target!.value.length > 1) {
-        const chars = this._extractValidChars(target!.value)
-        target!.value = ''
-
-        if (chars) {
-          this._distributeChars(target as HTMLInputElement, chars)
-          return
-        }
-      }
-
-      if (target!.value.length === 1 && !this._isValidInput(target!.value)) {
-        target!.value = ''
-      }
-
-      const inputs = this._getInputs()
-
-      if (!inputs.length) {
-        return
-      }
-
-      const value = inputs.map((input: HTMLInputElement) => input.value).join('')
-
-      if (value !== (this._inputElement ? this._inputElement.value : '')) {
-        this._setValue(value)
-      }
-
-      if (target!.value.length === 1) {
-        const nextInput = getNextActiveElement(inputs, target as HTMLInputElement, true)
-        if (nextInput) {
-          nextInput.focus()
-        }
-      }
-
-      this._setInputsTabIndexes()
-      this._syncFirstInputMaxLength()
-      this._checkAutoSubmit(inputs)
-    })
-
-    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_FORM_OTP_CONTROL, event => {
-      const { key, target } = event as unknown as { key: string, target: HTMLInputElement }
-
-      if (key === BACKSPACE_KEY && target!.value === '') {
-        const inputs = this._getInputs()
-
-        if (!inputs.length) {
-          return
-        }
-
-        getNextActiveElement(inputs, target as HTMLInputElement, false).focus()
-
-        this._setInputsTabIndexes()
-        return
-      }
-
-      if (key === ARROW_RIGHT_KEY || key === ARROW_LEFT_KEY) {
-        const shouldMoveNext = isForwardKey(key, isRTL(this._element))
-
-        if (shouldMoveNext && this._config.linear && target!.value === '') {
-          return
-        }
-
-        const inputs = this._getInputs()
-
-        if (!inputs.length) {
-          return
-        }
-
-        getNextActiveElement(inputs, target, shouldMoveNext).focus()
-      }
-    })
-
-    EventHandler.on(this._element, EVENT_PASTE, SELECTOR_FORM_OTP_CONTROL, event => {
-      event.preventDefault()
-
-      const pastedData = event.clipboardData.getData('text')
-      const validChars = this._extractValidChars(pastedData)
-
-      if (!validChars) {
-        return
-      }
-
-      this._distributeChars(event.target as HTMLInputElement, validChars)
-    })
-  }
-
-  // Write `chars` across the slots starting at `startInput`, then sync focus,
-  // the form value and auto-submit. Shared by paste and by multi-character
-  // `input` events.
-  _distributeChars(startInput: HTMLInputElement, chars: string): void {
-    const inputs = this._getInputs()
-
-    if (!inputs.length) {
+  protected _setDisabled(disabled: boolean): void {
+    if (this._input.disabled === disabled) {
       return
     }
 
-    // A value at least as long as the field is a complete code: fill from the
-    // first slot, whichever slot happens to be focused.
-    const startIndex = chars.length >= inputs.length ? 0 : Math.max(inputs.indexOf(startInput), 0)
-
-    for (let i = 0; i < chars.length && (startIndex + i) < inputs.length; i++) {
-      inputs[startIndex + i].value = chars[i]
-    }
-
-    // Focus the next empty input or the last filled one
-    const nextEmptyIndex = startIndex + chars.length
-    inputs[nextEmptyIndex < inputs.length ? nextEmptyIndex : inputs.length - 1].focus()
-
-    // Read the value back from the slots so already-filled ones are preserved.
-    this._setValue(inputs.map((input: HTMLInputElement) => input.value).join(''))
-    this._syncFirstInputMaxLength()
-    this._setInputsTabIndexes()
-    this._checkAutoSubmit(inputs)
+    this._input.disabled = disabled
+    this._render()
+    this._validation.update()
   }
 
-  // An empty first slot is where autofill lands, so it has to accept the whole
-  // code; once it holds a character it behaves like every other slot.
-  _syncFirstInputMaxLength(): void {
-    const inputs = this._getInputs()
-    const [first] = inputs
+  protected _completeValue(): string | null {
+    const { value } = this._input
+    return value.length === this._length ? value : null
+  }
 
-    if (first) {
-      first.maxLength = first.value ? 1 : inputs.length
+  protected _isFocused(): boolean {
+    return this._input.matches(':focus')
+  }
+
+  protected _firstEmptyIndex(): number {
+    return Math.min(this._input.value.length, this._length - 1)
+  }
+
+  // `:disabled` also matches an input inside `<fieldset disabled>`, which the
+  // `disabled` property doesn't
+  protected _isEditable(): boolean {
+    return !this._input.readOnly && !this._input.matches(':disabled')
+  }
+
+  // Represent the active slot as a selection: a filled slot is selected so the
+  // next keystroke overwrites it; an empty slot gets a collapsed caret.
+  protected _selectSlot(index: number): void {
+    const clamped = Math.max(0, Math.min(index, this._length - 1))
+    const end = clamped < this._input.value.length ? clamped + 1 : clamped
+    this._input.setSelectionRange(clamped, end)
+  }
+
+  protected _sanitize(value: string): string {
+    return value.normalize('NFKC').replace(this._type.filter, '').slice(0, this._length)
+  }
+
+  protected _render(): void {
+    const { value, placeholder } = this._input
+    const isFocused = this._isFocused()
+    const start = this._input.selectionStart ?? value.length
+    const end = this._input.selectionEnd ?? start
+    const caret = Math.min(start, this._length - 1)
+
+    for (const [index, slot] of this._slots.entries()) {
+      const char = value[index] ?? ''
+      const hint = placeholder.length === 1 ? placeholder : placeholder[index] ?? ''
+      const text = char && this._config.mask ? MASK_CHARACTER : char || hint
+      if (slot.textContent !== text) {
+        slot.textContent = text
+      }
+
+      slot.classList.toggle(CLASS_NAME_SLOT_FILLED, Boolean(char))
+      slot.classList.toggle(CLASS_NAME_SLOT_ACTIVE, isFocused && index === caret)
+      slot.classList.toggle(CLASS_NAME_SLOT_SELECTED, isFocused && end - start > 1 && index >= start && index < end)
     }
   }
 
-  _checkAutoSubmit(inputs: HTMLInputElement[]): void {
-    if (!this._config.autoSubmit) {
-      return
-    }
+  protected _checkComplete(): void {
+    const { value } = this._input
+    const completeValue = this._completeValue()
+    const changed = completeValue !== this._lastCompleteValue
+    this._lastCompleteValue = completeValue
 
-    // Check if all inputs are filled
-    const allFilled = inputs.every((input: HTMLInputElement) => input.value.length === 1)
+    if (completeValue && changed) {
+      EventHandler.trigger(this._element, EVENT_COMPLETE, { value })
 
-    if (allFilled) {
-      // Find the closest form element
-      const form = this._element.closest('form')
-      if (form && typeof form.requestSubmit === 'function') {
+      const { form } = this._input
+      if (this._config.autoSubmit && form && typeof form.requestSubmit === 'function') {
         form.requestSubmit()
       }
-    }
-  }
-
-  _getFirstEmptySlot(): HTMLInputElement | undefined {
-    const inputs = this._getInputs()
-
-    return inputs.find(input => !input.value) ?? inputs[0]
-  }
-
-  _getInputs(): HTMLInputElement[] {
-    return SelectorEngine.find<HTMLInputElement>(SELECTOR_FORM_OTP_CONTROL, this._element)
-  }
-
-  _readSlots(): string {
-    return this._getInputs().map(input => input.value).join('')
-  }
-
-  _createValueField(): void {
-    const field = createValueField('input', () => this._getFirstEmptySlot(), this._element)
-    this._resetCode = this._extractValidChars(String(this._config.value ?? '')) ? this._readSlots() : null
-    field.defaultValue = this._resetCode ?? this._getInputs().map(input => input.defaultValue).join('')
-    this._value = this._readSlots()
-    field.value = this._value
-
-    this._element.append(field)
-    this._inputElement = field
-    this._syncValueField()
-  }
-
-  _syncValueField(): void {
-    const field = this._inputElement!
-
-    configureValueField(field, {
-      disabled: this._disabled,
-      name: this._config.name,
-      required: this._config.required
-    })
-    field.pattern = `${this._config.type === 'number' ? '[0-9]' : '.'}{${this._getInputs().length}}`
-
-    if (this._config.id) {
-      field.id = this._config.id
-    } else {
-      field.removeAttribute('id')
-    }
-
-    this._validation.refresh()
-  }
-
-  _extractValidChars(text: string): string {
-    switch (this._config.type) {
-      case 'number': {
-        return text.replace(/\D/g, '')
-      }
-
-      default: {
-        return text // Allow all characters for unknown types
-      }
-    }
-  }
-
-  _isValidInput(value: string): boolean {
-    if (value.length !== 1) {
-      return false
-    }
-
-    switch (this._config.type) {
-      case 'number': {
-        return /^\d$/.test(value)
-      }
-
-      default: {
-        return /^.$/s.test(value) // Allow any single character for unknown types
-      }
-    }
-  }
-
-  _setValue(value: string | null): void {
-    if (!this._inputElement) {
-      return
-    }
-
-    const code = value || ''
-    const isChanged = code !== this._value
-
-    this._value = code
-    writeValueField(this._inputElement, code)
-    this._validation.update()
-
-    if (!isChanged) {
-      return
-    }
-
-    dispatchValueChange(this._inputElement)
-    EventHandler.trigger(this._element, EVENT_CHANGE, { value })
-
-    if (value && value.length === this._getInputs().length) {
-      EventHandler.trigger(this._element, EVENT_COMPLETE, { value })
-    }
-  }
-
-  _restoreValue(): void {
-    const code = this._resetCode
-
-    for (const [index, input] of this._getInputs().entries()) {
-      input.value = code === null ? input.defaultValue : code[index] ?? ''
-    }
-
-    this._setValue(this._readSlots() || null)
-    this._syncFirstInputMaxLength()
-    this._setInputsTabIndexes()
-  }
-
-  _seedSlots(code: OtpInputConfig['value'], clearWhenEmpty = false): void {
-    const value = this._extractValidChars(String(code ?? ''))
-
-    if (!value && !clearWhenEmpty) {
-      return
-    }
-
-    for (const [index, input] of this._getInputs().entries()) {
-      input.value = value[index] ?? ''
-    }
-
-    this._syncFirstInputMaxLength()
-  }
-
-  _setInputsAttributes(): void {
-    const inputs = this._getInputs()
-    for (const [index, input] of inputs.entries()) {
-      input.type = this._config.masked ? 'password' : 'text'
-
-      input.maxLength = 1
-      // Only the first slot advertises the one-time code, so SMS autofill and
-      // password managers target a single field instead of every slot.
-      input.autocomplete = index === 0 ? 'one-time-code' : 'off'
-      input.autocapitalize = 'off'
-      input.setAttribute('autocorrect', 'off')
-      input.spellcheck = false
-      input.enterKeyHint = index === inputs.length - 1 ? 'done' : 'next'
-
-      if (this._config.placeholder !== null) {
-        if (!this._placeholders.has(input)) {
-          this._placeholders.set(input, input.getAttribute('placeholder'))
-        }
-
-        const placeholder = String(this._config.placeholder)
-        input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder
-      }
-
-      writeAttribute(input, 'aria-required', this._config.required ? 'true' : null)
-
-      switch (this._config.type) {
-        case 'number': {
-          input.inputMode = 'numeric'
-          input.pattern = '[0-9]*'
-          break
-        }
-
-        default: {
-          input.inputMode = 'text'
-          input.pattern = '.*'
-        }
-      }
-
-      input.disabled = this._disabled
-      input.readOnly = false
-
-      if (this._config.id && !input.id) {
-        input.id = `${this._config.id}-${index}`
-      }
-
-      input.setAttribute('aria-label', this._config.ariaControlLabel(index, inputs.length))
-    }
-
-    this._syncFirstInputMaxLength()
-  }
-
-  _restorePlaceholder(input: HTMLInputElement): void {
-    const placeholder = this._placeholders.get(input)
-
-    if (typeof placeholder === 'string') {
-      input.placeholder = placeholder
-    } else {
-      input.removeAttribute('placeholder')
-    }
-
-    this._placeholders.delete(input)
-  }
-
-  _setInputsTabIndexes(): void {
-    const inputs = this._getInputs()
-    const active = rootActiveElement(this._element)
-    const tabStop = inputs.find(input => input === active) ?? inputs[0]
-
-    for (const input of inputs) {
-      input.tabIndex = input === tabStop ? 0 : -1
     }
   }
 
@@ -607,9 +750,9 @@ class OTPInput extends BaseComponent {
  * Data API implementation
  */
 
-onDocumentReady(window, EVENT_LOAD_DATA_API, () => {
-  for (const otp of SelectorEngine.find(SELECTOR_DATA_OTP)) {
-    OTPInput.getOrCreateInstance(otp)
+onDocumentReady(document, EVENT_DOM_CONTENT_LOADED_DATA_API, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_OTP)) {
+    OTPInput.getOrCreateInstance(element)
   }
 })
 

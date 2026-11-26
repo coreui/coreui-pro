@@ -160,7 +160,7 @@ The colon stays inside attribute values: `data-coreui-placement="bottom-start lg
 | `.avatar-status.status-offline` | `.avatar-status` with no theme class |
 | `.carousel-icon-prev`, `.carousel-icon-next` inside a `.btn-icon` | `<button class="carousel-control-prev">` with `.carousel-control-prev-icon` (and `-next`) |
 | `.carousel-overlay`, `.carousel-overlay-controls` | No equivalent. See `/components/carousel/`. |
-| `.otp`, `.otp-input`, `.otp-slot` | `.form-otp`, `.form-otp-control` (one input per character; name the `.form-otp` group with `aria-labelledby` or `aria-label`, a `<label for>` does not name the slots) |
+| `.otp`, `.otp-input`, `.otp-slot` | The same markup: one `<input class="otp-input">` in `.otp`. A masked field (`mask`) stays a password input. |
 | `.strength`, `.strength-segment` | An empty `<div data-coreui-password-strength>` (the plugin renders the meter) |
 | `.stepper` with `.stepper-item` | A different component: `.stepper[data-coreui-stepper]` with `.stepper-steps` and `.stepper-step`. See `/forms/stepper/`. |
 
@@ -192,7 +192,7 @@ These plugins are the same: Alert, Button, Carousel, Collapse, Dialog, Drawer, M
 | --- | --- | --- |
 | `Combobox`: `.menu` with `<button class="menu-item" data-bs-value>` after the toggle | `Combobox`: the toggle stays; the panel is `.popup.combobox-popup` holding `.list-box` > `.list-box-options[role="listbox"]` > `.list-box-option[data-coreui-value]` | `/forms/combobox/` |
 | `Datepicker`, `data-bs-toggle="datepicker"` on an input, needs `vanilla-calendar-pro` | `DatePicker`, `data-coreui-date-picker` on a `<div>`, no third-party calendar | `/forms/date-picker/` |
-| `OtpInput`, `data-bs-otp` (`length`, `groups`, `mask`, `separator`) | `OTPInput`, `data-coreui-otp` (`masked`, `linear`, `autoSubmit`, `name`) | `/forms/otp-input/` |
+| `OtpInput`, `data-bs-otp` (`length`, `groups`, `mask`, `separator`) | `OTPInput`, `data-coreui-otp` (the same options, plus `autoSubmit` and `validationState`; the value event is `change.coreui.otp-input`, not `input`) | `/forms/otp-input/` |
 | `Strength`, `data-bs-strength` | `PasswordStrength`, `data-coreui-password-strength` with `data-coreui-input="#field"` | `/forms/password-strength/` |
 | `Chips`, `data-bs-chips` | `ChipInput`, `data-coreui-chip-input` | `/forms/chip-input/` |
 | `Range`, `data-bs-bubble`, `formatter` | `Range`, `data-coreui-tooltips` (`true` or `"always"`), `tooltipsFormat` | `/forms/range/` |
@@ -357,7 +357,7 @@ CoreUI v6 follows the Bootstrap 5 to 6 changes, with three exceptions: responsiv
    | `$radius` in `scss/config` (6) | `--cui-radius` in `$root-tokens` |
    | `$btn-close-tokens` (6) | `$close-tokens` |
    | `$range-tokens` (6) | `$form-range-tokens` |
-   | `$otp-tokens` (6) | `$form-otp-tokens` |
+   | `$otp-tokens` (6) | `$otp-tokens` |
    | `$strength-tokens` (6) | `$password-strength-tokens` |
    | `$datepicker-tokens` (6) | `$date-picker-tokens` |
    | `$form-adorn-tokens` (6) | `$form-control-group-tokens` |
@@ -407,7 +407,7 @@ React and Vue projects can use `@coreui/react-pro` and `@coreui/vue-pro` (versio
    - `@popperjs/core`, `popperConfig`, `vanilla-calendar-pro`
    - `data-bs-`, `--bs-`, `\.bs\.`, `bootstrap\.` (keep `.bs-tooltip-*` and `.bs-popover-*`)
    - Bootstrap 6: class names containing `:` such as `md:`, `lg:`, `2xl:`, `hover:`, `sm-down:`
-   - Bootstrap 6: `btn-text`, `btn-styled`, `-accent`, `form-adorn`, `form-ghost`, `chip-dismiss`, `status-online`, `carousel-icon-`, `data-bs-chips`, `data-bs-strength`, `data-bs-otp`, `data-bs-bubble`, `toggle="datepicker"`, `nav-overflow`, `prose`
+   - Bootstrap 6: `btn-text`, `btn-styled`, `-accent`, `form-adorn`, `form-ghost`, `chip-dismiss`, `status-online`, `carousel-icon-`, `data-bs-chips`, `data-bs-strength`, `data-bs-bubble`, `toggle="datepicker"`, `nav-overflow`, `prose`
    - Bootstrap 5: `-xxl`, `btn-primary`, `btn-outline-`, `-light`, `-dark` (except `.navbar-dark`), `text-muted`, `modal-dialog`, `modal-content`, `accordion-button`, `form-check`, `needs-validation`, `was-validated`, `data-bs-ride`, `display-`, `lead`, `mw-100`, `mh-100`, `link-offset-`, `--bs-.*-rgb`
    - `@import` in Sass files
 3. Check every converted class against the stylesheet before keeping it:

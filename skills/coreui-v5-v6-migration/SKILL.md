@@ -243,7 +243,7 @@ A plugin that builds a component inside an element is enabled with a bare `data-
 | `data-coreui-touch` | remove, touch is native |
 | `data-coreui-animation` (Toast) | remove, add `.toast-instant` to skip the animation |
 | `data-coreui-read-only` (Rating) | `data-coreui-readonly` |
-| `data-coreui-readonly` (OTP) | remove, use `data-coreui-disabled="true"` |
+| `.form-otp` with a `.form-otp-control` per character (OTP) | `.otp` holding one `<input class="otp-input">`; `name`, `required`, `disabled`, `readonly`, `placeholder`, `value` and `maxlength` go on the input |
 | `data-coreui-select-adjacement-days`, `data-coreui-show-adjacement-days` | `data-coreui-select-adjacent-days`, `data-coreui-show-adjacent-days` |
 | `data-coreui-labels`, `data-coreui-clickable-labels`, `data-coreui-aria-labels` (Range Slider) | `data-coreui-ticks`, `data-coreui-clickable-ticks`, `data-coreui-aria-thumb-label` |
 | `data-coreui-search="global"` (Multi Select) | `data-coreui-search="true"` |
@@ -559,8 +559,10 @@ Change events now fire only when the value changes. Code that relied on a change
 | Range Slider | `ariaLabels` | `ariaThumbLabel` (array, comma-separated string, or `(index, total) => string`) |
 | Rating | `ariaLabel` | `ariaItemLabel` |
 | Rating | `readOnly` | `readonly` |
-| OTP Input | `ariaLabel` | `ariaControlLabel`; default `Character N of M` |
-| OTP Input | `readonly` | removed; use `disabled` |
+| OTP Input | `ariaLabel`, `linear` | removed |
+| OTP Input | `masked` | `mask` |
+| OTP Input | `type: 'number'`, `'text'` | `'numeric'`; `'text'` has no successor (`'alphanumeric'`, `'alpha'`) |
+| OTP Input | `name`, `required`, `disabled`, `placeholder`, `value` | attributes of the input |
 | Autocomplete, Multi Select, pickers | `invalid`, `valid` | `validationState: 'invalid'` or `'valid'` (old options are deprecated aliases) |
 
 ### Behaviour changes that need code
@@ -569,7 +571,7 @@ Change events now fire only when the value changes. Code that relied on a change
 2. **Calendar cell selectors.** Replace `.calendar-cell[tabindex="0"]` with `.calendar-cell[data-coreui-selectable]`. Day cells write `data-coreui-date` as `date.toDateString()`, so select them with `[data-coreui-date="${date.toDateString()}"]`.
 3. **Unnamed fields are not submitted.** Autocomplete, Multi Select, Chip Input and the pickers no longer generate a `name`. Set the `name` option on every one whose value the form must send.
 4. **Validation state comes only from the option.** Give it with `data-coreui-validation-state` and change it with `setValidationState()`. A component does not read `.is-invalid`, `.is-valid` or `aria-invalid` on its element, at start or later.
-5. **Hidden value inputs.** Replace `input[type="hidden"]` selectors: `.chip-input > select` for Chip Input, `.form-otp > input:not(.form-otp-control)` for OTP Input. Chip Input posts one entry per chip (`tags=a&tags=b`, nothing without chips) where v5 posted one value joined with commas: read the chips with `formData.getAll(name)` in the page and as a list on the server, a name ending in `[]` for PHP and Rails.
+5. **Hidden value inputs.** Replace `input[type="hidden"]` selectors: `.chip-input > select` for Chip Input, `.otp-input` for OTP Input. Chip Input posts one entry per chip (`tags=a&tags=b`, nothing without chips) where v5 posted one value joined with commas: read the chips with `formData.getAll(name)` in the page and as a list on the server, a name ending in `[]` for PHP and Rails.
 6. **Loading Button.** `disabledOnLoading` sets `aria-disabled="true"` and `.disabled`, not the `disabled` attribute. Replace `:disabled` checks with `[aria-disabled="true"]`.
 7. **Range Slider events.** The inner `changed.coreui.range` is gone. Listen to `input.coreui.range-slider` and `change.coreui.range-slider` on the slider element.
 8. **Stepper.** `next()` on the last step now finishes the stepper and fires `finish.coreui.stepper`. `finish()` before the last step does nothing; call `next()` to move forward.

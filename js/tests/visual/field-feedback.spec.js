@@ -164,21 +164,30 @@ describe('messages of a form field', () => {
   }
 
   describe('a one-time password', () => {
-    const OTP = `<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>${FEEDBACK}`
+    const OTP = `<div class="otp"><input class="otp-input" name="code" maxlength="2"></div>${FEEDBACK}`
 
     const mountOtp = (formAttributes, required = true) => {
       const form = mount(OTP, formAttributes)
-      const instance = new OTPInput(container.querySelector('.form-otp'), { required })
+      const input = container.querySelector('.otp-input')
+      input.required = required
+      const instance = new OTPInput(container.querySelector('.otp'))
 
-      return { form, instance, slots: [...container.querySelectorAll('.form-otp-control')] }
+      return {
+        form, input, instance, slots: [...container.querySelectorAll('.otp-slot')]
+      }
+    }
+
+    const typeCode = (input, value) => {
+      input.value = value
+      input.dispatchEvent(new Event('input', { bubbles: true }))
     }
 
     for (const [route, formAttributes, validate] of [
       ['the browser', 'data-coreui-validate', form => form.requestSubmit()],
       ['the form validation', 'data-coreui-validate novalidate', form => validateForm(form, new WeakMap())]
     ]) {
-      it(`shows the error after the group and links it to every slot once ${route} reports the code`, () => {
-        const { form, instance, slots } = mountOtp(formAttributes)
+      it(`shows the error after the field and links it to the input once ${route} reports the code`, () => {
+        const { form, input, instance, slots } = mountOtp(formAttributes)
 
         validate(form)
 
@@ -187,19 +196,15 @@ describe('messages of a form field', () => {
         expect(displayOf('.invalid-feedback')).toBe('block')
         expect(displayOf('.valid-feedback')).toBe('none')
         expect(getComputedStyle(slots[1]).borderTopColor).toBe(getComputedStyle(feedback).color)
-
-        for (const slot of slots) {
-          expect(slot.getAttribute('aria-describedby')).toBe(feedback.id)
-        }
+        expect(input.getAttribute('aria-describedby')).toBe(feedback.id)
 
         instance.dispose()
       })
     }
 
     it('keeps the success away while the form validation finds the code incomplete', () => {
-      const { form, instance, slots } = mountOtp('data-coreui-validate="valid" novalidate')
-      slots[0].value = '1'
-      slots[0].dispatchEvent(new Event('input', { bubbles: true }))
+      const { form, input, instance } = mountOtp('data-coreui-validate="valid" novalidate')
+      typeCode(input, '1')
 
       validateForm(form, new WeakMap())
 
@@ -210,15 +215,13 @@ describe('messages of a form field', () => {
     })
 
     it('keeps every slot in the error colour when the form validation reports a code the user touched', async () => {
-      const { form, instance, slots } = mountOtp('data-coreui-validate="valid" novalidate')
+      const { form, input, instance, slots } = mountOtp('data-coreui-validate="valid" novalidate')
 
       for (const slot of slots) {
         slot.style.transition = 'none'
       }
 
-      await userEvent.type(slots[0], '1')
-
-      expect(slots[0].matches(':user-valid')).toBeTrue()
+      await userEvent.type(input, '1')
 
       validateForm(form, new WeakMap())
 
@@ -230,12 +233,8 @@ describe('messages of a form field', () => {
     })
 
     it('shows only the error once the page gives the code the invalid state after a submit the browser took', () => {
-      const { form, instance, slots } = mountOtp('data-coreui-validate="valid" novalidate')
-
-      for (const [index, slot] of slots.entries()) {
-        slot.value = String(index)
-        slot.dispatchEvent(new Event('input', { bubbles: true }))
-      }
+      const { form, input, instance } = mountOtp('data-coreui-validate="valid" novalidate')
+      typeCode(input, '01')
 
       form.requestSubmit()
       instance.setValidationState('invalid')
@@ -246,13 +245,9 @@ describe('messages of a form field', () => {
       instance.dispose()
     })
 
-    it('shows the success after the group once the browser takes the code', () => {
-      const { form, instance, slots } = mountOtp('data-coreui-validate="valid"')
-
-      for (const [index, slot] of slots.entries()) {
-        slot.value = String(index)
-        slot.dispatchEvent(new Event('input', { bubbles: true }))
-      }
+    it('shows the success after the field once the browser takes the code', () => {
+      const { form, input, instance } = mountOtp('data-coreui-validate="valid"')
+      typeCode(input, '01')
 
       form.requestSubmit()
 
@@ -262,26 +257,40 @@ describe('messages of a form field', () => {
       instance.dispose()
     })
 
-    it('lays the value field over the group, where the browser shows its message', () => {
-      const { instance } = mountOtp('')
-      const group = container.querySelector('.form-otp').getBoundingClientRect()
-      const field = instance._inputElement.getBoundingClientRect()
+    it('lays the input over the slots, where the browser shows its message', () => {
+      const { input, instance } = mountOtp('')
+      const otp = container.querySelector('.otp').getBoundingClientRect()
+      const field = input.getBoundingClientRect()
 
-      expect([field.left, field.top, field.width, field.height]).toEqual([group.left, group.top, group.width, group.height])
-      expect(getComputedStyle(instance._inputElement).opacity).toBe('0')
+      expect([field.left, field.top, field.width, field.height]).toEqual([otp.left, otp.top, otp.width, otp.height])
+      expect(getComputedStyle(input).color).toBe('rgba(0, 0, 0, 0)')
 
       instance.dispose()
     })
 
-    it('shows the error after the group for a slot the page marks invalid, and gives no slot a state', () => {
-      const form = mount(OTP.replace('form-otp-control', 'form-otp-control is-invalid'), '')
-      const instance = new OTPInput(container.querySelector('.form-otp'))
-      const slots = [...container.querySelectorAll('.form-otp-control')]
+    it('shows the error after the field for an input the page marks invalid, and writes no state on it', () => {
+      const form = mount(OTP.replace('class="otp-input"', 'class="otp-input is-invalid"'), '')
+      const instance = new OTPInput(container.querySelector('.otp'))
+      const input = container.querySelector('.otp-input')
 
       expect(displayOf('.invalid-feedback')).toBe('block')
-      expect(slots.map(slot => slot.getAttribute('aria-invalid'))).toEqual([null, null])
-      expect(slots.map(slot => slot.hasAttribute('aria-describedby'))).toEqual([false, false])
+      expect(input.getAttribute('aria-invalid')).toBeNull()
       expect(form.checkValidity()).toBeTrue()
+
+      instance.dispose()
+    })
+
+    it('keeps a valid state the page gives in a plain form once the user leaves the code incomplete', async () => {
+      const { input, instance, slots } = mountOtp('', true)
+      instance.setValidationState('valid')
+
+      await userEvent.type(input, '1')
+      input.blur()
+
+      const { color } = getComputedStyle(container.querySelector('.valid-feedback'))
+
+      expect(displayOf('.valid-feedback')).toBe('block')
+      expect(getComputedStyle(slots[0]).borderTopColor).toBe(color)
 
       instance.dispose()
     })

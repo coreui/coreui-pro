@@ -25,11 +25,12 @@
   }
 }
 
-@mixin form-otp-control-validation-state($border-color, $focus-ring-color) {
-  border-color: $border-color;
+@mixin otp-validation-state($border-color, $focus-ring-color) {
+  .otp-slot {
+    --#{$prefix}otp-slot-border-color: #{$border-color};
+  }
 
-  &:focus {
-    border-color: $border-color;
+  .otp-slot-active {
     @include focus-ring(true, $color: $focus-ring-color);
   }
 }
@@ -44,11 +45,11 @@
   $border-color: var(--#{$prefix}#{$theme}-fg)
 ) {
   $without-error: ":not(.is-invalid, :has(.is-invalid, > :user-invalid, > .form-floating > :user-invalid))";
-  $form-otp-state: ".form-otp:is(.is-#{$state}, :has(.is-#{$state}))";
+  $otp-state: ".otp:is(.is-#{$state}, :has(> .is-#{$state}))";
   $range-without-error: "";
 
   @if $state != "invalid" {
-    $form-otp-state: "#{$form-otp-state}#{$without-error}";
+    $otp-state: "#{$otp-state}:not(.is-invalid, :has(> .is-invalid))";
     $range-without-error: ":not(.is-invalid)";
   }
 
@@ -402,35 +403,23 @@
     }
   }
 
-  .form-otp-control {
-    @include form-validation-state-selector($state) {
-      @include form-otp-control-validation-state($border-color, $focus-ring-color);
-    }
-  }
-
-  #{$form-otp-state} {
-    .form-otp-control {
-      @include form-otp-control-validation-state($border-color, $focus-ring-color);
-    }
+  #{$otp-state} {
+    @include otp-validation-state($border-color, $focus-ring-color);
 
     ~ .#{$state}-feedback,
     ~ .#{$state}-tooltip { display: block; }
   }
 
   @if $state == "invalid" {
-    [data-coreui-validate] .form-otp:has(:user-invalid) {
-      .form-otp-control {
-        @include form-otp-control-validation-state($border-color, $focus-ring-color);
-      }
+    [data-coreui-validate] .otp:has(> .otp-input:user-invalid) {
+      @include otp-validation-state($border-color, $focus-ring-color);
 
       ~ .invalid-feedback,
       ~ .invalid-tooltip { display: block; }
     }
   } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] .form-otp#{$without-error}:not(:has(:user-invalid)):has(> input:not(.form-otp-control):user-valid) {
-      .form-otp-control {
-        @include form-otp-control-validation-state($border-color, $focus-ring-color);
-      }
+    [data-coreui-validate~="valid"] .otp#{$without-error}:has(> .otp-input:user-valid) {
+      @include otp-validation-state($border-color, $focus-ring-color);
 
       ~ .valid-feedback,
       ~ .valid-tooltip { display: block; }

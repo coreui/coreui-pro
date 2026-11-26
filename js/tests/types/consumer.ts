@@ -195,7 +195,7 @@ const unknownOptions = [
   Tooltip.getOrCreateInstance(element, { titel: 'Hello' }),
   // @ts-expect-error — setDate takes the type of the date option
   new TimeInput(element).setDate({ second: true }),
-  // @ts-expect-error — and setValue the type of the value option
+  // @ts-expect-error — and setValue a string or a number
   new OTPInput(element).setValue([4])
 ]
 
@@ -332,7 +332,7 @@ const isValid: boolean = form.validate()
 const ownOptions = [
   new DateInput(element, { seconds: true, type: 'datetime' }),
   new TimeInput(element, { seconds: true }),
-  new OTPInput(element, { placeholder: 0, value: 123456 })
+  new OTPInput(element, { groups: [3, 3], length: 6, pasteTransformer: text => text.trim() })
 ]
 
 // A composite also takes the options of the parts it forwards them to.

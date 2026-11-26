@@ -350,16 +350,20 @@ const ADAPTERS = [
   },
   {
     name: 'OTPInput',
-    markup: attributes => `<div${attributes('form-otp')}><input class="form-otp-control"></div>${FEEDBACK}`,
-    create: (root, config) => new OTPInput(root.querySelector('.form-otp'), { name: 'code', ...config }),
-    host: t => t.root.querySelector('.form-otp'),
-    valueFields: t => [t.instance._inputElement],
+    markup: attributes => `<div${attributes('otp')}><input class="otp-input" name="code" maxlength="1"></div>${FEEDBACK}`,
+    create(root, config) {
+      const { required, ...options } = config ?? {}
+      root.querySelector('.otp-input').required = Boolean(required)
+      return new OTPInput(root.querySelector('.otp'), options)
+    },
+    host: t => t.root.querySelector('.otp'),
+    valueFields: t => [t.root.querySelector('.otp-input')],
     verdictField: t => t.form.elements.code,
-    frames: t => [t.root.querySelector('.form-otp')],
-    invalidTargets: t => [...t.root.querySelectorAll('.form-otp-control')],
-    describedTargets: t => [...t.root.querySelectorAll('.form-otp-control')],
-    changeAsUser: t => typeInto(t.root.querySelector('.form-otp-control'), '1'),
-    changeEvents: t => [[t.root.querySelector('.form-otp'), 'change.coreui.otp-input'], ...nativeChange(t.instance._inputElement)],
+    frames: t => [t.root.querySelector('.otp')],
+    invalidTargets: t => [t.root.querySelector('.otp-input')],
+    describedTargets: t => [t.root.querySelector('.otp-input')],
+    changeAsUser: t => typeInto(t.root.querySelector('.otp-input'), '1'),
+    changeEvents: t => [[t.root.querySelector('.otp'), 'change.coreui.otp-input'], [t.root.querySelector('.otp-input'), 'input']],
     changeMethods: [
       ['clear()', t => t.instance.clear()],
       ['reset()', t => t.instance.reset()]
