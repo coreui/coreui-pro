@@ -43,6 +43,7 @@ import type {
 import { onLabelClick } from './util/field-label.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus } from './util/focus.js'
+import { watchFieldset } from './util/fieldset.js'
 import { configureValueField, createValueField, type ValidationState } from './util/form-validation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isForwardKey, isRTL, jQueryDispatch, writeAttribute
@@ -224,6 +225,8 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   declare ['constructor']: typeof DateInput & typeof BaseComponent
   protected declare _date: Date | null
   protected declare _disabled: boolean
+  protected declare _fieldsetDisabled: boolean
+  protected declare _fieldsetWatch: HTMLElement
   protected declare _minDate: Date | null
   protected declare _notifying: number
   protected declare _orderMessage: string
@@ -290,7 +293,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._addEventListeners()
     this._removeLabelClick = onLabelClick(this._element, () => this._focusFirstEmptySection())
 
-    if (this._config.autofocus && !this._disabled) {
+    if (this._config.autofocus && !this._isDisabled()) {
       this._getSectionElements()[0]?.focus()
     }
   }
@@ -359,6 +362,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       return
     }
 
+    this._fieldsetWatch.remove()
     this._removeLabelClick()
     EventHandler.off(this._element, this.constructor.EVENT_KEY)
     this._validation.dispose()
@@ -378,12 +382,41 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       return
     }
 
-    const focused = this._getSectionElements().find(sectionElement => containsFocus(sectionElement)) ?? null
+    const focused = this._getFocusedSection()
     this._disabled = disabled
 
-    if (disabled) {
+    if (this._isDisabled()) {
       focused?.blur()
     }
+
+    this._inputElement!.disabled = disabled
+    this._errorElement!.disabled = disabled
+    this._writeDisabled(focused)
+    this._validation.update()
+  }
+
+  _setFieldsetDisabled(disabled: boolean): void {
+    this._fieldsetDisabled = disabled
+    this._writeDisabled(this._getFocusedSection())
+    this._validation.update()
+    queueMicrotask(() => {
+      if (this._isDisabled()) {
+        this._getFocusedSection()?.blur()
+        this._setTabIndexes()
+      }
+    })
+  }
+
+  _isDisabled(): boolean {
+    return this._disabled || this._fieldsetDisabled
+  }
+
+  _getFocusedSection(): HTMLElement | null {
+    return this._getSectionElements().find(sectionElement => containsFocus(sectionElement)) ?? null
+  }
+
+  _writeDisabled(focused: HTMLElement | null = null): void {
+    const disabled = this._isDisabled()
 
     this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
 
@@ -392,10 +425,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       writeAttribute(sectionElement, 'contenteditable', disabled ? null : 'true')
     }
 
-    this._inputElement!.disabled = disabled
-    this._errorElement!.disabled = disabled
     this._setTabIndexes(focused)
-    this._validation.update()
   }
 
   _getAriaLabel(): string {
@@ -446,7 +476,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     })
 
     EventHandler.on(this._element, eventName('mousedown'), SELECTOR_SECTION, (event: any) => {
-      if (this._disabled) {
+      if (this._isDisabled()) {
         return
       }
 
@@ -459,7 +489,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       if (!this._element.contains(event.relatedTarget)) {
         this._setAllSelected(false)
 
-        if (!this._disabled) {
+        if (!this._isDisabled()) {
           this._normalizeSections()
         }
       }
@@ -508,7 +538,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   }
 
   _focusFirstEmptySection(): void {
-    if (this._inputElement?.matches(':disabled')) {
+    if (this._isDisabled()) {
       return
     }
 
@@ -806,7 +836,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     const disabled = this._disabled
 
     this._element.classList.add(CLASS_NAME_FORM_CONTROL, CLASS_NAME_SECTION_INPUT)
-    this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
     this._element.setAttribute('role', 'group')
 
     if (!this._hostAriaLabel) {
@@ -839,12 +868,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
         'data-coreui-section': section.type
       }
 
-      if (disabled) {
-        attributes['aria-disabled'] = 'true'
-      } else {
-        attributes.contenteditable = 'true'
-      }
-
       if (readonly) {
         attributes['aria-readonly'] = 'true'
       }
@@ -870,8 +893,10 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       disabled, name, readOnly: readonly, required
     })
     this._element.append(this._errorElement, this._inputElement)
+    this._fieldsetWatch = watchFieldset(this._inputElement, disabled => this._setFieldsetDisabled(disabled))
+    this._fieldsetDisabled = this._fieldsetWatch.matches(':disabled')
     this._syncSections()
-    this._setTabIndexes()
+    this._writeDisabled()
     this._validation.refresh()
   }
 
@@ -901,9 +926,11 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   _setTabIndexes(activeElement: HTMLElement | null = null): void {
     const sectionElements = this._getSectionElements()
     const focusableElement = activeElement || sectionElements[0]
+    const disabled = this._isDisabled()
 
     for (const sectionElement of sectionElements) {
-      sectionElement.tabIndex = !this._disabled && sectionElement === focusableElement ? 0 : -1
+      const tabIndex = sectionElement === focusableElement ? '0' : '-1'
+      writeAttribute(sectionElement, 'tabindex', disabled ? (containsFocus(sectionElement) ? '-1' : null) : tabIndex)
     }
   }
 
@@ -943,7 +970,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   }
 
   _isEditable(): boolean {
-    return !this._disabled && !this._config.readonly
+    return !this._isDisabled() && !this._config.readonly
   }
 
   _getSection(index: number): EditableSection {

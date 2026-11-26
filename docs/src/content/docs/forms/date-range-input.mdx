@@ -217,6 +217,8 @@ The frame is a `.form-control-group`, so the standard sizing classes work — se
 
 Add `data-coreui-disabled="true"` to disable both ends, or `data-coreui-readonly="true"` to make them focusable but non-editable.
 
+Inside a `<fieldset disabled>` both ends are disabled with the fieldset and follow it when the fieldset is enabled or disabled later, or when the range moves into or out of one. To follow the fieldset each end adds a hidden `<coreui-fieldset-watch>` element after its value field. They are listed in `form.elements` and `fieldset.elements`, where they shift the index of the controls after them, and add nothing to the submitted data.
+
 <Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateRangeInputDisabledLabel">Disabled</label>
     <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20" data-coreui-disabled="true" aria-labelledby="dateRangeInputDisabledLabel"></div>

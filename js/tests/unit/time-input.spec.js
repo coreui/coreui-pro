@@ -94,6 +94,22 @@ describe('TimeInput', () => {
     })
   })
 
+  describe('fieldset', () => {
+    it('should follow a toggle of the fieldset and stay enabled in its first legend', () => {
+      fixtureEl.innerHTML = '<fieldset><div id="field"></div><legend><div id="legend"></div></legend></fieldset><fieldset disabled><legend><div id="first"></div></legend></fieldset>'
+      const timeInput = new TimeInput(fixtureEl.querySelector('#field'), { format: 'HH:mm' })
+      const inLegend = new TimeInput(fixtureEl.querySelector('#first'), { format: 'HH:mm' })
+      const [hours] = timeInput._element.querySelectorAll('.form-date-time-section')
+
+      fixtureEl.querySelector('fieldset').disabled = true
+      expect(hours.getAttribute('aria-disabled')).toEqual('true')
+
+      fixtureEl.querySelector('fieldset').disabled = false
+      expect(hours.isContentEditable).toBeTrue()
+      expect(inLegend._element.querySelector('.form-date-time-section').isContentEditable).toBeTrue()
+    })
+  })
+
   describe('DATA_KEY', () => {
     it('should return plugin data key', () => {
       expect(TimeInput.DATA_KEY).toEqual('coreui.time-input')

@@ -11,6 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
 import FieldValidation from './util/field-validation.js'
+import { watchFieldset } from './util/fieldset.js'
 import { holdsFocusOrNone } from './util/focus.js'
 import {
   appendControlGroupField,
@@ -51,6 +52,8 @@ abstract class PickerBase extends BaseComponent {
   protected declare _adoptedAttributes: [Element, string, string | null, string | null][]
   protected declare _cleanerElement: HTMLElement | null
   protected declare _createdElements: Element[]
+  protected declare _fieldsetDisabled: boolean
+  protected declare _fieldsetWatch: HTMLElement
   protected declare _footerTemplate: HTMLTemplateElement | null
   protected declare _input: any
   protected declare _menu: HTMLElement
@@ -103,6 +106,7 @@ abstract class PickerBase extends BaseComponent {
       return
     }
 
+    this._fieldsetWatch.remove()
     for (const element of this._listeningElements()) {
       EventHandler.off(element, this.constructor.EVENT_KEY)
     }
@@ -158,6 +162,16 @@ abstract class PickerBase extends BaseComponent {
 
   _addEventListeners(): void {
     const eventName = this.constructor.eventName('click')
+    this._fieldsetWatch = watchFieldset(this._element.lastElementChild!, disabled => {
+      this._fieldsetDisabled = disabled
+      queueMicrotask(() => {
+        if (this._fieldsetDisabled) {
+          this.hide()
+        }
+      })
+    })
+
+    this._fieldsetDisabled = this._fieldsetWatch.matches(':disabled')
 
     if (this._cleanerElement) {
       EventHandler.on(this._cleanerElement, eventName, (event: any) => {
@@ -193,7 +207,7 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _isEditable(): boolean {
-    return !this._config.disabled && !this._config.readonly
+    return !this._config.disabled && !this._fieldsetDisabled && !this._config.readonly
   }
 
   _createControlGroup(className: string): void {
@@ -310,7 +324,7 @@ abstract class PickerBase extends BaseComponent {
     return {
       clear: () => this.clear(),
       close: () => this.hide(),
-      disabled: this._config.disabled,
+      disabled: this._config.disabled || this._fieldsetDisabled,
       reset: () => this.reset()
     }
   }

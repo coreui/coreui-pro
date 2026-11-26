@@ -147,6 +147,8 @@ The field renders as a `.form-control`, so the standard sizing classes work — 
 
 Add `data-coreui-disabled="true"` to disable the field, or `data-coreui-readonly="true"` to make it focusable but non-editable.
 
+Inside a `<fieldset disabled>` the field is disabled with the fieldset and follows it when the fieldset is enabled or disabled later, or when the field moves into or out of one; a field in the fieldset's first `<legend>` stays enabled, as native fields do. To follow the fieldset the component adds a hidden `<coreui-fieldset-watch>` element after its value field. It is listed in `form.elements` and `fieldset.elements`, where it shifts the index of the controls after it, and adds nothing to the submitted data.
+
 <Example pro code={`<div class="mb-4">
     <label class="form-label" id="timeInputDisabledLabel">Disabled</label>
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-disabled="true" aria-labelledby="timeInputDisabledLabel"></div>

@@ -17,6 +17,7 @@ import { type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement } from
 import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
 import { containsFocus, rootActiveElement } from './util/focus.js'
+import { watchFieldset } from './util/fieldset.js'
 import FocusTrap from './util/focustrap.js'
 import { armValueFieldBubble, closeValueFieldBubble, type ValidationState } from './util/form-validation.js'
 import { isComposingKey, settleClick } from './util/layers.js'
@@ -270,6 +271,8 @@ class MultiSelect extends ComboboxBase {
   protected declare _offListOptions: HTMLOptionElement[]
   protected declare _seenValues: Set<string>
   protected declare _disabled: boolean
+  protected declare _fieldsetDisabled: boolean
+  protected declare _fieldsetWatch: HTMLElement
   protected declare _givenApplies: boolean
   protected declare _givenValues: Set<string> | null
   protected declare _sourceOptions: any[] | false
@@ -437,6 +440,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   override dispose(): void {
+    this._fieldsetWatch.remove()
     this._disposeLayer()
     this._validation.dispose()
     this._destroySelect()
@@ -588,7 +592,18 @@ class MultiSelect extends ComboboxBase {
 
   // Private
   override _isDisabled(): boolean {
-    return this._disabled
+    return this._disabled || this._fieldsetDisabled
+  }
+
+  _setFieldsetDisabled(disabled: boolean): void {
+    this._fieldsetDisabled = disabled
+    this._writeDisabled()
+    this._render()
+    queueMicrotask(() => {
+      if (this._isDisabled()) {
+        this.hide()
+      }
+    })
   }
 
   _setDisabled(disabled: boolean): void {
@@ -602,12 +617,21 @@ class MultiSelect extends ComboboxBase {
       this.hide()
     }
 
-    this._element.toggleAttribute('disabled', disabled)
+    this._writeDisabled()
+    this._render()
+  }
+
+  _writeDisabled(): void {
+    const disabled = this._isDisabled()
+
+    this._element.toggleAttribute('disabled', this._disabled)
     this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
     this._wrapperElement.classList.toggle(CLASS_NAME_DISABLED, disabled)
-    this._togglerElement.classList.toggle(CLASS_NAME_DISABLED, disabled)
 
-    this._writeFrameState()
+    if (!this._config.search) {
+      writeAttribute(this._wrapperElement, 'aria-disabled', disabled ? 'true' : null)
+      writeAttribute(this._wrapperElement, 'tabindex', disabled ? null : '0')
+    }
 
     if (this._indicatorElement) {
       this._indicatorElement.disabled = disabled
@@ -616,8 +640,6 @@ class MultiSelect extends ComboboxBase {
     if (this._searchElement) {
       this._searchElement.disabled = disabled
     }
-
-    this._render()
   }
 
   _destroySelect(): void {
@@ -681,7 +703,7 @@ class MultiSelect extends ComboboxBase {
     })
 
     EventHandler.on(this._togglerElement, EVENT_CLICK, SELECTOR_CLEANER, (event: any) => {
-      if (!this._disabled) {
+      if (!this._isDisabled()) {
         const refocus = containsFocus(event.delegateTarget)
 
         event.preventDefault()
@@ -697,7 +719,7 @@ class MultiSelect extends ComboboxBase {
     })
 
     EventHandler.on(this._wrapperElement, EVENT_CLICK, () => {
-      if (this._disabled) {
+      if (this._isDisabled()) {
         return
       }
 
@@ -813,7 +835,7 @@ class MultiSelect extends ComboboxBase {
         event.preventDefault()
         event.stopPropagation()
 
-        if (!this._disabled) {
+        if (!this._isDisabled()) {
           this._toggleSelectAll()
         }
       })
@@ -886,8 +908,6 @@ class MultiSelect extends ComboboxBase {
     } else {
       this._element.removeAttribute('required')
     }
-
-    this._element.toggleAttribute('disabled', this._disabled)
   }
 
   _createNativeOptions(parentElement: HTMLElement, options: any[]): void {
@@ -978,17 +998,15 @@ class MultiSelect extends ComboboxBase {
 
   _createSelect(): void {
     const wrapper = document.createElement('div')
-    wrapper.classList.add(CLASS_NAME_SELECT)
-
-    this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
-
-    wrapper.classList.add(...this._element.classList)
+    wrapper.classList.add(CLASS_NAME_SELECT, ...this._element.classList)
 
     this._wrapperElement = wrapper
     // The wrapper takes the native select's place, then the select moves inside it
     // as an invisible overlay so native `required` validation anchors over the control.
     this._element.parentNode!.insertBefore(wrapper, this._element)
     wrapper.prepend(this._element)
+    this._fieldsetWatch = watchFieldset(this._element, disabled => this._setFieldsetDisabled(disabled))
+    this._fieldsetDisabled = this._fieldsetWatch.matches(':disabled')
 
     this._uniqueId = this._config.id || this._hostAttributes.get('id') || getUID(`${this.constructor.NAME}`)
 
@@ -1007,6 +1025,7 @@ class MultiSelect extends ComboboxBase {
       this._element.setAttribute('name', this._uniqueName)
     }
 
+    this._writeDisabled()
     this._wireTogglerAccessibleName()
     this._markField()
     this._validation.refresh()
@@ -1024,12 +1043,6 @@ class MultiSelect extends ComboboxBase {
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
 
-    if (this._disabled) {
-      togglerEl.classList.add(CLASS_NAME_DISABLED)
-    }
-
-    this._writeFrameState()
-
     const selectionEl = document.createElement('div')
     selectionEl.classList.add(CLASS_NAME_SELECTION)
 
@@ -1043,7 +1056,7 @@ class MultiSelect extends ComboboxBase {
     this._selectionElement = selectionEl
 
     if (this._config.multiple && ['chips', 'tags'].includes(this._config.selectionType)) {
-      this._selectionChipSet = new MultiSelectChipSet(selectionEl, { removable: !this._disabled, typeahead: false })
+      this._selectionChipSet = new MultiSelectChipSet(selectionEl, { removable: !this._isDisabled(), typeahead: false })
     }
   }
 
@@ -1054,26 +1067,14 @@ class MultiSelect extends ComboboxBase {
 
     if (this._config.pickerIcon) {
       this._indicatorElement = this._createIndicator()
-      this._indicatorElement.disabled = this._disabled
     }
 
     this._updateSelectionCleaner()
   }
 
-  _writeFrameState(): void {
-    if (!this._config.search) {
-      writeAttribute(this._togglerElement, 'aria-disabled', this._disabled ? 'true' : null)
-      writeAttribute(this._togglerElement, 'tabindex', this._disabled ? null : '0')
-    }
-  }
-
   _createSearchInput(): void {
     const input = document.createElement('input')
     input.classList.add(CLASS_NAME_SEARCH)
-
-    if (this._disabled) {
-      input.disabled = true
-    }
 
     input.setAttribute('id', `search-${this._uniqueId}`)
     input.autocomplete = 'off'
@@ -1190,7 +1191,7 @@ class MultiSelect extends ComboboxBase {
       ariaRemoveLabel: this._config.ariaTagDeleteLabel ?? this._config.ariaChipRemoveLabel,
       disabled: disabled === true,
       owned: true,
-      removable: !this._disabled && disabled !== true
+      removable: !this._isDisabled() && disabled !== true
     })
 
     return chip
@@ -1209,7 +1210,7 @@ class MultiSelect extends ComboboxBase {
     for (const chip of SelectorEngine.children(selection, SELECTOR_CHIP) as HTMLElement[]) {
       const option = selected.find((option: any) => option.value === chip.dataset.value)
 
-      if (option && chip.firstChild?.textContent === option.text && Boolean(SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip)) === (!this._disabled && option.disabled !== true)) {
+      if (option && chip.firstChild?.textContent === option.text && Boolean(SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip)) === (!this._isDisabled() && option.disabled !== true)) {
         chips.set(option.value, chip)
         continue
       }
@@ -1555,7 +1556,7 @@ class MultiSelect extends ComboboxBase {
       return
     }
 
-    const clearable = !this._disabled && this._selectedOptions().some((option: any) => !option.disabled)
+    const clearable = !this._isDisabled() && this._selectedOptions().some((option: any) => !option.disabled)
 
     if (clearable && this._selectionCleanerElement === null) {
       const selectionCleaner = this._createCleaner()

@@ -2943,6 +2943,234 @@ describe('DateInput', () => {
     })
   })
 
+  describe('fieldset', () => {
+    const createInFieldset = (fieldsetAttributes = '', config = {}) => {
+      fixtureEl.innerHTML = `<form><fieldset ${fieldsetAttributes}><div id="mydateinput"></div></fieldset></form>`
+      return new DateInput(fixtureEl.querySelector('#mydateinput'), {
+        date: '2026-03-04', format: 'dd.MM.yyyy', name: 'due', ...config
+      })
+    }
+
+    const expectDisabled = (dateInput, disabled) => {
+      const [day] = getSections(dateInput._element)
+
+      expect(dateInput._element.classList.contains('disabled')).toBe(disabled)
+      expect(day.isContentEditable).toBe(!disabled)
+      expect(day.tabIndex).toBe(disabled ? -1 : 0)
+      expect(day.getAttribute('aria-disabled')).toEqual(disabled ? 'true' : null)
+    }
+
+    it('should start disabled inside a disabled fieldset without disabling its value field', () => {
+      const dateInput = createInFieldset('disabled')
+
+      expectDisabled(dateInput, true)
+      expect(getValueField(dateInput._element).hasAttribute('disabled')).toBeFalse()
+      expect(new FormData(fixtureEl.querySelector('form')).has('due')).toBeFalse()
+    })
+
+    it('should not autofocus inside a disabled fieldset', () => {
+      createInFieldset('disabled', { autofocus: true })
+
+      expect(document.activeElement).toEqual(document.body)
+    })
+
+    it('should stay enabled inside the first legend of a disabled fieldset', () => {
+      fixtureEl.innerHTML = '<fieldset disabled><legend><div id="mydateinput"></div></legend></fieldset>'
+      const dateInput = new DateInput(fixtureEl.querySelector('#mydateinput'), { format: 'dd.MM.yyyy' })
+
+      expectDisabled(dateInput, false)
+    })
+
+    it('should follow a toggle of the fieldset and keep submitting after it is enabled again', () => {
+      const dateInput = createInFieldset()
+      const fieldset = fixtureEl.querySelector('fieldset')
+
+      fieldset.disabled = true
+      expectDisabled(dateInput, true)
+
+      fieldset.disabled = false
+      expectDisabled(dateInput, false)
+      expect(getValueField(dateInput._element).hasAttribute('disabled')).toBeFalse()
+      expect(new FormData(fixtureEl.querySelector('form')).get('due')).toEqual('04.03.2026')
+    })
+
+    it('should follow a move into a disabled fieldset', () => {
+      fixtureEl.innerHTML = '<fieldset disabled></fieldset><div id="mydateinput"></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('#mydateinput'), { format: 'dd.MM.yyyy' })
+
+      fixtureEl.querySelector('fieldset').append(dateInput._element)
+
+      expectDisabled(dateInput, true)
+    })
+
+    it('should blur the focused section after the task that disables the fieldset', async () => {
+      const dateInput = createInFieldset()
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      fixtureEl.querySelector('fieldset').disabled = true
+
+      expect(day.tabIndex).toBe(-1)
+      await Promise.resolve()
+      expect(document.activeElement).not.toEqual(day)
+    })
+
+    it('should keep the focus and the tab stop when the fieldset is disabled and enabled in one task', async () => {
+      const dateInput = createInFieldset()
+      const fieldset = fixtureEl.querySelector('fieldset')
+      const sections = [...getSections(dateInput._element)]
+
+      sections[1].focus()
+      fieldset.disabled = true
+      fieldset.disabled = false
+      await Promise.resolve()
+
+      expect(document.activeElement).toEqual(sections[1])
+      expect(sections.map(section => section.tabIndex)).toEqual([-1, 0, -1])
+    })
+
+    it('should list its watcher in form.elements and leave it out of the submitted data', () => {
+      createInFieldset()
+      const form = fixtureEl.querySelector('form')
+
+      expect([...form.elements].filter(element => element.localName === 'coreui-fieldset-watch').length).toBe(1)
+      expect([...fixtureEl.querySelector('fieldset').elements].some(element => element.localName === 'coreui-fieldset-watch')).toBeTrue()
+      expect([...new FormData(form).keys()]).toEqual(['due'])
+    })
+
+    it('should stay disabled after enable() while the fieldset is disabled', () => {
+      const dateInput = createInFieldset('disabled', { disabled: true })
+
+      dateInput.enable()
+      expectDisabled(dateInput, true)
+      expect(getValueField(dateInput._element).hasAttribute('disabled')).toBeFalse()
+
+      fixtureEl.querySelector('fieldset').disabled = false
+      expectDisabled(dateInput, false)
+      expect(new FormData(fixtureEl.querySelector('form')).get('due')).toEqual('04.03.2026')
+    })
+
+    it('should keep the value field enabled when disable() and enable() run inside a fieldset that toggles', () => {
+      const dateInput = createInFieldset()
+      const fieldset = fixtureEl.querySelector('fieldset')
+
+      dateInput.disable()
+      fieldset.disabled = true
+      dateInput.enable()
+      fieldset.disabled = false
+
+      expect(getValueField(dateInput._element).hasAttribute('disabled')).toBeFalse()
+      expect(new FormData(fixtureEl.querySelector('form')).get('due')).toEqual('04.03.2026')
+    })
+
+    it('should stay disabled by its option when the fieldset is enabled', () => {
+      const dateInput = createInFieldset('disabled', { disabled: true })
+
+      fixtureEl.querySelector('fieldset').disabled = false
+
+      expectDisabled(dateInput, true)
+      expect(getValueField(dateInput._element).disabled).toBeTrue()
+    })
+
+    it('should ignore typing while the fieldset is disabled', () => {
+      const dateInput = createInFieldset()
+      const [day] = getSections(dateInput._element)
+
+      fixtureEl.querySelector('fieldset').disabled = true
+      pressKey(day, '9')
+      pressKey(day, 'ArrowUp')
+
+      expect(day.textContent).toEqual('04')
+    })
+
+    it('should move the focus on a click on a disabled section the way a disabled native field does', async () => {
+      const host = document.createElement('div')
+      document.body.prepend(host)
+      const clickBoth = async (markup, config) => {
+        host.innerHTML = `<input id="before">${markup}`
+        const dateInput = new DateInput(host.querySelector('#date'), { format: 'dd.MM.yyyy', ...config })
+        const click = async target => {
+          host.querySelector('#before').focus()
+          await userEvent.click(target, { force: true })
+          return document.activeElement
+        }
+
+        const native = await click(host.querySelector('#native'))
+        const section = await click(getSections(dateInput._element)[0])
+        dateInput.dispose()
+
+        return [section, native]
+      }
+
+      const options = [{ disabled: true }, {}]
+      const [inPane, nativeInPane] = await clickBoth('<div tabindex="0"><input id="native" disabled><div id="date"></div></div>', options[0])
+      const [inFieldset, nativeInFieldset] = await clickBoth('<fieldset disabled><input id="native"><div id="date"></div></fieldset>', options[1])
+
+      expect.soft(inPane).toBe(nativeInPane)
+      expect.soft(inPane.getAttribute('tabindex')).toEqual('0')
+      expect.soft(inFieldset).toBe(nativeInFieldset)
+      expect.soft(inFieldset).toBe(document.body)
+      host.remove()
+    })
+
+    it('should ignore paste and beforeinput typing while the fieldset is disabled', () => {
+      const dateInput = createInFieldset('disabled')
+      const [day] = getSections(dateInput._element)
+      const paste = new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: new DataTransfer() })
+      paste.clipboardData.setData('text', '01.01.2027')
+
+      day.dispatchEvent(paste)
+      day.dispatchEvent(new InputEvent('beforeinput', {
+        inputType: 'insertText', data: '9', bubbles: true, cancelable: true
+      }))
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 2, 4))
+    })
+
+    it('should restore its value on a form reset while the fieldset is disabled', async () => {
+      const dateInput = createInFieldset()
+      const form = fixtureEl.querySelector('form')
+
+      dateInput.setDate('2026-05-06')
+      fixtureEl.querySelector('fieldset').disabled = true
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 2, 4))
+      expectDisabled(dateInput, true)
+    })
+
+    it('should update its validation when the fieldset changes', () => {
+      const dateInput = createInFieldset()
+      const spy = spyOn(dateInput._validation, 'update')
+
+      fixtureEl.querySelector('fieldset').disabled = true
+
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('should remove its watcher on dispose before its validation goes', async () => {
+      const dateInput = createInFieldset('disabled')
+      const calls = []
+      const validation = dateInput._validation
+      for (const name of ['update', 'dispose']) {
+        const original = validation[name].bind(validation)
+        validation[name] = (...args) => {
+          calls.push(name)
+          return original(...args)
+        }
+      }
+
+      dateInput.dispose()
+      await Promise.resolve()
+
+      expect(fixtureEl.querySelector('coreui-fieldset-watch')).toBeNull()
+      expect(calls.at(-1)).toEqual('dispose')
+    })
+  })
+
   describe('clear', () => {
     it('should empty all sections and the value field', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
@@ -3370,16 +3598,18 @@ describe('DateInput', () => {
       expect(changes).toEqual(['15.07.2026'])
     })
 
-    it('should keep the tab stop on the section that holds the focus when enable() runs', () => {
+    it('should not let a disabled section take the focus, and put the tab stop back on the first one after enable()', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
       const sections = [...getSections(dateInput._element)]
 
       dateInput.disable()
       sections[2].focus()
+
+      expect(document.activeElement).not.toBe(sections[2])
+
       dateInput.enable()
 
-      expect(document.activeElement).toBe(sections[2])
-      expect(sections.map(section => section.tabIndex)).toEqual([-1, -1, 0])
+      expect(sections.map(section => section.tabIndex)).toEqual([0, -1, -1])
     })
 
     it('should drop a draft when setDate writes the field', () => {

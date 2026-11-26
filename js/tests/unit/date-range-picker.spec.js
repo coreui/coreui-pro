@@ -1498,6 +1498,22 @@ describe('DateRangePicker', () => {
     })
   })
 
+  describe('fieldset', () => {
+    it('should disable its fields and refuse to show inside a disabled fieldset', () => {
+      const picker = buildPicker({}, '<fieldset disabled><div id="picker"></div></fieldset>')
+
+      picker.show()
+
+      expect(picker._element.classList.contains('show')).toBeFalse()
+      expect([...picker._element.querySelectorAll('.form-date-time-section')].every(section => section.tabIndex === -1)).toBeTrue()
+
+      fixtureEl.querySelector('fieldset').disabled = false
+      picker.show()
+
+      expect(picker._element.classList.contains('show')).toBeTrue()
+    })
+  })
+
   describe('dispose', () => {
     it('should follow its own options when built again after an open picker with others', () => {
       fixtureEl.innerHTML = '<div id="picker"></div>'

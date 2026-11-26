@@ -8099,6 +8099,161 @@ describe('MultiSelect', () => {
     })
   })
 
+  describe('fieldset', () => {
+    const createInFieldset = (fieldsetAttributes = '', config = {}) => {
+      fixtureEl.innerHTML = `<form><fieldset ${fieldsetAttributes}><select name="tech"></select></fieldset></form>`
+      return new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1', selected: true }, { value: '2', text: 'Opt 2' }],
+        search: false,
+        selectionType: 'chips',
+        ...config
+      })
+    }
+
+    const expectDisabled = (multiSelect, disabled) => {
+      expect(multiSelect._wrapperElement.classList.contains('disabled')).toBe(disabled)
+      expect(multiSelect._wrapperElement.getAttribute('aria-disabled')).toEqual(disabled ? 'true' : null)
+      expect(multiSelect._wrapperElement.getAttribute('tabindex')).toEqual(disabled ? null : '0')
+      expect(Boolean(multiSelect._wrapperElement.querySelector('.chip .chip-remove'))).toBe(!disabled)
+      expect(Boolean(multiSelect._wrapperElement.querySelector('.form-control-cleaner'))).toBe(!disabled)
+      expect(multiSelect._indicatorElement.disabled).toBe(disabled)
+    }
+
+    it('should start disabled inside a disabled fieldset without disabling the native select', () => {
+      const multiSelect = createInFieldset('disabled')
+
+      expectDisabled(multiSelect, true)
+      expect(multiSelect._element.hasAttribute('disabled')).toBeFalse()
+      expect(new FormData(fixtureEl.querySelector('form')).has('tech')).toBeFalse()
+    })
+
+    it('should place its watcher right after the native select', () => {
+      const multiSelect = createInFieldset()
+
+      expect(multiSelect._element.nextElementSibling.localName).toEqual('coreui-fieldset-watch')
+    })
+
+    it('should not show inside a disabled fieldset', () => {
+      const multiSelect = createInFieldset('disabled')
+
+      multiSelect.show()
+
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBeFalse()
+    })
+
+    it('should follow a toggle of the fieldset and keep submitting after it is enabled again', () => {
+      const multiSelect = createInFieldset()
+      const fieldset = fixtureEl.querySelector('fieldset')
+
+      fieldset.disabled = true
+      expectDisabled(multiSelect, true)
+
+      fieldset.disabled = false
+      expectDisabled(multiSelect, false)
+      expect(multiSelect._element.hasAttribute('disabled')).toBeFalse()
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('tech')).toEqual(['1'])
+    })
+
+    it('should disable its search field with the fieldset', () => {
+      const multiSelect = createInFieldset('', { search: true })
+
+      fixtureEl.querySelector('fieldset').disabled = true
+
+      expect(multiSelect._searchElement.matches(':disabled')).toBeTrue()
+      expect(multiSelect._searchElement.disabled).toBeTrue()
+    })
+
+    it('should hide an open panel after the task that disables the fieldset', () => {
+      return new Promise(resolve => {
+        const multiSelect = createInFieldset()
+
+        multiSelect._element.addEventListener('shown.coreui.multi-select', async () => {
+          fixtureEl.querySelector('fieldset').disabled = true
+          expect(multiSelect._wrapperElement.classList.contains('show')).toBeTrue()
+          await Promise.resolve()
+          expect(multiSelect._wrapperElement.classList.contains('show')).toBeFalse()
+          resolve()
+        })
+
+        multiSelect.show()
+      })
+    })
+
+    it('should keep an open panel when the fieldset is disabled and enabled in one task', () => {
+      return new Promise(resolve => {
+        const multiSelect = createInFieldset()
+
+        multiSelect._element.addEventListener('shown.coreui.multi-select', async () => {
+          const fieldset = fixtureEl.querySelector('fieldset')
+          fieldset.disabled = true
+          fieldset.disabled = false
+          await Promise.resolve()
+          expect(multiSelect._wrapperElement.classList.contains('show')).toBeTrue()
+          resolve()
+        })
+
+        multiSelect.show()
+      })
+    })
+
+    it('should stay disabled after enable() while the fieldset is disabled', () => {
+      const multiSelect = createInFieldset('disabled', { disabled: true })
+
+      multiSelect.enable()
+      expectDisabled(multiSelect, true)
+
+      fixtureEl.querySelector('fieldset').disabled = false
+      expectDisabled(multiSelect, false)
+    })
+
+    it('should stay disabled by its option when the fieldset is enabled', () => {
+      const multiSelect = createInFieldset('disabled', { disabled: true })
+
+      fixtureEl.querySelector('fieldset').disabled = false
+
+      expectDisabled(multiSelect, true)
+      expect(multiSelect._element.disabled).toBeTrue()
+    })
+
+    it('should update its validation when the fieldset changes', () => {
+      const multiSelect = createInFieldset()
+      const spy = spyOn(multiSelect._validation, 'update')
+
+      fixtureEl.querySelector('fieldset').disabled = true
+
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('should follow a move into a disabled fieldset', () => {
+      fixtureEl.innerHTML = '<fieldset disabled></fieldset><select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [], search: false })
+
+      fixtureEl.querySelector('fieldset').append(multiSelect._wrapperElement)
+
+      expect(multiSelect._wrapperElement.classList.contains('disabled')).toBeTrue()
+    })
+
+    it('should remove its watcher on dispose before its validation goes', async () => {
+      const multiSelect = createInFieldset('disabled')
+      const calls = []
+      const validation = multiSelect._validation
+      for (const name of ['update', 'dispose']) {
+        const original = validation[name].bind(validation)
+        validation[name] = (...args) => {
+          calls.push(name)
+          return original(...args)
+        }
+      }
+
+      multiSelect.dispose()
+      await Promise.resolve()
+
+      expect(calls.at(-1)).toEqual('dispose')
+
+      expect(fixtureEl.querySelector('coreui-fieldset-watch')).toBeNull()
+    })
+  })
+
   describe('dispose', () => {
     it('should leave the disabled state to the option, not a class or the disabled attribute on the select', () => {
       fixtureEl.innerHTML = '<select class="disabled" multiple disabled><option value="1">One</option></select>'

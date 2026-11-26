@@ -2169,6 +2169,98 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('fieldset', () => {
+    const buildInFieldset = (fieldsetAttributes = '') => buildPicker({ date: '2026-03-04', locale: 'en-GB' }, `<fieldset ${fieldsetAttributes}><div id="picker"></div></fieldset>`)
+    const shown = picker => new Promise(resolve => {
+      picker._element.addEventListener('shown.coreui.date-picker', resolve, { once: true })
+    })
+
+    it('should disable the field and refuse to show inside a disabled fieldset', () => {
+      const picker = buildInFieldset('disabled')
+      const [section] = picker._element.querySelectorAll('.form-date-time-section')
+
+      picker.show()
+
+      expect(picker._element.classList.contains('show')).toBeFalse()
+      expect(section.tabIndex).toBe(-1)
+      expect(picker._toggleElement.matches(':disabled')).toBeTrue()
+      expect(picker._toggleElement.hasAttribute('disabled')).toBeFalse()
+      expect(picker.getContext().disabled).toBeTrue()
+    })
+
+    it('should close an open popup after the task that disables the fieldset', async () => {
+      const picker = buildInFieldset()
+      const opened = shown(picker)
+
+      picker.show()
+      await opened
+      fixtureEl.querySelector('fieldset').disabled = true
+      await Promise.resolve()
+
+      expect(picker._element.classList.contains('show')).toBeFalse()
+    })
+
+    it('should not give the focus back to a disabled section when the fieldset closes the popup', async () => {
+      const picker = buildInFieldset()
+      const opened = shown(picker)
+      const [section] = picker._element.querySelectorAll('.form-date-time-section')
+
+      section.focus()
+      picker.show()
+      await opened
+      fixtureEl.querySelector('fieldset').disabled = true
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(document.activeElement.classList.contains('form-date-time-section')).toBeFalse()
+    })
+
+    it('should list two watchers in form.elements, for the picker and its field', () => {
+      buildPicker({}, '<form><div id="picker"></div></form>')
+
+      expect([...fixtureEl.querySelector('form').elements].filter(element => element.localName === 'coreui-fieldset-watch').length).toBe(2)
+    })
+
+    it('should keep an open popup when the fieldset is disabled and enabled in one task', async () => {
+      const picker = buildInFieldset()
+      const fieldset = fixtureEl.querySelector('fieldset')
+      const opened = shown(picker)
+
+      picker.show()
+      await opened
+      fieldset.disabled = true
+      fieldset.disabled = false
+      await Promise.resolve()
+
+      expect(picker._element.classList.contains('show')).toBeTrue()
+    })
+
+    it('should show again once the fieldset is enabled', () => {
+      const picker = buildInFieldset('disabled')
+
+      fixtureEl.querySelector('fieldset').disabled = false
+      picker.show()
+
+      expect(picker._element.classList.contains('show')).toBeTrue()
+      expect(picker.getContext().disabled).toBeFalse()
+    })
+
+    it('should leave a wrapping label naming the field', () => {
+      buildPicker({}, '<label>Due <div id="picker"></div></label>')
+
+      expect(fixtureEl.querySelector('label').control.localName).not.toEqual('coreui-fieldset-watch')
+    })
+
+    it('should remove its watchers on dispose', async () => {
+      const picker = buildInFieldset('disabled')
+
+      picker.dispose()
+      await Promise.resolve()
+
+      expect(fixtureEl.querySelectorAll('coreui-fieldset-watch').length).toBe(0)
+    })
+  })
+
   describe('dispose', () => {
     it('should take back the name and the reference it wrote on a toggle the author supplied', () => {
       const picker = buildPicker({}, `<div id="picker">
