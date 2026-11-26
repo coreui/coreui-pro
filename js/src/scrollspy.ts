@@ -13,6 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
+import { deepActiveElement } from './util/focus.js'
 import { decodeFragment } from './util/hash-target.js'
 import {
   defineJQueryPlugin, getElement, isDisabled, isVisible, jQueryDispatch
@@ -102,7 +103,7 @@ class ScrollSpy extends BaseComponent {
   protected declare _observer: IntersectionObserver | null
   protected declare _sentinel: HTMLElement | null
   protected declare _sentinelObserver: IntersectionObserver | null
-  protected declare _pendingNavigation: { hash: string, section: HTMLElement } | null
+  protected declare _pendingNavigation: { hash: string, section: HTMLElement, focus?: Element | null } | null
   protected declare _settleTimeout: number | null
   protected declare _settleHandler: (() => void) | null
   protected declare _scrollIdleHandler: (() => void) | null
@@ -321,8 +322,12 @@ class ScrollSpy extends BaseComponent {
     this._computeActive()
   }
 
+  protected _getScroller(): Element {
+    return this._rootElement || document.scrollingElement || document.documentElement
+  }
+
   protected _isOverflowing(): boolean {
-    const scroller = this._rootElement || document.scrollingElement || document.documentElement
+    const scroller = this._getScroller()
     return scroller.scrollHeight > scroller.clientHeight
   }
 
@@ -395,15 +400,15 @@ class ScrollSpy extends BaseComponent {
 
       const root: any = this._rootElement || window
       const height = section.offsetTop - this._element.offsetTop
-      const currentTop = this._rootElement ?
-        this._rootElement.scrollTop :
-        (window.scrollY ?? window.pageYOffset)
+      const scroller = this._getScroller()
+      const currentTop = scroller.scrollTop
+      const reachableTop = Math.min(height, scroller.scrollHeight - scroller.clientHeight)
       const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
 
       // If we're already there (or motion is reduced), there will be no scroll
       // — and thus no `scrollend` — to wait for, so settle immediately. This
       // avoids a stuck pending navigation that never restores hash/focus.
-      if (reduceMotion || Math.abs(currentTop - height) <= 2) {
+      if (reduceMotion || Math.abs(currentTop - reachableTop) <= 2) {
         if (root.scrollTo) {
           root.scrollTo({ top: height, behavior: 'auto' })
         } else {
@@ -438,6 +443,10 @@ class ScrollSpy extends BaseComponent {
 
     this._settleHandler = () => this._onSettle()
     this._scrollIdleHandler = () => {
+      if (this._pendingNavigation) {
+        this._pendingNavigation.focus ??= deepActiveElement(document)
+      }
+
       clearTimeout(this._settleTimeout!)
       this._settleTimeout = setTimeout(() => this._onSettle(), SCROLL_IDLE_TIMEOUT)
     }
@@ -473,17 +482,22 @@ class ScrollSpy extends BaseComponent {
       return
     }
 
-    const { hash, section } = this._pendingNavigation
-    this._settleNavigation(hash, section)
+    const { hash, section, focus } = this._pendingNavigation
+    this._settleNavigation(hash, section, focus)
   }
 
-  protected _settleNavigation(hash: string, section: HTMLElement): void {
+  protected _settleNavigation(hash: string, section: HTMLElement, focus?: Element | null): void {
     this._pendingNavigation = null
 
     // Restore the URL hash (without adding a history entry) now that we've
     // arrived, and move focus to the section for keyboard/AT users.
     if (window.history?.replaceState) {
-      window.history.replaceState(null, '', hash)
+      window.history.replaceState(window.history.state, '', hash)
+    }
+
+    const active = deepActiveElement(document)
+    if (focus && active !== focus && active !== document.body) {
+      return
     }
 
     if (!section.hasAttribute('tabindex')) {

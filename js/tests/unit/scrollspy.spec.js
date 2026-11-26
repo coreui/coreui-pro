@@ -1,4 +1,5 @@
 import EventHandler from '../../src/dom/event-handler.js'
+import Menu from '../../src/menu.js'
 import ScrollSpy from '../../src/scrollspy.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
@@ -1392,6 +1393,196 @@ describe('ScrollSpy', () => {
         }, 100)
         link.click()
       })
+    })
+
+    it('should settle at once when the container cannot scroll any closer to the target', () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar"><ul class="nav">',
+        '  <li class="nav-item"><a class="nav-link" id="a-1" href="#div-1">1</a></li>',
+        '  <li class="nav-item"><a class="nav-link" id="a-2" href="#div-2">2</a></li>',
+        '</ul></nav>',
+        '<div class="content" style="overflow: auto; height: 50px">',
+        '  <div id="div-1" style="height: 100px">1</div>',
+        '  <div id="div-2" style="height: 20px">2</div>',
+        '</div>'
+      ].join('')
+
+      const contentEl = fixtureEl.querySelector('.content')
+      const section2 = fixtureEl.querySelector('#div-2')
+      contentEl.scrollTop = contentEl.scrollHeight
+      const scrollSpy = new ScrollSpy(contentEl, { target: '.navbar', smoothScroll: true })
+      const replaceSpy = spyOn(window.history, 'replaceState')
+
+      fixtureEl.querySelector('#a-2').click()
+
+      expect(scrollSpy._pendingNavigation).toBeNull()
+      expect(replaceSpy).toHaveBeenCalledWith(window.history.state, '', '#div-2')
+      expect(document.activeElement).toEqual(section2)
+    })
+
+    it('should leave the focus where the user moved it while the smooth scroll ran', () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar"><ul class="nav">',
+        '  <li class="nav-item"><a class="nav-link" id="a-1" href="#div-1">1</a></li>',
+        '  <li class="nav-item"><a class="nav-link" id="a-2" href="#div-2">2</a></li>',
+        '</ul></nav>',
+        '<button type="button" id="elsewhere">elsewhere</button>',
+        '<div class="content" style="overflow: auto; height: 50px">',
+        '  <div id="div-1" style="height: 100px">1</div>',
+        '  <div id="div-2" style="height: 200px">2</div>',
+        '</div>'
+      ].join('')
+
+      const contentEl = fixtureEl.querySelector('.content')
+      const link = fixtureEl.querySelector('#a-2')
+      const button = fixtureEl.querySelector('#elsewhere')
+      const scrollSpy = new ScrollSpy(contentEl, { target: '.navbar', smoothScroll: true })
+      const replaceSpy = spyOn(window.history, 'replaceState')
+
+      link.focus()
+      link.click()
+      contentEl.dispatchEvent(new Event('scroll'))
+      button.focus()
+      contentEl.dispatchEvent(new Event('scroll'))
+      scrollSpy._onSettle()
+
+      expect(replaceSpy).toHaveBeenCalledWith(window.history.state, '', '#div-2')
+      expect(document.activeElement).toEqual(button)
+      expect(fixtureEl.querySelector('#div-2').hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should move the focus to the section when it has not moved since the scroll began', () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar"><ul class="nav">',
+        '  <li class="nav-item"><a class="nav-link" id="a-1" href="#div-1">1</a></li>',
+        '  <li class="nav-item"><a class="nav-link" id="a-2" href="#div-2">2</a></li>',
+        '</ul></nav>',
+        '<div class="content" style="overflow: auto; height: 50px">',
+        '  <div id="div-1" style="height: 100px">1</div>',
+        '  <div id="div-2" style="height: 200px">2</div>',
+        '</div>'
+      ].join('')
+
+      const contentEl = fixtureEl.querySelector('.content')
+      const link = fixtureEl.querySelector('#a-2')
+      const scrollSpy = new ScrollSpy(contentEl, { target: '.navbar', smoothScroll: true })
+      spyOn(window.history, 'replaceState')
+
+      link.focus()
+      link.click()
+      contentEl.dispatchEvent(new Event('scroll'))
+      scrollSpy._onSettle()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#div-2'))
+    })
+
+    it('should move the focus to the section when the focus fell to the body while the smooth scroll ran', () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar"><ul class="nav">',
+        '  <li class="nav-item"><a class="nav-link" id="a-1" href="#div-1">1</a></li>',
+        '  <li class="nav-item"><a class="nav-link" id="a-2" href="#div-2">2</a></li>',
+        '</ul></nav>',
+        '<div class="content" style="overflow: auto; height: 50px">',
+        '  <div id="div-1" style="height: 100px">1</div>',
+        '  <div id="div-2" style="height: 200px">2</div>',
+        '</div>'
+      ].join('')
+
+      const contentEl = fixtureEl.querySelector('.content')
+      const link = fixtureEl.querySelector('#a-2')
+      const scrollSpy = new ScrollSpy(contentEl, { target: '.navbar', smoothScroll: true })
+      spyOn(window.history, 'replaceState')
+
+      link.focus()
+      link.click()
+      contentEl.dispatchEvent(new Event('scroll'))
+      link.blur()
+      scrollSpy._onSettle()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#div-2'))
+    })
+
+    it('should move the focus to the section after a menu item whose menu handed the focus back to its toggle', () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar"><ul class="nav">',
+        '  <li class="nav-item"><a class="nav-link" id="a-1" href="#div-1">1</a></li>',
+        '  <li class="nav-item">',
+        '    <a class="nav-link" href="#" role="button" data-coreui-toggle="menu" aria-expanded="false">Menu</a>',
+        '    <div class="menu"><a class="menu-item" id="a-2" href="#div-2">2</a></div>',
+        '  </li>',
+        '</ul></nav>',
+        '<div class="content" style="overflow: auto; height: 50px">',
+        '  <div id="div-1" style="height: 100px">1</div>',
+        '  <div id="div-2" style="height: 200px">2</div>',
+        '</div>'
+      ].join('')
+
+      const contentEl = fixtureEl.querySelector('.content')
+      const toggle = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const item = fixtureEl.querySelector('#a-2')
+      const menu = new Menu(toggle)
+      const scrollSpy = new ScrollSpy(contentEl, { target: '.navbar', smoothScroll: true })
+      spyOn(window.history, 'replaceState')
+
+      menu.show()
+      item.focus()
+      item.click()
+
+      expect(document.activeElement).toEqual(toggle)
+
+      contentEl.dispatchEvent(new Event('scroll'))
+      scrollSpy._onSettle()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#div-2'))
+    })
+
+    it('should settle at once when the window cannot scroll any closer to the target', () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar"><ul class="nav">',
+        '  <li class="nav-item"><a class="nav-link" id="a-1" href="#div-1">1</a></li>',
+        '  <li class="nav-item"><a class="nav-link" id="a-2" href="#div-2">2</a></li>',
+        '</ul></nav>',
+        '<div id="div-1" style="height: 3000px">1</div>',
+        '<div id="div-2" style="height: 20px">2</div>'
+      ].join('')
+
+      window.scrollTo({ top: document.scrollingElement.scrollHeight, behavior: 'instant' })
+      const scrollSpy = new ScrollSpy(document.body, { target: '.navbar', smoothScroll: true })
+      spyOn(window.history, 'replaceState')
+
+      fixtureEl.querySelector('#a-2').click()
+      const pending = scrollSpy._pendingNavigation
+      scrollSpy.dispose()
+      window.scrollTo({ top: 0, behavior: 'instant' })
+
+      expect(pending).toBeNull()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#div-2'))
+    })
+
+    it('should keep the history state when it restores the hash', () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar"><ul class="nav">',
+        '  <li class="nav-item"><a class="nav-link" id="a-1" href="#div-1">1</a></li>',
+        '  <li class="nav-item"><a class="nav-link" id="a-2" href="#div-2">2</a></li>',
+        '</ul></nav>',
+        '<div class="content" style="overflow: auto; height: 50px">',
+        '  <div id="div-1" style="height: 100px">1</div>',
+        '  <div id="div-2" style="height: 200px">2</div>',
+        '</div>'
+      ].join('')
+
+      const state = { page: 2 }
+      window.history.replaceState(state, '')
+      const contentEl = fixtureEl.querySelector('.content')
+      const scrollSpy = new ScrollSpy(contentEl, { target: '.navbar', smoothScroll: true })
+      const replaceSpy = spyOn(window.history, 'replaceState')
+
+      fixtureEl.querySelector('#a-2').click()
+      scrollSpy._onSettle()
+      replaceSpy.and.callThrough()
+      window.history.replaceState(null, '')
+
+      expect(replaceSpy).toHaveBeenCalledWith(state, '', '#div-2')
     })
   })
 })
