@@ -385,6 +385,15 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       focused?.blur()
     }
 
+    this._inputElement!.disabled = disabled
+    this._errorElement!.disabled = disabled
+    this._writeDisabled(focused)
+    this._validation.update()
+  }
+
+  _writeDisabled(focused: HTMLElement | null = null): void {
+    const disabled = this._disabled
+
     this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
 
     for (const sectionElement of this._getSectionElements()) {
@@ -392,10 +401,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       writeAttribute(sectionElement, 'contenteditable', disabled ? null : 'true')
     }
 
-    this._inputElement!.disabled = disabled
-    this._errorElement!.disabled = disabled
     this._setTabIndexes(focused)
-    this._validation.update()
   }
 
   _getAriaLabel(): string {
@@ -806,7 +812,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     const disabled = this._disabled
 
     this._element.classList.add(CLASS_NAME_FORM_CONTROL, CLASS_NAME_SECTION_INPUT)
-    this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
     this._element.setAttribute('role', 'group')
 
     if (!this._hostAriaLabel) {
@@ -839,12 +844,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
         'data-coreui-section': section.type
       }
 
-      if (disabled) {
-        attributes['aria-disabled'] = 'true'
-      } else {
-        attributes.contenteditable = 'true'
-      }
-
       if (readonly) {
         attributes['aria-readonly'] = 'true'
       }
@@ -871,7 +870,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     })
     this._element.append(this._errorElement, this._inputElement)
     this._syncSections()
-    this._setTabIndexes()
+    this._writeDisabled()
     this._validation.refresh()
   }
 

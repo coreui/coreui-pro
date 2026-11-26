@@ -602,12 +602,21 @@ class MultiSelect extends ComboboxBase {
       this.hide()
     }
 
+    this._writeDisabled()
+    this._render()
+  }
+
+  _writeDisabled(): void {
+    const disabled = this._disabled
+
     this._element.toggleAttribute('disabled', disabled)
     this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
     this._wrapperElement.classList.toggle(CLASS_NAME_DISABLED, disabled)
-    this._togglerElement.classList.toggle(CLASS_NAME_DISABLED, disabled)
 
-    this._writeFrameState()
+    if (!this._config.search) {
+      writeAttribute(this._wrapperElement, 'aria-disabled', disabled ? 'true' : null)
+      writeAttribute(this._wrapperElement, 'tabindex', disabled ? null : '0')
+    }
 
     if (this._indicatorElement) {
       this._indicatorElement.disabled = disabled
@@ -616,8 +625,6 @@ class MultiSelect extends ComboboxBase {
     if (this._searchElement) {
       this._searchElement.disabled = disabled
     }
-
-    this._render()
   }
 
   _destroySelect(): void {
@@ -886,8 +893,6 @@ class MultiSelect extends ComboboxBase {
     } else {
       this._element.removeAttribute('required')
     }
-
-    this._element.toggleAttribute('disabled', this._disabled)
   }
 
   _createNativeOptions(parentElement: HTMLElement, options: any[]): void {
@@ -978,11 +983,7 @@ class MultiSelect extends ComboboxBase {
 
   _createSelect(): void {
     const wrapper = document.createElement('div')
-    wrapper.classList.add(CLASS_NAME_SELECT)
-
-    this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
-
-    wrapper.classList.add(...this._element.classList)
+    wrapper.classList.add(CLASS_NAME_SELECT, ...this._element.classList)
 
     this._wrapperElement = wrapper
     // The wrapper takes the native select's place, then the select moves inside it
@@ -1007,6 +1008,7 @@ class MultiSelect extends ComboboxBase {
       this._element.setAttribute('name', this._uniqueName)
     }
 
+    this._writeDisabled()
     this._wireTogglerAccessibleName()
     this._markField()
     this._validation.refresh()
@@ -1023,12 +1025,6 @@ class MultiSelect extends ComboboxBase {
     const togglerEl = this._wrapperElement
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
-
-    if (this._disabled) {
-      togglerEl.classList.add(CLASS_NAME_DISABLED)
-    }
-
-    this._writeFrameState()
 
     const selectionEl = document.createElement('div')
     selectionEl.classList.add(CLASS_NAME_SELECTION)
@@ -1054,26 +1050,14 @@ class MultiSelect extends ComboboxBase {
 
     if (this._config.pickerIcon) {
       this._indicatorElement = this._createIndicator()
-      this._indicatorElement.disabled = this._disabled
     }
 
     this._updateSelectionCleaner()
   }
 
-  _writeFrameState(): void {
-    if (!this._config.search) {
-      writeAttribute(this._togglerElement, 'aria-disabled', this._disabled ? 'true' : null)
-      writeAttribute(this._togglerElement, 'tabindex', this._disabled ? null : '0')
-    }
-  }
-
   _createSearchInput(): void {
     const input = document.createElement('input')
     input.classList.add(CLASS_NAME_SEARCH)
-
-    if (this._disabled) {
-      input.disabled = true
-    }
 
     input.setAttribute('id', `search-${this._uniqueId}`)
     input.autocomplete = 'off'
