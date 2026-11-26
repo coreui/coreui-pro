@@ -374,7 +374,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `rootMargin` | string, null | `null` | Raw override of the Intersection Observer [rootMargin](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/rootMargin). When set it is passed to the observer as is and **takes precedence over `topMargin`** (for example `0px 0px -40%`). Leave it `null` to derive the activation line from `topMargin`. |
-| `smoothScroll` | boolean | `false` | Enables smooth scrolling when a user clicks on a link that refers to ScrollSpy observables. Once the scroll settles, the URL hash is updated and focus moves to the target section. |
+| `smoothScroll` | boolean | `false` | Enables smooth scrolling when a user clicks on a link that refers to ScrollSpy observables. Once the scroll settles, the URL hash is updated and focus moves to the target section, unless the user has moved focus to another element in the meantime. |
 | `target` | string, DOM element | `null`  | Specifies element to apply Scrollspy plugin. |
 | `threshold` | array | `[0]` | Intersection Observer [threshold](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/thresholds) values, at which fractions of a section's visibility the observer reports back. |
 | `topMargin` | string | `12%` | Position of the [activation line](#detection), measured from the top of the scroll container. Accepts a percentage of the container's height (`12%`) or pixels (`96px`, for example to sit below a sticky navbar). Ignored when `rootMargin` is set. |
@@ -413,4 +413,4 @@ firstScrollSpyEl.addEventListener('activate.coreui.scrollspy', () => {
 ## Accessibility
 
 - Scrollspy marks the current link with the `.active` class only; it does not set `aria-current`.
-- When a link in the spied navigation is followed, the plugin moves focus to the target section once scrolling ends, adding `tabindex="-1"` when the section has no `tabindex`, so keyboard and screen reader users continue from there.
+- When a link in the spied navigation is followed, the plugin moves focus to the target section once scrolling ends, adding `tabindex="-1"` when the section has no `tabindex`, so keyboard and screen reader users continue from there. If the user has moved focus to another element by then, for example by tabbing on or clicking into a field while the page was scrolling, focus stays there.
