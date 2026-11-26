@@ -383,6 +383,8 @@ A state you give stays until you change it: the user's changes of the selection,
 
 Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out appearance, remove pointer events, and prevent focusing.
 
+Inside a `<fieldset disabled>` the multi select is disabled with the fieldset and follows it when the fieldset is enabled or disabled later, or when the multi select moves into or out of one; an open panel closes. To follow the fieldset the component adds a hidden `<coreui-fieldset-watch>` element after the native `<select>`. It is listed in `form.elements` and `fieldset.elements`, where it shifts the index of the controls after it, and adds nothing to the submitted data.
+
 <Example pro code={`<select id="ms1-disabled" data-coreui-multi-select multiple data-coreui-search="true"  data-coreui-disabled="true">
     <option value="0">Angular</option>
     <option value="1">Bootstrap</option>
