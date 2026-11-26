@@ -147,7 +147,9 @@ In the controlled mode (`create: false`) there is no hidden field: a given state
 
 Set disabled state on the component to make the input and managed chips non-interactive.
 Use the `data-coreui-disabled="true"` option. A single chip is disabled with `data-coreui-disabled="true"` on the chip.
-For disabled, non-removable chips, combine it with `data-coreui-removable="false"`.
+For disabled, non-removable chips, combine it with `data-coreui-removable="false"`. To change the state later, call `disable()` or `enable()`; the chips stay.
+
+Inside a `<fieldset disabled>` the chip input is disabled with the fieldset and follows it when the fieldset is enabled or disabled later, or when the chip input moves into or out of one; a chip input in the fieldset's first `<legend>` stays enabled, as native fields do. To follow the fieldset the component adds a hidden `<coreui-fieldset-watch>` element after its value field. It is listed in `form.elements` and `fieldset.elements`, where it shifts the index of the controls after it, and adds nothing to the submitted data.
 
 <Example code={`<div class="chip-input" data-coreui-chip-input data-coreui-disabled="true" data-coreui-removable="false" data-coreui-placeholder="Input disabled">
     <span class="chip">Read only</span>
@@ -231,7 +233,9 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | --- | --- |
 | `add(value)` | Adds a chip with the given value. Returns the chip element or `null` if rejected. |
 | `clear()` | Removes all chips. |
+| `disable()` | Disables the field. |
 | `dispose()` | Destroys the component instance and the chip instances it created, and removes the fields it built. The chips stay in the document. |
+| `enable()` | Enables the field. |
 | `focus()` | Focuses the ghost input. |
 | `getInstance(element)` | Static method that returns the instance associated with a DOM element, or `null`. |
 | `getOrCreateInstance(element, config)` | Static method that returns the instance associated with a DOM element, creating it when there is none. |

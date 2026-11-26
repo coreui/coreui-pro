@@ -104,7 +104,7 @@ class ChipFilter extends ChipSet {
 
     this._anchor = null
     this._batching = false
-    this._moveTabStop(this._getFocusableChips().find(chip => chip.classList.contains(CLASS_NAME_ACTIVE)) ?? null)
+    this._moveTabStop(this._getSelectedTabStop())
     this._element.classList.add(CLASS_NAME_CHIP_FILTER, CLASS_NAME_CHIP_SET)
     this._initialSelection = this.getSelectedValues()
     this._reported = this._initialSelection.join('\0')
@@ -125,6 +125,7 @@ class ChipFilter extends ChipSet {
     this._unlistenLabel = onLabelClick(this._element, () => this._focusTarget()?.focus())
     writeAttribute(this._element, 'aria-required', this._config.required ? 'true' : null)
     this._validation.refresh()
+    this._watchFieldset(this._valueField)
   }
 
   // Getters
@@ -141,6 +142,14 @@ class ChipFilter extends ChipSet {
   }
 
   // Public
+  disable(): void {
+    this._setDisabled(true)
+  }
+
+  enable(): void {
+    this._setDisabled(false)
+  }
+
   selectChip(chip: HTMLElement): void {
     if (this._getChipElements().includes(chip)) {
       Chip.getInstance(chip)?.select()
@@ -169,6 +178,7 @@ class ChipFilter extends ChipSet {
   }
 
   override dispose(): void {
+    this._fieldsetWatch?.remove()
     this._validation.dispose()
     this._unlistenLabel()
     this._valueField.remove()
@@ -246,6 +256,20 @@ class ChipFilter extends ChipSet {
 
   override _triggerChange(): void {
     this._reportSelection()
+  }
+
+  override _applyDisabledState(): void {
+    super._applyDisabledState()
+    this._valueField.toggleAttribute('disabled', this._disabled)
+    this._validation.update()
+  }
+
+  override _getRestoredTabStop(): HTMLElement | null {
+    return super._getRestoredTabStop() ?? this._getSelectedTabStop()
+  }
+
+  _getSelectedTabStop(): HTMLElement | null {
+    return this._getFocusableChips().find(chip => chip.classList.contains(CLASS_NAME_ACTIVE)) ?? null
   }
 
   _selectEvery(): void {
@@ -364,7 +388,7 @@ class ChipFilter extends ChipSet {
   }
 
   _focusTarget(): HTMLElement | null {
-    if (this._disabled) {
+    if (this._isDisabled()) {
       return null
     }
 

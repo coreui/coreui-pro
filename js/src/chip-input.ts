@@ -148,6 +148,7 @@ class ChipInput extends ChipSet {
     this._initialChips = this._getChipElements()
     this._addInputEventListeners()
     this._validation.refresh()
+    this._watchFieldset(this._valueField ?? this._input)
   }
 
   // Getters
@@ -164,6 +165,14 @@ class ChipInput extends ChipSet {
   }
 
   // Public
+  disable(): void {
+    this._setDisabled(true)
+  }
+
+  enable(): void {
+    this._setDisabled(false)
+  }
+
   focus(): void {
     this._input?.focus()
   }
@@ -173,6 +182,7 @@ class ChipInput extends ChipSet {
   }
 
   override dispose(): void {
+    this._fieldsetWatch?.remove()
     this._validation.dispose()
 
     this._grid.replaceWith(...this._grid.childNodes)
@@ -206,7 +216,7 @@ class ChipInput extends ChipSet {
   }
 
   override _chipRole(): string | null {
-    return this._canModify() && this._config.removable ? 'gridcell' : null
+    return !this._config.readonly && this._config.removable ? 'gridcell' : null
   }
 
   override _roleElement(): HTMLElement | null {
@@ -226,7 +236,7 @@ class ChipInput extends ChipSet {
   }
 
   override _canModify(): boolean {
-    return !this._disabled && !this._config.readonly
+    return !this._isDisabled() && !this._config.readonly
   }
 
   // Chips live before the text field, not at the end of the set.
@@ -234,19 +244,30 @@ class ChipInput extends ChipSet {
     this._grid.append(chip)
   }
 
-  // Per-chip configuration based on the chip value and the input's
-  // disabled/readonly state.
   override _getChipConfig(chip: HTMLElement): Record<string, any> {
     const config = super._getChipConfig(chip)
-    const disabled = this._disabled || config.disabled
 
-    return { ...config, disabled, removable: config.removable && !this._config.readonly && !disabled }
+    return { ...config, disabled: this._isDisabled() || config.disabled, removable: config.removable && !this._config.readonly }
   }
 
-  // Keep the inherited chip instantiation and sync the remove button.
   override _setupChip(chip: HTMLElement): void {
     super._setupChip(chip)
+    this._syncRemoveButton(chip)
+  }
 
+  override _applyDisabledState(): void {
+    super._applyDisabledState()
+
+    for (const chip of this._getChipElements()) {
+      this._syncRemoveButton(chip)
+    }
+
+    this._applyInteractionState()
+    this._valueField?.toggleAttribute('disabled', this._disabled)
+    this._validation.update()
+  }
+
+  _syncRemoveButton(chip: HTMLElement): void {
     const removeButton = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip) as HTMLButtonElement
     if (removeButton) {
       removeButton.disabled = this._disabled || this._config.readonly
@@ -469,7 +490,7 @@ class ChipInput extends ChipSet {
 
   _applyInteractionState(): void {
     const { readonly } = this._config
-    this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
+    this._element.classList.toggle(CLASS_NAME_DISABLED, this._isDisabled())
     // The container is a generic element, so `aria-disabled`/`aria-readonly`
     // are not allowed on it — the native input states carry the semantics.
     this._input.disabled = this._disabled

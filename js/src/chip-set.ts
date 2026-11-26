@@ -15,6 +15,7 @@ import {
   type ChipAnnouncement, type ChipRemoveLabel, getChipAnnouncement, resolveChipClassName
 } from './util/chip-values.js'
 import { onDocumentReady } from './util/component-functions.js'
+import { watchFieldset } from './util/fieldset.js'
 import { containsFocus, focusWithTemporaryTabindex, rootActiveElement } from './util/focus.js'
 import { REMOVE_ICON } from './util/icons.js'
 import {
@@ -105,6 +106,8 @@ const DefaultType: Record<string, string> = {
 
 class ChipSet extends BaseComponent {
   protected declare _disabled: boolean
+  protected declare _fieldsetDisabled: boolean
+  protected declare _fieldsetWatch: HTMLElement | null
   protected declare _pendingFocus: HTMLElement | null
   protected declare _chips: string[]
   protected declare _ownedChips: Map<HTMLElement, Chip>
@@ -118,6 +121,8 @@ class ChipSet extends BaseComponent {
     super(element, config)
 
     this._disabled = this._config.disabled
+    this._fieldsetDisabled = false
+    this._fieldsetWatch = null
     this._pendingFocus = null
     this._chips = []
     this._ownedChips = new Map()
@@ -278,7 +283,74 @@ class ChipSet extends BaseComponent {
 
   // Private
   _canModify(): boolean {
-    return !this._disabled
+    return !this._isDisabled()
+  }
+
+  _isDisabled(): boolean {
+    return this._disabled || this._fieldsetDisabled
+  }
+
+  _watchFieldset(anchor: Element): void {
+    this._fieldsetWatch = watchFieldset(anchor, disabled => this._setFieldsetDisabled(disabled))
+
+    if (this._fieldsetWatch.matches(':disabled')) {
+      this._setFieldsetDisabled(true)
+    }
+  }
+
+  _setFieldsetDisabled(disabled: boolean): void {
+    this._fieldsetDisabled = disabled
+    this._applyDisabledState()
+    queueMicrotask(() => {
+      if (this._element && this._isDisabled()) {
+        this._releaseFocus()
+      }
+    })
+  }
+
+  _setDisabled(disabled: boolean): void {
+    if (disabled === this._disabled) {
+      return
+    }
+
+    this._disabled = disabled
+    this._applyDisabledState()
+
+    if (disabled) {
+      this._releaseFocus()
+    }
+  }
+
+  _applyDisabledState(): void {
+    for (const [chip, instance] of this._ownedChips) {
+      if (Chip.getInstance(chip) === instance) {
+        this._writeChipRole(chip)
+        instance._setDisabled(this._getChipConfig(chip).disabled)
+      }
+    }
+
+    this._syncRoles()
+    this._moveTabStop(this._getRestoredTabStop())
+  }
+
+  _getRestoredTabStop(): HTMLElement | null {
+    const active = rootActiveElement(this._element) as HTMLElement | null
+
+    return active && this._getFocusableChips().includes(active) ? active : null
+  }
+
+  _releaseFocus(): void {
+    const active = rootActiveElement(this._element) as HTMLElement | null
+
+    if (active && this._ownedChips.has(active)) {
+      active.blur()
+    }
+
+    for (const [chip, instance] of this._ownedChips) {
+      if (Chip.getInstance(chip) === instance) {
+        instance._makeFocusable()
+      }
+    }
   }
 
   _appendChip(chip: HTMLElement): void {
@@ -355,7 +427,7 @@ class ChipSet extends BaseComponent {
     const role = this._containerRole(leaving)
 
     writeAttribute(element, 'role', role)
-    writeAttribute(element, 'aria-disabled', this._disabled && ['grid', 'group', 'listbox'].includes(role as string) ? 'true' : null)
+    writeAttribute(element, 'aria-disabled', this._isDisabled() && ['grid', 'group', 'listbox'].includes(role as string) ? 'true' : null)
 
     if (this._chipRole() !== 'gridcell') {
       return
@@ -423,9 +495,7 @@ class ChipSet extends BaseComponent {
     const role = this._chipRole()
     const isNative = chip.matches(SELECTOR_NATIVE_HOST)
 
-    if (role && (!isNative || role === 'option')) {
-      chip.setAttribute('role', role)
-    }
+    this._writeChipRole(chip)
 
     if ((role === 'gridcell' && !isNative) || (role === 'listitem' && isNative)) {
       const row = document.createElement('span')
@@ -443,6 +513,14 @@ class ChipSet extends BaseComponent {
     this._ownedChips.set(chip, new Chip(chip, this._getChipConfig(chip)))
   }
 
+  _writeChipRole(chip: HTMLElement): void {
+    const role = this._chipRole()
+
+    if (role && (!chip.matches(SELECTOR_NATIVE_HOST) || role === 'option')) {
+      chip.setAttribute('role', role)
+    }
+  }
+
   _getChipConfig(chip: HTMLElement): Record<string, any> {
     const {
       filter: _filter, removable, selectable: _selectable, ...attributes
@@ -450,12 +528,12 @@ class ChipSet extends BaseComponent {
 
     return {
       ariaRemoveLabel: this._config.ariaRemoveLabel,
-      disabled: this._disabled,
       filter: false,
       owned: true,
       removeIcon: this._config.removeIcon,
       selectable: false,
       ...attributes,
+      disabled: this._fieldsetDisabled || (attributes.disabled ?? this._disabled),
       removable: Boolean(this._config.removable) && removable !== false
     }
   }
