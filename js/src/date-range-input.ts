@@ -392,8 +392,8 @@ class DateRangeInput extends BaseComponent {
       name: this._config.endName
     })
 
-    if (this._config.autofocus && !this._config.disabled) {
-      SelectorEngine.find(SELECTOR_SECTION, this._startElement)[0]?.focus()
+    if (this._config.autofocus) {
+      SelectorEngine.find(SELECTOR_SECTION, this._startElement).find(section => section.tabIndex === 0)?.focus()
     }
   }
 

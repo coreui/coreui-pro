@@ -136,6 +136,8 @@ Add `.form-floating-always` to the component element to keep both labels [always
 
 ## Disabled
 
+Inside a `<fieldset disabled>` the picker is disabled with the fieldset and follows it when the fieldset is enabled or disabled later, or when the picker moves into or out of one; an open popup closes. To follow the fieldset the picker and each of its date fields add a hidden `<coreui-fieldset-watch>` element. They are listed in `form.elements` and `fieldset.elements`, where they shift the index of the controls after them, and add nothing to the submitted data.
+
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
       <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-date-range-picker></div>

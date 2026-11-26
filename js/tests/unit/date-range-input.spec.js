@@ -1312,6 +1312,34 @@ describe('DateRangeInput', () => {
     })
   })
 
+  describe('fieldset', () => {
+    it('should not autofocus inside a disabled fieldset', () => {
+      build({ autofocus: true }, '<fieldset disabled><div id="range"></div></fieldset>')
+
+      expect(document.activeElement).toEqual(document.body)
+    })
+
+    it('should disable both ends when the fieldset is disabled later', () => {
+      const instance = build({}, '<fieldset><div id="range"></div></fieldset>')
+
+      fixtureEl.querySelector('fieldset').disabled = true
+
+      expect([...instance._element.querySelectorAll('.form-date-time-section')].every(section => section.getAttribute('aria-disabled') === 'true')).toBeTrue()
+    })
+
+    it('should disable both ends with a fieldset and enable them with it', () => {
+      const instance = build({}, '<fieldset disabled><div id="range"></div></fieldset>')
+      const sections = () => [...instance._element.querySelectorAll('.form-date-time-section')]
+
+      expect(sections().every(section => section.tabIndex === -1 && section.getAttribute('aria-disabled') === 'true')).toBeTrue()
+
+      fixtureEl.querySelector('fieldset').disabled = false
+
+      expect(sections().some(section => section.tabIndex === 0)).toBeTrue()
+      expect(sections().every(section => section.isContentEditable)).toBeTrue()
+    })
+  })
+
   describe('dispose', () => {
     it('should leave the separator the author wrote in place', () => {
       const range = build({}, '<div id="range"><span data-coreui-range-separator="to"><svg viewBox="0 0 1 1"></svg>to</span></div>')
