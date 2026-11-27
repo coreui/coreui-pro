@@ -385,6 +385,8 @@
       to: /utilities/font-size/
     - title: Font style
       to: /utilities/font-style/
+    - title: Font variant numeric
+      to: /utilities/font-variant-numeric/
     - title: Font weight
       to: /utilities/font-weight/
     - title: Gap

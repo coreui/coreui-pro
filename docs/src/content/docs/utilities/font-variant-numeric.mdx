@@ -1,0 +1,27 @@
+---
+title: "Bootstrap 6 Font Variant Numeric"
+name: "Font variant numeric"
+description: "Give every digit the same width, so numbers line up in columns and counters do not shift as they change."
+utility: {prefix: "font", property: "font-variant-numeric"}
+---
+
+## Tabular numbers
+
+Use `.font-tabular-nums` to give every digit the same width, so numbers line up vertically without switching to a monospace font. When the font has tabular figures, prices, phone numbers, opening hours, timers and figures stacked in a list or a table stay aligned, and a counter does not shift sideways as its value changes. It sets `font-variant-numeric: tabular-nums` and keeps the current font family.
+
+<Example code={`<p class="mb-0">11,111.11</p>
+  <p class="mb-0">99,999.99</p>
+  <p class="font-tabular-nums mb-0">11,111.11</p>
+  <p class="font-tabular-nums mb-0">99,999.99</p>`} />
+
+<Callout color="info">
+The effect depends on the font. Most system UI fonts include tabular figures; with a font that has none, the browser keeps its default digits.
+</Callout>
+
+## Customizing
+
+### Utilities API
+
+Font variant numeric utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-font-variant-numeric" />
