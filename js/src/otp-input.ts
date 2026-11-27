@@ -10,6 +10,7 @@ import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
+import { watchFieldset } from './util/fieldset.js'
 import { type ValidationState } from './util/form-validation.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
@@ -89,6 +90,7 @@ const DefaultType = {
 
 class OTPInput extends BaseComponent {
   protected declare _config: OtpInputConfig
+  protected declare _fieldsetWatch: HTMLElement
   protected declare _input: HTMLInputElement
   protected declare _type: { inputmode: string, pattern: string, filter: RegExp }
   protected declare _length: number
@@ -149,6 +151,7 @@ class OTPInput extends BaseComponent {
     this._addEventListeners()
     this._render()
     this._validation.refresh()
+    this._fieldsetWatch = watchFieldset(this._input, () => this._validation.update())
   }
 
   // Getters
@@ -206,6 +209,8 @@ class OTPInput extends BaseComponent {
   }
 
   override dispose(): void {
+    this._fieldsetWatch?.remove()
+
     for (const [type, listener] of Object.entries(this._inputListeners ?? {})) {
       EventHandler.off(this._input, type, listener)
     }

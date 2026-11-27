@@ -11,6 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
+import { watchFieldset } from './util/fieldset.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import type { ValidationState } from './util/form-validation.js'
 import {
@@ -183,6 +184,7 @@ const DefaultType: Record<string, string> = {
  */
 
 class Autocomplete extends ComboboxBase {
+  protected declare _fieldsetWatch: HTMLElement
   protected declare _indicatorElement: any
   protected declare _cleanerElement: any
   protected declare _inputElement: any
@@ -237,6 +239,7 @@ class Autocomplete extends ComboboxBase {
 
     this._createAutocomplete()
     this._validation.refresh()
+    this._fieldsetWatch = watchFieldset(this._inputElement!, () => this._validation.update())
     this._addEventListeners()
 
     Data.set(this._element, DATA_KEY, this)
@@ -284,6 +287,7 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
+    this._fieldsetWatch.remove()
     this._disposeLayer()
     this._validation.dispose()
     this._disposeFloating()

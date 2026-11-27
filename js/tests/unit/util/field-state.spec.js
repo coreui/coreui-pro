@@ -49,5 +49,12 @@ describe('Field state', () => {
       expect(resolveFieldState({ ownerError: true, user: 'valid' }).state).toBeUndefined()
       expect(resolveFieldState({ ownerError: true, reported: true }).state).toBe('invalid')
     })
+
+    it('should show neither its own error nor the error of its owner on a field left out of validation', () => {
+      expect(resolveFieldState({ excluded: true, ownError: true, ownerError: true })).toEqual({ invalid: false, state: undefined })
+      expect(resolveFieldState({ excluded: true, given: 'valid', ownError: true })).toEqual({ invalid: false, state: 'valid' })
+      expect(resolveFieldState({ excluded: true, inherited: 'invalid', ownError: true })).toEqual({ invalid: true, state: 'invalid' })
+      expect(resolveFieldState({ excluded: true, ownerError: true, user: 'valid' })).toEqual({ invalid: false, state: 'valid' })
+    })
   })
 })

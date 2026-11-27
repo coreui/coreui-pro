@@ -167,6 +167,7 @@ class FieldValidation {
   _draw(): void {
     const reported = [...this._userValidity.values()].map(userValidity => userValidity.read())
     const { invalid: isInvalid, state } = resolveFieldState({
+      excluded: !this._takesPart(),
       given: this._givenState(this._options.config()),
       inherited: this._owner?._inheritedState(),
       ownError: this._hasError(),
@@ -218,6 +219,19 @@ class FieldValidation {
     if (this._movedDescription) {
       writeAttribute(this._host, 'aria-describedby', joinIds(this._describedBy, this._host.getAttribute('aria-describedby')) || null)
     }
+  }
+
+  /**
+   * Tells whether the browser validates the component: whether one of its value fields takes part in
+   * validation, or, for a component without fields of its own, one of its parts does. A disabled,
+   * fieldset-disabled or read-only field does not.
+   *
+   * @returns `false` when the browser leaves the component out of validation
+   */
+  _takesPart(): boolean {
+    const fields = this._options.fields()
+
+    return fields.length > 0 ? fields.some(field => field.willValidate) : this._parts.some(part => part._takesPart())
   }
 
   /**

@@ -465,14 +465,14 @@ describe('DateInput', () => {
       expect(submitted).toEqual([['other', 'when']])
     })
 
-    it('should leave a read-only or disabled field holding a rejected date to the page, drawn', () => {
+    it('should let a read-only or disabled field holding a rejected date submit without drawing the error', () => {
       for (const config of [{ readonly: true }, { disabled: true }]) {
         const { form, host, submitted } = mount({ date: new Date(2027, 4, 5), maxDate: new Date(2026, 11, 31), ...config })
 
         form.requestSubmit()
 
         expect(submitted).toHaveLength(1)
-        expect(drawing(host)).toEqual({ ariaInvalid: true, described: true, isInvalid: true })
+        expect(drawing(host)).toEqual({ ariaInvalid: false, described: false, isInvalid: false })
       }
     })
 
@@ -629,18 +629,29 @@ describe('DateInput', () => {
       expect(form.checkValidity()).toBeFalse()
     })
 
-    it('should let a field disabled at runtime submit with the error drawn, and block again once it is enabled, still drawn', () => {
+    it('should let a field disabled at runtime or by its fieldset submit without the error drawn, and block and draw it again once enabled', () => {
       const { dateInput, form, host, submitted } = mount({ date: new Date(2027, 4, 5), maxDate: new Date(2026, 11, 31) })
 
       dateInput.disable()
       form.requestSubmit()
 
       expect(submitted).toEqual([['other']])
-      expect(drawing(host)).toEqual({ ariaInvalid: true, described: true, isInvalid: true })
+      expect(drawing(host)).toEqual({ ariaInvalid: false, described: false, isInvalid: false })
 
       dateInput.enable()
 
       expect(form.checkValidity()).toBeFalse()
+      expect(drawing(host)).toEqual({ ariaInvalid: true, described: true, isInvalid: true })
+
+      const fieldset = document.createElement('fieldset')
+      host.before(fieldset)
+      fieldset.append(host, fixtureEl.querySelector('.invalid-feedback'))
+      fieldset.disabled = true
+
+      expect(drawing(host)).toEqual({ ariaInvalid: false, described: false, isInvalid: false })
+
+      fieldset.disabled = false
+
       expect(drawing(host)).toEqual({ ariaInvalid: true, described: true, isInvalid: true })
 
       form.requestSubmit()

@@ -1583,4 +1583,50 @@ describe('RangeSlider', () => {
       }).toThrowError(TypeError, 'No method named "noMethod"')
     })
   })
+
+  describe('validation of a disabled field', () => {
+    const mount = () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><fieldset><div></div></fieldset></form>'
+      const fieldset = fixtureEl.querySelector('fieldset')
+      const instance = new RangeSlider(fieldset.firstElementChild, { name: 'level' })
+      fieldset.querySelector('input[type="range"]').setCustomValidity('Pick another level')
+
+      fixtureEl.querySelector('form').checkValidity()
+
+      return { fieldset, instance }
+    }
+
+    const drawing = element => ({
+      ariaInvalid: Boolean(element.querySelector('[aria-invalid="true"]')),
+      isInvalid: Boolean(element.querySelector('.is-invalid'))
+    })
+
+    it('should hide the reported error while a disabled fieldset leaves the field out of validation, and show it again once enabled', () => {
+      const { fieldset, instance } = mount()
+
+      expect(drawing(fieldset)).toEqual({ ariaInvalid: true, isInvalid: true })
+
+      fieldset.disabled = true
+
+      expect(drawing(fieldset)).toEqual({ ariaInvalid: false, isInvalid: false })
+
+      fieldset.disabled = false
+
+      expect(drawing(fieldset)).toEqual({ ariaInvalid: true, isInvalid: true })
+      instance.dispose()
+    })
+
+    it('should hide the reported error on disable() and show it again on enable()', () => {
+      const { fieldset, instance } = mount()
+
+      instance.disable()
+
+      expect(drawing(fieldset)).toEqual({ ariaInvalid: false, isInvalid: false })
+
+      instance.enable()
+
+      expect(drawing(fieldset)).toEqual({ ariaInvalid: true, isInvalid: true })
+      instance.dispose()
+    })
+  })
 })

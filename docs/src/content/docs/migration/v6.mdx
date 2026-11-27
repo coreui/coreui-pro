@@ -2002,7 +2002,7 @@ validation and the arrow between them. Two consequences:
   for a rejected entry: the value field holds no date until the entry is
   corrected. The field draws the error at once, in any form, with the class,
   the message and `aria-invalid` on its sections, and now also blocks the
-  submit. A disabled or read-only field draws it and never blocks. A block can
+  submit. A disabled or read-only field neither draws it nor blocks. A block can
   come or go without an `input` event reaching the form; follow it with the
   `errorChange` event of the field. A submit your code makes with
   `form.submit()` skips validation, as it does for native fields, so call

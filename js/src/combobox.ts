@@ -12,6 +12,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import ListBox, { type ListBoxEntry } from './list-box.js'
 import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
+import { watchFieldset } from './util/fieldset.js'
 import {
   alignValueField, closeValueFieldBubble, configureValueField, createValueField, dispatchValueChange, type ValidationState, writeValueField
 } from './util/form-validation.js'
@@ -169,6 +170,7 @@ const DefaultType: Record<string, string> = {
 
 class Combobox extends ComboboxBase {
   protected declare _createdNodes: ChildNode[]
+  protected declare _fieldsetWatch: HTMLElement
   protected declare _hostValue: Node[] | null
   protected declare _labels: Map<string, string>
   protected declare _resetValues: string[]
@@ -271,6 +273,7 @@ class Combobox extends ComboboxBase {
       return
     }
 
+    this._fieldsetWatch.remove()
     this._disposeLayer()
     this._validation.dispose()
     this._disposeFloating()
@@ -360,6 +363,7 @@ class Combobox extends ComboboxBase {
     this._resolveMenu()
     this._createSearchInput()
     this._validation.refresh()
+    this._fieldsetWatch = watchFieldset(this._element.lastElementChild!, () => this._validation.update())
 
     this._store = createSelectionStore(next => toSelectionValues(next, this._config.multiple ? 'multiple' : 'single'))
     this._store.commit(toSelectionValues(this._config.value, 'multiple').map(String))

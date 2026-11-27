@@ -59,6 +59,8 @@ Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out 
 
 <Example pro code={`<div data-coreui-disabled="true" data-coreui-rating data-coreui-value="3"></div>`} />
 
+Inside a `<fieldset disabled>` the rating shows no error a validation reported, and shows it again once the fieldset is enabled, as a native field does; a state you give stays. To follow the fieldset the component adds a hidden `<coreui-fieldset-watch>` element after its last star. It is listed in `form.elements` and `fieldset.elements`, where it shifts the index of the controls after it, and adds nothing to the submitted data.
+
 ## Validation
 
 A rating can be required, and it takes a validation state from the page.
