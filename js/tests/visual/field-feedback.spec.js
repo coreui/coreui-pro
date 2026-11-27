@@ -25,6 +25,8 @@ const LAYOUTS = {
   'next to the control': `<input class="form-control" data-test required>${FEEDBACK}`,
   'after a frame': `<div class="form-control-group"><input class="form-control" data-test required></div>${FEEDBACK}`,
   'after an input group': `<div class="input-group"><span class="input-group-text">@</span><input class="form-control" data-test required></div>${FEEDBACK}`,
+  'after a floating label': `<div class="form-floating"><input class="form-control" id="floatingAlone" placeholder="Name" data-test required><label for="floatingAlone">Name</label></div>${FEEDBACK}`,
+  'after a floating label holding a select': `<div class="form-floating"><select class="form-select" id="floatingSelect" data-test required><option value="">Pick</option><option value="a">A</option></select><label for="floatingSelect">Pick</label></div>${FEEDBACK}`,
   'after an input group with a floating label': `<div class="input-group"><span class="input-group-text">@</span><div class="form-floating"><input class="form-control" id="floating" placeholder="Name" data-test required><label for="floating">Name</label></div></div>${FEEDBACK}`,
   'after an input group holding a select': `<div class="input-group"><span class="input-group-text">@</span><select class="form-select" data-test required><option value="">Pick</option><option value="a">A</option></select></div>${FEEDBACK}`,
   'in the content of a check': `<input class="check" type="checkbox" id="check" data-test required><div class="form-field-content"><label for="check">Agree</label><small class="form-text">Required.</small>${FEEDBACK}</div>`,
@@ -39,6 +41,8 @@ const FIELDLESS_LAYOUTS = {
   'in a frame below the field wrapper': '<div class="form-field"><div class="picker"><div class="form-control-group"><input class="form-control" data-test required></div></div><div class="invalid-feedback">Error</div></div>',
   'in a frame inside an input group': `<div class="form-field"><div class="input-group"><span class="input-group-text">@</span><div class="form-control-group"><input class="form-control" data-test required></div></div>${FEEDBACK}</div>`,
   'bare in an input group': '<div class="form-field"><div class="input-group"><input data-test required></div><div class="invalid-feedback">Error</div></div>',
+  'after a floating label inside a frame': '<div class="form-field"><div class="form-control-group"><div class="form-floating"><input class="form-control" id="framedFloating" placeholder="Name" data-test required><label for="framedFloating">Name</label></div><div class="invalid-feedback">Error</div></div></div>',
+  'after a floating label inside a frame without a field': '<div class="form-control-group"><div class="form-floating"><input class="form-control" id="bareFramedFloating" placeholder="Name" data-test required><label for="bareFramedFloating">Name</label></div><div class="invalid-feedback">Error</div></div>',
   'in a range': '<div class="form-range"><input class="form-range-input" type="range" data-test></div><div class="invalid-feedback">Error</div>',
   'next to a range input inside the range wrapper': '<div class="form-range"><input type="number" data-test required></div><div class="invalid-feedback">Error</div>'
 }
@@ -122,6 +126,30 @@ describe('messages of a form field', () => {
       })
     })
   }
+
+  it('shows only the error after a floating label for a control marked invalid that the browser finds valid', () => {
+    const form = mount(LAYOUTS['after a floating label'], 'data-coreui-validate="valid" novalidate')
+    const control = container.querySelector('[data-test]')
+    makeValid(control)
+    form.requestSubmit()
+    control.classList.add('is-invalid')
+
+    expect(control.matches(':user-valid')).toBeTrue()
+    expect(displayOf('.invalid-feedback')).toBe('block')
+    expect(displayOf('.valid-feedback')).toBe('none')
+  })
+
+  it('shows only the error after a floating label the page marked invalid around a control the browser finds valid', () => {
+    const form = mount(LAYOUTS['after a floating label'], 'data-coreui-validate="valid" novalidate')
+    const control = container.querySelector('[data-test]')
+    makeValid(control)
+    form.requestSubmit()
+    container.querySelector('.form-floating').classList.add('is-invalid')
+
+    expect(control.matches(':user-valid')).toBeTrue()
+    expect(displayOf('.invalid-feedback')).toBe('block')
+    expect(displayOf('.valid-feedback')).toBe('none')
+  })
 
   for (const [layout, fields, wrap] of [
     ...Object.entries(LAYOUTS).map(([layout, fields]) => [layout, fields, true]),

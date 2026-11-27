@@ -47,10 +47,12 @@
   $without-error: ":not(.is-invalid, :has(.is-invalid, > :user-invalid, > .form-floating > :user-invalid))";
   $otp-state: ".otp:is(.is-#{$state}, :has(> .is-#{$state}))";
   $range-without-error: "";
+  $floating: ".form-floating:not(.input-group *, .form-control-group *)";
 
   @if $state != "invalid" {
     $otp-state: "#{$otp-state}:not(.is-invalid, :has(> .is-invalid))";
     $range-without-error: ":not(.is-invalid)";
+    $floating: "#{$floating}#{$without-error}";
   }
 
   .#{$state}-feedback {
@@ -363,6 +365,24 @@
   .form-range:has(.form-range-input.is-#{$state}) {
     ~ .#{$state}-feedback,
     ~ .#{$state}-tooltip { display: block; }
+  }
+
+  // Floating label feedback follows the wrapper that contains the control.
+  #{$floating}:has(> :where(.form-control, .form-select).is-#{$state}) {
+    ~ .#{$state}-feedback,
+    ~ .#{$state}-tooltip { display: block; }
+  }
+
+  @if $state == "invalid" {
+    [data-coreui-validate] #{$floating}:has(> :where(.form-control, .form-select):user-invalid) {
+      ~ .invalid-feedback,
+      ~ .invalid-tooltip { display: block; }
+    }
+  } @else if $state == "valid" {
+    [data-coreui-validate~="valid"] #{$floating}:has(> :where(.form-control, .form-select):user-valid) {
+      ~ .valid-feedback,
+      ~ .valid-tooltip { display: block; }
+    }
   }
 
   .rating.is-#{$state} .rating-item {

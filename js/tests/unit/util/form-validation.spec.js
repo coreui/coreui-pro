@@ -296,6 +296,18 @@ describe('Form validation utilities', () => {
       expect(fixtureEl.querySelector('#deep').hasAttribute('aria-describedby')).toBeFalse()
     })
 
+    it('should link the feedback after a floating label to the control inside it, and not to the next floating field', () => {
+      fixtureEl.innerHTML = `<form>
+        <div class="form-field"><div class="form-floating"><input id="floatingEmail" class="form-control" type="email" placeholder="Email" value="test@" required><label for="floatingEmail">Email</label></div><div id="floatingEmailError" class="invalid-feedback">Enter a valid email address.</div></div>
+        <div class="form-field"><div class="form-floating"><input id="floatingName" class="form-control" placeholder="Name" required><label for="floatingName">Name</label></div><div id="floatingNameError" class="invalid-feedback">Enter a name.</div></div>
+      </form>`
+
+      updateValidationState(fixtureEl.querySelector('form'), new WeakMap())
+
+      expect(describedBy(fixtureEl.querySelector('#floatingEmail'))).toBe('floatingEmailError')
+      expect(describedBy(fixtureEl.querySelector('#floatingName'))).toBe('floatingNameError')
+    })
+
     it('should link the message of a field inside an input group only when a field around the input group shows it', () => {
       fixtureEl.innerHTML = `<form>
         <div class="input-group"><div class="form-field"><div class="form-floating"><input id="alone" class="form-control" placeholder="Alone" required><label for="alone">Alone</label></div><div class="invalid-feedback">Alone</div></div></div>
