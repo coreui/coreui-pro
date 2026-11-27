@@ -2,6 +2,7 @@
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/focus-ring" as *;
+@use "mixins/forced-colors" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
@@ -103,8 +104,16 @@ $rating-tokens: defaults(
       color: var(--#{$prefix}theme-bg, var(--#{$prefix}rating-item-active-color));
       opacity: 1;
 
+      @include forced-colors() {
+        color: Highlight;
+      }
+
       .rating-item-icon {
         background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}rating-item-active-color));
+
+        @include forced-colors() {
+          background-color: Highlight;
+        }
       }
 
       .rating-item-custom-icon:has(+ .rating-item-custom-icon-active) {
@@ -122,6 +131,10 @@ $rating-tokens: defaults(
     height: var(--#{$prefix}rating-item-height);
     background-color: var(--#{$prefix}rating-item-color);
     mask: var(--#{$prefix}rating-item-icon) center / var(--#{$prefix}rating-item-height) no-repeat;
+
+    @include forced-colors() {
+      background-color: CanvasText;
+    }
   }
 
   .rating-item-custom-icon-active {

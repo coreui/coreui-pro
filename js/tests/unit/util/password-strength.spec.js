@@ -30,6 +30,43 @@ describe('Password strength', () => {
       expect(scorePassword('abcdefgh1', [], { minLength: 8, thresholds: [0] }).score).toBe(2)
       expect(scorePassword('abcdefgh1', [], { minLength: 8, thresholds: [0, 0, 0] }).score).toBe(4)
     })
+
+    const passes = (rule, password) => {
+      const weights = Object.fromEntries(Object.keys(PASSWORD_STRENGTH_WEIGHTS).map(key => [key, key === rule ? 10 : 0]))
+      return scorePassword(password, [], { minLength: 8, weights }).score === 4
+    }
+
+    it('should count punctuation, symbols and ordinary spaces as symbols', () => {
+      for (const password of ['-', '=', ' ', '£', '_', '!', '€', '😀']) {
+        expect(passes('special', password)).withContext(password).toBeTrue()
+      }
+
+      expect(passes('multipleSpecial', 'correct horse battery')).toBeTrue()
+      expect(passes('multipleSpecial', '_ ')).toBeTrue()
+    })
+
+    it('should not count letters, digits, combining marks or invisible characters as symbols', () => {
+      for (const password of ['ą', 'Ж', '日本', 'abc1', '\u0301\u200B', '\t']) {
+        expect(passes('special', password)).withContext(password).toBeFalse()
+      }
+    })
+
+    it('should count lowercase and uppercase letters outside ASCII', () => {
+      expect(passes('lowercase', 'ą')).toBeTrue()
+      expect(passes('lowercase', 'ж')).toBeTrue()
+      expect(passes('uppercase', 'Ż')).toBeTrue()
+      expect(passes('uppercase', 'Ж')).toBeTrue()
+      expect(passes('lowercase', 'Ż')).toBeFalse()
+      expect(passes('uppercase', '日')).toBeFalse()
+    })
+
+    it('should count decimal digits of any script as numbers', () => {
+      for (const password of ['7', '\u06F1', '\u0663', '\u0967']) {
+        expect(passes('numbers', password)).withContext(password).toBeTrue()
+      }
+
+      expect(passes('numbers', '²')).toBeFalse()
+    })
   })
 
   describe('normalizeStrength', () => {

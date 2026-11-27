@@ -1,6 +1,7 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/focus-ring" as *;
+@use "mixins/forced-colors" as *;
 @use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -229,7 +230,7 @@ $tab-pane-tokens: defaults(
       pointer-events: none;
       cursor: default;
 
-      @media (forced-colors: active) {
+      @include forced-colors() {
         color: GrayText;
         border-color: GrayText;
       }

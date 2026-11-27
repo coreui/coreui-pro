@@ -1,6 +1,7 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/focus-ring" as *;
+@use "mixins/forced-colors" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
@@ -116,6 +117,10 @@ $stepper-tokens: defaults(
       --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}theme-fg, var(--#{$prefix}stepper-step-indicator-active-color));
       --#{$prefix}stepper-step-indicator-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-indicator-active-color)) 5%, transparent);
       --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-indicator-active-border-color));
+
+      @include forced-colors() {
+        --#{$prefix}stepper-step-indicator-border-color: Highlight;
+      }
     }
 
     &:disabled {
@@ -137,6 +142,10 @@ $stepper-tokens: defaults(
 
       ~ .stepper-step-connector {
         --#{$prefix}stepper-step-connector-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-connector-complete-bg));
+
+        @include forced-colors() {
+          outline-color: Highlight;
+        }
       }
     }
 
@@ -172,6 +181,11 @@ $stepper-tokens: defaults(
     height: var(--#{$prefix}stepper-step-indicator-icon-size);
     background-color: var(--#{$prefix}stepper-step-indicator-icon-color);
     mask: var(--#{$prefix}stepper-step-indicator-icon) center / var(--#{$prefix}stepper-step-indicator-icon-size) no-repeat;
+
+    // Forced colors mode removes the background color that paints the icon.
+    @include forced-colors() {
+      background-color: CanvasText;
+    }
   }
 
   .stepper-step-connector {
@@ -180,6 +194,10 @@ $stepper-tokens: defaults(
     background: var(--#{$prefix}stepper-step-connector-bg);
     @include transition(var(--#{$prefix}stepper-step-connector-transition));
 
+    // Forced colors mode removes the background color. Show the line with an outline.
+    @include forced-colors() {
+      outline: 1px solid transparent;
+    }
   }
 
   .stepper-pane:not(.show) {

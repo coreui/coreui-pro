@@ -2,6 +2,7 @@
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/focus-ring" as *;
+@use "../mixins/forced-colors" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
@@ -86,6 +87,11 @@ $switch-tokens: defaults(
     box-shadow: var(--#{$prefix}switch-thumb-shadow);
     transform: translateY(-50%);
     @include transition(inset-inline-start var(--#{$prefix}switch-transition-duration) var(--#{$prefix}switch-transition-timing), background-color var(--#{$prefix}switch-transition-duration) var(--#{$prefix}switch-transition-timing));
+
+    // Forced colors mode removes the background color. Show the indicator with an outline.
+    @include forced-colors() {
+      outline: 1px solid transparent;
+    }
   }
 
   &:checked {

@@ -1,6 +1,7 @@
 @use "layout/breakpoints" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
+@use "mixins/forced-colors" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -241,7 +242,8 @@ $menu-tokens: defaults(
         color: inherit !important; // stylelint-disable-line declaration-no-important
       }
 
-      @media (forced-colors: active) {
+      // Show the focused item with the system highlight colors.
+      @include forced-colors() {
         color: HighlightText;
         background-color: Highlight;
         forced-color-adjust: none;

@@ -1,6 +1,7 @@
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/forced-colors" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
@@ -270,6 +271,13 @@ $sidebar-nav-tree-tokens: defaults(
         &:hover:not(:has(.nav-group-toggle-indicator))::after {
           background-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-group-indicator-hover-color));
           mask-image: var(--#{$prefix}sidebar-nav-group-indicator-hover-icon);
+        }
+      }
+
+      @include forced-colors() {
+        &:not(:has(.nav-group-toggle-indicator))::after,
+        &:hover:not(:has(.nav-group-toggle-indicator))::after {
+          background-color: CanvasText;
         }
       }
     }

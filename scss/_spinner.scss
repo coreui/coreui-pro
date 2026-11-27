@@ -1,4 +1,5 @@
 @use "functions/defaults" as *;
+@use "mixins/forced-colors" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
 
@@ -73,6 +74,11 @@ $spinner-grow-tokens: defaults(
 
     border: var(--#{$prefix}spinner-border-width) solid currentcolor;
     border-inline-end-color: transparent;
+
+    // Forced colors mode paints the transparent border, so the gap disappears and the ring does not seem to turn.
+    @include forced-colors() {
+      border-inline-end-color: Canvas;
+    }
   }
 
   .spinner-sm {
@@ -103,6 +109,11 @@ $spinner-grow-tokens: defaults(
 
     background-color: currentcolor;
     opacity: 0;
+
+    // Forced colors mode removes the background color. Show the circle with an outline.
+    @include forced-colors() {
+      outline: 1px solid transparent;
+    }
   }
 
   .spinner-rotate {

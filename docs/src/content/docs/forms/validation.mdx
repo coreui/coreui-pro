@@ -153,6 +153,8 @@ For invalid fields, ensure that the invalid feedback/error message is associated
 
 In a form the [form plugin](#usage) validates, a `.is-invalid` or `.is-valid` you set on a control stays: the plugin leaves that control's classes to you until you remove yours, and only adds and removes its own.
 
+Under `data-coreui-validate="valid"`, a control you mark with `.is-invalid` shows only the error, in the error colour, also when the browser finds its value valid.
+
 For a validated input group, wrap the group in a [`.form-field`](/forms/field/) and place the feedback outside the group, so it renders under the whole frame.
 
 A [form component](#form-components) takes a state the server rendered from `data-coreui-validation-state="invalid"` on its element, not from a class there. The stylesheet does not read that attribute, so the state and its message appear when the component starts: on `DOMContentLoaded` for a chip input and a chip filter, and on the `load` event of the window for the others.

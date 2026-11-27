@@ -2702,6 +2702,18 @@ buttons, and neither the button nor `toggle()` changes what a disabled field
 shows: a password revealed before the field is disabled stays visible, and
 can be hidden once the field is enabled again.
 
+#### Password Strength: what counts as a symbol, a letter and a digit
+
+The built-in scorer counts punctuation, symbols and ordinary spaces as symbols
+(`special`, `multipleSpecial`), lowercase and uppercase letters of every script
+with case for `lowercase` and `uppercase`, and decimal digits of every script
+for `numbers`. Before, any character outside `A-Z`, `a-z`, `0-9` and `_` that
+was not whitespace counted as a symbol, so `ą` or `日` raised the score as a
+symbol and a passphrase such as `correct horse battery` got none. Letters of
+scripts without case, such as Chinese, Arabic or Hebrew, now count for none of
+these rules, so a password written only in them loses the two symbol points
+and, from 8 characters up, drops one level; other passwords score higher. Set `weights` or pass your own scorer to change it.
+
 #### Password Strength: the level text keeps text contrast
 
 The level text (`.password-strength-text`) took the segment color, the
@@ -3309,6 +3321,10 @@ field behind that kept submitting.
 
 #### Collapse
 
+- **New: `.collapse-instant`** on a collapsible element opens and closes it
+  without a transition, like `.dialog-instant` and `.tooltip-instant` on their
+  components. The `.transition-none` utility does the same. See
+  [Collapse](/components/collapse/).
 - **New: `data-coreui-hash` on a collapsible element** opens it when the URL
   fragment matches its `id`, on load and on `hashchange`, then scrolls to it and
   focuses it when it is focusable and focus was not in another control. See
@@ -6574,6 +6590,17 @@ markup.
   support the media feature gets no transition at all. Rules that force
   `transition: none` stay outside the query — they disable motion on purpose,
   so they have to reach every reader.
+- **Added `$enable-forced-colors` and the `forced-colors()` mixin.** Components
+  include styles for forced colors mode (for example, Windows high contrast
+  themes), so parts drawn only with a background color or a transparent border
+  stay visible: check and radio marks, switch thumbs, range sliders, progress
+  bars, spinners, close buttons and the arrows of popovers and tooltips among
+  them. A resting floating label no longer shows the placeholder or the empty
+  date mask through itself. Set `$enable-forced-colors: false` to remove these
+  styles from the build, including the forced colors rules Menu, Nav and OTP
+  input already had. In your own Sass, use `@include forced-colors()` instead of
+  a bare `@media (forced-colors: active)` query, so your styles follow the same
+  option. See [Forced colors](/accessibility/overview/#forced-colors).
 - **The sizing utilities spell the property out: `.mw-100` → `.max-w-100`,
   `.mh-100` → `.max-h-100`.** The abbreviations were the only ones on that axis:
   the floor classes are `.min-vw-100`, `.min-vh-100`, `.min-dvw-100`, and the

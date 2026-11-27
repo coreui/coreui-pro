@@ -54,6 +54,7 @@ const SELECTOR_DATE_TIME = '.form-date-time'
 const SELECTOR_FIELD = '.form-field'
 const SELECTOR_FIELD_CONTROL = '.check, .radio, .switch'
 const SELECTOR_FLOATING = '.form-floating'
+const SELECTOR_FLOATING_CONTROL = '.form-floating > .form-control, .form-floating > .form-select'
 const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
 const SELECTOR_FRAME = '.form-control-group'
 const SELECTOR_INPUT_GROUP = '.input-group'
@@ -204,18 +205,19 @@ const reachesField = (control: Element, field: Element): boolean => {
 
 /**
  * Collects the invalid feedback the stylesheet shows for one control: the `.invalid-feedback` and
- * `.invalid-tooltip` after it, after its frame, after the `.form-range` of a `.form-range-input` or
- * after an element around it marked `.is-invalid`, up to where the next field starts, and in each
- * `.form-field` around it that shows its messages for the control, those that sit in a field around
- * the control. A field grouping several also shows the messages of the fields inside it; those
- * belong to other controls and are left out, and so are the messages the page hid.
+ * `.invalid-tooltip` after it, after its frame, after the `.form-range` of a `.form-range-input`,
+ * after the `.form-floating` a `.form-control` or `.form-select` sits in directly, outside a frame
+ * or an input group, or after an element around it marked `.is-invalid`, up to where the next field
+ * starts, and in each `.form-field` around it that shows its messages for the control, those that
+ * sit in a field around the control. A field grouping several also shows the messages of the fields
+ * inside it; those belong to other controls and are left out, and so are the messages the page hid.
  *
  * @param control - The control
  * @returns The feedback elements, in document order per rule
  */
 const getStructuralFeedback = (control: FormControl): Element[] => {
   const element = getLayoutElement(control)
-  const anchor = getFrame(element) ?? (element.matches(SELECTOR_RANGE_INPUT) ? element.closest(SELECTOR_RANGE) : null)
+  const anchor = getFrame(element) ?? (element.matches(SELECTOR_RANGE_INPUT) ? element.closest(SELECTOR_RANGE) : null) ?? (element.matches(SELECTOR_FLOATING_CONTROL) && !element.closest(SELECTOR_INPUT_GROUP) ? element.parentElement : null)
   const fieldFeedback: Element[] = []
 
   for (let field = element.closest(SELECTOR_FIELD); field; field = field.parentElement?.closest(SELECTOR_FIELD) ?? null) {

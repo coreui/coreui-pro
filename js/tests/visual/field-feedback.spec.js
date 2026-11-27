@@ -11,6 +11,7 @@
 import { userEvent } from 'vitest/browser'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
+import Combobox from '../../src/combobox.js'
 import DateInput from '../../src/date-input.js'
 import DatePicker from '../../src/date-picker.js'
 import DateRangeInput from '../../src/date-range-input.js'
@@ -25,6 +26,8 @@ const LAYOUTS = {
   'next to the control': `<input class="form-control" data-test required>${FEEDBACK}`,
   'after a frame': `<div class="form-control-group"><input class="form-control" data-test required></div>${FEEDBACK}`,
   'after an input group': `<div class="input-group"><span class="input-group-text">@</span><input class="form-control" data-test required></div>${FEEDBACK}`,
+  'after a floating label': `<div class="form-floating"><input class="form-control" id="floatingAlone" placeholder="Name" data-test required><label for="floatingAlone">Name</label></div>${FEEDBACK}`,
+  'after a floating label holding a select': `<div class="form-floating"><select class="form-select" id="floatingSelect" data-test required><option value="">Pick</option><option value="a">A</option></select><label for="floatingSelect">Pick</label></div>${FEEDBACK}`,
   'after an input group with a floating label': `<div class="input-group"><span class="input-group-text">@</span><div class="form-floating"><input class="form-control" id="floating" placeholder="Name" data-test required><label for="floating">Name</label></div></div>${FEEDBACK}`,
   'after an input group holding a select': `<div class="input-group"><span class="input-group-text">@</span><select class="form-select" data-test required><option value="">Pick</option><option value="a">A</option></select></div>${FEEDBACK}`,
   'in the content of a check': `<input class="check" type="checkbox" id="check" data-test required><div class="form-field-content"><label for="check">Agree</label><small class="form-text">Required.</small>${FEEDBACK}</div>`,
@@ -39,6 +42,8 @@ const FIELDLESS_LAYOUTS = {
   'in a frame below the field wrapper': '<div class="form-field"><div class="picker"><div class="form-control-group"><input class="form-control" data-test required></div></div><div class="invalid-feedback">Error</div></div>',
   'in a frame inside an input group': `<div class="form-field"><div class="input-group"><span class="input-group-text">@</span><div class="form-control-group"><input class="form-control" data-test required></div></div>${FEEDBACK}</div>`,
   'bare in an input group': '<div class="form-field"><div class="input-group"><input data-test required></div><div class="invalid-feedback">Error</div></div>',
+  'after a floating label inside a frame': '<div class="form-field"><div class="form-control-group"><div class="form-floating"><input class="form-control" id="framedFloating" placeholder="Name" data-test required><label for="framedFloating">Name</label></div><div class="invalid-feedback">Error</div></div></div>',
+  'after a floating label inside a frame without a field': '<div class="form-control-group"><div class="form-floating"><input class="form-control" id="bareFramedFloating" placeholder="Name" data-test required><label for="bareFramedFloating">Name</label></div><div class="invalid-feedback">Error</div></div>',
   'in a range': '<div class="form-range"><input class="form-range-input" type="range" data-test></div><div class="invalid-feedback">Error</div>',
   'next to a range input inside the range wrapper': '<div class="form-range"><input type="number" data-test required></div><div class="invalid-feedback">Error</div>'
 }
@@ -120,8 +125,32 @@ describe('messages of a form field', () => {
         expect(displayOf('.valid-feedback')).toBe('block')
         expect(displayOf('.invalid-feedback')).toBe('none')
       })
+
+      it('shows only the error for a control marked invalid that the browser finds valid', () => {
+        const form = mount(fields, 'data-coreui-validate="valid" novalidate')
+        const control = container.querySelector('[data-test]')
+        makeValid(control)
+        form.requestSubmit()
+        control.classList.add('is-invalid')
+
+        expect(control.matches(':user-valid')).toBeTrue()
+        expect(displayOf('.invalid-feedback')).toBe('block')
+        expect(displayOf('.valid-feedback')).toBe('none')
+      })
     })
   }
+
+  it('shows only the error after a floating label the page marked invalid around a control the browser finds valid', () => {
+    const form = mount(LAYOUTS['after a floating label'], 'data-coreui-validate="valid" novalidate')
+    const control = container.querySelector('[data-test]')
+    makeValid(control)
+    form.requestSubmit()
+    container.querySelector('.form-floating').classList.add('is-invalid')
+
+    expect(control.matches(':user-valid')).toBeTrue()
+    expect(displayOf('.invalid-feedback')).toBe('block')
+    expect(displayOf('.valid-feedback')).toBe('none')
+  })
 
   for (const [layout, fields, wrap] of [
     ...Object.entries(LAYOUTS).map(([layout, fields]) => [layout, fields, true]),
@@ -296,6 +325,21 @@ describe('messages of a form field', () => {
     })
   })
 
+  it('shows only the error after a combobox given the invalid state that holds a value the browser finds valid', () => {
+    const form = mount(`<label for="role">Role</label><button class="form-control combobox-toggle" type="button" id="role" data-coreui-name="role" data-coreui-validation-state="invalid" data-coreui-value="admin"></button><div class="popup combobox-popup"><div class="list-box"><div class="list-box-options" role="listbox" aria-label="Role"><div class="list-box-option" data-coreui-value="admin">Admin</div><div class="list-box-option" data-coreui-value="editor">Editor</div></div></div></div>${FEEDBACK}`, 'data-coreui-validate="valid" novalidate')
+    const toggle = container.querySelector('.combobox-toggle')
+    const combobox = new Combobox(toggle)
+    combobox.setValue('editor')
+    form.requestSubmit()
+
+    expect(container.querySelector('.combobox-select').matches(':user-valid')).toBeTrue()
+    expect(toggle).toHaveClass('is-invalid')
+    expect(displayOf('.invalid-feedback')).toBe('block')
+    expect(displayOf('.valid-feedback')).toBe('none')
+
+    combobox.dispose()
+  })
+
   it('colours a check, a radio and a switch, and their label, with the state', () => {
     for (const [markup, framed] of [
       ['<input class="check is-invalid" type="checkbox" id="c"><label for="c">Agree</label>', '.check'],
@@ -325,6 +369,35 @@ describe('messages of a form field', () => {
       expect(control.matches(':user-invalid')).toBeTrue()
       expect(getComputedStyle(control).borderTopColor).toBe(color)
       expect(getComputedStyle(container.querySelector('label')).color).toBe(color)
+
+      container.remove()
+    }
+  })
+
+  it('colours a control, a frame, an input group, a check, a radio and a switch the page marks invalid with the error while the browser finds the value valid', () => {
+    for (const [markup, framed = 'input'] of [
+      ['<input class="form-control" id="t" required><label for="t">Name</label>'],
+      ['<label for="g">Name</label><div class="form-control-group"><input class="form-control" id="g" required></div>', '.form-control-group'],
+      ['<label for="i">Name</label><div class="input-group"><span class="input-group-text">@</span><input class="form-control" id="i" required></div>'],
+      ['<input class="check" type="checkbox" id="c" required><label for="c">Agree</label>'],
+      ['<input class="radio" type="radio" name="plan" id="r" required><label for="r">Basic</label>'],
+      ['<input class="switch" type="checkbox" role="switch" id="s" required><label for="s">Subscribe</label>']
+    ]) {
+      const paint = () => [getComputedStyle(container.querySelector(framed)).borderTopColor, getComputedStyle(container.querySelector('label')).color]
+      mount(`${markup}${FEEDBACK}`)
+      makeValid(container.querySelector('input'))
+      container.querySelector('input').classList.add('is-invalid')
+      const expected = paint()
+      container.remove()
+
+      const form = mount(`${markup}${FEEDBACK}`, 'data-coreui-validate="valid" novalidate')
+      const control = container.querySelector('input')
+      makeValid(control)
+      form.requestSubmit()
+      control.classList.add('is-invalid')
+
+      expect(control.matches(':user-valid')).toBeTrue()
+      expect(paint()).toEqual(expected)
 
       container.remove()
     }

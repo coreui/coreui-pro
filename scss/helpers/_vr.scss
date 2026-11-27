@@ -1,4 +1,5 @@
 @use "../functions/defaults" as *;
+@use "../mixins/forced-colors" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
@@ -27,5 +28,10 @@ $vr-tokens: defaults(
     width: var(--#{$prefix}vr-border-width);
     min-height: 1em;
     background-color: var(--#{$prefix}vr-color);
+
+    // Forced colors mode removes the background color. Show the rule with an outline.
+    @include forced-colors() {
+      outline: 1px solid transparent;
+    }
   }
 }

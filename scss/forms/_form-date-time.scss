@@ -1,5 +1,6 @@
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/forced-colors" as *;
 @use "../mixins/form-control" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
@@ -112,6 +113,10 @@ $form-date-time-tokens: defaults(
     .form-date-time-section,
     .form-date-time-separator {
       color: transparent;
+
+      @include forced-colors() {
+        opacity: 0;
+      }
     }
 
     ~ label {
@@ -172,11 +177,19 @@ $form-date-time-tokens: defaults(
       .form-date-time-section,
       .form-date-time-separator {
         color: transparent;
+
+        @include forced-colors() {
+          opacity: 0;
+        }
       }
     }
 
     &:not(:focus-within) > .form-control-icon:has(+ .form-date-time:not(.form-date-time-filled)) {
       color: transparent;
+
+      @include forced-colors() {
+        opacity: 0;
+      }
     }
   }
 

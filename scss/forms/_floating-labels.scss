@@ -1,5 +1,6 @@
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/forced-colors" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
@@ -84,6 +85,13 @@ $form-floating-tokens: defaults(
         var(--#{$prefix}form-floating-transition-duration),
         var(--#{$prefix}form-floating-transition-timing)
       );
+
+      // Forced colors mode paints the transparent border around the label. Remove
+      // the border and add its width to the padding, so the text stays aligned.
+      @include forced-colors() {
+        padding: calc(var(--#{$prefix}form-floating-padding-y) + var(--#{$prefix}btn-input-border-width)) calc(var(--#{$prefix}form-floating-padding-x) + var(--#{$prefix}btn-input-border-width));
+        border: 0;
+      }
     }
 
     // A textarea grows, so its label stays at the top instead of centring
@@ -188,12 +196,21 @@ $form-floating-tokens: defaults(
       > .picker > .form-control-group > .form-control {
         &:not(:focus)::placeholder {
           color: transparent;
+
+          // Forced colors mode ignores the transparent color, so the placeholder shows under the label.
+          @include forced-colors() {
+            opacity: 0;
+          }
         }
       }
     }
 
     > .form-control-plaintext::placeholder {
       color: transparent;
+
+      @include forced-colors() {
+        opacity: 0;
+      }
     }
 
     > label:has(~ textarea:focus)::after,
@@ -218,6 +235,11 @@ $form-floating-tokens: defaults(
     > label:has(~ .form-control-plaintext),
     > .form-control-plaintext ~ label {
       border-width: var(--#{$prefix}btn-input-border-width) 0; // Required to properly position label text - as explained above
+
+      @include forced-colors() {
+        padding: calc(var(--#{$prefix}form-floating-padding-y) + var(--#{$prefix}btn-input-border-width)) var(--#{$prefix}form-floating-padding-x);
+        border: 0;
+      }
     }
 
     // `.form-control` is named on its own because of specificity

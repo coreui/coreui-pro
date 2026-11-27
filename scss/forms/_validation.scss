@@ -47,10 +47,12 @@
   $without-error: ":not(.is-invalid, :has(.is-invalid, > :user-invalid, > .form-floating > :user-invalid))";
   $otp-state: ".otp:is(.is-#{$state}, :has(> .is-#{$state}))";
   $range-without-error: "";
+  $floating: ".form-floating:not(.input-group *, .form-control-group *)";
 
   @if $state != "invalid" {
     $otp-state: "#{$otp-state}:not(.is-invalid, :has(> .is-invalid))";
     $range-without-error: ":not(.is-invalid)";
+    $floating: "#{$floating}#{$without-error}";
   }
 
   .#{$state}-feedback {
@@ -148,30 +150,6 @@
     }
   }
 
-  // Checkbox — label color and feedback display via .form-field:has().
-  .form-field:has(.check.is-#{$state}) {
-    label { color: $color; }
-
-    .#{$state}-feedback,
-    .#{$state}-tooltip { display: block; }
-  }
-
-  @if $state == "invalid" {
-    [data-coreui-validate] .form-field:has(.check:user-invalid) {
-      label { color: $color; }
-
-      .invalid-feedback,
-      .invalid-tooltip { display: block; }
-    }
-  } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] .form-field:has(.check:user-valid) {
-      label { color: $color; }
-
-      .valid-feedback,
-      .valid-tooltip { display: block; }
-    }
-  }
-
   // Radio — control-level styling.
   .radio {
     @include form-validation-state-selector($state) {
@@ -194,30 +172,6 @@
     }
   }
 
-  // Radio — label color and feedback display via .form-field:has().
-  .form-field:has(.radio.is-#{$state}) {
-    label { color: $color; }
-
-    .#{$state}-feedback,
-    .#{$state}-tooltip { display: block; }
-  }
-
-  @if $state == "invalid" {
-    [data-coreui-validate] .form-field:has(.radio:user-invalid) {
-      label { color: $color; }
-
-      .invalid-feedback,
-      .invalid-tooltip { display: block; }
-    }
-  } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] .form-field:has(.radio:user-valid) {
-      label { color: $color; }
-
-      .valid-feedback,
-      .valid-tooltip { display: block; }
-    }
-  }
-
   // Switch — control-level styling.
   .switch {
     @include form-validation-state-selector($state) {
@@ -236,8 +190,8 @@
     }
   }
 
-  // Switch — label color and feedback display via .form-field:has().
-  .form-field:has(.switch.is-#{$state}) {
+  // Check, radio and switch — label color and feedback display via .form-field:has().
+  .form-field:has(:is(.check, .radio, .switch).is-#{$state}) {
     label { color: $color; }
 
     .#{$state}-feedback,
@@ -245,14 +199,14 @@
   }
 
   @if $state == "invalid" {
-    [data-coreui-validate] .form-field:has(.switch:user-invalid) {
+    [data-coreui-validate] .form-field:has(:is(.check, .radio, .switch):user-invalid) {
       label { color: $color; }
 
       .invalid-feedback,
       .invalid-tooltip { display: block; }
     }
   } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] .form-field:has(.switch:user-valid) {
+    [data-coreui-validate~="valid"] .form-field:not(:has(.is-invalid, :user-invalid)):has(:is(.check, .radio, .switch):user-valid) {
       label { color: $color; }
 
       .valid-feedback,
@@ -324,6 +278,7 @@
       }
     }
 
+    .combobox-toggle.is-invalid,
     .form-control-group.is-invalid,
     .form-control-group:has(.is-invalid),
     [data-coreui-validate] .form-control-group:has(:user-invalid) {
@@ -363,6 +318,24 @@
   .form-range:has(.form-range-input.is-#{$state}) {
     ~ .#{$state}-feedback,
     ~ .#{$state}-tooltip { display: block; }
+  }
+
+  // Floating label feedback follows the wrapper that contains the control.
+  #{$floating}:has(> :where(.form-control, .form-select).is-#{$state}) {
+    ~ .#{$state}-feedback,
+    ~ .#{$state}-tooltip { display: block; }
+  }
+
+  @if $state == "invalid" {
+    [data-coreui-validate] #{$floating}:has(> :where(.form-control, .form-select):user-invalid) {
+      ~ .invalid-feedback,
+      ~ .invalid-tooltip { display: block; }
+    }
+  } @else if $state == "valid" {
+    [data-coreui-validate~="valid"] #{$floating}:has(> :where(.form-control, .form-select):user-valid) {
+      ~ .valid-feedback,
+      ~ .valid-tooltip { display: block; }
+    }
   }
 
   .rating.is-#{$state} .rating-item {

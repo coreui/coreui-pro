@@ -2,6 +2,7 @@
 @use "functions/escape-svg" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/forced-colors" as *;
 @use "mixins/mask-icon" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -196,5 +197,9 @@ $header-tokens: defaults(
     height: calc(var(--#{$prefix}header-toggler-font-size) * 1.25);
     background-color: currentcolor;
     @include mask-icon(var(--#{$prefix}header-toggler-icon-bg), 100% 100%);
+
+    @include forced-colors() {
+      background-color: CanvasText;
+    }
   }
 }

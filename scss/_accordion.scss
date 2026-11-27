@@ -2,6 +2,7 @@
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/focus-ring" as *;
+@use "mixins/forced-colors" as *;
 @use "mixins/mask-icon" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -193,6 +194,10 @@ $accordion-tokens: defaults(
       background-color: currentcolor;
       @include mask-icon(var(--#{$prefix}accordion-header-icon), var(--#{$prefix}accordion-header-icon-width), null);
       @include transition(var(--#{$prefix}accordion-header-icon-transition));
+
+      @include forced-colors() {
+        background-color: CanvasText;
+      }
     }
 
     .accordion-icon {

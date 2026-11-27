@@ -403,6 +403,22 @@ A shorthand mixin for the `prefers-color-scheme` media query is available with s
 }
 ```
 
+### Forced colors
+
+A shorthand mixin for the `forced-colors: active` media query is available. Its styles apply when the browser replaces page colors with system colors (for instance, Windows high contrast themes). The mixin outputs nothing when `$enable-forced-colors` is `false`.
+
+<ScssDocs file="scss/mixins/_forced-colors.scss" capture="mixin-forced-colors" />
+
+```scss
+@use "@coreui/coreui-pro/scss/mixins/forced-colors" as *;
+
+.custom-element {
+  @include forced-colors() {
+    // Insert forced colors styles here
+  }
+}
+```
+
 ### Mask icons
 
 An icon carried as a `background-image` paints the color baked into the SVG, so it cannot follow a theme. `mask-icon()` renders the shape through a CSS mask instead, which paints it with the element's `background-color` — so the icon takes whatever token that property reads.

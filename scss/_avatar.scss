@@ -1,6 +1,7 @@
 @use "sass:map";
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/forced-colors" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
@@ -100,6 +101,11 @@ $avatar-variants: defaults(
     background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}avatar-bg));
     @include border-radius(var(--#{$prefix}avatar-border-radius));
     @include transition(var(--#{$prefix}avatar-transition));
+
+    // Forced colors mode removes the background color. Show the edge with an outline.
+    @include forced-colors() {
+      outline: 1px solid transparent;
+    }
   }
 
   // scss-docs-start avatar-modifiers
@@ -137,6 +143,11 @@ $avatar-variants: defaults(
     background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}avatar-status-bg));
     border: var(--#{$prefix}avatar-status-border-width) solid var(--#{$prefix}avatar-status-border-color);
     @include border-radius(var(--#{$prefix}avatar-status-border-radius));
+
+    // Forced colors mode removes the status color. Keep the author colors, because the color tells the status.
+    @include forced-colors() {
+      forced-color-adjust: none;
+    }
   }
 
   @each $size, $map in $avatar-sizes {

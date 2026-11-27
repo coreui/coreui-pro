@@ -2,6 +2,7 @@
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../mixins/focus-ring" as *;
+@use "../mixins/forced-colors" as *;
 @use "../mixins/gradients" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
@@ -11,7 +12,7 @@
 
 $form-range-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start form-range-tokens
 $form-range-tokens: defaults(
@@ -48,7 +49,7 @@ $form-range-tokens: defaults(
 );
 // scss-docs-end form-range-tokens
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start form-range-mixins
 @mixin form-range-thumb() {
@@ -118,6 +119,41 @@ $form-range-tokens: defaults(
     padding: 0; // Need to reset padding
     appearance: none;
     background-color: transparent;
+
+    // Forced colors mode sets the track and thumb backgrounds to `Canvas` and drops the
+    // fill gradient, so the slider disappears. Paint the parts with system colors instead.
+    @include forced-colors() {
+      --#{$prefix}range-track-bg: Canvas;
+      --#{$prefix}range-track-fill-bg: Highlight;
+      --#{$prefix}range-track-disabled-bg: GrayText;
+      --#{$prefix}range-thumb-bg: ButtonText;
+      --#{$prefix}range-thumb-active-bg: Highlight;
+      --#{$prefix}range-thumb-disabled-bg: GrayText;
+      forced-color-adjust: none;
+
+      // Outline instead of border, so the track height and thumb offset stay the same.
+      &::-webkit-slider-runnable-track {
+        --#{$prefix}theme-bg: var(--#{$prefix}range-track-fill-bg);
+        outline: 1px solid CanvasText;
+      }
+
+      &::-moz-range-track {
+        --#{$prefix}theme-bg: var(--#{$prefix}range-track-fill-bg);
+        outline: 1px solid CanvasText;
+      }
+
+      &::-webkit-slider-thumb {
+        --#{$prefix}theme-bg: var(--#{$prefix}range-thumb-bg);
+        --#{$prefix}theme-bg-muted: var(--#{$prefix}range-thumb-active-bg);
+        --#{$prefix}theme-focus-ring: Highlight;
+      }
+
+      &::-moz-range-thumb {
+        --#{$prefix}theme-bg: var(--#{$prefix}range-thumb-bg);
+        --#{$prefix}theme-bg-muted: var(--#{$prefix}range-thumb-active-bg);
+        --#{$prefix}theme-focus-ring: Highlight;
+      }
+    }
 
     &:hover {
       &::-webkit-slider-thumb {
@@ -230,6 +266,10 @@ $form-range-tokens: defaults(
       height: var(--#{$prefix}range-tick-minor-height);
       content: "";
       background-color: var(--#{$prefix}range-tick-bg);
+
+      @include forced-colors() {
+        background-color: CanvasText;
+      }
     }
 
     &:has(> .form-range-tick-label)::before {
