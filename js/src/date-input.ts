@@ -225,7 +225,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   declare ['constructor']: typeof DateInput & typeof BaseComponent
   protected declare _date: Date | null
   protected declare _disabled: boolean
-  protected declare _fieldsetDisabled: boolean
   protected declare _fieldsetWatch: HTMLElement
   protected declare _minDate: Date | null
   protected declare _notifying: number
@@ -382,33 +381,29 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       return
     }
 
-    const focused = this._getFocusedSection()
     this._disabled = disabled
 
     if (this._isDisabled()) {
-      focused?.blur()
+      this._getFocusedSection()?.blur()
     }
 
     this._inputElement!.disabled = disabled
     this._errorElement!.disabled = disabled
-    this._writeDisabled(focused)
+    this._applyDisabledState()
+  }
+
+  _applyDisabledState(): void {
+    this._writeDisabled(this._getFocusedSection())
     this._validation.update()
   }
 
-  _setFieldsetDisabled(disabled: boolean): void {
-    this._fieldsetDisabled = disabled
-    this._writeDisabled(this._getFocusedSection())
-    this._validation.update()
-    queueMicrotask(() => {
-      if (this._isDisabled()) {
-        this._getFocusedSection()?.blur()
-        this._setTabIndexes()
-      }
-    })
+  _releaseFocus(): void {
+    this._getFocusedSection()?.blur()
+    this._setTabIndexes()
   }
 
   _isDisabled(): boolean {
-    return this._disabled || this._fieldsetDisabled
+    return this._disabled || this._fieldsetWatch.matches(':disabled')
   }
 
   _getFocusedSection(): HTMLElement | null {
@@ -893,8 +888,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
       disabled, name, readOnly: readonly, required
     })
     this._element.append(this._errorElement, this._inputElement)
-    this._fieldsetWatch = watchFieldset(this._inputElement, disabled => this._setFieldsetDisabled(disabled))
-    this._fieldsetDisabled = this._fieldsetWatch.matches(':disabled')
+    this._fieldsetWatch = watchFieldset(this._inputElement, () => this._applyDisabledState(), () => this._releaseFocus())
     this._syncSections()
     this._writeDisabled()
     this._validation.refresh()

@@ -106,7 +106,6 @@ const DefaultType: Record<string, string> = {
 
 class ChipSet extends BaseComponent {
   protected declare _disabled: boolean
-  protected declare _fieldsetDisabled: boolean
   protected declare _fieldsetWatch: HTMLElement | null
   protected declare _pendingFocus: HTMLElement | null
   protected declare _chips: string[]
@@ -121,7 +120,6 @@ class ChipSet extends BaseComponent {
     super(element, config)
 
     this._disabled = this._config.disabled
-    this._fieldsetDisabled = false
     this._fieldsetWatch = null
     this._pendingFocus = null
     this._chips = []
@@ -287,25 +285,19 @@ class ChipSet extends BaseComponent {
   }
 
   _isDisabled(): boolean {
-    return this._disabled || this._fieldsetDisabled
+    return this._disabled || this._isFieldsetDisabled()
+  }
+
+  _isFieldsetDisabled(): boolean {
+    return Boolean(this._fieldsetWatch?.matches(':disabled'))
   }
 
   _watchFieldset(anchor: Element): void {
-    this._fieldsetWatch = watchFieldset(anchor, disabled => this._setFieldsetDisabled(disabled))
+    this._fieldsetWatch = watchFieldset(anchor, () => this._applyDisabledState(), () => this._releaseFocus())
 
-    if (this._fieldsetWatch.matches(':disabled')) {
-      this._setFieldsetDisabled(true)
+    if (this._isFieldsetDisabled()) {
+      this._applyDisabledState()
     }
-  }
-
-  _setFieldsetDisabled(disabled: boolean): void {
-    this._fieldsetDisabled = disabled
-    this._applyDisabledState()
-    queueMicrotask(() => {
-      if (this._element && this._isDisabled()) {
-        this._releaseFocus()
-      }
-    })
   }
 
   _setDisabled(disabled: boolean): void {
@@ -533,7 +525,7 @@ class ChipSet extends BaseComponent {
       removeIcon: this._config.removeIcon,
       selectable: false,
       ...attributes,
-      disabled: this._fieldsetDisabled || (attributes.disabled ?? this._disabled),
+      disabled: this._isFieldsetDisabled() || (attributes.disabled ?? this._disabled),
       removable: Boolean(this._config.removable) && removable !== false
     }
   }

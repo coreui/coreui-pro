@@ -271,7 +271,6 @@ class MultiSelect extends ComboboxBase {
   protected declare _offListOptions: HTMLOptionElement[]
   protected declare _seenValues: Set<string>
   protected declare _disabled: boolean
-  protected declare _fieldsetDisabled: boolean
   protected declare _fieldsetWatch: HTMLElement
   protected declare _givenApplies: boolean
   protected declare _givenValues: Set<string> | null
@@ -592,18 +591,12 @@ class MultiSelect extends ComboboxBase {
 
   // Private
   override _isDisabled(): boolean {
-    return this._disabled || this._fieldsetDisabled
+    return this._disabled || this._fieldsetWatch.matches(':disabled')
   }
 
-  _setFieldsetDisabled(disabled: boolean): void {
-    this._fieldsetDisabled = disabled
+  _applyDisabledState(): void {
     this._writeDisabled()
     this._render()
-    queueMicrotask(() => {
-      if (this._isDisabled()) {
-        this.hide()
-      }
-    })
   }
 
   _setDisabled(disabled: boolean): void {
@@ -617,8 +610,7 @@ class MultiSelect extends ComboboxBase {
       this.hide()
     }
 
-    this._writeDisabled()
-    this._render()
+    this._applyDisabledState()
   }
 
   _writeDisabled(): void {
@@ -1005,8 +997,7 @@ class MultiSelect extends ComboboxBase {
     // as an invisible overlay so native `required` validation anchors over the control.
     this._element.parentNode!.insertBefore(wrapper, this._element)
     wrapper.prepend(this._element)
-    this._fieldsetWatch = watchFieldset(this._element, disabled => this._setFieldsetDisabled(disabled))
-    this._fieldsetDisabled = this._fieldsetWatch.matches(':disabled')
+    this._fieldsetWatch = watchFieldset(this._element, () => this._applyDisabledState(), () => this.hide())
 
     this._uniqueId = this._config.id || this._hostAttributes.get('id') || getUID(`${this.constructor.NAME}`)
 

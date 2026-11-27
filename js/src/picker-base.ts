@@ -52,8 +52,7 @@ abstract class PickerBase extends BaseComponent {
   protected declare _adoptedAttributes: [Element, string, string | null, string | null][]
   protected declare _cleanerElement: HTMLElement | null
   protected declare _createdElements: Element[]
-  protected declare _fieldsetDisabled: boolean
-  protected declare _fieldsetWatch: HTMLElement
+  protected declare _fieldsetWatch: HTMLElement | null
   protected declare _footerTemplate: HTMLTemplateElement | null
   protected declare _input: any
   protected declare _menu: HTMLElement
@@ -68,6 +67,7 @@ abstract class PickerBase extends BaseComponent {
     this._adoptedAttributes = []
     this._cleanerElement = null
     this._createdElements = []
+    this._fieldsetWatch = null
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element) as HTMLTemplateElement | null
     this._input = null
     this._menu = null as any
@@ -106,7 +106,7 @@ abstract class PickerBase extends BaseComponent {
       return
     }
 
-    this._fieldsetWatch.remove()
+    this._fieldsetWatch?.remove()
     for (const element of this._listeningElements()) {
       EventHandler.off(element, this.constructor.EVENT_KEY)
     }
@@ -162,16 +162,7 @@ abstract class PickerBase extends BaseComponent {
 
   _addEventListeners(): void {
     const eventName = this.constructor.eventName('click')
-    this._fieldsetWatch = watchFieldset(this._element.lastElementChild!, disabled => {
-      this._fieldsetDisabled = disabled
-      queueMicrotask(() => {
-        if (this._fieldsetDisabled) {
-          this.hide()
-        }
-      })
-    })
-
-    this._fieldsetDisabled = this._fieldsetWatch.matches(':disabled')
+    this._fieldsetWatch = watchFieldset(this._element.lastElementChild!, () => {}, () => this.hide())
 
     if (this._cleanerElement) {
       EventHandler.on(this._cleanerElement, eventName, (event: any) => {
@@ -207,7 +198,7 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _isEditable(): boolean {
-    return !this._config.disabled && !this._fieldsetDisabled && !this._config.readonly
+    return !this._config.disabled && !this._fieldsetWatch?.matches(':disabled') && !this._config.readonly
   }
 
   _createControlGroup(className: string): void {
@@ -324,7 +315,7 @@ abstract class PickerBase extends BaseComponent {
     return {
       clear: () => this.clear(),
       close: () => this.hide(),
-      disabled: this._config.disabled || this._fieldsetDisabled,
+      disabled: this._config.disabled || Boolean(this._fieldsetWatch?.matches(':disabled')),
       reset: () => this.reset()
     }
   }
