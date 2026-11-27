@@ -150,30 +150,6 @@
     }
   }
 
-  // Checkbox — label color and feedback display via .form-field:has().
-  .form-field:has(.check.is-#{$state}) {
-    label { color: $color; }
-
-    .#{$state}-feedback,
-    .#{$state}-tooltip { display: block; }
-  }
-
-  @if $state == "invalid" {
-    [data-coreui-validate] .form-field:has(.check:user-invalid) {
-      label { color: $color; }
-
-      .invalid-feedback,
-      .invalid-tooltip { display: block; }
-    }
-  } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] .form-field:has(.check:user-valid) {
-      label { color: $color; }
-
-      .valid-feedback,
-      .valid-tooltip { display: block; }
-    }
-  }
-
   // Radio — control-level styling.
   .radio {
     @include form-validation-state-selector($state) {
@@ -196,30 +172,6 @@
     }
   }
 
-  // Radio — label color and feedback display via .form-field:has().
-  .form-field:has(.radio.is-#{$state}) {
-    label { color: $color; }
-
-    .#{$state}-feedback,
-    .#{$state}-tooltip { display: block; }
-  }
-
-  @if $state == "invalid" {
-    [data-coreui-validate] .form-field:has(.radio:user-invalid) {
-      label { color: $color; }
-
-      .invalid-feedback,
-      .invalid-tooltip { display: block; }
-    }
-  } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] .form-field:has(.radio:user-valid) {
-      label { color: $color; }
-
-      .valid-feedback,
-      .valid-tooltip { display: block; }
-    }
-  }
-
   // Switch — control-level styling.
   .switch {
     @include form-validation-state-selector($state) {
@@ -238,8 +190,8 @@
     }
   }
 
-  // Switch — label color and feedback display via .form-field:has().
-  .form-field:has(.switch.is-#{$state}) {
+  // Check, radio and switch — label color and feedback display via .form-field:has().
+  .form-field:has(:is(.check, .radio, .switch).is-#{$state}) {
     label { color: $color; }
 
     .#{$state}-feedback,
@@ -247,14 +199,14 @@
   }
 
   @if $state == "invalid" {
-    [data-coreui-validate] .form-field:has(.switch:user-invalid) {
+    [data-coreui-validate] .form-field:has(:is(.check, .radio, .switch):user-invalid) {
       label { color: $color; }
 
       .invalid-feedback,
       .invalid-tooltip { display: block; }
     }
   } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] .form-field:has(.switch:user-valid) {
+    [data-coreui-validate~="valid"] .form-field:not(:has(.is-invalid, :user-invalid)):has(:is(.check, .radio, .switch):user-valid) {
       label { color: $color; }
 
       .valid-feedback,
@@ -326,6 +278,7 @@
       }
     }
 
+    .combobox-toggle.is-invalid,
     .form-control-group.is-invalid,
     .form-control-group:has(.is-invalid),
     [data-coreui-validate] .form-control-group:has(:user-invalid) {

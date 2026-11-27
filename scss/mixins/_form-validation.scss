@@ -46,7 +46,7 @@ $form-feedback-tokens: defaults(
       @content;
     }
   } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] #{if(sass(&): "&"; else: "")}:user-valid,
+    [data-coreui-validate~="valid"] #{if(sass(&): "&"; else: "")}:user-valid:where(:not(.is-invalid)),
     #{if(sass(&): "&"; else: "")}.is-#{$state} {
       @content;
     }
