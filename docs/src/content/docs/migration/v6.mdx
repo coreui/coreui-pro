@@ -6590,6 +6590,17 @@ markup.
   support the media feature gets no transition at all. Rules that force
   `transition: none` stay outside the query — they disable motion on purpose,
   so they have to reach every reader.
+- **Added `$enable-forced-colors` and the `forced-colors()` mixin.** Components
+  include styles for forced colors mode (for example, Windows high contrast
+  themes), so parts drawn only with a background color or a transparent border
+  stay visible: check and radio marks, switch thumbs, range sliders, progress
+  bars, spinners, close buttons and the arrows of popovers and tooltips among
+  them. A resting floating label no longer shows the placeholder or the empty
+  date mask through itself. Set `$enable-forced-colors: false` to remove these
+  styles from the build, including the forced colors rules Menu, Nav and OTP
+  input already had. In your own Sass, use `@include forced-colors()` instead of
+  a bare `@media (forced-colors: active)` query, so your styles follow the same
+  option. See [Forced colors](/accessibility/overview/#forced-colors).
 - **The sizing utilities spell the property out: `.mw-100` → `.max-w-100`,
   `.mh-100` → `.max-h-100`.** The abbreviations were the only ones on that axis:
   the floor classes are `.min-vw-100`, `.min-vh-100`, `.min-dvw-100`, and the

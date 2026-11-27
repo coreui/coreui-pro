@@ -18,6 +18,7 @@ Conformance belongs to a page, not to a library: WCAG judges the page a user mee
 - **Focus.** Dialogs and pickers move focus in when they open, keep it inside while they are modal, and give it back when they close. A menu leaves focus on its toggle until the arrow keys move it to the items.
 - **Status messages.** Changes the page shows without moving focus, such as a toast, a loading button or a chip being added, reach screen readers through [`announce()`](/accessibility/screen-readers/#announcing-messages).
 - **Motion.** Transitions respect the user's [reduced motion](/accessibility/reduced-motion/) preference.
+- **Forced colors.** Components stay visible when the system replaces page colors, as described in [forced colors](#forced-colors).
 
 ## What stays with your markup
 
@@ -55,6 +56,12 @@ For visually hidden interactive controls, such as traditional "skip" links, use 
 ```
 
 More in the [visually hidden helper](/helpers/visually-hidden/).
+
+## Forced colors
+
+CoreUI for Bootstrap includes support for the [`forced-colors` media feature](https://www.w3.org/TR/mediaqueries-5/#forced-colors). Some operating systems and browsers let the user replace page colors with a small palette of system colors (for instance, Windows high contrast themes). The components then use system colors and outlines, so that parts drawn only with a background color or a transparent border stay visible: avatars, progress bars, spinners, stepper connectors and marks, check and radio marks, switch thumbs, range sliders and their ticks, rating stars, close buttons, accordion chevrons, carousel arrows and indicators, header, navbar and sidebar togglers, sidebar navigation group indicators, the vertical rule, and the arrows of popovers and tooltips. The active stepper step, a completed connector, selected rating stars, the range fill and a progress bar use the system highlight color, so their state stays distinguishable. A resting floating label keeps the placeholder and the empty date mask hidden under it.
+
+To remove these styles from the compiled CSS, set `$enable-forced-colors` to `false`. That also removes the system highlight on a focused menu item and the guard that keeps the OTP slots readable, so keep it on unless your own styles cover forced colors. See [options](/customize/options/) for more, and the [`forced-colors()` mixin](/customize/sass/#forced-colors) for your own styles.
 
 ## How we test
 

@@ -2,6 +2,7 @@
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "../mixins/focus-ring" as *;
+@use "../mixins/forced-colors" as *;
 @use "../mixins/mask-icon" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
@@ -73,6 +74,11 @@ $radio-tokens: defaults(
     transform: scale(0);
     @include mask-icon(var(--#{$prefix}radio-mark));
     @include transition(opacity var(--#{$prefix}control-transition-duration) var(--#{$prefix}control-transition-timing), transform var(--#{$prefix}control-transition-duration) var(--#{$prefix}control-transition-timing));
+
+    // Forced colors mode removes the background color that paints the mark.
+    @include forced-colors() {
+      background-color: CanvasText;
+    }
   }
 
   &:checked {

@@ -1,4 +1,5 @@
 @use "../functions/defaults" as *;
+@use "../mixins/forced-colors" as *;
 @use "../mixins/form-control" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
@@ -117,10 +118,18 @@ $multi-select-tokens: defaults(
   .form-floating:not(.form-floating-always, .form-floating-always *) > .multi-select:not(:focus-within, .multi-select-filled) {
     .multi-select-placeholder {
       color: transparent;
+
+      @include forced-colors() {
+        opacity: 0;
+      }
     }
 
     .multi-select-search::placeholder {
       color: transparent;
+
+      @include forced-colors() {
+        opacity: 0;
+      }
     }
 
     ~ label {

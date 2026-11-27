@@ -2,6 +2,7 @@
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/focus-ring" as *;
+@use "mixins/forced-colors" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/mask-icon" as *;
 @use "mixins/tokens" as *;
@@ -193,6 +194,11 @@ $carousel-tokens: defaults(
     // instead of carrying it inside the SVG and being inverted by a filter.
     background-color: var(--#{$prefix}carousel-control-color);
     @include mask-icon($size: 100% 100%, $position: 50%);
+
+    // Forced colors mode removes the background color that paints the icons.
+    @include forced-colors() {
+      background-color: CanvasText;
+    }
   }
 
   .carousel-control-prev-icon {
@@ -292,6 +298,11 @@ $carousel-tokens: defaults(
       border-bottom: var(--#{$prefix}carousel-indicator-hit-area-height) solid transparent;
       opacity: var(--#{$prefix}carousel-indicator-opacity);
       @include transition(var(--#{$prefix}carousel-indicator-transition));
+
+      @include forced-colors() {
+        background-color: CanvasText;
+        border-color: Canvas;
+      }
     }
 
     .active {
@@ -321,6 +332,10 @@ $carousel-tokens: defaults(
           content: "";
           background-color: var(--#{$prefix}carousel-indicator-progress-bg);
           animation: carousel-indicator-progress var(--cui-carousel-interval, 5000ms) linear forwards;
+
+          @include forced-colors() {
+            background-color: Highlight;
+          }
         }
       }
     }

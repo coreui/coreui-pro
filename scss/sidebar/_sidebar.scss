@@ -4,6 +4,7 @@
 @use "../mixins/backdrop" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/focus-ring" as *;
+@use "../mixins/forced-colors" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
@@ -284,6 +285,14 @@ $sidebar-backdrop-tokens: defaults(
 
       &::before {
         background-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-toggler-focus-color));
+      }
+    }
+
+    @include forced-colors() {
+      &::before,
+      &:hover::before,
+      &:focus-visible::before {
+        background-color: CanvasText;
       }
     }
 
