@@ -750,6 +750,22 @@ describe('ChipFilter', () => {
     const chips = element => [...element.querySelectorAll('.chip')]
     const submitted = form => new FormData(form).getAll('dept')
 
+    it('should give up the focus of a chip focused before it starts inside a disabled fieldset', async () => {
+      fixtureEl.innerHTML = '<fieldset disabled><div class="chip-set chip-filter"><span class="chip" tabindex="0">Design</span></div></fieldset>'
+
+      const element = fixtureEl.querySelector('.chip-filter')
+      const [chip] = chips(element)
+      chip.focus()
+      const chipFilter = new ChipFilter(element)
+
+      expect(document.activeElement).toBe(chip)
+      await Promise.resolve()
+
+      expect(document.activeElement).not.toBe(chip)
+      expect(chip.hasAttribute('tabindex')).toBeFalse()
+      chipFilter.dispose()
+    })
+
     it('should start disabled inside a disabled fieldset without disabling its value field', () => {
       const { element, chipFilter } = create('disabled')
 
