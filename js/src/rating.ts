@@ -10,6 +10,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
+import { watchFieldset } from './util/fieldset.js'
 import { type ValidationState } from './util/form-validation.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import {
@@ -124,6 +125,7 @@ const DefaultType = {
 class Rating extends BaseComponent {
   protected declare _currentValue: number | string | null
   protected declare _disabled: boolean
+  protected declare _fieldsetWatch: HTMLElement
   protected declare _items: HTMLElement[]
   protected declare _name: string
   protected declare _startValue: number | string | null
@@ -154,6 +156,7 @@ class Rating extends BaseComponent {
     this._tooltip = null
 
     this._createRating()
+    this._fieldsetWatch = watchFieldset(this._element.lastElementChild!, () => this._validation.update())
     this._addEventListeners()
     this._createTooltip()
   }
@@ -211,6 +214,7 @@ class Rating extends BaseComponent {
       return
     }
 
+    this._fieldsetWatch?.remove()
     this._validation?.dispose()
     this._removeRating()
     this._tooltip?.dispose()

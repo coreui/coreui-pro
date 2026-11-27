@@ -221,6 +221,8 @@ Add the `data-coreui-disabled="true"` attribute to disable the component:
 
 <Example pro code={`<div data-coreui-autocomplete data-coreui-disabled="true" data-coreui-options="" data-coreui-placeholder="Disabled autocomplete..." ></div>`} />
 
+Inside a `<fieldset disabled>` the autocomplete shows no error a validation reported, and shows it again once the fieldset is enabled, as a native field does; a state you give stays. To follow the fieldset the component adds a hidden `<coreui-fieldset-watch>` element after its input. It is listed in `form.elements` and `fieldset.elements`, where it shifts the index of the controls after it, and adds nothing to the submitted data.
+
 ## Sizing
 
 The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the element you initialize — it becomes the `.form-control-group`, so the field matches our similarly sized text inputs.

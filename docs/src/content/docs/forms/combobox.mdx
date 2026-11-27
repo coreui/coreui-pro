@@ -403,6 +403,8 @@ Set `data-coreui-disabled="true"` (or the `disabled` option) to turn the whole c
     </div>
   </div>`} />
 
+Inside a `<fieldset disabled>` the combobox shows no error a validation reported, and shows it again once the fieldset is enabled, as a native field does; a state you give stays. To follow the fieldset the component adds a hidden `<coreui-fieldset-watch>` element inside its toggle. It is listed in `form.elements` and `fieldset.elements`, where it shifts the index of the controls after it, and adds nothing to the submitted data.
+
 ## Form submission
 
 The plugin inserts a hidden `<select class="combobox-select">` right after the toggle and keeps its selected options in step with the selection, so a combobox posts like a `<select>`, and like a `<select multiple>` in `multiple` mode: one key per value. Set `name` to submit it; without a name the combobox is not submitted with the form. The select carries `.input-group-ignore`, so a toggle in an [input group](/forms/input-group/) keeps its corners.

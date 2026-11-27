@@ -10,6 +10,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
 import FieldValidation from './util/field-validation.js'
+import { watchFieldset } from './util/fieldset.js'
 import { containsFocus } from './util/focus.js'
 import { type ValidationState } from './util/form-validation.js'
 import {
@@ -154,6 +155,7 @@ const DefaultType: Record<string, string> = {
 class RangeSlider extends BaseComponent {
   protected declare _config: RangeSliderConfig
   protected declare _disabled: boolean
+  protected declare _fieldsetWatch: HTMLElement
   protected declare _hostAttributes: Map<string, string>
   protected declare _inputs: HTMLInputElement[]
   protected declare _press: RangeSliderPress | null
@@ -223,6 +225,7 @@ class RangeSlider extends BaseComponent {
     this._onPointerMove = event => this._pointerMove(event as PointerEvent)
     this._onPointerUp = event => this._pointerUp(event as PointerEvent)
     this._build(this._config.value as number[])
+    this._fieldsetWatch = watchFieldset(this._wrapper!, () => this._validation.update())
   }
 
   // Getters
@@ -282,6 +285,7 @@ class RangeSlider extends BaseComponent {
       return
     }
 
+    this._fieldsetWatch.remove()
     this._validation.dispose()
     this._teardown()
     super.dispose()

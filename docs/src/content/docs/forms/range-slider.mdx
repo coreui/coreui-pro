@@ -72,6 +72,8 @@ Disable the slider to prevent user interaction.
 <Example pro code={`<div class="mb-4" data-coreui-range-slider data-coreui-value="50" data-coreui-disabled="true" data-coreui-aria-thumb-label='["Volume"]'></div>
   <div data-coreui-range-slider data-coreui-value="50, 75" data-coreui-disabled="true" data-coreui-aria-thumb-label='["Minimum price", "Maximum price"]'></div>`} />
 
+Inside a `<fieldset disabled>` the range slider shows no error a validation reported, and shows it again once the fieldset is enabled, as a native field does; a state you give stays. To follow the fieldset the component adds a hidden `<coreui-fieldset-watch>` element inside the slider, next to its handles. It is listed in `form.elements` and `fieldset.elements`, where it shifts the index of the controls after it, and adds nothing to the submitted data.
+
 ## Min and max
 
 Range Slider has implicit values for `min` and `max`—`0` and `100`, respectively. You may specify new values for those using the `min` and `max` attributes.

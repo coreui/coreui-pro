@@ -167,6 +167,8 @@ Add the `disabled` attribute to the input, or call `disable()`.
     <input type="text" class="otp-input" id="otpDisabled" maxlength="6" value="123456" disabled>
   </div>`} />
 
+Inside a `<fieldset disabled>` the OTP input shows no error a validation reported, and shows it again once the fieldset is enabled, as a native field does; a state you give stays. To follow the fieldset the component adds a hidden `<coreui-fieldset-watch>` element after its input. It is listed in `form.elements` and `fieldset.elements`, where it shifts the index of the controls after it, and adds nothing to the submitted data.
+
 ## Password manager badge
 
 Add `.otp-badge-space` when a password manager draws its badge over the last slot. The class reserves space at the end of the input.

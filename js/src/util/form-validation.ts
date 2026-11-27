@@ -645,14 +645,16 @@ const showsReportedError = (control: Element): boolean => {
  * Reads the state the form shows for a control: `'invalid'` while it matches `:user-invalid` in a
  * `data-coreui-validate` form, or while its value is invalid after a validation reported it where
  * reported errors are shown, see `showsReportedError()`; `'valid'` while it matches `:user-valid`
- * in a `data-coreui-validate="valid"` form.
+ * in a `data-coreui-validate="valid"` form. A control the browser leaves out of validation, being
+ * disabled, in a disabled fieldset or read-only, shows no reported error, as it matches neither
+ * pseudo-class; the report is kept for the time it takes part again.
  *
  * @param control - The control
  * @param reported - Whether a validation reported the control, that is fired `invalid` on it
  * @returns The state, or `undefined` when the form shows none
  */
 export const getUserValidity = (control: Element, reported = false): ValidationState | undefined => {
-  const reportedInvalid = reported && !(control as FormControl).validity.valid && showsReportedError(control)
+  const reportedInvalid = reported && (control as FormControl).willValidate && !(control as FormControl).validity.valid && showsReportedError(control)
 
   if (reportedInvalid || matchesSafely(control, SELECTOR_USER_INVALID)) {
     return 'invalid'

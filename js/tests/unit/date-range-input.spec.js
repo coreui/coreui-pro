@@ -555,6 +555,33 @@ describe('DateRangeInput', () => {
       expect(invalid()).toEqual(Array.from({ length: 6 }, () => null))
     })
 
+    it('should not flag an end before the start while the range is disabled, read-only or in a disabled fieldset, and flag it again once enabled', () => {
+      const invalid = () => fields().flatMap(field => [...field.querySelectorAll('.form-date-time-section')]).some(element => element.getAttribute('aria-invalid') === 'true')
+      for (const config of [{ disabled: true }, { readonly: true }]) {
+        const range = build({ ...config, startDate: new Date(2026, 6, 20), endDate: new Date(2026, 6, 14) })
+
+        expect(range.isRangeValid()).toBeFalse()
+        expect([root().classList.contains('is-invalid'), invalid()]).toEqual([false, false])
+
+        range.dispose()
+      }
+
+      build({ startDate: new Date(2026, 6, 20), endDate: new Date(2026, 6, 14) })
+      const fieldset = document.createElement('fieldset')
+      root().before(fieldset)
+      fieldset.append(root())
+
+      expect([root().classList.contains('is-invalid'), invalid()]).toEqual([true, true])
+
+      fieldset.disabled = true
+
+      expect([root().classList.contains('is-invalid'), invalid()]).toEqual([false, false])
+
+      fieldset.disabled = false
+
+      expect([root().classList.contains('is-invalid'), invalid()]).toEqual([true, true])
+    })
+
     it('should keep the fields announced as invalid while a typed end stays before the start', () => {
       const range = build({ startDate: new Date(2026, 6, 20), endDate: new Date(2026, 6, 21) })
       const [, end] = fields()

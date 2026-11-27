@@ -749,6 +749,36 @@ describe('Form validation utilities', () => {
       expect(read('validating', true)).toBeUndefined()
     })
 
+    it('should read no reported error on a control the browser leaves out of validation, and read it again once the control takes part', () => {
+      fixtureEl.innerHTML = `<form data-coreui-validate><fieldset>
+          <select id="select" required><option value=""></option></select>
+          <select id="multiple" multiple required><option>a</option></select>
+          <input id="radio" type="radio" name="radio" required>
+          <input id="email" type="email" value="abc">
+          <input id="readonly" type="email" value="abc">
+        </fieldset></form>`
+      const ids = ['select', 'multiple', 'radio', 'email', 'readonly']
+      const read = () => ids.map(id => getUserValidity(fixtureEl.querySelector(`#${id}`), true))
+      const fieldset = fixtureEl.querySelector('fieldset')
+
+      expect(read()).toEqual(ids.map(() => 'invalid'))
+
+      fieldset.disabled = true
+
+      expect(read()).toEqual(ids.map(() => undefined))
+
+      fieldset.disabled = false
+      fixtureEl.querySelector('#select').disabled = true
+      fixtureEl.querySelector('#readonly').readOnly = true
+
+      expect(read()).toEqual([undefined, 'invalid', 'invalid', 'invalid', undefined])
+
+      fixtureEl.querySelector('#select').disabled = false
+      fixtureEl.querySelector('#readonly').readOnly = false
+
+      expect(read()).toEqual(ids.map(() => 'invalid'))
+    })
+
     it('should read the form when called, so an attribute the page adds or removes counts from the next call', () => {
       fixtureEl.innerHTML = '<form><input id="value" required></form>'
       const form = fixtureEl.querySelector('form')
