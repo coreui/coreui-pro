@@ -5,6 +5,14 @@ name: "Stepper"
 description: "Build responsive, accessible multi-step forms and form wizards using CoreUI's Bootstrap 6 Stepper Component. Vertical and horizontal layouts, built-in validation, full customization."
 ---
 
+import stepperActions from './snippets/stepper-actions.js?raw'
+import stepperFinish from './snippets/stepper-finish.js?raw'
+import stepperFinishBasic from './snippets/stepper-finish-basic.js?raw'
+import stepperFinishVertical from './snippets/stepper-finish-vertical.js?raw'
+import stepperFinishValidation from './snippets/stepper-finish-validation.js?raw'
+import stepperFinishNovalidate from './snippets/stepper-finish-novalidate.js?raw'
+import stepperFinishSkipValidation from './snippets/stepper-finish-skip-validation.js?raw'
+
 # Stepper
 
 The Bootstrap Stepper component allows you to easily create multi-step form wizards, perfect for guiding users through long forms, registrations, or checkout flows.
@@ -122,7 +130,13 @@ A simple multi-step form built with the Bootstrap Stepper. Each step displays fo
         <button class="btn-solid theme-success" data-coreui-stepper-action="finish">Finish</button>
       </div>
     </div>
-  </div>`} />
+    <div id="myStepperMessage" hidden>
+      <p tabindex="-1">All steps are complete.</p>
+      <button type="button" class="btn-solid theme-danger" data-coreui-stepper-action="reset">Reset</button>
+    </div>
+  </div>`} sandboxJs={stepperFinishBasic} />
+
+<Code code={stepperFinishBasic} lang="js" />
 
 ## Vertical indicator layout
 
@@ -155,7 +169,7 @@ Display step indicators vertically above labels using the `.vertical` modifier. 
 
 Use the `.stepper-vertical` class to build a full vertical stepper, where both indicators and step content stack vertically. Ideal for mobile-first designs or top-to-bottom flows.
 
-<Example pro code={`<div class="stepper stepper-vertical" data-coreui-stepper>
+<Example pro code={`<div class="stepper stepper-vertical" data-coreui-stepper id="myStepperVertical">
     <ol class="stepper-steps">
       <li class="stepper-step">
         <button type="button" class="stepper-step-button active" data-coreui-toggle="step">
@@ -265,7 +279,13 @@ Use the `.stepper-vertical` class to build a full vertical stepper, where both i
         </div>
       </li>
     </ol>
-  </div>`} />
+    <div id="myStepperVerticalMessage" hidden>
+      <p tabindex="-1">All steps are complete.</p>
+      <button type="button" class="btn-solid theme-danger" data-coreui-stepper-action="reset">Reset</button>
+    </div>
+  </div>`} sandboxJs={stepperFinishVertical} />
+
+<Code code={stepperFinishVertical} lang="js" />
 
 A `data-coreui-stepper-action` button inside a step's content acts only while its step is the active one. A double click on Next moves one step, even though the content it sits in is still collapsing.
 
@@ -337,6 +357,93 @@ Use a Non-linear Bootstrap Stepper when users should have full control over navi
       </li>
     </ol>
   </div>`} />
+
+## Shared action buttons
+
+Instead of repeating **Previous**, **Next** and **Finish** in every pane, put them once in a `.stepper-actions` container, placed directly in `.stepper` after `.stepper-content`. The stepper keeps their state: **Previous** is disabled on the first enabled step, **Next** is hidden on the last enabled step and **Finish** on every other step, and the whole container is hidden once the wizard is finished and shown again by `reset()`. Call `update()` after adding or removing steps, and the buttons follow. Focus stays on the button the user pressed while it stays visible; when **Next** hides on the last step, focus moves to **Finish**, or to the step button when **Finish** cannot take focus. When **Next** hides on the last step, **Finish** takes its place and its focus, so the stepper ignores the second click of a double click on **Finish** and a held <kbd>Enter</kbd> on it: a double click or a held key on **Next** does not go on to finish the wizard. **Previous** and **Next** act on every click. Focus that stays on **Next** does not tell a screen reader that the step changed, so the example announces the label of the new step with [`announce()`](/accessibility/screen-readers/#announcing-messages) in the `stepChanged.coreui.stepper` handler, unless focus ends on a step button, which names the step itself. It checks in a microtask, because the stepper moves focus after the `stepChanged.coreui.stepper` handlers. Keep the **Reset** button with the completion message, outside `.stepper-actions`. Use the container in a stepper with panes; in a `.stepper-vertical` stepper keep the buttons in each step's content, next to the fields of their step, because the container would follow the whole list of steps and a screen reader in browse mode would read every later step between the fields and **Next**.
+
+<Example pro code={`<div class="stepper" data-coreui-stepper id="myStepperActions">
+    <ol class="stepper-steps">
+      <li class="stepper-step">
+        <button type="button" class="stepper-step-button active" data-coreui-toggle="step" data-coreui-target="#actions-step-1">
+          <span class="stepper-step-indicator">1</span>
+          <span class="stepper-step-label">Step 1</span>
+        </button>
+      </li>
+      <li class="stepper-step">
+        <button type="button" class="stepper-step-button" data-coreui-toggle="step" data-coreui-target="#actions-step-2">
+          <span class="stepper-step-indicator">2</span>
+          <span class="stepper-step-label">Step 2</span>
+        </button>
+      </li>
+      <li class="stepper-step">
+        <button type="button" class="stepper-step-button" data-coreui-toggle="step" data-coreui-target="#actions-step-3">
+          <span class="stepper-step-indicator">3</span>
+          <span class="stepper-step-label">Step 3</span>
+        </button>
+      </li>
+    </ol>
+    <div class="stepper-content">
+      <div class="stepper-pane" id="actions-step-1">
+        <p>The first step of the wizard.</p>
+      </div>
+      <div class="stepper-pane" id="actions-step-2">
+        <p>The second step of the wizard.</p>
+      </div>
+      <div class="stepper-pane" id="actions-step-3">
+        <p>The last step of the wizard.</p>
+      </div>
+    </div>
+    <div class="stepper-actions">
+      <button type="button" class="btn-solid theme-secondary" data-coreui-stepper-action="prev">Previous</button>
+      <button type="button" class="btn-solid theme-primary" data-coreui-stepper-action="next">Next</button>
+      <button type="button" class="btn-solid theme-success" data-coreui-stepper-action="finish">Finish</button>
+    </div>
+    <div id="myStepperActionsMessage" hidden>
+      <p tabindex="-1">All steps are complete.</p>
+      <button type="button" class="btn-solid theme-danger" data-coreui-stepper-action="reset">Reset</button>
+    </div>
+  </div>`} sandboxJs={stepperActions} />
+
+<Code code={stepperActions} lang="js" />
+
+## After the last step
+
+When the last step is finished, the stepper hides its panes and disables every step button, so the element that held focus, usually the **Finish** button, is gone and nothing in the stepper can take focus. Show your own completion message and move focus to it in the `finish.coreui.stepper` handler. Give the message `tabindex="-1"` so it can take focus. `reset()` moves focus to the step the stepper started on when focus was in a pane or step content it closes or on a step button, or when the `reset.coreui.stepper` or `stepChanged.coreui.stepper` handler hides, disables or removes the focused **Reset** button and moves focus nowhere else.
+
+<Example pro code={`<div class="stepper" data-coreui-stepper id="myStepperFinish">
+    <ol class="stepper-steps">
+      <li class="stepper-step">
+        <button type="button" class="stepper-step-button active" data-coreui-toggle="step" data-coreui-target="#finish-step-1">
+          <span class="stepper-step-indicator">1</span>
+          <span class="stepper-step-label">Step 1</span>
+        </button>
+      </li>
+      <li class="stepper-step">
+        <button type="button" class="stepper-step-button" data-coreui-toggle="step" data-coreui-target="#finish-step-2">
+          <span class="stepper-step-indicator">2</span>
+          <span class="stepper-step-label">Step 2</span>
+        </button>
+      </li>
+    </ol>
+    <div class="stepper-content">
+      <div class="stepper-pane" id="finish-step-1">
+        <p>The first step of the wizard.</p>
+        <button type="button" class="btn-solid theme-primary" data-coreui-stepper-action="next">Next</button>
+      </div>
+      <div class="stepper-pane" id="finish-step-2">
+        <p>The last step of the wizard.</p>
+        <button type="button" class="btn-solid theme-secondary" data-coreui-stepper-action="prev">Previous</button>
+        <button type="button" class="btn-solid theme-success" data-coreui-stepper-action="finish">Finish</button>
+      </div>
+    </div>
+    <div id="myStepperFinishMessage" hidden>
+      <p tabindex="-1">All steps are complete.</p>
+      <button type="button" class="btn-solid theme-danger" data-coreui-stepper-action="reset">Reset</button>
+    </div>
+  </div>`} sandboxJs={stepperFinish} />
+
+<Code code={stepperFinish} lang="js" />
 
 ## Form Validation
 
@@ -414,7 +521,13 @@ This example shows a stepper with native browser validation enabled. In a step f
         <button class="btn-solid theme-success" data-coreui-stepper-action="finish">Finish</button>
       </div>
     </div>
-  </div>`} />
+    <div id="validationStepperMessage" hidden>
+      <p tabindex="-1">All steps are complete.</p>
+      <button type="button" class="btn-solid theme-danger" data-coreui-stepper-action="reset">Reset</button>
+    </div>
+  </div>`} sandboxJs={stepperFinishValidation} />
+
+<Code code={stepperFinishValidation} lang="js" />
 
 ### Custom styles
 
@@ -476,7 +589,13 @@ To disable native browser styles validation and turn on custom styles, add the `
         <button class="btn-solid theme-success" data-coreui-stepper-action="finish">Finish</button>
       </div>
     </div>
-  </div>`} />
+    <div id="novalidateStepperMessage" hidden>
+      <p tabindex="-1">All steps are complete.</p>
+      <button type="button" class="btn-solid theme-danger" data-coreui-stepper-action="reset">Reset</button>
+    </div>
+  </div>`} sandboxJs={stepperFinishNovalidate} />
+
+<Code code={stepperFinishNovalidate} lang="js" />
 
 ### Skip validation
 
@@ -538,7 +657,13 @@ To skip form validation, so users can move on with an invalid step, add `data-co
         <button class="btn-solid theme-success" data-coreui-stepper-action="finish">Finish</button>
       </div>
     </div>
-  </div>`} />
+    <div id="skipValidationStepperMessage" hidden>
+      <p tabindex="-1">All steps are complete.</p>
+      <button type="button" class="btn-solid theme-danger" data-coreui-stepper-action="reset">Reset</button>
+    </div>
+  </div>`} sandboxJs={stepperFinishSkipValidation} />
+
+<Code code={stepperFinishSkipValidation} lang="js" />
 
 Validation is fully automatic, no extra JavaScript is needed.
 
@@ -579,7 +704,9 @@ The CoreUI Stepper Component is built with accessibility in mind:
 - **When the steps hold their own `.stepper-step-content`, the stepper is a list of expandable steps instead.** A tablist cannot own the form controls of the open step, so none of the tab roles are written: the list stays a list, each step stays a list item, and the buttons carry `aria-expanded` rather than `aria-selected`.
 - In the tab set, each step button is assigned `role="tab"` and attributes like `aria-selected`, `aria-controls` and `tabindex`, and its `.stepper-step` wrapper is marked `role="presentation"` so the tabs stay direct children of the list in the accessibility tree.
 - Step contents (`stepper-pane`) use `role="tabpanel"` and are properly linked to their trigger buttons.
-- When the step changes while focus is inside the stepper, for example on a **Next** button in the pane, focus moves to the new step's button, so a screen reader reads which step the user is on. A step changed from outside the stepper leaves focus where it is.
+- When the step changes while focus is in the pane or step content being closed, for example on a **Next** button in the pane, or on a step button, focus moves to the new step's button, so a screen reader reads which step the user is on. Focus on an element that stays visible, such as **Next** in `.stepper-actions` or a control outside the stepper, stays where it is. When a `stepChange.coreui.stepper` or `stepChanged.coreui.stepper` handler hides, disables or removes the focused element and moves focus nowhere else, focus moves to the new step's button.
+- With focus left on a button, the step change is not announced, because the panes are not live regions. Announce it in the `stepChanged.coreui.stepper` handler, for example with [`announce()`](/accessibility/screen-readers/#announcing-messages) and the label of the new step, or move focus into the new pane.
+- Finishing the wizard does not move focus: the stepper does not know what the page shows next. Show a completion message and move focus to it, as in [After the last step](#after-the-last-step).
 - When a step whose form has `novalidate` fails validation, the invalid controls get `aria-invalid="true"` and focus moves to the first of them that can take focus, as the browser does for a form without `novalidate`.
 - While the stepper marks a control invalid, its invalid feedback is added to its `aria-describedby`, the elements named in `data-coreui-invalid-feedback` or else the `.invalid-feedback` and `.invalid-tooltip` the stylesheet shows for it, so the validation message is read with the field when focus moves to it. When focus is already on the first invalid control, or no invalid control can take focus, the message is announced through [`announce()`](/accessibility/screen-readers/#announcing-messages) instead, or the browser's validation message when the control has none. The stepper does not rely on `aria-errormessage`, which VoiceOver does not read, and the panes are not live regions, so they do not repeat the message.
 - The roles and links are written when the stepper starts. After adding, removing or replacing steps, call `update()` so the new steps get them too.
@@ -651,8 +778,9 @@ const stepperList = stepperElementList.map(stepperEl => {
 | Event | Description |
 | --- | --- |
 | `finish.coreui.stepper` | Triggered when the last step is completed. |
-| `reset.coreui.stepper` | Triggered when the stepper is reset. |
-| `stepChange.coreui.stepper` | Fired when the active step changes. |
+| `reset.coreui.stepper` | Triggered when the stepper is reset. When the reset changes the step, it comes after `stepChange.coreui.stepper` and before `stepChanged.coreui.stepper`. |
+| `stepChange.coreui.stepper` | Fired when the active step is about to change, before the new step opens. `event.index` is the 1-based number of the new step. |
+| `stepChanged.coreui.stepper` | Fired after the active step has changed, once the new step is selected; in a `.stepper-vertical` stepper, once its content has expanded. `event.index` is the 1-based number of the new step. Not fired by `finish()`, by `update()`, when the stepper starts, or when `reset()` leaves the same step open. |
 | `stepValidationComplete.coreui.stepper` | Fired when the current step's form is validated, before the stepper decides. `event.stepIndex` is the 1-based number of the step validated; `event.isValid` tells whether every control passed; a validity the handler sets with `setCustomValidity()` counts for the step. |
 
 Example:
@@ -660,8 +788,8 @@ Example:
 ```js
 const myStepper = document.getElementById('myStepper')
 
-myStepper.addEventListener('stepChange.coreui.stepper', event => {
-  // console.log('Step changed to:', event.detail.index)
+myStepper.addEventListener('stepChanged.coreui.stepper', event => {
+  // console.log('Step changed to:', event.index)
 })
 ```
 

@@ -10,13 +10,13 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onDocumentReady } from './util/component-functions.js'
-import { rootActiveElement } from './util/focus.js'
+import { focusFirstUsable, rootActiveElement } from './util/focus.js'
 import {
   clearValidationState, followFormInput, isFormValid, updateValidationState, validateForm
 } from './util/form-validation.js'
 import type { ValidationMarks } from './util/form-validation.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, getUID, isDisabled, isForwardKey, isRTL, jQueryDispatch
+  defineJQueryPlugin, getNextActiveElement, getUID, isDisabled, isForwardKey, isRTL, isVisible, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -30,6 +30,7 @@ const EVENT_KEY = `.${DATA_KEY}`
 const EVENT_FINISH = `finish${EVENT_KEY}`
 const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_STEP_CHANGE = `stepChange${EVENT_KEY}`
+const EVENT_STEP_CHANGED = `stepChanged${EVENT_KEY}`
 const EVENT_STEP_VALIDATION_COMPLETE = `stepValidationComplete${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
@@ -46,6 +47,9 @@ const CLASS_NAME_STEPPER_VERTICAL = 'stepper-vertical'
 const SELECTOR_DATA_STEPPER = '[data-coreui-stepper]'
 const SELECTOR_STEPPER = '.stepper'
 const SELECTOR_STEPPER_ACTION = '[data-coreui-stepper-action]'
+const SELECTOR_STEPPER_ACTIONS = '.stepper-actions'
+const SELECTOR_STEPPER_ACTION_FINISH = '[data-coreui-stepper-action="finish"]'
+const SELECTOR_ACTIONS_FINISH = `${SELECTOR_STEPPER} > ${SELECTOR_STEPPER_ACTIONS} ${SELECTOR_STEPPER_ACTION_FINISH}`
 const SELECTOR_STEPPER_STEP = '.stepper-step'
 const SELECTOR_STEPPER_STEP_BUTTON = '.stepper-step-button'
 const SELECTOR_STEPPER_STEP_CONTENT = '.stepper-step-content'
@@ -153,17 +157,27 @@ class Stepper extends BaseComponent {
     }
 
     const index = this._stepButtons.indexOf(button) + 1
+    const focused = rootActiveElement(this._element)
+    const part = active && this._getStepPart(active)
+    const taken = Boolean(part?.contains(focused)) || this._stepButtons.includes(focused as HTMLButtonElement)
+    const content = SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, button.parentNode as ParentNode)
+    const changed = () => this._stepChanged(index, focused, button, taken)
+
     EventHandler.trigger(this._element, EVENT_STEP_CHANGE, { index })
 
-    const holdsFocus = this._holdsFocus()
     this._activeStepButton = button
     this._deactivate(active)
-    this._activate(button)
+    this._activate(button, content ? changed : undefined)
     this._updateStepButtonsDisabledState()
     this._updateCompleteStates(this._stepButtons.indexOf(button))
+    this._updateActions()
 
-    if (holdsFocus) {
+    if (content && taken) {
       button.focus()
+    }
+
+    if (!content) {
+      changed()
     }
   }
 
@@ -215,6 +229,7 @@ class Stepper extends BaseComponent {
     this._isFinished = true
     this._activeStepButton = null
     this._disableStepButtons()
+    this._updateActions()
 
     const finishHandler = () => {
       active.classList.remove(CLASS_NAME_ACTIVE)
@@ -242,7 +257,16 @@ class Stepper extends BaseComponent {
       return
     }
 
-    const holdsFocus = this._holdsFocus()
+    const focused = rootActiveElement(this._element)
+    const firstStep = this._initialStepButton || this._stepButtons[0]
+    const index = this._stepButtons.indexOf(firstStep) + 1
+    const changes = firstStep !== this._activeStepButton
+    const part = focused?.closest(`${SELECTOR_STEPPER_PANE}, ${SELECTOR_STEPPER_STEP_CONTENT}`)
+    const taken = (this._element.contains(part!) && part !== this._getStepPart(firstStep)) || this._stepButtons.includes(focused as HTMLButtonElement)
+
+    if (changes) {
+      EventHandler.trigger(this._element, EVENT_STEP_CHANGE, { index })
+    }
 
     for (const form of this._element.querySelectorAll(`${SELECTOR_STEPPER_PANE} form, ${SELECTOR_STEPPER_STEP_CONTENT} form`)) {
       (form as HTMLFormElement).reset()
@@ -252,7 +276,6 @@ class Stepper extends BaseComponent {
       this._untrackValidatedForm(form)
     }
 
-    const firstStep = this._initialStepButton || this._stepButtons[0]
     this._openStep(firstStep)
     this._updateCompleteStates(this._stepButtons.indexOf(firstStep))
 
@@ -260,12 +283,15 @@ class Stepper extends BaseComponent {
     this._isFinished = false
     this._updateStepButtonsDisabledState()
     this._setupAccessibilityAttributes()
-
-    if (holdsFocus) {
-      firstStep.focus()
-    }
+    this._updateActions()
 
     EventHandler.trigger(this._element, EVENT_RESET)
+
+    if (changes) {
+      this._stepChanged(index, focused, firstStep, taken)
+    } else {
+      this._restoreFocus(focused, firstStep, taken)
+    }
   }
 
   update(): void {
@@ -311,6 +337,7 @@ class Stepper extends BaseComponent {
     }
 
     this._setupAccessibilityAttributes()
+    this._updateActions()
   }
 
   override dispose(): void {
@@ -345,10 +372,6 @@ class Stepper extends BaseComponent {
   _isActionOfInactiveStep(action: Element): boolean {
     const content = action.closest(SELECTOR_STEPPER_STEP_CONTENT)
     return Boolean(content) && content!.parentNode!.querySelector(SELECTOR_STEPPER_STEP_BUTTON) !== this._activeStepButton
-  }
-
-  _holdsFocus(): boolean {
-    return this._element.contains(rootActiveElement(this._element))
   }
 
   _isCurrentStepValid(element: any): boolean {
@@ -406,7 +429,7 @@ class Stepper extends BaseComponent {
     this._validatedForms.delete(form)
   }
 
-  _activate(element: any): void {
+  _activate(element: any, callback?: () => void): void {
     if (!element) {
       return
     }
@@ -418,7 +441,54 @@ class Stepper extends BaseComponent {
 
     const stepContentElement = SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, element.parentNode)
     if (stepContentElement) {
-      this._animateHeight(stepContentElement, true)
+      this._animateHeight(stepContentElement, true, callback)
+    }
+  }
+
+  _stepChanged(index: number, focused: Element | null, button: HTMLElement, taken: boolean): void {
+    EventHandler.trigger(this._element, EVENT_STEP_CHANGED, { index })
+    this._restoreFocus(focused, button, taken)
+  }
+
+  _getStepPart(button: HTMLElement): HTMLElement | null {
+    return this._getTargetPane(button) || SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, button.parentNode as ParentNode)
+  }
+
+  _restoreFocus(focused: Element | null, button: HTMLElement, taken: boolean): void {
+    const active = rootActiveElement(this._element) ?? document.activeElement
+
+    if (!focused || focused === document.body || !(active === document.body || (active === focused && (taken || !isVisible(focused) || focused.matches(':disabled'))))) {
+      return
+    }
+
+    const actions = this._getActions()
+    const finish = actions?.contains(focused) ? SelectorEngine.findOne<HTMLElement>(SELECTOR_STEPPER_ACTION_FINISH, actions) : null
+    focusFirstUsable([finish, button])
+  }
+
+  _getActions(): HTMLElement | null {
+    return SelectorEngine.findOne(`:scope > ${SELECTOR_STEPPER_ACTIONS}`, this._element)
+  }
+
+  _updateActions(): void {
+    const actions = this._getActions()
+
+    if (!actions) {
+      return
+    }
+
+    const steps = this._getEnabledStepButtons()
+    const index = steps.indexOf(this._activeStepButton!)
+    actions.hidden = this._isFinished
+
+    for (const button of SelectorEngine.find<HTMLButtonElement>(SELECTOR_STEPPER_ACTION, actions)) {
+      const action = Manipulator.getDataAttribute(button, 'stepper-action')
+
+      if (action === 'prev') {
+        button.disabled = index < 1
+      } else if (action === 'next' || action === 'finish') {
+        button.hidden = (index === steps.length - 1) === (action === 'next')
+      }
     }
   }
 
@@ -719,10 +789,16 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_STEPPER_STEP_BUTTON, fu
   stepper.showStep(this)
 })
 
-EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_STEPPER_ACTION, function () {
+EventHandler.on(document, EVENT_KEYDOWN, SELECTOR_ACTIONS_FINISH, event => {
+  if (event.repeat && event.key === 'Enter') {
+    event.preventDefault()
+  }
+})
+
+EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_STEPPER_ACTION, function (event) {
   const action = Manipulator.getDataAttribute(this, 'stepper-action')
   const stepperElement = this.closest(SELECTOR_STEPPER)
-  if (!stepperElement) {
+  if (!stepperElement || (event.detail > 1 && this.matches(SELECTOR_ACTIONS_FINISH))) {
     return
   }
 
