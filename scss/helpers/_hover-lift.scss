@@ -31,7 +31,8 @@ $hover-lift-tokens: defaults(
     );
 
     &:hover,
-    &:focus-visible {
+    &:focus-visible,
+    &[aria-expanded="true"] {
       transform: var(--#{$prefix}hover-lift-transform);
       @include box-shadow(var(--#{$prefix}hover-lift-box-shadow));
     }

@@ -48,6 +48,7 @@ $popover-tokens: defaults(
 
     z-index: var(--#{$prefix}popover-zindex);
     display: block;
+    width: max-content;
     max-width: var(--#{$prefix}popover-max-width);
     // Our parent element can be arbitrary since tooltips are by default inserted as a sibling of their target element.
     // So reset our font and text properties to avoid inheriting weird values.

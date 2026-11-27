@@ -6,7 +6,7 @@ description: "Lift an element and add a shadow on hover or focus for a subtle se
 
 ## How it works
 
-Add `.hover-lift` to any element to translate it upward and deepen its `box-shadow` on `:hover` and `:focus-visible`. It is a lightweight way to signal that a card, tile or other surface is interactive.
+Add `.hover-lift` to any element to translate it upward and deepen its `box-shadow` on `:hover` and `:focus-visible`, and while it is expanded (`aria-expanded="true"`), so a menu toggle stays raised while its menu is open. It is a lightweight way to signal that a card, tile or other surface is interactive.
 
 The effect sets only `transform` and `box-shadow`, so it composes with anything — cards, buttons, list items, plain containers — and it honours [`prefers-reduced-motion`](/accessibility/reduced-motion/): a reader who asks for reduced motion still gets the raised shadow and offset, without the animation.
 

@@ -1629,6 +1629,31 @@ describe('Tooltip', () => {
       })
     })
 
+    it('should keep a manually shown tip open after setContent', async () => {
+      fixtureEl.innerHTML = '<button type="button" data-coreui-title="Original tooltip">Help</button>'
+
+      const tooltipEl = fixtureEl.querySelector('button')
+      const tooltip = new Tooltip(tooltipEl, { animation: false, trigger: 'manual' })
+      await new Promise(resolve => {
+        tooltipEl.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+        tooltip.show()
+      })
+
+      const shown = new Promise(resolve => {
+        tooltipEl.addEventListener('shown.coreui.tooltip', resolve, { once: true })
+      })
+      tooltip.setContent({ '.tooltip-inner': 'Updated tooltip' })
+      await shown
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
+      const tip = tooltip._getTipElement()
+      expect(tip.isConnected).toBeTrue()
+      expect(tip).toHaveClass('show')
+      expect(tip.querySelector('.tooltip-inner').textContent).toEqual('Updated tooltip')
+    })
+
     it('should keep tip hidden, if it was already hidden before', () => {
       fixtureEl.innerHTML = '<a href="#" rel="tooltip" data-coreui-title="Another tooltip"></a>'
 
