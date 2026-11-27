@@ -2711,8 +2711,8 @@ for `numbers`. Before, any character outside `A-Z`, `a-z`, `0-9` and `_` that
 was not whitespace counted as a symbol, so `ą` or `日` raised the score as a
 symbol and a passphrase such as `correct horse battery` got none. Letters of
 scripts without case, such as Chinese, Arabic or Hebrew, now count for none of
-these rules, so a password written only in them scores lower than before;
-others score higher. Set `weights` or pass your own scorer to change it.
+these rules, so a password written only in them loses the two symbol points
+and, from 8 characters up, drops one level; other passwords score higher. Set `weights` or pass your own scorer to change it.
 
 #### Password Strength: the level text keeps text contrast
 
