@@ -62,6 +62,7 @@
     font-size: var(--#{$prefix}form-feedback-font-size);
     font-style: var(--#{$prefix}form-feedback-font-style, inherit);
     color: $color;
+    overflow-wrap: anywhere;
   }
 
   // More specific to override base tooltip styles
@@ -79,6 +80,7 @@
     font-size: var(--#{$prefix}tooltip-font-size, var(--#{$prefix}form-feedback-tooltip-font-size));
     line-height: var(--#{$prefix}form-feedback-tooltip-line-height, inherit);
     color: $tooltip-color;
+    overflow-wrap: anywhere;
     background-color: var(--#{$prefix}#{$theme}-bg);
     opacity: 1;
     @include border-radius(var(--#{$prefix}tooltip-border-radius, var(--#{$prefix}form-feedback-tooltip-border-radius)));
@@ -342,6 +344,8 @@
   .form-range-input#{$range-without-error},
   input.form-range#{$range-without-error} {
     @include form-validation-state-selector($state) {
+      --#{$prefix}theme-bg: var(--#{$prefix}#{$theme}-bg);
+
       &::-webkit-slider-thumb { background: var(--#{$prefix}#{$theme}-bg); }
       &::-moz-range-thumb { background: var(--#{$prefix}#{$theme}-bg); }
 

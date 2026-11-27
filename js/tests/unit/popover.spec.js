@@ -1711,6 +1711,68 @@ describe('Popover', () => {
 
       expect(preventDefaultSpy).toHaveBeenCalled()
     })
+
+    it('should not prevent default on click via data-api for a hover or focus popover', () => {
+      fixtureEl.innerHTML = '<a href="#test" data-coreui-toggle="popover" data-coreui-trigger="hover focus" title="Popover Title" data-coreui-content="Popover content">Profile</a>'
+
+      const popoverEl = fixtureEl.querySelector('[data-coreui-toggle="popover"]')
+      const clickEvent = createEvent('click')
+      const preventDefaultSpy = spyOn(clickEvent, 'preventDefault').and.callThrough()
+
+      popoverEl.dispatchEvent(clickEvent)
+
+      expect(preventDefaultSpy).not.toHaveBeenCalled()
+      expect(Popover.getInstance(popoverEl)).not.toBeNull()
+    })
+
+    it('should prevent default on click via data-api when click is one of several triggers', () => {
+      fixtureEl.innerHTML = '<a href="#test" data-coreui-toggle="popover" data-coreui-trigger="click hover" title="Popover Title" data-coreui-content="Popover content">Profile</a>'
+
+      const popoverEl = fixtureEl.querySelector('[data-coreui-toggle="popover"]')
+      const clickEvent = createEvent('click')
+      const preventDefaultSpy = spyOn(clickEvent, 'preventDefault').and.callThrough()
+
+      popoverEl.dispatchEvent(clickEvent)
+
+      expect(preventDefaultSpy).toHaveBeenCalled()
+    })
+
+    it('should keep the default action of an anchor of a hover popover wrapper', () => {
+      fixtureEl.innerHTML = '<div data-coreui-toggle="popover" data-coreui-anchors="a" data-coreui-trigger="hover focus"><a href="#other" data-coreui-content="x">Other</a></div>'
+      const click = new MouseEvent('click', { bubbles: true, cancelable: true })
+
+      fixtureEl.querySelector('a').dispatchEvent(click)
+
+      expect(click.defaultPrevented).toBeFalse()
+      Popover.getInstance(fixtureEl.querySelector('div'))?.dispose()
+    })
+
+    it('should let a checkbox with a hover popover change state via data-api', () => {
+      fixtureEl.innerHTML = '<input type="checkbox" data-coreui-toggle="popover" data-coreui-trigger="hover focus" data-coreui-content="One email per month">'
+
+      const checkboxEl = fixtureEl.querySelector('input')
+      checkboxEl.click()
+
+      expect(checkboxEl.checked).toBeTrue()
+    })
+
+    it('should let a submit button in a hover popover wrapper submit its form via data-api', () => {
+      fixtureEl.innerHTML = [
+        '<form>',
+        '  <span class="d-inline-block" tabindex="0" data-coreui-toggle="popover" data-coreui-trigger="hover focus" data-coreui-content="Popover content">',
+        '    <button type="submit">Save</button>',
+        '  </span>',
+        '</form>'
+      ].join('')
+
+      const formEl = fixtureEl.querySelector('form')
+      const submitSpy = jasmine.createSpy('submit').and.callFake(event => event.preventDefault())
+      formEl.addEventListener('submit', submitSpy)
+
+      formEl.querySelector('button').click()
+
+      expect(submitSpy).toHaveBeenCalled()
+    })
   })
 
   describe('jQueryInterface', () => {

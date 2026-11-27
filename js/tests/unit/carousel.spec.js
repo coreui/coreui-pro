@@ -1363,24 +1363,49 @@ describe('Carousel', () => {
   })
 
   describe('keyboard', () => {
-    it('should go to the next item on right arrow and previous on left arrow', () => {
-      fixtureEl.innerHTML = basicMarkup()
+    for (const [direction, nextKey, prevKey] of [
+      ['ltr', 'ArrowRight', 'ArrowLeft'],
+      ['rtl', 'ArrowLeft', 'ArrowRight']
+    ]) {
+      it(`should move to the next and previous slides with the arrow keys in ${direction}`, () => {
+        fixtureEl.innerHTML = basicMarkup()
+        document.documentElement.dir = direction
+
+        const carouselEl = fixtureEl.querySelector('#myCarousel')
+        const carousel = new Carousel(carouselEl)
+        const nextSpy = spyOn(carousel, 'next')
+        const prevSpy = spyOn(carousel, 'prev')
+
+        const next = createEvent('keydown')
+        next.key = nextKey
+        carouselEl.dispatchEvent(next)
+
+        expect(nextSpy).toHaveBeenCalledTimes(1)
+        expect(prevSpy).not.toHaveBeenCalled()
+
+        const prev = createEvent('keydown')
+        prev.key = prevKey
+        carouselEl.dispatchEvent(prev)
+
+        expect(prevSpy).toHaveBeenCalledTimes(1)
+        expect(nextSpy).toHaveBeenCalledTimes(1)
+      })
+    }
+
+    it('should move to the next slide with the left arrow inside an RTL subtree of an LTR page', () => {
+      fixtureEl.innerHTML = `<div dir="rtl">${basicMarkup()}</div>`
 
       const carouselEl = fixtureEl.querySelector('#myCarousel')
       const carousel = new Carousel(carouselEl)
       const nextSpy = spyOn(carousel, 'next')
       const prevSpy = spyOn(carousel, 'prev')
 
-      const right = createEvent('keydown')
-      right.key = 'ArrowRight'
-      carouselEl.dispatchEvent(right)
-
       const left = createEvent('keydown')
       left.key = 'ArrowLeft'
       carouselEl.dispatchEvent(left)
 
-      expect(nextSpy).toHaveBeenCalled()
-      expect(prevSpy).toHaveBeenCalled()
+      expect(nextSpy).toHaveBeenCalledTimes(1)
+      expect(prevSpy).not.toHaveBeenCalled()
     })
 
     it('should ignore keystrokes from inputs and textareas', () => {
