@@ -2702,6 +2702,18 @@ buttons, and neither the button nor `toggle()` changes what a disabled field
 shows: a password revealed before the field is disabled stays visible, and
 can be hidden once the field is enabled again.
 
+#### Password Strength: what counts as a symbol, a letter and a digit
+
+The built-in scorer counts punctuation, symbols and ordinary spaces as symbols
+(`special`, `multipleSpecial`), lowercase and uppercase letters of every script
+with case for `lowercase` and `uppercase`, and decimal digits of every script
+for `numbers`. Before, any character outside `A-Z`, `a-z`, `0-9` and `_` that
+was not whitespace counted as a symbol, so `ą` or `日` raised the score as a
+symbol and a passphrase such as `correct horse battery` got none. Letters of
+scripts without case, such as Chinese, Arabic or Hebrew, now count for none of
+these rules, so a password written only in them scores lower than before;
+others score higher. Set `weights` or pass your own scorer to change it.
+
 #### Password Strength: the level text keeps text contrast
 
 The level text (`.password-strength-text`) took the segment color, the

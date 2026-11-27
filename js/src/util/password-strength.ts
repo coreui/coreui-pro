@@ -25,11 +25,11 @@ const RULES: Record<string, (password: string, minLength: number) => boolean> = 
   minLength: (password, minLength) => password.length >= minLength,
   extraLength: (password, minLength) => password.length >= minLength + 4,
   longPassword: password => password.length >= 16,
-  lowercase: password => /[a-z]/.test(password),
-  uppercase: password => /[A-Z]/.test(password),
-  numbers: password => /\d/.test(password),
-  special: password => /[^\w\s]/.test(password),
-  multipleSpecial: password => /[^\w\s].*[^\w\s]/.test(password)
+  lowercase: password => /\p{Ll}/u.test(password),
+  uppercase: password => /\p{Lu}/u.test(password),
+  numbers: password => /\p{Nd}/u.test(password),
+  special: password => /[ \p{P}\p{S}]/u.test(password),
+  multipleSpecial: password => /[ \p{P}\p{S}].*[ \p{P}\p{S}]/u.test(password)
 }
 
 /**
