@@ -220,6 +220,10 @@ $stepper-tokens: defaults(
     .stepper-step-content {
       padding-inline-start: calc(var(--#{$prefix}stepper-step-indicator-width) + var(--#{$prefix}stepper-step-connector-gap) / 2);
       @include transition(var(--#{$prefix}stepper-step-content-transition));
+
+      &.collapsing {
+        display: block;
+      }
     }
 
     .stepper-step .stepper-step-button:not(.active) ~ .stepper-step-content:not(.collapsing, .collapse) {
