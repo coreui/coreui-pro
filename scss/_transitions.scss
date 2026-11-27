@@ -97,12 +97,15 @@ $collapse-tokens: defaults(
   @supports (interpolate-size: allow-keywords) {
     .collapse {
       interpolate-size: allow-keywords;
-      @include transition-props(
-        var(--#{$prefix}transition-collapse-property),
-        var(--#{$prefix}transition-collapse-duration),
-        var(--#{$prefix}transition-collapse-timing),
-        allow-discrete
-      );
+
+      &:not(:where(.collapse-instant)) {
+        @include transition-props(
+          var(--#{$prefix}transition-collapse-property),
+          var(--#{$prefix}transition-collapse-duration),
+          var(--#{$prefix}transition-collapse-timing),
+          allow-discrete
+        );
+      }
 
       // `until-found` content is hidden by the browser instead, which keeps it
       // laid out so find-in-page can reach it. `display: none` would take it
@@ -154,11 +157,14 @@ $collapse-tokens: defaults(
     .collapsing {
       height: 0;
       overflow: hidden;
-      @include transition-props(
-        var(--#{$prefix}transition-collapse-property),
-        var(--#{$prefix}transition-collapse-duration),
-        var(--#{$prefix}transition-collapse-timing)
-      );
+
+      &:not(:where(.collapse-instant)) {
+        @include transition-props(
+          var(--#{$prefix}transition-collapse-property),
+          var(--#{$prefix}transition-collapse-duration),
+          var(--#{$prefix}transition-collapse-timing)
+        );
+      }
 
       &.collapse-horizontal {
         --#{$prefix}transition-collapse-property: width;
