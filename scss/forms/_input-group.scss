@@ -59,6 +59,7 @@ $input-group-tokens: defaults(
     }
 
     // Bring the "active" form control to the top of surrounding elements
+    > .date-picker:focus-within,
     > .form-control-group:focus-within,
     > .form-control:focus,
     > .form-select:focus,

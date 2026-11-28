@@ -1,8 +1,6 @@
-@use "../functions/escape-svg" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/form-validation" as *;
-@use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
@@ -362,14 +360,14 @@
   }
 
   .input-group {
-    > .autocomplete:focus-within,
-    > .date-picker:focus-within,
-    > .time-picker:focus-within,
-    > .form-control-group:focus-within,
-    > .multi-select:focus-within,
-    > .form-control:focus,
-    > .form-select:focus,
-    > .form-floating:focus-within {
+    > .autocomplete:not(:focus-within),
+    > .date-picker:not(:focus-within),
+    > .time-picker:not(:focus-within),
+    > .form-control-group:not(:focus-within),
+    > .multi-select:not(:focus-within),
+    > .form-control:not(:focus),
+    > .form-select:not(:focus),
+    > .form-floating:not(:focus-within) {
       @include form-validation-state-selector($state) {
         @if $state == "valid" {
           z-index: 3;
@@ -405,7 +403,7 @@
 }
 // scss-docs-end form-validation-state-mixin
 
-@layer forms {
+@layer components {
   // scss-docs-start form-validation-states-loop
   @each $state, $data in $form-validation-states {
     @include form-validation-state($state, $data...);
