@@ -1,6 +1,5 @@
 @use "../functions/defaults" as *;
 @use "focus-ring" as *;
-@use "../colors" as *;
 @use "../config" as *;
 
 // This mixin uses an `if()` technique to be compatible with Dart Sass
