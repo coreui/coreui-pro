@@ -340,6 +340,23 @@ describe('messages of a form field', () => {
     combobox.dispose()
   })
 
+  it('shows the tooltip message of the state over the base tooltip styles and hides the others', () => {
+    const tooltips = '<div class="tooltip invalid-tooltip">Error</div><div class="tooltip valid-tooltip">Looks good!</div>'
+    mount(`<input class="form-control" data-test>${tooltips}`)
+    const shown = selector => {
+      const { display, opacity } = getComputedStyle(container.querySelector(selector))
+      return `${display} ${opacity}`
+    }
+
+    expect([shown('.invalid-tooltip'), shown('.valid-tooltip')]).toEqual(['none 1', 'none 1'])
+
+    container.querySelector('[data-test]').classList.add('is-invalid')
+    expect([shown('.invalid-tooltip'), shown('.valid-tooltip')]).toEqual(['block 1', 'none 1'])
+
+    container.querySelector('[data-test]').classList.replace('is-invalid', 'is-valid')
+    expect([shown('.invalid-tooltip'), shown('.valid-tooltip')]).toEqual(['none 1', 'block 1'])
+  })
+
   it('colours a check, a radio and a switch, and their label, with the state', () => {
     for (const [markup, framed] of [
       ['<input class="check is-invalid" type="checkbox" id="c"><label for="c">Agree</label>', '.check'],

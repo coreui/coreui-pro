@@ -403,7 +403,7 @@
 }
 // scss-docs-end form-validation-state-mixin
 
-@layer forms {
+@layer components {
   // scss-docs-start form-validation-states-loop
   @each $state, $data in $form-validation-states {
     @include form-validation-state($state, $data...);
